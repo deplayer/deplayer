@@ -33,6 +33,7 @@
     "promise": "8.0.1",
     "raf": "3.4.0",
     "react": "^16.3.2",
+    "react-audioplayer": "^0.3.1",
     "react-dev-utils": "^5.0.1",
     "react-dom": "^16.3.2",
     "react-redux": "^5.0.7",

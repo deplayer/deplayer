@@ -2,7 +2,11 @@ import { isTrack } from './format-utils'
 
 const DatArchive = window.DatArchive
 let archive
-const files = []
+let files = []
+
+if (localStorage.getItem('files')) {
+  files = JSON.parse(localStorage.getItem('files'))
+}
 
 export const fetchPlaylist = (libraryDat) => {
   archive = new DatArchive(libraryDat)
@@ -11,18 +15,34 @@ export const fetchPlaylist = (libraryDat) => {
 }
 
 const readFolder = (folder = '/') => {
-  console.log(isTrack(folder))
-  if (isTrack(folder)) {
-    return addFile(folder)
-  }
+  archive.readdir(folder).then((retrievedFiles) => {
+    retrievedFiles.forEach((file) => {
+      let fullPath
 
-  archive.readdir(folder).then((files) => {
-    files.forEach((file) => {
       if (folder === '/') {
-        readFolder(folder + file)
+        fullPath = folder + file
       } else {
-        readFolder(folder + '/' + file)
+        fullPath = folder + '/' + file
       }
+
+      // We dont want to exec a query if we have saved this track previously
+      if (fileInCollection(file)) {
+        return
+      }
+
+      archive.stat(fullPath).then((stat) => {
+        if (stat.isFile()) {
+          if (isTrack(fullPath)) {
+            return addFile(fullPath)
+          }
+        } else {
+          readFolder(fullPath)
+        }
+      })
+        .catch((e) => {
+          console.error('Error stating file %s', fullPath)
+          console.error(e)
+        })
     })
   })
     .catch((e) => {
@@ -32,6 +52,20 @@ const readFolder = (folder = '/') => {
 }
 
 const addFile = (file) => {
-  console.info('Enqueing %s', file)
+  if (fileInCollection(file)) {
+    return
+  }
+
+  console.log('Adding %s', file)
+
   files.push(file)
+  localStorage.setItem('files', JSON.stringify(files))
+}
+
+const fileInCollection = (file) => {
+  if (file && files.indexOf(file) > -1) {
+    return true
+  }
+
+  return false
 }

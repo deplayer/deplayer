@@ -1,3 +1,8 @@
 export const isTrack = (file) => {
-  return file.match(/^.*\.[wav|ogg|mp3]$/)
+  const results = file.match(/^.*.[wav|ogg|mp3]$/)
+  if (results && results.length) {
+    return true
+  }
+
+  return false
 }
