@@ -1,24 +1,20 @@
-import './App.css';
-
 import React, { Component } from 'react';
+import PlaylistContainer from './containers/PlaylistContainer'
+import PlayerContainer from './containers/PlayerContainer'
+import { Provider } from 'react-redux'
+import configureStore from './store/configureStore'
 
-import Player from './components/Player';
-import Track from './components/Track';
-import logo from './logo.svg';
+const appStore = configureStore()
 
 class App extends Component {
   render() {
-    const tracks = this.props.files.map((track) => {
-      return <Track track={track} />
-    })
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <Player urlBase={this.props.urlBase} tracks={this.props.files} />
-      </div>
+      <Provider store={appStore}>
+        <div className="App">
+          <PlaylistContainer />
+          <PlayerContainer />
+        </div>
+      </Provider>
     );
   }
 }

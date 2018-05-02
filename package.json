@@ -33,7 +33,6 @@
     "promise": "8.0.1",
     "raf": "3.4.0",
     "react": "^16.3.2",
-    "react-audioplayer": "^0.3.1",
     "react-dev-utils": "^5.0.1",
     "react-dom": "^16.3.2",
     "react-redux": "^5.0.7",
@@ -93,5 +92,11 @@
   },
   "eslintConfig": {
     "extends": "react-app"
+  },
+  "devDependencies": {
+    "js-yaml": "^3.11.0",
+    "redux-logger": "^3.0.6",
+    "redux-promise": "^0.5.3",
+    "redux-thunk": "^2.2.0"
   }
 }
