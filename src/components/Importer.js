@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import parsers from 'playlist-parser'
+import saveCollectionItems from '../db/collection-store'
 
 const getAsText = (readFile) => {
   var reader = new FileReader()
@@ -25,16 +27,11 @@ const updateProgress = (evt) => {
 
 const loaded = (evt) => {
   // Obtain the read file data
-  var fileString = evt.target.result;
-  console.log(fileString)
-  // Handle UTF-16 file dump
-  // if(utils.regexp.isChinese(fileString)) {
-    //Chinese Characters + Name validation
-  // }
-  // else {
-    // run other charset test
-  // }
-  // xhr.send(fileString)
+  const fileString = evt.target.result
+  const M3U = parsers.M3U
+  const playlist = M3U.parse(fileString)
+  saveCollectionItems(playlist)
+  console.log(playlist)
 }
 
 const errorHandler = (evt) => {
@@ -52,7 +49,7 @@ export default class Importer extends Component {
   }
 
   startImport() {
-    const file = this.fileInput.current[0]
+    const file = this.fileInput.current.files[0]
     if (file) {
       getAsText(file)
     }

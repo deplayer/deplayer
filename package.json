@@ -27,6 +27,7 @@
     "fs-extra": "3.0.1",
     "html-webpack-plugin": "2.29.0",
     "jest": "20.0.4",
+    "md5": "^2.2.1",
     "object-assign": "4.1.1",
     "playlist-parser": "^0.0.12",
     "postcss-flexbugs-fixes": "3.2.0",
