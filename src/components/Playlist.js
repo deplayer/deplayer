@@ -1,9 +1,23 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types'
+import PlaylistTrack from './PlaylistTrack'
 
-export default class Playelist extends Component {
+class Playlist extends Component {
   render() {
+    const rows = this.props.playlist.tracks.map((track) => {
+      return <PlaylistTrack label={track.label} />
+    })
+
     return (
-      <div></div>
+      <div>
+        {rows}
+      </div>
     )
   }
 }
+
+Playlist.propTypes = {
+  playlist: PropTypes.object.isRequired
+}
+
+export default  Playlist
