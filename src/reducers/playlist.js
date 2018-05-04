@@ -1,6 +1,5 @@
 const defaultState = {
   currentPlaying: {
-    url: ''
   },
   tracks: [
     {
@@ -10,5 +9,11 @@ const defaultState = {
 }
 
 export default (state = defaultState, action = {}) => {
-  return state
+  switch (action.type) {
+    case 'SET_CURRENT_PLAYING':
+      return {...state, currentPlaying: action.song}
+
+    default:
+      return state
+  }
 }

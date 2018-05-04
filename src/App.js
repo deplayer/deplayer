@@ -23,6 +23,16 @@ const Home = () => {
   )
 }
 
+
+const CollectionPage = () => {
+  return (
+    <div>
+      <CollectionContainer  />
+      <PlayerContainer />
+    </div>
+  )
+}
+
 class App extends Component {
   render() {
     return (
@@ -36,7 +46,7 @@ class App extends Component {
             </ul>
             <Route exact path="/" component={Home} />
             <Route path="/import" component={ImporterContainer} />
-            <Route path="/collection" component={CollectionContainer} />
+            <Route path="/collection" component={CollectionPage} />
           </div>
         </Router>
       </Provider>

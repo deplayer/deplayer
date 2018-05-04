@@ -11,7 +11,11 @@ export default class Collection extends Component {
 
   render() {
     const songs = this.props.collection.visibleSongs.map((visibleSong) => {
-      return <CollectionRow key={visibleSong._id} song={visibleSong} />
+      return <CollectionRow
+        key={visibleSong._id}
+        dispatch={this.props.dispatch}
+        song={visibleSong}
+      />
     })
 
     return (

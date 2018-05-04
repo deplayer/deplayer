@@ -2,5 +2,7 @@ import { connect } from 'react-redux'
 import Player from '../components/Player'
 
 export default connect(
-  (state) => ({})
+  (state) => ({
+    playlist: state.playlist
+  })
 )(Player)
