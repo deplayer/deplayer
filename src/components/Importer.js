@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import parsers from 'playlist-parser'
-import saveCollectionItems from '../db/collection-store'
+import { saveCollectionItems } from '../db/collection-store'
 
 const getAsText = (readFile) => {
   var reader = new FileReader()
