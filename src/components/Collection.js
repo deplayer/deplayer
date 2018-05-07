@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 
 import { getCollection } from '../actions/collection';
-import CollectionRow from './CollectionRow';
+import ReactTable from "react-table";
+import 'react-table/react-table.css'
 
 export default class Collection extends Component {
   componentWillMount () {
@@ -10,17 +11,33 @@ export default class Collection extends Component {
   }
 
   render() {
-    const songs = this.props.collection.visibleSongs.map((visibleSong) => {
-      return <CollectionRow
-        key={visibleSong._id}
-        dispatch={this.props.dispatch}
-        song={visibleSong}
-      />
-    })
+    const columns = [
+      {
+        Header: 'Artist',
+        accessor: 'doc.artist' // String-based value accessors!
+      },
+      {
+        Header: 'Title',
+        accessor: 'doc.title' // String-based value accessors!
+      },
+      {
+        Header: 'Length',
+        accessor: 'doc.length' // String-based value accessors!
+      },
+    ]
 
     return (
       <div>
-        { songs }
+        <ReactTable
+          data={this.props.collection.rows}
+          columns={columns}
+          defaultSorted={[
+            {
+              id: 'doc.artist',
+              desc: false
+            }
+          ]}
+        />
         Total songs {this.props.collection.totalRows}
       </div>
     )
