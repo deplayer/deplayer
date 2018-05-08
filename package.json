@@ -100,8 +100,11 @@
     "extends": "react-app"
   },
   "devDependencies": {
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
     "js-yaml": "^3.11.0",
     "redux-logger": "^3.0.6",
+    "redux-mock-store": "^1.5.1",
     "redux-promise": "^0.5.3",
     "redux-thunk": "^2.2.0"
   }

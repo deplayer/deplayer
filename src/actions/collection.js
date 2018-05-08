@@ -1,6 +1,6 @@
 import * as db from '../db/collection-store';
 
-export function getCollection() {
+export const getCollection = () => {
   return function (dispatch) {
     dispatch({type: 'GET_COLLECTION'})
 
@@ -10,7 +10,7 @@ export function getCollection() {
   }
 }
 
-export function fillVisibleSongs(songsIds) {
+export const fillVisibleSongs = (songsIds) => {
   return function (dispatch) {
     dispatch({type: 'FILL_VISIBLE_SONGS'})
 

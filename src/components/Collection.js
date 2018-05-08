@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types'
 
 import { getCollection } from '../actions/collection';
 import { setCurrentPlaying } from '../actions/playlist'
 import ReactTable from "react-table";
 import 'react-table/react-table.css'
 
-export default class Collection extends Component {
+class Collection extends Component {
   componentWillMount () {
     const { dispatch } = this.props
     dispatch(getCollection())
@@ -19,15 +20,15 @@ export default class Collection extends Component {
     const columns = [
       {
         Header: 'Artist',
-        accessor: 'doc.artist' // String-based value accessors!
+        accessor: 'doc.artist'
       },
       {
         Header: 'Title',
-        accessor: 'doc.title' // String-based value accessors!
+        accessor: 'doc.title'
       },
       {
         Header: 'Length',
-        accessor: 'doc.length' // String-based value accessors!
+        accessor: 'doc.length'
       },
       {
         Header: 'Actions',
@@ -39,9 +40,9 @@ export default class Collection extends Component {
     ]
 
     return (
-      <div>
+      <div className='collection'>
         <ReactTable
-          data={this.props.collection.rows}
+          data={this.props.data}
           columns={columns}
           defaultSorted={[
             {
@@ -50,8 +51,18 @@ export default class Collection extends Component {
             }
           ]}
         />
-        Total songs {this.props.collection.totalRows}
+        Total songs {this.props.total}
       </div>
     )
   }
 }
+
+Collection.propTypes = {
+  data: PropTypes.array.isRequired,
+  page: PropTypes.number.isRequired,
+  pages: PropTypes.number.isRequired,
+  total: PropTypes.number.isRequired,
+  dispatch: PropTypes.func.isRequired
+}
+
+export default Collection
