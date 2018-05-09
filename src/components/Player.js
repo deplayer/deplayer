@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types'
 
-export default class Player extends Component {
+// TODO: Fill all events https://www.w3schools.com/tags/ref_av_dom.asp
+class Player extends Component {
   constructor(props) {
     super(props)
     this.playerRef = React.createRef()
@@ -12,14 +14,25 @@ export default class Player extends Component {
     }
   }
 
+  logError(ev) {
+    console.log(ev)
+  }
+
   render() {
     const currentPlaying = this.props.playlist.currentPlaying
     return (
       <audio
         ref={this.playerRef}
         src={currentPlaying.file}
+        onError={this.logError}
         controls
       />
     )
   }
 }
+
+Player.propTypes = {
+  playlist: PropTypes.object.isRequired
+}
+
+export default  Player

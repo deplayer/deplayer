@@ -13,22 +13,22 @@ class Collection extends Component {
   }
 
   play(song) {
-    this.props.dispatch(setCurrentPlaying(song.doc))
+    this.props.dispatch(setCurrentPlaying(song))
   }
 
   render() {
     const columns = [
       {
         Header: 'Artist',
-        accessor: 'doc.artist'
+        accessor: 'artist'
       },
       {
         Header: 'Title',
-        accessor: 'doc.title'
+        accessor: 'title'
       },
       {
         Header: 'Length',
-        accessor: 'doc.length'
+        accessor: 'length'
       },
       {
         Header: 'Actions',
@@ -46,7 +46,7 @@ class Collection extends Component {
           columns={columns}
           defaultSorted={[
             {
-              id: 'doc.artist',
+              id: 'artist',
               desc: false
             }
           ]}

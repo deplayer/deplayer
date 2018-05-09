@@ -19,6 +19,9 @@ describe('actions', () => {
           "total_rows": 0
         },
         "type": "COLLECTION_FETCHED"
+      },
+      {
+        "type": "FILL_VISIBLE_SONGS"
       }
     ]
 
