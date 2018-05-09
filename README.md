@@ -1,5 +1,5 @@
 # genar-radio
 
-## Storage
+## Planned features
 
-* [ ] Find a way to store playlist and settings  #fefa0423
+* Import/Export of database
