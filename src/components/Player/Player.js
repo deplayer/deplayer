@@ -3,6 +3,10 @@ import PropTypes from 'prop-types'
 
 // TODO: Fill all events https://www.w3schools.com/tags/ref_av_dom.asp
 class Player extends Component {
+  state = {
+    error: ''
+  }
+
   constructor(props) {
     super(props)
     this.playerRef = React.createRef()
@@ -15,18 +19,21 @@ class Player extends Component {
   }
 
   logError(ev) {
-    console.log(ev)
+    this.setState({error: this.playerRef.current.error.message})
   }
 
   render() {
     const currentPlaying = this.props.playlist.currentPlaying
     return (
-      <audio
-        ref={this.playerRef}
-        src={currentPlaying.file}
-        onError={this.logError}
-        controls
-      />
+      <div>
+        <audio
+          ref={this.playerRef}
+          src={currentPlaying.file}
+          onError={this.logError.bind(this)}
+          controls
+        />
+        {this.state.error}
+      </div>
     )
   }
 }

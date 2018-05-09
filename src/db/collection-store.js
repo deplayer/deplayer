@@ -3,10 +3,10 @@ import pouchdbFind from 'pouchdb-find'
 import md5 from 'md5'
 
 PouchDB.plugin(pouchdbFind);
+const db = new PouchDB('collection')
 
 // Save playlist items to collection
 export const saveCollectionItems = (playlist) => {
-  const db = new PouchDB('collection')
   const bulkItems = []
   playlist.forEach((plItem) => {
     plItem._id = md5(plItem.file)
@@ -23,19 +23,19 @@ export const saveCollectionItems = (playlist) => {
 }
 
 export const getCollection = () => {
-  const db = new PouchDB('collection')
-
   return db.allDocs({include_docs: true})
 }
 
-export const getSong = (id) => {
-  const db = new PouchDB('collection')
-  return db.get(id)
+export const getSongs = (ids) => {
+  const findPromises = []
+
+  ids.forEach((id) => {
+    findPromises.push(this.getSon(id))
+  })
+
+  return Promise.all(findPromises)
 }
 
-export const getSongs = (ids) => {
-  const db = new PouchDB('collection')
-  return db.find({
-    selector: {_id: {$in: ids}}
-  })
+export const getSong = (id) => {
+  return db.get(id)
 }

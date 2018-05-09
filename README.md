@@ -1,4 +1,6 @@
-# genar-radio
+# Decentraplayer
+
+Media player thought to run entirelly in the web browser.
 
 ## Planned features
 

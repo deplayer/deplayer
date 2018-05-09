@@ -8,7 +8,7 @@ export const getVisibleSongsIds = (collection) => {
 }
 
 export const getCollection = () => {
-  return function (dispatch) {
+  return (dispatch) => {
     dispatch({type: types.GET_COLLECTION})
 
     return db.getCollection().then((collection) => {
@@ -20,11 +20,13 @@ export const getCollection = () => {
 }
 
 export const fillVisibleSongs = (songsIds) => {
-  return function (dispatch) {
+  return (dispatch) => {
     dispatch({type: types.FILL_VISIBLE_SONGS})
 
-    return db.getSongs(songsIds).then((songs) => {
-      dispatch({type: types.FILL_VISIBLE_SONGS_FULLFILLED, data: songs})
+    songsIds.forEach((id) => {
+      db.getSong(id).then((song) => {
+        dispatch({type: types.FILL_VISIBLE_SONG_FULLFILLED, data: song})
+      })
     })
   }
 }
