@@ -1,16 +1,28 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types'
+// @flow
+
+import React, { Component } from 'react'
+import ReactTable from "react-table"
+import { Dispatch } from 'redux'
 
 import { setCurrentPlaying, addToPlaylist } from '../../actions/playlist'
-import ReactTable from "react-table";
+import SearchBar from '../SearchBar/SearchBar'
 import 'react-table/react-table.css'
 
-class MusicTable extends Component {
-  onAddToPlaylistClick(song) {
+type Props = {
+  data: Array<any>,
+  page: number,
+  offset: number,
+  pages: number,
+  total: number,
+  dispatch: Dispatch,
+}
+
+class MusicTable extends Component<Props> {
+  onAddToPlaylistClick(song: any) {
     this.props.dispatch(addToPlaylist(song))
   }
 
-  play(song) {
+  play(song: any) {
     this.props.dispatch(setCurrentPlaying(song))
   }
 
@@ -44,6 +56,7 @@ class MusicTable extends Component {
 
     return (
       <div className='music-table'>
+        <SearchBar />
         <ReactTable
           data={Object.values(this.props.data)}
           columns={columns}
@@ -61,15 +74,6 @@ class MusicTable extends Component {
       </div>
     )
   }
-}
-
-MusicTable.propTypes = {
-  data: PropTypes.array.isRequired,
-  page: PropTypes.number.isRequired,
-  offset: PropTypes.number.isRequired,
-  pages: PropTypes.number.isRequired,
-  total: PropTypes.number.isRequired,
-  dispatch: PropTypes.func.isRequired,
 }
 
 export default MusicTable

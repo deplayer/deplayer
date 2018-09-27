@@ -3,21 +3,15 @@
 import React from 'react'
 import { configure, shallow } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
-import Collection from './Collection'
+import SearchBar from './SearchBar'
 
 configure({ adapter: new Adapter() })
 
 const setup = () => {
   const props = {
-    data: [],
-    page: 1,
-    pages: 10,
-    total: 100,
-    offset: 10,
-    dispatch: () => {}
   }
 
-  const enzymeWrapper = shallow(<Collection {...props}/>)
+  const enzymeWrapper = shallow(<SearchBar {...props}/>)
 
   return {
     props,
@@ -27,6 +21,6 @@ const setup = () => {
 
 it('renders without crashing', () => {
   const { enzymeWrapper } = setup()
-  expect(enzymeWrapper.find('.collection').exists())
-    .toBe(true)
+  expect(enzymeWrapper.find('.search-bar').exists()).toBe(true)
+  expect(enzymeWrapper.find('.search-bar > input').exists()).toBe(true)
 })

@@ -1,10 +1,22 @@
+// @flow
+
 import React, { Component } from 'react';
-import PropTypes from 'prop-types'
+import { Dispatch } from 'redux'
+
 import MusicTable from './MusicTable'
 
 import { getCollection } from '../actions/collection';
 
-class Collection extends Component {
+type Props = {
+  data: any,
+  page: number,
+  offset: number,
+  pages: number,
+  total: number,
+  dispatch: Dispatch,
+}
+
+class Collection extends Component<Props> {
   componentWillMount () {
     const { dispatch } = this.props
     dispatch(getCollection())
@@ -17,15 +29,6 @@ class Collection extends Component {
       </div>
     )
   }
-}
-
-Collection.propTypes = {
-  data: PropTypes.object.isRequired,
-  page: PropTypes.number.isRequired,
-  offset: PropTypes.number.isRequired,
-  pages: PropTypes.number.isRequired,
-  total: PropTypes.number.isRequired,
-  dispatch: PropTypes.func.isRequired
 }
 
 export default Collection
