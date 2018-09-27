@@ -1,3 +1,5 @@
+// @flow
+
 import reducer from './playlist'
 
 describe('collection reducer', () => {
@@ -5,9 +7,7 @@ describe('collection reducer', () => {
     expect(reducer(undefined, {}))
       .toEqual({
         currentPlaying: {},
-        tracks: [
-          {label: 'Test playlist'}
-        ]
+        tracks: {}
       })
   })
 })

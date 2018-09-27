@@ -1,11 +1,19 @@
+// @flow
+
 import * as types from '../constants/ActionTypes'
+import { Action } from 'redux'
+
+type State = {
+  currentPlaying: any,
+  tracks: any
+}
 
 const defaultState = {
   currentPlaying: {},
   tracks: {}
 }
 
-export default (state = defaultState, action = {}) => {
+export default (state: State = defaultState, action: Action = {}): State => {
   switch (action.type) {
 
     case types.SET_CURRENT_PLAYING:

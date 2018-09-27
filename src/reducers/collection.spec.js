@@ -1,3 +1,5 @@
+// @flow
+
 import reducer from './collection'
 
 describe('collection reducer', () => {

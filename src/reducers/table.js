@@ -1,4 +1,15 @@
+// @flow
+
 import * as types from '../constants/ActionTypes'
+import { Action } from 'redux'
+
+type State = {
+  data: Array<any>,
+  total: number,
+  page: number,
+  pages: number,
+  offset: number
+}
 
 const defaultState = {
   data: [],
@@ -8,7 +19,7 @@ const defaultState = {
   offset: 10
 }
 
-export default (state = defaultState, action = {}) => {
+export default (state: State = defaultState, action: Action = {}): State => {
   switch (action.type) {
     case types.COLLECTION_FETCHED: {
       return {

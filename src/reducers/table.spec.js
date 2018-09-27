@@ -1,3 +1,5 @@
+// @flow
+
 import reducer from './table'
 import * as types from '../constants/ActionTypes'
 
@@ -8,25 +10,24 @@ describe('table reducer', () => {
         data: [],
         total: 0,
         page: 0,
-        pages: 0
+        pages: 0,
+        offset: 10
       })
   })
 
   it('should handle FILL_VISIBLE_SONGS_FULLFILLED', () => {
     const action = {
       type: types.FILL_VISIBLE_SONGS_FULLFILLED,
-      data: {
-        docs: [{label: 'test'}]
-      }
+      data: [{label: 'test'}]
     }
-
 
     expect(reducer(undefined, action))
       .toEqual({
         data: [{label: 'test'}],
         total: 0,
         page: 0,
-        pages: 0
+        pages: 0,
+        offset: 10,
       })
   })
 })

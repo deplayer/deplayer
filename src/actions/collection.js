@@ -1,14 +1,18 @@
+// @flow
+
+import { Dispatch } from 'redux'
+
 import * as types from '../constants/ActionTypes'
 import * as db from '../db/collection-store';
 
-export const getVisibleSongsIds = (collection) => {
+export const getVisibleSongsIds = (collection: any) => {
   return collection.rows.slice(0,10).map((row) => {
     return row.id
   })
 }
 
 export const getCollection = () => {
-  return (dispatch) => {
+  return (dispatch: Dispatch) => {
     dispatch({type: types.GET_COLLECTION})
 
     return db.getCollection().then((collection) => {
@@ -19,8 +23,8 @@ export const getCollection = () => {
   }
 }
 
-export const fillVisibleSongs = (songsIds) => {
-  return (dispatch) => {
+export const fillVisibleSongs = (songsIds: Array<string>) => {
+  return (dispatch: Dispatch) => {
     dispatch({type: types.FILL_VISIBLE_SONGS})
 
     songsIds.forEach((id) => {
