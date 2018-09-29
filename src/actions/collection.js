@@ -5,14 +5,13 @@ import { Dispatch } from 'redux'
 import * as types from '../constants/ActionTypes'
 import * as db from '../db/collection-store'
 
-export const getVisibleSongsIds = (collection: any) => {
-  return collection.rows.slice(0,10).map((row) => {
+export const getVisibleSongsIds = (collection: any) =>
+  collection.rows.slice(0,10).map((row) => {
     return row.id
   })
-}
 
-export const getCollection = () => {
-  return (dispatch: Dispatch) => {
+export const getCollection = () =>
+  (dispatch: Dispatch) => {
     dispatch({type: types.GET_COLLECTION})
 
     return db.getCollection().then((collection) => {
@@ -21,10 +20,9 @@ export const getCollection = () => {
       dispatch(fillVisibleSongs(visibleSongsIds))
     })
   }
-}
 
-export const fillVisibleSongs = (songsIds: Array<string>) => {
-  return (dispatch: Dispatch) => {
+export const fillVisibleSongs = (songsIds: Array<string>) =>
+  (dispatch: Dispatch) => {
     dispatch({type: types.FILL_VISIBLE_SONGS})
 
     songsIds.forEach((id) => {
@@ -33,4 +31,3 @@ export const fillVisibleSongs = (songsIds: Array<string>) => {
       })
     })
   }
-}

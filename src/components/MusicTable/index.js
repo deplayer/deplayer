@@ -12,6 +12,7 @@ type Props = {
   offset: number,
   pages: number,
   total: number,
+  error?: string,
   dispatch: Dispatch,
 }
 
@@ -52,9 +53,12 @@ class MusicTable extends Component<Props> {
       }
     ]
 
+    const errors = this.props.error ? this.props.error: ''
+
     return (
       <div className='music-table'>
         <SearchBar dispatch={this.props.dispatch} />
+        { errors }
         Total songs {this.props.total}
       </div>
     )

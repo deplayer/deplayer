@@ -8,7 +8,7 @@ import * as actions from './collection'
 const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
 
-describe('actions', () => {
+describe('actions/collection', () => {
   it('should create an action to get database collection', () => {
     const expectedAction = [
       {
