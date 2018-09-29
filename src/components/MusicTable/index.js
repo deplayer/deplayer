@@ -3,8 +3,8 @@
 import React, { Component } from 'react'
 import { Dispatch } from 'redux'
 
+import Song from '../../entities/Song'
 import { setCurrentPlaying, addToPlaylist } from '../../actions/playlist'
-import SearchBar from '../SearchBar/SearchBar'
 
 type Props = {
   data: Array<any>,
@@ -17,7 +17,7 @@ type Props = {
 }
 
 class MusicTable extends Component<Props> {
-  onAddToPlaylistClick(song: any) {
+  onAddToPlaylistClick(song: Song) {
     this.props.dispatch(addToPlaylist(song))
   }
 
@@ -26,38 +26,10 @@ class MusicTable extends Component<Props> {
   }
 
   render() {
-    const columns = [
-      {
-        Header: 'Artist',
-        accessor: 'artist'
-      },
-      {
-        Header: 'Title',
-        accessor: 'title'
-      },
-      {
-        Header: 'Length',
-        accessor: 'length'
-      },
-      {
-        Header: 'Actions',
-        id: 'actions',
-        accessor: (item) => {
-          return (
-            <div>
-              <button className='btn' onClick={(song) => this.play(item)}>Play</button>
-              <button className='btn' onClick={(song) => this.onAddToPlaylistClick(item)}>Add to playlist</button>
-            </div>
-          )
-        }
-      }
-    ]
-
     const errors = this.props.error ? this.props.error: ''
 
     return (
       <div className='music-table'>
-        <SearchBar dispatch={this.props.dispatch} />
         { errors }
         Total songs {this.props.total}
       </div>

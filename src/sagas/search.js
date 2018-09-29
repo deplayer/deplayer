@@ -31,7 +31,7 @@ export function* search(repository: IRepository, action: SearchAction): Generato
 // Binding actions to sagas
 function* searchSaga(): Generator<void, void, void> {
   const repository = new DummyRepository()
-  yield takeLatest(START_SEARCH, search, [repository])
+  yield takeLatest(START_SEARCH, search, repository)
 }
 
 export default searchSaga

@@ -20,27 +20,17 @@ const appStore = configureStore()
 
 const Home = () => {
   return (
-    <div>
+    <React.Fragment>
       <PlaylistContainer />
-      <PlayerContainer />
-    </div>
+    </React.Fragment>
   )
 }
 
 
 const CollectionPage = () => {
   return (
-    <div>
-      <CollectionContainer  />
-      <PlayerContainer />
-    </div>
-  )
-}
-
-const SearchPage = () => {
-  return (
     <React.Fragment>
-      <SearchContainer />
+      <CollectionContainer  />
     </React.Fragment>
   )
 }
@@ -50,7 +40,8 @@ class App extends Component<any> {
     return (
       <Provider store={appStore}>
         <Router>
-          <div>
+          <React.Fragment>
+            <SearchContainer />
             <ul>
               <li><Link to="/">Home</Link></li>
               <li><Link to="/search">Search</Link></li>
@@ -58,10 +49,10 @@ class App extends Component<any> {
               <li><Link to="/collection">Collection</Link></li>
             </ul>
             <Route exact path="/" component={Home} />
-            <Route path="/search" component={SearchPage} />
             <Route path="/import" component={ImporterContainer} />
             <Route path="/collection" component={CollectionPage} />
-          </div>
+            <PlayerContainer />
+          </React.Fragment>
         </Router>
       </Provider>
     );
