@@ -1,3 +1,5 @@
+// @flow
+
 import React, { Component } from 'react';
 import parsers from 'playlist-parser'
 import { saveCollectionItems } from '../db/collection-store'

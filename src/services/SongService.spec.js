@@ -8,6 +8,10 @@ describe('SongService', () => {
     const dummyRepository = new DummyRepository()
     const songService = new SongService(dummyRepository)
 
-    expect(songService.search('AC\\DC')).toEqual([{title: 'Highway to hell'}])
+    expect.assertions(2)
+    expect(songService.search('AC/DC')).toBeInstanceOf(Promise)
+    songService.search('AC/DC').then((result) => {
+      expect(result).toEqual([{title: 'Highway to hell'}])
+    })
   })
 })

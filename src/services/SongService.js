@@ -10,7 +10,15 @@ export default class SongService implements IService {
     this.songRepository = repository
   }
 
-  search(searchTerm: string) {
-    return this.songRepository.search(searchTerm)
+  search(searchTerm: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.songRepository.search(searchTerm)
+        .then((result) => {
+          resolve(result)
+        })
+        .catch((err) => {
+          reject(err)
+        })
+    })
   }
 }
