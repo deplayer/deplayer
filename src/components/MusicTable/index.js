@@ -5,9 +5,10 @@ import { Dispatch } from 'redux'
 
 import Song from '../../entities/Song'
 import { setCurrentPlaying, addToPlaylist } from '../../actions/playlist'
+import SongRow from './SongRow'
 
 type Props = {
-  data: Array<any>,
+  data: Array<Song>,
   page: number,
   offset: number,
   pages: number,
@@ -28,9 +29,14 @@ class MusicTable extends Component<Props> {
   render() {
     const errors = this.props.error ? this.props.error: ''
 
+    const songs = this.props.data.map((song) => {
+      return <SongRow key={song.id} song={song} />
+    })
+
     return (
       <div className='music-table'>
         { errors }
+        { songs }
         Total songs {this.props.total}
       </div>
     )

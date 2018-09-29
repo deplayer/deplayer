@@ -1,10 +1,12 @@
 // @flow
 
-import * as types from '../constants/ActionTypes'
 import { Action } from 'redux'
 
+import * as types from '../constants/ActionTypes'
+import Song from '../entities/Song'
+
 type State = {
-  data: Array<any>,
+  data: Array<Song>,
   total: number,
   page: number,
   pages: number,
