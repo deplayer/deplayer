@@ -23,7 +23,9 @@ class SearchBar extends Component<Props, State> {
   }
 
   startSearch = () => {
-    this.props.dispatch({type: START_SEARCH})
+    this.props.dispatch( {
+      type: START_SEARCH, searchTerm: this.state.searchTerm
+    })
   }
 
   render() {

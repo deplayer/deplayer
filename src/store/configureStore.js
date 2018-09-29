@@ -1,4 +1,4 @@
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import thunk from 'redux-thunk'
 import promise from 'redux-promise'
@@ -17,12 +17,16 @@ export default function configureStore() {
     middleware = [...middleware, logger]
   }
 
+  const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+
   // Instantiate sagaMiddleware
   const sagaMiddleware = createSagaMiddleware()
   // Prepare store with all the middlewares
   const store = createStore(
     rootReducer,
-    applyMiddleware(...middleware, sagaMiddleware)
+    composeEnhancers(
+      applyMiddleware(...middleware, sagaMiddleware)
+    )
   )
 
   if (module.hot) {
