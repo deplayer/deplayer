@@ -17,8 +17,13 @@ mock.onGet(/search/).reply(200, {
 })
 
 describe('ItunesApiRepository', () => {
+  const itunesRepo = new ItunesApiRepository()
+
   it('should handle song search', () => {
-    const itunesRepo = new ItunesApiRepository()
     expect(itunesRepo.search('Bad brains')).toBeInstanceOf(Promise)
+  })
+
+  it('should populate itunes api url from searchTerm', () => {
+    expect(itunesRepo.populateUrl('Bad brains')).toBe('https://itunes.apple.com/search?term=Bad%20brains')
   })
 })

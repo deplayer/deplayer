@@ -3,7 +3,7 @@
 import { call, put, takeLatest } from 'redux-saga/effects'
 
 import { IRepository } from '../repositories/IRepository'
-import DummyRepository from '../repositories/DummyRepository'
+import ItunesApiRepository from '../repositories/ItunesApiRepository'
 import {
   START_SEARCH,
   SEARCH_FULLFILLED,
@@ -30,7 +30,7 @@ export function* search(repository: IRepository, action: SearchAction): Generato
 
 // Binding actions to sagas
 function* searchSaga(): Generator<void, void, void> {
-  const repository = new DummyRepository()
+  const repository = new ItunesApiRepository()
   yield takeLatest(START_SEARCH, search, repository)
 }
 

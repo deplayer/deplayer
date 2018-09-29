@@ -55,7 +55,7 @@ class App extends Component<any> {
           </React.Fragment>
         </Router>
       </Provider>
-    );
+    )
   }
 }
 
