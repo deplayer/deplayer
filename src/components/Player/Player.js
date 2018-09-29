@@ -1,13 +1,22 @@
+// @flow
+
 import React, { Component } from 'react';
-import PropTypes from 'prop-types'
+
+type Props = {
+  playlist: any
+}
+
+type State = {
+  error: string
+}
 
 // TODO: Fill all events https://www.w3schools.com/tags/ref_av_dom.asp
-class Player extends Component {
+class Player extends Component<Props, State> {
   state = {
     error: ''
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
     this.playerRef = React.createRef()
   }
@@ -38,8 +47,4 @@ class Player extends Component {
   }
 }
 
-Player.propTypes = {
-  playlist: PropTypes.object.isRequired
-}
-
-export default  Player
+export default Player

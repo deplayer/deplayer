@@ -1,12 +1,10 @@
 // @flow
 
 import React, { Component } from 'react'
-import ReactTable from "react-table"
 import { Dispatch } from 'redux'
 
 import { setCurrentPlaying, addToPlaylist } from '../../actions/playlist'
 import SearchBar from '../SearchBar/SearchBar'
-import 'react-table/react-table.css'
 
 type Props = {
   data: Array<any>,
@@ -56,20 +54,7 @@ class MusicTable extends Component<Props> {
 
     return (
       <div className='music-table'>
-        <SearchBar />
-        <ReactTable
-          data={Object.values(this.props.data)}
-          columns={columns}
-          page={this.props.page}
-          pageSize={this.props.offset}
-          defaultSorted={[
-            {
-              id: 'artist',
-              desc: false
-            }
-          ]}
-          className="-striped -highlight"
-        />
+        <SearchBar dispatch={this.props.dispatch} />
         Total songs {this.props.total}
       </div>
     )

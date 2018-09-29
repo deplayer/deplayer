@@ -9,6 +9,7 @@ configure({ adapter: new Adapter() })
 
 const setup = () => {
   const props = {
+    dispatch: () => {}
   }
 
   const enzymeWrapper = shallow(<SearchBar {...props}/>)
@@ -23,4 +24,7 @@ it('renders without crashing', () => {
   const { enzymeWrapper } = setup()
   expect(enzymeWrapper.find('.search-bar').exists()).toBe(true)
   expect(enzymeWrapper.find('.search-bar > input').exists()).toBe(true)
+  enzymeWrapper.find('input').simulate('change', {target: {value: 'Pink Floyd'}});
+  expect(enzymeWrapper.state('searchTerm')).toBe('Pink Floyd');
+  enzymeWrapper.find('button').simulate('click');
 })
