@@ -14,7 +14,14 @@ export default class ItunesApiRepository implements IRepository {
 
   mapResponse(result: any): Array<Song> {
     return result.data.results.map((itSong) => {
-      return new Song()
+      return this.songFromItSong(itSong)
+    })
+  }
+
+  songFromItSong(itSong: any) {
+    return new Song({
+      artistName: itSong.artistName,
+      title: itSong.trackName
     })
   }
 

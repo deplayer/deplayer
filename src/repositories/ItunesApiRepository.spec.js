@@ -35,4 +35,8 @@ describe('ItunesApiRepository', () => {
       expect(results.length).toBe(1)
     })
   })
+
+  it('should convert itunes song to entity song', () => {
+    expect(itunesRepo.songFromItSong(exampleSong)).toBeInstanceOf(Song)
+  })
 })
