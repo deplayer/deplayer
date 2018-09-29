@@ -1,5 +1,5 @@
 // @flow
 
 export interface IRepository {
-  search(searchTerm: string): Promise<any>
+  search(searchTerm: string): Promise<Array<any>>
 }

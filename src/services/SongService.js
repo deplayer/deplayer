@@ -2,6 +2,7 @@
 
 import { IRepository } from '../repositories/IRepository'
 import { IService } from './IService'
+import Song from '../entities/Song'
 
 export default class SongService implements IService {
   songRepository: IRepository
@@ -12,7 +13,7 @@ export default class SongService implements IService {
     this.songRepository = repository
   }
 
-  search(searchTerm: string): Promise<any> {
+  search(searchTerm: string): Promise<Array<Song>> {
     const { songRepository } = this
     if (!songRepository) {
       throw Error('songRepository is not defined')

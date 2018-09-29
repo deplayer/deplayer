@@ -3,6 +3,7 @@
 import axios from 'axios'
 
 import { IRepository } from './IRepository'
+import Song from '../entities/Song'
 
 export default class ItunesApiRepository implements IRepository {
   baseUrl = 'https://itunes.apple.com'
@@ -11,7 +12,21 @@ export default class ItunesApiRepository implements IRepository {
     return `${this.baseUrl}/search?term=${encodeURIComponent(searchTerm)}`
   }
 
+  mapResponse(result: any): Array<Song> {
+    return result.data.results.map((itSong) => {
+      return new Song()
+    })
+  }
+
   search(searchTerm: string): Promise<any> {
-    return axios.get(this.populateUrl(searchTerm))
+    return new Promise((resolve, reject) => {
+      axios.get(this.populateUrl(searchTerm))
+        .then((result) => {
+          resolve(this.mapResponse(result))
+        })
+        .catch((err) => {
+          reject(err)
+        })
+    })
   }
 }
