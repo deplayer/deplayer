@@ -7,6 +7,7 @@ export default class SongService implements IService {
   songRepository: IRepository
 
   constructor(repository: IRepository) {
+    (this:any).search = this.search.bind(this);
     this.songRepository = repository
   }
 
