@@ -1,0 +1,6 @@
+test:
+  stage: test
+  image: node:8
+  script:
+  - yarn
+  - yarn test

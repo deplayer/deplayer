@@ -22,7 +22,6 @@ export function* search(repository: IRepository, action: SearchAction): Generato
 
   try {
     const searchResults = yield call(songService.search, action.searchTerm)
-    console.log(searchResults)
     yield put({type: SEARCH_FULLFILLED, searchResults})
   } catch (e) {
     yield put({type: SEARCH_REJECTED, message: e.message})
