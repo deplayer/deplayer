@@ -30,9 +30,19 @@ class SearchBar extends Component<Props, State> {
 
   render() {
     return (
-      <div className='search-bar'>
-        <input onChange={this.onSearchChange} type='text' />
-        <button onClick={this.startSearch} type='submit'>Search!</button>
+      <div className='search-bar ui huge action input'>
+        <input
+          onChange={this.onSearchChange}
+          placeholder='Search'
+          type='text'
+        />
+        <button
+          className='ui huge button'
+          onClick={this.startSearch}
+          type='submit'
+        >
+          Search!
+        </button>
       </div>
     )
   }

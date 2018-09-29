@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react'
 import { Dispatch } from 'redux'
+import { Table } from 'semantic-ui-react'
 
 import Song from '../../entities/Song'
 import { setCurrentPlaying, addToPlaylist } from '../../actions/playlist'
@@ -34,11 +35,19 @@ class MusicTable extends Component<Props> {
     })
 
     return (
-      <div className='music-table'>
-        { errors }
+      <Table className='music-table'>
+        <Table.Header>
+          <Table.Row>
+            <Table.Cell>{ errors }</Table.Cell>
+          </Table.Row>
+        </Table.Header>
         { songs }
-        Total songs {this.props.total}
-      </div>
+        <Table.Footer>
+          <Table.Row>
+            <Table.Cell>Total songs {this.props.total}</Table.Cell>
+          </Table.Row>
+        </Table.Footer>
+      </Table>
     )
   }
 }
