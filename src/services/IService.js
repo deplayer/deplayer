@@ -1,5 +1,5 @@
 // @flow
 
-export interface IApiService {
+export interface IService {
   search(searchTerm: string): Array<any>
 }

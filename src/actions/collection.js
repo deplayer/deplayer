@@ -3,7 +3,7 @@
 import { Dispatch } from 'redux'
 
 import * as types from '../constants/ActionTypes'
-import * as db from '../db/collection-store';
+import * as db from '../db/collection-store'
 
 export const getVisibleSongsIds = (collection: any) => {
   return collection.rows.slice(0,10).map((row) => {

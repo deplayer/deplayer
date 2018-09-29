@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "autoprefixer": "7.1.6",
+    "axios": "^0.18.0",
     "babel-core": "6.26.0",
     "babel-eslint": "7.2.3",
     "babel-jest": "20.0.3",
@@ -15,7 +16,7 @@
     "css-loader": "0.28.7",
     "dotenv": "4.0.0",
     "dotenv-expand": "4.2.0",
-    "eslint": "4.10.0",
+    "eslint": "^5.6.1",
     "eslint-config-react-app": "^2.1.0",
     "eslint-loader": "1.9.0",
     "eslint-plugin-flowtype": "2.39.1",
@@ -97,19 +98,27 @@
     ]
   },
   "eslintConfig": {
-    "extends": "react-app",
+    "extends": [
+      "react-app"
+    ],
     "env": {
       "jest": true
-    }
+    },
+    "plugins": [
+      "flowtype",
+      "jest"
+    ]
   },
   "devDependencies": {
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
+    "eslint-plugin-jest": "^21.22.1",
     "flow-bin": "^0.81.0",
     "js-yaml": "^3.12.0",
     "redux-logger": "^3.0.6",
     "redux-mock-store": "^1.5.1",
     "redux-promise": "^0.5.3",
+    "redux-saga-test-plan": "^3.7.0",
     "redux-thunk": "^2.2.0"
   }
 }

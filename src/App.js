@@ -7,7 +7,7 @@ import PlaylistContainer from './containers/PlaylistContainer'
 import PlayerContainer from './containers/PlayerContainer'
 import ImporterContainer from './containers/ImporterContainer'
 import CollectionContainer from './containers/CollectionContainer'
-import SearchBar from './components/SearchBar/SearchBar'
+import SearchContainer from './containers/SearchContainer'
 import configureStore from './store/configureStore'
 
 import {
@@ -40,7 +40,7 @@ const CollectionPage = () => {
 const SearchPage = () => {
   return (
     <React.Fragment>
-      <SearchBar />
+      <SearchContainer />
     </React.Fragment>
   )
 }
