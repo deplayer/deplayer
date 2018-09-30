@@ -1,9 +1,17 @@
+// @flux
+
 import { createStore, applyMiddleware, compose } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import thunk from 'redux-thunk'
 import promise from 'redux-promise'
 import { createLogger } from 'redux-logger'
+import {
+  loadTranslations,
+  setLocale,
+  syncTranslationWithStore,
+} from 'react-redux-i18n'
 
+import translationsObject from '../locales'
 import rootReducer from '../reducers'
 
 // Sagas
@@ -37,7 +45,13 @@ export default function configureStore() {
     })
   }
 
+  // Running sagas
   sagaMiddleware.run(searchSaga)
+
+  // Setting up locales
+  syncTranslationWithStore(store)
+  store.dispatch(loadTranslations(translationsObject))
+  store.dispatch(setLocale('en'))
 
   return store
 }

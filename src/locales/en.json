@@ -1,0 +1,8 @@
+{
+  "menu": {
+    "home": "Home",
+    "search": "Search",
+    "import": "Import",
+    "collection": "Collection"
+  }
+}

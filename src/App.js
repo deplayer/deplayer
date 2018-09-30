@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react'
 import { Provider } from 'react-redux'
+import { Translate } from 'react-redux-i18n'
 
 import './App.scss'
 
@@ -45,10 +46,10 @@ class App extends Component<any> {
           <React.Fragment>
             <SearchContainer />
             <div className='app-menu'>
-              <Link to="/">Home</Link>
-              <Link to="/search">Search</Link>
-              <Link to="/import">Import</Link>
-              <Link to="/collection">Collection</Link>
+              <Link to="/"><Translate value='menu.home' /></Link>
+              <Link to="/search"><Translate value='menu.search' /></Link>
+              <Link to="/import"><Translate value='menu.import' /></Link>
+              <Link to="/collection"><Translate value='menu.collection' /></Link>
             </div>
             <Route exact path="/" component={Home} />
             <Route path="/import" component={ImporterContainer} />
