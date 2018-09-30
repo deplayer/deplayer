@@ -4,5 +4,13 @@
     "search": "Search",
     "import": "Import",
     "collection": "Collection"
+  },
+  "song": {
+    "row": {
+      "title": "title",
+      "artis": {
+        "name": "Artist name"
+      }
+    }
   }
 }

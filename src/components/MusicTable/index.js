@@ -3,6 +3,7 @@
 import React, { Component } from 'react'
 import { Dispatch } from 'redux'
 import { Table } from 'semantic-ui-react'
+import { Translate } from 'react-redux-i18n'
 
 import Song from '../../entities/Song'
 import { setCurrentPlaying, addToPlaylist } from '../../actions/playlist'
@@ -28,7 +29,9 @@ class MusicTable extends Component<Props> {
   }
 
   render() {
-    const errors = this.props.error ? this.props.error: ''
+    const errors = this.props.error ?
+      <Table.Row><Table.Cell>{ this.props.error }</Table.Cell></Table.Row>
+      : null
 
     const songs = this.props.data.map((song) => {
       return <SongRow key={song.id} song={song} />
@@ -38,10 +41,16 @@ class MusicTable extends Component<Props> {
       <Table className='music-table'>
         <Table.Header>
           <Table.Row>
-            <Table.Cell>{ errors }</Table.Cell>
+            <Table.Cell></Table.Cell>
+            <Table.Cell><Translate value="song.row.title" /></Table.Cell>
+            <Table.Cell><Translate value="song.row.album" /></Table.Cell>
+            <Table.Cell><Translate value="song.row.artist.name" /></Table.Cell>
           </Table.Row>
         </Table.Header>
-        { songs }
+        <Table.Body>
+          { errors }
+          { songs }
+        </Table.Body>
         <Table.Footer>
           <Table.Row>
             <Table.Cell>Total songs {this.props.total}</Table.Cell>

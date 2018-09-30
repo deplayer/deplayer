@@ -18,13 +18,18 @@ export default class ItunesApiRepository implements IRepository {
     })
   }
 
+  // Map itunes song to entity song params
   songFromItSong(itSong: any) {
     return new Song({
       artistName: itSong.artistName,
-      title: itSong.trackName
+      title: itSong.trackName,
+      albumName: itSong.collectionName,
+      thumbnailUrl: itSong.artworkUrl60,
+      length: itSong.trackTimeMillis
     })
   }
 
+  // Execute search request against itunes API
   search(searchTerm: string): Promise<any> {
     return new Promise((resolve, reject) => {
       axios.get(this.populateUrl(searchTerm))

@@ -18,11 +18,11 @@ import rootReducer from '../reducers'
 import searchSaga from '../sagas/search'
 
 export default function configureStore() {
-  let middleware = [promise, thunk]
+  let middlewares = [promise, thunk]
 
   if (process.env.NODE_ENV !== 'production') {
     const logger = createLogger()
-    middleware = [...middleware, logger]
+    middlewares = [...middlewares, logger]
   }
 
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
@@ -33,7 +33,7 @@ export default function configureStore() {
   const store = createStore(
     rootReducer,
     composeEnhancers(
-      applyMiddleware(...middleware, sagaMiddleware)
+      applyMiddleware(...middlewares, sagaMiddleware)
     )
   )
 

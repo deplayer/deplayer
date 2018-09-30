@@ -11,6 +11,7 @@ button {
 
 .app-menu {
   @extend .ui.menu;
+  @extend .inverted;
 
   & > a {
     @extend .item;
@@ -21,3 +22,6 @@ button {
   width: 100%;
 }
 
+.music-table {
+  @extend .inverted;
+}
