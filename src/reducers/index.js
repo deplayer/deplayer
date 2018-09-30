@@ -13,5 +13,5 @@ export default combineReducers({
   collection,
   table,
   search,
-  i18nReducer
+  i18n: i18nReducer
 })
