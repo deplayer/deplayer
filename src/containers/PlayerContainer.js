@@ -1,3 +1,5 @@
+// @flow
+
 import { connect } from 'react-redux'
 import Player from '../components/Player/Player'
 

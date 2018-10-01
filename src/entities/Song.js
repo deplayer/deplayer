@@ -7,6 +7,16 @@ type money = {
   currency: string
 }
 
+type streamUri = {
+  uri: string,
+  quality: string
+}
+
+type stream = {
+  service: string,
+  uris: Array<streamUri>
+}
+
 export default class Song {
   id: string
   title: string
@@ -24,6 +34,8 @@ export default class Song {
   duration: number
   price: money
 
+  stream: Array<stream>
+
   constructor(songParams: any = {}) {
     const {
       id,
@@ -34,7 +46,8 @@ export default class Song {
       duration,
       genre,
       price,
-      currency
+      currency,
+      stream
     } = songParams
 
     this.id = id ? id : uuidv4()
@@ -55,5 +68,6 @@ export default class Song {
       price: price,
       currency: currency || 'USD'
     }
+    this.stream = stream || []
   }
 }

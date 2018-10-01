@@ -1,6 +1,7 @@
 // @flow
 
-import React, { Component } from 'react';
+import React, { Component } from 'react'
+import Song from '../../entities/Song'
 
 type Props = {
   playlist: any
@@ -15,8 +16,9 @@ class Player extends Component<Props, State> {
   state = {
     error: ''
   }
+  playerRef: { current:null | HTMLMediaElement }
 
-  constructor(props: any) {
+  constructor(props: Props) {
     super(props)
     this.playerRef = React.createRef()
   }
@@ -28,16 +30,25 @@ class Player extends Component<Props, State> {
   }
 
   logError(ev) {
-    this.setState({error: this.playerRef.current.error.message})
+    this.setState({
+      error: this.playerRef.current.error.message
+    })
   }
 
   render() {
-    const currentPlaying = this.props.playlist.currentPlaying
+    const currentPlaying = this.props.playlist.currentPlaying || {}
+    // Getting the first stream URI
+    const streamUri = currentPlaying
+      && currentPlaying.stream
+      && currentPlaying.stream.length ?
+      currentPlaying.stream[0].uris[0].uri: null
+    console.log(streamUri)
+
     return (
-      <div>
+      <div className='player'>
         <audio
           ref={this.playerRef}
-          src={currentPlaying.file}
+          src={streamUri}
           onError={this.logError.bind(this)}
           controls
         />

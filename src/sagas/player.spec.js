@@ -12,7 +12,7 @@ import { setCurrentPlaying } from './player'
 describe('player saga', () => {
   it('should handle player events', () => {
     const song = new Song()
-    expectSaga(setCurrentPlaying, song, {type: SET_CURRENT_PLAYING, song})
+    expectSaga(setCurrentPlaying, {type: SET_CURRENT_PLAYING, song})
       .run()
   })
 })
