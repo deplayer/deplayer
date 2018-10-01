@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { Table } from 'semantic-ui-react'
+import { Translate } from 'react-redux-i18n'
 
 import { getDurationStr } from '../../utils/timeFormatter'
 import Song from '../../entities/Song'
@@ -14,6 +15,7 @@ type Props = {
 
 const SongRow = (props: Props) => {
   const { song, onClick } = props
+  const nonAvailable = <Translate value='song.row.na' />
   return (
     <Table.Row
       className='song-row'
@@ -23,12 +25,12 @@ const SongRow = (props: Props) => {
         <CoverImage song={song} />
       </Table.Cell>
       <Table.Cell>{ song.title }</Table.Cell>
-      <Table.Cell>{ song.album.name }</Table.Cell>
-      <Table.Cell>{ song.artist.name }</Table.Cell>
-      <Table.Cell>{ song.artist.name }</Table.Cell>
+      <Table.Cell>{ song.album ? song.album.name: nonAvailable }</Table.Cell>
+      <Table.Cell>{ song.artist ? song.artist.name: nonAvailable }</Table.Cell>
+      <Table.Cell>{ song.artist ? song.artist.name: nonAvailable }</Table.Cell>
       <Table.Cell>{ getDurationStr(song.duration) }</Table.Cell>
       <Table.Cell>{ song.genre }</Table.Cell>
-      <Table.Cell>{ song.price.price + song.price.currency }</Table.Cell>
+      <Table.Cell>{ song.price ? song.price.price + song.price.currency: nonAvailable }</Table.Cell>
     </Table.Row>
   )
 }

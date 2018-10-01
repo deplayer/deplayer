@@ -3,14 +3,18 @@
 import * as types from '../constants/ActionTypes'
 import { Action } from 'redux'
 
+import Song from '../entities/Song'
+
 type State = {
-  currentPlaying: any,
-  tracks: any
+  currentPlaying?: Song | any,
+  tracks: any,
+  playing: boolean
 }
 
 const defaultState = {
   currentPlaying: {},
-  tracks: {}
+  tracks: {},
+  playing: false
 }
 
 export default (state: State = defaultState, action: Action = {}): State => {
@@ -18,6 +22,9 @@ export default (state: State = defaultState, action: Action = {}): State => {
 
     case types.SET_CURRENT_PLAYING:
       return {...state, currentPlaying: action.song}
+
+    case types.START_PLAYING:
+      return {...state, playing: true}
 
     case types.ADD_TO_PLAYLIST:
       state.tracks[action.song._id] = action.song

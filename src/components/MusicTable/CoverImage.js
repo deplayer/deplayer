@@ -8,7 +8,7 @@ type Props = {
 }
 
 const CoverImage = (props: Props) => {
-  if (props.song.cover.thumbnailUrl) {
+  if (props.song.cover && props.song.cover.thumbnailUrl) {
     return (
       <img
         alt={ `${props.song.album.name} cover` }

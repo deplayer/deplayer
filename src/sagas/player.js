@@ -1,9 +1,12 @@
 // @flow
 
-import { takeLatest } from 'redux-saga/effects'
+import { takeLatest, put } from 'redux-saga/effects'
 import createHistory from 'history/createBrowserHistory'
 
-import { SET_CURRENT_PLAYING } from '../constants/ActionTypes'
+import {
+  SET_CURRENT_PLAYING,
+  START_PLAYING
+} from '../constants/ActionTypes'
 import Song from '../entities/Song'
 
 // Starting history
@@ -13,6 +16,7 @@ const history = createHistory()
 export function* setCurrentPlaying(action: {song: Song}): Generator<void, void, void> {
   // Redirect to song view page
   yield history.push(`/song/${ action.song.id }`)
+  yield put({type: START_PLAYING})
 }
 
 // Binding actions to sagas

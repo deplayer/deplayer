@@ -1,7 +1,6 @@
 // @flow
 
 import React, { Component } from 'react'
-import Song from '../../entities/Song'
 
 type Props = {
   playlist: any
@@ -23,12 +22,6 @@ class Player extends Component<Props, State> {
     this.playerRef = React.createRef()
   }
 
-  componentDidMount() {
-    if (this.props.playlist.currentPlaying) {
-      this.playerRef.current.play()
-    }
-  }
-
   logError(ev) {
     this.setState({
       error: this.playerRef.current.error.message
@@ -42,7 +35,6 @@ class Player extends Component<Props, State> {
       && currentPlaying.stream
       && currentPlaying.stream.length ?
       currentPlaying.stream[0].uris[0].uri: null
-    console.log(streamUri)
 
     return (
       <div className='player'>
@@ -50,6 +42,7 @@ class Player extends Component<Props, State> {
           ref={this.playerRef}
           src={streamUri}
           onError={this.logError.bind(this)}
+          autoPlay={ this.props.playlist.playing }
           controls
         />
         {this.state.error}

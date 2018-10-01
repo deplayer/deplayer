@@ -14,8 +14,8 @@ describe('search saga', () => {
   it('should handle search events', () => {
     const repository = new DummyRepository()
 
-    expectSaga(search, repository, {type: START_SEARCH, searchTerm: 'Metallica'})
-    // .put({type: SEARCH_FULLFILLED, searchResults: [] })
+    return expectSaga(search, repository, {type: START_SEARCH, searchTerm: 'Metallica'})
+      .put({type: SEARCH_FULLFILLED, searchResults: [ { title: 'Highway to hell' } ] })
       .run()
   })
 })
