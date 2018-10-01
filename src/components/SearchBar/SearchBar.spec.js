@@ -7,10 +7,13 @@ import SearchBar from './SearchBar'
 
 configure({ adapter: new Adapter() })
 
-const setup = () => {
-  const props = {
-    dispatch: () => {}
+const setup = (customProps: any) => {
+  const defaultProps = {
+    dispatch: () => {},
+    loading: false
   }
+
+  const props = {...defaultProps, ...customProps}
 
   const enzymeWrapper = shallow(<SearchBar {...props}/>)
 
@@ -20,10 +23,18 @@ const setup = () => {
   }
 }
 
-it('renders without crashing', () => {
-  const { enzymeWrapper } = setup()
-  expect(enzymeWrapper.find('.search-bar').exists()).toBe(true)
-  expect(enzymeWrapper.find('.search-bar > input').exists()).toBe(true)
-  enzymeWrapper.find('input').simulate('change', {target: {value: 'Pink Floyd'}});
-  expect(enzymeWrapper.state('searchTerm')).toBe('Pink Floyd');
+describe('SearchBar', () => {
+  it('renders without crashing', () => {
+    const { enzymeWrapper } = setup()
+    expect(enzymeWrapper.find('.search-bar').exists()).toBe(true)
+    expect(enzymeWrapper.find('.search-bar > input').exists()).toBe(true)
+    enzymeWrapper.find('input').simulate('change', {target: {value: 'Pink Floyd'}});
+    expect(enzymeWrapper.state('searchTerm')).toBe('Pink Floyd');
+    expect(enzymeWrapper.find('i.search.icon').exists()).toBe(true)
+  })
+
+  it('should render loading spinner icon while loading', () => {
+    const { enzymeWrapper } = setup({loading: true})
+    expect(enzymeWrapper.find('.search-bar.loading').exists()).toBe(true)
+  })
 })

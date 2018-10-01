@@ -10,7 +10,8 @@ type State = {
 }
 
 type Props = {
-  dispatch: Dispatch
+  dispatch: Dispatch,
+  loading: boolean
 }
 
 const WAIT_INTERVAL = 1000
@@ -49,13 +50,13 @@ class SearchBar extends Component<Props, State> {
 
   render() {
     return (
-      <div className='search-bar ui huge action icon input'>
+      <div className={`search-bar ui huge action icon input ${this.props.loading ? 'loading': ''}`}>
         <input
           onChange={this.onSearchChange}
           placeholder='Search'
           type='text'
         />
-        <i className="search icon"></i>
+        <i className={`search icon`}></i>
       </div>
     )
   }
