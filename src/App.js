@@ -13,9 +13,10 @@ import CollectionContainer from './containers/CollectionContainer'
 import SearchContainer from './containers/SearchContainer'
 import SongContainer from './containers/SongContainer'
 import configureStore from './store/configureStore'
+import history from './store/configureHistory'
 
 import {
-  BrowserRouter as Router,
+  Router,
   Route,
   Link
 } from 'react-router-dom'
@@ -43,20 +44,24 @@ class App extends Component<any> {
   render() {
     return (
       <Provider store={appStore}>
-        <Router>
+        <Router history={history} >
           <React.Fragment>
-            <SearchContainer />
-            <div className='app-menu'>
+            <div className='sidebar-container'>
+              <SearchContainer />
               <Link to="/"><Translate value='menu.home' /></Link>
               <Link to="/search"><Translate value='menu.search' /></Link>
               <Link to="/import"><Translate value='menu.import' /></Link>
               <Link to="/collection"><Translate value='menu.collection' /></Link>
             </div>
-            <Route exact path="/" component={Home} />
-            <Route path="/import" component={ImporterContainer} />
-            <Route path="/collection" component={CollectionPage} />
-            <Route path="/song/:id" component={SongContainer} />
-            <PlayerContainer />
+            <div className='contents-container'>
+              <Route exact path="/" component={Home} />
+              <Route path="/import" component={ImporterContainer} />
+              <Route path="/collection" component={CollectionPage} />
+              <Route path="/song/:id" component={SongContainer} />
+            </div>
+            <div className='player-container'>
+              <PlayerContainer />
+            </div>
           </React.Fragment>
         </Router>
       </Provider>

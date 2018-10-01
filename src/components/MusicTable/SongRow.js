@@ -22,7 +22,7 @@ const SongRow = (props: Props) => {
       onClick={onClick}
     >
       <Table.Cell className='collapsing'>
-        <CoverImage song={song} />
+        <CoverImage cover={song.cover} size='thumbnail' albumName={song.album.name} />
       </Table.Cell>
       <Table.Cell>{ song.title }</Table.Cell>
       <Table.Cell>{ song.album ? song.album.name: nonAvailable }</Table.Cell>

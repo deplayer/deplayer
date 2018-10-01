@@ -17,6 +17,15 @@ type stream = {
   uris: Array<streamUri>
 }
 
+type cover = {
+  thumbnailUrl: string,
+  fullUrl: string
+}
+
+type album = {
+  name: string
+}
+
 export default class Song {
   id: string
   title: string
@@ -24,12 +33,8 @@ export default class Song {
   artist: {
     name: string
   }
-  album: {
-    name: string
-  }
-  cover: {
-    thumbnailUrl: string
-  }
+  album: album
+  cover: cover
   // In milliseconds
   duration: number
   price: money
@@ -43,6 +48,7 @@ export default class Song {
       artistName,
       albumName,
       thumbnailUrl,
+      fullUrl,
       duration,
       genre,
       price,
@@ -57,9 +63,10 @@ export default class Song {
 
     this.album = {
       name: albumName
-    }
+    } || {}
     this.cover = {
-      thumbnailUrl: thumbnailUrl
+      thumbnailUrl: thumbnailUrl,
+      fullUrl: fullUrl
     }
     this.artist = {
       name: artistName

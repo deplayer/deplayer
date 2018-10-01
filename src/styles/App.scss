@@ -26,6 +26,7 @@ $font-family: DOS,SimHei,Monaco,Menlo,Consolas,'Courier New',monospace;
 $primary-color: #4d94aa;
 $font-color: $primary-color;
 $inverted: $primary-color;
+$secondary-color: #fefe54;
 $background-color: #101010;
 $body-bg-color: $background-color;
 
@@ -36,16 +37,28 @@ $body-bg-color: $background-color;
 @import "sass-semantic-ui/src/scss/elements/_icon.scss";
 @import "sass-semantic-ui/src/scss/collections/_table.scss";
 @import "sass-semantic-ui/src/scss/collections/_menu.scss";
+@import "sass-semantic-ui/src/scss/views/_item.scss";
 
 body {
   color: $primary-color;
+}
+
+#root {
+  display: grid;
+  height: 100%;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-areas: "sidebar sidebar sidebar sidebar" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "player player player player" "player player player player";
 }
 
 button {
   @extend .ui.button;
 }
 
-.app-menu {
+.sidebar-container {
+  grid-area: sidebar;
+  background-color: #a50;
+
   @extend .ui.menu;
   @extend .inverted;
 
@@ -55,7 +68,14 @@ button {
 }
 
 .search-bar {
+  grid-area: sidebar;
+
   width: 100%;
+}
+
+.contents-container {
+  grid-area: contents;
+  overflow-y: scroll;
 }
 
 .music-table {
@@ -67,4 +87,40 @@ button {
   tr td {
     cursor: pointer;
   }
+}
+
+.song-view {
+  grid-area: contents;
+
+  @extend .ui.items;
+
+  .song {
+    @extend .item;
+
+    .image:not(.ui) {
+      width: auto;
+    }
+
+    .content {
+      .header {
+        color: $font-color;
+        font-size: 1.8em;
+
+      }
+      .meta {
+        color: $font-color;
+        font-size: 1.5em;
+      }
+    }
+  }
+}
+
+span.label {
+  color: $secondary-color;
+  background-color: #a50;
+}
+
+.player-container {
+  grid-area: player;
+  background-color: #a50;
 }

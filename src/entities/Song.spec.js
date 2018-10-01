@@ -13,4 +13,6 @@ describe('entities/Song', () => {
     expect(song.stream[0].service).toEqual('itunes')
     expect(song.stream[0].uris[0].uri).toEqual('http://some-songs-api/song.mp4')
   })
+
+  it('should create s Song with thumbnail and full size covers')
 })

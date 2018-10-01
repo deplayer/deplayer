@@ -4,11 +4,13 @@ import React from 'react'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../tests/configureEnzyme'
 import SongView from './SongView'
+import Song from '../entities/Song'
 
 configureEnzyme()
 
 const setup = (customProps: any) => {
   const defaultProps = {
+    song: new Song()
   }
 
   const props = {...defaultProps, ...customProps}

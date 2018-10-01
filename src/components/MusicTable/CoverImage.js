@@ -1,18 +1,33 @@
 // @flow
 
 import React from 'react'
-import Song from '../../entities/Song'
+
+type cover = {
+  thumbnailUrl: string,
+  fullUrl: string
+}
 
 type Props = {
-  song: Song
+  cover: cover,
+  size: string,
+  albumName: string
 }
 
 const CoverImage = (props: Props) => {
-  if (props.song.cover && props.song.cover.thumbnailUrl) {
+  if (props.size === 'thumbnail' && props.cover && props.cover.thumbnailUrl) {
     return (
       <img
-        alt={ `${props.song.album.name} cover` }
-        src={ props.song.cover.thumbnailUrl }
+        alt={ `${props.albumName} cover` }
+        src={ props.cover.thumbnailUrl }
+      />
+    )
+  }
+
+  if (props.size === 'full' && props.cover && props.cover.fullUrl) {
+    return (
+      <img
+        alt={ `${props.albumName} cover` }
+        src={ props.cover.fullUrl }
       />
     )
   }
