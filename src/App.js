@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import { Provider } from 'react-redux'
 import { Translate } from 'react-redux-i18n'
 
-import './App.scss'
+import './styles/App.scss'
 
 import PlaylistContainer from './containers/PlaylistContainer'
 import PlayerContainer from './containers/PlayerContainer'
