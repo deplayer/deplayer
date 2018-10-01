@@ -26,5 +26,4 @@ it('renders without crashing', () => {
   expect(enzymeWrapper.find('.search-bar > input').exists()).toBe(true)
   enzymeWrapper.find('input').simulate('change', {target: {value: 'Pink Floyd'}});
   expect(enzymeWrapper.state('searchTerm')).toBe('Pink Floyd');
-  enzymeWrapper.find('button').simulate('click');
 })
