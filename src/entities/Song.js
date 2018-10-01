@@ -2,9 +2,15 @@
 
 import uuidv4 from 'uuid'
 
+type money = {
+  price: number,
+  currency: string
+}
+
 export default class Song {
   id: string
   title: string
+  genre: string
   artist: {
     name: string
   }
@@ -16,6 +22,7 @@ export default class Song {
   }
   // In milliseconds
   duration: number
+  price: money
 
   constructor(songParams: any = {}) {
     const {
@@ -24,12 +31,16 @@ export default class Song {
       artistName,
       albumName,
       thumbnailUrl,
-      duration
+      duration,
+      genre,
+      price,
+      currency
     } = songParams
 
     this.id = id ? id : uuidv4()
     this.title = title
     this.duration = duration
+    this.genre = genre
 
     this.album = {
       name: albumName
@@ -39,6 +50,10 @@ export default class Song {
     }
     this.artist = {
       name: artistName
+    }
+    this.price = {
+      price: price,
+      currency: currency || 'USD'
     }
   }
 }

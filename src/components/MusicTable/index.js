@@ -47,6 +47,8 @@ class MusicTable extends Component<Props> {
             <Table.Cell><Translate value="song.row.album" /></Table.Cell>
             <Table.Cell><Translate value="song.row.dateAdded" /></Table.Cell>
             <Table.Cell><Translate value="song.row.time" /></Table.Cell>
+            <Table.Cell><Translate value="song.row.genre" /></Table.Cell>
+            <Table.Cell><Translate value="song.row.price" /></Table.Cell>
           </Table.Row>
         </Table.Header>
         <Table.Body>

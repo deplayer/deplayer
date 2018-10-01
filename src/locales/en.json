@@ -9,7 +9,11 @@
     "row": {
       "song": "Song",
       "album": "Album",
-      "artist": "Artist"
+      "artist": "Artist",
+      "time": "Duration",
+      "genre": "Genre",
+      "dateAdded": "Date added",
+      "price": "Price"
     }
   }
 }

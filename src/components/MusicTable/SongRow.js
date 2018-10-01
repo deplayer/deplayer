@@ -40,6 +40,8 @@ const SongRow = (props: Props) => {
       <Table.Cell>{ song.artist.name }</Table.Cell>
       <Table.Cell>{ song.artist.name }</Table.Cell>
       <Table.Cell>{ getDurationStr(song.duration) }</Table.Cell>
+      <Table.Cell>{ song.genre }</Table.Cell>
+      <Table.Cell>{ song.price.price + song.price.currency }</Table.Cell>
     </Table.Row>
   )
 }
