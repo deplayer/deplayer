@@ -20,9 +20,7 @@ class SearchBar extends Component<Props, State> {
 
   onSearchChange = (event: SyntheticInputEvent<EventTarget>) => {
     this.setState({ searchTerm: event.target.value})
-  }
 
-  startSearch = () => {
     this.props.dispatch( {
       type: START_SEARCH, searchTerm: this.state.searchTerm
     })
@@ -36,13 +34,6 @@ class SearchBar extends Component<Props, State> {
           placeholder='Search'
           type='text'
         />
-        <button
-          className='ui huge button'
-          onClick={this.startSearch}
-          type='submit'
-        >
-          Search!
-        </button>
       </div>
     )
   }

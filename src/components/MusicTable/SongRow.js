@@ -10,7 +10,7 @@ type Props = {
   song: Song
 }
 
-const CoverImage = (props: any) => {
+const CoverImage = (props: Props) => {
   if (props.song.cover.thumbnailUrl) {
     return (
       <img
