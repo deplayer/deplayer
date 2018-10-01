@@ -5,33 +5,20 @@ import { Table } from 'semantic-ui-react'
 
 import { getDurationStr } from '../../utils/timeFormatter'
 import Song from '../../entities/Song'
+import CoverImage from './CoverImage'
 
 type Props = {
-  song: Song
-}
-
-const CoverImage = (props: Props) => {
-  if (props.song.cover.thumbnailUrl) {
-    return (
-      <img
-        alt={ `${props.song.album.name} cover` }
-        src={ props.song.cover.thumbnailUrl }
-      />
-    )
-  }
-
-  return (
-    <img
-      alt='Placeholder cover'
-      src='https://via.placeholder.com/70x70'
-    />
-  )
+  song: Song,
+  onClick: () => any
 }
 
 const SongRow = (props: Props) => {
-  const { song } = props
+  const { song, onClick } = props
   return (
-    <Table.Row className='song-row'>
+    <Table.Row
+      className='song-row'
+      onClick={onClick}
+    >
       <Table.Cell className='collapsing'>
         <CoverImage song={song} />
       </Table.Cell>

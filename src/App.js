@@ -11,6 +11,7 @@ import PlayerContainer from './containers/PlayerContainer'
 import ImporterContainer from './containers/ImporterContainer'
 import CollectionContainer from './containers/CollectionContainer'
 import SearchContainer from './containers/SearchContainer'
+import SongContainer from './containers/SongContainer'
 import configureStore from './store/configureStore'
 
 import {
@@ -54,6 +55,7 @@ class App extends Component<any> {
             <Route exact path="/" component={Home} />
             <Route path="/import" component={ImporterContainer} />
             <Route path="/collection" component={CollectionPage} />
+            <Route path="/song/:id" component={SongContainer} />
             <PlayerContainer />
           </React.Fragment>
         </Router>

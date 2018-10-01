@@ -7,6 +7,21 @@
   src: local('DOS'), url('fonts/Fixedsys500c.woff') format('woff');
 }
 
+@font-face {
+  font-family: 'Icons';
+  src: url("fonts/icons.eot");
+  src: url("fonts/icons.eot?#iefix") format('embedded-opentype'),
+  url("fonts/icons.woff2") format('woff2'),
+  url("fonts/icons.woff") format('woff'),
+  url("fonts/icons.ttf") format('truetype'),
+  url("fonts/icons.svg#icons") format('svg');
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-decoration: inherit;
+  text-transform: none;
+}
+
 $font-family: DOS,SimHei,Monaco,Menlo,Consolas,'Courier New',monospace;
 $primary-color: #4d94aa;
 $font-color: $primary-color;
@@ -48,4 +63,8 @@ button {
   @extend .selectable;
   color: $font-color !important;
   background-color: $background-color !important;
+
+  tr td {
+    cursor: pointer;
+  }
 }

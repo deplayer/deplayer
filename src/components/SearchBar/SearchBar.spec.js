@@ -1,11 +1,11 @@
 // @flow
 
 import React from 'react'
-import { configure, shallow } from 'enzyme'
-import Adapter from 'enzyme-adapter-react-16'
+import { shallow } from 'enzyme'
+import configureEnzyme from '../../tests/configureEnzyme'
 import SearchBar from './SearchBar'
 
-configure({ adapter: new Adapter() })
+configureEnzyme()
 
 const setup = (customProps: any) => {
   const defaultProps = {

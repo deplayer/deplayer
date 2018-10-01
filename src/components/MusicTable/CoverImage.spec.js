@@ -5,18 +5,16 @@ import { shallow } from 'enzyme'
 import configureEnzyme from '../../tests/configureEnzyme'
 
 import Song from '../../entities/Song'
-import SongRow from './SongRow'
+import CoverImage from './CoverImage'
 
 configureEnzyme()
 
-
 const setup = () => {
   const props = {
-    song: new Song(),
-    onClick: () => {}
+    song: new Song()
   }
 
-  const enzymeWrapper = shallow(<SongRow {...props}/>)
+  const enzymeWrapper = shallow(<CoverImage {...props}/>)
 
   return {
     props,
@@ -24,10 +22,10 @@ const setup = () => {
   }
 }
 
-describe('SongRow', () => {
+describe('CoverImage', () => {
   it('should show render without errors', () => {
     const { enzymeWrapper } = setup()
-    expect(enzymeWrapper.find('.song-row').exists())
+    expect(enzymeWrapper.find('img').exists())
       .toBe(true)
   })
 })
