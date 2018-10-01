@@ -28,12 +28,13 @@ class SearchBar extends Component<Props, State> {
 
   render() {
     return (
-      <div className='search-bar ui huge action input'>
+      <div className='search-bar ui huge action icon input'>
         <input
           onChange={this.onSearchChange}
           placeholder='Search'
           type='text'
         />
+        <i class="search icon"></i>
       </div>
     )
   }
