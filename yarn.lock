@@ -7351,6 +7351,10 @@ sass-loader@^7.1.0:
     pify "^3.0.0"
     semver "^5.5.0"
 
+sass-semantic-ui@^2.2.12-3:
+  version "2.2.12-3"
+  resolved "https://registry.yarnpkg.com/sass-semantic-ui/-/sass-semantic-ui-2.2.12-3.tgz#01b3b79246616f26081e7e94224d55dbe4d0c4bf"
+
 sax@^1.2.1, sax@^1.2.4, sax@~1.2.1:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
@@ -7389,10 +7393,6 @@ semantic-ui-react@^0.82.5:
     lodash "^4.17.10"
     prop-types "^15.6.2"
     shallowequal "^1.1.0"
-
-semantic-ui-sass@^2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/semantic-ui-sass/-/semantic-ui-sass-2.3.1.tgz#1d283fab14a9ebb4a6277b2c9acb5affe51c0a27"
 
 semver-diff@^2.0.0:
   version "2.1.0"
