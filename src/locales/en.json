@@ -7,10 +7,9 @@
   },
   "song": {
     "row": {
-      "title": "title",
-      "artis": {
-        "name": "Artist name"
-      }
+      "song": "Song",
+      "album": "Album",
+      "artist": "Artist"
     }
   }
 }

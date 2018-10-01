@@ -25,7 +25,7 @@ export default class ItunesApiRepository implements IRepository {
       title: itSong.trackName,
       albumName: itSong.collectionName,
       thumbnailUrl: itSong.artworkUrl60,
-      length: itSong.trackTimeMillis
+      duration: itSong.trackTimeMillis
     })
   }
 

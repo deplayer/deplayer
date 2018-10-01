@@ -15,7 +15,7 @@ export default class Song {
     thumbnailUrl: string
   }
   // In milliseconds
-  length: number
+  duration: number
 
   constructor(songParams: any = {}) {
     const {
@@ -24,12 +24,12 @@ export default class Song {
       artistName,
       albumName,
       thumbnailUrl,
-      length
+      duration
     } = songParams
 
     this.id = id ? id : uuidv4()
     this.title = title
-    this.length = length
+    this.duration = duration
 
     this.album = {
       name: albumName

@@ -3,6 +3,7 @@
 import React from 'react'
 import { Table } from 'semantic-ui-react'
 
+import { getDurationStr } from '../../utils/timeFormatter'
 import Song from '../../entities/Song'
 
 type Props = {
@@ -37,6 +38,8 @@ const SongRow = (props: Props) => {
       <Table.Cell>{ song.title }</Table.Cell>
       <Table.Cell>{ song.album.name }</Table.Cell>
       <Table.Cell>{ song.artist.name }</Table.Cell>
+      <Table.Cell>{ song.artist.name }</Table.Cell>
+      <Table.Cell>{ getDurationStr(song.duration) }</Table.Cell>
     </Table.Row>
   )
 }

@@ -25,4 +25,5 @@ button {
 
 .music-table {
   @extend .inverted;
+  @extend .selectable;
 }
