@@ -128,6 +128,7 @@
     "redux-promise": "^0.5.3",
     "redux-saga-test-plan": "^3.7.0",
     "redux-thunk": "^2.2.0",
-    "sass-loader": "^7.1.0"
+    "sass-loader": "^7.1.0",
+    "surge": "^0.20.1"
   }
 }
