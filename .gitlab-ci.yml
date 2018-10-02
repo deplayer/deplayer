@@ -15,7 +15,7 @@ deploy:
   script:
   - yarn
   - yarn build
-  - node_modules/.bin/surge public genar-radio.surge.sh
+  - node_modules/.bin/surge build genar-radio.surge.sh
   variables:
     SURGE_LOGIN: $SURGE_LOGIN
     SURGE_TOKEN: $SURGE_TOKEN
