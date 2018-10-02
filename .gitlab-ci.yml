@@ -1,6 +1,6 @@
 stages:
-  - test
-  - deploy
+- test
+- deploy
 
 test:
   stage: test
@@ -13,9 +13,9 @@ deploy:
   stage: deploy
   image: node:8
   script:
-    - yarn
-    - yarn build
-    - node_modules/.bin/surge public genar-radio.surge.sh
-  environment:
-    - SURGE_LOGIN=$SURGE_LOGIN
-    - SURGE_TOKEN=$SURGE_TOKEN
+  - yarn
+  - yarn build
+  - node_modules/.bin/surge public genar-radio.surge.sh
+  variables:
+    SURGE_LOGIN: $SURGE_LOGIN
+    SURGE_TOKEN: $SURGE_TOKEN
