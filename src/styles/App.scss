@@ -128,4 +128,10 @@ span.label {
 
 .progress-bar {
   @extend .ui.progress;
+
+  .bar {
+    background-color: $secondary-color;
+    width: 0%;
+    transition: width .1s linear;
+  }
 }

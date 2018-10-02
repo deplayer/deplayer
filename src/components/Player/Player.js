@@ -9,13 +9,15 @@ type Props = {
 }
 
 type State = {
-  error: string
+  error: string,
+  currentTime: number
 }
 
 // TODO: Fill all events https://www.w3schools.com/tags/ref_av_dom.asp
 class Player extends Component<Props, State> {
   state = {
-    error: ''
+    error: '',
+    currentTime: 0
   }
   playerRef: { current: null | HTMLMediaElement }
 
@@ -30,6 +32,13 @@ class Player extends Component<Props, State> {
     })
   }
 
+  // Update current time state
+  onTimeUpdate = () => {
+    this.setState({
+      currentTime: this.playerRef && this.playerRef.current ? this.playerRef.current.currentTime: 0
+    })
+  }
+
   render() {
     const currentPlaying = this.props.playlist.currentPlaying || {}
     // Getting the first stream URI
@@ -41,14 +50,15 @@ class Player extends Component<Props, State> {
     return (
       <div className='player'>
         <ProgressBar
-          total={currentPlaying.duration}
-          current={this.playerRef && this.playerRef.current ? this.playerRef.current.currentTime: 0}
+          total={this.playerRef.current ? this.playerRef.current.duration : 0}
+          current={this.state.currentTime}
         />
         <audio
           ref={this.playerRef}
           src={streamUri}
           onError={this.logError.bind(this)}
           autoPlay={ this.props.playlist.playing }
+          onTimeUpdate={ this.onTimeUpdate }
           controls
         />
         {this.state.error}

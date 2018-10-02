@@ -7,8 +7,9 @@ import ProgressBar from './ProgressBar'
 
 configureEnzyme()
 
-const setup = () => {
-  const props = { }
+const setup = (customProps) => {
+  const defaultProps = {}
+  const props = {...defaultProps, ...customProps}
 
   const enzymeWrapper = shallow(<ProgressBar {...props}/>)
 
@@ -19,7 +20,9 @@ const setup = () => {
 }
 
 it('renders without crashing', () => {
-  const { enzymeWrapper } = setup()
+  const { enzymeWrapper } = setup({total: 60, current: 30})
   expect(enzymeWrapper.find('.progress-bar').exists())
     .toBe(true)
+
+  expect(enzymeWrapper.find('.bar').prop('style')).toEqual({width: '50%'})
 })

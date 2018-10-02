@@ -8,13 +8,12 @@ type Props = {
 }
 
 const ProgressBar = (props: Props) => {
+  const barWidth = (props.current * 100) / props.total
   return (
     <div
       className='progress-bar'
-      data-value={ props.current }
-      data-total={ props.total }
     >
-      <div className='bar'>
+      <div className='bar' style={{width: `${barWidth}%`}}>
         <div className='progress'></div>
       </div>
     </div>
