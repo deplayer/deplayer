@@ -38,6 +38,7 @@ $body-bg-color: $background-color;
 @import "sass-semantic-ui/src/scss/collections/_table.scss";
 @import "sass-semantic-ui/src/scss/collections/_menu.scss";
 @import "sass-semantic-ui/src/scss/views/_item.scss";
+@import "sass-semantic-ui/src/scss/modules/_progress.scss";
 
 body {
   color: $primary-color;
@@ -123,4 +124,8 @@ span.label {
 .player-container {
   grid-area: player;
   background-color: #a50;
+}
+
+.progress-bar {
+  @extend .ui.progress;
 }

@@ -2,6 +2,8 @@
 
 import React, { Component } from 'react'
 
+import ProgressBar from './ProgressBar'
+
 type Props = {
   playlist: any
 }
@@ -15,7 +17,7 @@ class Player extends Component<Props, State> {
   state = {
     error: ''
   }
-  playerRef: { current:null | HTMLMediaElement }
+  playerRef: { current: null | HTMLMediaElement }
 
   constructor(props: Props) {
     super(props)
@@ -38,6 +40,10 @@ class Player extends Component<Props, State> {
 
     return (
       <div className='player'>
+        <ProgressBar
+          total={currentPlaying.duration}
+          current={this.playerRef && this.playerRef.current ? this.playerRef.current.currentTime: 0}
+        />
         <audio
           ref={this.playerRef}
           src={streamUri}
