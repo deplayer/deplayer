@@ -49,7 +49,7 @@ body {
   height: 100%;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-  grid-template-areas: "sidebar sidebar sidebar sidebar" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "player player player player" "player player player player";
+  grid-template-areas: "sidebar sidebar sidebar sidebar" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "player player player player";
 }
 
 button {
@@ -124,10 +124,21 @@ span.label {
 .player-container {
   grid-area: player;
   background-color: #a50;
+
+  button {
+    @extend .huge;
+    @extend .compact;
+    @extend .circular;
+    @extend .icon;
+  }
 }
 
 .progress-bar {
   @extend .ui.progress;
+
+  &:first-child {
+    margin: 0;
+  }
 
   .bar {
     background-color: $secondary-color;

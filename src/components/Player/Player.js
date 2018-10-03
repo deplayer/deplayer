@@ -3,6 +3,7 @@
 import React, { Component } from 'react'
 
 import ProgressBar from './ProgressBar'
+import PlayPauseButton from './PlayPauseButton'
 
 type Props = {
   playlist: any
@@ -47,6 +48,21 @@ class Player extends Component<Props, State> {
       && currentPlaying.stream.length ?
       currentPlaying.stream[0].uris[0].uri: null
 
+    const PrevButton = (props) => {
+      return (
+        <button>
+          <i className='icon step backward'></i>
+        </button>
+      )
+    }
+    const NextButton = (props) => {
+      return (
+        <button>
+          <i className='icon step forward'></i>
+        </button>
+      )
+    }
+
     return (
       <div className='player'>
         <ProgressBar
@@ -59,8 +75,14 @@ class Player extends Component<Props, State> {
           onError={this.logError.bind(this)}
           autoPlay={ this.props.playlist.playing }
           onTimeUpdate={ this.onTimeUpdate }
-          controls
         />
+        <div className='ui icon buttons'>
+          <PrevButton />
+          <PlayPauseButton
+            playing={this.playerRef.current ? !this.playerRef.current.paused: false}
+          />
+          <NextButton />
+        </div>
         {this.state.error}
       </div>
     )
