@@ -63,6 +63,8 @@ class Player extends Component<Props, State> {
       )
     }
 
+    const isPlaying = this.playerRef.current ? !this.playerRef.current.paused: false
+
     return (
       <div className='player'>
         <ProgressBar
@@ -79,7 +81,8 @@ class Player extends Component<Props, State> {
         <div className='ui icon buttons'>
           <PrevButton />
           <PlayPauseButton
-            playing={this.playerRef.current ? !this.playerRef.current.paused: false}
+            playing={isPlaying}
+            onClick={isPlaying ? this.playerRef.current.pause: () => {}}
           />
           <NextButton />
         </div>

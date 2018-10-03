@@ -3,7 +3,8 @@
 import React from 'react'
 
 type Props = {
-  playing: boolean
+  playing: boolean,
+  onClick: () => void
 }
 
 const PlayPauseButton = (props: Props) => {
