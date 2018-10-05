@@ -17,6 +17,12 @@ const defaultState = {
   playing: false
 }
 
+const populateTracks = (tracks, song) => {
+  const songToAdd = []
+  songToAdd[song.id] = song
+  return {...tracks, ...songToAdd}
+}
+
 export default (state: State = defaultState, action: Action = {}): State => {
   switch (action.type) {
 
@@ -27,10 +33,8 @@ export default (state: State = defaultState, action: Action = {}): State => {
       return {...state, playing: true}
 
     case types.ADD_TO_PLAYLIST:
-      const songToAdd = []
-      songToAdd[action.song.id] = action.song
-      const tracks = {...state.tracks, ...songToAdd}
-      return {...state, tracks: tracks}
+      const tracks = populateTracks(state.tracks, action.song)
+      return {...state, tracks}
 
     default:
       return state

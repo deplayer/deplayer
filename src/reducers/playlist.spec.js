@@ -5,7 +5,6 @@ import Song from '../entities/Song'
 
 import {
   START_PLAYING,
-  SET_CURRENT_PLAYING,
   ADD_TO_PLAYLIST
 } from '../constants/ActionTypes'
 
@@ -35,6 +34,19 @@ describe('collection reducer', () => {
     expect(reducer(undefined, {type: ADD_TO_PLAYLIST, song: songToAdd}))
       .toEqual({
         tracks: currPlaying,
+        currentPlaying: {},
+        playing: false,
+      })
+  })
+
+  it('should handle ADD_COLLECTION_TO_PLAYLIST action', () => {
+    const songs = []
+    for (let i = 0; i < 20; i++) {
+      songs.push(new Song({id: i}))
+    }
+    expect(reducer(undefined, {type: ADD_COLLECTION_TO_PLAYLIST, collection: songs}))
+      .toEqual({
+        tracks: {},
         currentPlaying: {},
         playing: false,
       })
