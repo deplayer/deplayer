@@ -1,8 +1,13 @@
 // @flow
 
 import reducer from './playlist'
+import Song from '../entities/Song'
 
-import { START_PLAYING } from '../constants/ActionTypes'
+import {
+  START_PLAYING,
+  SET_CURRENT_PLAYING,
+  ADD_TO_PLAYLIST
+} from '../constants/ActionTypes'
 
 describe('collection reducer', () => {
   it('should return the initial state', () => {
@@ -20,6 +25,18 @@ describe('collection reducer', () => {
         currentPlaying: {},
         tracks: {},
         playing: true,
+      })
+  })
+
+  it('should handle ADD_TO_PLAYLIST action', () => {
+    const songToAdd = new Song({id: '1234'})
+    const currPlaying = {}
+    currPlaying['1234'] = songToAdd
+    expect(reducer(undefined, {type: ADD_TO_PLAYLIST, song: songToAdd}))
+      .toEqual({
+        tracks: currPlaying,
+        currentPlaying: {},
+        playing: false,
       })
   })
 })

@@ -27,8 +27,10 @@ export default (state: State = defaultState, action: Action = {}): State => {
       return {...state, playing: true}
 
     case types.ADD_TO_PLAYLIST:
-      state.tracks[action.song._id] = action.song
-      return {...state}
+      const songToAdd = []
+      songToAdd[action.song.id] = action.song
+      const tracks = {...state.tracks, ...songToAdd}
+      return {...state, tracks: tracks}
 
     default:
       return state
