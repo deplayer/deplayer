@@ -40,6 +40,20 @@ class Player extends Component<Props, State> {
     })
   }
 
+  playPause = () => {
+    this.isPlaying() ?
+      this.playerRef.current.pause():
+      this.playerRef.current.play()
+  }
+
+  isPlaying = () => {
+    if (this.playerRef.current) {
+      return !this.playerRef.current.paused
+    }
+
+    return false
+  }
+
   render() {
     const currentPlaying = this.props.playlist.currentPlaying || {}
     // Getting the first stream URI
@@ -63,7 +77,6 @@ class Player extends Component<Props, State> {
       )
     }
 
-    const isPlaying = this.playerRef.current ? !this.playerRef.current.paused: false
 
     return (
       <div className='player'>
@@ -81,8 +94,8 @@ class Player extends Component<Props, State> {
         <div className='ui icon buttons'>
           <PrevButton />
           <PlayPauseButton
-            playing={isPlaying}
-            onClick={isPlaying ? this.playerRef.current.pause: () => {}}
+            playing={this.isPlaying()}
+            onClick={this.playPause}
           />
           <NextButton />
         </div>

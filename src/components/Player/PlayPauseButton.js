@@ -9,7 +9,10 @@ type Props = {
 
 const PlayPauseButton = (props: Props) => {
   return (
-    <button className='play-pause'>
+    <button
+      className='play-pause'
+      onClick={props.onClick}
+    >
       <i className={`icon ${props.playing ? 'pause': 'play'} circle`}></i>
     </button>
   )
