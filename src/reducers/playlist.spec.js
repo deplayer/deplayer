@@ -7,7 +7,8 @@ import {
   START_PLAYING,
   ADD_TO_PLAYLIST,
   ADD_SONGS_TO_PLAYLIST,
-  SET_CURRENT_PLAYING
+  SET_CURRENT_PLAYING,
+  SET_COLUMN_SORT
 } from '../constants/ActionTypes'
 
 describe('collection reducer', () => {
@@ -17,6 +18,7 @@ describe('collection reducer', () => {
         currentPlaying: {},
         tracks: {},
         playing: false,
+        sortedIds: [],
       })
   })
 
@@ -26,6 +28,7 @@ describe('collection reducer', () => {
         currentPlaying: {},
         tracks: {},
         playing: true,
+        sortedIds: [],
       })
   })
 
@@ -38,6 +41,7 @@ describe('collection reducer', () => {
         tracks: currPlaying,
         currentPlaying: {},
         playing: false,
+        sortedIds: [],
       })
   })
 
@@ -57,6 +61,7 @@ describe('collection reducer', () => {
         tracks: expectedObj,
         currentPlaying: {},
         playing: false,
+        sortedIds: [],
       })
 
     const playingSong = expectedObj[5]
@@ -68,6 +73,40 @@ describe('collection reducer', () => {
         currentPlaying: playingSong,
         prevSongId: '4',
         nextSongId: '6',
+        playing: false,
+        sortedIds: [],
+      })
+  })
+
+  it('should handle SET_COLUMN_SORT action', () => {
+    const songs = []
+    const expectedObj = {}
+    for (let i = 1; i <= 20; i++) {
+      const song = new Song({id: i.toString(), price: {price: i%2}})
+      songs.push(song)
+      expectedObj[i] = song
+    }
+
+    const addSongsState = reducer(undefined, {type: ADD_SONGS_TO_PLAYLIST, songs})
+
+    // It should set prev and next songs Ids
+    const sortedSongs = songs.sort((song1, song2) => {
+      return song1.price.price - song2.price.price
+    })
+
+    const sortedIds = []
+
+    sortedSongs.forEach((song) => {
+      sortedIds.push(song.id)
+    })
+
+    expect(reducer(addSongsState, {type: SET_COLUMN_SORT, column: 'price', direction: 'ASC'}))
+      .toEqual({
+        tracks: expectedObj,
+        sortedIds: sortedIds,
+        currentPlaying: {},
+        prevSongId: '-1',
+        nextSongId: '2',
         playing: false,
       })
   })
