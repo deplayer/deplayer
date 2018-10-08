@@ -61,7 +61,7 @@ class Player extends Component<Props, State> {
   }
 
   playPrev = () => {
-    const prevSong = this.props.playlist.tracks[this.props.playlist.nextSongId]
+    const prevSong = this.props.playlist.tracks[this.props.playlist.prevSongId]
     this.props.dispatch(setCurrentPlaying(prevSong))
   }
 
