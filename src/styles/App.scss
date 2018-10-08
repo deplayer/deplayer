@@ -115,6 +115,14 @@ button {
 
   tr td {
     cursor: pointer;
+
+    &.collapsing {
+      height: 100vw;
+
+      @include media-breakpoint-up(md) {
+        height: 60px;
+      }
+    }
   }
 }
 
@@ -125,6 +133,10 @@ button {
   .image {
     grid-area: image;
     height: 100vw;
+
+    @include media-breakpoint-up(md) {
+      height: 60vh;
+    }
   }
 
   .song {
@@ -140,6 +152,12 @@ button {
     .content {
       grid-area: meta;
       position: absolute;
+      padding: 20px;
+
+      @include media-breakpoint-up(md) {
+        position: relative;
+        padding: 0px;
+      }
 
       .header {
         color: $font-color;
