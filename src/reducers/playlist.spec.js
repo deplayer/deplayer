@@ -18,7 +18,7 @@ describe('collection reducer', () => {
         currentPlaying: {},
         tracks: {},
         playing: false,
-        sortedIds: [],
+        trackIds: [],
       })
   })
 
@@ -28,7 +28,7 @@ describe('collection reducer', () => {
         currentPlaying: {},
         tracks: {},
         playing: true,
-        sortedIds: [],
+        trackIds: [],
       })
   })
 
@@ -41,7 +41,7 @@ describe('collection reducer', () => {
         tracks: currPlaying,
         currentPlaying: {},
         playing: false,
-        sortedIds: [],
+        trackIds: ['1234'],
       })
   })
 
@@ -61,7 +61,7 @@ describe('collection reducer', () => {
         tracks: expectedObj,
         currentPlaying: {},
         playing: false,
-        sortedIds: [],
+        trackIds: Object.keys(expectedObj),
       })
 
     const playingSong = expectedObj[5]
@@ -74,7 +74,7 @@ describe('collection reducer', () => {
         prevSongId: '4',
         nextSongId: '6',
         playing: false,
-        sortedIds: [],
+        trackIds: Object.keys(expectedObj),
       })
   })
 
@@ -94,19 +94,19 @@ describe('collection reducer', () => {
       return song1.price.price - song2.price.price
     })
 
-    const sortedIds = []
+    const trackIds = []
 
     sortedSongs.forEach((song) => {
-      sortedIds.push(song.id)
+      trackIds.push(song.id)
     })
 
     expect(reducer(addSongsState, {type: SET_COLUMN_SORT, column: 'price', direction: 'ASC'}))
       .toEqual({
         tracks: expectedObj,
-        sortedIds: sortedIds,
+        trackIds: trackIds,
         currentPlaying: {},
-        prevSongId: '-1',
-        nextSongId: '2',
+        prevSongId: undefined,
+        nextSongId: undefined,
         playing: false,
       })
   })

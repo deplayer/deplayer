@@ -10,7 +10,7 @@ type State = {
   nextSongId?: string,
   prevSongId?: string,
   tracks: any,
-  sortedIds: Array<string>,
+  trackIds: Array<string>,
   playing: boolean
 }
 
@@ -19,7 +19,7 @@ const defaultState = {
   nextSongId: undefined,
   prevSongId: undefined,
   tracks: {},
-  sortedIds: [],
+  trackIds: [],
   playing: false
 }
 
@@ -48,6 +48,7 @@ const getSiblingSong = (tracks, song, next = false) => {
 }
 
 const sortTracks = (tracks, field, direction) => {
+  return Object.keys(tracks)
 }
 
 export default (state: State = defaultState, action: Action = {}): State => {
@@ -66,15 +67,25 @@ export default (state: State = defaultState, action: Action = {}): State => {
 
     case types.ADD_TO_PLAYLIST:
       const tracks = populateTracks([action.song])
-      return {...state, tracks: {...state.tracks, ...tracks}}
+      const mergedTracks = {...state.tracks, ...tracks}
+      return {
+        ...state,
+        tracks: mergedTracks,
+        trackIds: Object.keys(mergedTracks)
+      }
 
     case types.ADD_SONGS_TO_PLAYLIST:
       const newTracks = populateTracks(action.songs)
-      return {...state, tracks: newTracks}
+      const allTracks = {...state.tracks, ...newTracks}
+      return {
+        ...state,
+        tracks: allTracks,
+        trackIds: Object.keys(allTracks)
+      }
 
     case types.SET_COLUMN_SORT:
-      const trackIds = sortTracks()
-      return {...state, sortedIds: trackIds}
+      const trackIds = sortTracks(state.tracks)
+      return {...state, trackIds: trackIds}
 
     default:
       return state
