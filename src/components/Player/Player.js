@@ -5,6 +5,7 @@ import { Dispatch } from 'redux'
 
 import ProgressBar from './ProgressBar'
 import PlayPauseButton from './PlayPauseButton'
+import SkipButton from './SkipButton'
 import { setCurrentPlaying } from '../../actions/playlist'
 
 type Props = {
@@ -79,25 +80,6 @@ class Player extends Component<Props, State> {
       && currentPlaying.stream.length ?
       currentPlaying.stream[0].uris[0].uri: null
 
-    const PrevButton = (props) => {
-      return (
-        <button
-          onClick={props.onClick}
-        >
-          <i className='icon step backward'></i>
-        </button>
-      )
-    }
-    const NextButton = (props) => {
-      return (
-        <button
-          onClick={props.onClick}
-        >
-          <i className='icon step forward'></i>
-        </button>
-      )
-    }
-
     return (
       <div className='player'>
         <ProgressBar
@@ -112,15 +94,17 @@ class Player extends Component<Props, State> {
           onTimeUpdate={ this.onTimeUpdate }
         />
         <div className='ui icon buttons player-controls'>
-          <PrevButton
+          <SkipButton
             onClick={this.playPrev}
+            type="prev"
           />
           <PlayPauseButton
             playing={this.isPlaying()}
             onClick={this.playPause}
           />
-          <NextButton
+          <SkipButton
             onClick={this.playNext}
+            type="next"
           />
         </div>
         {this.state.error}
