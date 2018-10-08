@@ -2,7 +2,6 @@
 
 import React, { Component } from 'react'
 import { Provider } from 'react-redux'
-import { Translate } from 'react-redux-i18n'
 
 import './styles/App.scss'
 
@@ -42,16 +41,24 @@ const CollectionPage = () => {
 
 class App extends Component<any> {
   render() {
+
+    const PlaylistButton = (props) => {
+      return (
+        <Link className='button' to="/">
+          <i className='icon folder outline'></i>
+        </Link>
+      )
+    }
+
     return (
       <Provider store={appStore}>
         <Router history={history} >
           <React.Fragment>
             <div className='sidebar-container'>
+              <div className='ui icon buttons library-controls'>
+                <PlaylistButton />
+              </div>
               <SearchContainer />
-              <Link to="/"><Translate value='menu.home' /></Link>
-              <Link to="/search"><Translate value='menu.search' /></Link>
-              <Link to="/import"><Translate value='menu.import' /></Link>
-              <Link to="/collection"><Translate value='menu.collection' /></Link>
             </div>
             <div className='contents-container'>
               <Route exact path="/" component={Home} />

@@ -36,7 +36,7 @@ export default class Track extends Component<Props> {
           </div>
           <div className='content'>
             <div className='header'>
-              <p><span className='label'><Translate value='song.label.title' /></span>: { song.title }</p>
+              <h1><span className='label'><Translate value='song.label.title' /></span>: { song.title }</h1>
               <p><span className='label'><Translate value='song.label.album' /></span>: { song.album.name }</p>
             </div>
             <div className='meta'><span className='label'><Translate value='song.label.artist' /></span>: { song.artist.name }</div>

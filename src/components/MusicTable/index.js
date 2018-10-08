@@ -6,7 +6,7 @@ import { Table } from 'semantic-ui-react'
 import { Translate } from 'react-redux-i18n'
 
 import Song from '../../entities/Song'
-import { setCurrentPlaying } from '../../actions/playlist'
+import { setCurrentPlaying, addSongsToPlaylist } from '../../actions/playlist'
 import SongRow from './SongRow'
 
 type Props = {
@@ -30,6 +30,7 @@ class MusicTable extends Component<Props> {
         key={song.id}
         song={song}
         onClick={() => {
+          this.props.dispatch(addSongsToPlaylist(this.props.data))
           this.props.dispatch(setCurrentPlaying(song))
         }}
       />

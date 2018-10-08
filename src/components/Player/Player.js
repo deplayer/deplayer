@@ -4,6 +4,7 @@ import React, { Component } from 'react'
 
 import ProgressBar from './ProgressBar'
 import PlayPauseButton from './PlayPauseButton'
+import { setCurrentPlaying } from '../../actions/playlist'
 
 type Props = {
   playlist: any
@@ -54,6 +55,16 @@ class Player extends Component<Props, State> {
     return false
   }
 
+  playNext = () => {
+    const nextSong = this.props.playlist.tracks[this.props.playlist.nextSongId]
+    this.props.dispatch(setCurrentPlaying(nextSong))
+  }
+
+  playPrev = () => {
+    const prevSong = this.props.playlist.tracks[this.props.playlist.nextSongId]
+    this.props.dispatch(setCurrentPlaying(prevSong))
+  }
+
   render() {
     const currentPlaying = this.props.playlist.currentPlaying || {}
     // Getting the first stream URI
@@ -64,19 +75,22 @@ class Player extends Component<Props, State> {
 
     const PrevButton = (props) => {
       return (
-        <button>
+        <button
+          onClick={props.onClick}
+        >
           <i className='icon step backward'></i>
         </button>
       )
     }
     const NextButton = (props) => {
       return (
-        <button>
+        <button
+          onClick={props.onClick}
+        >
           <i className='icon step forward'></i>
         </button>
       )
     }
-
 
     return (
       <div className='player'>
@@ -91,13 +105,17 @@ class Player extends Component<Props, State> {
           autoPlay={ this.props.playlist.playing }
           onTimeUpdate={ this.onTimeUpdate }
         />
-        <div className='ui icon buttons'>
-          <PrevButton />
+        <div className='ui icon buttons player-controls'>
+          <PrevButton
+            onClick={this.playPrev}
+          />
           <PlayPauseButton
             playing={this.isPlaying()}
             onClick={this.playPause}
           />
-          <NextButton />
+          <NextButton
+            onClick={this.playNext}
+          />
         </div>
         {this.state.error}
       </div>
