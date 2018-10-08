@@ -17,7 +17,6 @@ import history from './store/configureHistory'
 import {
   Router,
   Route,
-  Link
 } from 'react-router-dom'
 
 const appStore = configureStore()
@@ -42,22 +41,11 @@ const CollectionPage = () => {
 class App extends Component<any> {
   render() {
 
-    const PlaylistButton = (props) => {
-      return (
-        <Link className='button' to="/">
-          <i className='icon folder outline'></i>
-        </Link>
-      )
-    }
-
     return (
       <Provider store={appStore}>
         <Router history={history} >
           <React.Fragment>
             <div className='sidebar-container'>
-              <div className='ui icon buttons library-controls'>
-                <PlaylistButton />
-              </div>
               <SearchContainer />
             </div>
             <div className='contents-container'>

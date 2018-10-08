@@ -3,6 +3,7 @@
 import React, { Component } from 'react'
 import { Translate } from 'react-redux-i18n'
 import { Redirect } from 'react-router-dom'
+import { Table } from 'semantic-ui-react'
 
 import Song from '../entities/Song'
 import CoverImage from './MusicTable/CoverImage'
@@ -12,7 +13,7 @@ type Props = {
   song: Song
 }
 
-export default class Track extends Component<Props> {
+export default class Rowack extends Component<Props> {
   render() {
     const { song } = this.props
 
@@ -35,13 +36,52 @@ export default class Track extends Component<Props> {
             />
           </div>
           <div className='content'>
-            <div className='header'>
-              <h1><span className='label'><Translate value='song.label.title' /></span>: { song.title }</h1>
-              <p><span className='label'><Translate value='song.label.album' /></span>: { song.album.name }</p>
-            </div>
-            <div className='meta'><span className='label'><Translate value='song.label.artist' /></span>: { song.artist.name }</div>
-            <div className='meta'><span className='label'><Translate value='song.label.duration' /></span>: { getDurationStr(song.duration) }</div>
-            <div className='meta'><span className='label'><Translate value='song.label.genre' /></span>: { song.genre }</div>
+
+            <Table inverted size='large'>
+              <Table.Body>
+                <Table.Row>
+                  <Table.Cell className='collapsed'>
+                    <span className='label'><Translate value='song.label.title' /></span>
+                  </Table.Cell>
+                  <Table.Cell>
+                    { song.title }
+                  </Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell className='collapsed'>
+                    <span className='label'><Translate value='song.label.album' /></span>
+                  </Table.Cell>
+                  <Table.Cell>
+                    { song.album.name }
+                  </Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell className='collapsed'>
+                    <span className='label'><Translate value='song.label.artist' /></span>
+                  </Table.Cell>
+                  <Table.Cell>
+                    { song.artist.name }
+                  </Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell className='collapsed'>
+                    <span className='label'><Translate value='song.label.duration' /></span>
+                  </Table.Cell>
+                  <Table.Cell>
+                    { getDurationStr(song.duration) }
+                  </Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell className='collapsed'>
+                    <span className='label'><Translate value='song.label.genre' /></span>
+                  </Table.Cell>
+                  <Table.Cell>
+                    { song.genre }
+                  </Table.Cell>
+                </Table.Row>
+              </Table.Body>
+            </Table>
+
           </div>
         </div>
       </div>

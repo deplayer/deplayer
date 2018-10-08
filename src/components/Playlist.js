@@ -1,26 +1,26 @@
 // @flow
 
-import React, { Component } from 'react';
-import PropTypes from 'prop-types'
+import React from 'react';
+import { Dispatch } from 'redux'
+
 import MusicTable from './MusicTable'
 
-class Playlist extends Component {
-  render() {
-    return (
-      <div className='collection'>
-        <MusicTable {...this.props} />
-      </div>
-    )
-  }
+type Props = {
+  data: Array<any>,
+  page: number,
+  offset: number,
+  pages: number,
+  total: number,
+  playlist: any,
+  dispatch: Dispatch
 }
 
-Playlist.propTypes = {
-  data: PropTypes.array.isRequired,
-  page: PropTypes.number.isRequired,
-  offset: PropTypes.number.isRequired,
-  pages: PropTypes.number.isRequired,
-  total: PropTypes.number.isRequired,
-  dispatch: PropTypes.func.isRequired
+const Playlist = (props: Props) => {
+  return (
+    <div className='collection'>
+      <MusicTable {...props} />
+    </div>
+  )
 }
 
 export default  Playlist

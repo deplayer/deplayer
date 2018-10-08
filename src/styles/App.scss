@@ -79,7 +79,7 @@ button {
 
   &.ui.input {
     display: block;
-    margin: 0 auto;
+    margin: 20px auto;
   }
 
   width: 95%;
@@ -153,6 +153,30 @@ button {
       grid-area: meta;
       position: absolute;
       padding: 20px;
+
+      table {
+        background-color: $body-bg-color;
+
+        tr {
+          &:first-child {
+            font-size: 36px;
+            line-height: 30px;
+
+            td {
+              padding-right: 12px;
+              padding-left: 12px;
+            }
+          }
+
+          td {
+            &:first-child {
+              text-align: right;
+            }
+
+            border-color: transparent !important;
+          }
+        }
+      }
 
       @include media-breakpoint-up(md) {
         position: relative;

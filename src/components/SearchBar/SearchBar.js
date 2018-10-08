@@ -50,14 +50,16 @@ class SearchBar extends Component<Props, State> {
 
   render() {
     return (
-      <div className={`search-bar ui huge action icon input inverted ${this.props.loading ? 'loading': ''}`}>
-        <input
-          onChange={this.onSearchChange}
-          placeholder='Search'
-          type='text'
-        />
-        <i className='icon search'></i>
-      </div>
+      <React.Fragment>
+        <div className={`search-bar ui huge action icon input inverted ${this.props.loading ? 'loading': ''}`}>
+          <input
+            onChange={this.onSearchChange}
+            placeholder='Search'
+            type='text'
+          />
+          <i className='icon search'></i>
+        </div>
+      </React.Fragment>
     )
   }
 }
