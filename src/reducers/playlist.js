@@ -48,7 +48,24 @@ const getSiblingSong = (tracks, song, next = false) => {
 }
 
 const sortTracks = (tracks, field, direction) => {
-  return Object.keys(tracks)
+  if (!Object.keys(tracks).length) {
+    return []
+  }
+
+  const songs = Object.keys(tracks).map((songId) => {
+    return tracks[songId]
+  })
+
+  const sortedSongs = songs.sort((song1, song2) => {
+    return song1[field] - song2[field]
+  })
+
+  const sortedSongsIds = []
+  sortedSongs.forEach((song) => {
+    sortedSongsIds.push(song.id)
+  })
+
+  return sortedSongsIds
 }
 
 export default (state: State = defaultState, action: Action = {}): State => {
