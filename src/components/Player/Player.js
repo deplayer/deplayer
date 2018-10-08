@@ -92,6 +92,7 @@ class Player extends Component<Props, State> {
           onError={this.logError.bind(this)}
           autoPlay={ this.props.playlist.playing }
           onTimeUpdate={ this.onTimeUpdate }
+          onEnded={this.playNext}
         />
         <div className='ui icon buttons player-controls'>
           <SkipButton
