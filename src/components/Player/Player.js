@@ -1,13 +1,15 @@
 // @flow
 
 import React, { Component } from 'react'
+import { Dispatch } from 'redux'
 
 import ProgressBar from './ProgressBar'
 import PlayPauseButton from './PlayPauseButton'
 import { setCurrentPlaying } from '../../actions/playlist'
 
 type Props = {
-  playlist: any
+  playlist: any,
+  dispatch: Dispatch
 }
 
 type State = {
@@ -57,12 +59,16 @@ class Player extends Component<Props, State> {
 
   playNext = () => {
     const nextSong = this.props.playlist.tracks[this.props.playlist.nextSongId]
-    this.props.dispatch(setCurrentPlaying(nextSong))
+    if (nextSong) {
+      this.props.dispatch(setCurrentPlaying(nextSong))
+    }
   }
 
   playPrev = () => {
     const prevSong = this.props.playlist.tracks[this.props.playlist.prevSongId]
-    this.props.dispatch(setCurrentPlaying(prevSong))
+    if (prevSong) {
+      this.props.dispatch(setCurrentPlaying(prevSong))
+    }
   }
 
   render() {
