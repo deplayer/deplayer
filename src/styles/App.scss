@@ -1,4 +1,8 @@
 @import "sass-semantic-ui/src/scss/_variable.scss";
+@import "bootstrap/scss/_functions.scss";
+@import "bootstrap/scss/_variables.scss";
+@import "bootstrap/scss/_mixins.scss";
+@import "bootstrap/scss/_grid.scss";
 
 @font-face {
   font-family: 'DOS';
@@ -62,6 +66,7 @@ button {
 
   @extend .inverted;
   @extend .fluid;
+  padding-bottom: 20px;
 }
 
 .library-controls {
@@ -72,11 +77,18 @@ button {
 .search-bar {
   grid-area: sidebar;
 
-  @extend .fluid;
+  &.ui.input {
+    display: block;
+    margin: 0 auto;
+  }
+
+  width: 95%;
+  justify-content: center;
 
   input {
+    @extend .fluid;
     background-color: #000 !important;
-    width: 90%;
+    width: 100%;
     color: $font-color;
 
     &:focus {
@@ -86,40 +98,49 @@ button {
 }
 
 .contents-container {
+  overflow-y: auto;
   grid-area: contents;
-  overflow-y: scroll;
+
+  @include media-breakpoint-up(md) {
+    padding: 20px;
+  }
 }
 
 .music-table {
   @extend .inverted;
   @extend .selectable;
+  @extend .large;
   color: $font-color !important;
-  background-color: $background-color !important;
+  background-color: lighten($background-color, 10%) !important;
 
   tr td {
     cursor: pointer;
   }
 }
 
-.song-row {
-  img {
-    width: 100%;
-  }
-}
-
 .song-view {
   grid-area: contents;
+  position: relative;
 
-  @extend .ui.items;
+  .image {
+    grid-area: image;
+    height: 100vw;
+  }
 
   .song {
-    @extend .item;
 
-    .image:not(.ui) {
-      width: auto;
+    @include media-breakpoint-up(md) {
+      display: grid;
+      height: 100%;
+      width: 100%;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+      grid-template-areas: "image image meta meta meta";
     }
 
     .content {
+      grid-area: meta;
+      position: absolute;
+
       .header {
         color: $font-color;
         font-size: 1.8em;
@@ -141,6 +162,7 @@ span.label {
 .player-container {
   grid-area: player;
   background-color: $body-bg-color;
+  padding-top: 20px;
 
   button {
     @extend .huge;
@@ -154,8 +176,10 @@ span.label {
   margin-bottom: 0;
   @extend .ui.progress;
 
+  max-width: 95%;
+
   &:first-child {
-    margin: 0;
+    margin: 0 auto;
   }
 
   .bar {
@@ -170,7 +194,6 @@ span.label {
 }
 
 .player-controls {
-  @extend .container;
   @extend .fluid;
   justify-content: center;
   padding: 15px 0px;
@@ -185,4 +208,16 @@ span.label {
       color: lighten($secondary-color, 20%);
     }
   }
+}
+
+.image {
+  width: 100%;
+}
+
+.cover-image {
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
 }
