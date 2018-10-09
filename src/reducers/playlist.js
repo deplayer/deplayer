@@ -45,14 +45,25 @@ const getSiblingSong = (trackIds: Array<string>, song, next = false) => {
   return tracksIndex[position-1]
 }
 
-export const sortTrackIds = (tracks: any, field: string, direction) => {
+const extractField = (song, field) => {
+  return field.split('.').reduce((obj: any, i): any => {
+    return obj[i] ? obj[i]: '0'
+  }, song)
+}
+
+export const sortTrackIds = (tracks: any, field: string, direction: string) => {
   const songsIds = Object.keys(tracks)
-  return songsIds.sort((songId1, songId2) => {
-    if (tracks[songId1][field] < tracks[songId2][field]) {
-      return -1
+  return songsIds.sort((songId1: string, songId2: string) => {
+    const song1 = tracks[songId1]
+    const song2 = tracks[songId2]
+    const song1Field = extractField(song1, field)
+    const song2Field = extractField(song2, field)
+
+    if (song1Field < song2Field) {
+      return direction === 'ASC' ? -1: 1
     }
-    if (tracks[songId1][field] > tracks[songId2][field]) {
-      return 1
+    if (song1Field > song2Field) {
+      return direction === 'ASC' ? 1: -1
     }
 
     return 0

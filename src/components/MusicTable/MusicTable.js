@@ -28,6 +28,10 @@ const MusicTable = (props: Props) => {
 
   const songs = props.playlist.trackIds.map((songId) => {
     const song = props.collection.rows[songId]
+    if (!song) {
+      return <div><Translate value='error.noSongFound' /></div>
+    }
+
     return <SongRow
       key={song.id}
       song={song}
@@ -56,7 +60,7 @@ const MusicTable = (props: Props) => {
           <Table.Cell><Translate value="song.row.artist" /></Table.Cell>
           <Table.Cell><Translate value="song.row.album" /></Table.Cell>
           <Table.Cell><Translate value="song.row.dateAdded" /></Table.Cell>
-          <Table.Cell onClick={() => sortBy('time', props.collection.rows)}><Translate value="song.row.time" /></Table.Cell>
+          <Table.Cell onClick={() => sortBy('duration', props.collection.rows)}><Translate value="song.row.time" /></Table.Cell>
           <Table.Cell onClick={() => sortBy('genre', props.collection.rows)}><Translate value="song.row.genre" /></Table.Cell>
           <Table.Cell onClick={() => sortBy('price.price', props.collection.rows)}><Translate value="song.row.price" /></Table.Cell>
         </Table.Row>

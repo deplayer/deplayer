@@ -72,7 +72,7 @@ export default class Song {
       name: artistName
     }
     this.price = {
-      price: price,
+      price: price || 0,
       currency: currency || 'USD'
     }
     this.stream = stream || []
