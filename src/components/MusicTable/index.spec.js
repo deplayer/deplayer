@@ -17,7 +17,9 @@ const setup = () => {
     total: 100,
     offset: 10,
     dispatch: () => {},
-    playlist: {}
+    playlist: {
+      currentPlaying: {}
+    }
   }
 
   const enzymeWrapper = shallow(<MusicTable {...props}/>)
