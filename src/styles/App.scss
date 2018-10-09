@@ -236,6 +236,7 @@ span.label {
 .progress-bar {
   margin-bottom: 0;
   @extend .ui.progress;
+  background-color: darken($body-bg-color, 20%);
 
   max-width: 95%;
 
