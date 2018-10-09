@@ -4,24 +4,28 @@ import * as types from '../constants/ActionTypes'
 import { Action } from 'redux'
 
 type State = {
-  rows: Array<any>,
+  rows: any,
   totalRows: number,
-  visibleSongs: Array<any>,
+  visibleSongs: Array<string>,
 }
 
 const defaultState = {
-  rows: [],
+  rows: {},
   totalRows: 0,
   visibleSongs: [],
 }
 
 export default (state: State = defaultState, action: Action = {}) => {
   switch (action.type) {
-    case types.COLLECTION_FETCHED: {
+    case types.ADD_TO_COLLECTION: {
+      const rows = {}
+      action.data.forEach((row) => {
+        rows[row.id] = row
+      })
       return {
         ...state,
-        totalRows: action.data.total_rows,
-        rows: action.data.rows,
+        rows,
+        totalRows: action.data.length,
       }
     }
 

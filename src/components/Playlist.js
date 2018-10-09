@@ -3,7 +3,7 @@
 import React from 'react';
 import { Dispatch } from 'redux'
 
-import MusicTable from './MusicTable'
+import MusicTable from './MusicTable/MusicTable'
 
 type Props = {
   data: Array<any>,

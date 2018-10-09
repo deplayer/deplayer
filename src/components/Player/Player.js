@@ -10,6 +10,7 @@ import { setCurrentPlaying } from '../../actions/playlist'
 
 type Props = {
   playlist: any,
+  collection: any,
   dispatch: Dispatch
 }
 
@@ -59,14 +60,14 @@ class Player extends Component<Props, State> {
   }
 
   playNext = () => {
-    const nextSong = this.props.playlist.tracks[this.props.playlist.nextSongId]
+    const nextSong = this.props.collection.rows[this.props.playlist.nextSongId]
     if (nextSong) {
       this.props.dispatch(setCurrentPlaying(nextSong))
     }
   }
 
   playPrev = () => {
-    const prevSong = this.props.playlist.tracks[this.props.playlist.prevSongId]
+    const prevSong = this.props.collection.rows[this.props.playlist.prevSongId]
     if (prevSong) {
       this.props.dispatch(setCurrentPlaying(prevSong))
     }

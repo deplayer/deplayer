@@ -4,7 +4,7 @@ import React from 'react'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../../tests/configureEnzyme'
 
-import MusicTable from './index'
+import MusicTable from './MusicTable'
 
 configureEnzyme()
 

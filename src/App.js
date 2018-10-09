@@ -8,7 +8,6 @@ import './styles/App.scss'
 import PlaylistContainer from './containers/PlaylistContainer'
 import PlayerContainer from './containers/PlayerContainer'
 import ImporterContainer from './containers/ImporterContainer'
-import CollectionContainer from './containers/CollectionContainer'
 import SearchContainer from './containers/SearchContainer'
 import SongContainer from './containers/SongContainer'
 import configureStore from './store/configureStore'
@@ -29,15 +28,6 @@ const Home = () => {
   )
 }
 
-
-const CollectionPage = () => {
-  return (
-    <React.Fragment>
-      <CollectionContainer  />
-    </React.Fragment>
-  )
-}
-
 class App extends Component<any> {
   render() {
 
@@ -51,7 +41,6 @@ class App extends Component<any> {
             <div className='contents-container'>
               <Route exact path="/" component={Home} />
               <Route path="/import" component={ImporterContainer} />
-              <Route path="/collection" component={CollectionPage} />
               <Route path="/song/:id" component={SongContainer} />
             </div>
             <div className='player-container'>

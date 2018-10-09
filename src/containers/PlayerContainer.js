@@ -5,6 +5,7 @@ import Player from '../components/Player/Player'
 
 export default connect(
   (state) => ({
-    playlist: state.playlist
+    playlist: state.playlist,
+    collection: state.collection,
   })
 )(Player)

@@ -16,7 +16,6 @@ describe('collection reducer', () => {
     expect(reducer(undefined, {}))
       .toEqual({
         currentPlaying: {},
-        tracks: {},
         playing: false,
         trackIds: [],
       })
@@ -26,7 +25,6 @@ describe('collection reducer', () => {
     expect(reducer(undefined, {type: START_PLAYING}))
       .toEqual({
         currentPlaying: {},
-        tracks: {},
         playing: true,
         trackIds: [],
       })
@@ -38,7 +36,6 @@ describe('collection reducer', () => {
     currPlaying['1234'] = songToAdd
     expect(reducer(undefined, {type: ADD_TO_PLAYLIST, song: songToAdd}))
       .toEqual({
-        tracks: currPlaying,
         currentPlaying: {},
         playing: false,
         trackIds: ['1234'],
@@ -58,7 +55,6 @@ describe('collection reducer', () => {
 
     expect(addSongsState)
       .toEqual({
-        tracks: expectedObj,
         currentPlaying: {},
         playing: false,
         trackIds: Object.keys(expectedObj),
@@ -69,7 +65,6 @@ describe('collection reducer', () => {
     // It should set prev and next songs Ids
     expect(reducer(addSongsState, {type: SET_CURRENT_PLAYING, song: playingSong}))
       .toEqual({
-        tracks: expectedObj,
         currentPlaying: playingSong,
         prevSongId: '4',
         nextSongId: '6',
@@ -100,9 +95,8 @@ describe('collection reducer', () => {
       trackIds.push(song.id)
     })
 
-    expect(reducer(addSongsState, {type: SET_COLUMN_SORT, column: 'price', direction: 'ASC'}))
+    expect(reducer(addSongsState, {type: SET_COLUMN_SORT, column: 'price', direction: 'ASC', songs: expectedObj}))
       .toEqual({
-        tracks: expectedObj,
         trackIds: trackIds,
         currentPlaying: {},
         prevSongId: undefined,

@@ -9,7 +9,8 @@ import {
   START_SEARCH,
   SEARCH_FULLFILLED,
   SEARCH_REJECTED,
-  FILL_VISIBLE_SONGS_FULLFILLED
+  FILL_VISIBLE_SONGS_FULLFILLED,
+  ADD_TO_COLLECTION,
 } from '../constants/ActionTypes'
 import SongService from '../services/SongService'
 
@@ -26,6 +27,7 @@ export function* search(repository: IRepository, action: SearchAction): Generato
     const searchResults = yield call(songService.search, action.searchTerm)
     yield put({type: SEARCH_FULLFILLED, searchResults})
     yield put({type: FILL_VISIBLE_SONGS_FULLFILLED, data: searchResults})
+    yield put({type: ADD_TO_COLLECTION, data: searchResults})
   } catch (e) {
     yield put({type: SEARCH_REJECTED, message: e.message})
   }
