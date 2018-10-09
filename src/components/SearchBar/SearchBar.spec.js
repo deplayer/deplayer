@@ -10,7 +10,8 @@ configureEnzyme()
 const setup = (customProps: any) => {
   const defaultProps = {
     dispatch: () => {},
-    loading: false
+    loading: false,
+    playlist: {}
   }
 
   const props = {...defaultProps, ...customProps}

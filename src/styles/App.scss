@@ -34,6 +34,7 @@ $secondary-color: #fefe54;
 $background-color: #101010;
 $body-bg-color: $background-color;
 $green-color: rgba(51, 255, 0, 1);
+$yellow-color: #a50;
 
 @import "sass-semantic-ui/src/scss/globals/_reset.scss";
 @import "sass-semantic-ui/src/scss/globals/_site.scss";
@@ -64,8 +65,26 @@ button {
 .sidebar-container {
   grid-area: sidebar;
 
+  display: flex;
+
+  .button {
+    line-height: 96px;
+    margin-left: 20px;
+
+    a {
+      @extend .ui.button;
+      @extend .huge;
+      @extend .compact;
+      @extend .circular;
+      @extend .icon;
+      @extend .inverted;
+    }
+  }
+
   @extend .inverted;
   @extend .fluid;
+  padding-left: 20px;
+  padding-right: 20px;
   padding-bottom: 20px;
 }
 
@@ -198,7 +217,7 @@ button {
 
 span.label {
   color: $secondary-color;
-  background-color: #a50;
+  background-color: $yellow-color;
 }
 
 .player-container {
@@ -262,4 +281,11 @@ span.label {
   background-repeat: no-repeat;
   background-position: center center;
   background-size: contain;
+}
+
+.song-row {
+  &.current {
+    background-color: $body-bg-color;
+    color: #fff;
+  }
 }

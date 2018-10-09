@@ -10,6 +10,7 @@ import CoverImage from './CoverImage'
 
 type Props = {
   song: Song,
+  isCurrent: boolean,
   onClick: () => any
 }
 
@@ -18,7 +19,7 @@ const SongRow = (props: Props) => {
   const nonAvailable = <Translate value='song.row.na' />
   return (
     <Table.Row
-      className='song-row'
+      className={`song-row ${ props.isCurrent ? 'current': ''}`}
       onClick={onClick}
     >
       <Table.Cell className='collapsing'>

@@ -16,6 +16,7 @@ type Props = {
   pages: number,
   total: number,
   error?: string,
+  playlist: any,
   dispatch: Dispatch,
 }
 
@@ -24,10 +25,13 @@ const MusicTable = (props: Props) => {
     <Table.Row><Table.Cell>{ props.error }</Table.Cell></Table.Row>
     : null
 
+  const { id } = props.playlist.currentPlaying
+
   const songs = props.data.map((song) => {
     return <SongRow
       key={song.id}
       song={song}
+      isCurrent={id === song.id}
       onClick={() => {
         props.dispatch(addSongsToPlaylist(props.data))
         props.dispatch(setCurrentPlaying(song))

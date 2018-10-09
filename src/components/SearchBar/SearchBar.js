@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { Dispatch } from 'redux'
 
 import { START_SEARCH } from '../../constants/ActionTypes'
+import PlaylistButton from '../PlaylistButton'
 
 type State = {
   searchTerm: string
@@ -59,6 +60,7 @@ class SearchBar extends Component<Props, State> {
           />
           <i className='icon search'></i>
         </div>
+        <PlaylistButton />
       </React.Fragment>
     )
   }
