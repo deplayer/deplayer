@@ -11,15 +11,12 @@ configureEnzyme()
 
 const setup = () => {
   const props = {
-    data: [],
-    page: 1,
-    pages: 10,
-    total: 100,
-    offset: 10,
     dispatch: () => {},
     playlist: {
-      currentPlaying: {}
-    }
+      currentPlaying: {},
+      trackIds: []
+    },
+    collection: {}
   }
 
   const enzymeWrapper = shallow(<MusicTable {...props}/>)

@@ -1,6 +1,6 @@
 // @flow
 
-import reducer from './playlist'
+import reducer, { sortTrackIds } from './playlist'
 import Song from '../entities/Song'
 
 import {
@@ -85,19 +85,11 @@ describe('collection reducer', () => {
     const addSongsState = reducer(undefined, {type: ADD_SONGS_TO_PLAYLIST, songs})
 
     // It should set prev and next songs Ids
-    const sortedSongs = songs.sort((song1, song2) => {
-      return song1.price.price - song2.price.price
-    })
-
-    const trackIds = []
-
-    sortedSongs.forEach((song) => {
-      trackIds.push(song.id)
-    })
+    const sortedSongsIds = sortTrackIds(expectedObj, 'price', 'ASC')
 
     expect(reducer(addSongsState, {type: SET_COLUMN_SORT, column: 'price', direction: 'ASC', songs: expectedObj}))
       .toEqual({
-        trackIds: trackIds,
+        trackIds: sortedSongsIds,
         currentPlaying: {},
         prevSongId: undefined,
         nextSongId: undefined,

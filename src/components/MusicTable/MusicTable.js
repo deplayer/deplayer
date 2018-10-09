@@ -5,18 +5,17 @@ import { Dispatch } from 'redux'
 import { Table } from 'semantic-ui-react'
 import { Translate } from 'react-redux-i18n'
 
-import Song from '../../entities/Song'
-import { setCurrentPlaying, addSongsToPlaylist } from '../../actions/playlist'
+import {
+  setCurrentPlaying,
+  addSongsToPlaylist
+} from '../../actions/playlist'
+import { SET_COLUMN_SORT } from '../../constants/ActionTypes'
 import SongRow from './SongRow'
 
 type Props = {
-  data: Array<Song>,
-  page: number,
-  offset: number,
-  pages: number,
-  total: number,
   error?: string,
   playlist: any,
+  collection: any,
   dispatch: Dispatch,
 }
 
@@ -27,17 +26,26 @@ const MusicTable = (props: Props) => {
 
   const { id } = props.playlist.currentPlaying
 
-  const songs = props.data.map((song) => {
+  const songs = props.playlist.trackIds.map((songId) => {
+    const song = props.collection.rows[songId]
     return <SongRow
       key={song.id}
       song={song}
       isCurrent={id === song.id}
       onClick={() => {
-        props.dispatch(addSongsToPlaylist(props.data))
+        props.dispatch(addSongsToPlaylist(props.collection.rows))
         props.dispatch(setCurrentPlaying(song))
       }}
     />
   })
+
+  const sortBy = (field, songs) => {
+    props.dispatch({
+      type: SET_COLUMN_SORT,
+      songs,
+      column: field
+    })
+  }
 
   return (
     <Table className='music-table'>
@@ -48,9 +56,9 @@ const MusicTable = (props: Props) => {
           <Table.Cell><Translate value="song.row.artist" /></Table.Cell>
           <Table.Cell><Translate value="song.row.album" /></Table.Cell>
           <Table.Cell><Translate value="song.row.dateAdded" /></Table.Cell>
-          <Table.Cell><Translate value="song.row.time" /></Table.Cell>
-          <Table.Cell><Translate value="song.row.genre" /></Table.Cell>
-          <Table.Cell><Translate value="song.row.price" /></Table.Cell>
+          <Table.Cell onClick={() => sortBy('time', props.collection.rows)}><Translate value="song.row.time" /></Table.Cell>
+          <Table.Cell onClick={() => sortBy('genre', props.collection.rows)}><Translate value="song.row.genre" /></Table.Cell>
+          <Table.Cell onClick={() => sortBy('price.price', props.collection.rows)}><Translate value="song.row.price" /></Table.Cell>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -59,7 +67,7 @@ const MusicTable = (props: Props) => {
       </Table.Body>
       <Table.Footer>
         <Table.Row>
-          <Table.Cell>Total songs {props.total}</Table.Cell>
+          <Table.Cell>Total songs {props.playlist.trackIds.length}</Table.Cell>
         </Table.Row>
       </Table.Footer>
     </Table>

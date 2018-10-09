@@ -3,7 +3,7 @@ import Playlist from '../components/Playlist'
 
 export default connect(
   (state) => ({
-    ...state.table,
-    playlist: state.playlist
+    playlist: state.playlist,
+    collection: state.collection
   })
 )(Playlist)

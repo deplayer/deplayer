@@ -5,13 +5,7 @@ import history from '../store/configureHistory'
 
 import { IRepository } from '../repositories/IRepository'
 import ItunesApiRepository from '../repositories/ItunesApiRepository'
-import {
-  START_SEARCH,
-  SEARCH_FULLFILLED,
-  SEARCH_REJECTED,
-  FILL_VISIBLE_SONGS_FULLFILLED,
-  ADD_TO_COLLECTION,
-} from '../constants/ActionTypes'
+import  * as types from '../constants/ActionTypes'
 import SongService from '../services/SongService'
 
 type SearchAction = {
@@ -25,11 +19,11 @@ export function* search(repository: IRepository, action: SearchAction): Generato
   yield call(goToHomePage)
   try {
     const searchResults = yield call(songService.search, action.searchTerm)
-    yield put({type: SEARCH_FULLFILLED, searchResults})
-    yield put({type: FILL_VISIBLE_SONGS_FULLFILLED, data: searchResults})
-    yield put({type: ADD_TO_COLLECTION, data: searchResults})
+    yield put({type: types.SEARCH_FULLFILLED, searchResults})
+    yield put({type: types.ADD_TO_COLLECTION, data: searchResults})
+    yield put({type: types.ADD_SONGS_TO_PLAYLIST, songs: searchResults})
   } catch (e) {
-    yield put({type: SEARCH_REJECTED, message: e.message})
+    yield put({type: types.SEARCH_REJECTED, message: e.message})
   }
 }
 
@@ -40,7 +34,7 @@ export function* goToHomePage(): Generator<void, void, void> {
 // Binding actions to sagas
 function* searchSaga(): Generator<void, void, void> {
   const repository = new ItunesApiRepository()
-  yield takeLatest(START_SEARCH, search, repository)
+  yield takeLatest(types.START_SEARCH, search, repository)
 }
 
 export default searchSaga

@@ -6,12 +6,8 @@ import { Dispatch } from 'redux'
 import MusicTable from './MusicTable/MusicTable'
 
 type Props = {
-  data: Array<any>,
-  page: number,
-  offset: number,
-  pages: number,
-  total: number,
   playlist: any,
+  collection: any,
   dispatch: Dispatch
 }
 

@@ -45,9 +45,17 @@ const getSiblingSong = (trackIds: Array<string>, song, next = false) => {
   return tracksIndex[position-1]
 }
 
-const sortTrackIds = (tracks: any, field, direction) => {
-  return Object.keys(tracks).sort((song1, song2) => {
-    return tracks[song1][field] - tracks[song2][field]
+export const sortTrackIds = (tracks: any, field: string, direction) => {
+  const songsIds = Object.keys(tracks)
+  return songsIds.sort((songId1, songId2) => {
+    if (tracks[songId1][field] < tracks[songId2][field]) {
+      return -1
+    }
+    if (tracks[songId1][field] > tracks[songId2][field]) {
+      return 1
+    }
+
+    return 0
   })
 }
 
@@ -80,7 +88,7 @@ export default (state: State = defaultState, action: Action = {}): State => {
       }
 
     case types.SET_COLUMN_SORT:
-      return {...state, trackIds: sortTrackIds(action.songs, state.trackIds)}
+      return {...state, trackIds: sortTrackIds(action.songs, action.column)}
 
     default:
       return state
