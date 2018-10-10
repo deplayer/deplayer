@@ -34,9 +34,7 @@ class App extends Component<any> {
       <Provider store={appStore}>
         <Router history={history} >
           <React.Fragment>
-            <div className='sidebar-container'>
-              <SearchContainer />
-            </div>
+            <SearchContainer />
             <div className='contents-container'>
               <Route exact path="/" component={Home} />
               <Route path="/song/:id" component={SongContainer} />

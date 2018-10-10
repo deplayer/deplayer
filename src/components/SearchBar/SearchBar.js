@@ -9,12 +9,13 @@ import { START_SEARCH } from '../../constants/ActionTypes'
 import PlaylistButton from '../PlaylistButton'
 
 type State = {
-  searchTerm: string
+  searchTerm: string,
 }
 
 type Props = {
   dispatch: Dispatch,
-  loading: boolean
+  loading: boolean,
+  hasResults: boolean
 }
 
 const WAIT_INTERVAL = 1000
@@ -58,7 +59,7 @@ class SearchBar extends Component<Props, State> {
 
   render() {
     return (
-      <React.Fragment>
+      <div className={`sidebar-container ${ this.props.hasResults ? 'has-results': ''}`}>
         <KeyHandler
           keyEventName={KEYPRESS}
           keyValue='/'
@@ -73,8 +74,8 @@ class SearchBar extends Component<Props, State> {
           />
           <i className='icon search'></i>
         </div>
-        <PlaylistButton />
-      </React.Fragment>
+        { this.props.hasResults ?  <PlaylistButton /> : null }
+      </div>
     )
   }
 }

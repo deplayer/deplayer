@@ -63,9 +63,14 @@ button {
 }
 
 .sidebar-container {
-  grid-area: sidebar;
+  grid-area: contents;
+
+  &.has-results {
+    grid-area: sidebar;
+  }
 
   display: flex;
+  align-items: center;
 
   .button {
     line-height: 96px;
