@@ -4,7 +4,6 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import thunk from 'redux-thunk'
 import promise from 'redux-promise'
-import { createLogger } from 'redux-logger'
 import {
   loadTranslations,
   setLocale,
@@ -20,11 +19,6 @@ import playerSaga from '../sagas/player'
 
 export default function configureStore() {
   let middlewares = [promise, thunk]
-
-  if (process.env.NODE_ENV !== 'production') {
-    const logger = createLogger()
-    middlewares = [...middlewares, logger]
-  }
 
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 

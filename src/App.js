@@ -7,7 +7,6 @@ import './styles/App.scss'
 
 import PlaylistContainer from './containers/PlaylistContainer'
 import PlayerContainer from './containers/PlayerContainer'
-import ImporterContainer from './containers/ImporterContainer'
 import SearchContainer from './containers/SearchContainer'
 import SongContainer from './containers/SongContainer'
 import configureStore from './store/configureStore'
@@ -40,7 +39,6 @@ class App extends Component<any> {
             </div>
             <div className='contents-container'>
               <Route exact path="/" component={Home} />
-              <Route path="/import" component={ImporterContainer} />
               <Route path="/song/:id" component={SongContainer} />
             </div>
             <div className='player-container'>
