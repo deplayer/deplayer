@@ -9,6 +9,13 @@ Media player thought to run entirelly in the web browser.
 * Multi provider music streaming services song retrieval
   * iTunes API
 
+## Keyboard hotkeys
+
+* Play/Pause: `space`
+* Next track: `Arrow right` or `j`
+* Prev track: `Arrow left` or `k`
+* Focus on search: `/`
+
 ## Installing
 
 ```bash

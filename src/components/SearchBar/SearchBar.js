@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react';
 import { Dispatch } from 'redux'
+import KeyHandler, {KEYPRESS} from 'react-key-handler'
 
 import { START_SEARCH } from '../../constants/ActionTypes'
 import PlaylistButton from '../PlaylistButton'
@@ -23,6 +24,7 @@ class SearchBar extends Component<Props, State> {
     searchTerm: ''
   }
   timer: any
+  searchInput: any
 
   componentWillMount() {
     this.timer = null
@@ -49,11 +51,21 @@ class SearchBar extends Component<Props, State> {
     })
   }
 
+  setFocus = () => {
+    this.searchInput.focus()
+  }
+
   render() {
     return (
       <React.Fragment>
+        <KeyHandler
+          keyEventName={KEYPRESS}
+          keyValue='/'
+          onKeyHandle={this.setFocus}
+        />
         <div className={`search-bar ui huge action icon input inverted ${this.props.loading ? 'loading': ''}`}>
           <input
+            ref={(input) => { this.searchInput = input }}
             onChange={this.onSearchChange}
             placeholder='Search'
             type='text'

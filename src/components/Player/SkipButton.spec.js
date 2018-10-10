@@ -8,7 +8,9 @@ import SkipButton from './SkipButton'
 configureEnzyme()
 
 const setup = (customProps) => {
-  const defaultProps = {}
+  const defaultProps = {
+    keyValues: []
+  }
   const props = {...defaultProps, ...customProps}
 
   const enzymeWrapper = shallow(<SkipButton {...props}/>)

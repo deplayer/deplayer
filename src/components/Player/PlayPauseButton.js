@@ -1,6 +1,7 @@
 // @flow
 
 import React from 'react'
+import KeyHandler, {KEYPRESS} from 'react-key-handler'
 
 type Props = {
   playing: boolean,
@@ -9,12 +10,19 @@ type Props = {
 
 const PlayPauseButton = (props: Props) => {
   return (
-    <button
-      className='play-pause'
-      onClick={props.onClick}
-    >
-      <i className={`icon ${props.playing ? 'pause': 'play'} circle`}></i>
-    </button>
+    <React.Fragment>
+      <KeyHandler
+        keyEventName={KEYPRESS}
+        keyValue=" "
+        onKeyHandle={props.onClick}
+      />
+      <button
+        className='play-pause'
+        onClick={props.onClick}
+      >
+        <i className={`icon ${props.playing ? 'pause': 'play'} circle`}></i>
+      </button>
+    </React.Fragment>
   )
 }
 

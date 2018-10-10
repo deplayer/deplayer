@@ -100,6 +100,7 @@ class Player extends Component<Props, State> {
         <div className='ui icon buttons player-controls'>
           <SkipButton
             onClick={this.playPrev}
+            keyValues={['ArrowLeft', 'k']}
             type="prev"
           />
           <PlayPauseButton
@@ -108,6 +109,7 @@ class Player extends Component<Props, State> {
           />
           <SkipButton
             onClick={this.playNext}
+            keyValues={['ArrowRight', 'j']}
             type="next"
           />
         </div>
