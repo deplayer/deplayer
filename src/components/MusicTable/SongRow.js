@@ -25,13 +25,30 @@ const SongRow = (props: Props) => {
       <Table.Cell className='collapsing'>
         <CoverImage cover={song.cover} size='thumbnail' albumName={song.album.name} />
       </Table.Cell>
-      <Table.Cell>{ song.title }</Table.Cell>
-      <Table.Cell>{ song.album ? song.album.name: nonAvailable }</Table.Cell>
-      <Table.Cell>{ song.artist ? song.artist.name: nonAvailable }</Table.Cell>
-      <Table.Cell>{ song.artist ? song.artist.name: nonAvailable }</Table.Cell>
-      <Table.Cell>{ getDurationStr(song.duration) }</Table.Cell>
-      <Table.Cell>{ song.genre }</Table.Cell>
-      <Table.Cell>{ song.price ? song.price.price + song.price.currency: nonAvailable }</Table.Cell>
+      <Table.Cell>
+        <span className='label'><Translate value='song.label.title' /></span>
+        { song.title }
+      </Table.Cell>
+      <Table.Cell>
+        <span className='label'><Translate value='song.label.album' /></span>
+        { song.album ? song.album.name: nonAvailable }
+      </Table.Cell>
+      <Table.Cell>
+        <span className='label'><Translate value='song.label.artist' /></span>
+        { song.artist ? song.artist.name: nonAvailable }
+      </Table.Cell>
+      <Table.Cell>
+        <span className='label'><Translate value='song.label.duration' /></span>
+        { getDurationStr(song.duration) }
+      </Table.Cell>
+      <Table.Cell>
+        <span className='label'><Translate value='song.label.genre' /></span>
+        { song.genre }
+      </Table.Cell>
+      <Table.Cell>
+        <span className='label'><Translate value='song.label.price' /></span>
+        { song.price ? song.price.price + song.price.currency: nonAvailable }
+      </Table.Cell>
     </Table.Row>
   )
 }

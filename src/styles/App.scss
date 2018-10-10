@@ -144,6 +144,14 @@ button {
   tbody tr td {
     cursor: pointer;
 
+    .label {
+      margin-right: 5px;
+
+      @include media-breakpoint-up(md) {
+        display: none;
+      }
+    }
+
     &.collapsing {
       height: 100vw;
 
