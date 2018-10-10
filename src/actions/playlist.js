@@ -7,7 +7,7 @@ import * as types from '../constants/ActionTypes'
 import Song from '../entities/Song'
 
 // Set song to be played in Player
-export const setCurrentPlaying = (song: Song) =>
+export const setCurrentPlaying = (song: Song | string) =>
   (dispatch: Dispatch) => {
     return dispatch({type: types.SET_CURRENT_PLAYING, song})
   }

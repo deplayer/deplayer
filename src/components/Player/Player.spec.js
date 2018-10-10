@@ -16,6 +16,9 @@ const setup = (definedProps: any) => {
       rows: {}
     },
     dispatch: Dispatch,
+    match: {
+      params: {}
+    },
     ...definedProps
   }
 

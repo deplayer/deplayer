@@ -11,7 +11,8 @@ import { setCurrentPlaying } from '../../actions/playlist'
 type Props = {
   playlist: any,
   collection: any,
-  dispatch: Dispatch
+  dispatch: Dispatch,
+  match: any
 }
 
 type State = {
@@ -75,7 +76,8 @@ class Player extends Component<Props, State> {
 
   render() {
     const currentPlaying = this.props.playlist.currentPlaying || {}
-    // Getting the first stream URI
+    // Getting the first stream URI, in the future will be choosen based on
+    // priorities
     const streamUri = currentPlaying
       && currentPlaying.stream
       && currentPlaying.stream.length ?
