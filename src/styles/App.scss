@@ -188,8 +188,13 @@ button {
           }
 
           td {
+            padding-right: 12px !important;
+            padding-left: 12px !important;
             &:first-child {
-              text-align: right;
+
+              @include media-breakpoint-up(md) {
+                text-align: right;
+              }
             }
 
             border-color: transparent !important;
