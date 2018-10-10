@@ -132,7 +132,11 @@ button {
   color: $font-color !important;
   background-color: lighten($background-color, 10%) !important;
 
-  tr td {
+  td.action {
+    cursor: pointer;
+  }
+
+  tbody tr td {
     cursor: pointer;
 
     &.collapsing {
