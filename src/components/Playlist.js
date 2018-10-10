@@ -12,6 +12,10 @@ type Props = {
 }
 
 const Playlist = (props: Props) => {
+  if (!props.playlist.trackIds.length) {
+    return null
+  }
+
   return (
     <div className='collection'>
       <MusicTable {...props} />

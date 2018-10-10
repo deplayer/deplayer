@@ -15,5 +15,8 @@
       "dateAdded": "Date added",
       "price": "Price"
     }
+  },
+  "placeholder": {
+    "search": "Type some artist, song or album..."
   }
 }

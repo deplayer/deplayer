@@ -3,6 +3,7 @@
 import React, { Component } from 'react';
 import { Dispatch } from 'redux'
 import KeyHandler, {KEYPRESS} from 'react-key-handler'
+import { I18n } from 'react-redux-i18n'
 
 import { START_SEARCH } from '../../constants/ActionTypes'
 import PlaylistButton from '../PlaylistButton'
@@ -67,7 +68,7 @@ class SearchBar extends Component<Props, State> {
           <input
             ref={(input) => { this.searchInput = input }}
             onChange={this.onSearchChange}
-            placeholder='Search'
+            placeholder={ I18n.t('placeholder.search') }
             type='text'
           />
           <i className='icon search'></i>

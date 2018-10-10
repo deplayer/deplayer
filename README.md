@@ -44,3 +44,4 @@ yarn start
 * sass-semantic-ui # This was a bad decision, to be removed in future releases
 * bootstrap
 * react-simple-share
+* react-key-handler
