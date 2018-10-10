@@ -30,6 +30,7 @@ export default class ItunesApiRepository implements IRepository {
       genre: itSong.primaryGenreName,
       price: itSong.trackPrice,
       currency: itSong.currency,
+      shareUrl: itSong.trackViewUrl,
       stream: [
         {service: 'itunes', uris: [{uri: itSong.previewUrl, quality: 'demo'}]}
       ]

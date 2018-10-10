@@ -6,8 +6,7 @@ import { Table } from 'semantic-ui-react'
 import { Translate } from 'react-redux-i18n'
 
 import {
-  setCurrentPlaying,
-  addSongsToPlaylist
+  setCurrentPlaying
 } from '../../actions/playlist'
 import { SET_COLUMN_SORT } from '../../constants/ActionTypes'
 import SongRow from './SongRow'
@@ -37,7 +36,6 @@ const MusicTable = (props: Props) => {
       song={song}
       isCurrent={id === song.id}
       onClick={() => {
-        props.dispatch(addSongsToPlaylist(props.collection.rows))
         props.dispatch(setCurrentPlaying(song))
       }}
     />

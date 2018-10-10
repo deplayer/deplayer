@@ -14,5 +14,13 @@ describe('entities/Song', () => {
     expect(song.stream[0].uris[0].uri).toEqual('http://some-songs-api/song.mp4')
   })
 
-  it('should create s Song with thumbnail and full size covers')
+  it('should create s Song with thumbnail and full size covers', () => {
+    const song = new Song({thumbnailUrl: 'http://some-songs-api/song.mp4'})
+    expect(song.cover.thumbnailUrl).toEqual('http://some-songs-api/song.mp4')
+  })
+
+  it('should create s Song with shareUrl', () => {
+    const song = new Song({shareUrl: 'http://some-songs-api/song.mp4'})
+    expect(song.shareUrl).toEqual('http://some-songs-api/song.mp4')
+  })
 })

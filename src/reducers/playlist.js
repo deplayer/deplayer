@@ -24,7 +24,11 @@ const defaultState = {
 const populateTracks = (songs): Array<string> => {
   const tracks = []
   songs.forEach((song) => {
-    tracks.push(song.id)
+    if (song.id) {
+      tracks.push(song.id)
+    } else {
+      tracks.push(song)
+    }
   })
 
   return tracks

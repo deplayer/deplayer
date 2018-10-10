@@ -30,6 +30,7 @@ export default class Song {
   id: string
   title: string
   genre: string
+  shareUrl: string
   artist: {
     name: string
   }
@@ -53,13 +54,15 @@ export default class Song {
       genre,
       price,
       currency,
-      stream
+      stream,
+      shareUrl
     } = songParams
 
     this.id = id ? id : uuidv4()
     this.title = title
     this.duration = duration
     this.genre = genre
+    this.shareUrl = shareUrl
 
     this.album = {
       name: albumName

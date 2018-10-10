@@ -7,6 +7,7 @@ import { Table } from 'semantic-ui-react'
 
 import Song from '../entities/Song'
 import CoverImage from './MusicTable/CoverImage'
+import ShareButtons from './ShareButtons'
 import { getDurationStr } from '../utils/timeFormatter'
 
 type Props = {
@@ -36,6 +37,8 @@ export default class Rowack extends Component<Props> {
             />
           </div>
           <div className='content'>
+
+            <ShareButtons song={song} />
 
             <Table inverted size='large'>
               <Table.Body>
