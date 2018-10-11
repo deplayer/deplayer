@@ -6,8 +6,9 @@
     "collection": "Collection"
   },
   "song": {
-    "row": {
+    "label": {
       "song": "Song",
+      "title": "Title",
       "album": "Album",
       "artist": "Artist",
       "time": "Duration",

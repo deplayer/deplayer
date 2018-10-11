@@ -38,6 +38,10 @@ const SongRow = (props: Props) => {
         { song.artist ? song.artist.name: nonAvailable }
       </Table.Cell>
       <Table.Cell>
+        <span className='label'><Translate value='song.label.dateAdded' /></span>
+        { song.dateAdded ? song.dateAdded: nonAvailable }
+      </Table.Cell>
+      <Table.Cell>
         <span className='label'><Translate value='song.label.duration' /></span>
         { getDurationStr(song.duration) }
       </Table.Cell>

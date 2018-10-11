@@ -39,6 +39,7 @@ export default class Song {
   // In milliseconds
   duration: number
   price: money
+  dateAdded: Date
 
   stream: Array<stream>
 
