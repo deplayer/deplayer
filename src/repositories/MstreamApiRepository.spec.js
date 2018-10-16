@@ -3,30 +3,27 @@
 import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
 
+import exampleSongs from './mstreamExampleSongs.json'
 import MstreamApiRepository from './MstreamApiRepository'
-import Song from '../entities/Song'
 
 // Setting mock to default instance
 const mock = new MockAdapter(axios)
 
-// Mock any GET request to /search
+// Mock any GET request to /db/album-songs
 // arguments for reply are (status, data, headers)
-mock.onGet(/db\/search/).reply(200, {
-  albums: [],
-  artists: []
-})
+mock.onPost(/db\/album-songs/).reply(200, exampleSongs)
 
 describe('MstreamApiRepository', () => {
-  const itunesRepo = new MstreamApiRepository()
+  const mstreamRepo = new MstreamApiRepository()
 
   it('should handle song search', () => {
-    expect(itunesRepo.search('Bad brains')).toBeInstanceOf(Promise)
-  })
+    expect.assertions(2)
 
-  it('search should return an array of songs', () => {
-    expect.assertions(1)
-    return itunesRepo.search('Bad brains').then((results: Array<Song>) => {
-      expect(results.length).toBe(0)
+    expect(mstreamRepo.search('Bad brains')).toBeInstanceOf(Promise)
+
+    mstreamRepo.search('Commando 9mm').then((results) => {
+      expect(results).toBeInstanceOf(Array)
+      expect(results.length).toBe(1)
     })
   })
 })
