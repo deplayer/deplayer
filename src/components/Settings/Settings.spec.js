@@ -25,5 +25,6 @@ describe('Settings', () => {
   it('renders without crashing', () => {
     const { enzymeWrapper } = setup()
     expect(enzymeWrapper.find('.settings').exists()).toBe(true)
+    expect(enzymeWrapper.find('h1').exists()).toBe(true)
   })
 })
