@@ -4,7 +4,7 @@ import { takeLatest, put } from 'redux-saga/effects'
 
 import  * as types from '../constants/ActionTypes'
 
-function* saveSettings() {
+function* saveSettings(action: any) {
   yield put({type: types.SETTINGS_SAVED_SUCCESSFULLY})
 }
 

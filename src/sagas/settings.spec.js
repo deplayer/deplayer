@@ -4,18 +4,19 @@ import { expectSaga } from 'redux-saga-test-plan'
 
 import {
   SETTINGS_SAVE,
-  SETTINGS_SAVED_SUSCCESSFULLY
+  SETTINGS_SAVED_SUCCESSFULLY
 } from '../constants/ActionTypes'
 
-import { settings } from './settings'
+import settingsSaga from './settings'
 
 describe('settings saga', () => {
   it('should handle settings events', () => {
 
     const settingsPayload = {}
 
-    return expectSaga(settings, {type: SETTINGS_SAVE, settingsPayload})
-      .put({type: SETTINGS_SAVED_SUSCCESSFULLY})
+    return expectSaga(settingsSaga)
+      .dispatch({type: SETTINGS_SAVE, settingsPayload})
+      .put({type: SETTINGS_SAVED_SUCCESSFULLY})
       .run()
   })
 })
