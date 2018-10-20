@@ -3,9 +3,13 @@
 [include]
 
 [libs]
+./src/interfaces/global.js
 
 [lints]
 
 [options]
+module.name_mapper='.*\(.scss\)' -> 'SCSSModule'
+module.system=haste
+strip_root=true
 
 [strict]

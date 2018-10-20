@@ -38,4 +38,14 @@ describe('SearchBar', () => {
     const { enzymeWrapper } = setup({loading: true})
     expect(enzymeWrapper.find('.search-bar.loading').exists()).toBe(true)
   })
+
+  it('should render PlaylistButton if hasResults', () => {
+    const { enzymeWrapper } = setup({hasResults: true})
+    expect(enzymeWrapper.find('PlaylistButton').exists()).toBe(true)
+  })
+
+  it('should render SettingsButton', () => {
+    const { enzymeWrapper } = setup({})
+    expect(enzymeWrapper.find('SettingsButton').exists()).toBe(true)
+  })
 })

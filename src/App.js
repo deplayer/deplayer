@@ -9,6 +9,7 @@ import PlaylistContainer from './containers/PlaylistContainer'
 import PlayerContainer from './containers/PlayerContainer'
 import SearchContainer from './containers/SearchContainer'
 import SongContainer from './containers/SongContainer'
+import SettingsContainer from './containers/SettingsContainer'
 import configureStore from './store/configureStore'
 import history from './store/configureHistory'
 
@@ -38,6 +39,7 @@ class App extends Component<any> {
             <div className='contents-container'>
               <Route exact path="/" component={Home} />
               <Route path="/song/:id" component={SongContainer} />
+              <Route path="/settings" component={SettingsContainer} />
             </div>
             <div className='player-container'>
               <PlayerContainer />

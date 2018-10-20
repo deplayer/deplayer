@@ -1,7 +1,14 @@
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+
 import SearchBar from '../components/SearchBar/SearchBar'
 
-export default connect((state) => ({
-  loading: state.search.loading,
-  hasResults: state.playlist.trackIds && state.playlist.trackIds.length ? true : false
-}))(SearchBar)
+export default withRouter(connect((state, ownProps) => {
+  const hasResults = state.playlist.trackIds && state.playlist.trackIds.length ? true : false
+  const inHome = ownProps.location.pathname === '/' ? true : false
+  return {
+    hasResults,
+    loading: state.search.loading,
+    showInCenter: !hasResults && inHome
+  }
+})(SearchBar))
