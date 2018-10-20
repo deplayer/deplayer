@@ -16,12 +16,18 @@ mock.onPost(/db\/album-songs/).reply(200, exampleSongs)
 describe('MstreamApiRepository', () => {
   const mstreamRepo = new MstreamApiRepository()
 
+  it('should matchSearch against song', () => {
+    expect(mstreamRepo.matchSearch(exampleSongs[1], 'Commando 9MM')).toBe(true)
+    expect(mstreamRepo.matchSearch(exampleSongs[1], 'commando 9mm')).toBe(true)
+    expect(mstreamRepo.matchSearch(exampleSongs[0], 'Commando 9MM')).toBe(false)
+  })
+
   it('should handle song search', () => {
-    expect.assertions(2)
+    expect.assertions(3)
 
     expect(mstreamRepo.search('Bad brains')).toBeInstanceOf(Promise)
 
-    mstreamRepo.search('Commando 9mm').then((results) => {
+    return mstreamRepo.search('Commando 9mm').then((results) => {
       expect(results).toBeInstanceOf(Array)
       expect(results.length).toBe(1)
     })
