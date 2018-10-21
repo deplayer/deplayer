@@ -13,7 +13,8 @@ configureEnzyme()
 const setup = () => {
   const props = {
     song: new Song(),
-    onClick: () => {}
+    onClick: () => {},
+    isCurrent: false
   }
 
   const enzymeWrapper = shallow(<SongRow {...props}/>)

@@ -1,26 +1,36 @@
 // @flow
 
-import React from 'react'
-import { Translate }  from 'react-redux-i18n'
-import { Form, Button } from 'semantic-ui-react'
+import React, { Component } from 'react'
+import { Translate } from 'react-redux-i18n'
+import { Dispatch } from 'redux'
 
-const Settings = () => {
-  return (
-    <div className='settings'>
-      <h1><Translate value="titles.settings" /></h1>
+import SettingsForm from './SettingsForm'
+import { SAVE_SETTINGS } from '../../constants/ActionTypes'
 
-      <h2><Translate value="titles.providers" /></h2>
-      <h3><Translate value="titles.mstream" /></h3>
+type Props = {
+  dispatch: Dispatch
+}
 
-      <Form>
-        <Form.Field>
-          <label><Translate value="labels.mstream.baseUrl" /></label>
-          <Form.Input fluid type='text' name='baseUrl' />
-        </Form.Field>
-        <Button type='submit'><Translate value="buttons.mstream.save" /></Button>
-      </Form>
-    </div>
-  )
+type State = {}
+
+class Settings extends Component<Props, State> {
+
+  saveSettings = (form: any): any => {
+    this.props.dispatch({type: SAVE_SETTINGS, settingsPayload: form})
+  }
+
+  render() {
+    return (
+      <div className='settings'>
+        <h1><Translate value="titles.settings" /></h1>
+
+        <h2><Translate value="titles.providers" /></h2>
+        <h3><Translate value="titles.mstream" /></h3>
+
+        <SettingsForm onSubmit={this.saveSettings} />
+      </div>
+    )
+  }
 }
 
 export default Settings

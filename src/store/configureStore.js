@@ -51,5 +51,7 @@ export default function configureStore() {
   sagaMiddleware.run(playerSaga)
   sagaMiddleware.run(settingsSaga)
 
+  store.dispatch({type: 'INITIALIZED'})
+
   return store
 }

@@ -1,10 +1,10 @@
 // @flow
 
 import { IRepository } from '../repositories/IRepository'
-import { IService } from './IService'
+import { ISearchService } from './ISearchService'
 import Song from '../entities/Song'
 
-export default class SongService implements IService {
+export default class SongService implements ISearchService {
   songRepository: IRepository
 
   constructor(repository: IRepository) {
