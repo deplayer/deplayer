@@ -5,16 +5,24 @@ import { takeLatest, put, call } from 'redux-saga/effects'
 import  * as types from '../constants/ActionTypes'
 import SettingsService from '../services/SettingsService'
 import RxdbAdapter from '../services/adapters/RxdbAdapter'
+import DummyAdapter from '../services/adapters/DummyAdapter'
+
+// Returns adapter depending on environment
+function getAdapter() {
+  return process.env.NODE_ENV === 'production' ? new RxdbAdapter(): new DummyAdapter()
+}
 
 function* initialize() {
-  const settingsService = new SettingsService(new RxdbAdapter())
+  const adapter = getAdapter()
+  const settingsService = new SettingsService(adapter)
   yield call(settingsService.initialize)
   const settings = yield call(settingsService.get)
   yield put({type: types.RECEIVE_SETTINGS, settings})
 }
 
 function* saveSettings(action: any) {
-  const settingsService = new SettingsService(new RxdbAdapter())
+  const adapter = getAdapter()
+  const settingsService = new SettingsService(adapter)
   yield call(settingsService.save, 'settings', action.settingsPayload)
 
   yield put({type: types.SETTINGS_SAVED_SUCCESSFULLY})

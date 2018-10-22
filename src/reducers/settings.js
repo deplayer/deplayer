@@ -18,8 +18,9 @@ const defaultState = {
 
 export default (state: State = defaultState, action: Action = {}) => {
   switch (action.type) {
-    case RECEIVE_SETTINGS:
+    case RECEIVE_SETTINGS: {
       return {...state, settings: action.settings}
+    }
     default:
       return state
   }

@@ -22,7 +22,7 @@ describe('settings reducer', () => {
         baseUrl: 'http://localhost'
       }
     }
-    expect(reducer(undefined, {action: RECEIVE_SETTINGS, settings}))
+    expect(reducer(undefined, {type: RECEIVE_SETTINGS, settings}))
       .toEqual(
         {
           error: '',
