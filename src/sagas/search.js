@@ -27,6 +27,7 @@ export function* search(repository: IRepository, action: SearchAction): Generato
   }
 }
 
+// Going to home page
 export function* goToHomePage(): Generator<void, void, void> {
   yield history.push('/')
 }
