@@ -1,12 +1,11 @@
 // @flow
 
-import { call, put, takeLatest } from 'redux-saga/effects'
+import { call, put, takeLatest, select } from 'redux-saga/effects'
 import history from '../store/configureHistory'
 
-import { IRepository } from '../repositories/IRepository'
-import ItunesApiRepository from '../repositories/ItunesApiRepository'
+import { IConfig } from '../interfaces/IConfig'
 import  * as types from '../constants/ActionTypes'
-import SongService from '../services/SongService'
+import ProvidersService from '../services/ProvidersService'
 
 type SearchAction = {
   type: string,
@@ -14,8 +13,9 @@ type SearchAction = {
 }
 
 // Handling search saga
-export function* search(repository: IRepository, action: SearchAction): Generator<void, void, void> {
-  const songService = new SongService(repository)
+export function* search(config: IConfig, action: SearchAction): Generator<void, void, void> {
+  console.log(config)
+  const songService = new ProvidersService(config)
   yield call(goToHomePage)
   try {
     const searchResults = yield call(songService.search, action.searchTerm)
@@ -32,10 +32,12 @@ export function* goToHomePage(): Generator<void, void, void> {
   yield history.push('/')
 }
 
+const getConfig = state => state.config
+
 // Binding actions to sagas
 function* searchSaga(): Generator<void, void, void> {
-  const repository = new ItunesApiRepository()
-  yield takeLatest(types.START_SEARCH, search, repository)
+  const config = yield select(getConfig)
+  yield takeLatest(types.START_SEARCH, search, config)
 }
 
 export default searchSaga

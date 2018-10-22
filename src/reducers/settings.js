@@ -3,11 +3,12 @@
 import { Action } from 'redux'
 
 import { RECEIVE_SETTINGS } from '../constants/ActionTypes'
+import { IConfig } from '../interfaces/IConfig'
 
 type State = {
   error: string,
   saving: boolean,
-  settings: any
+  settings: IConfig
 }
 
 const defaultState = {

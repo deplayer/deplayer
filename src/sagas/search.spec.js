@@ -7,14 +7,17 @@ import {
   SEARCH_FULLFILLED
 } from '../constants/ActionTypes'
 
-import DummyRepository from '../repositories/DummyRepository'
 import { search } from './search'
 
 describe('search saga', () => {
   it('should handle search events', () => {
-    const repository = new DummyRepository()
+    const config = {
+      providers: {
+        dummy: {}
+      }
+    }
 
-    return expectSaga(search, repository, {type: START_SEARCH, searchTerm: 'Metallica'})
+    return expectSaga(search, config, {type: START_SEARCH, searchTerm: 'Metallica'})
       .put({type: SEARCH_FULLFILLED, searchResults: [ { title: 'Highway to hell' } ] })
       .run()
   })
