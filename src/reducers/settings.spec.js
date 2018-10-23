@@ -3,17 +3,12 @@
 import reducer from './settings'
 
 import { RECEIVE_SETTINGS } from '../constants/ActionTypes'
+import { defaultState } from './settings'
 
 describe('settings reducer', () => {
   it('should return the initial state', () => {
     expect(reducer(undefined, {}))
-      .toEqual(
-        {
-          error: '',
-          saving: false,
-          settings: {}
-        }
-      )
+      .toEqual(defaultState)
   })
 
   it('should handle RECEIVE_SETTINGS', () => {

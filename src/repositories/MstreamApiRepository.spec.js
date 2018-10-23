@@ -14,7 +14,7 @@ const mock = new MockAdapter(axios)
 mock.onPost(/db\/album-songs/).reply(200, exampleSongs)
 
 describe('MstreamApiRepository', () => {
-  const mstreamRepo = new MstreamApiRepository()
+  const mstreamRepo = new MstreamApiRepository({baseUrl: ''})
 
   it('should matchSearch against song', () => {
     expect(mstreamRepo.matchSearch(exampleSongs[1], 'Commando 9MM')).toBe(true)

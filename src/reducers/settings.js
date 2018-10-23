@@ -3,18 +3,28 @@
 import { Action } from 'redux'
 
 import { RECEIVE_SETTINGS } from '../constants/ActionTypes'
-import { IConfig } from '../interfaces/IConfig'
+import { ISettings } from '../interfaces/ISettings'
 
 type State = {
   error: string,
   saving: boolean,
-  settings: IConfig
+  settings: ISettings
 }
 
-const defaultState = {
+export const defaultState = {
   error: '',
   saving: false,
-  settings: {}
+  settings: {
+    providers: {
+      itunes: {
+        enabled: false
+      },
+      mstream: {
+        enabled: true,
+        baseUrl: '',
+      }
+    }
+  }
 }
 
 export default (state: State = defaultState, action: Action = {}) => {

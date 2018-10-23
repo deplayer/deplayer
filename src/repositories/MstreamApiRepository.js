@@ -2,6 +2,7 @@
 
 import axios from 'axios'
 
+import Song from '../entities/Song'
 import { IRepository } from './IRepository'
 
 /**
@@ -9,30 +10,52 @@ import { IRepository } from './IRepository'
  */
 export default class MstreamApiRepository implements IRepository {
   baseUrl: string
+  albumSongsUrl: string
 
-  constructor() {
-    this.baseUrl = '/db/album-songs'
+  constructor(settings: any) {
+    this.albumSongsUrl = settings.baseUrl + '/db/album-songs'
+    this.baseUrl = settings.baseUrl
   }
 
   matchSearch = (song: any, searchTerm: string) => {
     const re = new RegExp(searchTerm, 'gi')
-    return re.test(song.metadata.artist)
+    return re.test(song.filepath)
+      || re.test(song.metadata.artist)
       || re.test(song.metadata.album)
       || re.test(song.metadata.title)
   }
 
-  mapResponse = (result: any, searchTerm: string): Array<any> => {
+  filterSongs = (result: any, searchTerm: string): Array<any> => {
     return result.filter((resultSong) => {
       return this.matchSearch(resultSong, searchTerm)
     })
   }
 
+  mapSongs = (songs: Array<any>): Array<any> => {
+    return songs.map((song: any) => {
+      return new Song({
+        id: song.metadata.hash,
+        title: song.metadata.title,
+        artistName: song.metadata.artist,
+        albumName: song.metadata.album,
+        thumbnailUrl: song.metadata['album-art'],
+        fullUrl: song.metadata['album-art'],
+        stream: [
+          {
+            service: 'mstream',
+            uris: [{uri: this.baseUrl + '/media/' + decodeURIComponent(song.filepath)}]
+          }
+        ]
+      })
+    })
+  }
+
   search(searchTerm: string): Promise<Array<any>> {
     return new Promise((resolve, reject) => {
-      axios.post(this.baseUrl)
+      axios.post(this.albumSongsUrl)
         .then((result) => {
-          const mappedSongs = this.mapResponse(result.data, searchTerm)
-          resolve(mappedSongs)
+          const mappedSongs = this.filterSongs(result.data, searchTerm)
+          resolve(this.mapSongs(mappedSongs))
         })
         .catch((err) => {
           reject(err)

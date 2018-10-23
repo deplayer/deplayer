@@ -6,16 +6,19 @@ describe('ProvidersService', () => {
   it('should handle search against all providers', () => {
     const config = {
       providers: {
-        dummy: {}
+        dummy: {
+          enabled: true
+        }
       }
     }
     const providersService = new ProvidersService(config)
 
-    expect.assertions(1)
+    expect.assertions(2)
 
-    providersService.search('Dead kennedys')
-      .then((result) => {
-        expect(result).toBeDefined()
+    providersService.search('highway to hell')
+      .then((results) => {
+        expect(results).toBeDefined()
+        expect(results[0].title).toBeDefined()
       })
   })
 })

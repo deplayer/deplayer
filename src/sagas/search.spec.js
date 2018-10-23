@@ -13,7 +13,9 @@ describe('search saga', () => {
   it('should handle search events', () => {
     const config = {
       providers: {
-        dummy: {}
+        dummy: {
+          enabled: true
+        }
       }
     }
 
