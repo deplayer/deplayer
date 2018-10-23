@@ -32,6 +32,8 @@ export default (state: State = defaultState, action: Action = {}) => {
     case RECEIVE_SETTINGS: {
       return {...state, settings: action.settings}
     }
+      // case SETTINGS_SAVED_SUCCESSFULLY: {
+      // }
     default:
       return state
   }

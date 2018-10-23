@@ -16,8 +16,8 @@ function* initialize() {
   const adapter = getAdapter()
   const settingsService = new SettingsService(adapter)
   yield call(settingsService.initialize)
-  // const settings = yield call(settingsService.get)
-  // yield put({type: types.RECEIVE_SETTINGS, settings})
+  const settings = yield call(settingsService.get)
+  yield put({type: types.RECEIVE_SETTINGS, settings})
 }
 
 function* saveSettings(action: any) {

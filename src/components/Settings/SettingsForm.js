@@ -3,22 +3,23 @@
 import React from 'react'
 import { Form, Button } from 'semantic-ui-react'
 import { Translate }  from 'react-redux-i18n'
-import { Formik } from 'formik'
+import { Formik, Field } from 'formik'
+
+import { defaultState } from '../../reducers/settings'
 
 type Props = {
-  onSubmit: () => Promise<any>
+  onSubmit: () => Promise<any>,
+  settings: any
 }
 
 const SettingsForm = (props: Props) => {
-  const initialValues = {
-    mstream: {
-      baseUrl: ''
-    }
-  }
+  const { settings } = props
   return (
     <Formik
-      initialValues={initialValues}
+      initialValues={defaultState.settings}
+      values={settings.settings}
       onSubmit={props.onSubmit}
+      isSubmitting={settings.saving}
     >
       {({
         values,
@@ -27,25 +28,21 @@ const SettingsForm = (props: Props) => {
         handleChange,
         handleBlur,
         handleSubmit,
-        isSubmitting,
-        /* and other goodies */
+        isSubmitting
       }) => (
         <Form
           className='settings-form'
           onSubmit={handleSubmit}
         >
-          <Form.Field>
-            <label><Translate value="labels.mstream.baseUrl" /></label>
-            <Form.Input
-              fluid
-              type='text'
-              name='mstream.baseUrl'
-              onChange={handleChange}
-              placeholder='http://my-mstream-server.me'
-              value={values.mstream.baseUrl}
-            />
-          </Form.Field>
-          <Button disabled={isSubmitting} type='submit'><Translate value="buttons.mstream.save" /></Button>
+          <label><Translate value="labels.mstream.baseUrl" /></label>
+          <Field
+            type='text'
+            name='providers.mstream.baseUrl'
+            placeholder='http://my-mstream-server.me'
+          />
+          <Button disabled={isSubmitting} type='submit'>
+            <Translate value="buttons.mstream.save" />
+          </Button>
         </Form>
       )}
     </Formik>
