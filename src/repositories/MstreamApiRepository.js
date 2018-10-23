@@ -38,8 +38,8 @@ export default class MstreamApiRepository implements IRepository {
         title: song.metadata.title,
         artistName: song.metadata.artist,
         albumName: song.metadata.album,
-        thumbnailUrl: song.metadata['album-art'],
-        fullUrl: song.metadata['album-art'],
+        thumbnailUrl: song.metadata['album-art'] ? this.baseUrl + '/album-art/' + song.metadata['album-art']: undefined,
+        fullUrl: song.metadata['album-art'] ? this.baseUrl + '/album-art/' + song.metadata['album-art']: undefined,
         stream: [
           {
             service: 'mstream',
