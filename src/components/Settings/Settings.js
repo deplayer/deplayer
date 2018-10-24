@@ -5,7 +5,6 @@ import { Translate } from 'react-redux-i18n'
 import { Dispatch } from 'redux'
 
 import SettingsForm from './SettingsForm'
-import { SAVE_SETTINGS } from '../../constants/ActionTypes'
 
 type Props = {
   dispatch: Dispatch,
@@ -15,11 +14,6 @@ type Props = {
 type State = {}
 
 class Settings extends Component<Props, State> {
-
-  saveSettings = (form: any): any => {
-    this.props.dispatch({type: SAVE_SETTINGS, settingsPayload: form})
-  }
-
   render() {
     return (
       <div className='settings'>
@@ -29,8 +23,8 @@ class Settings extends Component<Props, State> {
         <h3><Translate value="titles.mstream" /></h3>
 
         <SettingsForm
-          onSubmit={this.saveSettings}
           settings={this.props.settings}
+          dispatch={this.props.dispatch}
         />
       </div>
     )

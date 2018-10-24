@@ -9,7 +9,12 @@ import SettingsForm from './SettingsForm'
 configureEnzyme()
 
 const setup = (customProps: any) => {
-  const defaultProps = { }
+  const defaultProps = {
+    settings: {
+      settings: {}
+    },
+    onSubmit: () => Promise
+  }
 
   const props = {...defaultProps, ...customProps}
 

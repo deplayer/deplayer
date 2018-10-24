@@ -18,7 +18,7 @@ export default class MstreamApiRepository implements IRepository {
   }
 
   matchSearch = (song: any, searchTerm: string) => {
-    const re = new RegExp(searchTerm, 'gi')
+    const re = new RegExp(searchTerm.toLowerCase(), 'gi')
     return re.test(song.filepath)
       || re.test(song.metadata.artist)
       || re.test(song.metadata.album)
@@ -35,7 +35,7 @@ export default class MstreamApiRepository implements IRepository {
     return songs.map((song: any) => {
       return new Song({
         id: song.metadata.hash,
-        title: song.metadata.title,
+        title: song.metadata.title ? song.metadata.title : song.filepath,
         artistName: song.metadata.artist,
         albumName: song.metadata.album,
         thumbnailUrl: song.metadata['album-art'] ? this.baseUrl + '/album-art/' + song.metadata['album-art']: undefined,

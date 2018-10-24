@@ -17,6 +17,7 @@ export default class RxdbAdapter implements IAdapter {
           resolve(result)
         })
           .catch((err) => {
+            console.warn(err)
             reject(err)
           })
       })
@@ -25,12 +26,16 @@ export default class RxdbAdapter implements IAdapter {
 
   get = (model: string, id: string): Promise<any> => {
     return new Promise((resolve, reject) => {
-      db.get().then((instance) => {
+      return db.get().then((instance) => {
 
         const query = instance[model].findOne({_id: id})
 
         query.exec().then((result) => {
-          resolve(result.get())
+          if (result) {
+            resolve(result.get())
+          }
+
+          resolve(null)
         })
           .catch((err) => {
             console.warn(err)

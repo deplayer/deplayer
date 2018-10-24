@@ -3,7 +3,6 @@
 import { call, put, takeLatest, select } from 'redux-saga/effects'
 import history from '../store/configureHistory'
 
-import { ISettings } from '../interfaces/ISettings'
 import  * as types from '../constants/ActionTypes'
 import ProvidersService from '../services/ProvidersService'
 
@@ -13,7 +12,8 @@ type SearchAction = {
 }
 
 // Handling search saga
-export function* search(settings: ISettings, action: SearchAction): Generator<void, void, void> {
+export function* search(action: SearchAction): Generator<void, void, void> {
+  const settings = yield select(getSettings)
   const providersService = new ProvidersService(settings)
   yield call(goToHomePage)
   try {
@@ -33,13 +33,12 @@ export function* goToHomePage(): Generator<void, void, void> {
 
 // Extract settings from state
 const getSettings = state => {
-  return state.settings && state.settings.settings ? state.settings.settings: state.settings
+  return state ? state.settings.settings : {providers: {}}
 }
 
 // Binding actions to sagas
 function* searchSaga(): Generator<void, void, void> {
-  const settings = yield select(getSettings)
-  yield takeLatest(types.START_SEARCH, search, settings)
+  yield takeLatest(types.START_SEARCH, search)
 }
 
 export default searchSaga

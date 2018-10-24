@@ -9,8 +9,10 @@ const collections = [
       title: 'settings schema',
       version: 0,
       type: 'object',
+      migrationStrategies: {
+      },
       properties: {
-        mstream: {
+        providers: {
           type: 'object'
         }
       },
@@ -21,6 +23,8 @@ const collections = [
 let dbPromise = null;
 
 const _create = async () => {
+  // console.log('DatabaseService: deleting previous database..')
+  // await RxDB.removeDatabase('settings', 'idb');
   console.log('DatabaseService: creating database..')
   const db = await RxDB.create({name: 'settings', adapter: 'idb'})
   console.log('DatabaseService: created database')
