@@ -32,7 +32,7 @@ export function* goToHomePage(): Generator<void, void, void> {
 }
 
 // Extract settings from state
-const getSettings = state => {
+export const getSettings = (state: any) => {
   return state ? state.settings.settings : {providers: {}}
 }
 
