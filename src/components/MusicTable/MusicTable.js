@@ -60,7 +60,6 @@ const MusicTable = (props: Props) => {
           <Table.Cell><Translate value="song.row.dateAdded" /></Table.Cell>
           <Table.Cell className='action' onClick={() => sortBy('duration', props.collection.rows)}><Translate value="song.row.time" /></Table.Cell>
           <Table.Cell className='action' onClick={() => sortBy('genre', props.collection.rows)}><Translate value="song.row.genre" /></Table.Cell>
-          <Table.Cell className='action' onClick={() => sortBy('price.price', props.collection.rows)}><Translate value="song.row.price" /></Table.Cell>
         </Table.Row>
       </Table.Header>
       <Table.Body>
