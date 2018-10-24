@@ -1,20 +1,11 @@
 // @flow
 
 import uuidv4 from 'uuid'
+import Media from './Media'
 
 type money = {
   price: number,
   currency: string
-}
-
-type streamUri = {
-  uri: string,
-  quality: string
-}
-
-type stream = {
-  service: string,
-  uris: Array<streamUri>
 }
 
 type cover = {
@@ -26,7 +17,7 @@ type album = {
   name: string
 }
 
-export default class Song {
+export default class Song extends Media {
   id: string
   title: string
   genre: string
@@ -41,9 +32,9 @@ export default class Song {
   price: money
   dateAdded: Date
 
-  stream: Array<stream>
-
   constructor(songParams: any = {}) {
+    super()
+
     const {
       id,
       title,

@@ -28,7 +28,7 @@ const MusicTable = (props: Props) => {
   const songs = props.playlist.trackIds.map((songId) => {
     const song = props.collection.rows[songId]
     if (!song) {
-      return <div><Translate value='error.noSongFound' /></div>
+      return <Table.Row><Table.Cell><div><Translate value='error.noSongFound' /></div></Table.Cell></Table.Row>
     }
 
     return <SongRow

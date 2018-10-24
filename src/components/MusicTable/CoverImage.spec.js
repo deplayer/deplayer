@@ -11,7 +11,14 @@ configureEnzyme()
 
 const setup = () => {
   const props = {
-    song: new Song()
+    song: new Song(),
+    size: 'thumbnail',
+    albumName: 'My album',
+    cover: {
+      fullUrl: '',
+      thumbnailUrl: '',
+    },
+    isCurrent: false
   }
 
   const enzymeWrapper = shallow(<CoverImage {...props}/>)

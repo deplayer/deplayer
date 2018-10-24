@@ -33,7 +33,7 @@ class Player extends Component<Props, State> {
     this.playerRef = React.createRef()
   }
 
-  logError(ev) {
+  logError(ev: any) {
     this.setState({
       error: this.playerRef.current.error.message
     })

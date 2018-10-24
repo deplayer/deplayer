@@ -24,8 +24,8 @@ export default (state: State = defaultState, action: Action = {}) => {
       })
       return {
         ...state,
-        rows,
-        totalRows: action.data.length,
+        rows: {...state.rows, ...rows},
+        totalRows: state.totalRows + action.data.length,
       }
     }
 

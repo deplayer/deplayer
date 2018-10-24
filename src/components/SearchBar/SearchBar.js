@@ -7,6 +7,7 @@ import { I18n } from 'react-redux-i18n'
 
 import { START_SEARCH } from '../../constants/ActionTypes'
 import PlaylistButton from '../PlaylistButton'
+import SettingsButton from '../Buttons/SettingsButton'
 
 type State = {
   searchTerm: string,
@@ -15,6 +16,7 @@ type State = {
 type Props = {
   dispatch: Dispatch,
   loading: boolean,
+  showInCenter: boolean,
   hasResults: boolean
 }
 
@@ -59,7 +61,7 @@ class SearchBar extends Component<Props, State> {
 
   render() {
     return (
-      <div className={`sidebar-container ${ this.props.hasResults ? 'has-results': ''}`}>
+      <div className={`sidebar-container ${ this.props.showInCenter ? '': 'has-results'}`}>
         <KeyHandler
           keyEventName={KEYPRESS}
           keyValue='/'
@@ -75,6 +77,7 @@ class SearchBar extends Component<Props, State> {
           <i className='icon search'></i>
         </div>
         { this.props.hasResults ?  <PlaylistButton /> : null }
+        <SettingsButton />
       </div>
     )
   }

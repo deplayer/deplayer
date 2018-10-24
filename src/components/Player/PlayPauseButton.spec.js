@@ -8,7 +8,9 @@ import PlayPauseButton from './PlayPauseButton'
 configureEnzyme()
 
 const setup = (customProps) => {
-  const defaultProps = {}
+  const defaultProps = {
+    onClick: () => {}
+  }
   const props = {...defaultProps, ...customProps}
 
   const enzymeWrapper = shallow(<PlayPauseButton {...props}/>)
