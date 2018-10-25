@@ -6,10 +6,11 @@ import { Dispatch } from 'redux'
 import ProgressBar from './ProgressBar'
 import PlayPauseButton from './PlayPauseButton'
 import SkipButton from './SkipButton'
+import VolumeControl from './VolumeControl'
 import { setCurrentPlaying } from '../../actions/playlist'
 
 type Props = {
-  playlist: any,
+  player: any,
   collection: any,
   dispatch: Dispatch,
   match: any
@@ -61,21 +62,21 @@ class Player extends Component<Props, State> {
   }
 
   playNext = () => {
-    const nextSong = this.props.collection.rows[this.props.playlist.nextSongId]
+    const nextSong = this.props.collection.rows[this.props.player.nextSongId]
     if (nextSong) {
       this.props.dispatch(setCurrentPlaying(nextSong))
     }
   }
 
   playPrev = () => {
-    const prevSong = this.props.collection.rows[this.props.playlist.prevSongId]
+    const prevSong = this.props.collection.rows[this.props.player.prevSongId]
     if (prevSong) {
       this.props.dispatch(setCurrentPlaying(prevSong))
     }
   }
 
   render() {
-    const currentPlaying = this.props.playlist.currentPlaying || {}
+    const currentPlaying = this.props.player.currentPlaying || {}
     // Getting the first stream URI, in the future will be choosen based on
     // priorities
     const streamUri = currentPlaying
@@ -93,7 +94,7 @@ class Player extends Component<Props, State> {
           ref={this.playerRef}
           src={streamUri}
           onError={this.logError.bind(this)}
-          autoPlay={ this.props.playlist.playing }
+          autoPlay={ this.props.player.playing }
           onTimeUpdate={ this.onTimeUpdate }
           onEnded={this.playNext}
         />
@@ -112,6 +113,7 @@ class Player extends Component<Props, State> {
             keyValues={['ArrowRight', 'j']}
             type="next"
           />
+          <VolumeControl volume={this.props.player.volume} />
         </div>
         {this.state.error}
       </div>
