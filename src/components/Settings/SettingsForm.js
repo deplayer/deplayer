@@ -11,12 +11,38 @@ import { defaultState } from '../../reducers/settings'
 
 type Props = {
   settings: any,
-  dispatch: Dispatch
+  dispatch: Dispatch,
+  schema: any
 }
 
 const SettingsForm = (props: Props) => {
   const saveSettings = (form: any): any => {
     props.dispatch({type: SAVE_SETTINGS, settingsPayload: form})
+  }
+
+  // Convert schema object to form elements
+  const populateFromSchema = (schema) => {
+    const { fields } = props.schema
+
+    const populatedFields = fields.map((field) => {
+      return (
+        <div
+          key={field.name}
+          className='form-group'
+        >
+          { field.type !== 'checkbox' ?
+              <label>{field.title}</label> : null }
+          <Field
+            name={field.name}
+            type={field.type}
+          />
+          { field.type === 'checkbox' ?
+              <label>{field.title}</label> : null }
+        </div>
+      )
+    })
+
+    return populatedFields
   }
 
   const { settings } = props
@@ -43,17 +69,7 @@ const SettingsForm = (props: Props) => {
           className='settings-form'
           onSubmit={handleSubmit}
         >
-          <label><Translate value="labels.enabled" /></label>
-          <Field
-            type='checkbox'
-            name='providers.mstream.enabled'
-          />
-          <label><Translate value="labels.mstream.baseUrl" /></label>
-          <Field
-            type='text'
-            name='providers.mstream.baseUrl'
-            placeholder='http://my-mstream-server.me'
-          />
+          { populateFromSchema(props.schema) }
           <Button disabled={isSubmitting} type='submit'>
             <Translate value="buttons.mstream.save" />
           </Button>

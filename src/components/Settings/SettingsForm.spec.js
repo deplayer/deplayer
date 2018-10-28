@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { shallow } from 'enzyme'
+import { Translate } from 'react-redux-i18n'
 import configureEnzyme from '../../tests/configureEnzyme'
 
 import SettingsForm from './SettingsForm'
@@ -9,7 +10,15 @@ import SettingsForm from './SettingsForm'
 configureEnzyme()
 
 const setup = (customProps: any) => {
+  const schema = {
+    fields: [
+      {title: <Translate value="labels.enabled" />, name: 'providers.mstream.enabled', type: 'checkbox'},
+      {title: <Translate value="labels.mstream.baseUrl" />, name: 'providers.mstream.baseUrl', type: 'url'}
+    ]
+  }
+
   const defaultProps = {
+    schema,
     settings: {
       settings: {}
     },

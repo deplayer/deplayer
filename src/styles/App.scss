@@ -65,6 +65,10 @@ button {
   @extend .btn-dark;
 }
 
+.contents-container {
+  @extend .container;
+}
+
 .sidebar-container {
   grid-area: contents;
 
@@ -319,6 +323,13 @@ span.label {
 
 .share-buttons {
   text-align: right;
+}
+
+.form-group input[type=text] {
+  @extend .form-control;
+}
+.form-group input[type=checkbox] {
+  @extend .form-check-input;
 }
 
 .volume-control {

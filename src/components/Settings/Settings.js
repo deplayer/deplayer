@@ -15,14 +15,17 @@ type State = {}
 
 class Settings extends Component<Props, State> {
   render() {
+    const schema = {
+      fields: [
+        {title: <Translate value="labels.enabled" />, name: 'providers.mstream.enabled', type: 'checkbox'},
+        {title: <Translate value="labels.mstream.baseUrl" />, name: 'providers.mstream.baseUrl', type: 'url'}
+      ]
+    }
+
     return (
       <div className='settings'>
-        <h1><Translate value="titles.settings" /></h1>
-
-        <h2><Translate value="titles.providers" /></h2>
-        <h3><Translate value="titles.mstream" /></h3>
-
         <SettingsForm
+          schema={schema}
           settings={this.props.settings}
           dispatch={this.props.dispatch}
         />
