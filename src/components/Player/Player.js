@@ -11,7 +11,10 @@ import { setCurrentPlaying } from '../../actions/playlist'
 
 type Props = {
   playlist: any,
-  player: any,
+  player: {
+    volume: number,
+    playing: boolean
+  },
   collection: any,
   dispatch: Dispatch,
   match: any
@@ -20,7 +23,7 @@ type Props = {
 type State = {
   error: string,
   currentTime: number,
-  volume: number
+  volume?: number
 }
 
 // TODO: Fill all events https://www.w3schools.com/tags/ref_av_dom.asp
@@ -28,7 +31,7 @@ class Player extends Component<Props, State> {
   state = {
     error: '',
     currentTime: 0,
-    volume: 0,
+    volume: undefined,
   }
   playerRef: { current: any }
 
@@ -96,6 +99,9 @@ class Player extends Component<Props, State> {
       && currentPlaying.stream.length ?
       currentPlaying.stream[0].uris[0].uri: null
 
+    // Getting desired volume
+    const volume = this.state.volume ? this.state.volume : this.props.player.volume
+
     return (
       <div className='player'>
         <ProgressBar
@@ -105,7 +111,7 @@ class Player extends Component<Props, State> {
         <audio
           ref={this.playerRef}
           src={streamUri}
-          volume={this.state.volume}
+          volume={ volume }
           onError={this.logError.bind(this)}
           autoPlay={ this.props.player.playing }
           onTimeUpdate={ this.onTimeUpdate }
@@ -127,7 +133,7 @@ class Player extends Component<Props, State> {
             type="next"
           />
           <VolumeControl
-            volume={this.state.volume}
+            volume={ volume }
             onChange={this.setVolume}
           />
         </div>
