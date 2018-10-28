@@ -4,7 +4,7 @@ import React from 'react'
 
 type Props = {
   volume: number,
-  onChange: () => Promise<any>
+  onChange: () => void
 }
 
 const VolumeControl = (props: Props) => {

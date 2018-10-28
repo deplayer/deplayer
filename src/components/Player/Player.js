@@ -10,6 +10,7 @@ import VolumeControl from './VolumeControl'
 import { setCurrentPlaying } from '../../actions/playlist'
 
 type Props = {
+  playlist: any,
   player: any,
   collection: any,
   dispatch: Dispatch,
@@ -65,7 +66,7 @@ class Player extends Component<Props, State> {
 
   // Play next song of the player list
   playNext = () => {
-    const nextSong = this.props.collection.rows[this.props.player.nextSongId]
+    const nextSong = this.props.collection.rows[this.props.playlist.nextSongId]
     if (nextSong) {
       this.props.dispatch(setCurrentPlaying(nextSong))
     }
@@ -73,7 +74,7 @@ class Player extends Component<Props, State> {
 
   // Play prev song of the player list
   playPrev = () => {
-    const prevSong = this.props.collection.rows[this.props.player.prevSongId]
+    const prevSong = this.props.collection.rows[this.props.playlist.prevSongId]
     if (prevSong) {
       this.props.dispatch(setCurrentPlaying(prevSong))
     }
@@ -87,7 +88,7 @@ class Player extends Component<Props, State> {
   }
 
   render() {
-    const currentPlaying = this.props.player.currentPlaying || {}
+    const currentPlaying = this.props.playlist.currentPlaying || {}
     // Getting the first stream URI, in the future will be choosen based on
     // priorities
     const streamUri = currentPlaying

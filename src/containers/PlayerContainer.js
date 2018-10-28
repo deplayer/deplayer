@@ -8,6 +8,7 @@ import Player from '../components/Player/Player'
 const ConnectedPlayer = connect(
   (state) => ({
     player: state.player,
+    playlist: state.playlist,
     collection: state.collection
   })
 )(Player)

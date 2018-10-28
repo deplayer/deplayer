@@ -9,6 +9,7 @@ type State = {
 
 const defaultState = {
   trackIds: [],
+  currentPlaying: {}
 }
 
 const populateTracks = (songs): Array<string> => {
@@ -28,6 +29,21 @@ const extractField = (song, field) => {
   return field.split('.').reduce((obj: any, i): any => {
     return obj[i] ? obj[i]: '0'
   }, song)
+}
+
+// Get sibling songs ids to know which is the next and prev song
+const getSiblingSong = (trackIds: Array<string>, song, next = false) => {
+  const tracksIndex = {}
+  const position = trackIds.indexOf(song.id)
+  trackIds.forEach((trackId, index) => {
+    tracksIndex[index] = trackId
+  })
+
+  if (next) {
+    return tracksIndex[position+1]
+  }
+
+  return tracksIndex[position-1]
 }
 
 export const sortTrackIds = (tracks: any, field: string, direction: string = 'ASC') => {
@@ -64,6 +80,14 @@ export default (state: State = defaultState, action: Action = {}): State => {
       return {
         ...state,
         trackIds
+      }
+
+    case types.SET_CURRENT_PLAYING:
+      return {
+        ...state,
+        currentPlaying: action.song,
+        prevSongId: getSiblingSong(state.trackIds, action.song),
+        nextSongId: getSiblingSong(state.trackIds, action.song, true),
       }
 
     case types.SET_COLUMN_SORT:

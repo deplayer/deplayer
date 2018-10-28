@@ -12,6 +12,7 @@ configureEnzyme()
 const setup = (definedProps: any) => {
   const props = {
     player: {},
+    playlist: {},
     collection: {
       rows: {}
     },

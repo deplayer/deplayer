@@ -7,6 +7,7 @@ import MusicTable from './MusicTable/MusicTable'
 
 type Props = {
   playlist: any,
+  player: any,
   collection: any,
   dispatch: Dispatch
 }

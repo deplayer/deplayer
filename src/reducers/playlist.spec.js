@@ -14,6 +14,7 @@ describe('collection reducer', () => {
     expect(reducer(undefined, {}))
       .toEqual({
         trackIds: [],
+        currentPlaying: {}
       })
   })
 
@@ -24,6 +25,7 @@ describe('collection reducer', () => {
     expect(reducer(undefined, {type: ADD_TO_PLAYLIST, song: songToAdd}))
       .toEqual({
         trackIds: ['1234'],
+        currentPlaying: {}
       })
   })
 
@@ -41,6 +43,7 @@ describe('collection reducer', () => {
     expect(addSongsState)
       .toEqual({
         trackIds: Object.keys(expectedObj),
+        currentPlaying: {}
       })
   })
 
@@ -60,6 +63,7 @@ describe('collection reducer', () => {
 
     expect(reducer(addSongsState, {type: SET_COLUMN_SORT, column: 'price', direction: 'ASC', songs: expectedObj}))
       .toEqual({
+        currentPlaying: {},
         trackIds: sortedSongsIds,
         prevSongId: undefined,
         nextSongId: undefined,
