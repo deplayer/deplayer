@@ -15,6 +15,7 @@ export default class SubsonicApiRepository implements IRepository {
   albumSongsUrl: string
   searchUrl: string
   streamBase: string
+  coverBase: string
 
   constructor(settings: any) {
     this.baseUrl = settings.baseUrl
@@ -23,6 +24,7 @@ export default class SubsonicApiRepository implements IRepository {
     this.albumSongsUrl = `${settings.baseUrl}/rest/getMusicFolders.view?u=${settings.user}&p=${settings.password}&c=genar-radio&v=1.11.0&f=json`
     this.searchUrl = `${settings.baseUrl}/rest/search3.view?u=${settings.user}&p=${settings.password}&c=genar-radio&v=1.11.0&f=json`
     this.streamBase = `${settings.baseUrl}/rest/stream.view?u=${settings.user}&p=${settings.password}&c=genar-radio&v=1.11.0&f=json`
+    this.coverBase = `${settings.baseUrl}/rest/getCoverArt.view?u=${settings.user}&p=${settings.password}&c=genar-radio&v=1.11.0&f=json`
   }
 
   mapSongs = (songs: Array<any>): Array<any> => {
@@ -32,8 +34,8 @@ export default class SubsonicApiRepository implements IRepository {
         title: song.title ? song.title : song.path,
         artistName: song.artist,
         albumName: song.album,
-        thumbnailUrl: song.coverArt,
-        fullUrl: song.coverArt,
+        thumbnailUrl: this.coverBase + '&id=' + song.coverArt,
+        fullUrl: this.coverBase + '&id=' + song.coverArt,
         stream: [
           {
             service: 'subsonic',
