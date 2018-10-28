@@ -3,6 +3,9 @@
 @import "bootstrap/scss/_variables.scss";
 @import "bootstrap/scss/_mixins.scss";
 @import "bootstrap/scss/_grid.scss";
+@import "bootstrap/scss/_forms.scss";
+@import "bootstrap/scss/_buttons.scss";
+@import "bootstrap/scss/_utilities.scss";
 
 @font-face {
   font-family: 'DOS';
@@ -36,10 +39,8 @@ $body-bg-color: $background-color;
 $green-color: rgba(51, 255, 0, 1);
 $yellow-color: #a50;
 
-@import "sass-semantic-ui/src/scss/globals/_reset.scss";
 @import "sass-semantic-ui/src/scss/globals/_site.scss";
 @import "sass-semantic-ui/src/scss/elements/_input.scss";
-@import "sass-semantic-ui/src/scss/elements/_button.scss";
 @import "sass-semantic-ui/src/scss/elements/_icon.scss";
 @import "sass-semantic-ui/src/scss/collections/_table.scss";
 @import "sass-semantic-ui/src/scss/collections/_menu.scss";
@@ -60,7 +61,8 @@ body {
 }
 
 button {
-  @extend .ui.button;
+  @extend .btn;
+  @extend .btn-dark;
 }
 
 .sidebar-container {
@@ -70,7 +72,7 @@ button {
     grid-area: sidebar;
   }
 
-  display: flex;
+  @extend .d-flex;
   align-items: center;
 
   .button {
@@ -78,7 +80,7 @@ button {
     margin-left: 20px;
 
     a {
-      @extend .ui.button;
+      @extend .btn;
       @extend .huge;
       @extend .compact;
       @extend .circular;
@@ -279,6 +281,7 @@ span.label {
 }
 
 .player-controls {
+  @extend .d-flex;
   @extend .fluid;
   justify-content: center;
   padding: 15px 0px;
@@ -316,4 +319,14 @@ span.label {
 
 .share-buttons {
   text-align: right;
+}
+
+.volume-control {
+  width: 20%;
+  @extend .form-group;
+  align-self: flex-end;
+
+  input {
+    width: 100%;
+  }
 }

@@ -6,6 +6,7 @@ import { Dispatch } from 'redux'
 import ProgressBar from './ProgressBar'
 import PlayPauseButton from './PlayPauseButton'
 import SkipButton from './SkipButton'
+import VolumeControl from './VolumeControl'
 import { setCurrentPlaying } from '../../actions/playlist'
 
 type Props = {
@@ -17,16 +18,18 @@ type Props = {
 
 type State = {
   error: string,
-  currentTime: number
+  currentTime: number,
+  volume: number
 }
 
 // TODO: Fill all events https://www.w3schools.com/tags/ref_av_dom.asp
 class Player extends Component<Props, State> {
   state = {
     error: '',
-    currentTime: 0
+    currentTime: 0,
+    volume: 0,
   }
-  playerRef: { current: null | HTMLMediaElement }
+  playerRef: { current: any }
 
   constructor(props: Props) {
     super(props)
@@ -60,6 +63,7 @@ class Player extends Component<Props, State> {
     return false
   }
 
+  // Play next song of the player list
   playNext = () => {
     const nextSong = this.props.collection.rows[this.props.playlist.nextSongId]
     if (nextSong) {
@@ -67,11 +71,19 @@ class Player extends Component<Props, State> {
     }
   }
 
+  // Play prev song of the player list
   playPrev = () => {
     const prevSong = this.props.collection.rows[this.props.playlist.prevSongId]
     if (prevSong) {
       this.props.dispatch(setCurrentPlaying(prevSong))
     }
+  }
+
+  // Set player volume
+  setVolume = (value: any) => {
+    const volume = value.currentTarget.value
+    this.setState({volume})
+    this.playerRef.current.volume = (volume / 100)
   }
 
   render() {
@@ -92,6 +104,7 @@ class Player extends Component<Props, State> {
         <audio
           ref={this.playerRef}
           src={streamUri}
+          volume={this.state.volume}
           onError={this.logError.bind(this)}
           autoPlay={ this.props.playlist.playing }
           onTimeUpdate={ this.onTimeUpdate }
@@ -111,6 +124,10 @@ class Player extends Component<Props, State> {
             onClick={this.playNext}
             keyValues={['ArrowRight', 'j']}
             type="next"
+          />
+          <VolumeControl
+            volume={this.state.volume}
+            onChange={this.setVolume}
           />
         </div>
         {this.state.error}

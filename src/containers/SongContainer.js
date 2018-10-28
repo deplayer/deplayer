@@ -3,6 +3,6 @@ import SongView from '../components/SongView'
 
 export default connect(
   (state) => ({
-    song: state.playlist.currentPlaying
+    song: state.player.currentPlaying
   })
 )(SongView)
