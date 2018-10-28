@@ -49,10 +49,6 @@ const SongRow = (props: Props) => {
         <span className='label'><Translate value='song.label.genre' /></span>
         { song.genre }
       </Table.Cell>
-      <Table.Cell>
-        <span className='label'><Translate value='song.label.price' /></span>
-        { song.price ? song.price.price + song.price.currency: nonAvailable }
-      </Table.Cell>
     </Table.Row>
   )
 }

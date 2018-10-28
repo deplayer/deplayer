@@ -3,22 +3,12 @@
 import * as types from '../constants/ActionTypes'
 import { Action } from 'redux'
 
-import Song from '../entities/Song'
-
 type State = {
-  currentPlaying?: Song | any,
-  nextSongId?: string,
-  prevSongId?: string,
-  trackIds: Array<string>,
-  playing: boolean
+  trackIds: Array<string>
 }
 
 const defaultState = {
-  currentPlaying: {},
-  nextSongId: undefined,
-  prevSongId: undefined,
   trackIds: [],
-  playing: false
 }
 
 const populateTracks = (songs): Array<string> => {
@@ -34,28 +24,13 @@ const populateTracks = (songs): Array<string> => {
   return tracks
 }
 
-// Get sibling songs ids to know which is the next and prev song
-const getSiblingSong = (trackIds: Array<string>, song, next = false) => {
-  const tracksIndex = {}
-  const position = trackIds.indexOf(song.id)
-  trackIds.forEach((trackId, index) => {
-    tracksIndex[index] = trackId
-  })
-
-  if (next) {
-    return tracksIndex[position+1]
-  }
-
-  return tracksIndex[position-1]
-}
-
 const extractField = (song, field) => {
   return field.split('.').reduce((obj: any, i): any => {
     return obj[i] ? obj[i]: '0'
   }, song)
 }
 
-export const sortTrackIds = (tracks: any, field: string, direction: string) => {
+export const sortTrackIds = (tracks: any, field: string, direction: string = 'ASC') => {
   const songsIds = Object.keys(tracks)
   return songsIds.sort((songId1: string, songId2: string) => {
     const song1 = tracks[songId1]
@@ -67,7 +42,7 @@ export const sortTrackIds = (tracks: any, field: string, direction: string) => {
       return direction === 'ASC' ? -1: 1
     }
     if (song1Field > song2Field) {
-      return direction === 'ASC' ? 1: -1
+      return direction === 'DESC' ? 1: -1
     }
 
     return 0
@@ -76,17 +51,6 @@ export const sortTrackIds = (tracks: any, field: string, direction: string) => {
 
 export default (state: State = defaultState, action: Action = {}): State => {
   switch (action.type) {
-
-    case types.SET_CURRENT_PLAYING:
-      return {
-        ...state,
-        currentPlaying: action.song,
-        prevSongId: getSiblingSong(state.trackIds, action.song),
-        nextSongId: getSiblingSong(state.trackIds, action.song, true),
-      }
-
-    case types.START_PLAYING:
-      return {...state, playing: true}
 
     case types.ADD_TO_PLAYLIST:
       const mergedTrackIds = [...state.trackIds, ...populateTracks([action.song])]

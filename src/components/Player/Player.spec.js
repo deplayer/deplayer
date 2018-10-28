@@ -11,7 +11,7 @@ configureEnzyme()
 
 const setup = (definedProps: any) => {
   const props = {
-    playlist: {},
+    player: {},
     collection: {
       rows: {}
     },
@@ -38,7 +38,7 @@ it('renders without crashing', () => {
 
 it('renders handle playNext', () => {
   const props = {
-    playlist: {
+    player: {
       trackIds: []
     }
   }
