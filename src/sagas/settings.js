@@ -18,7 +18,8 @@ function* initialize() {
   const settingsService = new SettingsService(new adapter())
   yield call(settingsService.initialize)
   const settings = yield call(settingsService.get)
-  yield put({type: types.RECEIVE_SETTINGS, settings})
+  const unserialized = JSON.parse(JSON.stringify(settings))
+  yield put({type: types.RECEIVE_SETTINGS, settings: unserialized})
 }
 
 function* saveSettings(action: any) {

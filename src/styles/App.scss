@@ -6,6 +6,7 @@
 @import "bootstrap/scss/_forms.scss";
 @import "bootstrap/scss/_buttons.scss";
 @import "bootstrap/scss/_utilities.scss";
+@import "bootstrap/scss/_reboot.scss";
 
 @font-face {
   font-family: 'DOS';
@@ -39,17 +40,31 @@ $body-bg-color: $background-color;
 $green-color: rgba(51, 255, 0, 1);
 $yellow-color: #a50;
 
-@import "sass-semantic-ui/src/scss/globals/_site.scss";
 @import "sass-semantic-ui/src/scss/elements/_input.scss";
 @import "sass-semantic-ui/src/scss/elements/_icon.scss";
 @import "sass-semantic-ui/src/scss/collections/_table.scss";
-@import "sass-semantic-ui/src/scss/collections/_menu.scss";
-@import "sass-semantic-ui/src/scss/collections/_form.scss";
 @import "sass-semantic-ui/src/scss/views/_item.scss";
 @import "sass-semantic-ui/src/scss/modules/_progress.scss";
 
+
+html, body {
+  height: 100%;
+}
+
+html {
+  font-size: $body-font-size;
+}
+
 body {
-  color: $primary-color;
+  margin: 0px;
+  padding: 0px;
+  overflow-x: hidden;
+  min-width: 320px;
+  background: $body-bg-color;
+  font-family: $font-family;
+  font-size: $body-font-size;
+  color: $font-color;
+  font-smoothing: antialiased;
 }
 
 #root {
@@ -66,7 +81,13 @@ button {
 }
 
 .contents-container {
-  @extend .container;
+  & > div {
+    @extend .container;
+
+    & > div {
+      @extend .row;
+    }
+  }
 }
 
 .sidebar-container {
@@ -325,13 +346,6 @@ span.label {
   text-align: right;
 }
 
-.form-group input[type=text] {
-  @extend .form-control;
-}
-.form-group input[type=checkbox] {
-  @extend .form-check-input;
-}
-
 .volume-control {
   width: 20%;
   @extend .form-group;
@@ -340,4 +354,10 @@ span.label {
   input {
     width: 100%;
   }
+}
+
+input.form-control:focus ,
+input.form-control {
+  background-color: #000 !important;
+  color: $secondary-color;
 }

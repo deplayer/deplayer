@@ -14,6 +14,7 @@ type SearchAction = {
 // Handling search saga
 export function* search(action: SearchAction): Generator<void, void, void> {
   const settings = yield select(getSettings)
+  console.log('saga received settings', settings)
   const providersService = new ProvidersService(settings)
   yield call(goToHomePage)
   try {

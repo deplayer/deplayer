@@ -1,6 +1,6 @@
 import RxDB from 'rxdb'
 
-RxDB.plugin(require('pouchdb-adapter-idb'));
+RxDB.plugin(require('pouchdb-adapter-idb'))
 
 const collections = [
   {
@@ -18,9 +18,9 @@ const collections = [
       },
     }
   }
-];
+]
 
-let dbPromise = null;
+let dbPromise = null
 
 const _create = async () => {
   // console.log('DatabaseService: deleting previous database..')
@@ -39,8 +39,8 @@ const _create = async () => {
 
 export const get = () => {
     if (!dbPromise) {
-      dbPromise = _create();
+      dbPromise = _create()
     }
 
-    return dbPromise;
+    return dbPromise
 }

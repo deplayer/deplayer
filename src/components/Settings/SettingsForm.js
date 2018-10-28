@@ -1,13 +1,12 @@
 // @flow
 
 import React from 'react'
-import { Form, Button } from 'semantic-ui-react'
+import { Button } from 'semantic-ui-react'
 import { Translate }  from 'react-redux-i18n'
-import { Formik, Field } from 'formik'
+import { Formik, Form, Field } from 'formik'
 import { Dispatch } from 'redux'
 
 import { SAVE_SETTINGS } from '../../constants/ActionTypes'
-import { defaultState } from '../../reducers/settings'
 
 type Props = {
   settings: any,
@@ -24,20 +23,23 @@ const SettingsForm = (props: Props) => {
   const populateFromSchema = (schema) => {
     const { fields } = props.schema
 
-    const populatedFields = fields.map((field) => {
+    const populatedFields = fields.map((field, index) => {
+      if (field.type === 'title') {
+        return <h2 key={index}>{field.title}</h2>
+      }
       return (
         <div
           key={field.name}
-          className='form-group'
+          className={`form-group row ${ field.type === 'checkbox' ? 'form-check-inline': ''}`}
         >
-          { field.type !== 'checkbox' ?
-              <label>{field.title}</label> : null }
-          <Field
-            name={field.name}
-            type={field.type}
-          />
-          { field.type === 'checkbox' ?
-              <label>{field.title}</label> : null }
+          <label className='col-sm-2 col-form-label'>{field.title}</label>
+          <div className='col-sm-10'>
+            <Field
+              className={`${ field.type === 'checkbox' ? 'form-check': 'form-control'}`}
+              name={field.name}
+              type={field.type}
+            />
+          </div>
         </div>
       )
     })
@@ -46,36 +48,36 @@ const SettingsForm = (props: Props) => {
   }
 
   const { settings } = props
+
   return (
     <Formik
-      initialValues={defaultState.settings}
-      values={settings.settings}
+      initialValues={settings.settings}
       onSubmit={(values, actions) => {
         saveSettings(values)
         actions.setSubmitting(false)
       }}
       isSubmitting={settings.saving}
-    >
-      {({
-        values,
-        errors,
-        touched,
-        handleChange,
-        handleBlur,
-        handleSubmit,
-        isSubmitting
-      }) => (
-        <Form
-          className='settings-form'
-          onSubmit={handleSubmit}
-        >
-          { populateFromSchema(props.schema) }
-          <Button disabled={isSubmitting} type='submit'>
-            <Translate value="buttons.mstream.save" />
-          </Button>
-        </Form>
-      )}
-    </Formik>
+      enableReinitialize
+      render=
+        {({
+          values,
+          errors,
+          touched,
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          isSubmitting
+        }) => (
+          <Form
+            className='settings-form'
+          >
+            { populateFromSchema(props.schema) }
+            <Button disabled={isSubmitting} type='submit'>
+              <Translate value="buttons.mstream.save" />
+            </Button>
+          </Form>
+        )}
+    />
   )
 }
 

@@ -12,6 +12,7 @@ configureEnzyme()
 const setup = (customProps: any) => {
   const schema = {
     fields: [
+      {title: <Translate value="labels.mstream" />, type: 'title'},
       {title: <Translate value="labels.enabled" />, name: 'providers.mstream.enabled', type: 'checkbox'},
       {title: <Translate value="labels.mstream.baseUrl" />, name: 'providers.mstream.baseUrl', type: 'url'}
     ]
