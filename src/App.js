@@ -6,6 +6,7 @@ import { Provider } from 'react-redux'
 import './styles/App.scss'
 
 import PlaylistContainer from './containers/PlaylistContainer'
+import CollectionContainer from './containers/CollectionContainer'
 import PlayerContainer from './containers/PlayerContainer'
 import SearchContainer from './containers/SearchContainer'
 import SongContainer from './containers/SongContainer'
@@ -38,6 +39,7 @@ class App extends Component<any> {
             <SearchContainer />
             <div className='contents-container'>
               <Route exact path="/" component={Home} />
+              <Route path="/collection" component={CollectionContainer} />
               <Route path="/song/:id" component={SongContainer} />
               <Route path="/settings" component={SettingsContainer} />
             </div>
