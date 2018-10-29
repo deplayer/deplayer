@@ -20,25 +20,9 @@ export default class ProvidersService  implements ISearchService {
     })
   }
 
-  search = (searchTerm: string): Promise<Array<any>> => {
-
-    return new Promise((resolve, reject) => {
-      const promises = this.providers.map((provider) => {
-        return provider.search(searchTerm)
-      })
-
-      Promise.all(promises).then((results) => {
-        const oneLevelResults = []
-
-        results.forEach((provResults) => {
-          provResults.forEach((mediaItem) => {
-            oneLevelResults.push(mediaItem)
-          })
-        })
-
-        resolve(oneLevelResults)
-      })
-      .catch(reject)
+  search = (searchTerm: string): Array<Promise<any>> => {
+    return this.providers.map((provider) => {
+      return provider.search(searchTerm)
     })
   }
 }

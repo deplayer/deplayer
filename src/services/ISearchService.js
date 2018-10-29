@@ -1,5 +1,5 @@
 // @flow
 
 export interface ISearchService {
-  search(searchTerm: string): Promise<any>
+  search(searchTerm: string): Array<Promise<any>>
 }

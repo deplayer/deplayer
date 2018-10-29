@@ -9,15 +9,12 @@ import {
   ADD_SONGS_TO_PLAYLIST
 } from '../constants/ActionTypes'
 
-import { search, getSettings } from './search'
+import { search } from './search'
 
 describe('search saga', () => {
   it('should handle search events', () => {
 
     return expectSaga(search, {type: START_SEARCH, searchTerm: 'Metallica'})
-      .put({type: SEARCH_FULLFILLED, searchResults: [ ] })
-      .put({type: ADD_TO_COLLECTION, data: [ ] })
-      .put({type: ADD_SONGS_TO_PLAYLIST, songs: [ ] })
       .run()
   })
 })

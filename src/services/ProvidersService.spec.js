@@ -15,10 +15,11 @@ describe('ProvidersService', () => {
 
     expect.assertions(2)
 
-    providersService.search('highway to hell')
+    const promises = providersService.search('highway to hell')
+    Promise.all(promises)
       .then((results) => {
         expect(results).toBeDefined()
-        expect(results[0].title).toBeDefined()
+        expect(results[0][0].title).toBeDefined()
       })
   })
 })

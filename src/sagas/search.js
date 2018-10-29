@@ -1,6 +1,12 @@
 // @flow
 
-import { call, put, takeLatest, select } from 'redux-saga/effects'
+import {
+  call,
+  put,
+  takeLatest,
+  select,
+  all
+} from 'redux-saga/effects'
 import history from '../store/configureHistory'
 
 import  * as types from '../constants/ActionTypes'
@@ -14,14 +20,16 @@ type SearchAction = {
 // Handling search saga
 export function* search(action: SearchAction): Generator<void, void, void> {
   const settings = yield select(getSettings)
-  console.log('saga received settings', settings)
   const providersService = new ProvidersService(settings)
   yield call(goToHomePage)
   try {
-    const searchResults = yield call(providersService.search, action.searchTerm)
-    yield put({type: types.SEARCH_FULLFILLED, searchResults})
-    yield put({type: types.ADD_TO_COLLECTION, data: searchResults})
-    yield put({type: types.ADD_SONGS_TO_PLAYLIST, songs: searchResults})
+    const searchPromises = yield call(providersService.search, action.searchTerm)
+    const searchResults = yield all(searchPromises)
+    for (const result in searchResults) {
+      yield put({type: types.SEARCH_FULLFILLED, result: searchResults[result]})
+      yield put({type: types.ADD_TO_COLLECTION, data: searchResults[result]})
+      yield put({type: types.ADD_SONGS_TO_PLAYLIST, songs: searchResults[result]})
+    }
   } catch (e) {
     yield put({type: types.SEARCH_REJECTED, message: e.message})
   }
