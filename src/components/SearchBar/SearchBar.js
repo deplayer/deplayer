@@ -7,6 +7,7 @@ import { I18n } from 'react-redux-i18n'
 
 import { START_SEARCH } from '../../constants/ActionTypes'
 import PlaylistButton from '../PlaylistButton'
+import CollectionButton from '../CollectionButton'
 import SettingsButton from '../Buttons/SettingsButton'
 
 type State = {
@@ -16,8 +17,7 @@ type State = {
 type Props = {
   dispatch: Dispatch,
   loading: boolean,
-  showInCenter: boolean,
-  hasResults: boolean
+  showInCenter: boolean
 }
 
 const WAIT_INTERVAL = 1000
@@ -76,7 +76,8 @@ class SearchBar extends Component<Props, State> {
           />
           <i className='icon search'></i>
         </div>
-        { this.props.hasResults ?  <PlaylistButton /> : null }
+        <PlaylistButton />
+        <CollectionButton />
         <SettingsButton />
       </div>
     )

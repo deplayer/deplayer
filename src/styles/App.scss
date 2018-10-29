@@ -82,7 +82,7 @@ button {
 
 .contents-container {
   & > div {
-    @extend .container;
+    @extend .container-fluid;
 
     & > div {
       @extend .row;
@@ -91,6 +91,7 @@ button {
 }
 
 .sidebar-container {
+  z-index: 1;
   grid-area: contents;
 
   &.has-results {
