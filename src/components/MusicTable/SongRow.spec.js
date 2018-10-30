@@ -30,5 +30,7 @@ describe('SongRow', () => {
     const { enzymeWrapper } = setup()
     expect(enzymeWrapper.find('.song-row').exists())
       .toBe(true)
+    expect(enzymeWrapper.find('button.add-to-collection').exists())
+      .toBe(true)
   })
 })

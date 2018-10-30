@@ -19,10 +19,10 @@ type SearchAction = {
 
 // Handling search saga
 export function* search(action: SearchAction): Generator<void, void, void> {
-  const settings = yield select(getSettings)
-  const providersService = new ProvidersService(settings)
-  yield call(goToHomePage)
   try {
+    const settings = yield select(getSettings)
+    const providersService = new ProvidersService(settings)
+    yield call(goToHomePage)
     const searchPromises = yield call(providersService.search, action.searchTerm)
     const searchResults = yield all(searchPromises)
     for (const result in searchResults) {

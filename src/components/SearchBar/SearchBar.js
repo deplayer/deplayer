@@ -18,7 +18,8 @@ type State = {
 type Props = {
   dispatch: Dispatch,
   loading: boolean,
-  showInCenter: boolean
+  showInCenter: boolean,
+  error: string
 }
 
 const WAIT_INTERVAL = 1000
@@ -71,32 +72,35 @@ class SearchBar extends Component<Props, State> {
 
   render() {
     return (
-      <div className={`sidebar-container ${ this.props.showInCenter ? '': 'has-results'}`}>
-        <KeyHandler
-          keyEventName={KEYPRESS}
-          keyValue='/'
-          onKeyHandle={this.setFocus}
-        />
-        <div className={`search-bar ui huge action icon input inverted ${this.props.loading ? 'loading': ''}`}>
-          <input
-            ref={(input) => { this.searchInput = input }}
-            onChange={this.onSearchChange}
-            onFocus={this.onFocus}
-            onBlur={this.onFocusOut}
-            placeholder={ I18n.t('placeholder.search') }
-            type='text'
+      <React.Fragment>
+        <div className={`sidebar-container ${ this.props.showInCenter ? '': 'has-results'}`}>
+          <KeyHandler
+            keyEventName={KEYPRESS}
+            keyValue='/'
+            onKeyHandle={this.setFocus}
           />
-          <i className='icon search'></i>
+          <div className={`search-bar ui huge action icon input inverted ${this.props.loading ? 'loading': ''}`}>
+            <input
+              ref={(input) => { this.searchInput = input }}
+              onChange={this.onSearchChange}
+              onFocus={this.onFocus}
+              onBlur={this.onFocusOut}
+              placeholder={ I18n.t('placeholder.search') }
+              type='text'
+            />
+            <i className='icon search'></i>
+          </div>
+          {
+            !this.state.focus ?
+              <React.Fragment>
+                <PlaylistButton />
+                <CollectionButton />
+                <SettingsButton />
+              </React.Fragment>: null
+          }
         </div>
-        {
-          !this.state.focus ?
-            <React.Fragment>
-              <PlaylistButton />
-              <CollectionButton />
-              <SettingsButton />
-            </React.Fragment>: null
-        }
-      </div>
+        { this.props.error ?  <div className='alert search'>{ this.props.error }</div> : null }
+      </React.Fragment>
     )
   }
 }

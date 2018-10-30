@@ -3,7 +3,9 @@
 import React from 'react'
 import { Table } from 'semantic-ui-react'
 import { Translate } from 'react-redux-i18n'
+import { Dispatch } from 'redux'
 
+import { ADD_TO_COLLECTION } from '../../constants/ActionTypes'
 import { getDurationStr } from '../../utils/timeFormatter'
 import Song from '../../entities/Song'
 import CoverImage from './CoverImage'
@@ -11,10 +13,16 @@ import CoverImage from './CoverImage'
 type Props = {
   song: Song,
   isCurrent: boolean,
-  onClick: () => any
+  onClick: () => any,
+  dispatch: Dispatch
 }
 
 const SongRow = (props: Props) => {
+
+  const addToCollection = (song) => {
+    props.dispatch({type: ADD_TO_COLLECTION, media: song})
+  }
+
   const { song, onClick } = props
   const nonAvailable = <Translate value='song.row.na' />
   return (
@@ -48,6 +56,12 @@ const SongRow = (props: Props) => {
       <Table.Cell>
         <span className='label'><Translate value='song.label.genre' /></span>
         { song.genre }
+      </Table.Cell>
+      <Table.Cell>
+        <button
+          className='add-to-collection'
+          onClick={() => addToCollection(song)}
+        />
       </Table.Cell>
     </Table.Row>
   )

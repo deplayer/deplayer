@@ -46,6 +46,8 @@ $yellow-color: #a50;
 @import "sass-semantic-ui/src/scss/views/_item.scss";
 @import "sass-semantic-ui/src/scss/modules/_progress.scss";
 
+// Own styles
+@import './alerts.scss';
 
 html, body {
   height: 100%;

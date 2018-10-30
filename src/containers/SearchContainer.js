@@ -9,6 +9,7 @@ export default withRouter(connect((state, ownProps) => {
   return {
     hasResults,
     loading: state.search.loading,
-    showInCenter: !hasResults && inHome
+    showInCenter: !hasResults && inHome,
+    error: state.search.error
   }
 })(SearchBar))
