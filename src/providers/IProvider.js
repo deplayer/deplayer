@@ -1,5 +1,5 @@
 // @flow
 
-export interface IRepository {
+export interface IProvider {
   search(searchTerm: string): Promise<Array<any>>
 }

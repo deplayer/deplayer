@@ -3,7 +3,7 @@
 import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
 
-import ItunesApiRepository from './ItunesApiRepository'
+import ItunesApiProvider from './ItunesApiProvider'
 import Song from '../entities/Song'
 import exampleSong from './exampleSong'
 
@@ -18,8 +18,8 @@ mock.onGet(/search/).reply(200, {
   ]
 })
 
-describe('ItunesApiRepository', () => {
-  const itunesRepo = new ItunesApiRepository()
+describe('ItunesApiProvider', () => {
+  const itunesRepo = new ItunesApiProvider()
 
   it('should handle song search', () => {
     expect(itunesRepo.search('Bad brains')).toBeInstanceOf(Promise)

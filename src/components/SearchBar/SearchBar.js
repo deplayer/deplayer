@@ -12,6 +12,7 @@ import SettingsButton from '../Buttons/SettingsButton'
 
 type State = {
   searchTerm: string,
+  focus: boolean,
 }
 
 type Props = {
@@ -25,7 +26,8 @@ const ENTER_KEY = 13
 
 class SearchBar extends Component<Props, State> {
   state = {
-    searchTerm: ''
+    searchTerm: '',
+    focus: false
   }
   timer: any
   searchInput: any
@@ -59,6 +61,14 @@ class SearchBar extends Component<Props, State> {
     this.searchInput.focus()
   }
 
+  onFocus = () => {
+    this.setState({focus: true})
+  }
+
+  onFocusOut = () => {
+    this.setState({focus: false})
+  }
+
   render() {
     return (
       <div className={`sidebar-container ${ this.props.showInCenter ? '': 'has-results'}`}>
@@ -71,14 +81,21 @@ class SearchBar extends Component<Props, State> {
           <input
             ref={(input) => { this.searchInput = input }}
             onChange={this.onSearchChange}
+            onFocus={this.onFocus}
+            onBlur={this.onFocusOut}
             placeholder={ I18n.t('placeholder.search') }
             type='text'
           />
           <i className='icon search'></i>
         </div>
-        <PlaylistButton />
-        <CollectionButton />
-        <SettingsButton />
+        {
+          !this.state.focus ?
+            <React.Fragment>
+              <PlaylistButton />
+              <CollectionButton />
+              <SettingsButton />
+            </React.Fragment>: null
+        }
       </div>
     )
   }

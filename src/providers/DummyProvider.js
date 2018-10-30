@@ -1,8 +1,8 @@
 // @flow
 
-import { IRepository } from './IRepository'
+import { IProvider } from './IProvider'
 
-export default class DummyRepository implements IRepository {
+export default class DummyProvider implements IProvider {
 
   search(searchTerm: string): Promise<any> {
     return new Promise((resolve) => {

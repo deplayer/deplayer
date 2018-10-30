@@ -4,7 +4,7 @@ import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
 
 import exampleSongs from './mstreamExampleSongs.json'
-import SubsonicApiRepository from './SubsonicApiRepository'
+import SubsonicApiProvider from './SubsonicApiProvider'
 
 // Setting mock to default instance
 const mock = new MockAdapter(axios)
@@ -16,8 +16,8 @@ mock.onGet(/rest\/search/).reply(200, { 'subsonic-response': {
     song: exampleSongs
   }}})
 
-describe('SubsonicApiRepository', () => {
-  const mstreamRepo = new SubsonicApiRepository({baseUrl: ''})
+describe('SubsonicApiProvider', () => {
+  const mstreamRepo = new SubsonicApiProvider({baseUrl: ''})
 
   it('should handle song search', () => {
     expect.assertions(3)

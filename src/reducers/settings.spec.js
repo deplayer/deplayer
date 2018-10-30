@@ -6,6 +6,7 @@ import {
   RECEIVE_SETTINGS,
   SETTINGS_SAVED_SUCCESSFULLY
 } from '../constants/ActionTypes'
+
 import { defaultState } from './settings'
 
 describe('settings reducer', () => {
@@ -39,6 +40,12 @@ describe('settings reducer', () => {
         mstream: {
           enabled: true,
           baseUrl: ''
+        },
+        subsonic: {
+          enabled: true,
+          baseUrl: '',
+          user: '',
+          password: ''
         }
       }
     }

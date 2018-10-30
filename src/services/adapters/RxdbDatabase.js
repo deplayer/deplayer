@@ -17,6 +17,16 @@ const collections = [
         }
       },
     }
+  },
+  {
+    name: 'media',
+    schema: {
+      title: 'collection schema',
+      version: 0,
+      type: 'object',
+      properties: {
+      }
+    }
   }
 ]
 

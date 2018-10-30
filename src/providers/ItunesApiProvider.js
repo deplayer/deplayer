@@ -2,10 +2,10 @@
 
 import axios from 'axios'
 
-import { IRepository } from './IRepository'
+import { IProvider } from './IProvider'
 import Song from '../entities/Song'
 
-export default class ItunesApiRepository implements IRepository {
+export default class ItunesApiProvider implements IProvider {
   baseUrl = 'https://itunes.apple.com'
 
   populateUrl(searchTerm: string): string {

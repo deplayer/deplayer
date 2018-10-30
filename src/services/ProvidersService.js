@@ -1,12 +1,12 @@
 // @flow
 
-import { IRepository } from '../repositories/IRepository'
+import { IProvider } from '../providers/IProvider'
 import { ISearchService } from './ISearchService'
 import { ISettings } from '../interfaces/ISettings'
 import providers from '../providers'
 
 export default class ProvidersService  implements ISearchService {
-  providers: Array<IRepository> = []
+  providers: Array<IProvider> = []
 
   constructor(config: ISettings) {
     Object.keys(config.providers).forEach((provider) => {

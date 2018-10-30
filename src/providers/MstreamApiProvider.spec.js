@@ -4,7 +4,7 @@ import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
 
 import exampleSongs from './mstreamExampleSongs.json'
-import MstreamApiRepository from './MstreamApiRepository'
+import MstreamApiProvider from './MstreamApiProvider'
 
 // Setting mock to default instance
 const mock = new MockAdapter(axios)
@@ -13,8 +13,8 @@ const mock = new MockAdapter(axios)
 // arguments for reply are (status, data, headers)
 mock.onPost(/db\/album-songs/).reply(200, exampleSongs)
 
-describe('MstreamApiRepository', () => {
-  const mstreamRepo = new MstreamApiRepository({baseUrl: ''})
+describe('MstreamApiProvider', () => {
+  const mstreamRepo = new MstreamApiProvider({baseUrl: ''})
 
   it('should matchSearch against song', () => {
     expect(mstreamRepo.matchSearch(exampleSongs[1], 'Commando 9MM')).toBe(true)

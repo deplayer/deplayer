@@ -1,13 +1,13 @@
 // @flow
 
-import ITunesRepository from '../repositories/ItunesApiRepository'
-import MstreamApiRepository from '../repositories/MstreamApiRepository'
-import SubsonicApiRepository from '../repositories/SubsonicApiRepository'
-import DummyRepository from '../repositories/DummyRepository'
+import ITunesProvider from './ItunesApiProvider'
+import MstreamApiProvider from './MstreamApiProvider'
+import SubsonicApiProvider from './SubsonicApiProvider'
+import DummyProvider from './DummyProvider'
 
 export default {
-  itunes: ITunesRepository,
-  mstream: MstreamApiRepository,
-  subsonic: SubsonicApiRepository,
-  dummy: DummyRepository,
+  itunes: ITunesProvider,
+  mstream: MstreamApiProvider,
+  subsonic: SubsonicApiProvider,
+  dummy: DummyProvider,
 }

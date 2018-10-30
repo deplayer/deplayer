@@ -3,12 +3,12 @@
 import axios from 'axios'
 
 import Song from '../entities/Song'
-import { IRepository } from './IRepository'
+import { IProvider } from './IProvider'
 
 /**
  * It should implement the API documented here: https://github.com/IrosTheBeggar/mStream/blob/master/docs/API/db_search.md
  */
-export default class MstreamApiRepository implements IRepository {
+export default class MstreamApiProvider implements IProvider {
   baseUrl: string
   albumSongsUrl: string
 

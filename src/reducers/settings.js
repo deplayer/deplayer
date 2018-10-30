@@ -22,6 +22,12 @@ export const defaultState = {
       mstream: {
         enabled: true,
         baseUrl: '',
+      },
+      subsonic: {
+        enabled: true,
+        baseUrl: '',
+        user: '',
+        password: ''
       }
     }
   }
