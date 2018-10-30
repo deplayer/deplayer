@@ -1,5 +1,7 @@
 .alert {
+  @extend .alert;
   &.search {
+    @extend .alert-warning;
     width: 100%;
   }
 }

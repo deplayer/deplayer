@@ -89,6 +89,7 @@ class SearchBar extends Component<Props, State> {
               type='text'
             />
             <i className='icon search'></i>
+            { this.props.error ?  <div className='alert search'>{ this.props.error }</div> : null }
           </div>
           {
             !this.state.focus ?
@@ -99,7 +100,6 @@ class SearchBar extends Component<Props, State> {
               </React.Fragment>: null
           }
         </div>
-        { this.props.error ?  <div className='alert search'>{ this.props.error }</div> : null }
       </React.Fragment>
     )
   }
