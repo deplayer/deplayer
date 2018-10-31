@@ -33,6 +33,7 @@ export default (state: State = defaultState, action: Action = {}) => {
     case types.SEARCH_FULLFILLED: {
       return {
         ...state,
+        error: '',
         loading: false
       }
     }

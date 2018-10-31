@@ -13,6 +13,7 @@ const setup = (definedProps: any) => {
   const props = {
     player: {},
     playlist: {},
+    itemCount: 0,
     collection: {
       rows: {}
     },
@@ -32,7 +33,7 @@ const setup = (definedProps: any) => {
 }
 
 it('renders without crashing', () => {
-  const { enzymeWrapper } = setup({})
+  const { enzymeWrapper } = setup({itemCount: 1})
   expect(enzymeWrapper.find('.player').exists())
     .toBe(true)
 })
@@ -41,7 +42,8 @@ it('renders handle playNext', () => {
   const props = {
     player: {
       trackIds: []
-    }
+    },
+    itemCount: 1
   }
 
   const { enzymeWrapper } = setup(props)

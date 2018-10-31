@@ -49,6 +49,7 @@ $yellow-color: #a50;
 
 // Own styles
 @import './alerts.scss';
+@import './buttons.scss';
 
 html, body {
   height: 100%;
@@ -76,11 +77,6 @@ body {
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   grid-template-areas: "sidebar sidebar sidebar sidebar" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "player player player player";
-}
-
-button {
-  @extend .btn;
-  @extend .btn-dark;
 }
 
 .contents-container {

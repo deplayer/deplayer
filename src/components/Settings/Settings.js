@@ -23,6 +23,8 @@ export const formSchema = {
     {title: <Translate value="labels.subsonic.baseUrl" />, name: 'providers.subsonic.baseUrl', type: 'url'},
     {title: <Translate value="labels.subsonic.user" />, name: 'providers.subsonic.user', type: 'text'},
     {title: <Translate value="labels.subsonic.password" />, name: 'providers.subsonic.password', type: 'password'},
+    {title: <Translate value="labels.itunes" />, type: 'title'},
+    {title: <Translate value="labels.enabled" />, name: 'providers.itunes.enabled', type: 'checkbox'},
   ]
 }
 

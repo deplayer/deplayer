@@ -9,7 +9,8 @@ const ConnectedPlayer = connect(
   (state) => ({
     player: state.player,
     playlist: state.playlist,
-    collection: state.collection
+    collection: state.collection,
+    itemCount: state.playlist.trackIds ? state.playlist.trackIds.length : 0
   })
 )(Player)
 

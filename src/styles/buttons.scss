@@ -1,0 +1,8 @@
+button {
+  @extend .btn;
+  @extend .btn-dark;
+}
+
+.settings-form button[type=submit] {
+  width: 100%;
+}

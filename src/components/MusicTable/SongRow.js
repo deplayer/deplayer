@@ -61,7 +61,9 @@ const SongRow = (props: Props) => {
         <button
           className='add-to-collection'
           onClick={() => addToCollection(song)}
-        />
+        >
+          <Translate value='song.button.addToCollection' />
+        </button>
       </Table.Cell>
     </Table.Row>
   )

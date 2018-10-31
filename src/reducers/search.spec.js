@@ -27,7 +27,7 @@ describe('search reducer', () => {
       .toEqual({loading: false, error: 'Testing error'})
   })
   it('should handle SEARCH_FULLFILLED', () => {
-    expect(reducer({error: '', loading: true}, {type: SEARCH_FULLFILLED}))
+    expect(reducer({error: 'whatever', loading: true}, {type: SEARCH_FULLFILLED}))
       .toEqual({loading: false, error: ''})
   })
 })

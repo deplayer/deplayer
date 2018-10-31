@@ -15,6 +15,7 @@ type Props = {
     volume: number,
     playing: boolean
   },
+  itemCount: number,
   collection: any,
   dispatch: Dispatch,
   match: any
@@ -92,6 +93,11 @@ class Player extends Component<Props, State> {
 
   render() {
     const currentPlaying = this.props.playlist.currentPlaying || {}
+
+    if (!this.props.itemCount) {
+      return null
+    }
+
     // Getting the first stream URI, in the future will be choosen based on
     // priorities
     const streamUri = currentPlaying
