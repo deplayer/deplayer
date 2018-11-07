@@ -50,6 +50,7 @@ $yellow-color: #a50;
 // Own styles
 @import './alerts.scss';
 @import './buttons.scss';
+@import './searchBar.scss';
 
 html, body {
   height: 100%;
@@ -124,29 +125,6 @@ body {
 .library-controls {
   @extend .fluid;
   padding: 10px 0;
-}
-
-.search-bar {
-  grid-area: sidebar;
-
-  &.ui.input {
-    display: block;
-    margin: 20px auto;
-  }
-
-  width: 95%;
-  justify-content: center;
-
-  input {
-    @extend .fluid;
-    background-color: #000 !important;
-    width: 100%;
-    color: $font-color;
-
-    &:focus {
-      color: $font-color !important;
-    }
-  }
 }
 
 .contents-container {

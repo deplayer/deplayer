@@ -20,7 +20,7 @@ type Props = {
 const SongRow = (props: Props) => {
 
   const addToCollection = (song) => {
-    props.dispatch({type: ADD_TO_COLLECTION, media: song})
+    props.dispatch({type: ADD_TO_COLLECTION, data: [song]})
   }
 
   const { song, onClick } = props

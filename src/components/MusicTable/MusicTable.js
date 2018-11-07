@@ -38,6 +38,7 @@ const MusicTable = (props: Props) => {
       onClick={() => {
         props.dispatch(setCurrentPlaying(song))
       }}
+      dispatch={props.dispatch}
     />
   })
 

@@ -1,0 +1,23 @@
+.search-bar {
+  grid-area: sidebar;
+
+  &.ui.input {
+    display: block;
+    margin: 20px auto;
+  }
+
+  width: 95%;
+  justify-content: center;
+
+  input {
+    @extend .fluid;
+    background-color: #000 !important;
+    width: 100%;
+    color: $font-color;
+
+    &:focus {
+      color: $font-color !important;
+    }
+  }
+}
+

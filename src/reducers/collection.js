@@ -9,7 +9,7 @@ type State = {
   visibleSongs: Array<string>,
 }
 
-const defaultState = {
+export const defaultState = {
   rows: {},
   totalRows: 0,
   visibleSongs: [],

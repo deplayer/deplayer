@@ -4,13 +4,7 @@ import { takeLatest, put, call } from 'redux-saga/effects'
 
 import  * as types from '../constants/ActionTypes'
 import SettingsService from '../services/SettingsService'
-import RxdbAdapter from '../services/adapters/RxdbAdapter'
-import DummyAdapter from '../services/adapters/DummyAdapter'
-
-// Returns adapter depending on environment
-function getAdapter() {
-  return process.env.NODE_ENV === 'test' ? DummyAdapter : RxdbAdapter
-}
+import { getAdapter } from '../services/adapters'
 
 // Application initialization routines
 function* initialize() {
