@@ -24,6 +24,12 @@ export default class RxdbAdapter implements IAdapter {
     })
   }
 
+  addMany(model: string, payload: any): Promise<any> {
+    return new Promise((resolve) => {
+      resolve({})
+    })
+  }
+
   get = (model: string, id: string): Promise<any> => {
     return new Promise((resolve, reject) => {
       return db.get().then((instance) => {

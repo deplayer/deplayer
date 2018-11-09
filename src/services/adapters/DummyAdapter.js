@@ -12,6 +12,12 @@ export default class DummyAdapter implements IAdapter {
     })
   }
 
+  addMany(model: string, payload: any): Promise<any> {
+    return new Promise((resolve) => {
+      resolve({})
+    })
+  }
+
   get(model: string, id: string): Promise<any> {
     return new Promise((resolve) => {
       resolve({})

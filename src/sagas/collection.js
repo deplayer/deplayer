@@ -8,13 +8,15 @@ import { getAdapter } from '../services/adapters'
 
 import {
   ADD_TO_COLLECTION,
+  RECEIVE_COLLECTION,
 } from '../constants/ActionTypes'
 
-// Handling setCurrentPlaying saga
-export function* addToCollection(action: {data: Array<Media>}): Generator<void, void, void> {
+// Handling ADD_TO_COLLECTION saga
+function* addToCollection(action: any) {
   const adapter = getAdapter()
   const collectionService = new CollectionService(new adapter())
-  yield console.log(action.data)
+  const collection = yield collectionService.bulkSave(action.data)
+  yield put({type: RECEIVE_COLLECTION, collection})
 }
 
 // Binding actions to sagas
