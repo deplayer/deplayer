@@ -2,7 +2,6 @@
 
 import { takeLatest, put } from 'redux-saga/effects'
 
-import Media from '../entities/Media'
 import CollectionService from '../services/CollectionService'
 import { getAdapter } from '../services/adapters'
 
@@ -12,7 +11,7 @@ import {
 } from '../constants/ActionTypes'
 
 // Handling ADD_TO_COLLECTION saga
-function* addToCollection(action: any) {
+export function* addToCollection(action: any): any {
   const adapter = getAdapter()
   const collectionService = new CollectionService(new adapter())
   const collection = yield collectionService.bulkSave(action.data)
