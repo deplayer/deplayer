@@ -1,6 +1,5 @@
 // @flow
 
-import uuidv4 from 'uuid'
 import Media from './Media'
 
 type money = {
@@ -18,8 +17,6 @@ type album = {
 }
 
 export default class Song extends Media {
-  id: string
-  title: string
   genre: string
   shareUrl: string
   artist: {
@@ -33,11 +30,9 @@ export default class Song extends Media {
   dateAdded: Date
 
   constructor(songParams: any = {}) {
-    super()
+    super(songParams)
 
     const {
-      id,
-      title,
       artistName,
       albumName,
       thumbnailUrl,
@@ -50,8 +45,6 @@ export default class Song extends Media {
       shareUrl
     } = songParams
 
-    this.id = id ? id : uuidv4()
-    this.title = title
     this.duration = duration
     this.genre = genre
     this.shareUrl = shareUrl

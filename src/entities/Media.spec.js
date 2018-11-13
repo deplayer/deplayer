@@ -7,4 +7,8 @@ describe('entities/Media', () => {
     const media = new Media()
     expect(media).toBeDefined()
   })
+
+  it('should return a schema representation', () => {
+    expect(Media.toSchema()).toBeDefined()
+  })
 })

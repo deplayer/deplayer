@@ -1,5 +1,7 @@
 import RxDB from 'rxdb'
 
+import Media from '../../entities/Media'
+
 RxDB.plugin(require('pouchdb-adapter-idb'))
 
 const collections = [
@@ -24,8 +26,7 @@ const collections = [
       title: 'collection schema',
       version: 0,
       type: 'object',
-      properties: {
-      }
+      properties: Media.toSchema()
     }
   }
 ]
@@ -43,6 +44,7 @@ const _create = async () => {
   // create collections
   console.log('DatabaseService: create collections')
   await Promise.all(collections.map(colData => db.collection(colData)))
+  console.log('DatabaseService: collections created')
 
   return db
 }
