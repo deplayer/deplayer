@@ -28,10 +28,13 @@ const SongRow = (props: Props) => {
   return (
     <Table.Row
       className={`song-row ${ props.isCurrent ? 'current': ''}`}
-      onClick={onClick}
     >
       <Table.Cell className='collapsing'>
-        <CoverImage cover={song.cover} size='thumbnail' albumName={song.album.name} />
+        <CoverImage
+          cover={song.cover}
+          size='thumbnail'
+          albumName={song.album.name}
+        />
       </Table.Cell>
       <Table.Cell>
         <span className='label'><Translate value='song.label.title' /></span>
@@ -59,10 +62,16 @@ const SongRow = (props: Props) => {
       </Table.Cell>
       <Table.Cell>
         <button
-          className='add-to-collection'
+          className='play circle spaced'
+          onClick={onClick}
+        >
+          <i className='icon play circle'></i>
+        </button>
+        <button
+          className='add-to-collection circle spaced'
           onClick={() => addToCollection(song)}
         >
-          <Translate value='song.button.addToCollection' />
+          <i className='icon add circle'></i>
         </button>
       </Table.Cell>
     </Table.Row>

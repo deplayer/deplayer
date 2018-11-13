@@ -1,6 +1,19 @@
 button {
   @extend .btn;
   @extend .btn-dark;
+
+  &.circle {
+    border-radius: 100%;
+
+    i {
+      margin: 0;
+      display: inline;
+    }
+  }
+
+  &.spaced {
+    margin-right: 5px;
+  }
 }
 
 .settings-form button[type=submit] {

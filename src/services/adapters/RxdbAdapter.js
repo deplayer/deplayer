@@ -24,10 +24,19 @@ export default class RxdbAdapter implements IAdapter {
     })
   }
 
-  addMany(model: string, payload: any): Promise<any> {
-    return new Promise((resolve) => {
-      resolve({})
+  addMany(model: string, payload: Array<any>): Promise<any> {
+    const inserts = []
+    payload.forEach((item) => {
+      const insertPromise = this.addItem(item)
+
+      inserts.push(insertPromise)
     })
+
+    return Promise.all(inserts)
+  }
+
+  addItem = (item: any): Promise<any> => {
+    return this.save('collection', item.id, item)
   }
 
   get = (model: string, id: string): Promise<any> => {

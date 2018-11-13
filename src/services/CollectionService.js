@@ -24,7 +24,7 @@ export default class CollectionService implements IStorageService {
     return this.storageAdapter.addMany('collection', collection)
   }
 
-  get = (): Promise<any> => {
-    return this.storageAdapter.get('collection', 'collection')
+  get = (id: string): Promise<any> => {
+    return this.storageAdapter.get('collection', id)
   }
 }
