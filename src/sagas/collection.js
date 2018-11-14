@@ -22,7 +22,7 @@ export function* addToCollection(action: any): any {
   const adapter = getAdapter()
   const collectionService = new CollectionService(new adapter())
   const collection = yield collectionService.bulkSave(action.data)
-  yield put({type: types.RECEIVE_COLLECTION, collection})
+  yield put({type: types.RECEIVE_COLLECTION, data: collection})
 }
 
 // Binding actions to sagas
