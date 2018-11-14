@@ -23,4 +23,10 @@ export default class DummyAdapter implements IAdapter {
       resolve({})
     })
   }
+
+  getAll(model: string): Promise<any> {
+    return new Promise((resolve) => {
+      resolve([])
+    })
+  }
 }

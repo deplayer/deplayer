@@ -33,7 +33,7 @@ const SongRow = (props: Props) => {
         <CoverImage
           cover={song.cover}
           size='thumbnail'
-          albumName={song.album.name}
+          albumName={song.album ? song.album.name : 'N/A'}
         />
       </Table.Cell>
       <Table.Cell>

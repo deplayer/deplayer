@@ -14,6 +14,7 @@ import SongRow from './SongRow'
 type Props = {
   error?: string,
   playlist: any,
+  tableIds: any,
   collection: any,
   dispatch: Dispatch,
 }
@@ -25,10 +26,10 @@ const MusicTable = (props: Props) => {
 
   const { id } = props.playlist.currentPlaying
 
-  const songs = props.playlist.trackIds.map((songId) => {
+  const songs = props.tableIds.map((songId) => {
     const song = props.collection.rows[songId]
-    if (!song) {
-      return <Table.Row><Table.Cell><div><Translate value='error.noSongFound' /></div></Table.Cell></Table.Row>
+    if (!song || !song.id) {
+      return <Table.Row key={songId}><Table.Cell><div><Translate value='error.noSongFound' /></div></Table.Cell></Table.Row>
     }
 
     return <SongRow

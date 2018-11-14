@@ -15,6 +15,10 @@ export const defaultState = {
   visibleSongs: [],
 }
 
+const getKeys = (rows: any): Array<string> => {
+  return Object.keys(rows)
+}
+
 export default (state: State = defaultState, action: Action = {}) => {
   switch (action.type) {
     case types.RECEIVE_COLLECTION: {
@@ -22,10 +26,12 @@ export default (state: State = defaultState, action: Action = {}) => {
       action.data.forEach((row) => {
         rows[row.id] = row
       })
+      const visibleSongs = getKeys(rows)
       return {
         ...state,
+        visibleSongs,
         rows: {...state.rows, ...rows},
-        totalRows: state.totalRows + action.data.length,
+        totalRows: state.totalRows + action.data.length
       }
     }
 

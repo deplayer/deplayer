@@ -13,13 +13,13 @@ type Props = {
 }
 
 const Collection = (props: Props) => {
-  if (!props.playlist.trackIds.length) {
+  if (!props.collection.visibleSongs.length) {
     return null
   }
 
   return (
     <div className='collection'>
-      <MusicTable {...props} />
+      <MusicTable tableIds={props.collection.visibleSongs} {...props} />
     </div>
   )
 }

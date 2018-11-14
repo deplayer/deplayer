@@ -31,13 +31,35 @@ export default class Media {
       title: {
         type: 'string'
       },
+      duration: {
+        type: 'number'
+      },
+      genre: {
+        type: 'string'
+      },
+      shareUrl: {
+        type: 'string'
+      },
+      album: {
+        type: 'object'
+      },
+      cover: {
+        type: 'object'
+      },
+      artist: {
+        type: 'object'
+      },
+      stream: {
+        type: 'array'
+      },
     }
   }
 
   toDocument(): any {
     return {
       id: this.id,
-      title: this.title
+      title: this.title,
+      stream: this.stream
     }
   }
 }

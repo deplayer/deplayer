@@ -12,6 +12,7 @@ configureEnzyme()
 const setup = () => {
   const props = {
     dispatch: () => {},
+    tableIds: [],
     playlist: {
       trackIds: [],
       currentPlaying: {},
