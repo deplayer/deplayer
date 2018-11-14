@@ -19,7 +19,7 @@ const Playlist = (props: Props) => {
 
   return (
     <div className='collection'>
-      <MusicTable {...props} />
+      <MusicTable tableIds={props.playlist.trackIds} {...props} />
     </div>
   )
 }
