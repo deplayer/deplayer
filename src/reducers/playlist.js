@@ -85,6 +85,7 @@ export default (state: State = defaultState, action: Action = {}): State => {
     case types.SET_CURRENT_PLAYING:
       return {
         ...state,
+        trackIds: [...state.trackIds, ...populateTracks([action.song])],
         currentPlaying: action.song,
         prevSongId: getSiblingSong(state.trackIds, action.song),
         nextSongId: getSiblingSong(state.trackIds, action.song, true),

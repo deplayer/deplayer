@@ -3,6 +3,8 @@
 import * as types from '../constants/ActionTypes'
 import { Action } from 'redux'
 
+import Song from '../entities/Song'
+
 type State = {
   rows: any,
   totalRows: number,
@@ -24,7 +26,7 @@ export default (state: State = defaultState, action: Action = {}) => {
     case types.RECEIVE_COLLECTION: {
       const rows = {}
       action.data.forEach((row) => {
-        rows[row.id] = row
+        rows[row.id] = new Song(row)
       })
       const visibleSongs = getKeys(rows)
       return {

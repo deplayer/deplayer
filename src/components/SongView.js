@@ -33,7 +33,7 @@ export default class Rowack extends Component<Props> {
             <CoverImage
               cover={song.cover}
               size='full'
-              albumName={song.album.name}
+              albumName={song.album ? song.album.name: 'N/A'}
             />
           </div>
           <div className='content'>
