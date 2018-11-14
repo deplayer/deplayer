@@ -17,17 +17,21 @@ export default class CollectionService implements IStorageService {
   }
 
   save = (id: string, payload: any): Promise<any> => {
-    return this.storageAdapter.save('collection', id, payload)
+    return this.storageAdapter.save('media', id, payload)
   }
 
   bulkSave = (collection: Array<Media>): Promise<any> => {
     const collectionItems = collection.map((elem) => {
       return elem.toDocument()
     })
-    return this.storageAdapter.addMany('collection', collectionItems)
+    return this.storageAdapter.addMany('media', collectionItems)
   }
 
   get = (id: string): Promise<any> => {
-    return this.storageAdapter.get('collection', id)
+    return this.storageAdapter.get('media', id)
+  }
+
+  getAll = (): Promise<any> => {
+    return this.storageAdapter.getAll('media')
   }
 }

@@ -60,4 +60,25 @@ export default class RxdbAdapter implements IAdapter {
       })
     })
   }
+
+  getAll = (model: string): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      return db.get().then((instance) => {
+
+        const query = instance[model].find()
+
+        query.exec().then((result) => {
+          if (result) {
+            resolve(Promise.all(result))
+          }
+
+          resolve(null)
+        })
+          .catch((err) => {
+            console.warn(err)
+            reject(err)
+          })
+      })
+    })
+  }
 }

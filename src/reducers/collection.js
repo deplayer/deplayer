@@ -17,7 +17,7 @@ export const defaultState = {
 
 export default (state: State = defaultState, action: Action = {}) => {
   switch (action.type) {
-    case types.ADD_TO_COLLECTION: {
+    case types.RECEIVE_COLLECTION: {
       const rows = {}
       action.data.forEach((row) => {
         rows[row.id] = row
