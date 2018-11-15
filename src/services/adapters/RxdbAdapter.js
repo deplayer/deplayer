@@ -11,7 +11,6 @@ export default class RxdbAdapter implements IAdapter {
   save = (model: string, id: string, payload: any): Promise<any> => {
     const doc = {...payload, _id: id}
     return db.get().then((instance) => {
-      console.log('Upserting: ', doc)
       return instance[model].upsert(doc)
     })
   }
@@ -26,11 +25,10 @@ export default class RxdbAdapter implements IAdapter {
 
     return new Promise((resolve, reject) => {
       Promise.all(inserts).then((results) => {
-        console.log(results)
         resolve(results)
       })
         .catch((e) => {
-          console.log(e)
+          console.warn(e)
           reject(e)
         })
     })

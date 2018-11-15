@@ -16,6 +16,7 @@ type Props = {
   playlist: any,
   tableIds: any,
   collection: any,
+  totalSongs: number,
   dispatch: Dispatch,
 }
 
@@ -71,7 +72,7 @@ const MusicTable = (props: Props) => {
       </Table.Body>
       <Table.Footer>
         <Table.Row>
-          <Table.Cell>Total songs {props.playlist.trackIds.length}</Table.Cell>
+          <Table.Cell>Total songs {props.totalSongs}</Table.Cell>
         </Table.Row>
       </Table.Footer>
     </Table>

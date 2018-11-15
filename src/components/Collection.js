@@ -19,7 +19,11 @@ const Collection = (props: Props) => {
 
   return (
     <div className='collection'>
-      <MusicTable tableIds={props.collection.visibleSongs} {...props} />
+      <MusicTable
+        tableIds={props.collection.visibleSongs}
+        totalSongs={props.collection.totalRows}
+        {...props}
+      />
     </div>
   )
 }
