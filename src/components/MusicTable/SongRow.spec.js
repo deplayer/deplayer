@@ -14,7 +14,8 @@ const setup = () => {
   const props = {
     song: new Song(),
     onClick: () => {},
-    isCurrent: false
+    isCurrent: false,
+    dispatch: jest.fn()
   }
 
   const enzymeWrapper = shallow(<SongRow {...props}/>)

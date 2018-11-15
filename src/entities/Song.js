@@ -59,10 +59,15 @@ export default class Song extends Media {
     this.artist = {
       name: artistName
     }
-    this.price = {
-      price: price || 0,
-      currency: currency || 'USD'
+    if (typeof price === 'number') {
+      this.price = {
+        price: price || 0,
+        currency: currency || 'USD'
+      }
+    } else {
+      this.price = price
     }
+
     this.stream = stream || []
   }
 }
