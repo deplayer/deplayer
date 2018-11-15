@@ -19,6 +19,7 @@ import searchSaga from '../sagas/search'
 import playerSaga from '../sagas/player'
 import settingsSaga from '../sagas/settings'
 import collectionSaga from '../sagas/collection'
+import notificationsSaga from '../sagas/notifications'
 
 export default function configureStore() {
   let middlewares = [promise, thunk]
@@ -53,6 +54,7 @@ export default function configureStore() {
   sagaMiddleware.run(settingsSaga)
   sagaMiddleware.run(searchSaga)
   sagaMiddleware.run(collectionSaga)
+  sagaMiddleware.run(notificationsSaga)
 
   store.dispatch({type: INITIALIZED})
 

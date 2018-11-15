@@ -3,17 +3,16 @@
 import { expectSaga } from 'redux-saga-test-plan'
 
 import {
-  ADD_ONE_TO_COLLECTION
+  START_PLAYING
 } from '../constants/ActionTypes'
-
 import Song from '../entities/Song'
 
-import { addToCollection } from './collection'
+import { sendCurrentPlayingNotification } from './notifications'
 
-describe('collection saga', () => {
+describe('notificaiton saga', () => {
   it('should handle player events', () => {
     const song = new Song()
-    return expectSaga(addToCollection, {type: ADD_ONE_TO_COLLECTION, data: [song]})
+    return expectSaga(sendCurrentPlayingNotification, {type: START_PLAYING, song})
       .run()
   })
 })
