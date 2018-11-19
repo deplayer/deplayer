@@ -14,7 +14,8 @@ type Props = {
   song: Song,
   isCurrent: boolean,
   onClick: () => any,
-  dispatch: Dispatch
+  dispatch: Dispatch,
+  disableAddButton?: boolean
 }
 
 const SongRow = (props: Props) => {
@@ -67,12 +68,14 @@ const SongRow = (props: Props) => {
         >
           <i className='icon play circle'></i>
         </button>
-        <button
-          className='add-to-collection circle spaced'
-          onClick={() => addToCollection(song)}
-        >
-          <i className='icon add circle'></i>
-        </button>
+        { props.disableAddButton &&
+          <button
+            className='add-to-collection circle spaced'
+            onClick={(song) => addToCollection(song)}
+          >
+            <i className='icon add circle'></i>
+          </button>
+        }
       </Table.Cell>
     </Table.Row>
   )

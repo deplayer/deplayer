@@ -18,6 +18,7 @@ type Props = {
   collection: any,
   totalSongs: number,
   dispatch: Dispatch,
+  disableAddButton?: boolean,
 }
 
 const MusicTable = (props: Props) => {
@@ -40,6 +41,7 @@ const MusicTable = (props: Props) => {
       onClick={() => {
         props.dispatch(setCurrentPlaying(song))
       }}
+      disableAddButton={props.disableAddButton}
       dispatch={props.dispatch}
     />
   })

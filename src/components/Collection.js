@@ -22,6 +22,7 @@ const Collection = (props: Props) => {
       <MusicTable
         tableIds={props.collection.visibleSongs}
         totalSongs={props.collection.totalRows}
+        disableAddButton
         {...props}
       />
     </div>
