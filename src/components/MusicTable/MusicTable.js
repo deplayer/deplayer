@@ -8,7 +8,6 @@ import { Translate } from 'react-redux-i18n'
 import {
   setCurrentPlaying
 } from '../../actions/playlist'
-import { SET_COLUMN_SORT } from '../../constants/ActionTypes'
 import SongRow from './SongRow'
 
 type Props = {
@@ -23,7 +22,7 @@ type Props = {
 
 const MusicTable = (props: Props) => {
   const errors = props.error ?
-    <Table.Row><Table.Cell>{ props.error }</Table.Cell></Table.Row>
+    <div><div>{ props.error }</div></div>
     : null
 
   const { id } = props.playlist.currentPlaying
@@ -31,7 +30,7 @@ const MusicTable = (props: Props) => {
   const songs = props.tableIds.map((songId) => {
     const song = props.collection.rows[songId]
     if (!song || !song.id) {
-      return <Table.Row key={songId}><Table.Cell><div><Translate value='error.noSongFound' /></div></Table.Cell></Table.Row>
+      return <div key={songId}><div><Translate value='error.noSongFound' /></div></div>
     }
 
     return <SongRow
@@ -46,38 +45,18 @@ const MusicTable = (props: Props) => {
     />
   })
 
-  const sortBy = (field, songs) => {
-    props.dispatch({
-      type: SET_COLUMN_SORT,
-      songs,
-      column: field
-    })
-  }
-
   return (
-    <Table className='music-table'>
-      <Table.Header>
-        <Table.Row>
-          <Table.Cell></Table.Cell>
-          <Table.Cell><Translate value="song.row.song" /></Table.Cell>
-          <Table.Cell><Translate value="song.row.artist" /></Table.Cell>
-          <Table.Cell><Translate value="song.row.album" /></Table.Cell>
-          <Table.Cell><Translate value="song.row.dateAdded" /></Table.Cell>
-          <Table.Cell className='action' onClick={() => sortBy('duration', props.collection.rows)}><Translate value="song.row.time" /></Table.Cell>
-          <Table.Cell className='action' onClick={() => sortBy('genre', props.collection.rows)}><Translate value="song.row.genre" /></Table.Cell>
-          <Table.Cell><Translate value="song.row.actions" /></Table.Cell>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
+    <div className='music-table'>
+      <div>
         { errors }
         { songs }
-      </Table.Body>
-      <Table.Footer>
+      </div>
+      <div>
         <Table.Row>
-          <Table.Cell>Total songs {props.totalSongs}</Table.Cell>
+          <div>Total songs {props.totalSongs}</div>
         </Table.Row>
-      </Table.Footer>
-    </Table>
+      </div>
+    </div>
   )
 }
 
