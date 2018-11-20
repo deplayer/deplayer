@@ -25,10 +25,19 @@ export function* addToCollection(action: any): any {
   yield put({type: types.RECEIVE_COLLECTION, data: collection})
 }
 
+// Handling REMOVE_FROM_COLLECTION saga
+export function* removeFromCollection(action: any): any {
+  const adapter = getAdapter()
+  const collectionService = new CollectionService(new adapter())
+  const collection = yield collectionService.bulkRemove(action.data)
+  yield put({type: types.RECEIVE_COLLECTION, data: collection})
+}
+
 // Binding actions to sagas
 function* collectionSaga(): Generator<void, void, void> {
   yield takeLatest(types.INITIALIZED, initialize)
   yield takeLatest(types.ADD_TO_COLLECTION, addToCollection)
+  yield takeLatest(types.REMOVE_FROM_COLLECTION, removeFromCollection)
 }
 
 export default collectionSaga

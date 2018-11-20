@@ -10,15 +10,18 @@ import SongRow from './SongRow'
 configureEnzyme()
 
 
-const setup = () => {
+const setup = (customProps) => {
   const props = {
     song: new Song(),
     onClick: () => {},
     isCurrent: false,
-    dispatch: jest.fn()
+    dispatch: jest.fn(),
+    disableAddButton: false
   }
 
-  const enzymeWrapper = shallow(<SongRow {...props}/>)
+  const finalProps = {...props, ...customProps}
+
+  const enzymeWrapper = shallow(<SongRow {...finalProps}/>)
 
   return {
     props,
@@ -32,6 +35,12 @@ describe('SongRow', () => {
     expect(enzymeWrapper.find('.song-row').exists())
       .toBe(true)
     expect(enzymeWrapper.find('button.add-to-collection').exists())
+      .toBe(true)
+  })
+
+  it('should show remove button when disableAddButton is true', () => {
+    const { enzymeWrapper } = setup({disableAddButton: true})
+    expect(enzymeWrapper.find('button.remove-from-collection').exists())
       .toBe(true)
   })
 })

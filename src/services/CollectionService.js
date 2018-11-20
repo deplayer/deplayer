@@ -27,6 +27,13 @@ export default class CollectionService implements IStorageService {
     return this.storageAdapter.addMany('media', collectionItems)
   }
 
+  bulkRemove = (collection: Array<Media>): Promise<any> => {
+    const collectionIds = collection.map((elem) => {
+      return elem.id
+    })
+    return this.storageAdapter.removeMany('media', collectionIds)
+  }
+
   get = (id: string): Promise<any> => {
     return this.storageAdapter.get('media', id)
   }

@@ -5,7 +5,7 @@ import { Table } from 'semantic-ui-react'
 import { Translate } from 'react-redux-i18n'
 import { Dispatch } from 'redux'
 
-import { ADD_TO_COLLECTION } from '../../constants/ActionTypes'
+import { ADD_TO_COLLECTION, REMOVE_FROM_COLLECTION } from '../../constants/ActionTypes'
 import { getDurationStr } from '../../utils/timeFormatter'
 import Song from '../../entities/Song'
 import CoverImage from './CoverImage'
@@ -20,11 +20,16 @@ type Props = {
 
 const SongRow = (props: Props) => {
 
-  const addToCollection = (song) => {
-    props.dispatch({type: ADD_TO_COLLECTION, data: [song]})
+  const addToCollection = () => {
+    props.dispatch({type: ADD_TO_COLLECTION, data: [props.song]})
   }
 
-  const { song, onClick } = props
+  const removeFromCollection = () => {
+    props.dispatch({type: REMOVE_FROM_COLLECTION, data: [props.song]})
+  }
+
+  const { song, onClick, disableAddButton } = props
+
   const nonAvailable = <Translate value='song.row.na' />
   return (
     <Table.Row
@@ -68,12 +73,20 @@ const SongRow = (props: Props) => {
         >
           <i className='icon play circle'></i>
         </button>
-        { props.disableAddButton &&
+        { !disableAddButton &&
           <button
             className='add-to-collection circle spaced'
-            onClick={(song) => addToCollection(song)}
+            onClick={addToCollection}
           >
             <i className='icon add circle'></i>
+          </button>
+        }
+        { disableAddButton &&
+          <button
+            className='remove-from-collection circle spaced'
+            onClick={removeFromCollection}
+          >
+            <i className='icon remove circle'></i>
           </button>
         }
       </Table.Cell>
