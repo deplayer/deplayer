@@ -10,7 +10,6 @@
   justify-content: center;
 
   input {
-    @extend .fluid;
     background-color: #000 !important;
     width: 100%;
     color: $font-color;

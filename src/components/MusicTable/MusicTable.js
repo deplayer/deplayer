@@ -2,7 +2,6 @@
 
 import React from 'react'
 import { Dispatch } from 'redux'
-import { Table } from 'semantic-ui-react'
 import { Translate } from 'react-redux-i18n'
 
 import {
@@ -51,10 +50,10 @@ const MusicTable = (props: Props) => {
         { errors }
         { songs }
       </div>
-      <div>
-        <Table.Row>
+      <div className='music-table-foote'>
+        <div>
           <div>Total songs {props.totalSongs}</div>
-        </Table.Row>
+        </div>
       </div>
     </div>
   )

@@ -1,7 +1,6 @@
 // @flow
 
 import React from 'react'
-import { Button } from 'semantic-ui-react'
 import { Translate }  from 'react-redux-i18n'
 import { Formik, Form, Field } from 'formik'
 import { Dispatch } from 'redux'
@@ -72,9 +71,9 @@ const SettingsForm = (props: Props) => {
             className='settings-form'
           >
             { populateFromSchema(props.schema) }
-            <Button disabled={isSubmitting} type='submit'>
+            <button disabled={isSubmitting} type='submit'>
               <Translate value="buttons.mstream.save" />
-            </Button>
+            </button>
           </Form>
         )}
     />
