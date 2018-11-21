@@ -17,6 +17,8 @@ deploy:
   - yarn build
   - cp build/index.html build/200.html # Creating fallback page
   - node_modules/.bin/surge build genar-radio.surge.sh
+  only:
+  - master
   variables:
     SURGE_LOGIN: $SURGE_LOGIN
     SURGE_TOKEN: $SURGE_TOKEN

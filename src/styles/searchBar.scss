@@ -18,5 +18,13 @@
       color: $font-color !important;
     }
   }
+
+  .icon {
+    position: absolute;
+    display: inline;
+    top: 0;
+    right: 10px;
+    line-height: 38px;
+  }
 }
 

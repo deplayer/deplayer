@@ -1,0 +1,22 @@
+.icon {
+  @extend .eva;
+
+  &.music {
+    @extend .eva-music;
+  }
+  &.database {
+    @extend .eva-archive;
+  }
+  &.cogs {
+    @extend .eva-settings-2;
+  }
+  &.play {
+    @extend .eva-play-circle;
+  }
+  &.remove {
+    @extend .eva-trash;
+  }
+  &.search {
+    @extend .eva-search;
+  }
+}

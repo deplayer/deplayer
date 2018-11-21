@@ -1,33 +1,13 @@
-@import "bootstrap/scss/_functions.scss";
-@import "bootstrap/scss/_variables.scss";
-@import "bootstrap/scss/_mixins.scss";
-@import "bootstrap/scss/_grid.scss";
-@import "bootstrap/scss/_forms.scss";
-@import "bootstrap/scss/_buttons.scss";
-@import "bootstrap/scss/_utilities.scss";
-@import "bootstrap/scss/_reboot.scss";
-@import "bootstrap/scss/_alert.scss";
+@import "bootstrap/scss/bootstrap.scss";
+$eva-icons-font-path: 'fonts' !default;
+$eva-icons-font-family: 'Eva-Icons' !default;
+@import "eva-icons/style/scss/_eva-icons-font.scss";
 
 @font-face {
   font-family: 'DOS';
   font-style: normal;
   font-weight: normal;
   src: local('DOS'), url('fonts/Fixedsys500c.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Icons';
-  src: url("fonts/icons.eot");
-  src: url("fonts/icons.eot?#iefix") format('embedded-opentype'),
-  url("fonts/icons.woff2") format('woff2'),
-  url("fonts/icons.woff") format('woff'),
-  url("fonts/icons.ttf") format('truetype'),
-  url("fonts/icons.svg#icons") format('svg');
-  font-style: normal;
-  font-weight: normal;
-  font-variant: normal;
-  text-decoration: inherit;
-  text-transform: none;
 }
 
 $font-family: DOS,SimHei,Monaco,Menlo,Consolas,'Courier New',monospace;
@@ -45,6 +25,8 @@ $yellow-color: #a50;
 @import './alerts.scss';
 @import './buttons.scss';
 @import './searchBar.scss';
+@import './icons.scss';
+@import './form.scss';
 
 html, body {
   height: 100%;
