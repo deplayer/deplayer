@@ -46,10 +46,8 @@ const MusicTable = (props: Props) => {
 
   return (
     <div className='music-table'>
-      <div>
-        { errors }
-        { songs }
-      </div>
+      { errors }
+      { songs }
       <div className='music-table-foote'>
         <div>
           <div>Total songs {props.totalSongs}</div>

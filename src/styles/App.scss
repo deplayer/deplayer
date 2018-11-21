@@ -107,8 +107,9 @@ body {
     cursor: pointer;
   }
 
-  tbody tr td {
-    cursor: pointer;
+  .song-row {
+    @extend .d-flex;
+    width: 100%;
 
     .label {
       margin-right: 5px;
@@ -118,8 +119,8 @@ body {
       }
     }
 
-    &.collapsing {
-      height: 100vw;
+    .collapsing {
+      width: 100vw;
 
       @include media-breakpoint-up(md) {
         height: 60px;
