@@ -48,7 +48,7 @@ body {
   height: 100%;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-  grid-template-areas: "sidebar sidebar sidebar sidebar" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "player player player player";
+  grid-template-areas: "sidebar sidebar sidebar sidebar" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "player player player player";
 }
 
 .contents-container {
@@ -64,6 +64,8 @@ body {
 .sidebar-container {
   z-index: 1;
   grid-area: contents;
+  padding-left: 20px;
+  padding-right: 20px;
 
   &.has-results {
     grid-area: sidebar;
@@ -80,10 +82,6 @@ body {
       @extend .btn;
     }
   }
-
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-bottom: 20px;
 }
 
 .library-controls {
@@ -118,6 +116,10 @@ body {
       @extend .flex-grow-1;
       padding-left: 10px;
       padding-right: 10px;
+    }
+
+    .media-actions {
+      max-width: 40px;
     }
 
     .label {

@@ -13,10 +13,22 @@
   &.play {
     @extend .eva-play-circle;
   }
+  &.pause {
+    @extend .eva-pause-circle;
+  }
   &.remove {
     @extend .eva-trash;
   }
   &.search {
     @extend .eva-search;
+  }
+  &.step.backward {
+    @extend .eva-play-circle;
+  }
+  &.step.forward {
+    @extend .eva-play-circle;
+  }
+  &.add.circle {
+    @extend .eva-file-add;
   }
 }
