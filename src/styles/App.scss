@@ -101,15 +101,24 @@ body {
 
 .music-table {
   color: $font-color !important;
-  background-color: lighten($background-color, 10%) !important;
-
-  td.action {
-    cursor: pointer;
-  }
 
   .song-row {
     @extend .d-flex;
+    @extend .justify-content-between;
+    background-color: lighten($background-color, 10%) !important;
     width: 100%;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+    .media-info {
+      @extend .flex-grow-1;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
 
     .label {
       margin-right: 5px;
@@ -125,6 +134,15 @@ body {
       @include media-breakpoint-up(md) {
         height: 60px;
       }
+    }
+  }
+
+  .media-thumb {
+    min-width: 40px;
+
+    div {
+      min-width: 40px;
+      background-color: $yellow-color;
     }
   }
 }

@@ -34,38 +34,21 @@ const SongRow = (props: Props) => {
     <div
       className={`song-row ${ props.isCurrent ? 'current': ''}`}
     >
-      <div className='collapsing'>
+      <div className='media-thumb'>
         <CoverImage
           cover={song.cover}
           size='thumbnail'
           albumName={song.album ? song.album.name : 'N/A'}
         />
       </div>
-      <div>
-        <span className='label'><Translate value='song.label.title' /></span>
-        { song.title }
-      </div>
-      <div>
-        <span className='label'><Translate value='song.label.album' /></span>
-        { song.album ? song.album.name: nonAvailable }
-      </div>
-      <div>
+      <div className='media-info'>
+        <span className='title-label'>{ song.title } - { song.album ? song.album.name: nonAvailable }</span>
         <span className='label'><Translate value='song.label.artist' /></span>
         { song.artist ? song.artist.name: nonAvailable }
-      </div>
-      <div>
-        <span className='label'><Translate value='song.label.dateAdded' /></span>
-        { song.dateAdded ? song.dateAdded: nonAvailable }
-      </div>
-      <div>
         <span className='label'><Translate value='song.label.duration' /></span>
         { getDurationStr(song.duration) }
       </div>
-      <div>
-        <span className='label'><Translate value='song.label.genre' /></span>
-        { song.genre }
-      </div>
-      <div>
+      <div className='media-actions'>
         <button
           className='play circle spaced'
           onClick={onClick}
