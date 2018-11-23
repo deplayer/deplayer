@@ -27,9 +27,13 @@ export function* addToCollection(action: any): any {
 
 // Handling REMOVE_FROM_COLLECTION saga
 export function* removeFromCollection(action: any): any {
-  const adapter = getAdapter()
-  const collectionService = new CollectionService(new adapter())
-  yield collectionService.bulkRemove(action.data)
+  try {
+    const adapter = getAdapter()
+    const collectionService = new CollectionService(new adapter())
+    yield collectionService.bulkRemove(action.data)
+  } catch (e) {
+    yield put({type: types.REMOVE_FROM_COLLECTION_REJECTED, message: e.message})
+  }
 }
 
 // Binding actions to sagas
