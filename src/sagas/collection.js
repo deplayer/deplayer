@@ -29,8 +29,7 @@ export function* addToCollection(action: any): any {
 export function* removeFromCollection(action: any): any {
   const adapter = getAdapter()
   const collectionService = new CollectionService(new adapter())
-  const collection = yield collectionService.bulkRemove(action.data)
-  yield put({type: types.RECEIVE_COLLECTION, data: collection})
+  yield collectionService.bulkRemove(action.data)
 }
 
 // Binding actions to sagas

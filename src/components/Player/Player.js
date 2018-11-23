@@ -109,41 +109,43 @@ class Player extends Component<Props, State> {
     const volume = this.state.volume ? this.state.volume : this.props.player.volume
 
     return (
-      <div className='player'>
-        <ProgressBar
-          total={this.playerRef.current ? this.playerRef.current.duration : 0}
-          current={this.state.currentTime}
-        />
-        <audio
-          ref={this.playerRef}
-          src={streamUri}
-          volume={ volume }
-          onError={this.logError.bind(this)}
-          autoPlay={ this.props.player.playing }
-          onTimeUpdate={ this.onTimeUpdate }
-          onEnded={this.playNext}
-        />
-        <div className='ui icon buttons player-controls'>
-          <SkipButton
-            onClick={this.playPrev}
-            keyValues={['ArrowLeft', 'k']}
-            type="prev"
+      <div className='player-container'>
+        <div className='player'>
+          <ProgressBar
+            total={this.playerRef.current ? this.playerRef.current.duration : 0}
+            current={this.state.currentTime}
           />
-          <PlayPauseButton
-            playing={this.isPlaying()}
-            onClick={this.playPause}
-          />
-          <SkipButton
-            onClick={this.playNext}
-            keyValues={['ArrowRight', 'j']}
-            type="next"
-          />
-          <VolumeControl
+          <audio
+            ref={this.playerRef}
+            src={streamUri}
             volume={ volume }
-            onChange={this.setVolume}
+            onError={this.logError.bind(this)}
+            autoPlay={ this.props.player.playing }
+            onTimeUpdate={ this.onTimeUpdate }
+            onEnded={this.playNext}
           />
+          <div className='ui icon buttons player-controls'>
+            <SkipButton
+              onClick={this.playPrev}
+              keyValues={['ArrowLeft', 'k']}
+              type="prev"
+            />
+            <PlayPauseButton
+              playing={this.isPlaying()}
+              onClick={this.playPause}
+            />
+            <SkipButton
+              onClick={this.playNext}
+              keyValues={['ArrowRight', 'j']}
+              type="next"
+            />
+            <VolumeControl
+              volume={ volume }
+              onChange={this.setVolume}
+            />
+          </div>
+          {this.state.error}
         </div>
-        {this.state.error}
       </div>
     )
   }

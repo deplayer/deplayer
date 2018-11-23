@@ -1,7 +1,6 @@
 // @flow
 
 import React from 'react'
-import { Table } from 'semantic-ui-react'
 import { Translate } from 'react-redux-i18n'
 import { Dispatch } from 'redux'
 
@@ -32,41 +31,24 @@ const SongRow = (props: Props) => {
 
   const nonAvailable = <Translate value='song.row.na' />
   return (
-    <Table.Row
+    <div
       className={`song-row ${ props.isCurrent ? 'current': ''}`}
     >
-      <Table.Cell className='collapsing'>
+      <div className='media-thumb'>
         <CoverImage
           cover={song.cover}
           size='thumbnail'
           albumName={song.album ? song.album.name : 'N/A'}
         />
-      </Table.Cell>
-      <Table.Cell>
-        <span className='label'><Translate value='song.label.title' /></span>
-        { song.title }
-      </Table.Cell>
-      <Table.Cell>
-        <span className='label'><Translate value='song.label.album' /></span>
-        { song.album ? song.album.name: nonAvailable }
-      </Table.Cell>
-      <Table.Cell>
+      </div>
+      <div className='media-info'>
+        <span className='title-label'>{ song.title } - { song.album ? song.album.name: nonAvailable }</span>
         <span className='label'><Translate value='song.label.artist' /></span>
         { song.artist ? song.artist.name: nonAvailable }
-      </Table.Cell>
-      <Table.Cell>
-        <span className='label'><Translate value='song.label.dateAdded' /></span>
-        { song.dateAdded ? song.dateAdded: nonAvailable }
-      </Table.Cell>
-      <Table.Cell>
         <span className='label'><Translate value='song.label.duration' /></span>
         { getDurationStr(song.duration) }
-      </Table.Cell>
-      <Table.Cell>
-        <span className='label'><Translate value='song.label.genre' /></span>
-        { song.genre }
-      </Table.Cell>
-      <Table.Cell>
+      </div>
+      <div className='media-actions'>
         <button
           className='play circle spaced'
           onClick={onClick}
@@ -89,8 +71,8 @@ const SongRow = (props: Props) => {
             <i className='icon remove circle'></i>
           </button>
         }
-      </Table.Cell>
-    </Table.Row>
+      </div>
+    </div>
   )
 }
 

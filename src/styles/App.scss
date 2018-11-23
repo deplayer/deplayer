@@ -1,34 +1,12 @@
-@import "sass-semantic-ui/src/scss/_variable.scss";
-@import "bootstrap/scss/_functions.scss";
-@import "bootstrap/scss/_variables.scss";
-@import "bootstrap/scss/_mixins.scss";
-@import "bootstrap/scss/_grid.scss";
-@import "bootstrap/scss/_forms.scss";
-@import "bootstrap/scss/_buttons.scss";
-@import "bootstrap/scss/_utilities.scss";
-@import "bootstrap/scss/_reboot.scss";
-@import "bootstrap/scss/_alert.scss";
+@import "bootstrap/scss/bootstrap.scss";
+$fa-font-path: "./fonts" !default;
+@import "font-awesome/scss/font-awesome.scss";
 
 @font-face {
   font-family: 'DOS';
   font-style: normal;
   font-weight: normal;
   src: local('DOS'), url('fonts/Fixedsys500c.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Icons';
-  src: url("fonts/icons.eot");
-  src: url("fonts/icons.eot?#iefix") format('embedded-opentype'),
-  url("fonts/icons.woff2") format('woff2'),
-  url("fonts/icons.woff") format('woff'),
-  url("fonts/icons.ttf") format('truetype'),
-  url("fonts/icons.svg#icons") format('svg');
-  font-style: normal;
-  font-weight: normal;
-  font-variant: normal;
-  text-decoration: inherit;
-  text-transform: none;
 }
 
 $font-family: DOS,SimHei,Monaco,Menlo,Consolas,'Courier New',monospace;
@@ -41,23 +19,16 @@ $body-bg-color: $background-color;
 $green-color: rgba(51, 255, 0, 1);
 $yellow-color: #a50;
 
-@import "sass-semantic-ui/src/scss/elements/_input.scss";
-@import "sass-semantic-ui/src/scss/elements/_icon.scss";
-@import "sass-semantic-ui/src/scss/collections/_table.scss";
-@import "sass-semantic-ui/src/scss/views/_item.scss";
-@import "sass-semantic-ui/src/scss/modules/_progress.scss";
 
 // Own styles
 @import './alerts.scss';
 @import './buttons.scss';
 @import './searchBar.scss';
+@import './icons.scss';
+@import './form.scss';
 
 html, body {
   height: 100%;
-}
-
-html {
-  font-size: $body-font-size;
 }
 
 body {
@@ -67,7 +38,6 @@ body {
   min-width: 320px;
   background: $body-bg-color;
   font-family: $font-family;
-  font-size: $body-font-size;
   color: $font-color;
   font-smoothing: antialiased;
 }
@@ -77,7 +47,7 @@ body {
   height: 100%;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-  grid-template-areas: "sidebar sidebar sidebar sidebar" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "player player player player";
+  grid-template-areas: "sidebar sidebar sidebar sidebar" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "player player player player";
 }
 
 .contents-container {
@@ -93,6 +63,8 @@ body {
 .sidebar-container {
   z-index: 1;
   grid-area: contents;
+  padding-left: 20px;
+  padding-right: 20px;
 
   &.has-results {
     grid-area: sidebar;
@@ -107,23 +79,11 @@ body {
 
     a {
       @extend .btn;
-      @extend .huge;
-      @extend .compact;
-      @extend .circular;
-      @extend .icon;
-      @extend .inverted;
     }
   }
-
-  @extend .inverted;
-  @extend .fluid;
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-bottom: 20px;
 }
 
 .library-controls {
-  @extend .fluid;
   padding: 10px 0;
 }
 
@@ -137,18 +97,29 @@ body {
 }
 
 .music-table {
-  @extend .inverted;
-  @extend .selectable;
-  @extend .large;
   color: $font-color !important;
-  background-color: lighten($background-color, 10%) !important;
 
-  td.action {
-    cursor: pointer;
-  }
+  .song-row {
+    @extend .d-flex;
+    @extend .justify-content-between;
+    background-color: lighten($background-color, 10%) !important;
+    width: 100%;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
 
-  tbody tr td {
-    cursor: pointer;
+    .media-info {
+      @extend .flex-grow-1;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .media-actions {
+      max-width: 40px;
+    }
 
     .label {
       margin-right: 5px;
@@ -158,12 +129,22 @@ body {
       }
     }
 
-    &.collapsing {
-      height: 100vw;
+    .collapsing {
+      width: 100vw;
 
       @include media-breakpoint-up(md) {
         height: 60px;
       }
+    }
+  }
+
+  .media-thumb {
+    min-width: 76px;
+    min-height: 76px;
+
+    div {
+      min-width: 40px;
+      background-color: $yellow-color;
     }
   }
 }
@@ -254,16 +235,11 @@ span.label {
   padding-top: 20px;
 
   button {
-    @extend .huge;
-    @extend .compact;
-    @extend .circular;
-    @extend .icon;
   }
 }
 
 .progress-bar {
   margin-bottom: 0;
-  @extend .ui.progress;
   background-color: darken($body-bg-color, 20%);
 
   max-width: 95%;
@@ -285,7 +261,6 @@ span.label {
 
 .player-controls {
   @extend .d-flex;
-  @extend .fluid;
   justify-content: center;
   padding: 15px 0px;
 

@@ -43,9 +43,7 @@ class App extends Component<any> {
               <Route path="/song/:id" component={SongContainer} />
               <Route path="/settings" component={SettingsContainer} />
             </div>
-            <div className='player-container'>
-              <PlayerContainer />
-            </div>
+            <PlayerContainer />
           </React.Fragment>
         </Router>
       </Provider>

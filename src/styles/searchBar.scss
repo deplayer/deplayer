@@ -10,14 +10,16 @@
   justify-content: center;
 
   input {
-    @extend .fluid;
-    background-color: #000 !important;
     width: 100%;
-    color: $font-color;
+    @extend .form-control;
+  }
 
-    &:focus {
-      color: $font-color !important;
-    }
+  .icon {
+    position: absolute;
+    display: inline;
+    top: 0;
+    right: 10px;
+    line-height: 38px;
   }
 }
 
