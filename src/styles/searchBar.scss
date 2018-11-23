@@ -10,13 +10,8 @@
   justify-content: center;
 
   input {
-    background-color: #000 !important;
     width: 100%;
-    color: $font-color;
-
-    &:focus {
-      color: $font-color !important;
-    }
+    @extend .form-control;
   }
 
   .icon {

@@ -1,34 +1,34 @@
 .icon {
-  @extend .eva;
+  @extend .fa;
 
   &.music {
-    @extend .eva-music;
+    @extend .fa-music;
   }
   &.database {
-    @extend .eva-archive;
+    @extend .fa-archive;
   }
   &.cogs {
-    @extend .eva-settings-2;
+    @extend .fa-gears;
   }
   &.play {
-    @extend .eva-play-circle;
+    @extend .fa-play-circle;
   }
   &.pause {
-    @extend .eva-pause-circle;
-  }
-  &.remove {
-    @extend .eva-trash;
+    @extend .fa-pause-circle;
   }
   &.search {
-    @extend .eva-search;
+    @extend .fa-search;
   }
   &.step.backward {
-    @extend .eva-play-circle;
+    @extend .fa-fast-backward;
   }
   &.step.forward {
-    @extend .eva-play-circle;
+    @extend .fa-fast-forward;
   }
   &.add.circle {
-    @extend .eva-file-add;
+    @extend .fa-plus-square;
+  }
+  &.remove {
+    @extend .fa-minus-square;
   }
 }

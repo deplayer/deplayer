@@ -1,7 +1,6 @@
 @import "bootstrap/scss/bootstrap.scss";
-$eva-icons-font-path: 'fonts' !default;
-$eva-icons-font-family: 'Eva-Icons' !default;
-@import "eva-icons/style/scss/_eva-icons-font.scss";
+$fa-font-path: "./fonts" !default;
+@import "font-awesome/scss/font-awesome.scss";
 
 @font-face {
   font-family: 'DOS';
@@ -140,7 +139,8 @@ body {
   }
 
   .media-thumb {
-    min-width: 40px;
+    min-width: 76px;
+    min-height: 76px;
 
     div {
       min-width: 40px;
