@@ -28,9 +28,10 @@ export default class SubsonicApiProvider implements IProvider {
   }
 
   mapSongs = (songs: Array<any>): Array<any> => {
-    return songs.map((song: any) => {
+    const secureSongs = songs instanceof Array ? songs : [songs]
+    return secureSongs.map((song: any) => {
       return new Song({
-        id: song.id,
+        id: "" + song.id,
         title: song.title ? song.title : song.path,
         artistName: song.artist,
         albumName: song.album,

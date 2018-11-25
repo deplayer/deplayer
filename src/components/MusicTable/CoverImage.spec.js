@@ -32,7 +32,7 @@ const setup = () => {
 describe('CoverImage', () => {
   it('should show render without errors', () => {
     const { enzymeWrapper } = setup()
-    expect(enzymeWrapper.find('Img').exists())
+    expect(enzymeWrapper.find('i').exists())
       .toBe(true)
   })
 })

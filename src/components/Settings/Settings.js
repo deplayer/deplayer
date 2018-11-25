@@ -4,6 +4,7 @@ import React, { Component } from 'react'
 import { Translate } from 'react-redux-i18n'
 import { Dispatch } from 'redux'
 
+import { DELETE_COLLECTION } from '../../constants/ActionTypes'
 import SettingsForm from './SettingsForm'
 
 type Props = {
@@ -29,6 +30,10 @@ export const formSchema = {
 }
 
 class Settings extends Component<Props, State> {
+  deleteCollection = () => {
+    this.props.dispatch({type: DELETE_COLLECTION})
+  }
+
   render() {
     return (
       <div className='settings'>
@@ -37,6 +42,7 @@ class Settings extends Component<Props, State> {
           settings={this.props.settings}
           dispatch={this.props.dispatch}
         />
+        <button onClick={this.deleteCollection}><Translate value="labels.deleteCollection" /></button>
       </div>
     )
   }

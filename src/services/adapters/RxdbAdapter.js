@@ -9,9 +9,9 @@ export default class RxdbAdapter implements IAdapter {
   }
 
   save = (model: string, id: string, payload: any): Promise<any> => {
-    const doc = {...payload, _id: id}
+    console.log(payload)
     return db.get().then((instance) => {
-      return instance[model].upsert(doc)
+      return instance[model].insert(payload)
     })
   }
 
@@ -95,6 +95,14 @@ export default class RxdbAdapter implements IAdapter {
             console.warn(err)
             reject(err)
           })
+      })
+    })
+  }
+
+  removeCollection = (model: string): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      return db.get().then((instance) => {
+        return instance[model].remove()
       })
     })
   }

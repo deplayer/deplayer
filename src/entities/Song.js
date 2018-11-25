@@ -70,4 +70,14 @@ export default class Song extends Media {
 
     this.stream = stream || []
   }
+
+  toDocument(): any {
+    return {
+      id: this.id,
+      title: this.title,
+      stream: this.stream,
+      artist: this.artist,
+      cover: this.cover,
+    }
+  }
 }

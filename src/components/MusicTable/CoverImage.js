@@ -44,9 +44,8 @@ const CoverImage = (props: Props) => {
   }
 
   return (
-    <Img
-      alt='Placeholder cover'
-      src='https://via.placeholder.com/70x70'
+    <i
+      className='cover-image fa fa-music'
     />
   )
 }

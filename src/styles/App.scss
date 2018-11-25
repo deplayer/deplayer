@@ -90,6 +90,12 @@ body {
     padding: 20px;
   }
 }
+.settings {
+  overflow-y: auto;
+  padding-left: 40px;
+  padding-right: 40px;
+  grid-area: contents;
+}
 
 .music-table {
   color: $font-color !important;
@@ -286,6 +292,7 @@ span.label {
   background-repeat: no-repeat;
   background-position: center center;
   background-size: contain;
+  font-size: 4em;
 }
 
 .song-row {

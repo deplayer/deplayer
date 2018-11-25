@@ -36,11 +36,22 @@ export function* removeFromCollection(action: any): any {
   }
 }
 
+export function* deleteCollection(): any {
+  try {
+    const adapter = getAdapter()
+    const collectionService = new CollectionService(new adapter())
+    yield collectionService.removeAll()
+  } catch (e) {
+    yield put({type: types.REMOVE_FROM_COLLECTION_REJECTED, message: e.message})
+  }
+}
+
 // Binding actions to sagas
 function* collectionSaga(): Generator<void, void, void> {
   yield takeLatest(types.INITIALIZED, initialize)
   yield takeLatest(types.ADD_TO_COLLECTION, addToCollection)
   yield takeLatest(types.REMOVE_FROM_COLLECTION, removeFromCollection)
+  yield takeLatest(types.DELETE_COLLECTION, deleteCollection)
 }
 
 export default collectionSaga

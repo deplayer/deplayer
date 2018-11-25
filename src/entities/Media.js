@@ -26,7 +26,8 @@ export default class Media {
   static toSchema(): any {
     return {
       id: {
-        type: 'string'
+        type: 'string',
+        primary: true
       },
       title: {
         type: 'string'
@@ -41,10 +42,23 @@ export default class Media {
         type: 'string'
       },
       album: {
-        type: 'object'
+        type: 'object',
+        properties: {
+          name: {
+            type: 'string'
+          },
+        }
       },
       cover: {
-        type: 'object'
+        type: 'object',
+        properties: {
+          thumbnailUrl: {
+            type: 'string'
+          },
+          fullUrl: {
+            type: 'string'
+          },
+        }
       },
       artist: {
         type: 'object'
@@ -57,7 +71,7 @@ export default class Media {
 
   toDocument(): any {
     return {
-      id: this.id,
+      id: '' + this.id,
       title: this.title,
       stream: this.stream
     }
