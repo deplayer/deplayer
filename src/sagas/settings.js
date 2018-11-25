@@ -12,8 +12,12 @@ function* initialize() {
   const settingsService = new SettingsService(new adapter())
   yield call(settingsService.initialize)
   const settings = yield call(settingsService.get)
-  const unserialized = JSON.parse(JSON.stringify(settings))
-  yield put({type: types.RECEIVE_SETTINGS, settings: unserialized})
+  if (!settings) {
+    yield put({type: types.GET_SETTINGS_REJECTED})
+  } else {
+    const unserialized = JSON.parse(JSON.stringify(settings))
+    yield put({type: types.RECEIVE_SETTINGS, settings: unserialized})
+  }
 }
 
 function* saveSettings(action: any) {

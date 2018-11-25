@@ -15,7 +15,7 @@ export default class SettingsService implements IStorageService {
   }
 
   save = (id: string, payload: any): Promise<any> => {
-    return this.storageAdapter.save('settings', id, payload)
+    return this.storageAdapter.save('settings', 'settings', payload)
   }
 
   get = (): Promise<any> => {
