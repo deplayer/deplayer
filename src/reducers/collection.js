@@ -28,11 +28,12 @@ export default (state: State = defaultState, action: Action = {}) => {
       action.data.forEach((row) => {
         rows[row.id] = new Song(row)
       })
-      const visibleSongs = getKeys(rows)
+      const totalRows = {...state.rows, ...rows}
+      const visibleSongs = getKeys(totalRows)
       return {
         ...state,
         visibleSongs,
-        rows: {...state.rows, ...rows},
+        rows: totalRows,
         totalRows: state.totalRows + action.data.length
       }
     }

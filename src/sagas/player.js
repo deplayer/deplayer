@@ -14,7 +14,7 @@ import Song from '../entities/Song'
 export function* setCurrentPlaying(action: {song: Song}): Generator<void, void, void> {
   // Redirect to song view page
   yield put({type: START_PLAYING})
-  yield put({type: PUSH_TO_VIEW, song: action.song})
+  // yield put({type: PUSH_TO_VIEW, song: action.song})
 }
 
 export function* goToViewPage(action: {song: Song}): Generator<void, void, void> {

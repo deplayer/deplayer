@@ -6,7 +6,8 @@ import Song from '../entities/Song'
 import {
   ADD_TO_PLAYLIST,
   ADD_SONGS_TO_PLAYLIST,
-  SET_COLUMN_SORT
+  SET_COLUMN_SORT,
+  SET_CURRENT_PLAYING
 } from '../constants/ActionTypes'
 
 describe('collection reducer', () => {
@@ -67,6 +68,15 @@ describe('collection reducer', () => {
         trackIds: sortedSongsIds,
         prevSongId: undefined,
         nextSongId: undefined,
+      })
+  })
+
+  it('should handle SET_CURRENT_PLAYING action', () => {
+    const songToAdd = new Song({id: '1234'})
+    expect(reducer({trackIds: ['1234']}, {type: SET_CURRENT_PLAYING, song: songToAdd}))
+      .toEqual({
+        trackIds: ['1234'],
+        currentPlaying: songToAdd
       })
   })
 })

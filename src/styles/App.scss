@@ -107,6 +107,8 @@ body {
     padding-right: 10px;
     padding-top: 10px;
     padding-bottom: 10px;
+    border-top: 4px solid;
+    border-bottom: 4px solid $body-bg-color;
 
     .media-info {
       @extend .flex-grow-1;
@@ -149,6 +151,7 @@ body {
 .song-view {
   grid-area: contents;
   position: relative;
+  overflow-y: auto;
 
   .image {
     grid-area: image;

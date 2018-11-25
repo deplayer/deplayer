@@ -81,7 +81,7 @@ const MusicTable = (props: Props) => {
           />
         )}
       </AutoSizer>
-
+      {errors}
     </React.Fragment>
   )
 }
