@@ -37,12 +37,10 @@ class App extends Component<any> {
         <Router history={history} >
           <React.Fragment>
             <SearchContainer />
-            <div className='contents-container'>
-              <Route exact path="/" component={Home} />
-              <Route path="/collection" component={CollectionContainer} />
-              <Route path="/song/:id" component={SongContainer} />
-              <Route path="/settings" component={SettingsContainer} />
-            </div>
+            <Route exact path="/" component={Home} />
+            <Route path="/collection" component={CollectionContainer} />
+            <Route path="/song/:id" component={SongContainer} />
+            <Route path="/settings" component={SettingsContainer} />
             <PlayerContainer />
           </React.Fragment>
         </Router>

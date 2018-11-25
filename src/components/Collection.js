@@ -17,11 +17,17 @@ const Collection = (props: Props) => {
     return null
   }
 
+  const collectionRef = React.createRef()
+
   return (
-    <div className='collection'>
+    <div
+      className='collection'
+      ref={collectionRef}
+    >
       <MusicTable
         tableIds={props.collection.visibleSongs}
         totalSongs={props.collection.totalRows}
+        forwardedRef={collectionRef}
         disableAddButton
         {...props}
       />

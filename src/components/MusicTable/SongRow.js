@@ -14,7 +14,8 @@ type Props = {
   isCurrent: boolean,
   onClick: () => any,
   dispatch: Dispatch,
-  disableAddButton?: boolean
+  disableAddButton?: boolean,
+  style: any
 }
 
 const SongRow = (props: Props) => {
@@ -31,8 +32,9 @@ const SongRow = (props: Props) => {
 
   const nonAvailable = <Translate value='song.row.na' />
   return (
-    <div
+    <li
       className={`song-row ${ props.isCurrent ? 'current': ''}`}
+      style={props.style}
     >
       <div className='media-thumb'>
         <CoverImage
@@ -72,7 +74,7 @@ const SongRow = (props: Props) => {
           </button>
         }
       </div>
-    </div>
+    </li>
   )
 }
 

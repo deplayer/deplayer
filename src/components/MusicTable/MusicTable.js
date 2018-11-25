@@ -3,6 +3,7 @@
 import React from 'react'
 import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
+import { AutoSizer, List } from 'react-virtualized'
 
 import {
   setCurrentPlaying
@@ -26,34 +27,62 @@ const MusicTable = (props: Props) => {
 
   const { id } = props.playlist.currentPlaying
 
-  const songs = props.tableIds.map((songId) => {
+  const rowRenderer = ({
+    index,       // Index of row
+    isScrolling, // The List is currently being scrolled
+    isVisible,   // This row is visible within the List (eg it is not an overscanned row)
+    key,         // Unique key within array of rendered rows
+    parent,      // Reference to the parent List (instance)
+    style        // Style object to be applied to row (to position it);
+    // This must be passed through to the rendered row element.
+  }) => {
+    const songId = props.tableIds[index]
     const song = props.collection.rows[songId]
+
     if (!song || !song.id) {
-      return <div key={songId}><div><Translate value='error.noSongFound' /></div></div>
+      return (
+        <li
+          className='song-row'
+          key={key}
+          style={style}
+        >
+          <Translate value='error.noSongFound' />
+        </li>
+      )
     }
 
-    return <SongRow
-      key={song.id}
-      song={song}
-      isCurrent={id === song.id}
-      onClick={() => {
-        props.dispatch(setCurrentPlaying(song))
-      }}
-      disableAddButton={props.disableAddButton}
-      dispatch={props.dispatch}
-    />
-  })
+    return (
+      <SongRow
+        key={key}
+        song={song}
+        isCurrent={id === song.id}
+        style={style}
+        onClick={() => {
+          props.dispatch(setCurrentPlaying(song))
+        }}
+        disableAddButton={props.disableAddButton}
+        dispatch={props.dispatch}
+      />
+    )
+  }
 
   return (
-    <div className='music-table'>
-      { errors }
-      { songs }
-      <div className='music-table-foote'>
-        <div>
-          <div>Total songs {props.totalSongs}</div>
-        </div>
-      </div>
-    </div>
+    <React.Fragment>
+      <AutoSizer className='music-table'>
+        {({ height, width }) => (
+          <List
+            height={height}
+            rowCount={props.totalSongs}
+            rowHeight={100}
+            rowRenderer={rowRenderer}
+            width={width}
+            overscanRowCount={6}
+            recomputeRowHeights
+          />
+        )}
+      </AutoSizer>
+
+    </React.Fragment>
   )
 }
 
