@@ -42,7 +42,7 @@ describe('settings reducer', () => {
           baseUrl: ''
         },
         subsonic: {
-          enabled: true,
+          enabled: false,
           baseUrl: '',
           user: '',
           password: ''

@@ -2,7 +2,10 @@
 
 import { Action } from 'redux'
 
-import { RECEIVE_SETTINGS } from '../constants/ActionTypes'
+import {
+  RECEIVE_SETTINGS,
+  SETTINGS_SAVED_SUCCESSFULLY
+} from '../constants/ActionTypes'
 import { ISettings } from '../interfaces/ISettings'
 
 type State = {
@@ -20,11 +23,11 @@ export const defaultState = {
         enabled: false
       },
       mstream: {
-        enabled: true,
+        enabled: false,
         baseUrl: '',
       },
       subsonic: {
-        enabled: true,
+        enabled: false,
         baseUrl: '',
         user: '',
         password: ''
@@ -35,7 +38,8 @@ export const defaultState = {
 
 export default (state: State = defaultState, action: Action = {}) => {
   switch (action.type) {
-    case RECEIVE_SETTINGS: {
+    case RECEIVE_SETTINGS:
+    case SETTINGS_SAVED_SUCCESSFULLY: {
       return {...state, settings: action.settings}
     }
 

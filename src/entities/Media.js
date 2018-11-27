@@ -26,8 +26,7 @@ export default class Media {
   static toSchema(): any {
     return {
       id: {
-        type: 'string',
-        primary: true
+        type: 'string'
       },
       title: {
         type: 'string'

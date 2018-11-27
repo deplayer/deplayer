@@ -9,16 +9,17 @@ export default class RxdbAdapter implements IAdapter {
   }
 
   save = (model: string, id: string, payload: any): Promise<any> => {
-    console.log(payload)
+    const fixedPayload = {_id: id, ...payload}
+    console.log('Saving: ', fixedPayload)
     return db.get().then((instance) => {
-      return instance[model].insert(payload)
+      return instance[model].upsert(fixedPayload)
     })
   }
 
   addMany(model: string, payload: Array<any>): Promise<any> {
     const inserts = []
     payload.forEach((item) => {
-      const insertPromise = this.addItem(item)
+      const insertPromise = this.addItem(model, item)
 
       inserts.push(insertPromise)
     })
@@ -53,22 +54,20 @@ export default class RxdbAdapter implements IAdapter {
     })
   }
 
-  addItem = (item: any): Promise<any> => {
-    return this.save('media', item.id, item)
+  addItem = (model: string, item: any): Promise<any> => {
+    return this.save(model, item.id, item)
   }
 
   get = (model: string, id: string): Promise<any> => {
     return new Promise((resolve, reject) => {
       return db.get().then((instance) => {
-
-        const query = instance[model].findOne({_id: id})
-
-        query.exec().then((result) => {
-          if (result) {
-            resolve(result.get())
+        this.getDocObj(model, id).then((result) => {
+          if (!result) {
+            console.log('Result for %s with id %s not found', model, id)
+            return resolve()
           }
 
-          resolve(null)
+          return resolve(result.get())
         })
           .catch((err) => {
             console.warn(err)
@@ -89,7 +88,7 @@ export default class RxdbAdapter implements IAdapter {
             resolve(result)
           }
 
-          resolve(null)
+          resolve()
         })
           .catch((err) => {
             console.warn(err)
