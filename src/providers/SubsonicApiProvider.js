@@ -18,13 +18,16 @@ export default class SubsonicApiProvider implements IProvider {
   coverBase: string
 
   constructor(settings: any) {
+    const appName = 'genar-radio'
+    const songCount = 1000
+    const artistCount = 1000
     this.baseUrl = settings.baseUrl
     this.user = settings.user
     this.password = settings.password
-    this.albumSongsUrl = `${settings.baseUrl}/rest/getMusicFolders.view?u=${settings.user}&p=${settings.password}&c=genar-radio&v=1.11.0&f=json`
-    this.searchUrl = `${settings.baseUrl}/rest/search3.view?u=${settings.user}&p=${settings.password}&c=genar-radio&v=1.11.0&f=json`
-    this.streamBase = `${settings.baseUrl}/rest/stream.view?u=${settings.user}&p=${settings.password}&c=genar-radio&v=1.11.0&f=json`
-    this.coverBase = `${settings.baseUrl}/rest/getCoverArt.view?u=${settings.user}&p=${settings.password}&c=genar-radio&v=1.11.0&f=json`
+    this.albumSongsUrl = `${settings.baseUrl}/rest/getMusicFolders.view?u=${settings.user}&p=${settings.password}&c=${appName}&v=1.11.0&f=json`
+    this.searchUrl = `${settings.baseUrl}/rest/search3.view?songCount=${songCount}&artistCount=${artistCount}&u=${settings.user}&p=${settings.password}&c=${appName}&v=1.11.0&f=json`
+    this.streamBase = `${settings.baseUrl}/rest/stream.view?u=${settings.user}&p=${settings.password}&c=${appName}&v=1.11.0&f=json`
+    this.coverBase = `${settings.baseUrl}/rest/getCoverArt.view?u=${settings.user}&p=${settings.password}&c=${appName}&v=1.11.0&f=json`
   }
 
   mapSongs = (songs: Array<any>): Array<any> => {

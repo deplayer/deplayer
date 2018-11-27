@@ -53,9 +53,11 @@ class SearchBar extends Component<Props, State> {
 
   // Starting to search when the user press enter key or stops to writte in the interval
   triggerChange = () => {
-    this.props.dispatch( {
-      type: START_SEARCH, searchTerm: this.state.searchTerm
-    })
+    if (this.state.searchTerm) {
+      this.props.dispatch( {
+        type: START_SEARCH, searchTerm: this.state.searchTerm
+      })
+    }
   }
 
   setFocus = () => {
@@ -79,7 +81,9 @@ class SearchBar extends Component<Props, State> {
             keyValue='/'
             onKeyHandle={this.setFocus}
           />
-          <div className={`search-bar ui huge action icon input inverted ${this.props.loading ? 'loading': ''}`}>
+          <div
+            className={`search-bar ui huge action icon input inverted ${this.props.loading ? 'loading': ''}`}
+          >
             <input
               ref={(input) => { this.searchInput = input }}
               onChange={this.onSearchChange}
@@ -88,7 +92,7 @@ class SearchBar extends Component<Props, State> {
               placeholder={ I18n.t('placeholder.search') }
               type='text'
             />
-            <i className='icon search'></i>
+            { this.props.loading ? <i className='fa fa-loading'></i> : <i className='icon search'></i> }
             { this.props.error ?  <div className='alert search'>{ this.props.error }</div> : null }
           </div>
           {
