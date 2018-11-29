@@ -5,8 +5,7 @@ import Song from '../entities/Song'
 
 import {
   START_PLAYING,
-  VOLUME_SET,
-  SET_CURRENT_PLAYING
+  VOLUME_SET
 } from '../constants/ActionTypes'
 
 describe('collection reducer', () => {
@@ -25,15 +24,5 @@ describe('collection reducer', () => {
     const expected = {...defaultState, volume: 23}
     expect(reducer(defaultState, {type: VOLUME_SET, value: 23}))
       .toEqual(expected)
-  })
-
-  it('should handle SET_CURRENT_PLAYING action', () => {
-    const songToAdd = new Song({id: '1234'})
-    const currPlaying = {}
-    expect(reducer({trackIds: ['1234']}, {type: SET_CURRENT_PLAYING, song: songToAdd}))
-      .toEqual({
-        trackIds: ['1234'],
-        currentPlaying: songToAdd
-      })
   })
 })

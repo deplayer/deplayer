@@ -1,14 +1,12 @@
 // @flow
 
-import reducer from './queue'
+import reducer, {defaultState} from './queue'
 import Song from '../entities/Song'
-
-import { sortTrackIds } from './utils/queues'
 
 import {
   ADD_TO_QUEUE,
   ADD_SONGS_TO_QUEUE,
-  SET_COLUMN_SORT,
+  SET_CURRENT_PLAYING
 } from '../constants/ActionTypes'
 
 describe('queue reducer', () => {
@@ -52,26 +50,13 @@ describe('queue reducer', () => {
       })
   })
 
-  it('should handle SET_COLUMN_SORT action', () => {
-    const songs = []
-    const expectedObj = {}
-    for (let i = 1; i <= 20; i++) {
-      const song = new Song({id: i.toString(), price: {price: i%2}})
-      songs.push(song)
-      expectedObj[i] = song
-    }
-
-    const addSongsState = reducer(undefined, {type: ADD_SONGS_TO_QUEUE, songs})
-
-    // It should set prev and next songs Ids
-    const sortedSongsIds = sortTrackIds(expectedObj, 'price', 'ASC')
-
-    expect(reducer(addSongsState, {type: SET_COLUMN_SORT, column: 'price', direction: 'ASC', songs: expectedObj}))
+  it('should handle SET_CURRENT_PLAYING action', () => {
+    const songToAdd = new Song({id: '1234'})
+    const props = {...defaultState, trackIds: ['1234']}
+    expect(reducer(props, {type: SET_CURRENT_PLAYING, song: songToAdd}))
       .toEqual({
-        currentPlaying: {},
-        trackIds: sortedSongsIds,
-        prevSongId: undefined,
-        nextSongId: undefined,
+        ...props,
+        currentPlaying: songToAdd
       })
   })
 })

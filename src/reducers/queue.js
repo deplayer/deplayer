@@ -12,7 +12,7 @@ type State = {
   currentPlaying: any
 }
 
-const defaultState = {
+export const defaultState = {
   trackIds: [],
   currentPlaying: {},
   nextSongId: undefined,
@@ -35,6 +35,13 @@ export default (state: State = defaultState, action: Action = {}): State => {
         ...state,
         trackIds
       }
+
+    case types.SET_CURRENT_PLAYING:
+      return {
+        ...state,
+        currentPlaying: action.song
+      }
+
 
     default:
       return state
