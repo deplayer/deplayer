@@ -115,6 +115,9 @@ class Player extends Component<Props, State> {
             total={this.playerRef.current ? this.playerRef.current.duration : 0}
             current={this.state.currentTime}
           />
+          <h4 className='song-title'>
+            { currentPlaying.title } - { currentPlaying.artist ? currentPlaying.artist.name : '' }
+          </h4>
           <audio
             ref={this.playerRef}
             src={streamUri}

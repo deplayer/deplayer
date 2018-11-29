@@ -52,10 +52,11 @@ describe('queue reducer', () => {
 
   it('should handle SET_CURRENT_PLAYING action', () => {
     const songToAdd = new Song({id: '1234'})
-    const props = {...defaultState, trackIds: ['1234']}
+    const props = {...defaultState}
     expect(reducer(props, {type: SET_CURRENT_PLAYING, song: songToAdd}))
       .toEqual({
         ...props,
+        trackIds: ['1234'],
         currentPlaying: songToAdd
       })
   })

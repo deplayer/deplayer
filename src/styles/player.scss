@@ -1,0 +1,53 @@
+.player-container {
+  grid-area: player;
+  background-color: $body-bg-color;
+  padding-top: 20px;
+
+  button {
+  }
+}
+
+h4.song-title {
+  text-align: center;
+  padding-top: 10px;
+  color: $secondary-color;
+}
+
+.progress-bar {
+  margin-bottom: 0;
+  background-color: darken($body-bg-color, 20%);
+
+  max-width: 95%;
+
+  &:first-child {
+    margin: 0 auto;
+  }
+
+  .bar {
+    background-color: $secondary-color;
+    width: 0%;
+    transition: width .1s linear;
+
+    &:hover {
+      background-color: lighten($secondary-color, 20%);
+    }
+  }
+}
+
+.player-controls {
+  @extend .d-flex;
+  justify-content: center;
+  padding: 15px 0px;
+
+  button {
+    padding: 0px;
+    font-size: 34px;
+    color: $secondary-color;
+    background-color: $body-bg-color;
+
+    &:hover {
+      color: lighten($secondary-color, 20%);
+    }
+  }
+}
+

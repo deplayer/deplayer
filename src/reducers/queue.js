@@ -30,15 +30,15 @@ export default (state: State = defaultState, action: Action = {}): State => {
       }
 
     case types.ADD_SONGS_TO_QUEUE:
-      const trackIds = [...state.trackIds, ...populateTracks(action.songs)]
       return {
         ...state,
-        trackIds
+        trackIds: [...state.trackIds, ...populateTracks(action.songs)]
       }
 
     case types.SET_CURRENT_PLAYING:
       return {
         ...state,
+        trackIds: [...state.trackIds, ...populateTracks([action.song])],
         currentPlaying: action.song
       }
 
