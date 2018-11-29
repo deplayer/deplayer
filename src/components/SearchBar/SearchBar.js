@@ -9,6 +9,7 @@ import { START_SEARCH } from '../../constants/ActionTypes'
 import PlaylistButton from '../PlaylistButton'
 import CollectionButton from '../CollectionButton'
 import SettingsButton from '../Buttons/SettingsButton'
+import PlayAllButton from '../Buttons/PlayAllButton'
 
 type State = {
   searchTerm: string,
@@ -36,7 +37,6 @@ class SearchBar extends Component<Props, State> {
   componentWillMount() {
     this.timer = null
   }
-
   // Handling searchTerm text change
   onSearchChange = (event: SyntheticInputEvent<EventTarget>) => {
     clearTimeout(this.timer)
@@ -101,6 +101,7 @@ class SearchBar extends Component<Props, State> {
                 <PlaylistButton />
                 <CollectionButton />
                 <SettingsButton />
+                <PlayAllButton />
               </React.Fragment>: null
           }
         </div>

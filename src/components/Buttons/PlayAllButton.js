@@ -4,14 +4,14 @@ import React from 'react';
 
 import { Link } from 'react-router-dom'
 
-const SettingsButton = (props: any) => {
+const PlayAllButton = (props: any) => {
   return (
     <div className='playall-button button'>
       <Link to="/settings">
-        <i className='fa fa-play'></i>
+        <i className='fa fa-caret-right'></i>
       </Link>
     </div>
   )
 }
 
-export default SettingsButton
+export default PlayAllButton
