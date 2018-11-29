@@ -12,7 +12,7 @@ import SongRow from './SongRow'
 
 type Props = {
   error?: string,
-  playlist: any,
+  queue: any,
   tableIds: any,
   collection: any,
   totalSongs: number,
@@ -25,7 +25,7 @@ const MusicTable = (props: Props) => {
     <div><div>{ props.error }</div></div>
     : null
 
-  const { id } = props.playlist.currentPlaying
+  const { id } = props.queue.currentPlaying
 
   const rowRenderer = ({
     index,       // Index of row

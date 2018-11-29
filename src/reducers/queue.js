@@ -4,38 +4,37 @@ import { Action } from 'redux'
 
 import * as types from '../constants/ActionTypes'
 import {
-  sortTrackIds,
   populateTracks
 } from './utils/queues'
 
 type State = {
-  trackIds: Array<string>
+  trackIds: Array<string>,
+  currentPlaying: any
 }
 
 const defaultState = {
   trackIds: [],
-  currentPlaying: {}
+  currentPlaying: {},
+  nextSongId: undefined,
+  prevSongId: undefined
 }
 
 export default (state: State = defaultState, action: Action = {}): State => {
   switch (action.type) {
 
-    case types.ADD_TO_PLAYLIST:
+    case types.ADD_TO_QUEUE:
       const mergedTrackIds = [...state.trackIds, ...populateTracks([action.song])]
       return {
         ...state,
         trackIds: mergedTrackIds
       }
 
-    case types.ADD_SONGS_TO_PLAYLIST:
-      const trackIds = populateTracks(action.songs)
+    case types.ADD_SONGS_TO_QUEUE:
+      const trackIds = [...state.trackIds, ...populateTracks(action.songs)]
       return {
         ...state,
         trackIds
       }
-
-    case types.SET_COLUMN_SORT:
-      return {...state, trackIds: sortTrackIds(action.songs, action.column)}
 
     default:
       return state

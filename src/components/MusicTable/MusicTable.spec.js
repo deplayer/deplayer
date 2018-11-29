@@ -13,10 +13,11 @@ const setup = () => {
   const props = {
     dispatch: () => {},
     tableIds: [],
-    playlist: {
+    queue: {
       trackIds: [],
       currentPlaying: {},
     },
+    totalSongs: 10,
     collection: {}
   }
 

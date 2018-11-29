@@ -26,6 +26,10 @@ export const ADD_TO_PLAYLIST = 'ADD_TO_PLAYLIST'
 export const ADD_SONGS_TO_PLAYLIST = 'ADD_SONGS_TO_PLAYLIST'
 export const SET_COLUMN_SORT = 'SET_COLUMN_SORT'
 
+// Queue
+export const ADD_TO_QUEUE = 'ADD_TO_QUEUE'
+export const ADD_SONGS_TO_QUEUE = 'ADD_SONGS_TO_QUEUE'
+
 // Search
 export const START_SEARCH = 'START_SEARCH'
 export const SEARCH_FULLFILLED = 'SEARCH_FULLFILLED'

@@ -3,7 +3,7 @@ import Collection from '../components/Collection'
 
 export default connect(
   (state) => ({
-    playlist: state.playlist,
+    queue: state.queue,
     player: state.player,
     collection: state.collection
   })

@@ -1,16 +1,17 @@
 // @flow
 
-import reducer from './playlist'
+import reducer from './queue'
 import Song from '../entities/Song'
+
 import { sortTrackIds } from './utils/queues'
 
 import {
-  ADD_TO_PLAYLIST,
-  ADD_SONGS_TO_PLAYLIST,
-  SET_COLUMN_SORT
+  ADD_TO_QUEUE,
+  ADD_SONGS_TO_QUEUE,
+  SET_COLUMN_SORT,
 } from '../constants/ActionTypes'
 
-describe('collection reducer', () => {
+describe('queue reducer', () => {
   it('should return the initial state', () => {
     expect(reducer(undefined, {}))
       .toEqual({
@@ -19,18 +20,18 @@ describe('collection reducer', () => {
       })
   })
 
-  it('should handle ADD_TO_PLAYLIST action', () => {
+  it('should handle ADD_TO_QUEUE action', () => {
     const songToAdd = new Song({id: '1234'})
     const currPlaying = {}
     currPlaying['1234'] = songToAdd
-    expect(reducer(undefined, {type: ADD_TO_PLAYLIST, song: songToAdd}))
+    expect(reducer(undefined, {type: ADD_TO_QUEUE, song: songToAdd}))
       .toEqual({
         trackIds: ['1234'],
         currentPlaying: {}
       })
   })
 
-  it('should handle ADD_SONGS_TO_PLAYLIST action', () => {
+  it('should handle ADD_SONGS_TO_QUEUE action', () => {
     const songs = []
     const expectedObj = {}
     for (let i = 1; i <= 20; i++) {
@@ -39,7 +40,10 @@ describe('collection reducer', () => {
       expectedObj[i] = song
     }
 
-    const addSongsState = reducer(undefined, {type: ADD_SONGS_TO_PLAYLIST, songs})
+    const addSongsState = reducer(undefined, {
+      type: ADD_SONGS_TO_QUEUE,
+      songs
+    })
 
     expect(addSongsState)
       .toEqual({
@@ -57,7 +61,7 @@ describe('collection reducer', () => {
       expectedObj[i] = song
     }
 
-    const addSongsState = reducer(undefined, {type: ADD_SONGS_TO_PLAYLIST, songs})
+    const addSongsState = reducer(undefined, {type: ADD_SONGS_TO_QUEUE, songs})
 
     // It should set prev and next songs Ids
     const sortedSongsIds = sortTrackIds(expectedObj, 'price', 'ASC')

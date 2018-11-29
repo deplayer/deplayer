@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 
 import './styles/App.scss'
 
-import PlaylistContainer from './containers/PlaylistContainer'
+import QueueContainer from './containers/QueueContainer'
 import CollectionContainer from './containers/CollectionContainer'
 import PlayerContainer from './containers/PlayerContainer'
 import SearchContainer from './containers/SearchContainer'
@@ -24,7 +24,7 @@ const appStore = configureStore()
 const Home = () => {
   return (
     <React.Fragment>
-      <PlaylistContainer />
+      <QueueContainer />
     </React.Fragment>
   )
 }
