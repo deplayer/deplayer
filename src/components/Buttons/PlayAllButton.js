@@ -13,7 +13,7 @@ type Props = {
 
 const PlayAllButton = (props: Props) => {
   const playAll = () => {
-    props.dispatch({type: PLAY_ALL})
+    props.dispatch({type: PLAY_ALL, path: props.location.pathname.replace(/\//, '')})
   }
 
   if (props.location.pathname.match(/^\/(settings)?$/)) {

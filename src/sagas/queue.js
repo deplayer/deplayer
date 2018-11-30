@@ -15,7 +15,7 @@ export const getSongs  = (state: any) => {
 }
 
 // Handling setCurrentPlaying saga
-export function* playAll(action: {song: Song}): Generator<void, void, void> {
+export function* playAll(action: any): Generator<void, void, void> {
   const songs = yield select(getSongs)
   const preparedSongs = Object.keys(songs)
   yield put({type: ADD_SONGS_TO_QUEUE, songs: preparedSongs})
