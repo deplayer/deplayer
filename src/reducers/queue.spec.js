@@ -3,11 +3,7 @@
 import reducer, {defaultState} from './queue'
 import Song from '../entities/Song'
 
-import {
-  ADD_TO_QUEUE,
-  ADD_SONGS_TO_QUEUE,
-  SET_CURRENT_PLAYING
-} from '../constants/ActionTypes'
+import * as types from '../constants/ActionTypes'
 
 describe('queue reducer', () => {
   it('should return the initial state', () => {
@@ -22,7 +18,7 @@ describe('queue reducer', () => {
     const songToAdd = new Song({id: '1234'})
     const currPlaying = {}
     currPlaying['1234'] = songToAdd
-    expect(reducer(undefined, {type: ADD_TO_QUEUE, song: songToAdd}))
+    expect(reducer(undefined, {type: types.ADD_TO_QUEUE, song: songToAdd}))
       .toEqual({
         trackIds: ['1234'],
         currentPlaying: {}
@@ -39,7 +35,7 @@ describe('queue reducer', () => {
     }
 
     const addSongsState = reducer(undefined, {
-      type: ADD_SONGS_TO_QUEUE,
+      type: types.ADD_SONGS_TO_QUEUE,
       songs
     })
 
@@ -53,7 +49,7 @@ describe('queue reducer', () => {
   it('should handle SET_CURRENT_PLAYING action', () => {
     const songToAdd = new Song({id: '1234'})
     const props = {...defaultState}
-    expect(reducer(props, {type: SET_CURRENT_PLAYING, song: songToAdd}))
+    expect(reducer(props, {type: types.SET_CURRENT_PLAYING, song: songToAdd}))
       .toEqual({
         ...props,
         trackIds: ['1234'],

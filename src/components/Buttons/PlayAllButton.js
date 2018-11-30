@@ -1,17 +1,35 @@
 // @flow
 
-import React from 'react';
+import React from 'react'
+import { Dispatch } from 'redux'
+import { withRouter } from 'react-router-dom'
 
-import { Link } from 'react-router-dom'
+import { PLAY_ALL } from '../../constants/ActionTypes'
 
-const PlayAllButton = (props: any) => {
+type Props = {
+  dispatch: Dispatch,
+  location: any
+}
+
+const PlayAllButton = (props: Props) => {
+  const playAll = () => {
+    props.dispatch({type: PLAY_ALL})
+  }
+
+  if (props.location.pathname.match(/^\/(settings)?$/)) {
+    return null
+  }
+
   return (
-    <div className='playall-button button'>
-      <Link to="/settings">
-        <i className='fa fa-caret-right'></i>
-      </Link>
-    </div>
+    <button
+      className='playall-button button'
+      onClick={playAll}
+    >
+      <i className='fa fa-caret-right'></i>
+    </button>
   )
 }
 
-export default PlayAllButton
+const RoutedButton = withRouter(props => <PlayAllButton {...props}/>)
+
+export default RoutedButton

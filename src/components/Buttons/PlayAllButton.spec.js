@@ -8,7 +8,11 @@ import PlayAllButton from './PlayAllButton'
 configureEnzyme()
 
 const setup = (customProps: any) => {
-  const defaultProps = {}
+  const defaultProps = {
+    location: {
+      pathname: '/collection'
+    }
+  }
 
   const props = {...defaultProps, ...customProps}
 
@@ -23,6 +27,6 @@ const setup = (customProps: any) => {
 describe('PlayAllButton', () => {
   it('renders without crashing', () => {
     const { enzymeWrapper } = setup()
-    expect(enzymeWrapper.find('.playall-button').exists()).toBe(true)
+    expect(enzymeWrapper.find('Route').exists()).toBe(true)
   })
 })

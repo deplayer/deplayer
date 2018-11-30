@@ -20,6 +20,7 @@ import playerSaga from '../sagas/player'
 import settingsSaga from '../sagas/settings'
 import collectionSaga from '../sagas/collection'
 import notificationsSaga from '../sagas/notifications'
+import queueSaga from '../sagas/queue'
 
 export default function configureStore() {
   let middlewares = [promise, thunk]
@@ -55,6 +56,7 @@ export default function configureStore() {
   sagaMiddleware.run(searchSaga)
   sagaMiddleware.run(collectionSaga)
   sagaMiddleware.run(notificationsSaga)
+  sagaMiddleware.run(queueSaga)
 
   store.dispatch({type: INITIALIZED})
 

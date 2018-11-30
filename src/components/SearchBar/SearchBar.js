@@ -101,7 +101,9 @@ class SearchBar extends Component<Props, State> {
                 <PlaylistButton />
                 <CollectionButton />
                 <SettingsButton />
-                <PlayAllButton />
+                <PlayAllButton
+                  dispatch={this.props.dispatch}
+                />
               </React.Fragment>: null
           }
         </div>

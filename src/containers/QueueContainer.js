@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import Playlist from '../components/Playlist'
+import Queue from '../components/Queue'
 
 export default connect(
   (state) => ({
@@ -8,4 +8,4 @@ export default connect(
     player: state.player,
     collection: state.collection
   })
-)(Playlist)
+)(Queue)
