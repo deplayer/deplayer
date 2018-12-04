@@ -7,7 +7,6 @@ import {
   ADD_SONGS_TO_QUEUE,
   START_PLAYING
 } from '../constants/ActionTypes'
-import Song from '../entities/Song'
 
 // Extract songs from collection state
 export const getSongs  = (state: any) => {

@@ -7,14 +7,32 @@ import { getAdapter } from '../services/adapters'
 
 import * as types from '../constants/ActionTypes'
 
+const mapToMedia = (collection) => {
+  return collection.map((elem) => {
+    return {
+      ...elem.get(),
+      ...{
+        artist: { name: elem.artist.name },
+        artistName: elem.artist.name,
+        thumbnailUrl: elem.cover.thumbnailUrl,
+        fullUrl: elem.cover.thumbnailUrl
+      }
+    }
+  })
+}
+
 // Application initialization routines
 function* initialize() {
-  const adapter = getAdapter()
-  const collectionService = new CollectionService(new adapter())
-  yield call(collectionService.initialize)
-  const collection = yield call(collectionService.getAll)
-  const unserialized = JSON.parse(JSON.stringify(collection))
-  yield put({type: types.RECEIVE_COLLECTION, data: unserialized})
+  try {
+    const adapter = getAdapter()
+    const collectionService = new CollectionService(new adapter())
+    yield call(collectionService.initialize)
+    const collection = yield call(collectionService.getAll)
+    const mappedData = mapToMedia(collection)
+    yield put({type: types.RECEIVE_COLLECTION, data: mappedData})
+  } catch (e) {
+    yield put({type: types.RECEIVE_COLLECTION_REJECTED, error: e.message})
+  }
 }
 
 // Handling ADD_TO_COLLECTION saga

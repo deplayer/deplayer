@@ -19,9 +19,6 @@ type album = {
 export default class Song extends Media {
   genre: string
   shareUrl: string
-  artist: {
-    name: string
-  }
   album: album
   cover: cover
   // In milliseconds
@@ -33,7 +30,6 @@ export default class Song extends Media {
     super(songParams)
 
     const {
-      artistName,
       albumName,
       thumbnailUrl,
       fullUrl,
@@ -55,9 +51,6 @@ export default class Song extends Media {
     this.cover = {
       thumbnailUrl: thumbnailUrl,
       fullUrl: fullUrl
-    }
-    this.artist = {
-      name: artistName
     }
     if (typeof price === 'number') {
       this.price = {
