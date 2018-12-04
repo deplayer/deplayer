@@ -2,9 +2,10 @@
 
 import React from 'react'
 import { Translate }  from 'react-redux-i18n'
-import { Formik, Form, Field } from 'formik'
+import { Formik, Form } from 'formik'
 import { Dispatch } from 'redux'
 
+import FormField from './FormField'
 import { SAVE_SETTINGS } from '../../constants/ActionTypes'
 
 type Props = {
@@ -33,10 +34,8 @@ const SettingsForm = (props: Props) => {
         >
           <label className='col-sm-2 col-form-label'>{field.title}</label>
           <div className='col-sm-10'>
-            <Field
-              className={`${ field.type === 'checkbox' ? 'form-check': 'form-control'}`}
-              name={field.name}
-              type={field.type}
+            <FormField
+              field={field}
             />
           </div>
         </div>
