@@ -1,14 +1,25 @@
 // @flow
 
-import { takeLatest, call } from 'redux-saga/effects'
+import { takeLatest, call, select } from 'redux-saga/effects'
 
 import NotificatoinService from '../services/NotificationService'
 import * as types from '../constants/ActionTypes'
 
+const getCurrentSong = (state: any) => {
+  if (!state) {
+    return
+  }
+
+  const rows = state.collection.rows
+  const currentId = state.queue.currentPlaying
+  return rows[currentId]
+}
+
 // Handling START_PLAYING saga
 export function* sendCurrentPlayingNotification(action: any): any {
   const notificationService = new NotificatoinService()
-  yield call(notificationService.sendNotification)
+  const currentSong = yield select(getCurrentSong)
+  yield call(notificationService.sendNotification, currentSong)
 }
 
 export function* setupNotifications(): any {

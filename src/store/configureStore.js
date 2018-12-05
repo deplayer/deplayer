@@ -21,6 +21,7 @@ import settingsSaga from '../sagas/settings'
 import collectionSaga from '../sagas/collection'
 import notificationsSaga from '../sagas/notifications'
 import queueSaga from '../sagas/queue'
+import mediaSessionSaga from '../sagas/mediaSession'
 
 export default function configureStore() {
   let middlewares = [promise, thunk]
