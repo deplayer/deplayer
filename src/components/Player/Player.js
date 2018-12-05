@@ -70,12 +70,16 @@ class Player extends Component<Props, State> {
 
   // Play next song of the player list
   playNext = () => {
-    this.props.dispatch(setCurrentPlaying(this.props.queue.nextSongId))
+    if (this.props.queue.nextSongId) {
+      this.props.dispatch(setCurrentPlaying(this.props.queue.nextSongId))
+    }
   }
 
   // Play prev song of the player list
   playPrev = () => {
-    this.props.dispatch(setCurrentPlaying(this.props.queue.prevSongId))
+    if (this.props.queue.prevSongId) {
+      this.props.dispatch(setCurrentPlaying(this.props.queue.prevSongId))
+    }
   }
 
   // Set player volume

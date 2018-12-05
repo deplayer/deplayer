@@ -43,13 +43,11 @@ const SongRow = (props: Props) => {
           albumName={song.album ? song.album.name : 'N/A'}
         />
       </div>
-      <div className='media-info'>
-        <span className='title-label'>{ song.title } - { song.album ? song.album.name: nonAvailable }</span>
-        <span className='label'><Translate value='song.label.artist' /></span>
-        { song.artist ? song.artist.name: nonAvailable }
-        <span className='label'><Translate value='song.label.duration' /></span>
-        { getDurationStr(song.duration) }
-      </div>
+      <ul className='media-info'>
+        <li className='title-label'>{ song.title } - { song.album ? song.album.name: nonAvailable }</li>
+        <li>{ song.artist ? song.artist.name: nonAvailable }</li>
+        <li>{ getDurationStr(song.duration) }</li>
+      </ul>
       <div className='media-actions'>
         <button
           className='play circle spaced'
