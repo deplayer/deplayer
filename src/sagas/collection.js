@@ -8,6 +8,10 @@ import { getAdapter } from '../services/adapters'
 import * as types from '../constants/ActionTypes'
 
 const mapToMedia = (collection) => {
+  if (!collection.length) {
+    return {}
+  }
+
   return collection.map((elem) => {
     return {
       ...elem.get(),
@@ -40,7 +44,8 @@ export function* addToCollection(action: any): any {
   const adapter = getAdapter()
   const collectionService = new CollectionService(new adapter())
   const collection = yield collectionService.bulkSave(action.data)
-  yield put({type: types.RECEIVE_COLLECTION, data: collection})
+  const mappedData = mapToMedia(collection)
+  yield put({type: types.RECEIVE_COLLECTION, data: mappedData})
 }
 
 // Handling REMOVE_FROM_COLLECTION saga

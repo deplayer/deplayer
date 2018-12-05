@@ -7,6 +7,7 @@ import MusicTable from './MusicTable/MusicTable'
 
 type Props = {
   playlist: any,
+  queue: any,
   player: any,
   collection: any,
   dispatch: Dispatch
@@ -25,6 +26,7 @@ const Collection = (props: Props) => {
       ref={collectionRef}
     >
       <MusicTable
+        queue={props.queue}
         tableIds={props.collection.visibleSongs}
         totalSongs={props.collection.totalRows}
         forwardedRef={collectionRef}

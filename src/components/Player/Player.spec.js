@@ -2,7 +2,6 @@
 
 import React from 'react'
 import { shallow } from 'enzyme'
-import { Dispatch } from 'redux'
 
 import configureEnzyme from '../../tests/configureEnzyme'
 import Player from './Player'
@@ -12,12 +11,18 @@ configureEnzyme()
 const setup = (definedProps: any) => {
   const props = {
     player: {},
-    queue: {},
+    dispatch: jest.fn(),
+    queue: {
+      currentPlaying: 'test'
+    },
     itemCount: 0,
     collection: {
-      rows: {}
+      rows: {
+        'test': {
+          name: 'test'
+        }
+      }
     },
-    dispatch: Dispatch,
     match: {
       params: {}
     },
@@ -40,9 +45,6 @@ it('renders without crashing', () => {
 
 it('renders handle playNext', () => {
   const props = {
-    player: {
-      trackIds: []
-    },
     itemCount: 1
   }
 

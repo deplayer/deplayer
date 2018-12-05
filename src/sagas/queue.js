@@ -5,7 +5,8 @@ import { takeLatest, put, select } from 'redux-saga/effects'
 import {
   PLAY_ALL,
   ADD_SONGS_TO_QUEUE,
-  START_PLAYING
+  START_PLAYING,
+  SET_CURRENT_PLAYING
 } from '../constants/ActionTypes'
 
 // Extract songs from collection state
@@ -18,6 +19,7 @@ export function* playAll(action: any): Generator<void, void, void> {
   const songs = yield select(getSongs)
   const preparedSongs = Object.keys(songs)
   yield put({type: ADD_SONGS_TO_QUEUE, songs: preparedSongs})
+  yield put({type: SET_CURRENT_PLAYING, song: preparedSongs[0]})
   yield put({type: START_PLAYING})
 }
 

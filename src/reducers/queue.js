@@ -4,7 +4,8 @@ import { Action } from 'redux'
 
 import * as types from '../constants/ActionTypes'
 import {
-  populateTracks
+  populateTracks,
+  getSiblingSong
 } from './utils/queues'
 
 type State = {
@@ -14,9 +15,9 @@ type State = {
 
 export const defaultState = {
   trackIds: [],
-  currentPlaying: {},
-  nextSongId: undefined,
-  prevSongId: undefined
+  currentPlaying: null,
+  nextSongId: null,
+  prevSongId: null
 }
 
 export default (state: State = defaultState, action: Action = {}): State => {
@@ -30,18 +31,23 @@ export default (state: State = defaultState, action: Action = {}): State => {
       }
 
     case types.ADD_SONGS_TO_QUEUE:
+      const tracks = [...state.trackIds, ...populateTracks(action.songs)]
       return {
         ...state,
-        trackIds: [...state.trackIds, ...populateTracks(action.songs)]
+        trackIds: tracks
       }
 
     case types.SET_CURRENT_PLAYING:
+      const scTracks = state.trackIds.includes(action.song)
+        ? state.trackIds
+        : [...state.trackIds, action.song]
       return {
         ...state,
-        trackIds: [...state.trackIds, ...populateTracks([action.song])],
-        currentPlaying: action.song
+        trackIds: scTracks,
+        currentPlaying: action.song,
+        prevSongId: getSiblingSong(scTracks, action.song),
+        nextSongId: getSiblingSong(scTracks, action.song, true),
       }
-
 
     default:
       return state

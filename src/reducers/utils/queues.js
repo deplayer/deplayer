@@ -1,4 +1,5 @@
 
+// deprecate
 export const populateTracks = (songs): Array<string> => {
   const tracks = []
   songs.forEach((song) => {
@@ -15,7 +16,7 @@ export const populateTracks = (songs): Array<string> => {
 // Get sibling songs ids to know which is the next and prev song
 export const getSiblingSong = (trackIds: Array<string>, song, next = false) => {
   const tracksIndex = {}
-  const position = trackIds.indexOf(song.id)
+  const position = trackIds.indexOf(song) ? trackIds.indexOf(song) : 0
   trackIds.forEach((trackId, index) => {
     tracksIndex[index] = trackId
   })

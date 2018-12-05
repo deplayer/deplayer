@@ -7,7 +7,7 @@ import { AutoSizer, List } from 'react-virtualized'
 
 import {
   setCurrentPlaying
-} from '../../actions/playlist'
+} from '../../actions/queue'
 import SongRow from './SongRow'
 
 type Props = {
@@ -25,7 +25,7 @@ const MusicTable = (props: Props) => {
     <div><div>{ props.error }</div></div>
     : null
 
-  const { id } = props.queue.currentPlaying
+  const id = props.queue.currentPlaying
 
   const rowRenderer = ({
     index,       // Index of row
@@ -58,7 +58,7 @@ const MusicTable = (props: Props) => {
         isCurrent={id === song.id}
         style={style}
         onClick={() => {
-          props.dispatch(setCurrentPlaying(song))
+          props.dispatch(setCurrentPlaying(song.id))
         }}
         disableAddButton={props.disableAddButton}
         dispatch={props.dispatch}

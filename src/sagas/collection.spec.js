@@ -13,7 +13,10 @@ import { addToCollection } from './collection'
 describe('collection saga', () => {
   it('should handle player events', () => {
     const song = new Song()
-    return expectSaga(addToCollection, {type: ADD_ONE_TO_COLLECTION, data: [song]})
+    return expectSaga(addToCollection, {
+      type: ADD_ONE_TO_COLLECTION,
+      data: [song]
+    })
       .run()
   })
 })

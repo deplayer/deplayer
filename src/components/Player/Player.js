@@ -7,7 +7,7 @@ import ProgressBar from './ProgressBar'
 import PlayPauseButton from './PlayPauseButton'
 import SkipButton from './SkipButton'
 import VolumeControl from './VolumeControl'
-import { setCurrentPlaying } from '../../actions/playlist'
+import { setCurrentPlaying } from '../../actions/queue'
 
 type Props = {
   queue: any,
@@ -70,18 +70,12 @@ class Player extends Component<Props, State> {
 
   // Play next song of the player list
   playNext = () => {
-    const nextSong = this.props.collection.rows[this.props.queue.nextSongId]
-    if (nextSong) {
-      this.props.dispatch(setCurrentPlaying(nextSong))
-    }
+    this.props.dispatch(setCurrentPlaying(this.props.queue.nextSongId))
   }
 
   // Play prev song of the player list
   playPrev = () => {
-    const prevSong = this.props.collection.rows[this.props.queue.prevSongId]
-    if (prevSong) {
-      this.props.dispatch(setCurrentPlaying(prevSong))
-    }
+    this.props.dispatch(setCurrentPlaying(this.props.queue.prevSongId))
   }
 
   // Set player volume
@@ -92,7 +86,8 @@ class Player extends Component<Props, State> {
   }
 
   render() {
-    const currentPlaying = this.props.queue.currentPlaying || {}
+    const currentPlayingId = this.props.queue.currentPlaying
+    const currentPlaying = this.props.collection.rows[currentPlayingId]
 
     if (!this.props.itemCount) {
       return null
