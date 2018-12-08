@@ -9,7 +9,8 @@ configureEnzyme()
 
 const setup = (customProps) => {
   const defaultProps = {
-    keyValues: []
+    keyValues: [],
+    onChange: jest.fn()
   }
   const props = {...defaultProps, ...customProps}
 

@@ -58,6 +58,7 @@ export default function configureStore() {
   sagaMiddleware.run(collectionSaga)
   sagaMiddleware.run(notificationsSaga)
   sagaMiddleware.run(queueSaga)
+  sagaMiddleware.run(mediaSessionSaga)
 
   store.dispatch({type: INITIALIZED})
 

@@ -8,6 +8,7 @@ import MusicTable from './MusicTable/MusicTable'
 type Props = {
   playlist: any,
   player: any,
+  queue: any,
   collection: any,
   dispatch: Dispatch
 }
@@ -21,6 +22,7 @@ const Playlist = (props: Props) => {
     <div className='collection'>
       <MusicTable
         tableIds={props.playlist.trackIds}
+        queue={props.queue}
         totalSongs={props.playlist.trackIds.length}
         {...props}
       />

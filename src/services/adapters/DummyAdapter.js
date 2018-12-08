@@ -18,6 +18,18 @@ export default class DummyAdapter implements IAdapter {
     })
   }
 
+  removeMany(model: string, payload: any): Promise<any> {
+    return new Promise((resolve) => {
+      resolve({})
+    })
+  }
+
+  removeCollection(model: string): Promise<any> {
+    return new Promise((resolve) => {
+      resolve({})
+    })
+  }
+
   get(model: string, id: string): Promise<any> {
     return new Promise((resolve) => {
       resolve({})

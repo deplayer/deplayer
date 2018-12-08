@@ -15,6 +15,7 @@ const setup = (customProps) => {
     song: new Song(),
     onClick: () => {},
     isCurrent: false,
+    style: {},
     dispatch: jest.fn(),
     disableAddButton: false
   }
