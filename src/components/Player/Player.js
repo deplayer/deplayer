@@ -7,7 +7,7 @@ import ProgressBar from './ProgressBar'
 import PlayPauseButton from './PlayPauseButton'
 import SkipButton from './SkipButton'
 import VolumeControl from './VolumeControl'
-import { setCurrentPlaying } from '../../actions/queue'
+import { PLAY_NEXT, PLAY_PREV } from '../../constants/ActionTypes'
 
 type Props = {
   queue: any,
@@ -71,14 +71,14 @@ class Player extends Component<Props, State> {
   // Play next song of the player list
   playNext = () => {
     if (this.props.queue.nextSongId) {
-      this.props.dispatch(setCurrentPlaying(this.props.queue.nextSongId))
+      this.props.dispatch({type: PLAY_NEXT})
     }
   }
 
   // Play prev song of the player list
   playPrev = () => {
     if (this.props.queue.prevSongId) {
-      this.props.dispatch(setCurrentPlaying(this.props.queue.prevSongId))
+      this.props.dispatch({type: PLAY_PREV})
     }
   }
 

@@ -10,6 +10,8 @@ export const FILL_VISIBLE_SONG_FULLFILLED = 'FILL_VISIBLE_SONG_FULLFILLED'
 // Player
 export const VOLUME_SET = 'VOLUME_SET'
 export const START_PLAYING = 'START_PLAYING'
+export const STOP_PLAYING = 'STOP_PLAYING'
+export const PAUSE_PLAYING = 'PAUSE_PLAYING'
 export const SET_CURRENT_PLAYING = 'SET_CURRENT_PLAYING'
 export const PLAY_ALL = 'PLAY_ALL'
 
@@ -31,6 +33,8 @@ export const SET_COLUMN_SORT = 'SET_COLUMN_SORT'
 // Queue
 export const ADD_TO_QUEUE = 'ADD_TO_QUEUE'
 export const ADD_SONGS_TO_QUEUE = 'ADD_SONGS_TO_QUEUE'
+export const PLAY_NEXT = 'PLAY_NEXT'
+export const PLAY_PREV = 'PLAY_PREV'
 
 // Search
 export const START_SEARCH = 'START_SEARCH'

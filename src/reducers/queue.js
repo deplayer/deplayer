@@ -10,7 +10,9 @@ import {
 
 type State = {
   trackIds: Array<string>,
-  currentPlaying: any
+  currentPlaying: any,
+  nextSongId: null,
+  prevSongId: null
 }
 
 export const defaultState = {
@@ -18,6 +20,19 @@ export const defaultState = {
   currentPlaying: null,
   nextSongId: null,
   prevSongId: null
+}
+
+const setCurrentPlaying = (state: any, action: any) => {
+  const scTracks = state.trackIds.includes(action.song)
+    ? state.trackIds
+    : [...state.trackIds, action.song]
+  return {
+    ...state,
+    trackIds: scTracks,
+    currentPlaying: action.song,
+    prevSongId: getSiblingSong(scTracks, action.song),
+    nextSongId: getSiblingSong(scTracks, action.song, true),
+  }
 }
 
 export default (state: State = defaultState, action: Action = {}): State => {
@@ -38,16 +53,21 @@ export default (state: State = defaultState, action: Action = {}): State => {
       }
 
     case types.SET_CURRENT_PLAYING:
-      const scTracks = state.trackIds.includes(action.song)
-        ? state.trackIds
-        : [...state.trackIds, action.song]
-      return {
-        ...state,
-        trackIds: scTracks,
-        currentPlaying: action.song,
-        prevSongId: getSiblingSong(scTracks, action.song),
-        nextSongId: getSiblingSong(scTracks, action.song, true),
+      return setCurrentPlaying(state, action)
+
+    case types.PLAY_NEXT:
+      if (state.nextSongId) {
+        return setCurrentPlaying(state, {song: state.nextSongId})
       }
+
+      return state
+
+    case types.PLAY_PREV:
+      if (state.prevSongId) {
+        return setCurrentPlaying(state, {song: state.prevSongId})
+      }
+
+      return state
 
     default:
       return state
