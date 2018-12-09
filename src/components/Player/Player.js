@@ -93,7 +93,7 @@ class Player extends Component<Props, State> {
     const currentPlayingId = this.props.queue.currentPlaying
     const currentPlaying = this.props.collection.rows[currentPlayingId]
 
-    if (!this.props.itemCount) {
+    if (!this.props.itemCount || !currentPlaying) {
       return null
     }
 

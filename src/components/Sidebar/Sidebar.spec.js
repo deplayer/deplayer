@@ -3,7 +3,7 @@
 import React from 'react'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../../tests/configureEnzyme'
-import SearchBar from './SearchBar'
+import Sidebar from './Sidebar'
 
 configureEnzyme()
 
@@ -16,7 +16,7 @@ const setup = (customProps: any) => {
 
   const props = {...defaultProps, ...customProps}
 
-  const enzymeWrapper = shallow(<SearchBar {...props}/>)
+  const enzymeWrapper = shallow(<Sidebar {...props}/>)
 
   return {
     props,
@@ -24,7 +24,7 @@ const setup = (customProps: any) => {
   }
 }
 
-describe('SearchBar', () => {
+describe('Sidebar', () => {
   it('renders without crashing', () => {
     const { enzymeWrapper } = setup()
     expect(enzymeWrapper.find('.search-bar').exists()).toBe(true)
@@ -37,15 +37,5 @@ describe('SearchBar', () => {
   it('should render loading spinner icon while loading', () => {
     const { enzymeWrapper } = setup({loading: true})
     expect(enzymeWrapper.find('.search-bar.loading').exists()).toBe(true)
-  })
-
-  it('should render PlaylistButton if hasResults', () => {
-    const { enzymeWrapper } = setup({hasResults: true})
-    expect(enzymeWrapper.find('PlaylistButton').exists()).toBe(true)
-  })
-
-  it('should render SettingsButton', () => {
-    const { enzymeWrapper } = setup({})
-    expect(enzymeWrapper.find('SettingsButton').exists()).toBe(true)
   })
 })

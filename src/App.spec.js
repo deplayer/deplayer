@@ -31,7 +31,7 @@ it('renders without crashing', () => {
     .toBe(true)
   expect(enzymeWrapper.find('Router').exists())
     .toBe(true)
-  expect(enzymeWrapper.find('SearchBar').exists())
+  expect(enzymeWrapper.find('Sidebar').exists())
     .toBe(true)
   expect(enzymeWrapper.find('Player').exists())
     .toBe(true)

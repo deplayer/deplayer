@@ -6,10 +6,6 @@ import KeyHandler, {KEYPRESS} from 'react-key-handler'
 import { I18n } from 'react-redux-i18n'
 
 import { START_SEARCH } from '../../constants/ActionTypes'
-import PlaylistButton from '../PlaylistButton'
-import CollectionButton from '../CollectionButton'
-import SettingsButton from '../Buttons/SettingsButton'
-import PlayAllButton from '../Buttons/PlayAllButton'
 
 type State = {
   searchTerm: string,
@@ -20,13 +16,14 @@ type Props = {
   dispatch: Dispatch,
   loading: boolean,
   showInCenter: boolean,
+  children: any,
   error: string
 }
 
 const WAIT_INTERVAL = 1000
 const ENTER_KEY = 13
 
-class SearchBar extends Component<Props, State> {
+class Sidebar extends Component<Props, State> {
   state = {
     searchTerm: '',
     focus: false
@@ -73,6 +70,12 @@ class SearchBar extends Component<Props, State> {
   }
 
   render() {
+    const { children } = this.props;
+
+    const childrenWithProps = React.Children.map(children, child =>
+      React.cloneElement(child, { dispatch: this.props.dispatch })
+    );
+
     return (
       <React.Fragment>
         <div className={`sidebar-container ${ this.props.showInCenter ? '': 'has-results'}`}>
@@ -95,21 +98,12 @@ class SearchBar extends Component<Props, State> {
             { this.props.loading ? <i className='fa fa-loading'></i> : <i className='icon search'></i> }
             { this.props.error ?  <div className='alert search'>{ this.props.error }</div> : null }
           </div>
-          {
-            !this.state.focus ?
-              <React.Fragment>
-                <PlaylistButton />
-                <CollectionButton />
-                <SettingsButton />
-                <PlayAllButton
-                  dispatch={this.props.dispatch}
-                />
-              </React.Fragment>: null
-          }
+              {}
+          {  !this.state.focus ? childrenWithProps : null }
         </div>
       </React.Fragment>
     )
   }
 }
 
-export default SearchBar
+export default Sidebar

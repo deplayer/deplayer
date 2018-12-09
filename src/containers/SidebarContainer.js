@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import SearchBar from '../components/SearchBar/SearchBar'
+import Sidebar from '../components/Sidebar/Sidebar'
 
 export default withRouter(connect((state, ownProps) => {
   const hasResults = state.queue.trackIds && state.queue.trackIds.length ? true : false
@@ -12,4 +12,4 @@ export default withRouter(connect((state, ownProps) => {
     showInCenter: !hasResults && inHome,
     error: state.search.error
   }
-})(SearchBar))
+})(Sidebar))
