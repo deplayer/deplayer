@@ -18,6 +18,7 @@ import PlaylistButton from './components/PlaylistButton'
 import CollectionButton from './components/CollectionButton'
 import SettingsButton from './components/Buttons/SettingsButton'
 import PlayAllButton from './components/Buttons/PlayAllButton'
+import ClearQueueButton from './components/Buttons/ClearQueueButton'
 
 import {
   Router,
@@ -29,7 +30,43 @@ const appStore = configureStore()
 const Home = () => {
   return (
     <React.Fragment>
+      <SidebarContainer>
+        <PlaylistButton />
+        <CollectionButton />
+        <SettingsButton />
+        <ClearQueueButton />
+      </SidebarContainer>
+
       <QueueContainer />
+    </React.Fragment>
+  )
+}
+
+const Collection = () => {
+  return (
+    <React.Fragment>
+      <SidebarContainer>
+        <PlaylistButton />
+        <CollectionButton />
+        <SettingsButton />
+        <PlayAllButton />
+      </SidebarContainer>
+
+      <CollectionContainer />
+    </React.Fragment>
+  )
+}
+
+const Settings = () => {
+  return (
+    <React.Fragment>
+      <SidebarContainer>
+        <PlaylistButton />
+        <CollectionButton />
+        <SettingsButton />
+      </SidebarContainer>
+
+      <SettingsContainer />
     </React.Fragment>
   )
 }
@@ -41,18 +78,10 @@ class App extends Component<any> {
       <Provider store={appStore}>
         <Router history={history} >
           <React.Fragment>
-            <SidebarContainer>
-              <PlaylistButton />
-              <CollectionButton />
-              <SettingsButton />
-              <PlayAllButton
-                dispatch={this.props.dispatch}
-              />
-            </SidebarContainer>
             <Route exact path="/" component={Home} />
-            <Route path="/collection" component={CollectionContainer} />
+            <Route path="/collection" component={Collection} />
             <Route path="/song/:id" component={SongContainer} />
-            <Route path="/settings" component={SettingsContainer} />
+            <Route path="/settings" component={Settings} />
             <PlayerContainer />
           </React.Fragment>
         </Router>

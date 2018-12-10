@@ -78,4 +78,11 @@ describe('queue reducer', () => {
         prevSongId: '1234'
       })
   })
+
+  it('should handle CLEAR_QUEUE action', () => {
+    const trackIds = ['1234', '4321']
+    const props = {...defaultState, trackIds}
+    expect(reducer(props, {type: types.CLEAR_QUEUE, song: '1234'}))
+      .toEqual(defaultState)
+  })
 })

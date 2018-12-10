@@ -10,16 +10,15 @@ import {
 } from '../constants/ActionTypes'
 
 // Extract songs from collection state
-export const getSongs  = (state: any) => {
-  return state ? state.collection.rows : []
+export const getSongs  = (state: any): Array<string> => {
+  return state ? state.collection.visibleSongs : []
 }
 
 // Handling setCurrentPlaying saga
 export function* playAll(action: any): Generator<void, void, void> {
   const songs = yield select(getSongs)
-  const preparedSongs = Object.keys(songs)
-  yield put({type: ADD_SONGS_TO_QUEUE, songs: preparedSongs})
-  yield put({type: SET_CURRENT_PLAYING, song: preparedSongs[0]})
+  yield put({type: ADD_SONGS_TO_QUEUE, songs: songs})
+  yield put({type: SET_CURRENT_PLAYING, song: songs[0]})
   yield put({type: START_PLAYING})
 }
 

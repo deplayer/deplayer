@@ -7,9 +7,9 @@ import { getAdapter } from '../services/adapters'
 
 import * as types from '../constants/ActionTypes'
 
-const mapToMedia = (collection) => {
+const mapToMedia = (collection: Array<any>) => {
   if (!collection.length) {
-    return {}
+    return []
   }
 
   return collection.map((elem) => {

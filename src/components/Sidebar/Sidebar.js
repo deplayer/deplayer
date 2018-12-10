@@ -98,7 +98,6 @@ class Sidebar extends Component<Props, State> {
             { this.props.loading ? <i className='fa fa-loading'></i> : <i className='icon search'></i> }
             { this.props.error ?  <div className='alert search'>{ this.props.error }</div> : null }
           </div>
-              {}
           {  !this.state.focus ? childrenWithProps : null }
         </div>
       </React.Fragment>

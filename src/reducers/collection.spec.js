@@ -15,7 +15,7 @@ describe('collection reducer', () => {
   it('should handle RECEIVE_COLLECTION', () => {
     const fixtureSong = new Song()
     const rows = {}
-    rows[fixtureSong.id] = fixtureSong
+    rows[fixtureSong.id] = new Song(fixtureSong)
     const expected = {...defaultState, totalRows: 1, rows, visibleSongs: [fixtureSong.id]}
     expect(reducer(defaultState, {type: RECEIVE_COLLECTION, data: [fixtureSong]}))
       .toEqual(expected)

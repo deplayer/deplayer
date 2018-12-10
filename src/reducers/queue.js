@@ -69,6 +69,9 @@ export default (state: State = defaultState, action: Action = {}): State => {
 
       return state
 
+    case types.CLEAR_QUEUE:
+      return defaultState
+
     default:
       return state
   }
