@@ -15,8 +15,8 @@ const getCurrentSong = (state: any) => {
   return rows[currentId]
 }
 
-function* dispatch(action: string) {
-  yield put(action)
+function dispatch(action: string) {
+  put(action)
 }
 
 // Handling START_PLAYING saga
