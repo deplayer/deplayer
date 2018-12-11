@@ -27,6 +27,7 @@ $yellow-color: #a50;
 @import './icons.scss';
 @import './form.scss';
 @import './player.scss';
+@import './sidebar.scss';
 
 html, body {
   height: 100%;
@@ -49,28 +50,6 @@ body {
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   grid-template-areas: "sidebar sidebar sidebar sidebar" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "player player player player";
-}
-
-.sidebar-container {
-  z-index: 1;
-  grid-area: contents;
-  padding-left: 20px;
-  padding-right: 20px;
-
-  &.has-results {
-    grid-area: sidebar;
-  }
-
-  @extend .d-flex;
-  align-items: center;
-
-  .button {
-    margin-left: 20px;
-
-    a {
-      @extend .btn;
-    }
-  }
 }
 
 .library-controls {
@@ -144,15 +123,14 @@ body {
       }
     }
   }
+}
 
-  .media-thumb {
-    min-width: 76px;
-    min-height: 76px;
+.media-thumb {
+  width: 76px;
+  height: 76px;
 
-    div {
-      min-width: 40px;
-      background-color: $yellow-color;
-    }
+  div {
+    min-width: 40px;
   }
 }
 
@@ -246,7 +224,7 @@ span.label {
   height: 100%;
   background-repeat: no-repeat;
   background-position: center center;
-  background-size: contain;
+  background-size: cover;
   font-size: 4em;
 }
 

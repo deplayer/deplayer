@@ -1,0 +1,25 @@
+.sidebar-container {
+  @extend .d-flex;
+
+  padding-top: 10px;
+  padding-bottom: 10px;
+
+  z-index: 1;
+  grid-area: contents;
+  padding-left: 20px;
+  padding-right: 20px;
+
+  &.has-results {
+    grid-area: sidebar;
+  }
+
+  align-items: center;
+
+  .button {
+    margin-left: 20px;
+
+    a {
+      @extend .btn;
+    }
+  }
+}

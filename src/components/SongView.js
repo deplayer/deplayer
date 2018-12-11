@@ -4,20 +4,20 @@ import React, { Component } from 'react'
 import { Translate } from 'react-redux-i18n'
 import { Redirect } from 'react-router-dom'
 
-import Song from '../entities/Song'
 import CoverImage from './MusicTable/CoverImage'
-import ShareButtons from './ShareButtons'
 import { getDurationStr } from '../utils/timeFormatter'
 
 type Props = {
-  song: Song
+  collection: any,
+  match: any
 }
 
-export default class Rowack extends Component<Props> {
+export default class SongView extends Component<Props> {
   render() {
-    const { song } = this.props
+    const songId = this.props.match.params.id
+    const song = this.props.collection.rows[songId]
 
-    if (!song.id) {
+    if (!song || !song.id) {
       return (
         <div>
           <Redirect to='/' />
@@ -37,9 +37,7 @@ export default class Rowack extends Component<Props> {
           </div>
           <div className='content'>
 
-            <ShareButtons song={song} />
-
-            <div inverted size='large'>
+            <div>
               <div>
                 <div>
                   <div className='collapsed'>

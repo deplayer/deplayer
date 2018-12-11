@@ -2,9 +2,11 @@
 
 import React, { Component } from 'react'
 import { Dispatch } from 'redux'
+import { Link } from 'react-router-dom'
 
 import ProgressBar from './ProgressBar'
 import PlayPauseButton from './PlayPauseButton'
+import CoverImage from '../MusicTable/CoverImage'
 import SkipButton from './SkipButton'
 import VolumeControl from './VolumeControl'
 import { PLAY_NEXT, PLAY_PREV } from '../../constants/ActionTypes'
@@ -109,44 +111,59 @@ class Player extends Component<Props, State> {
 
     return (
       <div className='player-container'>
-        <div className='player'>
-          <ProgressBar
-            total={this.playerRef.current ? this.playerRef.current.duration : 0}
-            current={this.state.currentTime}
-          />
-          <h4 className='song-title'>
+        <ProgressBar
+          total={this.playerRef.current ? this.playerRef.current.duration : 0}
+          current={this.state.currentTime}
+        />
+        <Link to={`/song/${currentPlaying.id}`}>
+          <h5 className='song-title'>
             { currentPlaying.title } - { currentPlaying.artist ? currentPlaying.artist.name : '' }
-          </h4>
-          <audio
-            ref={this.playerRef}
-            src={streamUri}
-            volume={ volume }
-            onError={this.logError.bind(this)}
-            autoPlay={ this.props.player.playing }
-            onTimeUpdate={ this.onTimeUpdate }
-            onEnded={this.playNext}
-          />
-          <div className='ui icon buttons player-controls'>
-            <SkipButton
-              onClick={this.playPrev}
-              keyValues={['ArrowLeft', 'k']}
-              type="prev"
-            />
-            <PlayPauseButton
-              playing={this.isPlaying()}
-              onClick={this.playPause}
-            />
-            <SkipButton
-              onClick={this.playNext}
-              keyValues={['ArrowRight', 'j']}
-              type="next"
-            />
-            <VolumeControl
-              volume={ volume }
-              onChange={this.setVolume}
+          </h5>
+        </Link>
+        <div className='player-contents'>
+          <div className='media-thumb'>
+            <CoverImage
+              cover={currentPlaying.cover}
+              size='thumbnail'
+              albumName={currentPlaying.album ? currentPlaying.album.name : 'N/A'}
             />
           </div>
-          {this.state.error}
+          <div className='player'>
+            <div className='player-tools'>
+              <div>
+                <audio
+                  ref={this.playerRef}
+                  src={streamUri}
+                  volume={ volume }
+                  onError={this.logError.bind(this)}
+                  autoPlay={ this.props.player.playing }
+                  onTimeUpdate={ this.onTimeUpdate }
+                  onEnded={this.playNext}
+                />
+                <div className='ui icon buttons player-controls'>
+                  <SkipButton
+                    onClick={this.playPrev}
+                    keyValues={['ArrowLeft', 'k']}
+                    type="prev"
+                  />
+                  <PlayPauseButton
+                    playing={this.isPlaying()}
+                    onClick={this.playPause}
+                  />
+                  <SkipButton
+                    onClick={this.playNext}
+                    keyValues={['ArrowRight', 'j']}
+                    type="next"
+                  />
+                  <VolumeControl
+                    volume={ volume }
+                    onChange={this.setVolume}
+                  />
+                </div>
+                {this.state.error}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     )

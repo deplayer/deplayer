@@ -2,14 +2,20 @@
 
 import React from 'react'
 import { Dispatch } from 'redux'
+import { connect } from 'react-redux'
 
 import { CLEAR_QUEUE } from '../../constants/ActionTypes'
 
 type Props = {
-  dispatch: Dispatch
+  dispatch: Dispatch,
+  queue: any
 }
 
 const ClearQueueButton = (props: Props) => {
+  if (!props.queue.trackIds.length) {
+    return null
+  }
+
   const clearQueue = () => {
     props.dispatch({type: CLEAR_QUEUE})
   }
@@ -24,4 +30,8 @@ const ClearQueueButton = (props: Props) => {
   )
 }
 
-export default ClearQueueButton
+export default connect(
+  (state) => ({
+    queue: state.queue
+  })
+)(ClearQueueButton)

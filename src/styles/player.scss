@@ -1,17 +1,25 @@
 .player-container {
   grid-area: player;
   background-color: $body-bg-color;
-  padding-top: 20px;
+  padding-top: 10px;
 
-  button {
+  .player-contents {
+    @extend .d-flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    .media-thumb {
+      margin: 10px;
+      background-color: darken($body-bg-color, 20%);
+    }
   }
 }
 
-h4.song-title {
+.song-title {
   text-align: center;
-  padding-top: 10px;
-  color: $secondary-color;
+  padding-top: 5px;
   padding-bottom: 0;
+  margin-bottom: 0;
 }
 
 .progress-bar {
@@ -38,13 +46,15 @@ h4.song-title {
 .player-controls {
   @extend .d-flex;
   justify-content: center;
-  padding: 15px 0px;
 
   button {
     padding: 0px;
     font-size: 34px;
     color: $secondary-color;
     background-color: $body-bg-color;
+    border: none;
+    margin-left: 10px;
+    margin-right: 10px;
 
     &:hover {
       color: lighten($secondary-color, 20%);
@@ -52,3 +62,6 @@ h4.song-title {
   }
 }
 
+.player {
+  width: 100%;
+}
