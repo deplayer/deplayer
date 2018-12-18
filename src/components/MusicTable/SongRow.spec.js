@@ -35,13 +35,5 @@ describe('SongRow', () => {
     const { enzymeWrapper } = setup()
     expect(enzymeWrapper.find('.song-row').exists())
       .toBe(true)
-    expect(enzymeWrapper.find('button.add-to-collection').exists())
-      .toBe(true)
-  })
-
-  it('should show remove button when disableAddButton is true', () => {
-    const { enzymeWrapper } = setup({disableAddButton: true})
-    expect(enzymeWrapper.find('button.remove-from-collection').exists())
-      .toBe(true)
   })
 })

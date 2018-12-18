@@ -2014,7 +2014,7 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
-classnames@^2.2.3, classnames@^2.2.5:
+classnames@^2.2.3, classnames@^2.2.5, classnames@^2.2.6:
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
   integrity sha512-JR/iSQOSt+LQIWwrwEzJ9uk0xfN3mTVYMwt1Ir5mUcSN6pU+V4zQFFaJsclJbPuAUQH+yfWef6tm7l1quW3C8Q==
@@ -9568,6 +9568,14 @@ rc@^1.2.7:
     ini "~1.3.0"
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
+
+react-contexify@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/react-contexify/-/react-contexify-4.0.0.tgz#d9325c18cf431d9d5fae35dbf7c24af59d79e65b"
+  integrity sha512-y2+tTsfjFWeEwmhTxE2qlthquxhPg454kuGA3HIx2vbQFio/jB9Rq39u8PV9KZjFYmH65A2UNySBUFL6fAvi9A==
+  dependencies:
+    classnames "^2.2.6"
+    prop-types "^15.6.2"
 
 react-dev-utils@^5.0.1:
   version "5.0.1"

@@ -115,11 +115,6 @@ class Player extends Component<Props, State> {
           total={this.playerRef.current ? this.playerRef.current.duration : 0}
           current={this.state.currentTime}
         />
-        <Link to={`/song/${currentPlaying.id}`}>
-          <h5 className='song-title'>
-            { currentPlaying.title } - { currentPlaying.artist ? currentPlaying.artist.name : '' }
-          </h5>
-        </Link>
         <div className='player-contents'>
           <div className='media-thumb'>
             <CoverImage
@@ -131,6 +126,11 @@ class Player extends Component<Props, State> {
           <div className='player'>
             <div className='player-tools'>
               <div>
+                <Link to={`/song/${currentPlaying.id}`}>
+                  <h5 className='song-title'>
+                    { currentPlaying.title } - { currentPlaying.artist ? currentPlaying.artist.name : '' }
+                  </h5>
+                </Link>
                 <audio
                   ref={this.playerRef}
                   src={streamUri}
