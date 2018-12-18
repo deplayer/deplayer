@@ -36,6 +36,7 @@ export const ADD_SONGS_TO_QUEUE = 'ADD_SONGS_TO_QUEUE'
 export const PLAY_NEXT = 'PLAY_NEXT'
 export const PLAY_PREV = 'PLAY_PREV'
 export const CLEAR_QUEUE = 'CLEAR_QUEUE'
+export const SHUFFLE = 'SHUFFLE'
 
 // Search
 export const START_SEARCH = 'START_SEARCH'

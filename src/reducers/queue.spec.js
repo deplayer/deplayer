@@ -68,7 +68,12 @@ describe('queue reducer', () => {
 
   it('should handle PLAY_PREV action', () => {
     const trackIds = ['1234', '4321']
-    const props = {...defaultState, trackIds, currentPlaying: '1234', prevSongId: '4321'}
+    const props = {
+      ...defaultState,
+      trackIds,
+      currentPlaying: '1234',
+      prevSongId: '4321'
+    }
     expect(reducer(props, {type: types.PLAY_PREV, song: '1234'}))
       .toEqual({
         ...props,
@@ -84,5 +89,18 @@ describe('queue reducer', () => {
     const props = {...defaultState, trackIds}
     expect(reducer(props, {type: types.CLEAR_QUEUE, song: '1234'}))
       .toEqual(defaultState)
+  })
+
+  it('should handle SHUFFLE action', () => {
+    const trackIds = ['1234', '4321', '3456', '2323']
+    const props = {...defaultState, trackIds}
+    const res = reducer(props, {type: types.SHUFFLE})
+    expect(
+      res.trackIds.map((id) => {
+        return trackIds.map((sid) => {
+          return sid === id
+        })
+      }).length !== 4
+    ).toBe(false)
   })
 })

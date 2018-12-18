@@ -11,8 +11,8 @@ import {
 type State = {
   trackIds: Array<string>,
   currentPlaying: any,
-  nextSongId: null,
-  prevSongId: null
+  nextSongId: string|null,
+  prevSongId: string|null
 }
 
 export const defaultState = {
@@ -20,6 +20,19 @@ export const defaultState = {
   currentPlaying: null,
   nextSongId: null,
   prevSongId: null
+}
+
+
+
+const shuffleArray = (array) => {
+  for (var i = array.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+  }
+
+  return array
 }
 
 const setCurrentPlaying = (state: any, action: any) => {
@@ -71,6 +84,12 @@ export default (state: State = defaultState, action: Action = {}): State => {
 
     case types.CLEAR_QUEUE:
       return defaultState
+
+    case types.SHUFFLE:
+      return {
+        ...state,
+        trackIds: shuffleArray(state.trackIds)
+      }
 
     default:
       return state

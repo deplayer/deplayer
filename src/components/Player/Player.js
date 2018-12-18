@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 
 import ProgressBar from './ProgressBar'
 import PlayPauseButton from './PlayPauseButton'
+import ShuffleButton from './ShuffleButton'
 import CoverImage from '../MusicTable/CoverImage'
 import SkipButton from './SkipButton'
 import VolumeControl from './VolumeControl'
@@ -158,6 +159,9 @@ class Player extends Component<Props, State> {
                   <VolumeControl
                     volume={ volume }
                     onChange={this.setVolume}
+                  />
+                  <ShuffleButton
+                    dispatch={this.props.dispatch}
                   />
                 </div>
                 {this.state.error}
