@@ -22,7 +22,20 @@
   margin-bottom: 0;
 }
 
+.curr-time {
+}
+.total-time {
+  position: absolute;
+  right: 10px;
+}
+
+.progress {
+  display: block;
+  background-color: darken($primary-color, 10%);
+}
+
 .progress-bar {
+  position: relative;
   margin-bottom: 0;
   background-color: darken($body-bg-color, 20%);
 
@@ -31,9 +44,12 @@
   }
 
   .bar {
-    background-color: $secondary-color;
     width: 0%;
     transition: width .1s linear;
+
+    color: black;
+    text-align: right;
+    padding-right: 20px;
 
     &:hover {
       background-color: lighten($secondary-color, 20%);

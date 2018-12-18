@@ -1,6 +1,7 @@
 // @flow
 
 import React from 'react'
+import { getDurationStr } from '../../utils/timeFormatter'
 
 type Props = {
   total: number,
@@ -16,6 +17,10 @@ const ProgressBar = (props: Props) => {
       <div className='bar' style={{width: `${barWidth}%`}}>
         <div className='progress'></div>
       </div>
+
+      <span className='total-time'>
+        { getDurationStr(props.total * 1000) }
+      </span>
     </div>
   )
 }

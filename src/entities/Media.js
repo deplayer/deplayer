@@ -15,6 +15,7 @@ type stream = {
 export default class Media {
   id: string
   title: string
+  duration: number
   artist: {
     name: string
   }
@@ -89,7 +90,8 @@ export default class Media {
       id: '' + this.id,
       title: this.title,
       artist: this.artist,
-      stream: this.stream
+      stream: this.stream,
+      duration: this.duration
     }
   }
 }
