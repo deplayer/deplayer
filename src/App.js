@@ -19,6 +19,7 @@ import CollectionButton from './components/CollectionButton'
 import SettingsButton from './components/Buttons/SettingsButton'
 import PlayAllButton from './components/Buttons/PlayAllButton'
 import ClearQueueButton from './components/Buttons/ClearQueueButton'
+import BackButton from './components/Buttons/BackButton'
 
 import {
   Router,
@@ -71,6 +72,21 @@ const Settings = () => {
   )
 }
 
+const Song = () => {
+  return (
+    <React.Fragment>
+      <SidebarContainer>
+        <PlaylistButton />
+        <CollectionButton />
+        <SettingsButton />
+        <BackButton />
+      </SidebarContainer>
+
+      <SongContainer />
+    </React.Fragment>
+  )
+}
+
 class App extends Component<any> {
   render() {
 
@@ -80,7 +96,7 @@ class App extends Component<any> {
           <React.Fragment>
             <Route exact path="/" component={Home} />
             <Route path="/collection" component={Collection} />
-            <Route path="/song/:id" component={SongContainer} />
+            <Route path="/song/:id" component={Song} />
             <Route path="/settings" component={Settings} />
             <PlayerContainer />
           </React.Fragment>

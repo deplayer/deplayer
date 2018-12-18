@@ -148,6 +148,11 @@ body {
     }
   }
 
+  @include media-breakpoint-up(md) {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
   .song {
 
     @include media-breakpoint-up(md) {
@@ -161,7 +166,8 @@ body {
     .content {
       grid-area: meta;
       position: absolute;
-      padding: 20px;
+      padding-left: 20px;
+      padding-right: 20px;
 
       table {
         background-color: $body-bg-color;
@@ -194,7 +200,6 @@ body {
 
       @include media-breakpoint-up(md) {
         position: relative;
-        padding: 0px;
       }
 
       .header {
