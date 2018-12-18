@@ -44,6 +44,10 @@ body {
   font-smoothing: antialiased;
 }
 
+a {
+  outline: none;
+}
+
 #root {
   display: grid;
   height: 100%;
