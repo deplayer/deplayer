@@ -19,7 +19,7 @@ const ProgressBar = (props: Props) => {
       </div>
 
       <span className='total-time'>
-        { getDurationStr(props.total * 1000) }
+        -{ getDurationStr(props.total * 1000 - props.current * 1000) }
       </span>
     </div>
   )
