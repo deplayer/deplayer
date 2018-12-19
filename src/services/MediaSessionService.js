@@ -17,16 +17,16 @@ export default class MediaSessionService {
         ]
       })
       navigator.mediaSession.setActionHandler('play', () => {
-        dispatch(actions.START_PLAYING)
+        dispatch({type: actions.START_PLAYING})
       })
       navigator.mediaSession.setActionHandler('pause', () => {
-        dispatch(actions.PAUSE_PLAYING)
+        dispatch({type: actions.PAUSE_PLAYING})
       })
       navigator.mediaSession.setActionHandler('previoustrack', () => {
-        dispatch(actions.PLAY_PREV)
+        dispatch({type: actions.PLAY_PREV})
       })
       navigator.mediaSession.setActionHandler('nexttrack', () => {
-        dispatch(actions.PLAY_NEXT)
+        dispatch({type: actions.PLAY_NEXT})
       })
 
       navigator.mediaSession.setActionHandler('seekbackward', () => { })
