@@ -16,7 +16,7 @@ const getCurrentSong = (state: any) => {
 }
 
 // Handling START_PLAYING saga
-export function* setCurrentPlayingMeta (action: any, dispatch: any): any {
+export function* setCurrentPlayingMeta (dispatch: any): any {
   const mediaSessionService = new MediaSessionService()
   const currentSong = yield select(getCurrentSong)
   yield call(mediaSessionService.updateMetadata, currentSong, dispatch)
