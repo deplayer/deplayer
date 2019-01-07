@@ -1,6 +1,7 @@
 import RxDB from 'rxdb'
 
 import Media from '../../entities/Media'
+import Artist from '../../entities/Artist'
 
 RxDB.plugin(require('pouchdb-adapter-idb'))
 
@@ -21,12 +22,45 @@ const collections = [
     }
   },
   {
+    name: 'queue',
+    schema: {
+      title: 'playing queue',
+      version: 0,
+      type: 'object',
+      migrationStrategies: {
+      },
+      properties: {
+        trackIds: {
+          type: 'array'
+        },
+        currentPlaying: {
+          type: 'string'
+        },
+        nextSongId: {
+          type: 'string'
+        },
+        prevSongId: {
+          type: 'string'
+        }
+      },
+    }
+  },
+  {
     name: 'media',
     schema: {
       title: 'collection schema',
       version: 0,
       type: 'object',
       properties: Media.toSchema()
+    }
+  },
+  {
+    name: 'artist',
+    schema: {
+      title: 'media artists',
+      version: 0,
+      type: 'object',
+      properties: Artist.toSchema()
     }
   }
 ]
