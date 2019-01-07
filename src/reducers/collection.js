@@ -21,7 +21,7 @@ const getKeys = (rows: any): Array<string> => {
   return Object.keys(rows)
 }
 
-const searchObj = (obj: any, query: RegExp): boolean => {
+export const searchObj = (obj: any, query: RegExp): boolean => {
   for (var key in obj) {
     var value = obj[key]
 
@@ -37,10 +37,10 @@ const searchObj = (obj: any, query: RegExp): boolean => {
   return false
 }
 
-const filterSongs = (songs: any, term: string) => {
+export const filterSongs = (songs: any, term: string) => {
   const keys = getKeys(songs).filter((key) => {
     const song = songs[key]
-    const filterTerm = new RegExp(term)
+    const filterTerm = new RegExp(term, 'gim')
     return searchObj(song, filterTerm)
   })
   return keys
@@ -64,7 +64,7 @@ export default (state: State = defaultState, action: Action = {}) => {
       }
     }
 
-    case types.START_SEARCH: {
+    case types.SEARCH_FINISHED: {
       return {
         ...state,
         visibleSongs: filterSongs(state.rows, action.searchTerm)

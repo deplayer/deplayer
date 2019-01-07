@@ -33,6 +33,7 @@ export function* search(action: SearchAction): Generator<void, void, void> {
   } catch (e) {
     yield put({type: types.SEARCH_REJECTED, message: e.message})
   }
+  yield put({type: types.SEARCH_FINISHED})
 }
 
 // Going to home page

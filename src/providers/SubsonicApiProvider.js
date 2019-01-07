@@ -6,7 +6,7 @@ import Song from '../entities/Song'
 import { IProvider } from './IProvider'
 
 /**
- * It should implement the API documented here: https://github.com/IrosTheBeggar/mStream/blob/master/docs/API/db_search.md
+ * It should implement the Subsonic API
  */
 export default class SubsonicApiProvider implements IProvider {
   baseUrl: string
