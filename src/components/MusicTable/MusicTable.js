@@ -72,7 +72,7 @@ const MusicTable = (props: Props) => {
         {({ height, width }) => (
           <List
             height={height}
-            rowCount={props.totalSongs}
+            rowCount={props.tableIds.length}
             rowHeight={100}
             rowRenderer={rowRenderer}
             width={width}
