@@ -70,11 +70,11 @@ class Sidebar extends Component<Props, State> {
   }
 
   render() {
-    const { children } = this.props;
+    const { children } = this.props
 
     const childrenWithProps = React.Children.map(children, child =>
       React.cloneElement(child, { dispatch: this.props.dispatch })
-    );
+    )
 
     return (
       <React.Fragment>

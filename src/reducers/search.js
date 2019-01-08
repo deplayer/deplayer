@@ -8,8 +8,9 @@ type State = {
   loading: boolean
 }
 
-const defaultState = {
+export const defaultState = {
   error: '',
+  searchTerm: '',
   loading: false
 }
 
@@ -18,6 +19,7 @@ export default (state: State = defaultState, action: Action = {}) => {
     case types.START_SEARCH: {
       return {
         ...state,
+        searchTerm: action.searchTerm,
         loading: true
       }
     }

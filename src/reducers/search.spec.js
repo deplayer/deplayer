@@ -1,6 +1,6 @@
 // @flow
 
-import reducer from './search'
+import reducer, { defaultState } from './search'
 import {
   START_SEARCH,
   SEARCH_REJECTED,
@@ -10,17 +10,12 @@ import {
 describe('search reducer', () => {
   it('should return the initial state', () => {
     expect(reducer(undefined, {}))
-      .toEqual(
-        {
-          error: '',
-          loading: false
-        }
-      )
+      .toEqual(defaultState)
   })
 
   it('should handle START_SEARCH', () => {
-    expect(reducer({error: '', loading: false}, {type: START_SEARCH}))
-      .toEqual({loading: true, error: ''})
+    expect(reducer({error: '', loading: false}, {type: START_SEARCH, searchTerm: 'Lorem'}))
+      .toEqual({loading: true, error: '', searchTerm: 'Lorem'})
   })
   it('should handle SEARCH_REJECTED', () => {
     expect(reducer({error: '', loading: true}, {type: SEARCH_REJECTED, message: 'Testing error'}))
