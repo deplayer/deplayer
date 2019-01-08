@@ -10,6 +10,7 @@ export default withRouter(connect((state, ownProps) => {
     hasResults,
     loading: state.search.loading,
     showInCenter: !hasResults && inHome,
-    error: state.search.error
+    error: state.search.error,
+    searchTerm: state.search.searchTerm
   }
 })(Sidebar))

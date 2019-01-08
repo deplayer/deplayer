@@ -22,7 +22,7 @@ export function* search(action: SearchAction): Generator<void, void, void> {
   try {
     const settings = yield select(getSettings)
     const providersService = new ProvidersService(settings)
-    yield call(goToHomePage)
+    // yield call(goToHomePage)
     const searchPromises = yield call(providersService.search, action.searchTerm)
     const searchResults = yield all(searchPromises)
     for (const result in searchResults) {
@@ -33,7 +33,7 @@ export function* search(action: SearchAction): Generator<void, void, void> {
   } catch (e) {
     yield put({type: types.SEARCH_REJECTED, message: e.message})
   }
-  yield put({type: types.SEARCH_FINISHED})
+  yield put({type: types.SEARCH_FINISHED, searchTerm: action.searchTerm})
 }
 
 // Going to home page

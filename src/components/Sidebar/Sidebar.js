@@ -17,6 +17,7 @@ type Props = {
   loading: boolean,
   showInCenter: boolean,
   children: any,
+  searchTerm: string,
   error: string
 }
 
