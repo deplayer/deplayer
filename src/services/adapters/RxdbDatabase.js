@@ -34,13 +34,13 @@ const collections = [
           type: 'array'
         },
         currentPlaying: {
-          type: 'string'
+          type: ['string', 'null']
         },
         nextSongId: {
-          type: 'string'
+          type: ['string', 'null']
         },
         prevSongId: {
-          type: 'string'
+          type: ['string', 'null']
         }
       },
     }

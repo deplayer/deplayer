@@ -1,30 +1,54 @@
 // @flow
 
-import { takeLatest, put, select } from 'redux-saga/effects'
+import { takeLatest, put, select, call } from 'redux-saga/effects'
 
-import {
-  PLAY_ALL,
-  ADD_SONGS_TO_QUEUE,
-  START_PLAYING,
-  SET_CURRENT_PLAYING
-} from '../constants/ActionTypes'
+import { getAdapter } from '../services/adapters'
+import QueueService from '../services/QueueService'
+
+import * as types from '../constants/ActionTypes'
 
 // Extract songs from collection state
-export const getSongs  = (state: any): Array<string> => {
+export const getSongs = (state: any): Array<string> => {
   return state ? state.collection.visibleSongs : []
 }
 
-// Handling setCurrentPlaying saga
+export const getQueue = (state: any): any => {
+  return state ? state.queue : {}
+}
+
+// Handling playAll saga
 export function* playAll(action: any): Generator<void, void, void> {
   const songs = yield select(getSongs)
-  yield put({type: ADD_SONGS_TO_QUEUE, songs: songs})
-  yield put({type: SET_CURRENT_PLAYING, song: songs[0]})
-  yield put({type: START_PLAYING})
+  yield put({type: types.ADD_SONGS_TO_QUEUE, songs: songs})
+  yield put({type: types.SET_CURRENT_PLAYING, song: songs[0]})
+  yield put({type: types.START_PLAYING})
+}
+
+const adapter = getAdapter()
+const queueService = new QueueService(new adapter())
+
+export function* saveQueue(): Generator<void, void, void> {
+  const queue = yield select(getQueue)
+  yield call(queueService.save, 'queue', queue)
+}
+
+// Application initialization routines
+function* initialize() {
+  yield call(queueService.initialize)
+  const queue = yield call(queueService.get)
+  if (!queue) {
+    yield put({type: types.GET_QUEUE_REJECTED})
+  } else {
+    const unserialized = JSON.parse(JSON.stringify(queue))
+    yield put({type: types.RECEIVE_QUEUE, queue: unserialized})
+  }
 }
 
 // Binding actions to sagas
-function* playerSaga(): Generator<void, void, void> {
-  yield takeLatest(PLAY_ALL, playAll)
+function* queueSaga(): Generator<void, void, void> {
+  yield takeLatest(types.PLAY_ALL, playAll)
+  yield takeLatest(types.ADD_SONGS_TO_QUEUE, saveQueue)
+  yield takeLatest(types.INITIALIZED, initialize)
 }
 
-export default playerSaga
+export default queueSaga

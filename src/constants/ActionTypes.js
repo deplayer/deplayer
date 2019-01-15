@@ -32,6 +32,8 @@ export const SET_COLUMN_SORT = 'SET_COLUMN_SORT'
 
 // Queue
 export const ADD_TO_QUEUE = 'ADD_TO_QUEUE'
+export const RECEIVE_QUEUE = 'RECEIVE_QUEUE'
+export const GET_QUEUE_REJECTED = 'GET_QUEUE_REJECTED'
 export const ADD_SONGS_TO_QUEUE = 'ADD_SONGS_TO_QUEUE'
 export const PLAY_NEXT = 'PLAY_NEXT'
 export const PLAY_PREV = 'PLAY_PREV'

@@ -22,8 +22,6 @@ export const defaultState = {
   prevSongId: null
 }
 
-
-
 const shuffleArray = (array) => {
   for (var i = array.length - 1; i > 0; i--) {
     var j = Math.floor(Math.random() * (i + 1));
@@ -50,6 +48,9 @@ const setCurrentPlaying = (state: any, action: any) => {
 
 export default (state: State = defaultState, action: Action = {}): State => {
   switch (action.type) {
+
+    case types.RECEIVE_QUEUE:
+      return {...state, ...action.queue}
 
     case types.ADD_TO_QUEUE:
       const mergedTrackIds = [...state.trackIds, ...populateTracks([action.song])]

@@ -103,4 +103,16 @@ describe('queue reducer', () => {
       }).length !== 4
     ).toBe(false)
   })
+
+  it('should handle RECEIVE_QUEUE', () => {
+    const trackIds = ['1234', '4321']
+    const props = {
+      ...defaultState,
+      trackIds,
+      currentPlaying: '1234',
+      prevSongId: '4321'
+    }
+    expect(reducer(props, {type: types.RECEIVE_QUEUE}))
+    .toEqual(props)
+  })
 })
