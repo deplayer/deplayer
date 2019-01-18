@@ -43,6 +43,20 @@ export default function register() {
             'This web app is being served cache-first by a service ' +
               'worker. To learn more, visit https://goo.gl/SC7cgQ'
           );
+
+          navigator.serviceWorker.addEventListener('fetch', function(event) {
+            event.respondWith(
+              caches.match(event.request).then(function(resp) {
+                return resp || fetch(event.request).then(function(response) {
+                  return caches.open('v1').then(function(cache) {
+                    cache.put(event.request, response.clone());
+                    return response;
+                  });
+                });
+              })
+            );
+          })
+
         });
       } else {
         // Is not local host. Just register service worker
