@@ -8,7 +8,7 @@ class LazyImage extends React.Component {
   }
 
   // The Image object to check the loading will be stored here
-  image
+  image = null
 
   constructor(props) {
     super(props)
