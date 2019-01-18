@@ -7,7 +7,4 @@ import registerServiceWorker from './registerServiceWorker';
 
 ReactDOM.render(<App />, document.getElementById('root'))
 
-// Browser bar hack
-window.scrollTo(0,1)
-
 registerServiceWorker();
