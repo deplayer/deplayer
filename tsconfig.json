@@ -4,6 +4,7 @@
         "strictNullChecks": true,
         "module": "es6",
         "jsx": "react",
+        "moduleResolution": "node",
         "target": "es5",
         "allowJs": true
     },
