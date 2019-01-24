@@ -123,11 +123,6 @@ module.exports = {
         include: paths.appSrc,
       },
       {
-        test: /\.(ts|tsx)$/,
-        loader: 'ts-loader',
-        include: paths.appSrc,
-      },
-      {
         // "oneOf" will traverse all following loaders until one will
         // match the requirements. When no loader matches it will fall
         // back to the "file" loader at the end of the loader list.
@@ -155,6 +150,12 @@ module.exports = {
               // directory for faster rebuilds.
               cacheDirectory: true,
             },
+          },
+          // Typescript
+          {
+            test: /\.(ts|tsx)$/,
+            loader: ['react-hot-loader/webpack', 'ts-loader'],
+            include: paths.appSrc,
           },
           // SASS support
           {

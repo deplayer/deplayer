@@ -47,6 +47,7 @@
     "react-contexify": "^4.0.0",
     "react-dev-utils": "6.0.0-next.3e165448",
     "react-dom": "^16.3.2",
+    "react-hot-loader": "^4.6.3",
     "react-key-handler": "^1.2.0-beta.3",
     "react-redux": "^5.0.7",
     "react-redux-i18n": "^1.9.3",
