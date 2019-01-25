@@ -130,6 +130,7 @@
     ]
   },
   "devDependencies": {
+    "@types/jest": "^23.3.13",
     "axios-mock-adapter": "^1.15.0",
     "babel-preset-flow": "^6.23.0",
     "enzyme": "^3.3.0",
@@ -144,6 +145,7 @@
     "redux-thunk": "^2.2.0",
     "sass-loader": "^7.1.0",
     "surge": "^0.20.1",
+    "ts-jest": "^23.10.5",
     "ts-loader": "^5.3.3"
   }
 }
