@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@types/react": "^16.7.20",
+    "@types/react-dom": "^16.0.11",
     "autoprefixer": "7.1.6",
+    "awesome-typescript-loader": "^5.2.1",
     "axios": "^0.18.0",
     "babel-core": "6.26.0",
     "babel-eslint": "^10.0.1",
@@ -44,8 +47,9 @@
     "react-contexify": "^4.0.0",
     "react-dev-utils": "6.0.0-next.3e165448",
     "react-dom": "^16.3.2",
+    "react-hot-loader": "^4.6.3",
     "react-key-handler": "^1.2.0-beta.3",
-    "react-redux": "^5.0.7",
+    "react-redux": "^6.0.0",
     "react-redux-i18n": "^1.9.3",
     "react-router-dom": "^4.2.2",
     "react-simple-share": "^0.1.2",
@@ -57,8 +61,10 @@
     "rxdb": "^8.0.2",
     "rxjs": "^6.3.3",
     "sass-semantic-ui": "^2.2.12-3",
+    "source-map-loader": "^0.2.4",
     "style-loader": "0.19.0",
     "sw-precache-webpack-plugin": "0.11.4",
+    "typescript": "^3.2.4",
     "url-loader": "0.6.2",
     "uuid": "^3.3.2",
     "webpack": "^4.29.0",
@@ -124,6 +130,7 @@
     ]
   },
   "devDependencies": {
+    "@types/jest": "^23.3.13",
     "axios-mock-adapter": "^1.15.0",
     "babel-preset-flow": "^6.23.0",
     "enzyme": "^3.3.0",
@@ -137,6 +144,8 @@
     "redux-saga-test-plan": "^3.7.0",
     "redux-thunk": "^2.2.0",
     "sass-loader": "^7.1.0",
-    "surge": "^0.20.1"
+    "surge": "^0.20.1",
+    "ts-jest": "^23.10.5",
+    "ts-loader": "^5.3.3"
   }
 }

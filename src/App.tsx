@@ -1,6 +1,4 @@
-// @flow
-
-import React, { Component } from 'react'
+import * as React from 'react'
 import { Provider } from 'react-redux'
 
 import './styles/App.scss'
@@ -87,7 +85,7 @@ const Song = () => {
   )
 }
 
-class App extends Component<any> {
+class App extends React.Component<any> {
   render() {
 
     return (

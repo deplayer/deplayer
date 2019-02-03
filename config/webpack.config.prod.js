@@ -153,6 +153,12 @@ module.exports = {
               compact: true,
             },
           },
+          // Typescript
+          {
+            test: /\.(ts|tsx)$/,
+            loader: 'ts-loader',
+            include: paths.appSrc,
+          },
           // SASS support
           {
             test: /\.scss$/,
