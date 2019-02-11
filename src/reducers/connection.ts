@@ -1,3 +1,5 @@
+import * as types from '../constants/ActionTypes'
+
 type State = {
   connected: Boolean
 }
@@ -7,5 +9,12 @@ export const defaultState = {
 }
 
 export default (state: State = defaultState, action) => {
-  return state
+  switch (action.type) {
+    case types.SET_ONLINE_CONNECTION: {
+      return {...state, connected: true}
+    }
+
+    default:
+      return state
+  }
 }

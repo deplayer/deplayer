@@ -22,6 +22,7 @@ import collectionSaga from '../sagas/collection'
 import notificationsSaga from '../sagas/notifications'
 import queueSaga from '../sagas/queue'
 import mediaSessionSaga from '../sagas/mediaSession'
+import connectionSaga from '../sagas/connection'
 
 export default function configureStore() {
   let middlewares = [promise, thunk]
@@ -59,6 +60,7 @@ export default function configureStore() {
   sagaMiddleware.run(notificationsSaga)
   sagaMiddleware.run(queueSaga)
   sagaMiddleware.run(mediaSessionSaga, store)
+  sagaMiddleware.run(connectionSaga, store)
 
   store.dispatch({type: INITIALIZED})
 
