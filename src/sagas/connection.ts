@@ -6,8 +6,8 @@ import * as types from '../constants/ActionTypes'
 
 // Application initialization routines
 function* initialize(dispatch) {
-  const connectionService = new ConnectionService(dispatch)
-  yield call(connectionService.registerConnection)
+  const connectionService = new ConnectionService()
+  yield call(connectionService.registerConnection, dispatch)
 }
 
 // Binding actions to sagas
