@@ -1,9 +1,8 @@
-// @flow
-
 import React from 'react'
 import { Field } from 'formik'
 import Toggle from 'react-toggle'
-import "react-toggle/style.css"
+
+require("react-toggle/style.css")
 
 type Props = {
   field: any

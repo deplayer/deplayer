@@ -1,8 +1,6 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 
-import './styles/App.scss'
-
 import QueueContainer from './containers/QueueContainer'
 import CollectionContainer from './containers/CollectionContainer'
 import PlayerContainer from './containers/PlayerContainer'
@@ -23,6 +21,8 @@ import {
   Router,
   Route,
 } from 'react-router-dom'
+
+require('./styles/App.scss')
 
 const appStore = configureStore()
 
