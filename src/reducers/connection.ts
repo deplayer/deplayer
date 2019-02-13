@@ -14,6 +14,10 @@ export default (state: State = defaultState, action) => {
       return {...state, connected: true}
     }
 
+    case types.SET_OFFLINE_CONNECTION: {
+      return {...state, connected: false}
+    }
+
     default:
       return state
   }

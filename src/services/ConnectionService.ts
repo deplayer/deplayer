@@ -3,7 +3,7 @@ import { Dispatch } from 'redux'
 
 export default class ConnectionService {
   registerConnection = (dispatch: Dispatch) => {
-    const updateOnlineStatus = (event) => {
+    const updateOnlineStatus = () => {
       if (navigator.onLine) {
         console.log('enter online mode')
         dispatch({type: types.SET_ONLINE_CONNECTION})
@@ -15,5 +15,7 @@ export default class ConnectionService {
 
     window.addEventListener('online', updateOnlineStatus)
     window.addEventListener('offline', updateOnlineStatus)
+
+    updateOnlineStatus()
   }
 }

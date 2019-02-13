@@ -32,3 +32,11 @@
     @extend .fa-minus-square;
   }
 }
+
+.fa.fa-wifi.disabled {
+  color: red;
+}
+
+.fa.fa-wifi {
+  color: green;
+}

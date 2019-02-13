@@ -8,12 +8,16 @@ type Props = {
 const ConnectionStatus = (props: Props) => {
   if (props.connection.connected) {
     return (
-      <i className='fa fa-wifi'></i>
+      <div className='button'>
+        <i className='fa fa-wifi'></i>
+      </div>
     )
   }
 
   return (
-    <i className='fa fa-wifi-slash'></i>
+    <div className='button'>
+      <i className='fa fa-wifi disabled'></i>
+    </div>
   )
 }
 
