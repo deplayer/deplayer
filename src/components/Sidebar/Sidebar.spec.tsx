@@ -1,6 +1,4 @@
-// @flow
-
-import React from 'react'
+import * as React from 'react'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../../tests/configureEnzyme'
 import Sidebar from './Sidebar'
@@ -26,7 +24,7 @@ const setup = (customProps: any) => {
 
 describe('Sidebar', () => {
   it('renders without crashing', () => {
-    const { enzymeWrapper } = setup()
+    const { enzymeWrapper } = setup({})
     expect(enzymeWrapper.find('.search-bar').exists()).toBe(true)
     expect(enzymeWrapper.find('.search-bar > input').exists()).toBe(true)
     enzymeWrapper.find('input').simulate('change', {target: {value: 'Pink Floyd'}});

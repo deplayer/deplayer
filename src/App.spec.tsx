@@ -12,6 +12,9 @@ const setup = () => {
     pages: 10,
     total: 100,
     offset: 10,
+    connection: {
+      connected: false
+    },
     dispatch: () => {}
   }
 

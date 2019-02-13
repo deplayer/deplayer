@@ -1,10 +1,9 @@
-// @flow
-
-import React, { Component } from 'react';
+import * as React from 'react'
 import { Dispatch } from 'redux'
 import KeyHandler, {KEYPRESS} from 'react-key-handler'
 import { I18n } from 'react-redux-i18n'
 
+import ConnectionStatus from '../Connection/ConnectionStatus'
 import { START_SEARCH } from '../../constants/ActionTypes'
 
 type State = {
@@ -24,7 +23,7 @@ type Props = {
 const WAIT_INTERVAL = 1000
 const ENTER_KEY = 13
 
-class Sidebar extends Component<Props, State> {
+class Sidebar extends React.Component<Props, State> {
   state = {
     searchTerm: '',
     focus: false
@@ -35,10 +34,11 @@ class Sidebar extends Component<Props, State> {
   componentWillMount() {
     this.timer = null
   }
+
   // Handling searchTerm text change
-  onSearchChange = (event: SyntheticInputEvent<EventTarget>) => {
+  onSearchChange = (event:  React.FormEvent<HTMLInputElement>) => {
     clearTimeout(this.timer)
-    this.setState({ searchTerm: event.target.value})
+    this.setState({ searchTerm: event.currentTarget.value})
     this.timer = setTimeout(this.triggerChange, WAIT_INTERVAL)
   }
 
@@ -85,6 +85,7 @@ class Sidebar extends Component<Props, State> {
             keyValue='/'
             onKeyHandle={this.setFocus}
           />
+          <ConnectionStatus />
           <div
             className={`search-bar ui huge action icon input inverted ${this.props.loading ? 'loading': ''}`}
           >
