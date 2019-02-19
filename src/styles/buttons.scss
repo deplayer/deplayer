@@ -1,6 +1,5 @@
 button {
   @extend .btn;
-  @extend .btn-dark;
 
   &.circle {
     border-radius: 100%;
