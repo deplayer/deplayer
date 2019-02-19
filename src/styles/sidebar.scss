@@ -18,6 +18,10 @@
   .button {
     margin-left: 20px;
 
+    &.connection-btn {
+      margin-left: 0;
+    }
+
     a {
       @extend .btn;
     }
