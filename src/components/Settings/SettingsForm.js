@@ -70,7 +70,7 @@ const SettingsForm = (props: Props) => {
             className='settings-form'
           >
             { populateFromSchema(props.schema) }
-            <button disabled={isSubmitting} type='submit'>
+            <button className='with-bg' disabled={isSubmitting} type='submit'>
               <Translate value="buttons.mstream.save" />
             </button>
           </Form>

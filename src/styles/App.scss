@@ -20,6 +20,7 @@ $green-color: rgba(51, 255, 0, 1);
 $yellow-color: #a50;
 $button-color: $secondary-color;
 $button-color-hover: $yellow-color;
+$button-bg-color: $inverted;
 
 // Own styles
 @import './alerts.scss';

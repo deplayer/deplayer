@@ -19,6 +19,10 @@ button {
   &.spaced {
     margin-right: 5px;
   }
+
+  &.with-bg {
+    background-color: $button-bg-color;
+  }
 }
 
 .song-menu {

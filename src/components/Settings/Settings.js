@@ -42,7 +42,7 @@ class Settings extends Component<Props, State> {
           settings={this.props.settings}
           dispatch={this.props.dispatch}
         />
-        <button onClick={this.deleteCollection}><Translate value="labels.deleteCollection" /></button>
+        <button className='with-bg' onClick={this.deleteCollection}><Translate value="labels.deleteCollection" /></button>
       </div>
     )
   }
