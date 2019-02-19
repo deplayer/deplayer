@@ -1,5 +1,11 @@
+.btn,
 button {
   @extend .btn;
+  color: $button-color;
+
+  &:hover {
+    color: $button-color-hover;
+  }
 
   &.circle {
     border-radius: 100%;

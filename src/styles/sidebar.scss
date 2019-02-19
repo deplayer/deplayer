@@ -18,14 +18,12 @@
   button,
   .button {
     margin-left: 20px;
-    color: $button-color;
 
     &.connection-btn {
       margin-left: 0;
     }
 
     a {
-      color: $button-color;
       @extend .btn;
     }
   }
