@@ -1,5 +1,3 @@
-// @flow
-
 import QueueService from './QueueService'
 import DummyAdapter from './adapters/DummyAdapter'
 import { defaultState } from '../reducers/queue'

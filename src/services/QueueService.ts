@@ -1,5 +1,3 @@
-// @flow
-
 import { IStorageService } from './IStorageService'
 import { IAdapter } from './adapters/IAdapter'
 
