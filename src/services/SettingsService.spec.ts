@@ -1,5 +1,3 @@
-// @flow
-
 import SettingsService from './SettingsService'
 import DummyAdapter from './adapters/DummyAdapter'
 
