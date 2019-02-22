@@ -1,5 +1,3 @@
-// @flow
-
 import reducer from './settings'
 
 import {

@@ -1,5 +1,3 @@
-// @flow
-
 import CollectionService from './CollectionService'
 import DummyAdapter from './adapters/DummyAdapter'
 
