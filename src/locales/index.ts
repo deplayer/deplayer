@@ -1,4 +1,4 @@
-import en from './en.json'
+import * as en from './en.json'
 
 export default {
   en
