@@ -5,6 +5,7 @@
     "module": "es6",
     "jsx": "react",
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     "target": "es5",
     "allowJs": true
   },
