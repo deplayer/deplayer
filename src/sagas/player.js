@@ -11,7 +11,7 @@ import {
 import Song from '../entities/Song'
 
 // Handling setCurrentPlaying saga
-export function* setCurrentPlaying(action: {song: Song}): Generator<void, void, void> {
+export function* setCurrentPlaying(action: {songId: string}): Generator<void, void, void> {
   // Redirect to song view page
   yield put({type: START_PLAYING})
   // yield put({type: PUSH_TO_VIEW, song: action.song})

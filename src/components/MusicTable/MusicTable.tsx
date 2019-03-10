@@ -53,7 +53,7 @@ const MusicTable = (props: Props) => {
         isCurrent={id === song.id}
         style={style}
         onClick={() => {
-          props.dispatch({type: types.SET_CURRENT_PLAYING, song: song.id})
+          props.dispatch({type: types.SET_CURRENT_PLAYING, songId: song.id})
         }}
         disableAddButton={props.disableAddButton}
         dispatch={props.dispatch}

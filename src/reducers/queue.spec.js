@@ -43,7 +43,7 @@ describe('queue reducer', () => {
   it('should handle SET_CURRENT_PLAYING action', () => {
     const trackIds = ['1234', '4321']
     const props = {...defaultState, trackIds}
-    expect(reducer(props, {type: types.SET_CURRENT_PLAYING, song: '1234'}))
+    expect(reducer(props, {type: types.SET_CURRENT_PLAYING, songId: '1234'}))
       .toEqual({
         ...props,
         trackIds,
@@ -56,7 +56,7 @@ describe('queue reducer', () => {
   it('should handle PLAY_NEXT action', () => {
     const trackIds = ['1234', '4321']
     const props = {...defaultState, trackIds, currentPlaying: '1234', nextSongId: '4321'}
-    expect(reducer(props, {type: types.PLAY_NEXT, song: '1234'}))
+    expect(reducer(props, {type: types.PLAY_NEXT}))
       .toEqual({
         ...props,
         trackIds,
@@ -74,7 +74,7 @@ describe('queue reducer', () => {
       currentPlaying: '1234',
       prevSongId: '4321'
     }
-    expect(reducer(props, {type: types.PLAY_PREV, song: '1234'}))
+    expect(reducer(props, {type: types.PLAY_PREV}))
       .toEqual({
         ...props,
         trackIds,

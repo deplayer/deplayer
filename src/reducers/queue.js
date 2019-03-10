@@ -34,15 +34,15 @@ const shuffleArray = (array) => {
 }
 
 const setCurrentPlaying = (state: any, action: any) => {
-  const scTracks = state.trackIds.includes(action.song)
+  const scTracks = state.trackIds.includes(action.songId)
     ? state.trackIds
-    : [...state.trackIds, action.song]
+    : [...state.trackIds, action.songId]
   return {
     ...state,
     trackIds: scTracks,
-    currentPlaying: action.song,
-    prevSongId: getSiblingSong(scTracks, action.song),
-    nextSongId: getSiblingSong(scTracks, action.song, true),
+    currentPlaying: action.songId,
+    prevSongId: getSiblingSong(scTracks, action.songId),
+    nextSongId: getSiblingSong(scTracks, action.songId, true),
   }
 }
 
@@ -71,14 +71,14 @@ export default (state: State = defaultState, action: Action = {}): State => {
 
     case types.PLAY_NEXT:
       if (state.nextSongId) {
-        return setCurrentPlaying(state, {song: state.nextSongId})
+        return setCurrentPlaying(state, {songId: state.nextSongId})
       }
 
       return state
 
     case types.PLAY_PREV:
       if (state.prevSongId) {
-        return setCurrentPlaying(state, {song: state.prevSongId})
+        return setCurrentPlaying(state, {songId: state.prevSongId})
       }
 
       return state
