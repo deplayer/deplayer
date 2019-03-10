@@ -8,7 +8,11 @@
     height: 100vw;
 
     @include media-breakpoint-up(md) {
-      height: 60vh;
+      height: 100%;
+    }
+
+    .cover-image {
+      background-size: contain;
     }
   }
 
