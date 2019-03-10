@@ -1,5 +1,3 @@
-// @flow
-
 import {
   call,
   put,
@@ -11,6 +9,7 @@ import history from '../store/configureHistory'
 
 import  * as types from '../constants/ActionTypes'
 import ProvidersService from '../services/ProvidersService'
+import IndexService from '../services/Search/IndexService'
 
 type SearchAction = {
   type: string,
@@ -18,7 +17,7 @@ type SearchAction = {
 }
 
 // Handling search saga
-export function* search(action: SearchAction): Generator<void, void, void> {
+export function* search(action: SearchAction): any {
   try {
     const settings = yield select(getSettings)
     const providersService = new ProvidersService(settings)
@@ -36,8 +35,14 @@ export function* search(action: SearchAction): Generator<void, void, void> {
   yield put({type: types.SEARCH_FINISHED, searchTerm: action.searchTerm})
 }
 
+// generate fulltext index
+export function* generateIndex(action): any {
+  const service = new IndexService()
+  yield service.generateIndexFrom(action.data)
+}
+
 // Going to home page
-export function* goToHomePage(): Generator<void, void, void> {
+export function* goToHomePage(): any {
   yield history.push('/')
 }
 
@@ -47,8 +52,9 @@ export const getSettings = (state: any) => {
 }
 
 // Binding actions to sagas
-function* searchSaga(): Generator<void, void, void> {
+function* searchSaga(): any {
   yield takeLatest(types.START_SEARCH, search)
+  yield takeLatest(types.RECEIVE_COLLECTION, generateIndex)
 }
 
 export default searchSaga

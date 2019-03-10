@@ -35,6 +35,7 @@ $button-bg-color: $inverted;
 @import './song-view.scss';
 @import './progress.scss';
 @import './neon.scss';
+@import './collection.scss';
 
 html, body {
   height: 100%;
@@ -66,16 +67,6 @@ body {
 .contents-container {
   overflow-y: auto;
   grid-area: contents;
-}
-
-.collection {
-  overflow: hidden;
-  grid-area: contents;
-
-  @include media-breakpoint-up(md) {
-    padding-left: 20px;
-    padding-right: 20px;
-  }
 }
 
 .settings {
