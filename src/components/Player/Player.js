@@ -92,6 +92,13 @@ class Player extends Component<Props, State> {
     this.playerRef.current.volume = (volume / 100)
   }
 
+  // Set player currentTime
+  setCurrentTime = (value: any) => {
+    const currentTime = value
+    this.setState({currentTime})
+    this.playerRef.current.currentTime = currentTime
+  }
+
   render() {
     const currentPlayingId = this.props.queue.currentPlaying
     const currentPlaying = this.props.collection.rows[currentPlayingId]
@@ -113,8 +120,10 @@ class Player extends Component<Props, State> {
     return (
       <div className='player-container'>
         <ProgressBar
+          dispatch={this.props.dispatch}
           total={this.playerRef.current ? this.playerRef.current.duration : 0}
           current={this.state.currentTime}
+          onChange={this.setCurrentTime}
         />
         <div className='player-contents'>
           <div className='media-thumb'>

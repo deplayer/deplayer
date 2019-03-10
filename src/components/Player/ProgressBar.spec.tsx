@@ -19,8 +19,8 @@ const setup = (customProps) => {
 
 it('renders without crashing', () => {
   const { enzymeWrapper } = setup({total: 60, current: 30})
-  expect(enzymeWrapper.find('.progress-bar').exists())
+  expect(enzymeWrapper.find('.progress').exists())
     .toBe(true)
 
-  expect(enzymeWrapper.find('.bar').prop('value')).toEqual(50)
+  expect(enzymeWrapper.find('.bar').prop('value')).toEqual(30)
 })
