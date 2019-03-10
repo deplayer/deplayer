@@ -1,6 +1,4 @@
-// @flow
-
-import React from 'react'
+import * as React from 'react'
 import { Translate } from 'react-redux-i18n'
 import { Dispatch } from 'redux'
 
@@ -35,8 +33,9 @@ const SongRow = (props: Props) => {
         />
       </div>
       <ul className='media-info'>
-        <li className='title-label'>{ song.title } - { song.album ? song.album.name: nonAvailable }</li>
-        <li>{ song.artist ? song.artist.name: nonAvailable }</li>
+        <li className='title-label'><h4>{ song.title }</h4></li>
+        <li><h5>{ song.album ? song.album.name: nonAvailable }</h5></li>
+        <li><h6>{ song.artist ? song.artist.name: nonAvailable }</h6></li>
         <li>{ getDurationStr(song.duration) }</li>
       </ul>
       <ContextualMenu {...props} />

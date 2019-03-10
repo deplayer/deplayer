@@ -6,7 +6,6 @@ import 'react-contexify/dist/ReactContexify.min.css'
 import { ADD_TO_COLLECTION, REMOVE_FROM_COLLECTION } from '../../constants/ActionTypes'
 
 type MenuProps = {
-  id: string,
   dispatch: Dispatch,
   disableAddButton?: boolean,
   onClick: () => any,

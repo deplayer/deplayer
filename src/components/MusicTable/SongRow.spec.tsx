@@ -1,6 +1,4 @@
-// @flow
-
-import React from 'react'
+import * as React from 'react'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../../tests/configureEnzyme'
 
@@ -32,7 +30,7 @@ const setup = (customProps) => {
 
 describe('SongRow', () => {
   it('should show render without errors', () => {
-    const { enzymeWrapper } = setup()
+    const { enzymeWrapper } = setup({})
     expect(enzymeWrapper.find('.song-row').exists())
       .toBe(true)
   })

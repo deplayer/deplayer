@@ -9,10 +9,12 @@
     align-items: center;
 
     .media-thumb {
+      display: block;
       margin-top: 10px;
       background-color: darken($body-bg-color, 20%);
     }
   }
+
 }
 
 .song-title {
@@ -20,13 +22,6 @@
   padding-top: 5px;
   padding-bottom: 0;
   margin-bottom: 0;
-}
-
-.curr-time {
-}
-.total-time {
-  position: absolute;
-  right: 10px;
 }
 
 .player-controls {
