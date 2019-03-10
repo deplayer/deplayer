@@ -1,6 +1,4 @@
-// @flow
-
-import React from 'react'
+import * as React from 'react'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../../tests/configureEnzyme'
 
@@ -23,7 +21,7 @@ const setup = (customProps: any) => {
 
 describe('Settings', () => {
   it('renders without crashing', () => {
-    const { enzymeWrapper } = setup()
+    const { enzymeWrapper } = setup({})
     expect(enzymeWrapper.find('.settings').exists()).toBe(true)
   })
 })

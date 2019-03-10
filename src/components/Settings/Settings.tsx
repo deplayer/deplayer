@@ -1,6 +1,4 @@
-// @flow
-
-import React, { Component } from 'react'
+import * as React from 'react'
 import { Translate } from 'react-redux-i18n'
 import { Dispatch } from 'redux'
 
@@ -29,7 +27,7 @@ export const formSchema = {
   ]
 }
 
-class Settings extends Component<Props, State> {
+class Settings extends React.Component<Props, State> {
   deleteCollection = () => {
     this.props.dispatch({type: DELETE_COLLECTION})
   }
