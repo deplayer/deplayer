@@ -70,7 +70,6 @@ body {
 
 .collection {
   overflow: hidden;
-  background: transparent;
   grid-area: contents;
 
   @include media-breakpoint-up(md) {
@@ -96,7 +95,6 @@ body {
     height: 100px;
     @extend .d-flex;
     @extend .justify-content-between;
-    background-color: lighten($background-color, 10%) !important;
     width: 100%;
     padding-left: 10px;
     padding-right: 10px;
