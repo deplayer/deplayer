@@ -1,6 +1,5 @@
-// @flow
+import * as React from 'react'
 
-import React from 'react'
 import { getDurationStr } from '../../utils/timeFormatter'
 
 type Props = {

@@ -4841,6 +4841,11 @@ inline-process-browser@^1.0.0:
     falafel "^1.0.1"
     through2 "^0.6.5"
 
+input-range-scss@^1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/input-range-scss/-/input-range-scss-1.5.1.tgz#329beb333b3002f6964c8276c7605627ee3ed87f"
+  integrity sha512-osL2GDyJDXeTnNOVvXcizDKf1d1CTG+GLVu/tHX14HWkUwdn1TugfN6xBnPY0HHsqlVEgwTdXNRZc0Kz8qCm5g==
+
 inquirer@:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-6.2.0.tgz#51adcd776f661369dc1e894859c2560a224abdd8"
