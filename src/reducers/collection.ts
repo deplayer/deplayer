@@ -1,7 +1,4 @@
-// @flow
-
 import * as types from '../constants/ActionTypes'
-import { Action } from 'redux'
 
 import Song from '../entities/Song'
 
@@ -46,7 +43,7 @@ export const filterSongs = (songs: any, term: string) => {
   return keys
 }
 
-export default (state: State = defaultState, action: Action = {}) => {
+export default (state: State = defaultState, action: any = {}) => {
   switch (action.type) {
     case types.ADD_TO_COLLECTION:
     case types.RECEIVE_COLLECTION: {
