@@ -1,5 +1,3 @@
-// @flow
-
 import { takeLatest, put, call } from 'redux-saga/effects'
 
 import CollectionService from '../services/CollectionService'
@@ -30,7 +28,7 @@ function* initialize() {
   try {
     const adapter = getAdapter()
     const collectionService = new CollectionService(new adapter())
-    yield call(collectionService.initialize)
+    yield collectionService.initialize
     const collection = yield call(collectionService.getAll)
     const mappedData = mapToMedia(collection)
     yield put({type: types.RECEIVE_COLLECTION, data: mappedData})
@@ -70,7 +68,7 @@ export function* deleteCollection(): any {
 }
 
 // Binding actions to sagas
-function* collectionSaga(): Generator<void, void, void> {
+function* collectionSaga(): any {
   yield takeLatest(types.INITIALIZED, initialize)
   yield takeLatest(types.ADD_TO_COLLECTION, addToCollection)
   yield takeLatest(types.REMOVE_FROM_COLLECTION, removeFromCollection)
