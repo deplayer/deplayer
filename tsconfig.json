@@ -3,6 +3,10 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "module": "es6",
+    "lib": [
+      "es6",
+      "dom"
+    ],
     "jsx": "react",
     "moduleResolution": "node",
     "resolveJsonModule": true,
