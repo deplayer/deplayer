@@ -1,6 +1,7 @@
 import * as types from '../constants/ActionTypes'
 
 import Song from '../entities/Song'
+import IndexService from '../services/Search/IndexService'
 
 type State = {
   rows: any,
@@ -35,12 +36,20 @@ export const searchObj = (obj: any, query: RegExp): boolean => {
 }
 
 export const filterSongs = (songs: any, term: string) => {
-  const keys = getKeys(songs).filter((key) => {
-    const song = songs[key]
-    const filterTerm = new RegExp(term, 'gim')
-    return searchObj(song, filterTerm)
+  const songsArray = getKeys(songs).map((key) => {
+    return songs[key]
   })
-  return keys
+
+  const indexService = new IndexService()
+  const results = indexService
+    .generateIndexFrom(songsArray)
+    .search(term)
+
+  const mappedResults = results.map((result) => {
+    return result.ref
+  })
+
+  return mappedResults
 }
 
 export default (state: State = defaultState, action: any = {}) => {

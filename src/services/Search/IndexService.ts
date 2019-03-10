@@ -1,19 +1,27 @@
 import elasticlunr from 'elasticlunr'
 
 export default class IndexService {
+  index: any
+
   generateIndexFrom(collection) {
-    const index = elasticlunr(function () {
-      // then, the normal elasticlunr index initialization
+    this.index = elasticlunr(function () {
       this.addField('album')
       this.addField('artistName')
       this.addField('title')
     })
 
+    this.index.saveDocument(false)
+
     collection.forEach((doc) => {
-      index.addDoc(doc)
+      this.index.addDoc(doc)
     })
 
-    const results = index.search("Lagrimas")
-    console.log(results)
+
+    return this
+  }
+
+  search(searchTerm: string) {
+    const results = this.index.search(searchTerm)
+    return results
   }
 }

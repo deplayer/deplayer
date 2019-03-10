@@ -1,5 +1,3 @@
-// @flow
-
 import reducer, { defaultState } from './search'
 import {
   START_SEARCH,

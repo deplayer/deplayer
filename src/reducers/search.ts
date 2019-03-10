@@ -1,7 +1,4 @@
-// @flow
-
 import * as types from '../constants/ActionTypes'
-import { Action } from 'redux'
 
 type State = {
   error: string,
@@ -14,7 +11,7 @@ export const defaultState = {
   loading: false
 }
 
-export default (state: State = defaultState, action: Action = {}) => {
+export default (state: State = defaultState, action: any = {}) => {
   switch (action.type) {
     case types.START_SEARCH: {
       return {
