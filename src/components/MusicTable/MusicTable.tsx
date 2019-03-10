@@ -1,22 +1,17 @@
-// @flow
-
-import React from 'react'
-import { Dispatch } from 'redux'
+import * as React from 'react'
 import { Translate } from 'react-redux-i18n'
 import { AutoSizer, List } from 'react-virtualized'
 
-import {
-  setCurrentPlaying
-} from '../../actions/queue'
+import * as types from '../../constants/ActionTypes'
 import SongRow from './SongRow'
 
-type Props = {
+export type Props = {
   error?: string,
   queue: any,
   tableIds: any,
   collection: any,
   totalSongs: number,
-  dispatch: Dispatch,
+  dispatch: (action: any) => any,
   disableAddButton?: boolean,
 }
 
@@ -58,7 +53,7 @@ const MusicTable = (props: Props) => {
         isCurrent={id === song.id}
         style={style}
         onClick={() => {
-          props.dispatch(setCurrentPlaying(song.id))
+          props.dispatch({type: types.SET_CURRENT_PLAYING, song})
         }}
         disableAddButton={props.disableAddButton}
         dispatch={props.dispatch}

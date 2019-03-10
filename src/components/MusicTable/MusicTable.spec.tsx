@@ -1,17 +1,16 @@
-// @flow
-
-import React from 'react'
+import * as React from 'react'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../../tests/configureEnzyme'
 
-import MusicTable from './MusicTable'
+import MusicTable, { Props } from './MusicTable'
 
 configureEnzyme()
 
 
 const setup = () => {
-  const props = {
-    dispatch: () => {},
+  const props: Props = {
+    error: 'test',
+    dispatch: (value) => value,
     tableIds: [],
     queue: {
       trackIds: [],
