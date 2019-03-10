@@ -1,6 +1,4 @@
-// @flow
-
-import React from 'react'
+import * as React from 'react'
 import { shallow } from 'enzyme'
 import { Translate } from 'react-redux-i18n'
 import configureEnzyme from '../../tests/configureEnzyme'
@@ -23,7 +21,7 @@ const setup = (customProps: any) => {
     settings: {
       settings: {}
     },
-    onSubmit: () => Promise
+    onSubmit: () => Promise.resolve()
   }
 
   const props = {...defaultProps, ...customProps}
@@ -38,7 +36,7 @@ const setup = (customProps: any) => {
 
 describe('SettingsForm', () => {
   it('renders without crashing', () => {
-    const { enzymeWrapper } = setup()
+    const { enzymeWrapper } = setup({})
     expect(enzymeWrapper.find('Formik').exists()).toBe(true)
   })
 })

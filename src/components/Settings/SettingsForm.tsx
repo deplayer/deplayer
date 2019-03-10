@@ -1,6 +1,4 @@
-// @flow
-
-import React from 'react'
+import * as React from 'react'
 import { Translate }  from 'react-redux-i18n'
 import { Formik, Form } from 'formik'
 import { Dispatch } from 'redux'
@@ -54,7 +52,6 @@ const SettingsForm = (props: Props) => {
         saveSettings(values)
         actions.setSubmitting(false)
       }}
-      isSubmitting={settings.saving}
       enableReinitialize
       render=
         {({
