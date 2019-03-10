@@ -22,5 +22,5 @@ it('renders without crashing', () => {
   expect(enzymeWrapper.find('.progress-bar').exists())
     .toBe(true)
 
-  expect(enzymeWrapper.find('.bar').prop('style')).toEqual({width: '50%'})
+  expect(enzymeWrapper.find('.bar').prop('value')).toEqual(50)
 })

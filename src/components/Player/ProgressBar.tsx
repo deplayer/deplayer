@@ -8,15 +8,19 @@ type Props = {
 }
 
 const ProgressBar = (props: Props) => {
-  const barWidth = (props.current * 100) / props.total
+  const proportionalCurrent = (props.current * 100) / props.total
   return (
     <div
       className='progress-bar'
     >
-      <div className='bar' style={{width: `${barWidth}%`}}>
-        <div className='progress'></div>
-      </div>
-
+      <input
+        className='bar'
+        min={0}
+        max={100}
+        step={ 100 / props.total }
+        type='range'
+        value={ proportionalCurrent }
+      />
       <span className='total-time'>
         -{ getDurationStr(props.total * 1000 - props.current * 1000) }
       </span>
