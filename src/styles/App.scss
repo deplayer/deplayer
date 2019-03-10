@@ -25,12 +25,14 @@ $button-bg-color: $inverted;
 // Own styles
 @import './alerts.scss';
 @import './buttons.scss';
+@import './links.scss';
 @import './searchBar.scss';
 @import './icons.scss';
 @import './form.scss';
 @import './player.scss';
 @import './sidebar.scss';
 @import './spinner.scss';
+@import './song-view.scss';
 
 html, body {
   height: 100%;
@@ -45,10 +47,6 @@ body {
   font-family: $font-family;
   color: $font-color;
   font-smoothing: antialiased;
-}
-
-a {
-  outline: none;
 }
 
 #root {
@@ -147,87 +145,6 @@ a {
   height: 100%;
 }
 
-.song-view {
-  grid-area: contents;
-  position: relative;
-  overflow-y: auto;
-
-  .image {
-    grid-area: image;
-    height: 100vw;
-
-    @include media-breakpoint-up(md) {
-      height: 60vh;
-    }
-  }
-
-  @include media-breakpoint-up(md) {
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-
-  .song {
-
-    @include media-breakpoint-up(md) {
-      display: grid;
-      height: 100%;
-      width: 100%;
-      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-      grid-template-areas: "image image meta meta meta";
-    }
-
-    .content {
-      grid-area: meta;
-      position: absolute;
-      padding-left: 20px;
-      padding-right: 20px;
-
-      table {
-        background-color: $body-bg-color;
-
-        tr {
-          &:first-child {
-            font-size: 36px;
-            line-height: 30px;
-
-            td {
-              padding-right: 12px;
-              padding-left: 12px;
-            }
-          }
-
-          td {
-            padding-right: 12px !important;
-            padding-left: 12px !important;
-            &:first-child {
-
-              @include media-breakpoint-up(md) {
-                text-align: right;
-              }
-            }
-
-            border-color: transparent !important;
-          }
-        }
-      }
-
-      @include media-breakpoint-up(md) {
-        position: relative;
-      }
-
-      .header {
-        color: $font-color;
-        font-size: 1.8em;
-
-      }
-      .meta {
-        color: $font-color;
-        font-size: 1.5em;
-      }
-    }
-  }
-}
-
 span.label {
   color: $secondary-color;
   background-color: $yellow-color;
@@ -255,16 +172,6 @@ span.label {
 
 .share-buttons {
   text-align: right;
-}
-
-.volume-control {
-  width: 20%;
-  @extend .form-group;
-  align-self: flex-end;
-
-  input {
-    width: 100%;
-  }
 }
 
 input.form-control:focus ,

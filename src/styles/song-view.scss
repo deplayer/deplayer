@@ -1,0 +1,80 @@
+.song-view {
+  grid-area: contents;
+  position: relative;
+  overflow-y: auto;
+
+  .image {
+    grid-area: image;
+    height: 100vw;
+
+    @include media-breakpoint-up(md) {
+      height: 60vh;
+    }
+  }
+
+  @include media-breakpoint-up(md) {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .song {
+
+    @include media-breakpoint-up(md) {
+      display: grid;
+      height: 100%;
+      width: 100%;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+      grid-template-areas: "image image meta meta meta";
+    }
+
+    .content {
+      grid-area: meta;
+      position: absolute;
+      padding-left: 20px;
+      padding-right: 20px;
+
+      table {
+        background-color: $body-bg-color;
+
+        tr {
+          &:first-child {
+            font-size: 36px;
+            line-height: 30px;
+
+            td {
+              padding-right: 12px;
+              padding-left: 12px;
+            }
+          }
+
+          td {
+            padding-right: 12px !important;
+            padding-left: 12px !important;
+            &:first-child {
+
+              @include media-breakpoint-up(md) {
+                text-align: right;
+              }
+            }
+
+            border-color: transparent !important;
+          }
+        }
+      }
+
+      @include media-breakpoint-up(md) {
+        position: relative;
+      }
+
+      .header {
+        color: $font-color;
+        font-size: 1.8em;
+
+      }
+      .meta {
+        color: $font-color;
+        font-size: 1.5em;
+      }
+    }
+  }
+}
