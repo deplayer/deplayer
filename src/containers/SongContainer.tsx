@@ -1,7 +1,5 @@
-// @flow
-
 import { connect } from 'react-redux'
-import React from 'react'
+import * as React from 'react'
 import { withRouter } from 'react-router-dom'
 
 import SongView from '../components/SongView'
