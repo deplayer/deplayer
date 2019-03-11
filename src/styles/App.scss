@@ -91,8 +91,15 @@ body {
     padding-right: 10px;
     padding-top: 10px;
     padding-bottom: 10px;
-    border-top: 4px solid;
-    border-bottom: 4px solid $body-bg-color;
+    border-top: 1px solid $primary-color;
+    border-bottom: 1px solid $body-bg-color;
+
+    &.current {
+      background-color: lighten($body-bg-color, 8%);
+      color: #fff;
+      border-top: 1px solid #fff;
+      border-bottom: 1px solid #fff;
+    }
 
     .media-info {
       color: $secondary-color;
@@ -163,11 +170,6 @@ span.label {
 }
 
 .song-row {
-  &.current {
-    background-color: $body-bg-color;
-    color: #fff;
-  }
-
   h4, h5, h6 {
     margin: 0;
     padding: 0;

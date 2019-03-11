@@ -1,6 +1,6 @@
 // @flow
 
-import reducer, {defaultState, searchObj, filterSongs} from './collection'
+import reducer, {defaultState, filterSongs} from './collection'
 import { RECEIVE_COLLECTION } from '../constants/ActionTypes'
 import Song from '../entities/Song'
 
@@ -20,17 +20,6 @@ describe('collection reducer', () => {
     expect(reducer(defaultState, {type: RECEIVE_COLLECTION, data: [fixtureSong]}))
       .toEqual(expected)
   })
-})
-
-describe('searchObj', () => {
-  const fixtureSong = new Song({
-    title: 'test'
-  })
-
-  expect(searchObj(fixtureSong, new RegExp('test', 'gim')))
-    .toEqual(true)
-  expect(searchObj(fixtureSong, new RegExp('nonfound', 'gim')))
-    .toEqual(false)
 })
 
 describe('filterSongs', () => {

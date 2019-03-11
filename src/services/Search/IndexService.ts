@@ -1,13 +1,14 @@
-import elasticlunr from 'elasticlunr'
+import * as elasticlunr from 'elasticlunr'
 
 export default class IndexService {
   index: any
 
   generateIndexFrom(collection) {
     this.index = elasticlunr(function () {
-      this.addField('album')
-      this.addField('artistName')
       this.addField('title')
+      this.addField('artistName')
+    }, {
+      bool: 'AND'
     })
 
     this.index.saveDocument(false)
@@ -16,12 +17,18 @@ export default class IndexService {
       this.index.addDoc(doc)
     })
 
-
     return this
   }
 
   search(searchTerm: string) {
-    const results = this.index.search(searchTerm)
+    const results = this.index.search(searchTerm, {
+      fields: {
+        artistName: {boost: 2},
+        title: {boost: 1}
+      },
+      bool: 'AND',
+      expand: true
+    })
     return results
   }
 }

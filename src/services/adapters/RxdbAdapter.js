@@ -10,7 +10,6 @@ export default class RxdbAdapter implements IAdapter {
 
   save = (model: string, id: string, payload: any): Promise<any> => {
     const fixedPayload = {_id: id, ...payload}
-    console.log('Saving: ', fixedPayload)
     return db.get().then((instance) => {
       return instance[model].upsert(fixedPayload)
     })

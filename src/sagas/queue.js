@@ -20,7 +20,7 @@ export const getQueue = (state: any): any => {
 export function* playAll(action: any): Generator<void, void, void> {
   const songs = yield select(getSongs)
   yield put({type: types.ADD_SONGS_TO_QUEUE, songs: songs})
-  if (songs[0]) {
+  if (songs.length) {
     yield put({type: types.SET_CURRENT_PLAYING, songId: songs[0].id})
     yield put({type: types.START_PLAYING})
   }

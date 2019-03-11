@@ -19,27 +19,16 @@ const getKeys = (rows: any): Array<string> => {
   return Object.keys(rows)
 }
 
-export const searchObj = (obj: any, query: RegExp): boolean => {
-  for (var key in obj) {
-    var value = obj[key]
-
-    if (typeof value === 'object') {
-        searchObj(value, query)
-    }
-
-    if (query.test(value)) {
-      return true
-    }
-  }
-
-  return false
-}
-
 export const filterSongs = (songs: any, term: string) => {
   const songsArray = getKeys(songs).map((key) => {
     return songs[key]
   })
 
+  if (!term || term === '') {
+    return songsArray
+  }
+
+  // TODO: Save, cache and load index from db
   const indexService = new IndexService()
   const results = indexService
     .generateIndexFrom(songsArray)
