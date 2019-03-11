@@ -21,7 +21,7 @@ export function* search(action: SearchAction): any {
   try {
     const settings = yield select(getSettings)
     const providersService = new ProvidersService(settings)
-    // yield call(goToHomePage)
+    yield call(goToSearchResults)
     const searchPromises = yield call(providersService.search, action.searchTerm)
     const searchResults = yield all(searchPromises)
     for (const result in searchResults) {
@@ -42,8 +42,8 @@ export function* generateIndex(action): any {
 }
 
 // Going to home page
-export function* goToHomePage(): any {
-  yield history.push('/')
+export function* goToSearchResults(): any {
+  yield history.push('/search-results')
 }
 
 // Extract settings from state

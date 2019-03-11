@@ -3,7 +3,7 @@ import * as elasticlunr from 'elasticlunr'
 export default class IndexService {
   index: any
 
-  generateIndexFrom(collection) {
+  constructor() {
     this.index = elasticlunr(function () {
       this.addField('title')
       this.addField('artistName')
@@ -12,7 +12,9 @@ export default class IndexService {
     })
 
     this.index.saveDocument(false)
+  }
 
+  generateIndexFrom(collection) {
     collection.forEach((doc) => {
       this.index.addDoc(doc)
     })

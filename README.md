@@ -4,10 +4,11 @@
 
 Media player thought to run entirelly in the web browser.
 
-## Planned features
+## Current features
 
-* Multi provider music streaming services song retrieval
-  * iTunes API
+* Progressive Web App
+* Fulltext search support thanks to [elasticlunr](https://elasticlunr.com/).
+* Support for Subsonic API.
 
 ## Keyboard hotkeys
 

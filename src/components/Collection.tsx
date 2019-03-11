@@ -1,6 +1,4 @@
-// @flow
-
-import React from 'react';
+import * as React from 'react'
 import { Dispatch } from 'redux'
 
 import MusicTable from './MusicTable/MusicTable'
@@ -18,18 +16,14 @@ const Collection = (props: Props) => {
     return null
   }
 
-  const collectionRef = React.createRef()
-
   return (
     <div
       className='collection'
-      ref={collectionRef}
     >
       <MusicTable
         queue={props.queue}
         tableIds={props.collection.visibleSongs}
         totalSongs={props.collection.totalRows}
-        forwardedRef={collectionRef}
         disableAddButton
         {...props}
       />

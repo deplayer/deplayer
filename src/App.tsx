@@ -95,6 +95,7 @@ class App extends React.Component<any> {
             <Route exact path="/" component={Home} />
             <Route path="/index.html" component={Home} />
             <Route path="/collection" component={Collection} />
+            <Route path="/search-results" component={Collection} />
             <Route path="/song/:id" component={Song} />
             <Route path="/settings" component={Settings} />
             <PlayerContainer />
