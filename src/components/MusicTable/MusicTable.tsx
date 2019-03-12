@@ -61,6 +61,9 @@ const MusicTable = (props: Props) => {
     )
   }
 
+  // Track the position of current playing to jump there
+  const currentIndex = props.tableIds.indexOf(props.queue.currentPlaying)
+
   return (
     <React.Fragment>
       <AutoSizer className='music-table'>
@@ -72,6 +75,7 @@ const MusicTable = (props: Props) => {
             rowRenderer={rowRenderer}
             width={width}
             overscanRowCount={6}
+            scrollToIndex={currentIndex}
             recomputeRowHeights
           />
         )}
