@@ -1,6 +1,4 @@
-// @flow
-
-import React from 'react'
+import * as React from 'react'
 import { Dispatch } from 'redux'
 import { withRouter } from 'react-router-dom'
 
