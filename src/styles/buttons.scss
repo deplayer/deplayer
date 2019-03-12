@@ -1,3 +1,22 @@
+.button {
+  a {
+    color: $button-color-hover;
+    @extend .btn;
+  }
+  &.current {
+    a {
+      color: $green-color;
+      text-shadow: 0px 0px 5px $green-color;
+    }
+
+    border-bottom: solid 1px $green-color;
+  }
+
+  i {
+    padding-left: 2px;
+  }
+}
+
 .btn,
 button {
   @extend .btn;

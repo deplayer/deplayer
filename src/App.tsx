@@ -10,8 +10,8 @@ import SettingsContainer from './containers/SettingsContainer'
 import configureStore from './store/configureStore'
 import history from './store/configureHistory'
 
-import PlaylistButton from './components/PlaylistButton'
-import CollectionButton from './components/CollectionButton'
+import PlaylistButton from './components/Buttons/PlaylistButton'
+import CollectionButton from './components/Buttons/CollectionButton'
 import SettingsButton from './components/Buttons/SettingsButton'
 import PlayAllButton from './components/Buttons/PlayAllButton'
 import ClearQueueButton from './components/Buttons/ClearQueueButton'
@@ -30,7 +30,7 @@ const Home = () => {
   return (
     <React.Fragment>
       <SidebarContainer>
-        <PlaylistButton />
+        <PlaylistButton current />
         <CollectionButton />
         <SettingsButton />
         <ClearQueueButton />
@@ -61,7 +61,7 @@ const Settings = () => {
       <SidebarContainer>
         <PlaylistButton />
         <CollectionButton />
-        <SettingsButton />
+        <SettingsButton current />
       </SidebarContainer>
 
       <SettingsContainer />
