@@ -27,7 +27,6 @@ export function* search(action: SearchAction): any {
     for (const result in searchResults) {
       yield put({type: types.SEARCH_FULLFILLED, result: searchResults[result]})
       yield put({type: types.ADD_TO_COLLECTION, data: searchResults[result]})
-      yield put({type: types.ADD_SONGS_TO_QUEUE, songs: searchResults[result]})
     }
   } catch (e) {
     yield put({type: types.SEARCH_REJECTED, message: e.message})
