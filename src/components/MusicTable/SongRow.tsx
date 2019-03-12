@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Translate } from 'react-redux-i18n'
 import { Dispatch } from 'redux'
+import { Link } from 'react-router-dom'
 
 import { getDurationStr } from '../../utils/timeFormatter'
 import Song from '../../entities/Song'
@@ -33,7 +34,13 @@ const SongRow = (props: Props) => {
         />
       </div>
       <ul className='media-info'>
-        <li className='title-label'><h4>{ song.title }</h4></li>
+        <li className='title-label'>
+          <h4>
+            <Link to={`/song/${song.id}`}>
+              { song.title }
+            </Link>
+            </h4>
+          </li>
         <li><h5>{ song.album ? song.album.name: nonAvailable }</h5></li>
         <li><h6>{ song.artist ? song.artist.name: nonAvailable }</h6></li>
         <li>{ getDurationStr(song.duration) }</li>

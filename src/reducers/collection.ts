@@ -69,6 +69,13 @@ export default (state: State = defaultState, action: any = {}) => {
       }
     }
 
+    case types.SET_SEARCH_TERM: {
+      return {
+        ...state,
+        searchTerm: action.searchTerm
+      }
+    }
+
     default:
       return state
   }

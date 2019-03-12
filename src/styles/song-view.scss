@@ -37,6 +37,10 @@
       padding-left: 20px;
       padding-right: 20px;
 
+      @include media-breakpoint-up(md) {
+        padding: 50px;
+      }
+
       table {
         background-color: $body-bg-color;
 
