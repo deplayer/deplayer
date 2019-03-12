@@ -16,6 +16,7 @@ type Props = {
   showInCenter: boolean,
   children: any,
   searchTerm: string,
+  searchToggled: boolean,
   error: string
 }
 
@@ -28,8 +29,12 @@ class Sidebar extends React.Component<Props, State> {
   }
   timer: any
   searchInput: any
+  props: Props
 
-  componentWillMount() {
+  constructor(props: Props){
+    super(props);
+
+    this.props = props
     this.timer = null
   }
 
@@ -71,6 +76,30 @@ class Sidebar extends React.Component<Props, State> {
     this.setState({focus: false})
   }
 
+  renderSearch = (props) => {
+    if (!props.searchToggled) {
+      return null;
+    }
+
+    return (
+      <div
+        className={`search-bar ui huge action icon input inverted ${this.props.loading ? 'loading': ''}`}
+      >
+        <input
+          ref={(input) => { this.searchInput = input }}
+          onChange={this.onSearchChange}
+          onFocus={this.onFocus}
+          onBlur={this.onFocusOut}
+          value={this.props.searchTerm}
+          placeholder={ I18n.t('placeholder.search') }
+          type='text'
+        />
+        { this.props.loading ? <i className='icon fa fa-spinner'></i> : <i className='icon search'></i> }
+        { this.props.error ?  <div className='alert search'>{ this.props.error }</div> : null }
+      </div>
+    )
+  }
+
   render() {
     const { children } = this.props
 
@@ -87,21 +116,7 @@ class Sidebar extends React.Component<Props, State> {
             onKeyHandle={this.setFocus}
           />
           <ConnectionStatus />
-          <div
-            className={`search-bar ui huge action icon input inverted ${this.props.loading ? 'loading': ''}`}
-          >
-            <input
-              ref={(input) => { this.searchInput = input }}
-              onChange={this.onSearchChange}
-              onFocus={this.onFocus}
-              onBlur={this.onFocusOut}
-              value={this.props.searchTerm}
-              placeholder={ I18n.t('placeholder.search') }
-              type='text'
-            />
-            { this.props.loading ? <i className='fa fa-loading'></i> : <i className='icon search'></i> }
-            { this.props.error ?  <div className='alert search'>{ this.props.error }</div> : null }
-          </div>
+          { this.renderSearch(this.props) }
           {  !this.state.focus ? childrenWithProps : null }
         </div>
       </React.Fragment>

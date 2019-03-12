@@ -3,13 +3,15 @@ import * as types from '../constants/ActionTypes'
 type State = {
   error: string,
   searchTerm: string,
-  loading: boolean
+  loading: boolean,
+  searchToggled: boolean
 }
 
 export const defaultState = {
   error: '',
   searchTerm: '',
-  loading: false
+  loading: false,
+  searchToggled: false
 }
 
 export default (state: State = defaultState, action: any = {}) => {
@@ -18,6 +20,13 @@ export default (state: State = defaultState, action: any = {}) => {
       return {
         ...state,
         searchTerm: action.searchTerm
+      }
+    }
+
+    case types.TOGGLE_SEARCH: {
+      return {
+        ...state,
+        searchToggled: !state.searchToggled
       }
     }
 

@@ -9,6 +9,7 @@ const setup = (customProps: any) => {
   const defaultProps = {
     dispatch: () => {},
     loading: false,
+    searchToggled: true,
     playlist: {}
   }
 

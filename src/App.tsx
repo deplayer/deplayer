@@ -10,6 +10,7 @@ import SettingsContainer from './containers/SettingsContainer'
 import configureStore from './store/configureStore'
 import history from './store/configureHistory'
 
+import SearchButton from './components/Buttons/SearchButton'
 import PlaylistButton from './components/Buttons/PlaylistButton'
 import CollectionButton from './components/Buttons/CollectionButton'
 import SettingsButton from './components/Buttons/SettingsButton'
@@ -30,6 +31,7 @@ const Home = () => {
   return (
     <React.Fragment>
       <SidebarContainer>
+        <SearchButton />
         <PlaylistButton current />
         <CollectionButton />
         <SettingsButton />
@@ -45,6 +47,7 @@ const Collection = () => {
   return (
     <React.Fragment>
       <SidebarContainer>
+        <SearchButton />
         <PlaylistButton />
         <CollectionButton current />
         <SettingsButton />
@@ -59,6 +62,7 @@ const Settings = () => {
   return (
     <React.Fragment>
       <SidebarContainer>
+        <SearchButton />
         <PlaylistButton />
         <CollectionButton />
         <SettingsButton current />
@@ -73,6 +77,7 @@ const Song = () => {
   return (
     <React.Fragment>
       <SidebarContainer>
+        <SearchButton />
         <PlaylistButton />
         <CollectionButton />
         <SettingsButton />
