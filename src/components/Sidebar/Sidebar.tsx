@@ -4,10 +4,9 @@ import KeyHandler, {KEYPRESS} from 'react-key-handler'
 import { I18n } from 'react-redux-i18n'
 
 import ConnectionStatus from '../Connection/ConnectionStatus'
-import { START_SEARCH } from '../../constants/ActionTypes'
+import * as types from '../../constants/ActionTypes'
 
 type State = {
-  searchTerm: string,
   focus: boolean,
 }
 
@@ -25,7 +24,6 @@ const ENTER_KEY = 13
 
 class Sidebar extends React.Component<Props, State> {
   state = {
-    searchTerm: '',
     focus: false
   }
   timer: any
@@ -38,7 +36,10 @@ class Sidebar extends React.Component<Props, State> {
   // Handling searchTerm text change
   onSearchChange = (event:  React.FormEvent<HTMLInputElement>) => {
     clearTimeout(this.timer)
-    this.setState({ searchTerm: event.currentTarget.value})
+    this.props.dispatch({
+      type: types.SET_SEARCH_TERM,
+      searchTerm: event.currentTarget.value
+    })
     this.timer = setTimeout(this.triggerChange, WAIT_INTERVAL)
   }
 
@@ -51,9 +52,9 @@ class Sidebar extends React.Component<Props, State> {
 
   // Starting to search when the user press enter key or stops to writte in the interval
   triggerChange = () => {
-    if (this.state.searchTerm) {
+    if (this.props.searchTerm) {
       this.props.dispatch( {
-        type: START_SEARCH, searchTerm: this.state.searchTerm
+        type: types.START_SEARCH, searchTerm: this.props.searchTerm
       })
     }
   }
@@ -94,6 +95,7 @@ class Sidebar extends React.Component<Props, State> {
               onChange={this.onSearchChange}
               onFocus={this.onFocus}
               onBlur={this.onFocusOut}
+              value={this.props.searchTerm}
               placeholder={ I18n.t('placeholder.search') }
               type='text'
             />

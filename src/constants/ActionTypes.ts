@@ -42,6 +42,7 @@ export const CLEAR_QUEUE = 'CLEAR_QUEUE'
 export const SHUFFLE = 'SHUFFLE'
 
 // Search
+export const SET_SEARCH_TERM = 'SET_SEARCH_TERM'
 export const START_SEARCH = 'START_SEARCH'
 export const SEARCH_FULLFILLED = 'SEARCH_FULLFILLED'
 export const SEARCH_REJECTED = 'SEARCH_REJECTED'

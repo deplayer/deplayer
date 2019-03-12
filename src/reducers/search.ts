@@ -2,6 +2,7 @@ import * as types from '../constants/ActionTypes'
 
 type State = {
   error: string,
+  searchTerm: string,
   loading: boolean
 }
 
@@ -13,6 +14,13 @@ export const defaultState = {
 
 export default (state: State = defaultState, action: any = {}) => {
   switch (action.type) {
+    case types.SET_SEARCH_TERM: {
+      return {
+        ...state,
+        searchTerm: action.searchTerm
+      }
+    }
+
     case types.START_SEARCH: {
       return {
         ...state,

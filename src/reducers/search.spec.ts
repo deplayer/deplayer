@@ -12,16 +12,16 @@ describe('search reducer', () => {
   })
 
   it('should handle START_SEARCH', () => {
-    expect(reducer({error: '', loading: false}, {type: START_SEARCH, searchTerm: 'Lorem'}))
+    expect(reducer({error: '', searchTerm: 'Lorem', loading: false}, {type: START_SEARCH, searchTerm: 'Lorem'}))
       .toEqual({loading: true, error: '', searchTerm: 'Lorem'})
   })
   it('should handle SEARCH_REJECTED', () => {
-    expect(reducer({error: '', loading: true}, {type: SEARCH_REJECTED, message: 'Testing error'}))
-      .toEqual({loading: false, error: 'Testing error'})
+    expect(reducer({error: '', searchTerm: '', loading: true}, {type: SEARCH_REJECTED, message: 'Testing error'}))
+      .toEqual({loading: false, error: 'Testing error', searchTerm: ''})
   })
   it('should handle SEARCH_FULLFILLED', () => {
-    expect(reducer({error: 'whatever', loading: true}, {type: SEARCH_FULLFILLED}))
-      .toEqual({loading: false, error: ''})
+    expect(reducer({error: 'whatever', searchTerm: '', loading: true}, {type: SEARCH_FULLFILLED}))
+      .toEqual({loading: false, error: '', searchTerm: ''})
   })
 })
 
