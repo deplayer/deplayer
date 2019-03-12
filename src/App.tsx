@@ -46,11 +46,10 @@ const Collection = () => {
     <React.Fragment>
       <SidebarContainer>
         <PlaylistButton />
-        <CollectionButton />
+        <CollectionButton current />
         <SettingsButton />
         <PlayAllButton />
       </SidebarContainer>
-
       <CollectionContainer />
     </React.Fragment>
   )
