@@ -1,5 +1,3 @@
-// @flow
-
 import reducer, {defaultState, filterSongs} from './collection'
 import { RECEIVE_COLLECTION } from '../constants/ActionTypes'
 import Song from '../entities/Song'
@@ -7,9 +5,7 @@ import Song from '../entities/Song'
 describe('collection reducer', () => {
   it('should return the initial state', () => {
     expect(reducer(undefined, {}))
-      .toEqual(
-        {"rows": {}, "totalRows": 0, "visibleSongs": []}
-      )
+      .toEqual( defaultState)
   })
 
   it('should handle RECEIVE_COLLECTION', () => {

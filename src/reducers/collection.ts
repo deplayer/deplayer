@@ -7,12 +7,14 @@ type State = {
   rows: any,
   totalRows: number,
   visibleSongs: Array<string>,
+  searchTerm: string
 }
 
 export const defaultState = {
   rows: {},
   totalRows: 0,
   visibleSongs: [],
+  searchTerm: ''
 }
 
 const getKeys = (rows: any): Array<string> => {
@@ -20,13 +22,13 @@ const getKeys = (rows: any): Array<string> => {
 }
 
 export const filterSongs = (songs: any, term: string) => {
+  if (!term || term === '') {
+    return Object.keys(songs)
+  }
+
   const songsArray = getKeys(songs).map((key) => {
     return songs[key]
   })
-
-  if (!term || term === '') {
-    return songsArray
-  }
 
   // TODO: Save, cache and load index from db
   const indexService = new IndexService()
@@ -50,11 +52,10 @@ export default (state: State = defaultState, action: any = {}) => {
         rows[row.id] = new Song(row)
       })
       const totalRows = {...state.rows, ...rows}
-      const visibleSongs = state.visibleSongs.length ? state.visibleSongs : getKeys(totalRows)
       return {
         ...state,
         rows: totalRows,
-        visibleSongs,
+        visibleSongs: filterSongs(rows, state.searchTerm),
         totalRows: state.totalRows + action.data.length
       }
     }
@@ -63,6 +64,7 @@ export default (state: State = defaultState, action: any = {}) => {
     case types.SEARCH_FINISHED: {
       return {
         ...state,
+        searchTerm: action.searchTerm,
         visibleSongs: filterSongs(state.rows, action.searchTerm)
       }
     }
