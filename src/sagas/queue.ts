@@ -1,5 +1,3 @@
-// @flow
-
 import { takeLatest, put, select, call } from 'redux-saga/effects'
 
 import { getAdapter } from '../services/adapters'
@@ -17,7 +15,7 @@ export const getQueue = (state: any): any => {
 }
 
 // Handling playAll saga
-export function* playAll(action: any): Generator<void, void, void> {
+export function* playAll(action: any): any {
   const songs = yield select(getSongs)
   yield put({type: types.ADD_SONGS_TO_QUEUE, songs: songs})
   if (songs.length) {
@@ -29,14 +27,14 @@ export function* playAll(action: any): Generator<void, void, void> {
 const adapter = getAdapter()
 const queueService = new QueueService(new adapter())
 
-export function* saveQueue(): Generator<void, void, void> {
+export function* saveQueue(): any {
   const queue = yield select(getQueue)
   yield call(queueService.save, 'queue', queue)
 }
 
 // Application initialization routines
 function* initialize() {
-  yield call(queueService.initialize)
+  yield queueService.initialize
   const queue = yield call(queueService.get)
   if (!queue) {
     yield put({type: types.GET_QUEUE_REJECTED})
@@ -47,7 +45,7 @@ function* initialize() {
 }
 
 // Binding actions to sagas
-function* queueSaga(): Generator<void, void, void> {
+function* queueSaga(): any {
   yield takeLatest(types.PLAY_ALL, playAll)
   yield takeLatest(types.ADD_SONGS_TO_QUEUE, saveQueue)
   yield takeLatest(types.INITIALIZED, initialize)
