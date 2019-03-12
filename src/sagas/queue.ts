@@ -17,9 +17,9 @@ export const getQueue = (state: any): any => {
 // Handling playAll saga
 export function* playAll(action: any): any {
   const songs = yield select(getSongs)
-  yield put({type: types.ADD_SONGS_TO_QUEUE, songs: songs})
   if (songs.length) {
-    yield put({type: types.SET_CURRENT_PLAYING, songId: songs[0].id})
+    yield put({type: types.ADD_SONGS_TO_QUEUE, songs: songs})
+    yield put({type: types.SET_CURRENT_PLAYING, songId: songs[0]})
     yield put({type: types.START_PLAYING})
   }
 }
