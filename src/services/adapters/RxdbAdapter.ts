@@ -1,5 +1,3 @@
-// @flow
-
 import { IAdapter } from './IAdapter'
 import * as db from './RxdbDatabase'
 
@@ -16,7 +14,7 @@ export default class RxdbAdapter implements IAdapter {
   }
 
   addMany(model: string, payload: Array<any>): Promise<any> {
-    const inserts = []
+    const inserts: Array<any> = []
     payload.forEach((item) => {
       const insertPromise = this.addItem(model, item)
 
@@ -35,7 +33,7 @@ export default class RxdbAdapter implements IAdapter {
   }
 
   removeMany(model: string, payload: Array<string>): Promise<any> {
-    const removes = []
+    const removes: Array<any> = []
     payload.forEach((item) => {
       const removePromise = this.getDocObj(model, item).then((doc) => doc.remove() )
 

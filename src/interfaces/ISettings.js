@@ -1,3 +1,3 @@
-export type IConfig = {
+export interface ISettings {
   providers: Array<any>
 }

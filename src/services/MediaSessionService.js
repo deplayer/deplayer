@@ -40,7 +40,7 @@ export default class MediaSessionService {
       return true
     }
 
-    console.log("This browser does not support media session")
+    // console.log("This browser does not support media session")
     return
   }
 }
