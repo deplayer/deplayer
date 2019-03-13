@@ -22,7 +22,7 @@ const MSidebar = (props: Props) => {
       sidebarId='left-sidebar'
       onSetOpen={onSetSidebarOpen}
     >
-     &nbsp;
+      <span style={{display: 'none'}}></span>
     </Sidebar>
   )
 }
