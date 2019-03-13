@@ -31,7 +31,7 @@ const Home = () => {
   return (
     <React.Fragment>
       <SidebarContainer>
-        <TopbarContainer>
+        <TopbarContainer title='Queue'>
           <SearchButton />
           <ClearQueueButton />
           <PlayAllButton />
@@ -48,7 +48,7 @@ const Collection = () => {
   return (
     <React.Fragment>
       <SidebarContainer>
-        <TopbarContainer>
+        <TopbarContainer title='Collection'>
           <SearchButton />
           <PlayAllButton />
         </TopbarContainer>
@@ -63,7 +63,7 @@ const Settings = () => {
   return (
     <React.Fragment>
       <SidebarContainer>
-        <TopbarContainer>
+        <TopbarContainer title='Settings'>
           <SearchButton />
         </TopbarContainer>
 
@@ -78,7 +78,7 @@ const Song = () => {
   return (
     <React.Fragment>
       <SidebarContainer>
-        <TopbarContainer>
+        <TopbarContainer title='song'>
           <SearchButton />
           <BackButton />
         </TopbarContainer>

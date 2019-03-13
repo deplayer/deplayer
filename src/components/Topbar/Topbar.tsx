@@ -11,6 +11,7 @@ type State = {
 }
 
 type Props = {
+  title?: string,
   dispatch: Dispatch,
   loading: boolean,
   showInCenter: boolean,
@@ -22,6 +23,16 @@ type Props = {
 
 const WAIT_INTERVAL = 1000
 const ENTER_KEY = 13
+
+const titleComponent = (title) => {
+  return (
+    <div>
+      <h2>
+        { title }
+      </h2>
+    </div>
+  )
+}
 
 class Topbar extends React.Component<Props, State> {
   state = {
@@ -101,7 +112,7 @@ class Topbar extends React.Component<Props, State> {
   }
 
   render() {
-    const { children } = this.props
+    const { children, title } = this.props
 
     const childrenWithProps = React.Children.map(children, child =>
       React.cloneElement(child, { dispatch: this.props.dispatch })
@@ -117,6 +128,7 @@ class Topbar extends React.Component<Props, State> {
             onKeyHandle={this.setFocus}
           />
           { this.renderSearch(this.props) }
+          {  !this.state.focus ? titleComponent(title): null }
           <div>
             {  !this.state.focus ? childrenWithProps : null }
           </div>
