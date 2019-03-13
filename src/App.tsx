@@ -12,9 +12,6 @@ import configureStore from './store/configureStore'
 import history from './store/configureHistory'
 
 import SearchButton from './components/Buttons/SearchButton'
-import PlaylistButton from './components/Buttons/PlaylistButton'
-import CollectionButton from './components/Buttons/CollectionButton'
-import SettingsButton from './components/Buttons/SettingsButton'
 import PlayAllButton from './components/Buttons/PlayAllButton'
 import ClearQueueButton from './components/Buttons/ClearQueueButton'
 import BackButton from './components/Buttons/BackButton'
@@ -31,16 +28,14 @@ const appStore = configureStore()
 const Home = () => {
   return (
     <React.Fragment>
-      <SidebarContainer />
-      <TopbarContainer>
-        <SearchButton />
-        <PlaylistButton current />
-        <CollectionButton />
-        <SettingsButton />
-        <ClearQueueButton />
-      </TopbarContainer>
+      <SidebarContainer>
+        <TopbarContainer>
+          <SearchButton />
+          <ClearQueueButton />
+        </TopbarContainer>
 
-      <QueueContainer />
+        <QueueContainer />
+      </SidebarContainer>
     </React.Fragment>
   )
 }
@@ -48,15 +43,13 @@ const Home = () => {
 const Collection = () => {
   return (
     <React.Fragment>
-      <SidebarContainer />
-      <TopbarContainer>
-        <SearchButton />
-        <PlaylistButton />
-        <CollectionButton current />
-        <SettingsButton />
-        <PlayAllButton />
-      </TopbarContainer>
-      <CollectionContainer />
+      <SidebarContainer>
+        <TopbarContainer>
+          <SearchButton />
+          <PlayAllButton />
+        </TopbarContainer>
+        <CollectionContainer />
+      </SidebarContainer>
     </React.Fragment>
   )
 }
@@ -64,15 +57,13 @@ const Collection = () => {
 const Settings = () => {
   return (
     <React.Fragment>
-      <SidebarContainer />
-      <TopbarContainer>
-        <SearchButton />
-        <PlaylistButton />
-        <CollectionButton />
-        <SettingsButton current />
-      </TopbarContainer>
+      <SidebarContainer>
+        <TopbarContainer>
+          <SearchButton />
+        </TopbarContainer>
 
-      <SettingsContainer />
+        <SettingsContainer />
+      </SidebarContainer>
     </React.Fragment>
   )
 }
@@ -80,16 +71,14 @@ const Settings = () => {
 const Song = () => {
   return (
     <React.Fragment>
-      <SidebarContainer />
-      <TopbarContainer>
-        <SearchButton />
-        <PlaylistButton />
-        <CollectionButton />
-        <SettingsButton />
-        <BackButton />
-      </TopbarContainer>
+      <SidebarContainer>
+        <TopbarContainer>
+          <SearchButton />
+          <BackButton />
+        </TopbarContainer>
 
-      <SongContainer />
+        <SongContainer />
+      </SidebarContainer>
     </React.Fragment>
   )
 }

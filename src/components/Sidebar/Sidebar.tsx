@@ -9,11 +9,6 @@ import QueueMenuItem from './QueueMenuItem'
 
 const Sidebar = require('react-sidebar').default;
 
-type Props = {
-  sidebarToggled: boolean,
-  dispatch: Dispatch
-}
-
 type ContentProps = {
   dispatch: Dispatch
 }
@@ -32,7 +27,15 @@ const SidebarContents = (props: ContentProps) => {
   )
 }
 
+type Props = {
+  sidebarToggled: boolean,
+  children: any,
+  dispatch: Dispatch
+}
+
 const MSidebar = (props: Props) => {
+  const { children } = props
+
   const onSetSidebarOpen = (open) => {
     props.dispatch({type: types.TOGGLE_SIDEBAR})
   }
@@ -47,12 +50,13 @@ const MSidebar = (props: Props) => {
     <Sidebar
       sidebar={contents}
       open={props.sidebarToggled}
+      docked={props.sidebarToggled}
       sidebarId='left-sidebar'
       overlayId='left-sidebar-overlay'
       contentId='left-sidebar-content'
       onSetOpen={onSetSidebarOpen}
     >
-      <span style={{display: 'none'}}></span>
+      { children }
     </Sidebar>
   )
 }
