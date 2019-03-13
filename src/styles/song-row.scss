@@ -1,0 +1,91 @@
+.show-cover {
+  &::after {
+    content: $fa-var-play-circle-o;
+    text-align: center;
+    font-size: 60px;
+    color: $secondary-color;
+    background-color: rgba(77, 148, 170, 0.5);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}
+
+.song-row {
+  h4, h5, h6 {
+    margin: 0;
+    padding: 0;
+  }
+
+  h4 {
+    font-size: 1.1rem;
+    color: $secondary-color;
+  }
+
+  h5, h6 {
+    font-size: 1rem;
+    color: $primary-color;
+  }
+
+  .media-thumb {
+    cursor: pointer;
+    position: relative;
+
+    &:hover {
+      @extend .show-cover;
+    }
+  }
+
+  height: 100px;
+  @extend .d-flex;
+  @extend .justify-content-between;
+  width: 100%;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-top: 1px solid $primary-color;
+  border-bottom: 1px solid $body-bg-color;
+
+  &.current {
+    background-color: lighten($body-bg-color, 8%);
+    color: #fff;
+    border-top: 1px solid #fff;
+    border-bottom: 1px solid #fff;
+
+    .media-thumb {
+      @extend .show-cover;
+    }
+  }
+
+  .media-info {
+    color: $secondary-color;
+    @extend .flex-grow-1;
+    padding-left: 10px;
+    padding-right: 10px;
+    @extend .list-unstyled;
+  }
+
+  .media-actions {
+    width: 100%;
+    max-width: 40px;
+  }
+
+  .label {
+    margin-right: 5px;
+
+    @include media-breakpoint-up(md) {
+      display: none;
+    }
+  }
+
+  .collapsing {
+    width: 100vw;
+
+    @include media-breakpoint-up(md) {
+      height: 60px;
+    }
+  }
+}

@@ -17,7 +17,7 @@ const SidebarContents = (props: ContentProps) => {
   return (
     <div>
       <CloseButton dispatch={props.dispatch} />
-
+      <h4>genar-radio</h4>
       <ul>
         <li><QueueMenuItem /></li>
         <li><CollectionMenuItem /></li>
