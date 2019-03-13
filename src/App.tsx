@@ -4,6 +4,7 @@ import { Provider } from 'react-redux'
 import QueueContainer from './containers/QueueContainer'
 import CollectionContainer from './containers/CollectionContainer'
 import PlayerContainer from './containers/PlayerContainer'
+import Placeholder from './components/Player/Placeholder'
 import SidebarContainer from './containers/SidebarContainer'
 import TopbarContainer from './containers/TopbarContainer'
 import SongContainer from './containers/SongContainer'
@@ -25,6 +26,7 @@ require('./styles/App.scss')
 
 const appStore = configureStore()
 
+// TODO: Make a HOC
 const Home = () => {
   return (
     <React.Fragment>
@@ -32,10 +34,11 @@ const Home = () => {
         <TopbarContainer>
           <SearchButton />
           <ClearQueueButton />
+          <PlayAllButton />
         </TopbarContainer>
 
         <QueueContainer />
-        <PlayerContainer />
+        <Placeholder />
       </SidebarContainer>
     </React.Fragment>
   )
@@ -50,7 +53,7 @@ const Collection = () => {
           <PlayAllButton />
         </TopbarContainer>
         <CollectionContainer />
-        <PlayerContainer />
+        <Placeholder />
       </SidebarContainer>
     </React.Fragment>
   )
@@ -65,7 +68,7 @@ const Settings = () => {
         </TopbarContainer>
 
         <SettingsContainer />
-        <PlayerContainer />
+        <Placeholder />
       </SidebarContainer>
     </React.Fragment>
   )
@@ -81,7 +84,7 @@ const Song = () => {
         </TopbarContainer>
 
         <SongContainer />
-        <PlayerContainer />
+        <Placeholder />
       </SidebarContainer>
     </React.Fragment>
   )
@@ -100,6 +103,7 @@ class App extends React.Component<any> {
             <Route path="/search-results" component={Collection} />
             <Route path="/song/:id" component={Song} />
             <Route path="/settings" component={Settings} />
+            <PlayerContainer />
           </React.Fragment>
         </Router>
       </Provider>

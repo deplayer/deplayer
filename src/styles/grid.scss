@@ -1,0 +1,22 @@
+#root,
+#left-sidebar-content {
+  display: grid;
+  height: 100%;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+#left-sidebar-content {
+  grid-template-areas: "topbar topbar topbar topbar" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "placeholder placeholder placeholder placeholder";
+}
+
+#root {
+  grid-template-areas: "undefined undefined undefined undefined" "undefined undefined undefined undefined" "undefined undefined undefined undefined" "undefined undefined undefined undefined" "undefined undefined undefined undefined" "undefined undefined undefined undefined" "undefined undefined undefined undefined" "undefined undefined undefined undefined" "undefined undefined undefined undefined" "undefined undefined undefined undefined" "undefined undefined undefined undefined" "player player player player";
+}
+
+.placeholder {
+  overflow: hidden;
+  grid-area: placeholder;
+  position: relative;
+  min-height: 122px;
+}

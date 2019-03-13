@@ -12,6 +12,7 @@ $fa-font-path: "./fonts" !default;
 @import './variables.scss';
 
 // Own styles
+@import './grid.scss';
 @import './alerts.scss';
 @import './buttons.scss';
 @import './links.scss';
@@ -42,14 +43,6 @@ body {
   font-family: $font-family;
   color: $font-color;
   font-smoothing: antialiased;
-}
-
-#left-sidebar-content {
-  display: grid;
-  height: 100%;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-  grid-template-areas: "topbar topbar topbar topbar" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "contents contents contents contents" "player player player player";
 }
 
 .library-controls {
