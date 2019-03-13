@@ -9,18 +9,7 @@ $fa-font-path: "./fonts" !default;
   src: local('DOS'), url('fonts/Fixedsys500c.woff') format('woff');
 }
 
-$font-family: DOS,SimHei,Monaco,Menlo,Consolas,'Courier New',monospace;
-$primary-color: #4d94aa;
-$font-color: $primary-color;
-$inverted: $primary-color;
-$secondary-color: #fefe54;
-$background-color: #101010;
-$body-bg-color: $background-color;
-$green-color: rgba(51, 255, 0, 1);
-$yellow-color: #a50;
-$button-color: $secondary-color;
-$button-color-hover: $yellow-color;
-$button-bg-color: $inverted;
+@import './variables.scss';
 
 // Own styles
 @import './alerts.scss';
@@ -55,8 +44,7 @@ body {
   font-smoothing: antialiased;
 }
 
-#left-sidebar-content,
-#root {
+#left-sidebar-content {
   display: grid;
   height: 100%;
   grid-template-columns: 1fr 1fr 1fr 1fr;

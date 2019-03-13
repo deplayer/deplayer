@@ -35,6 +35,7 @@ const Home = () => {
         </TopbarContainer>
 
         <QueueContainer />
+        <PlayerContainer />
       </SidebarContainer>
     </React.Fragment>
   )
@@ -49,6 +50,7 @@ const Collection = () => {
           <PlayAllButton />
         </TopbarContainer>
         <CollectionContainer />
+        <PlayerContainer />
       </SidebarContainer>
     </React.Fragment>
   )
@@ -63,6 +65,7 @@ const Settings = () => {
         </TopbarContainer>
 
         <SettingsContainer />
+        <PlayerContainer />
       </SidebarContainer>
     </React.Fragment>
   )
@@ -78,6 +81,7 @@ const Song = () => {
         </TopbarContainer>
 
         <SongContainer />
+        <PlayerContainer />
       </SidebarContainer>
     </React.Fragment>
   )
@@ -96,7 +100,6 @@ class App extends React.Component<any> {
             <Route path="/search-results" component={Collection} />
             <Route path="/song/:id" component={Song} />
             <Route path="/settings" component={Settings} />
-            <PlayerContainer />
           </React.Fragment>
         </Router>
       </Provider>
