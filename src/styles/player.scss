@@ -3,6 +3,7 @@
   grid-area: player;
   background-color: $body-bg-color;
   padding: 10px;
+  z-index: 0;
 
   .player-contents {
     @extend .d-flex;

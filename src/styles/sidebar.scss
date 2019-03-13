@@ -1,0 +1,17 @@
+#left-sidebar {
+  background-color: $background-color;
+
+  ul {
+    padding: 50px;
+    @extend .list-unstyled;
+  }
+
+  .close-button {
+    float: right;
+    font-size: 30px;
+  }
+}
+
+#left-sidebar-content {
+  z-index: 0;
+}
