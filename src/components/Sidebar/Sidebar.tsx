@@ -19,10 +19,10 @@ const MSidebar = (props: Props) => {
     <Sidebar
       sidebar={<b>Sidebar content</b>}
       open={props.sidebarToggled}
+      sidebarId='left-sidebar'
       onSetOpen={onSetSidebarOpen}
-      styles={{ sidebar: { background: "white" } }}
     >
-      Test
+     &nbsp;
     </Sidebar>
   )
 }
