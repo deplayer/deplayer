@@ -1,6 +1,4 @@
-// @flow
-
-import uuidv4 from 'uuid'
+import * as uuidv4 from 'uuid'
 
 export default class Artist {
   id: string

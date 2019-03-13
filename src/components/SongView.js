@@ -52,7 +52,7 @@ export default class SongView extends Component<Props> {
                     <span className='label'><Translate value='song.label.album' /></span>
                   </div>
                   <div>
-                    { song.album.name }
+                    { song.albumName || 'N/A' }
                   </div>
                 </div>
                 <div>

@@ -10,8 +10,17 @@
   background-color: lighten($body-bg-color, 8%);
 
   ul {
-    padding: 10px;
     @extend .list-unstyled;
+    padding-top: 15px;
+
+    li {
+      padding-top: 5px;
+      padding-bottom: 5px;
+      padding-left: 10px;
+      padding-right: 10px;
+
+      border-top: 1px solid $primary-color;
+    }
   }
 
   .close-button {
