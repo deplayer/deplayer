@@ -15,7 +15,7 @@ const SettingsMenuItem = ({current = false}: Props) => {
   return (
     <div className={ classNames }>
       <Link
-        to="/"
+        to="/settings"
         title="settings"
       >
         <i className='icon cogs outline'></i>

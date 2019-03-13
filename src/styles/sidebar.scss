@@ -2,13 +2,18 @@
   background-color: $background-color;
 
   ul {
-    padding: 50px;
+    padding: 30px;
+    padding-right: 80px;
     @extend .list-unstyled;
   }
 
   .close-button {
     float: right;
     font-size: 30px;
+  }
+
+  i {
+    margin-right: 10px;
   }
 }
 

@@ -37,6 +37,7 @@ $button-bg-color: $inverted;
 @import './neon.scss';
 @import './collection.scss';
 @import './sidebar.scss';
+@import './settings.scss';
 
 html, body {
   height: 100%;
@@ -67,13 +68,6 @@ body {
 
 .contents-container {
   overflow-y: auto;
-  grid-area: contents;
-}
-
-.settings {
-  overflow-y: auto;
-  padding-left: 40px;
-  padding-right: 40px;
   grid-area: contents;
 }
 
