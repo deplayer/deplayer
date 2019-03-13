@@ -2,8 +2,8 @@ import * as React from 'react'
 import { Dispatch } from 'redux'
 import KeyHandler, {KEYPRESS} from 'react-key-handler'
 import { I18n } from 'react-redux-i18n'
+import SidebarButton from '../Buttons/SidebarButton'
 
-import ConnectionStatus from '../Connection/ConnectionStatus'
 import * as types from '../../constants/ActionTypes'
 
 type State = {
@@ -110,14 +110,16 @@ class Topbar extends React.Component<Props, State> {
     return (
       <React.Fragment>
         <div className={`sidebar-container ${ this.props.showInCenter ? '': 'has-results'}`}>
+          <SidebarButton />
           <KeyHandler
             keyEventName={KEYPRESS}
             keyValue='/'
             onKeyHandle={this.setFocus}
           />
-          <ConnectionStatus />
           { this.renderSearch(this.props) }
-          {  !this.state.focus ? childrenWithProps : null }
+          <div>
+            {  !this.state.focus ? childrenWithProps : null }
+          </div>
         </div>
       </React.Fragment>
     )

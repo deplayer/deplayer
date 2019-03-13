@@ -12,16 +12,16 @@ describe('search reducer', () => {
   })
 
   it('should handle START_SEARCH', () => {
-    expect(reducer({error: '', searchTerm: 'Lorem', loading: false}, {type: START_SEARCH, searchTerm: 'Lorem'}))
-      .toEqual({loading: true, error: '', searchTerm: 'Lorem'})
+    expect(reducer({error: '', searchTerm: 'Lorem', loading: false, searchToggled: false}, {type: START_SEARCH, searchTerm: 'Lorem'}))
+      .toEqual({loading: true, error: '', searchTerm: 'Lorem', searchToggled: false})
   })
   it('should handle SEARCH_REJECTED', () => {
-    expect(reducer({error: '', searchTerm: '', loading: true}, {type: SEARCH_REJECTED, message: 'Testing error'}))
-      .toEqual({loading: false, error: 'Testing error', searchTerm: ''})
+    expect(reducer({error: '', searchTerm: '', loading: true, searchToggled: false}, {type: SEARCH_REJECTED, message: 'Testing error'}))
+      .toEqual({loading: false, error: 'Testing error', searchTerm: '', searchToggled: false})
   })
   it('should handle SEARCH_FULLFILLED', () => {
-    expect(reducer({error: 'whatever', searchTerm: '', loading: true}, {type: SEARCH_FULLFILLED}))
-      .toEqual({loading: false, error: '', searchTerm: ''})
+    expect(reducer({error: 'whatever', searchTerm: '', loading: true, searchToggled: false}, {type: SEARCH_FULLFILLED}))
+      .toEqual({loading: false, error: '', searchTerm: '', searchToggled: false})
   })
 })
 

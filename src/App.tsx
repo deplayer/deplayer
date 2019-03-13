@@ -4,6 +4,7 @@ import { Provider } from 'react-redux'
 import QueueContainer from './containers/QueueContainer'
 import CollectionContainer from './containers/CollectionContainer'
 import PlayerContainer from './containers/PlayerContainer'
+import SidebarContainer from './containers/SidebarContainer'
 import TopbarContainer from './containers/TopbarContainer'
 import SongContainer from './containers/SongContainer'
 import SettingsContainer from './containers/SettingsContainer'
@@ -30,6 +31,7 @@ const appStore = configureStore()
 const Home = () => {
   return (
     <React.Fragment>
+      <SidebarContainer />
       <TopbarContainer>
         <SearchButton />
         <PlaylistButton current />
@@ -46,6 +48,7 @@ const Home = () => {
 const Collection = () => {
   return (
     <React.Fragment>
+      <SidebarContainer />
       <TopbarContainer>
         <SearchButton />
         <PlaylistButton />
@@ -61,6 +64,7 @@ const Collection = () => {
 const Settings = () => {
   return (
     <React.Fragment>
+      <SidebarContainer />
       <TopbarContainer>
         <SearchButton />
         <PlaylistButton />
@@ -76,6 +80,7 @@ const Settings = () => {
 const Song = () => {
   return (
     <React.Fragment>
+      <SidebarContainer />
       <TopbarContainer>
         <SearchButton />
         <PlaylistButton />

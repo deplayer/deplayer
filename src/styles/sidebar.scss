@@ -1,7 +1,12 @@
 .sidebar-container {
   @extend .d-flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   box-shadow: 0px 8px 12px rgba(77, 148, 170, 0.5);
+
+  & > div {
+    @extend .d-flex;
+    justify-content: flex-end;
+  }
 
   padding-top: 10px;
   padding-bottom: 10px;
@@ -21,6 +26,7 @@
   .button {
     margin-left: 20px;
 
+    &.sidebar-button,
     &.connection-btn {
       margin-left: 0;
     }
