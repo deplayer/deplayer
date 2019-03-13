@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../../tests/configureEnzyme'
-import Sidebar from './Sidebar'
+import Topbar from './Topbar'
 
 configureEnzyme()
 
@@ -15,7 +15,7 @@ const setup = (customProps: any) => {
 
   const props = {...defaultProps, ...customProps}
 
-  const enzymeWrapper = shallow(<Sidebar {...props}/>)
+  const enzymeWrapper = shallow(<Topbar {...props}/>)
 
   return {
     props,
@@ -23,7 +23,7 @@ const setup = (customProps: any) => {
   }
 }
 
-describe('Sidebar', () => {
+describe('Topbar', () => {
   it('renders without crashing', () => {
     const { enzymeWrapper } = setup({})
     expect(enzymeWrapper.find('.search-bar').exists()).toBe(true)

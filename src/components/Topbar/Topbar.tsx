@@ -23,7 +23,7 @@ type Props = {
 const WAIT_INTERVAL = 1000
 const ENTER_KEY = 13
 
-class Sidebar extends React.Component<Props, State> {
+class Topbar extends React.Component<Props, State> {
   state = {
     focus: false
   }
@@ -124,4 +124,4 @@ class Sidebar extends React.Component<Props, State> {
   }
 }
 
-export default Sidebar
+export default Topbar

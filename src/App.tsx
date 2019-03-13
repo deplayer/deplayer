@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import QueueContainer from './containers/QueueContainer'
 import CollectionContainer from './containers/CollectionContainer'
 import PlayerContainer from './containers/PlayerContainer'
-import SidebarContainer from './containers/SidebarContainer'
+import TopbarContainer from './containers/TopbarContainer'
 import SongContainer from './containers/SongContainer'
 import SettingsContainer from './containers/SettingsContainer'
 import configureStore from './store/configureStore'
@@ -30,13 +30,13 @@ const appStore = configureStore()
 const Home = () => {
   return (
     <React.Fragment>
-      <SidebarContainer>
+      <TopbarContainer>
         <SearchButton />
         <PlaylistButton current />
         <CollectionButton />
         <SettingsButton />
         <ClearQueueButton />
-      </SidebarContainer>
+      </TopbarContainer>
 
       <QueueContainer />
     </React.Fragment>
@@ -46,13 +46,13 @@ const Home = () => {
 const Collection = () => {
   return (
     <React.Fragment>
-      <SidebarContainer>
+      <TopbarContainer>
         <SearchButton />
         <PlaylistButton />
         <CollectionButton current />
         <SettingsButton />
         <PlayAllButton />
-      </SidebarContainer>
+      </TopbarContainer>
       <CollectionContainer />
     </React.Fragment>
   )
@@ -61,12 +61,12 @@ const Collection = () => {
 const Settings = () => {
   return (
     <React.Fragment>
-      <SidebarContainer>
+      <TopbarContainer>
         <SearchButton />
         <PlaylistButton />
         <CollectionButton />
         <SettingsButton current />
-      </SidebarContainer>
+      </TopbarContainer>
 
       <SettingsContainer />
     </React.Fragment>
@@ -76,13 +76,13 @@ const Settings = () => {
 const Song = () => {
   return (
     <React.Fragment>
-      <SidebarContainer>
+      <TopbarContainer>
         <SearchButton />
         <PlaylistButton />
         <CollectionButton />
         <SettingsButton />
         <BackButton />
-      </SidebarContainer>
+      </TopbarContainer>
 
       <SongContainer />
     </React.Fragment>
