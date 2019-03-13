@@ -26,7 +26,10 @@ const SongRow = (props: Props) => {
       className={`song-row ${ props.isCurrent ? 'current': ''}`}
       style={props.style}
     >
-      <div className='media-thumb'>
+      <div
+        className='media-thumb'
+        onClick={props.onClick}
+      >
         <CoverImage
           cover={song.cover}
           size='thumbnail'

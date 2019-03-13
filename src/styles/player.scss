@@ -23,6 +23,11 @@
   padding-top: 5px;
   padding-bottom: 0;
   margin-bottom: 0;
+  font-size: 14px;
+
+  @include media-breakpoint-up(md) {
+    font-size: 20px;
+  }
 }
 
 .player-controls {

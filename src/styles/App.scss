@@ -184,6 +184,26 @@ span.label {
     font-size: 1rem;
     color: $primary-color;
   }
+
+  .media-thumb {
+    cursor: pointer;
+    position: relative;
+
+    &:hover {
+      &::after {
+        content: $fa-var-play-circle-o;
+        text-align: center;
+        font-size: 60px;
+        color: $secondary-color;
+        background-color: rgba(77, 148, 170, 0.5);
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+    }
+  }
 }
 
 .share-buttons {
