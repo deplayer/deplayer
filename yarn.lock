@@ -8606,6 +8606,15 @@ rc@^1.1.7, rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-audio-spectrum@^0.0.9:
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/react-audio-spectrum/-/react-audio-spectrum-0.0.9.tgz#c286e61cf02c6076359e1f97408d472579376b4d"
+  integrity sha512-ZkDQEFqG+rBzgsX9SjKcdZ6pfYSjHALH61FA97SnWCfzDEdFi55gnTs6MbwLe41sIBsGKUiPBTb+dKArG0LP2w==
+  dependencies:
+    prop-types "^15.6.0"
+    react "^16.1.0"
+    react-dom "^16.1.0"
+
 react-contexify@^4.0.0:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/react-contexify/-/react-contexify-4.0.1.tgz#154600f9a0cab6176e0d7f1900b76d0acf25ea8a"
@@ -8639,6 +8648,16 @@ react-dev-utils@6.0.0-next.3e165448:
     sockjs-client "1.1.4"
     strip-ansi "4.0.0"
     text-table "0.2.0"
+
+react-dom@^16.1.0:
+  version "16.8.4"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.8.4.tgz#1061a8e01a2b3b0c8160037441c3bf00a0e3bc48"
+  integrity sha512-Ob2wK7XG2tUDt7ps7LtLzGYYB6DXMCLj0G5fO6WeEICtT4/HdpOi7W/xLzZnR6RCG1tYza60nMdqtxzA8FaPJQ==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.2"
+    scheduler "^0.13.4"
 
 react-dom@^16.3.2:
   version "16.8.1"
@@ -8772,6 +8791,16 @@ react-virtualized@^9.21.0:
     loose-envify "^1.3.0"
     prop-types "^15.6.0"
     react-lifecycles-compat "^3.0.4"
+
+react@^16.1.0:
+  version "16.8.4"
+  resolved "https://registry.yarnpkg.com/react/-/react-16.8.4.tgz#fdf7bd9ae53f03a9c4cd1a371432c206be1c4768"
+  integrity sha512-0GQ6gFXfUH7aZcjGVymlPOASTuSjlQL4ZtVC5YKH+3JL6bBLCVO21DknzmaPlI90LN253ojj02nsapy+j7wIjg==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.2"
+    scheduler "^0.13.4"
 
 react@^16.3.2:
   version "16.8.1"
@@ -9395,6 +9424,14 @@ sax@^1.2.1, sax@^1.2.4:
 scheduler@^0.13.1:
   version "0.13.1"
   resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.13.1.tgz#1a217df1bfaabaf4f1b92a9127d5d732d85a9591"
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+
+scheduler@^0.13.4:
+  version "0.13.4"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.13.4.tgz#8fef05e7a3580c76c0364d2df5e550e4c9140298"
+  integrity sha512-cvSOlRPxOHs5dAhP9yiS/6IDmVAVxmk33f0CtTJRkmUWcb1Us+t7b1wqdzoC0REw2muC9V5f1L/w5R5uKGaepA==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"

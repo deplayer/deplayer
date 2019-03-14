@@ -142,6 +142,7 @@ class Player extends Component<Props, State> {
                   </h5>
                 </Link>
                 <audio
+                  id='player-audio'
                   ref={this.playerRef}
                   src={streamUri}
                   volume={ volume }

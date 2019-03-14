@@ -7,6 +7,7 @@ import { getDurationStr } from '../../utils/timeFormatter'
 import Song from '../../entities/Song'
 import CoverImage from './CoverImage'
 import ContextualMenu from './ContextualMenu'
+import Spectrum from './Spectrum'
 
 type Props = {
   song: Song,
@@ -49,6 +50,7 @@ const SongRow = (props: Props) => {
         <li>{ getDurationStr(song.duration) }</li>
       </ul>
       <ContextualMenu {...props} />
+      { props.isCurrent ? <Spectrum /> : null}
     </li>
   )
 }
