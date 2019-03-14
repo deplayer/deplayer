@@ -11,6 +11,12 @@ Media player thought to run entirelly in the web browser.
 * Support for Subsonic API.
 * Desktop and mobile notifications thanks to [Notification Web API](https://developer.mozilla.org/en-US/docs/Web/API/notification)
 
+## Music providers
+
+* Subsonic API
+* mStream API
+* iTunes API (it has only samples, usefull for testing)
+
 ## Keyboard hotkeys
 
 * Play/Pause: `space`

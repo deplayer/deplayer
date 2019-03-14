@@ -14,7 +14,6 @@ export default class SettingsService implements IStorageService {
 
   save = (id: string, payload: any): Promise<any> => {
     return this.storageAdapter.save('settings', id, payload)
-      .then(() => console.log('succesfully saved %s', id))
       .catch((e) => {
         console.log('Error saving settings', e)
       })
