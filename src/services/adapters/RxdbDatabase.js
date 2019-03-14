@@ -18,7 +18,7 @@ const collections = [
         providers: {
           type: 'object'
         },
-        searchIndex: {
+        search_index: {
           type: 'object'
         }
       },
