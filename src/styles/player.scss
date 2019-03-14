@@ -1,4 +1,5 @@
 .player-container {
+  position: relative;
   box-shadow: 0 -8px 12px rgba(77, 148, 170, 0.5);
   grid-area: player;
   background-color: $body-bg-color;
@@ -38,7 +39,7 @@
   button {
     padding: 0px;
     font-size: 34px;
-    background-color: $body-bg-color;
+    background-color: transparent;
     border: none;
     margin-left: 10px;
     margin-right: 10px;

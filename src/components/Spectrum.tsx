@@ -15,7 +15,7 @@ const Spectrum = () => {
         {stop: 0.5, color: '#0CD7FD'},
         {stop: 1, color: 'red'}
       ]}
-      gap={4}
+      gap={0.5}
     />
   )
 }

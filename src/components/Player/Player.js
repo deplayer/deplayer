@@ -10,6 +10,7 @@ import ShuffleButton from './ShuffleButton'
 import CoverImage from '../MusicTable/CoverImage'
 import SkipButton from './SkipButton'
 import VolumeControl from './VolumeControl'
+import Spectrum from './../Spectrum'
 import { PLAY_NEXT, PLAY_PREV } from '../../constants/ActionTypes'
 
 type Props = {
@@ -180,6 +181,7 @@ class Player extends Component<Props, State> {
             </div>
           </div>
         </div>
+        <Spectrum />
       </div>
     )
   }
