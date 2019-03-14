@@ -71,6 +71,7 @@ export default class Song extends Media {
       stream: this.stream,
       artist: this.artist,
       cover: this.cover,
+      album: this.album,
       duration: this.duration,
     }
   }

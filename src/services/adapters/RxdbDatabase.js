@@ -17,6 +17,9 @@ const collections = [
       properties: {
         providers: {
           type: 'object'
+        },
+        searchIndex: {
+          type: 'object'
         }
       },
     }

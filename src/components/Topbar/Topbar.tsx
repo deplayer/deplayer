@@ -128,7 +128,7 @@ class Topbar extends React.Component<Props, State> {
             onKeyHandle={this.setFocus}
           />
           { this.renderSearch(this.props) }
-          {  !this.state.focus ? titleComponent(title): null }
+          {  !this.state.focus && !this.props.searchToggled  ? titleComponent(title): null }
           <div>
             {  !this.state.focus ? childrenWithProps : null }
           </div>

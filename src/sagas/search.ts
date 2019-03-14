@@ -9,7 +9,6 @@ import history from '../store/configureHistory'
 
 import  * as types from '../constants/ActionTypes'
 import ProvidersService from '../services/ProvidersService'
-import IndexService from '../services/Search/IndexService'
 
 type SearchAction = {
   type: string,
@@ -34,12 +33,6 @@ export function* search(action: SearchAction): any {
   yield put({type: types.SEARCH_FINISHED, searchTerm: action.searchTerm})
 }
 
-// generate fulltext index
-export function* generateIndex(action): any {
-  const service = new IndexService()
-  yield service.generateIndexFrom(action.data)
-}
-
 // Going to home page
 export function* goToSearchResults(): any {
   yield history.push('/search-results')
@@ -53,7 +46,6 @@ export const getSettings = (state: any) => {
 // Binding actions to sagas
 function* searchSaga(): any {
   yield takeLatest(types.START_SEARCH, search)
-  yield takeLatest(types.RECEIVE_COLLECTION, generateIndex)
 }
 
 export default searchSaga
