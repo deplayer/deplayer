@@ -17,8 +17,20 @@ const collections = [
       properties: {
         providers: {
           type: 'object'
-        },
-        search_index: {
+        }
+      },
+    }
+  },
+  {
+    name: 'search_index',
+    schema: {
+      title: 'search_index',
+      version: 0,
+      type: 'object',
+      migrationStrategies: {
+      },
+      properties: {
+        index: {
           type: 'object'
         }
       },

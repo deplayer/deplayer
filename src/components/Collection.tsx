@@ -8,11 +8,12 @@ type Props = {
   queue: any,
   player: any,
   collection: any,
+  visibleSongs: Array<string>,
   dispatch: Dispatch
 }
 
 const Collection = (props: Props) => {
-  if (!props.collection.visibleSongs.length) {
+  if (!props.visibleSongs.length) {
     return null
   }
 
@@ -22,7 +23,7 @@ const Collection = (props: Props) => {
     >
       <MusicTable
         queue={props.queue}
-        tableIds={props.collection.visibleSongs}
+        tableIds={props.visibleSongs}
         totalSongs={props.collection.totalRows}
         disableAddButton
         {...props}

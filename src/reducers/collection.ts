@@ -1,46 +1,15 @@
 import * as types from '../constants/ActionTypes'
 
 import Song from '../entities/Song'
-import IndexService from '../services/Search/IndexService'
 
 type State = {
   rows: any,
   totalRows: number,
-  visibleSongs: Array<string>,
-  searchTerm: string
 }
 
 export const defaultState = {
   rows: {},
-  totalRows: 0,
-  visibleSongs: [],
-  searchTerm: ''
-}
-
-const getKeys = (rows: any): Array<string> => {
-  return Object.keys(rows)
-}
-
-export const filterSongs = (songs: any, term: string) => {
-  if (!term || term === '') {
-    return Object.keys(songs)
-  }
-
-  const songsArray = getKeys(songs).map((key) => {
-    return songs[key]
-  })
-
-  // TODO: Save, cache and load index from db
-  const indexService = new IndexService()
-  const results = indexService
-    .generateIndexFrom(songsArray)
-    .search(term)
-
-  const mappedResults = results.map((result) => {
-    return result.ref
-  })
-
-  return mappedResults
+  totalRows: 0
 }
 
 export default (state: State = defaultState, action: any = {}) => {
@@ -55,24 +24,7 @@ export default (state: State = defaultState, action: any = {}) => {
       return {
         ...state,
         rows: totalRows,
-        visibleSongs: filterSongs(rows, state.searchTerm),
         totalRows: state.totalRows + action.data.length
-      }
-    }
-
-    case types.START_SEARCH:
-    case types.SEARCH_FINISHED: {
-      return {
-        ...state,
-        searchTerm: action.searchTerm,
-        visibleSongs: filterSongs(state.rows, action.searchTerm)
-      }
-    }
-
-    case types.SET_SEARCH_TERM: {
-      return {
-        ...state,
-        searchTerm: action.searchTerm
       }
     }
 

@@ -1,7 +1,7 @@
 import { IStorageService } from './IStorageService'
 import { IAdapter } from './adapters/IAdapter'
 
-export default class SettingsService implements IStorageService {
+export default class SearchIndexService implements IStorageService {
   storageAdapter: IAdapter
 
   constructor(storageAdapter: IAdapter) {
@@ -13,13 +13,14 @@ export default class SettingsService implements IStorageService {
   }
 
   save = (id: string, payload: any): Promise<any> => {
-    return this.storageAdapter.save('settings', id, payload)
+    console.log('search index saving: ', payload)
+    return this.storageAdapter.save('search_index', 'search_index', payload)
       .catch((e) => {
-        console.log('Error saving settings', e.message)
+        console.log('Error saving search_index', e.message)
       })
   }
 
-  get = (id: string = 'settings'): Promise<any> => {
-    return this.storageAdapter.get('settings', id)
+  get = (): Promise<any> => {
+    return this.storageAdapter.get('search_index', 'search_index')
   }
 }

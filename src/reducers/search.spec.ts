@@ -1,4 +1,7 @@
-import reducer, { defaultState } from './search'
+import reducer, { defaultState, filterSongs } from './search'
+
+import Song from '../entities/Song'
+
 import {
   START_SEARCH,
   SEARCH_REJECTED,
@@ -12,17 +15,26 @@ describe('search reducer', () => {
   })
 
   it('should handle START_SEARCH', () => {
-    expect(reducer({error: '', searchTerm: 'Lorem', loading: false, searchToggled: false}, {type: START_SEARCH, searchTerm: 'Lorem'}))
-      .toEqual({loading: true, error: '', searchTerm: 'Lorem', searchToggled: false})
+    expect(reducer({...defaultState, searchTerm: 'Lorem'}, {type: START_SEARCH, searchTerm: 'Lorem'}))
+      .toEqual({...defaultState, loading: true, searchTerm: 'Lorem'})
   })
   it('should handle SEARCH_REJECTED', () => {
-    expect(reducer({error: '', searchTerm: '', loading: true, searchToggled: false}, {type: SEARCH_REJECTED, message: 'Testing error'}))
-      .toEqual({loading: false, error: 'Testing error', searchTerm: '', searchToggled: false})
+    expect(reducer({...defaultState, loading: true, searchToggled: false}, {type: SEARCH_REJECTED, message: 'Testing error'}))
+      .toEqual({...defaultState, loading: false, error: 'Testing error', searchTerm: '', searchToggled: false})
   })
   it('should handle SEARCH_FULLFILLED', () => {
-    expect(reducer({error: 'whatever', searchTerm: '', loading: true, searchToggled: false}, {type: SEARCH_FULLFILLED}))
-      .toEqual({loading: false, error: '', searchTerm: '', searchToggled: false})
+    expect(reducer({...defaultState, error: 'whatever', loading: true}, {type: SEARCH_FULLFILLED}))
+      .toEqual({...defaultState, loading: false, error: '', searchTerm: '', searchToggled: false})
   })
 })
 
+describe('filterSongs', () => {
+  const fixtureSong = new Song({
+    id: 'test',
+    title: 'test'
+  })
+  const songs = {test: fixtureSong}
 
+  expect(filterSongs(songs, 'test'))
+    .toEqual(['test'])
+})

@@ -5,6 +5,7 @@ export default connect(
   (state) => ({
     queue: state.queue,
     player: state.player,
-    collection: state.collection
+    collection: state.collection,
+    visibleSongs: Object.keys(state.collection.rows)
   })
 )(Collection)

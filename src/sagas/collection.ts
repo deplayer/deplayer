@@ -1,7 +1,7 @@
 import { takeLatest, put, call } from 'redux-saga/effects'
 
 import CollectionService from '../services/CollectionService'
-import SettingsService from '../services/SettingsService'
+import SearchIndexService from '../services/SearchIndexService'
 import { getAdapter } from '../services/adapters'
 import IndexService from '../services/Search/IndexService'
 
@@ -43,7 +43,7 @@ function* initializeCollection() {
 function* initializeSearchIndex() {
   try {
     const adapter = getAdapter()
-    const settingsService = new SettingsService(new adapter())
+    const settingsService = new SearchIndexService(new adapter())
     yield settingsService.initialize
     const searchIndex = yield call(settingsService.get, 'search_index')
     yield put({type: types.RECEIVE_SEARCH_INDEX, data: searchIndex})
@@ -90,19 +90,20 @@ export function* generateIndex(action): any {
   const collection = yield call(collectionService.getAll)
   const mappedData = mapToMedia(collection)
   const service = new IndexService()
-  const index = service.generateIndexFrom(mappedData)
-  const settingsService = new SettingsService(new adapter())
-  yield call(settingsService.save, 'search_index', index)
-
-
+  const { index } = service.generateIndexFrom(mappedData)
+  try {
+    yield put({type: types.RECEIVE_SEARCH_INDEX, data: index.toJSON()})
+  } catch (e) {
+    yield put({type: types.RECEIVE_SEARCH_INDEX_REJECTED, message: e.message})
+  }
 }
 
 // Binding actions to sagas
 function* collectionSaga(): any {
   yield takeLatest(types.INITIALIZED, initializeCollection)
   yield takeLatest(types.INITIALIZED, initializeSearchIndex)
-  yield takeLatest(types.ADD_TO_COLLECTION, addToCollection)
   yield takeLatest(types.ADD_TO_COLLECTION, generateIndex)
+  yield takeLatest(types.ADD_TO_COLLECTION, addToCollection)
   yield takeLatest(types.REMOVE_FROM_COLLECTION, removeFromCollection)
   yield takeLatest(types.DELETE_COLLECTION, deleteCollection)
 }
