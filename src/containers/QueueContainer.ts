@@ -6,6 +6,6 @@ export default connect(
     queue: state.queue,
     playlist: state.playlist,
     player: state.player,
-    visibleSongs: Object.keys(state.search.visibleSongs)
+    collection: state.collection
   })
 )(Queue)
