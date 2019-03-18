@@ -3,6 +3,7 @@ import { Provider } from 'react-redux'
 
 import QueueContainer from './containers/QueueContainer'
 import CollectionContainer from './containers/CollectionContainer'
+import SearchResultsContainer from './containers/SearchResultsContainer'
 import PlayerContainer from './containers/PlayerContainer'
 import Placeholder from './components/Player/Placeholder'
 import SidebarContainer from './containers/SidebarContainer'
@@ -59,6 +60,21 @@ const Collection = () => {
   )
 }
 
+const SearchResults = () => {
+  return (
+    <React.Fragment>
+      <SidebarContainer>
+        <TopbarContainer title='Search results'>
+          <SearchButton />
+          <PlayAllButton />
+        </TopbarContainer>
+        <SearchResultsContainer />
+        <Placeholder />
+      </SidebarContainer>
+    </React.Fragment>
+  )
+}
+
 const Settings = () => {
   return (
     <React.Fragment>
@@ -100,7 +116,7 @@ class App extends React.Component<any> {
             <Route exact path="/" component={Home} />
             <Route path="/index.html" component={Home} />
             <Route path="/collection" component={Collection} />
-            <Route path="/search-results" component={Collection} />
+            <Route path="/search-results" component={SearchResults} />
             <Route path="/song/:id" component={Song} />
             <Route path="/settings" component={Settings} />
             <PlayerContainer />

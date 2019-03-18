@@ -96,6 +96,8 @@ export function* generateIndex(action): any {
   } catch (e) {
     yield put({type: types.RECEIVE_SEARCH_INDEX_REJECTED, message: e.message})
   }
+
+  yield addToCollection(action)
 }
 
 // Binding actions to sagas
@@ -103,7 +105,6 @@ function* collectionSaga(): any {
   yield takeLatest(types.INITIALIZED, initializeCollection)
   yield takeLatest(types.INITIALIZED, initializeSearchIndex)
   yield takeLatest(types.ADD_TO_COLLECTION, generateIndex)
-  yield takeLatest(types.ADD_TO_COLLECTION, addToCollection)
   yield takeLatest(types.REMOVE_FROM_COLLECTION, removeFromCollection)
   yield takeLatest(types.DELETE_COLLECTION, deleteCollection)
 }

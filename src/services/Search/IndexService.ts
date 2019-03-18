@@ -22,6 +22,18 @@ export default class IndexService {
     return this
   }
 
+  // This don't work because this method is not exposed in library
+  loadIndex(indexDump: any) {
+    // TODO: Handle the empty index comming
+    if (!indexDump) {
+      return this
+    }
+    console.log('indexDump', indexDump)
+    this.index = elasticlunr.Index.load(indexDump)
+
+    return this
+  }
+
   search(searchTerm: string) {
     const results = this.index.search(searchTerm, {
       fields: {
