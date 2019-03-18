@@ -27,36 +27,42 @@ require('./styles/App.scss')
 
 const appStore = configureStore()
 
-// TODO: Make a HOC
-const Home = () => {
+type LayoutProps = {
+  title: string,
+  children: any
+}
+
+const Layout = (props: LayoutProps) => {
   return (
     <React.Fragment>
       <SidebarContainer>
-        <TopbarContainer title='Queue'>
+        <TopbarContainer title={ props.title }>
           <SearchButton />
           <ClearQueueButton />
           <PlayAllButton />
         </TopbarContainer>
 
-        <QueueContainer />
+        { props.children }
         <Placeholder />
       </SidebarContainer>
     </React.Fragment>
   )
 }
 
+// TODO: Make a HOC
+const Home = () => {
+  return (
+    <Layout title='Home'>
+      <QueueContainer />
+    </Layout>
+  )
+}
+
 const Collection = () => {
   return (
-    <React.Fragment>
-      <SidebarContainer>
-        <TopbarContainer title='Collection'>
-          <SearchButton />
-          <PlayAllButton />
-        </TopbarContainer>
-        <CollectionContainer />
-        <Placeholder />
-      </SidebarContainer>
-    </React.Fragment>
+    <Layout title='Collection'>
+      <CollectionContainer />
+    </Layout>
   )
 }
 

@@ -1,23 +1,51 @@
 import * as React from 'react'
 import AudioSpectrum from 'react-audio-spectrum'
 
-const Spectrum = () => {
-  return (
-    <AudioSpectrum
-      id="audio-canvas"
-      audioId={'player-audio'}
-      capColor={'red'}
-      capHeight={2}
-      meterWidth={2}
-      meterCount={512}
-      meterColor={[
-        {stop: 0, color: '#f00'},
-        {stop: 0.5, color: '#0CD7FD'},
-        {stop: 1, color: 'red'}
-      ]}
-      gap={0.5}
-    />
-  )
+type Props = {}
+type State = {
+  width: number
+}
+
+class Spectrum  extends React.Component<Props, State> {
+  constructor(props) {
+    super(props);
+    this.state = { width: 0 };
+    this.updateWindowDimensions = this.updateWindowDimensions.bind(this)
+  }
+
+  componentWillMount() {
+    this.updateWindowDimensions()
+    window.addEventListener('resize', this.updateWindowDimensions)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateWindowDimensions)
+  }
+
+  updateWindowDimensions() {
+    this.setState({ width: window.innerWidth })
+  }
+
+  render () {
+    const widthFactor = 8
+    return (
+      <AudioSpectrum
+        id="audio-canvas"
+        audioId={'player-audio'}
+        capColor={'red'}
+        capHeight={2}
+        meterWidth={this.state.width / (this.state.width / widthFactor)}
+        meterCount={this.state.width}
+        width={this.state.width}
+        meterColor={[
+          {stop: 0, color: '#f00'},
+          {stop: 0.5, color: '#0CD7FD'},
+          {stop: 1, color: 'red'}
+        ]}
+        gap={0.5}
+      />
+    )
+  }
 }
 
 export default Spectrum
