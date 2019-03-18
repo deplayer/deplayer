@@ -43,6 +43,12 @@
     border: none;
     margin-left: 10px;
     margin-right: 10px;
+
+    &:focus {
+      border: none;
+      outline: 0;
+      box-shadow: none;
+    }
   }
 }
 
