@@ -7,7 +7,7 @@ import * as types from '../constants/ActionTypes'
 
 // Extract songs from collection state
 export const getSongs = (state: any): Array<string> => {
-  return state ? state.search.visibleSongs : []
+  return state ? state.collection.searchResults : []
 }
 
 export const getQueue = (state: any): any => {

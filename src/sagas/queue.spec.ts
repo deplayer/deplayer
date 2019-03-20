@@ -1,5 +1,3 @@
-// @flow
-
 import { expectSaga } from 'redux-saga-test-plan'
 
 import {
