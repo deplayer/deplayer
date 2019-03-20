@@ -1,6 +1,4 @@
-// @flow
-
-import uuidv4 from 'uuid'
+import * as uuidv4 from 'uuid'
 
 type streamUri = {
   uri: string,
@@ -16,6 +14,7 @@ export default class Media {
   id: string
   title: string
   duration: number
+  artistName: string
   artist: {
     name: string
   }
@@ -33,6 +32,7 @@ export default class Media {
     this.artist = {
       name: artistName
     }
+    this.artistName = artistName
   }
 
   static toSchema(): any {

@@ -1,5 +1,3 @@
-// @flow
-
 import { IAdapter } from './IAdapter'
 
 export default class DummyAdapter implements IAdapter {

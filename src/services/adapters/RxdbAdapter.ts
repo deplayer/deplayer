@@ -103,7 +103,7 @@ export default class RxdbAdapter implements IAdapter {
     })
   }
 
-  getAll = (model: string): Promise<any> => {
+  getAll = (model: string, conditions: any = {}): Promise<any> => {
     return new Promise((resolve, reject) => {
       return db.get().then((instance) => {
 
@@ -120,6 +120,14 @@ export default class RxdbAdapter implements IAdapter {
             console.warn(err)
             reject(err)
           })
+      })
+    })
+  }
+
+  getQueryObj = (model: string): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      return db.get().then((instance) => {
+        resolve(instance[model].find())
       })
     })
   }

@@ -40,7 +40,7 @@ export default class CollectionService implements IStorageService {
     return this.storageAdapter.get('media', id)
   }
 
-  getAll = (): Promise<any> => {
-    return this.storageAdapter.getAll('media')
+  getAll = (excludeProviders: any = {}): Promise<any> => {
+    return this.storageAdapter.getAll('media', {})
   }
 }

@@ -1,14 +1,10 @@
 import * as types from '../constants/ActionTypes'
 
-import IndexService from '../services/Search/IndexService'
-import Song from '../entities/Song'
-
 type State = {
   error: string,
   searchTerm: string,
   loading: boolean,
   searchIndex: object,
-  visibleSongs: Array<string>,
   searchToggled: boolean
 }
 
@@ -17,34 +13,7 @@ export const defaultState = {
   searchTerm: '',
   loading: false,
   searchIndex: {},
-  visibleSongs: [],
   searchToggled: false
-}
-
-const getKeys = (rows: any): Array<string> => {
-  return Object.keys(rows)
-}
-
-export const filterSongs = (songs: any, term: string) => {
-  if (!term || term === '') {
-    return Object.keys(songs)
-  }
-
-  const songsArray = getKeys(songs).map((key) => {
-    return songs[key]
-  })
-
-  // TODO: Save, cache and load index from db
-  const indexService = new IndexService()
-  const results = indexService
-    .generateIndexFrom(songsArray)
-    .search(term)
-
-  const mappedResults = results.map((result) => {
-    return result.ref
-  })
-
-  return mappedResults
 }
 
 export default (state: State = defaultState, action: any = {}) => {
@@ -91,18 +60,6 @@ export default (state: State = defaultState, action: any = {}) => {
         ...state,
         error: '',
         loading: false
-      }
-    }
-
-    case types.ADD_TO_COLLECTION:
-    case types.RECEIVE_COLLECTION: {
-      const rows = {}
-      action.data.forEach((row) => {
-        rows[row.id] = new Song(row)
-      })
-      return {
-        ...state,
-        visibleSongs: filterSongs(rows, state.searchTerm)
       }
     }
 

@@ -1,5 +1,3 @@
-// @flow
-
 import Media from './Media'
 
 type money = {

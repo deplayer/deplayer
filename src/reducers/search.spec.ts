@@ -1,6 +1,4 @@
-import reducer, { defaultState, filterSongs } from './search'
-
-import Song from '../entities/Song'
+import reducer, { defaultState } from './search'
 
 import {
   START_SEARCH,
@@ -26,15 +24,4 @@ describe('search reducer', () => {
     expect(reducer({...defaultState, error: 'whatever', loading: true}, {type: SEARCH_FULLFILLED}))
       .toEqual({...defaultState, loading: false, error: '', searchTerm: '', searchToggled: false})
   })
-})
-
-describe('filterSongs', () => {
-  const fixtureSong = new Song({
-    id: 'test',
-    title: 'test'
-  })
-  const songs = {test: fixtureSong}
-
-  expect(filterSongs(songs, 'test'))
-    .toEqual(['test'])
 })

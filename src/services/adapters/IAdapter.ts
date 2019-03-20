@@ -4,6 +4,6 @@ export interface IAdapter {
   addMany(model: string, payload: Array<any>): Promise<any>,
   removeMany(model: string, payload: Array<any>): Promise<any>,
   get(model: string, id: string): Promise<any>,
-  getAll(model: string): Promise<any>,
+  getAll(model: string, conditions: any): Promise<any>,
   removeCollection(model: string): Promise<any>
 }
