@@ -5,3 +5,8 @@
   grid-area: contents;
 }
 
+.toggle-control {
+  @extend .form-control;
+  background: transparent;
+  border: none;
+}

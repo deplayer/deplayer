@@ -29,10 +29,12 @@ const FormField = (props: Props) => {
 
   if (field.type === 'checkbox') {
     return (
-      <Field
-        name={field.name}
-        component={FormikToggle}
-      />
+      <div className='toggle-control'>
+        <Field
+          name={field.name}
+          component={FormikToggle}
+        />
+      </div>
     )
   }
 

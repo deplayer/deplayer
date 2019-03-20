@@ -28,7 +28,7 @@ const SettingsForm = (props: Props) => {
       return (
         <div
           key={field.name}
-          className={`form-group row ${ field.type === 'checkbox' ? 'form-check-inline': ''}`}
+          className="form-group row"
         >
           <label className='col-sm-2 col-form-label'>{field.title}</label>
           <div className='col-sm-10'>
