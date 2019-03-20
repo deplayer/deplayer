@@ -18,6 +18,7 @@ export default class Song extends Media {
   genre: string
   shareUrl: string
   album: album
+  albumName: string
   cover: cover
   // In milliseconds
   duration: number
@@ -46,6 +47,7 @@ export default class Song extends Media {
     this.album = {
       name: albumName
     } || {}
+    this.albumName = albumName
     this.cover = {
       thumbnailUrl: thumbnailUrl,
       fullUrl: fullUrl

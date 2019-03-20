@@ -7,6 +7,7 @@ export default class IndexService {
     this.index = elasticlunr(function () {
       this.addField('title')
       this.addField('artistName')
+      this.addField('albumName')
     }, {
       bool: 'AND'
     })
@@ -37,6 +38,7 @@ export default class IndexService {
   search(searchTerm: string) {
     const results = this.index.search(searchTerm, {
       fields: {
+        albumName: {boost: 3},
         artistName: {boost: 2},
         title: {boost: 1}
       },
