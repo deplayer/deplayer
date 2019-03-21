@@ -23,4 +23,12 @@ describe('entities/Song', () => {
     const song = new Song({shareUrl: 'http://some-songs-api/song.mp4'})
     expect(song.shareUrl).toEqual('http://some-songs-api/song.mp4')
   })
+
+  it('should answer hasAnyProviderOf', () => {
+    const song = new Song({
+      stream: [{uris: [{uri: 'http://some-songs-api/song.mp4'}], service: 'itunes'}]
+    })
+
+    expect(song.hasAnyProviderOf(['itunes'])).toEqual(true)
+  })
 })

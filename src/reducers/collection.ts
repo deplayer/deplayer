@@ -8,6 +8,7 @@ type State = {
   searchTerm: string,
   visibleSongs: Array<string>,
   searchResults: Array<string>,
+  enabledProviders: Array<string>,
   totalRows: number,
 }
 
@@ -16,8 +17,12 @@ export const defaultState = {
   searchTerm: '',
   visibleSongs: [],
   searchResults: [],
+  enabledProviders: [],
   totalRows: 0
 }
+
+// const excludeDisabledProviders = () => {
+// }
 
 export default (state: State = defaultState, action: any = {}) => {
   switch (action.type) {
@@ -32,7 +37,10 @@ export default (state: State = defaultState, action: any = {}) => {
     case types.RECEIVE_COLLECTION: {
       const rows = {}
       action.data.forEach((row) => {
-        rows[row.id] = new Song(row)
+        const song = new Song(row)
+        if (song.hasAnyProviderOf(state.enabledProviders)) {
+          rows[row.id] = song
+        }
       })
       const totalRows = {...state.rows, ...rows}
       return {
@@ -41,6 +49,17 @@ export default (state: State = defaultState, action: any = {}) => {
         visibleSongs: filterSongs(totalRows, state.searchTerm),
         searchResults: state.searchTerm !== '' ? filterSongs(totalRows, state.searchTerm) : [],
         totalRows: state.totalRows + action.data.length
+      }
+    }
+
+    case types.RECEIVE_SETTINGS: {
+      const enabledProviders = Object.keys(action.settings.providers).filter((key) => {
+        return action.settings.providers[key].enabled
+      })
+
+      return {
+        ...state,
+        enabledProviders
       }
     }
 

@@ -1,7 +1,3 @@
-// @flow
-
-import { Action } from 'redux'
-
 import {
   RECEIVE_SETTINGS,
   SETTINGS_SAVED_SUCCESSFULLY
@@ -36,7 +32,7 @@ export const defaultState = {
   }
 }
 
-export default (state: State = defaultState, action: Action = {}) => {
+export default (state: State = defaultState, action: any = {}) => {
   switch (action.type) {
     case RECEIVE_SETTINGS:
     case SETTINGS_SAVED_SUCCESSFULLY: {

@@ -64,6 +64,20 @@ export default class Song extends Media {
     this.stream = stream || []
   }
 
+  hasAnyProviderOf(checkProviders: Array<string>): boolean {
+    const providers = this.stream.map((stream) => stream.service)
+
+    let result = false
+
+    providers.forEach((prov) => {
+      if (checkProviders.indexOf(prov) !== -1) {
+        result = true
+      }
+    })
+
+    return result
+  }
+
   toDocument(): any {
     return {
       id: this.id,
