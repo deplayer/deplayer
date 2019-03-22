@@ -1,7 +1,3 @@
-// @flow
-
-import { Action } from 'redux'
-
 import * as types from '../constants/ActionTypes'
 import {
   populateTracks,
@@ -46,7 +42,7 @@ const setCurrentPlaying = (state: any, action: any) => {
   }
 }
 
-export default (state: State = defaultState, action: Action = {}): State => {
+export default (state: State = defaultState, action: any  = {}): State => {
   switch (action.type) {
 
     case types.RECEIVE_QUEUE:

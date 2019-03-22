@@ -147,7 +147,7 @@ class Player extends Component<Props, State> {
                   ref={this.playerRef}
                   src={streamUri}
                   volume={ volume }
-                  crossorigin="anonymous"
+                  crossOrigin="anonymous"
                   onError={this.logError.bind(this)}
                   autoPlay={ this.props.player.playing }
                   onTimeUpdate={ this.onTimeUpdate }

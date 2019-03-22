@@ -8,7 +8,7 @@ import SongRow from './SongRow'
 export type Props = {
   error?: string,
   queue: any,
-  tableIds: any,
+  tableIds: Array<string>,
   collection: any,
   totalSongs: number,
   dispatch: (action: any) => any,

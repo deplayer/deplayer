@@ -1,6 +1,7 @@
-// @flow
-
 import Media from '../entities/Media'
+
+// fix ts window typings
+declare var window: any
 
 export default class NotificationService {
   sendNotification = (media: Media) => {

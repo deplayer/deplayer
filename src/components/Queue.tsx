@@ -10,7 +10,7 @@ type Props = {
   dispatch: Dispatch
 }
 
-const Playlist = (props: Props) => {
+const Queue = (props: Props) => {
   if (!props.queue.trackIds.length) {
     return null
   }
@@ -26,4 +26,4 @@ const Playlist = (props: Props) => {
   )
 }
 
-export default  Playlist
+export default  Queue

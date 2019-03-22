@@ -1,5 +1,3 @@
-// @flow
-
 import reducer, {defaultState} from './queue'
 import Song from '../entities/Song'
 
@@ -20,7 +18,7 @@ describe('queue reducer', () => {
   })
 
   it('should handle ADD_SONGS_TO_QUEUE action', () => {
-    const songs = []
+    const songs: any = []
     const expectedObj = {}
     for (let i = 1; i <= 20; i++) {
       const song = new Song({id: i.toString()})
