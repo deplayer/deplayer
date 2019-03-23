@@ -1,5 +1,3 @@
-// @flow
-
 import { takeLatest, put, call } from 'redux-saga/effects'
 
 import  * as types from '../constants/ActionTypes'
@@ -10,13 +8,14 @@ import { getAdapter } from '../services/adapters'
 function* initialize() {
   const adapter = getAdapter()
   const settingsService = new SettingsService(new adapter())
-  yield call(settingsService.initialize)
+  yield settingsService.initialize
   const settings = yield call(settingsService.get)
   if (!settings) {
     yield put({type: types.GET_SETTINGS_REJECTED})
   } else {
     const unserialized = JSON.parse(JSON.stringify(settings))
     yield put({type: types.RECEIVE_SETTINGS, settings: unserialized})
+    yield put({type: types.INITIALIZED})
   }
 }
 
@@ -30,8 +29,8 @@ function* saveSettings(action: any) {
 }
 
 // Binding actions to sagas
-function* settingsSaga(): Generator<void, void, void> {
-  yield takeLatest(types.INITIALIZED, initialize)
+function* settingsSaga(): any {
+  yield takeLatest(types.INITIALIZE_SETTINGS, initialize)
   yield takeLatest(types.SAVE_SETTINGS, saveSettings)
 }
 

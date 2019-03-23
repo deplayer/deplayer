@@ -6,7 +6,7 @@ import {
   SAVE_SETTINGS,
   SETTINGS_SAVED_SUCCESSFULLY,
   RECEIVE_SETTINGS,
-  INITIALIZED
+  INITIALIZE_SETTINGS
 } from '../constants/ActionTypes'
 
 import settingsSaga from './settings'
@@ -22,7 +22,7 @@ describe('settings saga', () => {
       .run()
   })
 
-  it('should handle INITIALIZED event', () => {
+  it('should handle INITIALIZE_SETTINGS event', () => {
 
     const settingsPayload = {
       providers: {
@@ -33,7 +33,7 @@ describe('settings saga', () => {
     }
 
     return expectSaga(settingsSaga)
-      .dispatch({type: INITIALIZED, settingsPayload})
+      .dispatch({type: INITIALIZE_SETTINGS, settingsPayload})
       .put({type: RECEIVE_SETTINGS, settings: {}})
       .run()
   })

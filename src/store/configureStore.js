@@ -4,7 +4,7 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import thunk from 'redux-thunk'
 import promise from 'redux-promise'
-import { INITIALIZED } from '../constants/ActionTypes'
+import * as types from '../constants/ActionTypes'
 import {
   loadTranslations,
   setLocale,
@@ -62,7 +62,7 @@ export default function configureStore() {
   sagaMiddleware.run(mediaSessionSaga, store)
   sagaMiddleware.run(connectionSaga, store)
 
-  store.dispatch({type: INITIALIZED})
+  store.dispatch({type: types.INITIALIZE_SETTINGS})
 
   return store
 }

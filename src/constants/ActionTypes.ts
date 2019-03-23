@@ -1,5 +1,6 @@
 // App
 export const INITIALIZED = 'INITIALIZED'
+export const INITIALIZE_SETTINGS = 'INITIALIZE_SETTINGS'
 export const TOGGLE_SIDEBAR = 'TOGGLE_SIDEBAR'
 
 // Songs

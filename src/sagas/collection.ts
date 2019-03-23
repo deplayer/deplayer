@@ -76,7 +76,7 @@ export function* deleteCollection(): any {
   try {
     const adapter = getAdapter()
     const collectionService = new CollectionService(new adapter())
-    yield collectionService.removeAll()
+    yield collectionService.removeAll
   } catch (e) {
     yield put({type: types.REMOVE_FROM_COLLECTION_REJECTED, message: e.message})
   }

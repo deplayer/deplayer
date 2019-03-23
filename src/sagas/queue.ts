@@ -6,8 +6,12 @@ import QueueService from '../services/QueueService'
 import * as types from '../constants/ActionTypes'
 
 // Extract songs from collection state
-export const getSongs = (state: any): Array<string> => {
-  return state ? state.collection.searchResults : []
+export const getSongs = (state: any, action): Array<string> => {
+  if (action.path === 'search') {
+    return state ? state.collection.searchResults : []
+  }
+
+  return state ? state.collection.visibleSongs : []
 }
 
 export const getQueue = (state: any): any => {
@@ -16,7 +20,7 @@ export const getQueue = (state: any): any => {
 
 // Handling playAll saga
 export function* playAll(action: any): any {
-  const songs = yield select(getSongs)
+  const songs = yield select(getSongs, action)
   if (songs.length) {
     yield put({type: types.ADD_SONGS_TO_QUEUE, songs: songs})
     yield put({type: types.SET_CURRENT_PLAYING, songId: songs[0]})

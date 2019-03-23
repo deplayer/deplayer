@@ -2954,13 +2954,10 @@ ee-first@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
 
-"elasticlunr@git+https://git@github.com/gtrias/elasticlunr.js.git":
-  version "0.9.6"
-  resolved "git+https://git@github.com/gtrias/elasticlunr.js.git#32d88f3d667b845363a4f253fe36717f487a7401"
-
-"elasticlunr@git+https://git@github.com/weixsong/elasticlunr.js.git":
-  version "0.9.6"
-  resolved "git+https://git@github.com/weixsong/elasticlunr.js.git#c468634165ecace8281f487a8f0e301a6880473b"
+elasticlunr@^0.9.5:
+  version "0.9.5"
+  resolved "https://registry.yarnpkg.com/elasticlunr/-/elasticlunr-0.9.5.tgz#65541bb309dddd0cf94f2d1c8861b2be651bb0d5"
+  integrity sha1-ZVQbswnd3Qz5Ty0ciGGyvmUbsNU=
 
 electron-to-chromium@^1.3.30:
   version "1.3.113"
@@ -8593,9 +8590,9 @@ rc@^1.1.7, rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-audio-spectrum@^0.0.9:
+"react-audio-spectrum@git+https://git@github.com/gtrias/react-audio-spectrum.git":
   version "0.0.9"
-  resolved "https://registry.yarnpkg.com/react-audio-spectrum/-/react-audio-spectrum-0.0.9.tgz#c286e61cf02c6076359e1f97408d472579376b4d"
+  resolved "git+https://git@github.com/gtrias/react-audio-spectrum.git#f172be9eb53263e4ee0c2ce5ee9da1df1fcbe582"
   dependencies:
     prop-types "^15.6.0"
     react "^16.1.0"
