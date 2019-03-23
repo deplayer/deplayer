@@ -1,7 +1,7 @@
-// @flow
-
-import React from 'react'
+import * as React from 'react'
 import { shallow } from 'enzyme'
+import Slider from 'rc-slider'
+
 import configureEnzyme from '../../tests/configureEnzyme'
 import VolumeControl from './VolumeControl'
 
@@ -24,6 +24,6 @@ const setup = (customProps) => {
 
 it('renders without crashing', () => {
   const { enzymeWrapper } = setup({volume: 50})
-  expect(enzymeWrapper.find('input.form-control-range').exists())
+  expect(enzymeWrapper.find(Slider).exists())
     .toBe(true)
 })

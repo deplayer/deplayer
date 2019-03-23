@@ -1,6 +1,6 @@
-// @flow
+import * as React from 'react'
 
-import React from 'react'
+import LazyImage from '../LazyImage'
 
 type cover = {
   thumbnailUrl: string,
@@ -14,14 +14,18 @@ type Props = {
 }
 
 const CoverImage = (props: Props) => {
-
   const Img = (props) => {
     return (
-      <div
-        className='cover-image'
-        style={{backgroundImage: `url(${props.src})`}}
-        data-alt={ props.alt }
-      />
+      <LazyImage
+        src={props.src}
+        srcAlt={props.alt}
+      >
+        <div
+          className='cover-image'
+          style={{backgroundImage: `url(${props.src})`}}
+          data-alt={ props.alt }
+        />
+      </LazyImage>
     )
   }
 

@@ -87,8 +87,7 @@ class Player extends Component<Props, State> {
   }
 
   // Set player volume
-  setVolume = (value: any) => {
-    const volume = value.currentTarget.value
+  setVolume = (volume: any) => {
     this.setState({volume})
     this.playerRef.current.volume = (volume / 100)
   }

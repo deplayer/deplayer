@@ -30,6 +30,7 @@ $fa-font-path: "./fonts" !default;
 @import './settings.scss';
 @import './song-row.scss';
 @import './audio-canvas.scss';
+@import './lazy-image.scss';
 
 html, body {
   height: 100%;

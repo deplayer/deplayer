@@ -3,7 +3,6 @@ import { Dispatch } from 'redux'
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css';
 
-import * as types from '../../constants/ActionTypes'
 import { getDurationStr } from '../../utils/timeFormatter'
 
 type Props = {

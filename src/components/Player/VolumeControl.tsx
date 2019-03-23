@@ -1,6 +1,5 @@
-// @flow
-
-import React from 'react'
+import * as React from 'react'
+import Slider from 'rc-slider'
 
 type Props = {
   volume: number,
@@ -10,13 +9,14 @@ type Props = {
 const VolumeControl = (props: Props) => {
   return (
     <div className='volume-control'>
-      <input
-        className='form-control-range'
+      <Slider
+        className='bar'
+        min={0}
+        max={100}
+        step={ 1 }
         type='range'
-        min='0'
-        max='100'
-        value={props.volume}
-        onChange={props.onChange}
+        value={ props.volume }
+        onChange={ props.onChange }
       />
     </div>
   )

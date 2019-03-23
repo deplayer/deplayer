@@ -1,5 +1,4 @@
 import * as React from 'react'
-import Spinner from './Spinner'
 
 class LazyImage extends React.Component {
   state = {
@@ -42,14 +41,8 @@ class LazyImage extends React.Component {
   }
 
   render() {
-    if (this.state.loading && !this.state.error) {
-      return (
-        <Spinner />
-      )
-    }
-
     return (
-      <div className="lazy-image">
+      <div className="lazy-image fade-in one">
         { this.props.children }
       </div>
     )
