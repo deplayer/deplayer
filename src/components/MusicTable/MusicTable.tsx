@@ -80,6 +80,9 @@ const MusicTable = (props: Props) => {
           />
         )}
       </AutoSizer>
+      <div className="table-status">
+        Total items: { props.tableIds.length }
+      </div>
       {errors}
     </React.Fragment>
   )
