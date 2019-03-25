@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { Translate }  from 'react-redux-i18n'
 import { Formik, Form } from 'formik'
 import { Dispatch } from 'redux'
+import { Translate } from 'react-redux-i18n'
 
 import FormField from './FormField'
 import { SAVE_SETTINGS } from '../../constants/ActionTypes'
@@ -23,14 +23,16 @@ const SettingsForm = (props: Props) => {
 
     const populatedFields = fields.map((field, index) => {
       if (field.type === 'title') {
-        return <h2 key={index}>{field.title}</h2>
+        return <h2 key={index}><Translate value={field.title} /></h2>
       }
       return (
         <div
           key={field.name}
           className="form-group row"
         >
-          <label className='col-sm-2 col-form-label'>{field.title}</label>
+          <label className='col-sm-2 col-form-label'>
+            <Translate value={field.title} />
+          </label>
           <div className='col-sm-10'>
             <FormField
               field={field}
