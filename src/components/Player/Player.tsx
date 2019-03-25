@@ -1,6 +1,4 @@
-// @flow
-
-import React, { Component } from 'react'
+import * as React from 'react'
 import { Dispatch } from 'redux'
 import { Link } from 'react-router-dom'
 
@@ -32,11 +30,11 @@ type State = {
 }
 
 // TODO: Fill all events https://www.w3schools.com/tags/ref_av_dom.asp
-class Player extends Component<Props, State> {
+class Player extends React.Component<Props, State> {
   state = {
     error: '',
     currentTime: 0,
-    volume: undefined,
+    volume: 1,
   }
   playerRef: { current: any }
 
@@ -87,7 +85,7 @@ class Player extends Component<Props, State> {
   }
 
   // Set player volume
-  setVolume = (volume: any) => {
+  setVolume = (volume: number) => {
     this.setState({volume})
     this.playerRef.current.volume = (volume / 100)
   }
@@ -145,7 +143,6 @@ class Player extends Component<Props, State> {
                   id='player-audio'
                   ref={this.playerRef}
                   src={streamUri}
-                  volume={ volume }
                   crossOrigin="anonymous"
                   onError={this.logError.bind(this)}
                   autoPlay={ this.props.player.playing }

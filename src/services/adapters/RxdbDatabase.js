@@ -12,13 +12,16 @@ const collections = [
       title: 'settings schema',
       version: 0,
       type: 'object',
-      migrationStrategies: {
-      },
       properties: {
         providers: {
           type: 'object'
+        },
+        app: {
+          type: 'object'
         }
       },
+      migrationStrategies: {
+      }
     }
   },
   {

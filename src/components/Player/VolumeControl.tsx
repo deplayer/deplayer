@@ -3,7 +3,7 @@ import Slider from 'rc-slider'
 
 type Props = {
   volume: number,
-  onChange: () => void
+  onChange: (volume: number) => void
 }
 
 const VolumeControl = (props: Props) => {

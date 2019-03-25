@@ -22,4 +22,8 @@ export default class SettingsService implements IStorageService {
   get = (id: string = 'settings'): Promise<any> => {
     return this.storageAdapter.get('settings', id)
   }
+
+  removeAll = (): Promise<any> => {
+    return this.storageAdapter.removeCollection('settings')
+  }
 }

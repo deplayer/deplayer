@@ -1,7 +1,10 @@
 import * as React from 'react'
+import { connect } from 'react-redux'
 import AudioSpectrum from 'react-audio-spectrum'
 
-type Props = {}
+type Props = {
+  appSettings: any
+}
 type State = {
   width: number
 }
@@ -27,6 +30,13 @@ class Spectrum  extends React.Component<Props, State> {
   }
 
   render () {
+    if (
+      !this.props.appSettings.settings
+      || !this.props.appSettings.settings.app.spectrum.enabled
+    ) {
+      return null
+    }
+
     const widthFactor = 8
     return (
       <AudioSpectrum
@@ -48,4 +58,8 @@ class Spectrum  extends React.Component<Props, State> {
   }
 }
 
-export default Spectrum
+export default connect(
+  (state) => ({
+    appSettings: state.settings
+  })
+)(Spectrum)

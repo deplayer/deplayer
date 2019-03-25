@@ -27,10 +27,22 @@ function* saveSettings(action: any) {
   yield put({type: types.RECEIVE_SETTINGS, settings: action.settingsPayload})
 }
 
+export function* deleteSettings(): any {
+  try {
+    const adapter = getAdapter()
+    const settingsService  = new SettingsService(new adapter())
+    yield settingsService.removeAll
+  } catch (e) {
+    yield put({type: types.REMOVE_FROM_SETTINGS_REJECTED, message: e.message})
+  }
+}
+
+
 // Binding actions to sagas
 function* settingsSaga(): any {
   yield takeLatest(types.INITIALIZE_SETTINGS, initialize)
   yield takeLatest(types.SAVE_SETTINGS, saveSettings)
+  yield takeLatest(types.DELETE_SETTINGS, deleteSettings)
 }
 
 export default settingsSaga

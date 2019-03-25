@@ -1,6 +1,4 @@
-// @flow
-
-import React from 'react'
+import * as React from 'react'
 import { shallow } from 'enzyme'
 
 import configureEnzyme from '../../tests/configureEnzyme'
@@ -8,7 +6,7 @@ import Player from './Player'
 
 configureEnzyme()
 
-const setup = (definedProps: any) => {
+const setup = (definedProps: any): {props: any, enzymeWrapper: any} => {
   const props = {
     player: {},
     dispatch: jest.fn(),
