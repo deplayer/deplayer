@@ -1,5 +1,5 @@
-import { IStorageService } from './IStorageService'
-import { IAdapter } from './adapters/IAdapter'
+import { IStorageService } from '../IStorageService'
+import { IAdapter } from '../adapters/IAdapter'
 
 export default class SettingsService implements IStorageService {
   storageAdapter: IAdapter

@@ -5,7 +5,7 @@ import { Dispatch } from 'redux'
 import { DELETE_COLLECTION } from '../../constants/ActionTypes'
 import SettingsForm from './SettingsForm'
 import { ISettingsBuilder } from '../../interfaces/ISettingsBuilder'
-import SettingsBuilder from '../../services/SettingsBuilder'
+import SettingsBuilder from '../../services/settings/SettingsBuilder'
 
 type Props = {
   dispatch: Dispatch,

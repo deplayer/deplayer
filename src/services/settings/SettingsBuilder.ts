@@ -1,4 +1,4 @@
-import { ISettingsBuilder } from '../interfaces/ISettingsBuilder'
+import { ISettingsBuilder } from '../../interfaces/ISettingsBuilder'
 
 export default class SettingsBuilder implements ISettingsBuilder {
   getFormSchema() {
