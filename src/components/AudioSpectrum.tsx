@@ -64,8 +64,14 @@ class AudioSpectrum extends React.Component<Props> {
   componentDidMount() {
     this.prepareAPIs()
     this.prepareElements()
-    let analyser = this.setupAudioNode(this.audioEle)
+    const analyser = this.setupAudioNode(this.audioEle)
     this.initAudioEvents(analyser)
+  }
+
+  componentWillUnmount() {
+    this.audioEle = null
+    this.audioCanvas = null
+    this.audioContext = null
   }
 
   initAudioEvents = (analyser) => {
@@ -79,10 +85,10 @@ class AudioSpectrum extends React.Component<Props> {
   }
 
   drawSpectrum = (analyser) => {
-    let cwidth = this.audioCanvas.width
-    let cheight = this.audioCanvas.height - this.props.capHeight
+    const cwidth = this.audioCanvas.width
+    const cheight = this.audioCanvas.height - this.props.capHeight
     const capYPositionArray: Array<any> = [] // store the vertical position of hte caps for the preivous frame
-    let ctx = this.audioCanvas.getContext('2d')
+    const ctx = this.audioCanvas.getContext('2d')
     let gradient = ctx.createLinearGradient(0, 0, 0, 300)
 
     if (this.props.meterColor.constructor === Array) {
@@ -96,43 +102,43 @@ class AudioSpectrum extends React.Component<Props> {
     }
 
     let drawMeter = () => {
-      let array = new Uint8Array(analyser.frequencyBinCount); // item value of array: 0 - 255
+      const array = new Uint8Array(analyser.frequencyBinCount); // item value of array: 0 - 255
       analyser.getByteFrequencyData(array);
       if (this.playStatus === 'PAUSED') {
         for (let i = array.length - 1; i >= 0; i--) {
           array[i] = 0
         }
-        let allCapsReachBottom = !capYPositionArray.some(cap => cap > 0)
+        const allCapsReachBottom = !capYPositionArray.some(cap => cap > 0)
         if (allCapsReachBottom) {
           ctx.clearRect(0, 0, cwidth, cheight + this.props.capHeight)
           cancelAnimationFrame(this.animationId) // since the sound is top and animation finished, stop the requestAnimation to prevent potential memory leak,THIS IS VERY IMPORTANT!
           return
         }
       }
-      let step = Math.round(array.length / this.props.meterCount) // sample limited data from the total array
+      const step = Math.round(array.length / this.props.meterCount) // sample limited data from the total array
       ctx.clearRect(0, 0, cwidth, cheight + this.props.capHeight)
       for (let i = 0; i < this.props.meterCount; i++) {
-        let value = array[i * step]
+        const value = array[i * step]
         if (capYPositionArray.length < Math.round(this.props.meterCount)) {
           capYPositionArray.push(value)
-        };
+        }
         ctx.fillStyle = this.props.capColor
         // draw the cap, with transition effect
         if (value < capYPositionArray[i]) {
           // let y = cheight - (--capYPositionArray[i])
-          let preValue = --capYPositionArray[i]
-          let y = (270 - preValue) * cheight / 270
+          const preValue = --capYPositionArray[i]
+          const y = (270 - preValue) * cheight / 270
           ctx.fillRect(i * (this.props.meterWidth + this.props.gap), y, this.props.meterWidth, this.props.capHeight)
         } else {
           // let y = cheight - value
-          let y = (270 - value) * cheight / 270
+          const y = (270 - value) * cheight / 270
           ctx.fillRect(i * (this.props.meterWidth + this.props.gap), y, this.props.meterWidth, this.props.capHeight)
           capYPositionArray[i] = value
         };
         ctx.fillStyle = gradient; // set the filllStyle to gradient for a better look
 
         // let y = cheight - value + this.props.capHeight
-        let y = (270 - value) * (cheight) / 270 + this.props.capHeight
+        const y = (270 - value) * (cheight) / 270 + this.props.capHeight
         ctx.fillRect(i * (this.props.meterWidth + this.props.gap), y, this.props.meterWidth, cheight) // the meter
       }
       this.animationId = requestAnimationFrame(drawMeter)
@@ -145,7 +151,7 @@ class AudioSpectrum extends React.Component<Props> {
     analyser.smoothingTimeConstant = 0.8
     analyser.fftSize = 2048
 
-    let mediaEleSource = this.audioContext.createMediaElementSource(audioEle)
+    const mediaEleSource = this.audioContext.createMediaElementSource(audioEle)
     mediaEleSource.connect(analyser)
     mediaEleSource.connect(this.audioContext.destination);
 
