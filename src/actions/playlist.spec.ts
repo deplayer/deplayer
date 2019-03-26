@@ -13,7 +13,7 @@ const mockStore = configureMockStore(middlewares)
 
 describe('actions/playlist', () => {
   it('should create an action to add songs to playlist', () => {
-    const testSong = new Song()
+    const testSong = new Song({forcedId: 'test'})
     const songs = [testSong]
     const expectedAction = {type: ADD_SONGS_TO_PLAYLIST, songs}
 

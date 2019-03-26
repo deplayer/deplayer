@@ -21,7 +21,7 @@ describe('queue reducer', () => {
     const songs: any = []
     const expectedObj = {}
     for (let i = 1; i <= 20; i++) {
-      const song = new Song({id: i.toString()})
+      const song = new Song({forcedId: i.toString()})
       songs.push(song)
       expectedObj[i] = song
     }

@@ -1,4 +1,4 @@
-import * as uuidv4 from 'uuid'
+import MediaId from './MediaId'
 
 type streamUri = {
   uri: string,
@@ -11,10 +11,10 @@ type stream = {
 }
 
 export default class Media {
-  id: string
   title: string
   duration: number
   artistName: string
+  externalId: string
   artist: {
     name: string
   }
@@ -22,17 +22,22 @@ export default class Media {
 
   constructor(mediaParams: any = {}) {
     const {
-      id,
       artistName,
-      title
+      title,
+      id
     } = mediaParams
-    this.id = id ? id : uuidv4()
+
     this.title = title
+    this.externalId = id
 
     this.artist = {
       name: artistName
     }
     this.artistName = artistName
+  }
+
+  get id() {
+    return new MediaId(this).value
   }
 
   static toSchema(): any {

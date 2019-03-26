@@ -1,7 +1,3 @@
-// @flow
-
-import { Action } from 'redux'
-
 import * as types from '../constants/ActionTypes'
 import {
   sortTrackIds,
@@ -17,9 +13,8 @@ const defaultState = {
   currentPlaying: {}
 }
 
-export default (state: State = defaultState, action: Action = {}): State => {
+export default (state: State = defaultState, action: any = {}): State => {
   switch (action.type) {
-
     case types.ADD_TO_PLAYLIST:
       const mergedTrackIds = [...state.trackIds, ...populateTracks([action.song])]
       return {

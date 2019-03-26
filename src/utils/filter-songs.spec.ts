@@ -3,7 +3,7 @@ import Song from '../entities/Song'
 
 describe('filterSongs', () => {
   const fixtureSong = new Song({
-    id: 'test',
+    forcedId: 'test',
     title: 'test'
   })
   const songs = {test: fixtureSong}

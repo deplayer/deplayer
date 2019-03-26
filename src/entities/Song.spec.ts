@@ -1,5 +1,3 @@
-// @flow
-
 import Song from './Song'
 
 describe('entities/Song', () => {

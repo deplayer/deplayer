@@ -1,4 +1,5 @@
 import Media from './Media'
+import SongId from './SongId'
 
 type money = {
   price: number,
@@ -15,6 +16,7 @@ type album = {
 }
 
 export default class Song extends Media {
+  forcedId: string
   genre: string
   shareUrl: string
   album: album
@@ -29,6 +31,7 @@ export default class Song extends Media {
     super(songParams)
 
     const {
+      forcedId,
       albumName,
       thumbnailUrl,
       fullUrl,
@@ -43,6 +46,7 @@ export default class Song extends Media {
     this.duration = duration
     this.genre = genre
     this.shareUrl = shareUrl
+    this.forcedId = forcedId
 
     this.album = {
       name: albumName
@@ -62,6 +66,10 @@ export default class Song extends Media {
     }
 
     this.stream = stream || []
+  }
+
+  get id() {
+    return new SongId(this).value
   }
 
   hasAnyProviderOf(checkProviders: Array<string>): boolean {
