@@ -10,6 +10,7 @@ Media player thought to run entirelly in the web browser.
 * Fulltext search support thanks to [elasticlunr](https://elasticlunr.com/).
 * Support for Subsonic API.
 * Desktop and mobile notifications thanks to [Notification Web API](https://developer.mozilla.org/en-US/docs/Web/API/notification)
+* Spectum audio visual thanks to [react-audio-spectrum](https://github.com/hu-ke/react-audio-spectrum)
 
 ## Music providers
 
@@ -49,7 +50,6 @@ yarn start
 * react-router
 * react-redux-i18n
 * redux-saga
-* sass-semantic-ui # This was a bad decision, to be removed in future releases
 * bootstrap
 * react-simple-share
 * react-key-handler

@@ -28,6 +28,11 @@ export const defaultState = {
         user: '',
         password: ''
       }
+    },
+    app: {
+      spectrum: {
+        enabled: true
+      }
     }
   }
 }

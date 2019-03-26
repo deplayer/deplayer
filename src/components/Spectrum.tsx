@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import AudioSpectrum from 'react-audio-spectrum'
+import AudioSpectrum from './AudioSpectrum'
 
 type Props = {
   appSettings: any
