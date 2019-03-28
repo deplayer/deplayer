@@ -16,6 +16,7 @@ type album = {
 }
 
 export default class Song extends Media {
+  id: string
   forcedId: string
   genre: string
   shareUrl: string
@@ -43,15 +44,16 @@ export default class Song extends Media {
       shareUrl
     } = songParams
 
+    this.id = forcedId ? forcedId : new SongId(this).value
     this.duration = duration
     this.genre = genre
     this.shareUrl = shareUrl
     this.forcedId = forcedId
 
     this.album = {
-      name: albumName
-    } || {}
-    this.albumName = albumName
+      name: albumName ? albumName : ''
+    }
+    this.albumName = this.album.name
     this.cover = {
       thumbnailUrl: thumbnailUrl,
       fullUrl: fullUrl
@@ -66,10 +68,6 @@ export default class Song extends Media {
     }
 
     this.stream = stream || []
-  }
-
-  get id() {
-    return new SongId(this).value
   }
 
   hasAnyProviderOf(checkProviders: Array<string>): boolean {

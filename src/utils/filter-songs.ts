@@ -4,7 +4,7 @@ const getKeys = (rows: any): Array<string> => {
   return Object.keys(rows)
 }
 
-const filterSongs = (songs: any, term: string) => {
+const filterSongs = (songs: any, term?: string) => {
   if (!term || term === '') {
     return Object.keys(songs)
   }

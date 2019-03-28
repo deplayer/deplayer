@@ -21,9 +21,6 @@ export const defaultState = {
   totalRows: 0
 }
 
-// const excludeDisabledProviders = () => {
-// }
-
 export default (state: State = defaultState, action: any = {}) => {
   switch (action.type) {
     case types.SET_SEARCH_TERM: {
@@ -46,7 +43,7 @@ export default (state: State = defaultState, action: any = {}) => {
       return {
         ...state,
         rows: totalRows,
-        visibleSongs: filterSongs(totalRows, state.searchTerm),
+        visibleSongs: filterSongs(totalRows),
         searchResults: state.searchTerm !== '' ? filterSongs(totalRows, state.searchTerm) : [],
         totalRows: state.totalRows + action.data.length
       }

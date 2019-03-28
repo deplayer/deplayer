@@ -35,15 +35,10 @@ const MusicTable = (props: Props) => {
     const song = props.collection.rows[songId]
 
     if (!song || !song.id) {
-      return (
-        <li
-          className='song-row'
-          key={key}
-          style={style}
-        >
-          <Translate value='error.noSongFound' />
-        </li>
-      )
+      console.log(songId)
+      console.log(song)
+      console.log('rows', props.collection.rows)
+      return null
     }
 
     return (

@@ -34,7 +34,6 @@ export default class SubsonicApiProvider implements IProvider {
     const secureSongs = songs instanceof Array ? songs : [songs]
     return secureSongs.map((song: any) => {
       return new Song({
-        id: "" + song.id,
         title: song.title ? song.title : song.path,
         artistName: song.artist,
         albumName: song.album,
@@ -55,7 +54,10 @@ export default class SubsonicApiProvider implements IProvider {
     return new Promise((resolve, reject) => {
       axios.get(`${this.searchUrl}&query=${searchTerm}`)
         .then((result) => {
-          resolve(this.mapSongs(result.data['subsonic-response'].searchResult3.song))
+          const response = result.data['subsonic-response'].searchResult3 ? result.data['subsonic-response'].searchResult3.song : []
+          resolve(
+            this.mapSongs(response)
+          )
         })
         .catch((err) => {
           reject(err)

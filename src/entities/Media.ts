@@ -11,6 +11,7 @@ type stream = {
 }
 
 export default class Media {
+  id: string
   title: string
   duration: number
   artistName: string
@@ -29,15 +30,12 @@ export default class Media {
 
     this.title = title
     this.externalId = id
+    this.id = new MediaId(this).value
 
     this.artist = {
-      name: artistName
+      name: artistName ? artistName : ''
     }
-    this.artistName = artistName
-  }
-
-  get id() {
-    return new MediaId(this).value
+    this.artistName = this.artist.name
   }
 
   static toSchema(): any {
