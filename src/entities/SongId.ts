@@ -1,4 +1,5 @@
 import Song from './Song'
+import slugify from '@sindresorhus/slugify'
 
 export default class SongId {
   id: string
@@ -7,10 +8,10 @@ export default class SongId {
     if (song.forcedId) {
       this.id = song.forcedId
     } else {
-      this.id = song.artistName + '-' + song.albumName + '-' + song.title
+      this.id = song.artistName + '_' + song.albumName + '_' + song.title
     }
 
-    this.id = this.id.replace(/ /g, '-')
+    this.id = slugify(this.id)
   }
 
   get value() {

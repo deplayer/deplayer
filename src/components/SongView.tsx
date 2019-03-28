@@ -1,6 +1,4 @@
-// @flow
-
-import React, { Component } from 'react'
+import * as React from 'react'
 import { Translate } from 'react-redux-i18n'
 import { Redirect } from 'react-router-dom'
 
@@ -12,7 +10,7 @@ type Props = {
   match: any
 }
 
-export default class SongView extends Component<Props> {
+export default class SongView extends React.Component<Props> {
   render() {
     const songId = this.props.match.params.id
     const song = this.props.collection.rows[songId]

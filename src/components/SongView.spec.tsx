@@ -1,6 +1,4 @@
-// @flow
-
-import React from 'react'
+import * as React from 'react'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../tests/configureEnzyme'
 import SongView from './SongView'
@@ -31,7 +29,7 @@ const setup = (customProps: any) => {
 
 describe('SongView', () => {
   it('redirect if no song found', () => {
-    const { enzymeWrapper } = setup()
+    const { enzymeWrapper } = setup({})
     expect(enzymeWrapper.find('Redirect').exists()).toBe(true)
   })
 
