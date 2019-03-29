@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Translate } from 'react-redux-i18n'
 import { AutoSizer, List } from 'react-virtualized'
 
 import * as types from '../../constants/ActionTypes'
@@ -35,9 +34,6 @@ const MusicTable = (props: Props) => {
     const song = props.collection.rows[songId]
 
     if (!song || !song.id) {
-      console.log(songId)
-      console.log(song)
-      console.log('rows', props.collection.rows)
       return null
     }
 

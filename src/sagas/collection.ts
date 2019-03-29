@@ -17,6 +17,8 @@ const mapToMedia = (collection: Array<any>) => {
       ...elem.get(),
       ...{
         artist: { name: elem.artist.name },
+        album: { name: elem.album.name },
+        albumName: elem.album.name,
         artistName: elem.artist.name,
         thumbnailUrl: elem.cover.thumbnailUrl,
         fullUrl: elem.cover.thumbnailUrl

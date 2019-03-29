@@ -13,6 +13,7 @@ type Props = {
 export default class SongView extends React.Component<Props> {
   render() {
     const songId = this.props.match.params.id
+    console.log(songId)
     const song = this.props.collection.rows[songId]
 
     if (!song || !song.id) {

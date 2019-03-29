@@ -4,8 +4,8 @@ const getKeys = (rows: any): Array<string> => {
   return Object.keys(rows)
 }
 
-const filterSongs = (songs: any, term?: string) => {
-  if (!term || term === '') {
+const filterSongs = (songs: any, term: string = '') => {
+  if (term === '') {
     return Object.keys(songs)
   }
 
