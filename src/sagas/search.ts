@@ -31,6 +31,7 @@ export function* search(action: SearchAction): any {
     yield put({type: types.SEARCH_REJECTED, message: e.message})
   }
   yield put({type: types.SEARCH_FINISHED, searchTerm: action.searchTerm})
+  yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.search.finished'})
 }
 
 // Going to home page

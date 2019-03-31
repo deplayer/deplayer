@@ -19,5 +19,10 @@
   },
   "placeholder": {
     "search": "Type some artist, song or album..."
+  },
+  "notifications": {
+    "search": {
+      "finished": "Search finished!"
+    }
   }
 }

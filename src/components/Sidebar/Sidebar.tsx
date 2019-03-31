@@ -16,8 +16,7 @@ type ContentProps = {
 const SidebarContents = (props: ContentProps) => {
   return (
     <div>
-      <CloseButton dispatch={props.dispatch} />
-      <h4>genar-radio</h4>
+      <h4>genar-radio <CloseButton dispatch={props.dispatch} /></h4>
       <ul>
         <li><QueueMenuItem /></li>
         <li><CollectionMenuItem /></li>

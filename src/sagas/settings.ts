@@ -32,8 +32,10 @@ export function* deleteSettings(): any {
   try {
     const adapter = getAdapter()
     const settingsService  = new SettingsService(new adapter())
-    yield settingsService.removeAll
+    yield call(settingsService.removeAll)
+    yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.settings.deleted'})
   } catch (e) {
+    yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.settings.deleted_failed'})
     yield put({type: types.REMOVE_FROM_SETTINGS_REJECTED, message: e.message})
   }
 }
