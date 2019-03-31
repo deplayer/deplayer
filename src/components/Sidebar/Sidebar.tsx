@@ -49,7 +49,6 @@ const MSidebar = (props: Props) => {
     <Sidebar
       sidebar={contents}
       open={props.sidebarToggled}
-      docked={props.sidebarToggled}
       sidebarId='left-sidebar'
       overlayId='left-sidebar-overlay'
       contentId='left-sidebar-content'

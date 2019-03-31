@@ -5,6 +5,10 @@
     text-align: center;
     padding-left: 20px;
     line-height: 55px;
+
+    button {
+      margin-left: 20px;
+    }
   }
 
   background-color: lighten($body-bg-color, 8%);
