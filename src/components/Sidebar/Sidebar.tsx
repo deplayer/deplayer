@@ -10,12 +10,13 @@ import QueueMenuItem from './QueueMenuItem'
 const Sidebar = require('react-sidebar').default;
 
 type ContentProps = {
-  dispatch: Dispatch
+  dispatch: Dispatch,
+  onSetSidebarOpen: Function
 }
 
 const SidebarContents = (props: ContentProps) => {
   return (
-    <div>
+    <div onClick={() => props.onSetSidebarOpen()}>
       <h4>genar-radio <CloseButton dispatch={props.dispatch} /></h4>
       <ul>
         <li><QueueMenuItem /></li>
@@ -41,6 +42,7 @@ const MSidebar = (props: Props) => {
 
   const contents = (
     <SidebarContents
+      onSetSidebarOpen={onSetSidebarOpen}
       dispatch={props.dispatch}
     />
   )
