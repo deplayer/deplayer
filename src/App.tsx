@@ -18,11 +18,15 @@ import PlayAllButton from './components/Buttons/PlayAllButton'
 import ClearQueueButton from './components/Buttons/ClearQueueButton'
 import BackButton from './components/Buttons/BackButton'
 
+// Alerts
+import Alert from 'react-s-alert'
+
 import {
   Router,
   Route,
 } from 'react-router-dom'
 
+require('react-s-alert/dist/s-alert-default.css')
 require('./styles/App.scss')
 
 const appStore = configureStore()
@@ -119,13 +123,14 @@ class App extends React.Component<any> {
       <Provider store={appStore}>
         <Router history={history} >
           <React.Fragment>
-            <Route exact path="/" component={Home} />
-            <Route path="/index.html" component={Home} />
-            <Route path="/collection" component={Collection} />
-            <Route path="/search-results" component={SearchResults} />
-            <Route path="/song/:id" component={Song} />
-            <Route path="/settings" component={Settings} />
-            <PlayerContainer />
+              <Route exact path="/" component={Home} />
+              <Route path="/index.html" component={Home} />
+              <Route path="/collection" component={Collection} />
+              <Route path="/search-results" component={SearchResults} />
+              <Route path="/song/:id" component={Song} />
+              <Route path="/settings" component={Settings} />
+              <PlayerContainer />
+              <Alert stack={{limit: 3}} />
           </React.Fragment>
         </Router>
       </Provider>

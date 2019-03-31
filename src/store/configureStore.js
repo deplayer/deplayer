@@ -1,16 +1,15 @@
-// @flux
-
 import { createStore, applyMiddleware, compose } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import thunk from 'redux-thunk'
 import promise from 'redux-promise'
-import * as types from '../constants/ActionTypes'
+
 import {
   loadTranslations,
   setLocale,
   syncTranslationWithStore,
 } from 'react-redux-i18n'
 
+import * as types from '../constants/ActionTypes'
 import translationsObject from '../locales'
 import rootReducer from '../reducers'
 
@@ -24,8 +23,11 @@ import queueSaga from '../sagas/queue'
 import mediaSessionSaga from '../sagas/mediaSession'
 import connectionSaga from '../sagas/connection'
 
+// Custom middlewares
+import alerts from './middlewares/alerts'
+
 export default function configureStore() {
-  let middlewares = [promise, thunk]
+  let middlewares = [promise, thunk, alerts]
 
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 

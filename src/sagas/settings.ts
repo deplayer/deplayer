@@ -25,6 +25,7 @@ function* saveSettings(action: any) {
 
   yield put({type: types.SETTINGS_SAVED_SUCCESSFULLY})
   yield put({type: types.RECEIVE_SETTINGS, settings: action.settingsPayload})
+  yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.settings.saved'})
 }
 
 export function* deleteSettings(): any {
