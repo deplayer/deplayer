@@ -106,7 +106,6 @@ class Topbar extends React.Component<Props, State> {
           type='text'
         />
         { this.props.loading ? <i className='icon fa fa-spinner'></i> : <i className='icon search'></i> }
-        { this.props.error ?  <div className='alert search'>{ this.props.error }</div> : null }
       </div>
     )
   }
