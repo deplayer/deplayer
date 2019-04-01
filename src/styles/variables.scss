@@ -1,8 +1,30 @@
 // Fonts
-$font-family: Monaco,Menlo,Consolas,'Courier New',monospace;
+// $font-family: Monaco,Menlo,Consolas,'Courier New',monospace;
+$font-family: inherit;
 
 // Colors
-$primary-color: #4d94aa;
-$secondary-color: #fefe54;
-$greyscale-color: #101010;
+$primary-base: #2073c2;
+$primary-color: $primary-base;
+$primary-color-100: lighten(adjust-hue($primary-base, 0), 50%);
+$primary-color-400: lighten(adjust-hue($primary-base, 10), 20%);
+$primary-color-600: darken(adjust-hue($primary-base, -5), 10%);
+$primary-color-800: darken(adjust-hue($primary-base, -5), 10%);
+
+// Green colors
+$secondary-base: #20c220;
+$secondary-color: $secondary-base;
+$secondary-color-lighter1: lighten(adjust-hue($secondary-base, 5), 10%);
+$secondary-color-lighter2: lighten(adjust-hue($secondary-base, 10), 20%);
+$secondary-color-darker1: darken(adjust-hue($secondary-base, -5), 10%);
+$secondary-color-darker2: darken(adjust-hue($secondary-base, -10), 20%);
+
+$greyscale-base: #2f5263;
+$greyscale-color: $greyscale-base;
+$greyscale-color-100: lighten(adjust-hue($greyscale-base, 0), 60%);
+$greyscale-lighter1: lighten(adjust-hue($greyscale-base, 5), 10%);
+$greyscale-lighter2: lighten(adjust-hue($greyscale-base, 10), 20%);
+$greyscale-darker1: darken(adjust-hue($greyscale-base, -5), 10%);
+$greyscale-darker2: darken(adjust-hue($greyscale-base, -10), 20%);
+
+$warning-color: #dc3545;
 $yellow-color: #a50;

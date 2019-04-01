@@ -1,29 +1,31 @@
 #left-sidebar {
+  background-color: $greyscale-darker1;
+  padding-top: 10px;
+  width: 100%;
+  max-width: 200px;
+
+  button, .button, a {
+    color: $gray-100;
+    background: transparent;
+  }
 
   h4 {
     clear: both;
     text-align: center;
-    padding-left: 20px;
     line-height: 55px;
-
-    button {
-      margin-left: 20px;
-    }
+    color: $greyscale-color-100;
   }
-
-  background-color: lighten($greyscale-color, 8%);
 
   ul {
     @extend .list-unstyled;
-    padding-top: 15px;
+    padding-top: 35px;
 
     li {
-      padding-top: 5px;
-      padding-bottom: 5px;
-      padding-left: 10px;
-      padding-right: 10px;
+      line-height: 60px;
+      padding-left: 20px;
+      padding-right: 20px;
 
-      border-top: 1px solid $primary-color;
+      border-top: 1px solid $greyscale-darker2;
     }
   }
 

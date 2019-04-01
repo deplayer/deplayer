@@ -11,7 +11,7 @@ export const defaultState = {
 export default (state: State = defaultState, action) => {
   switch (action.type) {
     case types.TOGGLE_SIDEBAR: {
-      return {...state, sidebarToggled: !state.sidebarToggled}
+      return {...state, sidebarToggled: action.value ? action.value :!state.sidebarToggled}
     }
 
     default:

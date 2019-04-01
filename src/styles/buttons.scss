@@ -1,29 +1,13 @@
-.button {
-  a {
-    color: $primary-color;
-    @extend .btn;
-  }
-  &.current {
-    a {
-      color: $primary-color;
-      text-shadow: 0px 0px 5px $primary-color;
-    }
-
-    border-bottom: solid 1px $primary-color;
-  }
-
-  i {
-    padding-left: 2px;
-  }
-}
-
 .btn,
 button {
   @extend .btn;
-  color: $primary-color;
+  color: $primary-color-100;
+  background-color: $primary-color;
+  font-weight: bold;
 
   &:hover {
-    color: $primary-color;
+    color: $primary-color-100;
+    background-color: $primary-color-800;
   }
 
   &.circle {

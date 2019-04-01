@@ -2,13 +2,6 @@
 $fa-font-path: "./fonts" !default;
 @import "font-awesome/scss/font-awesome.scss";
 
-@font-face {
-  font-family: 'DOS';
-  font-style: normal;
-  font-weight: normal;
-  src: local('DOS'), url('fonts/Fixedsys500c.woff') format('woff');
-}
-
 @import './variables.scss';
 
 // Own styles
@@ -31,6 +24,7 @@ $fa-font-path: "./fonts" !default;
 @import './song-row.scss';
 @import './audio-canvas.scss';
 @import './lazy-image.scss';
+@import './toggle.scss';
 
 html, body {
   height: 100%;
@@ -41,9 +35,9 @@ body {
   padding: 0px;
   overflow-x: hidden;
   min-width: 320px;
-  background: $greyscale-color;
+  background: $greyscale-darker2;
   font-family: $font-family;
-  color: $primary-color;
+  color: $greyscale-color-100;
   font-smoothing: antialiased;
 }
 

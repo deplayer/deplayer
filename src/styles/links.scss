@@ -1,8 +1,10 @@
 a {
+  color: $gray-100;
   outline: none;
 
   &:hover {
     text-decoration: none;
+    color: $gray-400;
   }
 }
 

@@ -2,12 +2,10 @@ import * as React from 'react'
 import { Dispatch } from 'redux'
 
 import * as types from '../../constants/ActionTypes'
-import CloseButton from './CloseButton'
 import CollectionMenuItem from './CollectionMenuItem'
 import SettingsMenuItem from './SettingsMenuItem'
 import QueueMenuItem from './QueueMenuItem'
-
-const Sidebar = require('react-sidebar').default;
+import Sidebar from 'react-sidebar'
 
 type ContentProps = {
   dispatch: Dispatch,
@@ -17,7 +15,7 @@ type ContentProps = {
 const SidebarContents = (props: ContentProps) => {
   return (
     <div onClick={() => props.onSetSidebarOpen()}>
-      <h4>genar-radio <CloseButton dispatch={props.dispatch} /></h4>
+      <h4>genar-radio</h4>
       <ul>
         <li><QueueMenuItem /></li>
         <li><CollectionMenuItem /></li>
@@ -34,8 +32,8 @@ type Props = {
 }
 
 type State = {
-  sidebarDocked: boolean,
-  sidebarOpen: boolean
+  sidebarOpen: boolean,
+  sidebarDocked: boolean
 }
 
 const mql = window.matchMedia(`(min-width: 800px)`)
@@ -45,7 +43,7 @@ class MSidebar extends React.Component<Props, State> {
     super(props)
     this.state = {
       sidebarDocked: mql.matches,
-      sidebarOpen: mql.matches
+      sidebarOpen: props.sidebarToggled
     }
 
     this.mediaQueryChanged = this.mediaQueryChanged.bind(this);
@@ -61,16 +59,16 @@ class MSidebar extends React.Component<Props, State> {
   }
 
   mediaQueryChanged() {
-    this.setState({ sidebarDocked: mql.matches, sidebarOpen: false });
+    this.setState({ sidebarDocked: mql.matches, sidebarOpen: false })
   }
 
   onSetSidebarOpen = (open) => {
-    this.props.dispatch({type: types.TOGGLE_SIDEBAR})
-    this.setState({ sidebarOpen: open });
+    this.props.dispatch({type: types.TOGGLE_SIDEBAR, value: open})
   }
 
   render() {
-    const { children } = this.props
+    const { children, sidebarToggled } = this.props
+    const { sidebarDocked } = this.state
 
     const contents = (
       <SidebarContents
@@ -82,12 +80,13 @@ class MSidebar extends React.Component<Props, State> {
     return (
       <Sidebar
         sidebar={contents}
-        open={this.props.sidebarToggled}
+        open={sidebarToggled}
         sidebarId='left-sidebar'
         overlayId='left-sidebar-overlay'
         contentId='left-sidebar-content'
         onSetOpen={this.onSetSidebarOpen}
-        docked={this.state.sidebarDocked}
+        transitions={false}
+        docked={sidebarDocked}
       >
         { children }
       </Sidebar>
