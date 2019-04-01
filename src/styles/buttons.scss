@@ -1,15 +1,15 @@
 .button {
   a {
-    color: $button-color-hover;
+    color: $primary-color;
     @extend .btn;
   }
   &.current {
     a {
-      color: $green-color;
-      text-shadow: 0px 0px 5px $green-color;
+      color: $primary-color;
+      text-shadow: 0px 0px 5px $primary-color;
     }
 
-    border-bottom: solid 1px $green-color;
+    border-bottom: solid 1px $primary-color;
   }
 
   i {
@@ -20,10 +20,10 @@
 .btn,
 button {
   @extend .btn;
-  color: $button-color;
+  color: $primary-color;
 
   &:hover {
-    color: $button-color-hover;
+    color: $primary-color;
   }
 
   &.circle {
@@ -40,7 +40,6 @@ button {
   }
 
   &.with-bg {
-    background-color: $button-bg-color;
   }
 }
 
@@ -57,7 +56,7 @@ button {
 }
 
 .react-contexify {
-  background-color: $body-bg-color !important;
+  background-color: $greyscale-color !important;
   border: 0;
   box-shadow: none !important;
   padding: 0;

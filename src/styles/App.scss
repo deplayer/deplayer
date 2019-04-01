@@ -41,9 +41,9 @@ body {
   padding: 0px;
   overflow-x: hidden;
   min-width: 320px;
-  background: $body-bg-color;
+  background: $greyscale-color;
   font-family: $font-family;
-  color: $font-color;
+  color: $primary-color;
   font-smoothing: antialiased;
 }
 
@@ -57,7 +57,7 @@ body {
 }
 
 .music-table {
-  color: $font-color !important;
+  color: $primary-color !important;
   margin: 0;
   padding: 0;
   @extend .list-unstyled;

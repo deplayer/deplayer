@@ -11,7 +11,7 @@
     }
   }
 
-  background-color: lighten($body-bg-color, 8%);
+  background-color: lighten($greyscale-color, 8%);
 
   ul {
     @extend .list-unstyled;

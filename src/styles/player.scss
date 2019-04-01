@@ -2,7 +2,7 @@
   position: relative;
   box-shadow: 0 -8px 12px rgba(77, 148, 170, 0.5);
   grid-area: player;
-  background-color: $body-bg-color;
+  background-color: $greyscale-color;
   padding: 10px;
   z-index: 1000;
 
@@ -14,7 +14,7 @@
     .media-thumb {
       display: block;
       margin-top: 10px;
-      background-color: darken($body-bg-color, 20%);
+      background-color: darken($greyscale-color, 20%);
     }
   }
 

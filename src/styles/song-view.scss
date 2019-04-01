@@ -42,7 +42,7 @@
       }
 
       table {
-        background-color: $body-bg-color;
+        background-color: $greyscale-color;
 
         tr {
           &:first-child {
@@ -75,12 +75,12 @@
       }
 
       .header {
-        color: $font-color;
+        color: $primary-color;
         font-size: 1.8em;
 
       }
       .meta {
-        color: $font-color;
+        color: $primary-color;
         font-size: 1.5em;
       }
     }

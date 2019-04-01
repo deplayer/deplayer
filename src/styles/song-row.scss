@@ -52,10 +52,10 @@
   }
 
   border-top: 1px solid $primary-color;
-  border-bottom: 1px solid $body-bg-color;
+  border-bottom: 1px solid $greyscale-color;
 
   &.current {
-    background-color: lighten($body-bg-color, 8%);
+    background-color: lighten($greyscale-color, 8%);
     color: #fff;
     border-top: 1px solid #fff;
     border-bottom: 1px solid #fff;

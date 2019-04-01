@@ -33,32 +33,66 @@ type Props = {
   dispatch: Dispatch
 }
 
-const MSidebar = (props: Props) => {
-  const { children } = props
+type State = {
+  sidebarDocked: boolean,
+  sidebarOpen: boolean
+}
 
-  const onSetSidebarOpen = (open) => {
-    props.dispatch({type: types.TOGGLE_SIDEBAR})
+const mql = window.matchMedia(`(min-width: 800px)`)
+
+class MSidebar extends React.Component<Props, State> {
+  constructor(props) {
+    super(props)
+    this.state = {
+      sidebarDocked: mql.matches,
+      sidebarOpen: mql.matches
+    }
+
+    this.mediaQueryChanged = this.mediaQueryChanged.bind(this);
+    this.onSetSidebarOpen = this.onSetSidebarOpen.bind(this);
   }
 
-  const contents = (
-    <SidebarContents
-      onSetSidebarOpen={onSetSidebarOpen}
-      dispatch={props.dispatch}
-    />
-  )
+  componentWillMount() {
+    mql.addListener(this.mediaQueryChanged);
+  }
 
-  return (
-    <Sidebar
-      sidebar={contents}
-      open={props.sidebarToggled}
-      sidebarId='left-sidebar'
-      overlayId='left-sidebar-overlay'
-      contentId='left-sidebar-content'
-      onSetOpen={onSetSidebarOpen}
-    >
-      { children }
-    </Sidebar>
-  )
+  componentWillUnmount() {
+    mql.removeListener(this.mediaQueryChanged);
+  }
+
+  mediaQueryChanged() {
+    this.setState({ sidebarDocked: mql.matches, sidebarOpen: false });
+  }
+
+  onSetSidebarOpen = (open) => {
+    this.props.dispatch({type: types.TOGGLE_SIDEBAR})
+    this.setState({ sidebarOpen: open });
+  }
+
+  render() {
+    const { children } = this.props
+
+    const contents = (
+      <SidebarContents
+        onSetSidebarOpen={this.onSetSidebarOpen}
+        dispatch={this.props.dispatch}
+      />
+    )
+
+    return (
+      <Sidebar
+        sidebar={contents}
+        open={this.props.sidebarToggled}
+        sidebarId='left-sidebar'
+        overlayId='left-sidebar-overlay'
+        contentId='left-sidebar-content'
+        onSetOpen={this.onSetSidebarOpen}
+        docked={this.state.sidebarDocked}
+      >
+        { children }
+      </Sidebar>
+    )
+  }
 }
 
 
