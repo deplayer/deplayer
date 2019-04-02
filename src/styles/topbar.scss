@@ -1,7 +1,7 @@
 .topbar-container {
   @extend .d-flex;
   justify-content: space-between;
-  box-shadow: 0px 8px 12px rgba(77, 148, 170, 0.5);
+  border-bottom: solid 4px $greyscale-lighter2;
 
   & > div {
     @extend .d-flex;

@@ -44,12 +44,12 @@ const ArtistTable = (props: Props) => {
 
   return (
     <React.Fragment>
-      <AutoSizer className='music-table'>
+      <AutoSizer className='artists-table'>
         {({ height, width }) => (
           <List
             height={height}
             rowCount={props.tableIds.length}
-            rowHeight={100}
+            rowHeight={50}
             rowRenderer={rowRenderer}
             width={width}
             overscanRowCount={6}

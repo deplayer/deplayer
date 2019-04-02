@@ -19,7 +19,7 @@ const ArtistsMenuItem = ({current = false}: Props) => {
         title="artists"
       >
         <i className='icon fa fa-microphone'></i>
-        Arists
+        Artists
       </Link>
     </div>
   )

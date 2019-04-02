@@ -39,11 +39,8 @@ export default class SongView extends React.Component<Props> {
             <div>
               <div>
                 <div>
-                  <div className='collapsed'>
-                    <span className='label'><Translate value='song.label.title' /></span>
-                  </div>
                   <div>
-                    { song.title }
+                    <h2>{ song.title }</h2>
                   </div>
                 </div>
                 <div>

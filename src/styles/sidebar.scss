@@ -10,6 +10,7 @@
   button, .button, a {
     color: $gray-100;
     background: transparent;
+    letter-spacing: 2px;
 
     &.current {
       a {

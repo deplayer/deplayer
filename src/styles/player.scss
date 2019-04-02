@@ -1,6 +1,6 @@
 .player-container {
   position: relative;
-  box-shadow: 0 -8px 12px rgba(77, 148, 170, 0.5);
+  border-top: solid 2px $primary-color;
   grid-area: player;
   background-color: $gray-900;
   padding: 10px;
