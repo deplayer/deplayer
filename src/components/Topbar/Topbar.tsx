@@ -119,7 +119,7 @@ class Topbar extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <div className={`topbar-container ${ this.props.showInCenter ? '': 'has-results'}`}>
+        <div className={`topbar-container has-results`}>
           <SidebarButton />
           <KeyHandler
             keyEventName={KEYPRESS}

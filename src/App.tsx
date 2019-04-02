@@ -57,7 +57,7 @@ const Layout = (props: LayoutProps) => {
 // TODO: Make a HOC
 const Home = () => {
   return (
-    <Layout title='Home'>
+    <Layout title='Queue'>
       <QueueContainer />
     </Layout>
   )

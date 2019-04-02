@@ -12,11 +12,17 @@ type Props = {
 
 const Queue = (props: Props) => {
   if (!props.queue.trackIds.length) {
-    return null
+    return (
+      <div className='queue no-results'>
+        <blockquote className='blockquote'>
+          <p>Add songs from the collection or search for new ones</p>
+        </blockquote>
+      </div>
+    )
   }
 
   return (
-    <div className='collection'>
+    <div className='queue'>
       <MusicTable
         tableIds={props.queue.trackIds}
         {...props}

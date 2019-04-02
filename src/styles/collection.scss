@@ -1,6 +1,11 @@
+.queue,
 .collection {
   overflow: hidden;
   grid-area: contents;
+
+  &.no-results {
+    margin: auto;
+  }
 }
 
 .table-status {
