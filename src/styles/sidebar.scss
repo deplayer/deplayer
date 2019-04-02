@@ -2,7 +2,10 @@
   background-color: $greyscale-darker1;
   padding-top: 10px;
   width: 100%;
-  max-width: 200px;
+
+  @include media-breakpoint-up(md) {
+    max-width: 200px;
+  }
 
   button, .button, a {
     color: $gray-100;
@@ -22,10 +25,19 @@
 
     li {
       line-height: 60px;
-      padding-left: 20px;
-      padding-right: 20px;
+      border-top: 2px solid $greyscale-color;
 
-      border-top: 1px solid $greyscale-darker2;
+      a {
+        padding-left: 20px;
+        padding-right: 20px;
+        width: 100%;
+        height: 100%;
+        display: inline-block;
+
+        i {
+          margin-right: 10px;
+        }
+      }
     }
   }
 
