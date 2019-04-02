@@ -5,9 +5,25 @@
 
   button {
     margin-bottom: 40px;
+    max-width: 200px;
   }
 
-  h2 {
+  @include media-breakpoint-up(md) {
+    h2 {
+      margin-top: 60px;
+
+      &:first-child {
+        margin-top: 20px;
+      }
+    }
+  }
+
+  > .btn-group {
+    button {
+      background: transparent;
+      color: $warning;
+      font-weight: normal;
+    }
   }
 }
 

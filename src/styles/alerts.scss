@@ -17,12 +17,11 @@
     position: fixed;
     background: $secondary-color-darker2;
     padding: 8px 22px;
+    line-height: 22px;
     padding-right: 40px;
-    line-height: 1.4;
     z-index: 9999;
     pointer-events: none;
     color: rgba(250,251,255,0.95);
-    font-size: 100%;
     max-width: 300px;
     -webkit-transition: top .4s, bottom .4s;
     transition: top .4s, bottom .4s;
