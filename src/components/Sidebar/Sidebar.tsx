@@ -29,6 +29,15 @@ const SidebarContents = (props: ContentProps) => {
         <li><ArtistsMenuItem  current={inSection('artists')} /></li>
         <li><SettingsMenuItem current={inSection('settings')} /></li>
       </ul>
+
+      <section className='sidebar-meta'>
+        <a
+          href={'https://gitlab.com/gtrias/genar-radio'}
+          target="_blank"
+        >
+          <i className='fa fa-gitlab' />
+        </a>
+      </section>
     </div>
   )
 }
