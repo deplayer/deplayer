@@ -8,11 +8,10 @@
     justify-content: flex-end;
   }
 
-  padding-top: 10px;
-  padding-bottom: 10px;
-
   z-index: 1;
   grid-area: contents;
+  padding-top: 10px;
+  padding-bottom: 10px;
   padding-left: 10px;
   padding-right: 10px;
 
@@ -29,10 +28,21 @@
     &.connection-btn {
       margin-left: 0;
     }
+
+    &.sidebar-button {
+      @include media-breakpoint-up(md) {
+        display: none;
+      }
+    }
   }
 
   h2 {
-    text-transform: uppercase;
     margin-bottom: 0;
+
+    @include media-breakpoint-up(md) {
+      &:before {
+        content: '> ';
+      }
+    }
   }
 }

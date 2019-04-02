@@ -15,7 +15,7 @@
 
 .s-alert-box {
     position: fixed;
-    background: rgba(42,45,50,0.85);
+    background: $secondary-color-darker2;
     padding: 8px 22px;
     padding-right: 40px;
     line-height: 1.4;
@@ -143,19 +143,19 @@ $alert-offset: 30px;
 /* conditions */
 
 .s-alert-info {
-    background: #00A2D3;
+    background: $info;
     color: #fff;
 }
 .s-alert-success {
-    background: #27AE60;
+    background: $success;
     color: #fff;
 }
 .s-alert-warning {
-    background: #F1C40F;
+    background: $warning;
     color: #fff;
 }
 .s-alert-error {
-    background: #E74C3C;
+    background: $danger;
     color: #fff;
 }
 

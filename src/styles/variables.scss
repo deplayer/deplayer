@@ -3,15 +3,15 @@
 $font-family: inherit;
 
 // Colors
-$primary-base: #2073c2;
+$primary: #2073c2;
+$primary-base: $primary;
 $primary-color: $primary-base;
 $primary-color-100: lighten(adjust-hue($primary-base, 0), 50%);
 $primary-color-400: lighten(adjust-hue($primary-base, 10), 20%);
 $primary-color-600: darken(adjust-hue($primary-base, -5), 10%);
 $primary-color-800: darken(adjust-hue($primary-base, -5), 10%);
 
-// Green colors
-$secondary-base: #20c220;
+$secondary-base: #fefe54;
 $secondary-color: $secondary-base;
 $secondary-color-lighter1: lighten(adjust-hue($secondary-base, 5), 10%);
 $secondary-color-lighter2: lighten(adjust-hue($secondary-base, 10), 20%);
