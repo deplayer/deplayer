@@ -22,3 +22,4 @@ deploy:
   variables:
     SURGE_LOGIN: $SURGE_LOGIN
     SURGE_TOKEN: $SURGE_TOKEN
+    PUBLIC_URL: https://genar-radio.surge.sh
