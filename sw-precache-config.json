@@ -1,0 +1,13 @@
+{
+  "staticFileGlobs": [
+    "build/css/**.css",
+    "build/**.html",
+    "build/images/**.*",
+    "build/js/**.js"
+  ],
+  "stripPrefix": "build/",
+  "runtimeCaching": [{
+    "urlPattern": "(.*)",
+    "handler": "networkFirst"
+  }]
+}
