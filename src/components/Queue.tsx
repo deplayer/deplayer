@@ -19,7 +19,6 @@ const Queue = (props: Props) => {
     <div className='collection'>
       <MusicTable
         tableIds={props.queue.trackIds}
-        totalSongs={props.queue.trackIds.length}
         {...props}
       />
     </div>
