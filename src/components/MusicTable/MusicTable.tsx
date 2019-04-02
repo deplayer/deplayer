@@ -9,7 +9,6 @@ export type Props = {
   queue: any,
   tableIds: Array<string>,
   collection: any,
-  totalSongs: number,
   dispatch: (action: any) => any,
   disableAddButton?: boolean,
 }
@@ -72,7 +71,7 @@ const MusicTable = (props: Props) => {
         )}
       </AutoSizer>
       <div className="table-status">
-        Total items: { props.tableIds.length }
+        Total items: <b>{ props.tableIds.length }</b>
       </div>
       {errors}
     </React.Fragment>

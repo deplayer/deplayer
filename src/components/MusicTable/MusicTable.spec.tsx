@@ -16,7 +16,6 @@ const setup = () => {
       trackIds: [],
       currentPlaying: {},
     },
-    totalSongs: 10,
     collection: {}
   }
 
