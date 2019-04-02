@@ -10,6 +10,13 @@
   button, .button, a {
     color: $gray-100;
     background: transparent;
+
+    &.current {
+      a {
+        color: $white;
+        background-color: $greyscale-lighter1;
+      }
+    }
   }
 
   h4 {

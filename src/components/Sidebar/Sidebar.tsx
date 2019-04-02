@@ -9,17 +9,21 @@ import Sidebar from 'react-sidebar'
 
 type ContentProps = {
   dispatch: Dispatch,
+  location: any,
   onSetSidebarOpen: Function
 }
 
 const SidebarContents = (props: ContentProps) => {
+  const inQueue = props.location.pathname.match(/^\/$/) ? true : false
+  const inCollection = props.location.pathname.match(/^\/collection$/) ? true : false
+  const inSettings = props.location.pathname.match(/^\/settings/) ? true : false
   return (
     <div onClick={() => props.onSetSidebarOpen()}>
       <h4>genar-radio</h4>
       <ul>
-        <li><QueueMenuItem /></li>
-        <li><CollectionMenuItem /></li>
-        <li><SettingsMenuItem /></li>
+        <li><QueueMenuItem current={inQueue} /></li>
+        <li><CollectionMenuItem current={inCollection} /></li>
+        <li><SettingsMenuItem current={inSettings} /></li>
       </ul>
     </div>
   )
@@ -27,6 +31,7 @@ const SidebarContents = (props: ContentProps) => {
 
 type Props = {
   sidebarToggled: boolean,
+  location: any,
   children: any,
   dispatch: Dispatch
 }
@@ -67,11 +72,12 @@ class MSidebar extends React.Component<Props, State> {
   }
 
   render() {
-    const { children, sidebarToggled } = this.props
+    const { children, sidebarToggled, location } = this.props
     const { sidebarDocked } = this.state
 
     const contents = (
       <SidebarContents
+        location={location}
         onSetSidebarOpen={this.onSetSidebarOpen}
         dispatch={this.props.dispatch}
       />
