@@ -8,7 +8,7 @@ export default class NotificationService {
     const Notification = this.getNotificationClass()
     if (Notification) {
       new Notification(
-        media.title + ' - ' + media.artist.name
+        media.title + ' - ' + media.author.name
       )
     }
   }

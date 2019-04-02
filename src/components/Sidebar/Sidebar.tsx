@@ -5,6 +5,7 @@ import * as types from '../../constants/ActionTypes'
 import CollectionMenuItem from './CollectionMenuItem'
 import SettingsMenuItem from './SettingsMenuItem'
 import QueueMenuItem from './QueueMenuItem'
+import ArtistsMenuItem from './ArtistsMenuItem'
 import Sidebar from 'react-sidebar'
 
 type ContentProps = {
@@ -14,16 +15,19 @@ type ContentProps = {
 }
 
 const SidebarContents = (props: ContentProps) => {
-  const inQueue = props.location.pathname.match(/^\/$/) ? true : false
-  const inCollection = props.location.pathname.match(/^\/collection$/) ? true : false
-  const inSettings = props.location.pathname.match(/^\/settings/) ? true : false
+  const inSection = (section: string) => {
+    const pattern = '^/' + section + '$'
+    return props.location.pathname.match(new RegExp(pattern)) ? true : false
+  }
+
   return (
     <div onClick={() => props.onSetSidebarOpen()}>
       <h4>genar-radio</h4>
       <ul>
-        <li><QueueMenuItem current={inQueue} /></li>
-        <li><CollectionMenuItem current={inCollection} /></li>
-        <li><SettingsMenuItem current={inSettings} /></li>
+        <li><QueueMenuItem current={inSection('')} /></li>
+        <li><CollectionMenuItem current={inSection('collection')} /></li>
+        <li><ArtistsMenuItem  current={inSection('artists')} /></li>
+        <li><SettingsMenuItem current={inSection('settings')} /></li>
       </ul>
     </div>
   )

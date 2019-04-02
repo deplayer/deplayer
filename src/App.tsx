@@ -10,6 +10,7 @@ import SidebarContainer from './containers/SidebarContainer'
 import TopbarContainer from './containers/TopbarContainer'
 import SongContainer from './containers/SongContainer'
 import SettingsContainer from './containers/SettingsContainer'
+import ArtistsContainer from './containers/ArtistsContainer'
 import configureStore from './store/configureStore'
 import history from './store/configureHistory'
 
@@ -62,11 +63,32 @@ const Home = () => {
   )
 }
 
+type AppLayoutProps = {
+  title: string,
+  children: any
+}
+
+const AppLayout = (props: AppLayoutProps) => {
+  return (
+    <Layout title={props.title}>
+      { props.children }
+    </Layout>
+  )
+}
+
+const Artists = () => {
+  return (
+    <AppLayout title='Artists'>
+      <ArtistsContainer />
+    </AppLayout>
+  )
+}
+
 const Collection = () => {
   return (
-    <Layout title='Collection'>
+    <AppLayout title='Collection'>
       <CollectionContainer />
-    </Layout>
+    </AppLayout>
   )
 }
 
@@ -128,6 +150,7 @@ class App extends React.Component<any> {
               <Route path="/collection" component={Collection} />
               <Route path="/search-results" component={SearchResults} />
               <Route path="/song/:id" component={Song} />
+              <Route path="/artists" component={Artists} />
               <Route path="/settings" component={Settings} />
               <PlayerContainer />
               <Alert stack={{limit: 3}} />

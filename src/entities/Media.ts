@@ -13,17 +13,15 @@ type stream = {
 export default class Media {
   id: string
   title: string
+  author: any
+  authorName: string
   duration: number
-  artistName: string
   externalId: string
-  artist: {
-    name: string
-  }
   stream: Array<stream>
 
   constructor(mediaParams: any = {}) {
     const {
-      artistName,
+      authorName,
       title,
       id
     } = mediaParams
@@ -32,10 +30,10 @@ export default class Media {
     this.externalId = id
     this.id = new MediaId(this).value
 
-    this.artist = {
-      name: artistName ? artistName : ''
+    this.author = {
+      name: authorName ? authorName : ''
     }
-    this.artistName = this.artist.name
+    this.authorName = this.author.name
   }
 
   static toSchema(): any {
@@ -92,7 +90,7 @@ export default class Media {
     return {
       id: '' + this.id,
       title: this.title,
-      artist: this.artist,
+      artist: this.author,
       stream: this.stream,
       duration: this.duration
     }

@@ -1,21 +1,33 @@
-import reducer, {defaultState} from './collection'
+import reducer, { defaultState } from './collection'
 import * as types from '../constants/ActionTypes'
 import Song from '../entities/Song'
 
 describe('collection reducer', () => {
   it('should return the initial state', () => {
     expect(reducer(undefined, {}))
-      .toEqual( defaultState)
+      .toEqual(defaultState)
   })
 
   it('should handle RECEIVE_COLLECTION', () => {
     const initialState = {...defaultState, enabledProviders: ['itunes']}
     const fixtureSong = new Song({
+      artistName: 'The Doors',
       stream: [{uris: [{uri: 'http://some-songs-api/song.mp4'}], service: 'itunes'}]
     })
     const rows = {}
     rows[fixtureSong.id] = new Song(fixtureSong)
-    const expected = {...initialState, totalRows: 1, rows, visibleSongs: [fixtureSong.id]}
+
+    const artists = {}
+    artists[fixtureSong.artist.id] = fixtureSong.artist
+
+    const expected = {
+      ...initialState,
+      totalRows: 1,
+      artists,
+      rows,
+      visibleSongs: [fixtureSong.id]
+    }
+
     expect(reducer(initialState, {type: types.RECEIVE_COLLECTION, data: [fixtureSong]}))
       .toEqual(expected)
   })

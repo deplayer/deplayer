@@ -1,5 +1,6 @@
 import Media from './Media'
 import SongId from './SongId'
+import Artist from './Artist'
 
 type money = {
   price: number,
@@ -27,12 +28,16 @@ export default class Song extends Media {
   duration: number
   price: money
   dateAdded: Date
+  artistName: string
+
+  artist: Artist
 
   constructor(songParams: any = {}) {
     super(songParams)
 
     const {
       forcedId,
+      artistName,
       albumName,
       thumbnailUrl,
       fullUrl,
@@ -43,6 +48,11 @@ export default class Song extends Media {
       stream,
       shareUrl
     } = songParams
+
+    this.artist = new Artist({
+      name: artistName ? artistName : ''
+    })
+    this.artistName = this.artist.name
 
     this.id = forcedId ? forcedId : new SongId(this).value
     this.duration = duration

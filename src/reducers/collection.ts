@@ -5,15 +5,17 @@ import Song from '../entities/Song'
 
 type State = {
   rows: any,
+  artists: any,
   searchTerm: string,
   visibleSongs: Array<string>,
   searchResults: Array<string>,
   enabledProviders: Array<string>,
-  totalRows: number,
+  totalRows: number
 }
 
 export const defaultState = {
   rows: {},
+  artists: {},
   searchTerm: '',
   visibleSongs: [],
   searchResults: [],
@@ -33,16 +35,20 @@ export default (state: State = defaultState, action: any = {}) => {
     case types.ADD_TO_COLLECTION:
     case types.RECEIVE_COLLECTION: {
       const rows = {}
+      const artists = {}
       action.data.forEach((row) => {
         const song = new Song(row)
         if (song.hasAnyProviderOf(state.enabledProviders)) {
           rows[row.id] = song
+          artists[song.artist.id] = song.artist
         }
       })
       const totalRows = {...state.rows, ...rows}
+      const totalArtists = {...state.artists, ...artists}
       return {
         ...state,
         rows: totalRows,
+        artists: totalArtists,
         visibleSongs: filterSongs(totalRows),
         searchResults: state.searchTerm !== '' ? filterSongs(totalRows, state.searchTerm) : [],
         totalRows: state.totalRows + action.data.length
