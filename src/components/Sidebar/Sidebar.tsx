@@ -33,6 +33,7 @@ const SidebarContents = (props: ContentProps) => {
       <section className='sidebar-meta'>
         <a
           href={'https://gitlab.com/gtrias/genar-radio'}
+          title="Show me the code"
           target="_blank"
         >
           <i className='fa fa-gitlab' />
