@@ -9,7 +9,7 @@ import CoverImage from '../MusicTable/CoverImage'
 import SkipButton from './SkipButton'
 import VolumeControl from './VolumeControl'
 import Spectrum from './../Spectrum'
-import { PLAY_NEXT, PLAY_PREV } from '../../constants/ActionTypes'
+import * as types from '../../constants/ActionTypes'
 
 type Props = {
   queue: any,
@@ -24,7 +24,6 @@ type Props = {
 }
 
 type State = {
-  error: string,
   currentTime: number,
   volume?: number
 }
@@ -32,7 +31,6 @@ type State = {
 // TODO: Fill all events https://www.w3schools.com/tags/ref_av_dom.asp
 class Player extends React.Component<Props, State> {
   state = {
-    error: '',
     currentTime: 0,
     volume: 1,
   }
@@ -44,8 +42,10 @@ class Player extends React.Component<Props, State> {
   }
 
   logError(ev: any) {
-    this.setState({
-      error: this.playerRef.current.error.message
+    this.props.dispatch({
+      type: types.SEND_NOTIFICATION,
+      notification: 'notifications.player.play_failed',
+      level: 'warning'
     })
   }
 
@@ -73,14 +73,14 @@ class Player extends React.Component<Props, State> {
   // Play next song of the player list
   playNext = () => {
     if (this.props.queue.nextSongId) {
-      this.props.dispatch({type: PLAY_NEXT})
+      this.props.dispatch({type: types.PLAY_NEXT})
     }
   }
 
   // Play prev song of the player list
   playPrev = () => {
     if (this.props.queue.prevSongId) {
-      this.props.dispatch({type: PLAY_PREV})
+      this.props.dispatch({type: types.PLAY_PREV})
     }
   }
 
@@ -172,7 +172,6 @@ class Player extends React.Component<Props, State> {
                     dispatch={this.props.dispatch}
                   />
                 </div>
-                {this.state.error}
               </div>
             </div>
           </div>
