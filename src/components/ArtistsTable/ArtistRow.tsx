@@ -13,13 +13,13 @@ const ArtistRow = (props: Props) => {
 
   return (
     <li
-      className='song-row'
+      className='artist-row'
       style={props.style}
     >
       <div>
         { artist.name }
 
-        <span className='badge'>
+        <span className='badge badge-secondary'>
           { props.songs.length }
         </span>
       </div>

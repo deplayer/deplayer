@@ -1,27 +1,22 @@
 import * as React from 'react'
-import classnames from 'classnames'
 
-import { Link } from 'react-router-dom'
+import MenuItem from './MenuItem'
 
 type Props = {
+  totalItems: number,
   current?: Boolean
 }
 
-const ArtistsMenuItem = ({current = false}: Props) => {
-  const classNames = classnames({
-    button: true,
-    current: current
-  })
+const ArtistsMenuItem = ({totalItems, current = false}: Props) => {
   return (
-    <div className={ classNames }>
-      <Link
-        to="/artists"
-        title="artists"
-      >
-        <i className='icon fa fa-microphone'></i>
-        Artists
-      </Link>
-    </div>
+    <MenuItem
+      totalItems={totalItems}
+      current={current}
+      url='/artists'
+      title='artists'
+      label='Artists'
+      iconClasses='icon fa fa-microphone'
+    />
   )
 }
 

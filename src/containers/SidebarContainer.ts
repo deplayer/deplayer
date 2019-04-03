@@ -5,6 +5,8 @@ import Sidebar from '../components/Sidebar/Sidebar'
 
 export default withRouter(connect((state, ownProps) => {
   return {
+    collection: state.collection,
+    queue: state.queue,
     sidebarToggled: state.app.sidebarToggled
   }
 })(Sidebar))

@@ -10,7 +10,11 @@
   button, .button, a {
     color: $gray-100;
     background: transparent;
-    letter-spacing: 2px;
+
+    .badge {
+      line-height: 57px;
+      float: right;
+    }
 
     &.current {
       a {

@@ -10,6 +10,8 @@ import Sidebar from 'react-sidebar'
 
 type ContentProps = {
   dispatch: Dispatch,
+  collection: any,
+  queue: any,
   location: any,
   onSetSidebarOpen: Function
 }
@@ -24,10 +26,27 @@ const SidebarContents = (props: ContentProps) => {
     <div onClick={() => props.onSetSidebarOpen()}>
       <h4>genar-radio</h4>
       <ul>
-        <li><QueueMenuItem current={inSection('')} /></li>
-        <li><CollectionMenuItem current={inSection('collection')} /></li>
-        <li><ArtistsMenuItem  current={inSection('artists')} /></li>
-        <li><SettingsMenuItem current={inSection('settings')} /></li>
+        <li>
+          <QueueMenuItem
+            current={inSection('')}
+            totalItems={props.queue.trackIds.length}
+          />
+        </li>
+        <li>
+          <CollectionMenuItem
+            current={inSection('collection')}
+            totalItems={props.collection.totalRows}
+          />
+        </li>
+        <li>
+          <ArtistsMenuItem
+            current={inSection('artists')}
+            totalItems={props.collection.artists.length}
+          />
+        </li>
+        <li>
+          <SettingsMenuItem current={inSection('settings')} />
+        </li>
       </ul>
 
       <section className='sidebar-meta'>
@@ -45,6 +64,8 @@ const SidebarContents = (props: ContentProps) => {
 
 type Props = {
   sidebarToggled: boolean,
+  collection: any,
+  queue: any,
   location: any,
   children: any,
   dispatch: Dispatch
@@ -92,6 +113,8 @@ class MSidebar extends React.Component<Props, State> {
     const contents = (
       <SidebarContents
         location={location}
+        collection={this.props.collection}
+        queue={this.props.queue}
         onSetSidebarOpen={this.onSetSidebarOpen}
         dispatch={this.props.dispatch}
       />

@@ -1,27 +1,22 @@
 import * as React from 'react'
-import classnames from 'classnames'
 
-import { Link } from 'react-router-dom'
+import MenuItem from './MenuItem'
 
 type Props = {
+  totalItems: number,
   current?: Boolean
 }
 
-const QueueMenuItem = ({current = false}: Props) => {
-  const classNames = classnames({
-    button: true,
-    current: current
-  })
+const QueueMenuItem = ({current = false, totalItems}: Props) => {
   return (
-    <div className={ classNames }>
-      <Link
-        to="/"
-        title="playlists"
-      >
-        <i className='icon music outline'></i>
-        Queue
-      </Link>
-    </div>
+    <MenuItem
+      totalItems={totalItems}
+      current={current}
+      url='/'
+      title='queue'
+      label='Queue'
+      iconClasses='icon music outline'
+    />
   )
 }
 

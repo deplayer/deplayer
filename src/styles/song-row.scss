@@ -13,9 +13,17 @@
   }
 }
 
+.artist-row,
 .song-row {
   position: relative;
   overflow: hidden;
+
+  border-top: 1px solid $primary-color;
+  border-bottom: 1px solid $greyscale-color;
+
+  .badge {
+    line-height: 1.5;
+  }
 
   h4, h5, h6 {
     margin: 0;
@@ -42,7 +50,6 @@
   }
 
   & > div {
-    height: 100px;
     width: 100%;
     @extend .d-flex;
     @extend .justify-content-between;
@@ -51,9 +58,6 @@
     padding-top: 10px;
     padding-bottom: 10px;
   }
-
-  border-top: 1px solid $primary-color;
-  border-bottom: 1px solid $greyscale-color;
 
   &.current {
     border-bottom: 1px solid $primary-color;
