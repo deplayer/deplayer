@@ -1,5 +1,5 @@
 {
-  "staticFileGlobs": [
+  "globPatterns": [
     "build/css/**.css",
     "build/**.html",
     "build/images/**.*",

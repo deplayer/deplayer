@@ -73,7 +73,6 @@
     "sass-semantic-ui": "^2.2.12-3",
     "source-map-loader": "^0.2.4",
     "style-loader": "0.19.0",
-    "sw-precache-webpack-plugin": "0.11.4",
     "typescript": "^3.2.4",
     "url-loader": "0.6.2",
     "uuid": "^3.3.2",
@@ -84,7 +83,7 @@
   },
   "scripts": {
     "start": "node scripts/start.js",
-    "build": "node scripts/build.js && sw-precache --config=sw-precache-config.json --root build",
+    "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom --forceExit"
   },
   "jest": {
@@ -158,8 +157,8 @@
     "redux-thunk": "^2.2.0",
     "sass-loader": "^7.1.0",
     "surge": "^0.20.1",
-    "sw-precache": "^5.2.1",
     "ts-jest": "^23.10.5",
-    "ts-loader": "^5.3.3"
+    "ts-loader": "^5.3.3",
+    "workbox-webpack-plugin": "^4.2.0"
   }
 }
