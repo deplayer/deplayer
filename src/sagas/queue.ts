@@ -7,7 +7,7 @@ import * as types from '../constants/ActionTypes'
 
 // Extract songs from collection state
 export const getSongs = (state: any, action): Array<string> => {
-  if (action.path === 'search') {
+  if (action.path === 'search-results') {
     return state ? state.collection.searchResults : []
   }
 
