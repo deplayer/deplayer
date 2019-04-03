@@ -59,11 +59,11 @@ export default class Song extends Media {
     this.genre = genre
     this.shareUrl = shareUrl
     this.forcedId = forcedId
+    this.albumName = albumName
 
     this.album = {
       name: albumName ? albumName : ''
     }
-    this.albumName = this.album.name
     this.cover = {
       thumbnailUrl: thumbnailUrl,
       fullUrl: fullUrl

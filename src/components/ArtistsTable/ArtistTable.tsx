@@ -37,6 +37,7 @@ const ArtistTable = (props: Props) => {
       <ArtistRow
         key={key}
         artist={artist}
+        songs={props.collection.songsByArtist[artist.id]}
         style={style}
       />
     )

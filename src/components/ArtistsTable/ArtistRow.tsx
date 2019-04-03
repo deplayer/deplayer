@@ -4,6 +4,7 @@ import Artist from '../../entities/Artist'
 
 type Props = {
   artist: Artist,
+  songs: any,
   style: any
 }
 
@@ -17,6 +18,10 @@ const ArtistRow = (props: Props) => {
     >
       <div>
         { artist.name }
+
+        <span className='badge'>
+          { props.songs.length }
+        </span>
       </div>
     </li>
   )

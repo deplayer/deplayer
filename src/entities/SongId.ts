@@ -10,11 +10,9 @@ export default class SongId {
     } else {
       this.id = song.artistName + '_' + song.albumName + '_' + song.title
     }
-
-    this.id = slugify(this.id)
   }
 
   get value() {
-    return this.id
+    return slugify(this.id)
   }
 }

@@ -17,7 +17,6 @@ const mapToMedia = (collection: Array<any>) => {
       ...elem.get(),
       ...{
         artist: { name: elem.artist.name },
-        album: { name: elem.album.name },
         albumName: elem.album.name,
         artistName: elem.artist.name,
         thumbnailUrl: elem.cover.thumbnailUrl,
@@ -60,7 +59,11 @@ export function* addToCollection(action: any): any {
   const collectionService = new CollectionService(new adapter())
   const collection = yield collectionService.bulkSave(action.data)
   const mappedData = mapToMedia(collection)
-  yield put({type: types.RECEIVE_COLLECTION, data: mappedData})
+  try {
+    yield put({type: types.RECEIVE_COLLECTION, data: mappedData})
+  } catch (e) {
+    yield put({type: types.RECEIVE_COLLECTION_REJECTED, error: e.message})
+  }
 }
 
 // Handling REMOVE_FROM_COLLECTION saga

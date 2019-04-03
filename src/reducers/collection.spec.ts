@@ -20,10 +20,14 @@ describe('collection reducer', () => {
     const artists = {}
     artists[fixtureSong.artist.id] = fixtureSong.artist
 
+    const songsByArtist = {}
+    songsByArtist[fixtureSong.artist.id] = [fixtureSong.id]
+
     const expected = {
       ...initialState,
       totalRows: 1,
       artists,
+      songsByArtist,
       rows,
       visibleSongs: [fixtureSong.id]
     }
