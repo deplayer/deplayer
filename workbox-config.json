@@ -8,6 +8,6 @@
   "stripPrefix": "build/",
   "runtimeCaching": [{
     "urlPattern": "(.*)",
-    "handler": "networkFirst"
+    "handler": "staleWhileRevalidate"
   }]
 }
