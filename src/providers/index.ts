@@ -1,5 +1,3 @@
-// @flow
-
 import ITunesProvider from './ItunesApiProvider'
 import MstreamApiProvider from './MstreamApiProvider'
 import SubsonicApiProvider from './SubsonicApiProvider'

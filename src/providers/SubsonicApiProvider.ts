@@ -1,5 +1,3 @@
-// @flow
-
 import axios from 'axios'
 
 import Song from '../entities/Song'

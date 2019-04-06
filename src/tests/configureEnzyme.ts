@@ -1,5 +1,5 @@
 import { configure } from 'enzyme'
-import * as ReactSixteenAdapter from 'enzyme-adapter-react-16';
+import ReactSixteenAdapter from 'enzyme-adapter-react-16';
 
 const configureJest = () => {
   configure({ adapter: new ReactSixteenAdapter() })

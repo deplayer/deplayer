@@ -1,4 +1,4 @@
-import * as elasticlunr from 'elasticlunr'
+import elasticlunr from 'elasticlunr'
 
 export default class IndexService {
   index: any

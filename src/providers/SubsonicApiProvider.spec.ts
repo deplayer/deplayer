@@ -1,5 +1,3 @@
-// @flow
-
 import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
 
@@ -14,7 +12,8 @@ const mock = new MockAdapter(axios)
 mock.onGet(/rest\/search/).reply(200, { 'subsonic-response': {
   searchResult3: {
     song: exampleSongs
-  }}})
+  }}}
+)
 
 describe('SubsonicApiProvider', () => {
   const mstreamRepo = new SubsonicApiProvider({baseUrl: ''})
