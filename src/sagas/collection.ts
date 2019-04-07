@@ -108,8 +108,8 @@ export function* generateIndex(action): any {
 
 // Binding actions to sagas
 function* collectionSaga(): any {
-  yield takeLatest(types.RECEIVE_SETTINGS, initializeCollection)
-  yield takeLatest(types.INITIALIZED, initializeSearchIndex)
+  yield takeLatest(types.RECEIVE_SETTINGS_FINISHED, initializeCollection)
+  yield takeLatest(types.RECEIVE_SETTINGS_FINISHED, initializeSearchIndex)
   yield takeLatest(types.ADD_TO_COLLECTION, generateIndex)
   yield takeLatest(types.REMOVE_FROM_COLLECTION, removeFromCollection)
   yield takeLatest(types.DELETE_COLLECTION, deleteCollection)

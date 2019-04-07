@@ -38,6 +38,11 @@ export function* saveQueue(): any {
   yield queueService.save('queue', queue)
 }
 
+export function* clearQueue(): any {
+  logger.log('queue-saga', 'removing queue')
+  yield queueService.save('queue', {})
+}
+
 // Application initialization routines
 function* initialize() {
   yield queueService.initialize
@@ -57,6 +62,7 @@ function* initialize() {
 function* queueSaga(): any {
   yield takeLatest(types.PLAY_ALL, playAll)
   yield takeLatest(types.ADD_SONGS_TO_QUEUE, saveQueue)
+  yield takeLatest(types.CLEAR_QUEUE, clearQueue)
   yield takeLatest(types.INITIALIZED, initialize)
 }
 

@@ -16,6 +16,7 @@ function* initialize() {
     const unserialized = JSON.parse(JSON.stringify(settings))
     yield put({type: types.RECEIVE_SETTINGS, settings: unserialized})
   }
+  yield put({type: types.RECEIVE_SETTINGS_FINISHED})
 }
 
 function* saveSettings(action: any) {
