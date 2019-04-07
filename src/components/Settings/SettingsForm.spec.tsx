@@ -17,9 +17,10 @@ const setup = (customProps: any) => {
   }
 
   const defaultProps = {
-    schema,
     settings: {
-      settings: {}
+      settings: {
+        settingsForm: schema
+      },
     },
     onSubmit: () => Promise.resolve()
   }

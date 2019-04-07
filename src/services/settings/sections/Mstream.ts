@@ -1,6 +1,8 @@
 import { ISettingsSection } from './ISettingsSection'
 
 export default class Mstream implements ISettingsSection {
+  isRepeatable: true
+
   getFormSchema() {
     return [
       {title: "labels.mstream", type: 'title'},

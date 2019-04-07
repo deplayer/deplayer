@@ -2,12 +2,12 @@ import * as React from 'react'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../../tests/configureEnzyme'
 
-import Settings, { formSchema } from './Settings'
+import Settings from './Settings'
 
 configureEnzyme()
 
 const setup = (customProps: any) => {
-  const defaultProps = {schema: formSchema}
+  const defaultProps = {settings: {settingsForm: {}}}
 
   const props = {...defaultProps, ...customProps}
 

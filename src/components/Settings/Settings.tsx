@@ -4,8 +4,6 @@ import { Dispatch } from 'redux'
 
 import * as types from '../../constants/ActionTypes'
 import SettingsForm from './SettingsForm'
-import { ISettingsBuilder } from '../../interfaces/ISettingsBuilder'
-import SettingsBuilder from '../../services/settings/SettingsBuilder'
 
 type Props = {
   dispatch: Dispatch,
@@ -13,10 +11,6 @@ type Props = {
 }
 
 type State = {}
-
-export const formSchema = (settingsBuilder: ISettingsBuilder) => {
-  return settingsBuilder.getFormSchema()
-}
 
 class Settings extends React.Component<Props, State> {
   deleteCollection = () => {
@@ -28,10 +22,12 @@ class Settings extends React.Component<Props, State> {
   }
 
   render() {
+    const settingsForm = this.props.settings.settingsForm
+
     return (
       <div className='settings'>
         <SettingsForm
-          schema={formSchema(new SettingsBuilder())}
+          schema={settingsForm}
           settings={this.props.settings}
           dispatch={this.props.dispatch}
         />

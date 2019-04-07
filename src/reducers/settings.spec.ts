@@ -22,6 +22,7 @@ describe('settings reducer', () => {
     expect(reducer(undefined, {type: RECEIVE_SETTINGS, settings}))
       .toEqual(
         {
+          ...defaultState,
           error: '',
           saving: false,
           settings
@@ -50,6 +51,7 @@ describe('settings reducer', () => {
     expect(reducer(undefined, {type: SETTINGS_SAVED_SUCCESSFULLY, settings}))
       .toEqual(
         {
+          ...defaultState,
           error: '',
           saving: false,
           settings

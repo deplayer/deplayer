@@ -3,16 +3,21 @@ import {
   SETTINGS_SAVED_SUCCESSFULLY
 } from '../constants/ActionTypes'
 import { ISettings } from '../interfaces/ISettings'
+import SettingsBuilder from '../services/settings/SettingsBuilder'
 
 type State = {
   error: string,
   saving: boolean,
-  settings: ISettings
+  settings: ISettings,
+  settingsForm: any
 }
+
+const settingsBuilder = new SettingsBuilder()
 
 export const defaultState = {
   error: '',
   saving: false,
+  settingsForm: settingsBuilder.getFormSchema(),
   settings: {
     providers: {
       itunes: {
