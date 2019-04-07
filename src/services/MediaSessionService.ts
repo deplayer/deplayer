@@ -1,4 +1,9 @@
 import * as actions from '../constants/ActionTypes'
+import logger from '../utils/logger'
+
+// fix ts navigator typings
+declare var navigator: any
+declare var window: any
 
 export default class MediaSessionService {
   updateMetadata = (media, dispatch) => {
@@ -40,7 +45,7 @@ export default class MediaSessionService {
       return true
     }
 
-    // console.log("This browser does not support media session")
+    logger.log('MediaSession', "This browser does not support media session")
     return
   }
 }

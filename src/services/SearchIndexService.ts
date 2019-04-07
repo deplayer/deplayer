@@ -1,5 +1,6 @@
 import { IStorageService } from './IStorageService'
 import { IAdapter } from './adapters/IAdapter'
+import logger from '../utils/logger'
 
 export default class SearchIndexService implements IStorageService {
   storageAdapter: IAdapter
@@ -13,10 +14,10 @@ export default class SearchIndexService implements IStorageService {
   }
 
   save = (id: string, payload: any): Promise<any> => {
-    console.log('search index saving: ', payload)
+    logger.log('search index saving: ', payload)
     return this.storageAdapter.save('search_index', 'search_index', payload)
       .catch((e) => {
-        console.log('Error saving search_index', e.message)
+        logger.error('Error saving search_index', e.message)
       })
   }
 

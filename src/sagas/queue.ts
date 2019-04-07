@@ -2,6 +2,7 @@ import { takeLatest, put, select, call } from 'redux-saga/effects'
 
 import { getAdapter } from '../services/adapters'
 import QueueService from '../services/QueueService'
+import logger from '../utils/logger'
 
 import * as types from '../constants/ActionTypes'
 
@@ -32,18 +33,22 @@ const adapter = getAdapter()
 const queueService = new QueueService(new adapter())
 
 export function* saveQueue(): any {
+  logger.log('queue-saga', 'saving queue')
   const queue = yield select(getQueue)
-  yield call(queueService.save, 'queue', queue)
+  yield queueService.save('queue', queue)
 }
 
 // Application initialization routines
 function* initialize() {
   yield queueService.initialize
+  logger.log('queue-saga', 'initializing queue')
   const queue = yield call(queueService.get)
   if (!queue) {
+    logger.log('queue-saga', 'error retrieving queue')
     yield put({type: types.GET_QUEUE_REJECTED})
   } else {
     const unserialized = JSON.parse(JSON.stringify(queue))
+    logger.log('queue-saga', 'queue recieved and unserialized')
     yield put({type: types.RECEIVE_QUEUE, queue: unserialized})
   }
 }

@@ -1,14 +1,15 @@
 import * as types from '../constants/ActionTypes'
 import { Dispatch } from 'redux'
+import logger from '../utils/logger'
 
 export default class ConnectionService {
   registerConnection = (dispatch: Dispatch) => {
     const updateOnlineStatus = () => {
       if (navigator.onLine) {
-        console.log('enter online mode')
+        logger.log('ConnectionService', 'enter online mode')
         dispatch({type: types.SET_ONLINE_CONNECTION})
       } else {
-        console.log('exit online mode')
+        logger.log('ConnectionService', 'exit online mode')
         dispatch({type: types.SET_OFFLINE_CONNECTION})
       }
     }

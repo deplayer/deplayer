@@ -1,5 +1,6 @@
 import { IAdapter } from './IAdapter'
 import * as db from './RxdbDatabase'
+import logger from '../../utils/logger'
 
 export default class RxdbAdapter implements IAdapter {
   initialize = () => {
@@ -26,7 +27,7 @@ export default class RxdbAdapter implements IAdapter {
         resolve(results)
       })
         .catch((e) => {
-          console.warn(e)
+          logger.log('RxdbDatabase', e)
           reject(e)
         })
     })
@@ -45,7 +46,7 @@ export default class RxdbAdapter implements IAdapter {
         resolve(results)
       })
         .catch((e) => {
-          console.warn(e)
+          logger.log('RxdbDatabase', e)
           reject(e)
         })
     })
@@ -60,14 +61,14 @@ export default class RxdbAdapter implements IAdapter {
       return db.get().then((instance) => {
         this.getDocObj(model, id).then((result) => {
           if (!result) {
-            console.log('Result for %s with id %s not found', model, id)
+            logger.log('RxdbDatabase', 'Result for %s with id %s not found', model, id)
             return resolve()
           }
 
           return resolve(result.get())
         })
           .catch((err) => {
-            console.warn(err)
+            logger.log('RxdbDatabase', err)
             reject(err)
           })
       })
@@ -88,7 +89,7 @@ export default class RxdbAdapter implements IAdapter {
           resolve()
         })
           .catch((err) => {
-            console.warn(err)
+            logger.log('RxdbDatabase', err)
             reject(err)
           })
       })
@@ -117,7 +118,7 @@ export default class RxdbAdapter implements IAdapter {
           resolve(null)
         })
           .catch((err) => {
-            console.warn(err)
+            logger.warn('RxdbDatabase', err)
             reject(err)
           })
       })

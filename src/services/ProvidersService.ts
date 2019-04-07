@@ -1,5 +1,3 @@
-// @flow
-
 import { IProvider } from '../providers/IProvider'
 import { ISearchService } from './ISearchService'
 import { ISettings } from '../interfaces/ISettings'

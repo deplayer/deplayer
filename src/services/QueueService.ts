@@ -1,5 +1,6 @@
 import { IStorageService } from './IStorageService'
 import { IAdapter } from './adapters/IAdapter'
+import logger from '../utils/logger'
 
 export default class QueueService implements IStorageService {
   storageAdapter: IAdapter
@@ -15,7 +16,7 @@ export default class QueueService implements IStorageService {
   save = (id: string, payload: any): Promise<any> => {
     return this.storageAdapter.save('queue', 'queue', payload)
       .catch((e) => {
-        console.log('Error saving queue', e.message)
+        logger.log('Error saving queue', e.message)
       })
   }
 

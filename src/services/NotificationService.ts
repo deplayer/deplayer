@@ -1,4 +1,5 @@
 import Media from '../entities/Media'
+import logger from '../utils/logger'
 
 // fix ts window typings
 declare var window: any
@@ -17,7 +18,7 @@ export default class NotificationService {
     const Notification = window.Notification
 
     if (!Notification) {
-      console.log("This browser does not support desktop notification");
+      logger.log("This browser does not support desktop notification");
       return
     }
 

@@ -2,6 +2,7 @@ import RxDB from 'rxdb'
 
 import Media from '../../entities/Media'
 import Artist from '../../entities/Artist'
+import logger from '../../utils/logger'
 
 const collections: Array<any> = [
   {
@@ -100,15 +101,15 @@ const _create = async (): Promise<any> => {
 
   // console.log('DatabaseService: deleting previous database..')
   // await RxDB.removeDatabase('settings', 'idb');
-  console.log('DatabaseService: creating database..')
+  logger.log('DatabaseService', 'creating database..')
   const db = await createDB()
-  console.log('DatabaseService: created database')
+  logger.log('DatabaseService', 'created database')
   window['db'] = db; // write to window for debugging
 
   // create collections
-  console.log('DatabaseService: create collections')
+  logger.log('DatabaseService', 'create collections')
   await Promise.all(collections.map(colData => db.collection(colData)))
-  console.log('DatabaseService: collections created')
+  logger.log('DatabaseService', 'collections created')
 
   return db
 }

@@ -1,4 +1,5 @@
 import elasticlunr from 'elasticlunr'
+import logger from '../../utils/logger'
 
 export default class IndexService {
   index: any
@@ -29,7 +30,7 @@ export default class IndexService {
     if (!indexDump) {
       return this
     }
-    console.log('indexDump', indexDump)
+    logger.log('indexDump', indexDump)
     this.index = elasticlunr.Index.load(indexDump)
 
     return this

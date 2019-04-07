@@ -1,4 +1,5 @@
 import * as React from 'react'
+import logger from '../utils/logger'
 
 declare var AudioContext: any;
 
@@ -167,8 +168,7 @@ class AudioSpectrum extends React.Component<Props> {
     try {
       this.audioContext = new AudioContext() // 1.set audioContext
     } catch (e) {
-      // console.error('!Your browser does not support AudioContext')
-      console.log(e);
+      logger.error('!Your browser does not support AudioContext')
     }
   }
 

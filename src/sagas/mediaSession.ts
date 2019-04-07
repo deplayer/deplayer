@@ -1,5 +1,3 @@
-// @flow
-
 import { takeLatest, call, select } from 'redux-saga/effects'
 
 import MediaSessionService from '../services/MediaSessionService'
@@ -23,7 +21,7 @@ export function* setCurrentPlayingMeta (dispatch: any): any {
 }
 
 // Binding actions to sagas
-function* mediaSessionSaga(store: any): Generator<void, void, void> {
+function* mediaSessionSaga(store: any): any {
   yield takeLatest(types.SET_CURRENT_PLAYING, setCurrentPlayingMeta, store.dispatch)
   yield takeLatest(types.PLAY_NEXT, setCurrentPlayingMeta, store.dispatch)
   yield takeLatest(types.PLAY_PREV, setCurrentPlayingMeta, store.dispatch)
