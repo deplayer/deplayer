@@ -9,3 +9,14 @@
 .rc-slider-handle {
   // margin-top: 0;
 }
+
+.rc-slider-handle {
+  border: solid 2px $primary-color-100;
+  width: 16px;
+  height: 16px;
+  background-color: $primary-color;
+}
+
+.rc-slider-track {
+  background-color: $primary-color-400;
+}
