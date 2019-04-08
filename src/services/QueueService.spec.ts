@@ -1,5 +1,5 @@
 import QueueService from './QueueService'
-import DummyAdapter from './adapters/DummyAdapter'
+import DummyAdapter from './database/DummyAdapter'
 import { defaultState } from '../reducers/queue'
 
 describe('QueueService', () => {

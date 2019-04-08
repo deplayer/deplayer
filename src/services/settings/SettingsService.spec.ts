@@ -1,5 +1,5 @@
 import SettingsService from './SettingsService'
-import DummyAdapter from '../adapters/DummyAdapter'
+import DummyAdapter from '../database/DummyAdapter'
 
 describe('SettingsService', () => {
   it('should handle save', () => {

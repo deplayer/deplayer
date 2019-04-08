@@ -2,7 +2,7 @@ import { takeLatest, put, call } from 'redux-saga/effects'
 
 import CollectionService from '../services/CollectionService'
 import SearchIndexService from '../services/SearchIndexService'
-import { getAdapter } from '../services/adapters'
+import { getAdapter } from '../services/database'
 import IndexService from '../services/Search/IndexService'
 
 import * as types from '../constants/ActionTypes'

@@ -1,6 +1,6 @@
 import { takeLatest, put, select, call } from 'redux-saga/effects'
 
-import { getAdapter } from '../services/adapters'
+import { getAdapter } from '../services/database'
 import QueueService from '../services/QueueService'
 import logger from '../utils/logger'
 

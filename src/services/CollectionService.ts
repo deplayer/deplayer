@@ -1,5 +1,5 @@
 import { IStorageService } from './IStorageService'
-import { IAdapter } from './adapters/IAdapter'
+import { IAdapter } from './database/IAdapter'
 
 import Media from '../entities/Media'
 

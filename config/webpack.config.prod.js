@@ -285,16 +285,16 @@ module.exports = {
     // the HTML & assets that are part of the Webpack build.
     new GenerateSW({
       // Config options, if needed.
-      // By default, a cache-busting query parameter is appended to requests
-      // used to populate the caches, to ensure the responses are fresh.
-      // If a URL is already hashed by Webpack, then there is no concern
-      // about it being stale, and the cache-busting can be skipped.
-      dontCacheBustUrlsMatching: /\.\w{8}\./,
       // For unknown URLs, fallback to the index page
       navigateFallback: publicUrl + '/index.html',
       // Ignores URLs starting from /__ (useful for Firebase):
       // https://github.com/facebookincubator/create-react-app/issues/2237#issuecomment-302693219
-      navigateFallbackWhitelist: [/^(?!\/__).*/]
+      navigateFallbackWhitelist: [/^(?!\/__).*/],
+      swDest: path.join('build', 'service-worker.js'),
+      runtimeCaching: [{
+        urlPattern: "(.*)",
+        handler: "StaleWhileRevalidate"
+      }]
     }),
     // Moment.js is an extremely popular library that bundles large locale files
     // by default due to how Webpack interprets its code. This is a practical

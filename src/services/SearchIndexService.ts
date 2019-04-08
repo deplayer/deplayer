@@ -1,5 +1,5 @@
 import { IStorageService } from './IStorageService'
-import { IAdapter } from './adapters/IAdapter'
+import { IAdapter } from './database/IAdapter'
 import logger from '../utils/logger'
 
 export default class SearchIndexService implements IStorageService {

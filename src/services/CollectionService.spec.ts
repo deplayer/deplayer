@@ -1,5 +1,5 @@
 import CollectionService from './CollectionService'
-import DummyAdapter from './adapters/DummyAdapter'
+import DummyAdapter from './database/DummyAdapter'
 
 describe('CollectionService', () => {
   it('should handle save', () => {

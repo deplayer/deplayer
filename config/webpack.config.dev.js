@@ -243,7 +243,11 @@ module.exports = {
       // Ignores URLs starting from /__ (useful for Firebase):
       // https://github.com/facebookincubator/create-react-app/issues/2237#issuecomment-302693219
       navigateFallbackWhitelist: [/^(?!\/__).*/],
-      swDest: path.join('build', 'service-worker.js')
+      swDest: path.join('build', 'service-worker.js'),
+      runtimeCaching: [{
+        urlPattern: "(.*)",
+        handler: "StaleWhileRevalidate"
+      }]
     }),
     // Makes some environment variables available to the JS code, for example:
     // if (process.env.NODE_ENV === 'development') { ... }. See `./env.js`.
