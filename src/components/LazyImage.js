@@ -1,9 +1,10 @@
 import * as React from 'react'
+import Spinner from './Spinner'
 
 class LazyImage extends React.Component {
   state = {
     error: null,
-    loading: true,
+    loading: false
   }
 
   // The Image object to check the loading will be stored here
@@ -40,14 +41,6 @@ class LazyImage extends React.Component {
     this.destroyLoading()
   }
 
-  render() {
-    return (
-      <div className="lazy-image fade-in one">
-        { this.props.children }
-      </div>
-    )
-  }
-
   // Initialize the loading parameters
   initializeLoading(src) {
     this.image = new Image()
@@ -55,24 +48,16 @@ class LazyImage extends React.Component {
     this.image.src = src
     this.image.onload = this.handleLoad
     this.image.onerror = this.handleError
-
-    this.setState({
-      loading: true,
-    })
   }
 
   // Reset the loading parameters
   destroyLoading() {
     this.image = null
-
-    this.setState({
-      loading: false,
-    })
   }
 
   handleLoad(e) {
     this.setState({
-      loading: false,
+      loading: false
     })
   }
 
@@ -81,6 +66,18 @@ class LazyImage extends React.Component {
       error: `Failed to load ${this.props.src}`,
       loading: false
     })
+  }
+
+  render() {
+    if (this.state.loading) {
+      return (<Spinner />)
+    }
+
+    return (
+      <div className="lazy-image fade-in one">
+        { this.props.children }
+      </div>
+    )
   }
 }
 

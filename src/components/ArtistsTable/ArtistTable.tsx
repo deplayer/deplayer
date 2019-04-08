@@ -8,8 +8,7 @@ export type Props = {
   queue: any,
   tableIds: Array<string>,
   collection: any,
-  dispatch: (action: any) => any,
-  disableAddButton?: boolean,
+  dispatch: (action: any) => any
 }
 
 const ArtistTable = (props: Props) => {
