@@ -9,7 +9,8 @@ import { getDurationStr } from '../utils/timeFormatter'
 type Props = {
   collection: any,
   queue: any,
-  match: any
+  match: any,
+  className: string|null
 }
 
 const getSong = (match, collection, queue) => {
@@ -37,7 +38,7 @@ export default class SongView extends React.Component<Props> {
     }
 
     return (
-      <div className='song-view'>
+      <div className={`song-view ${this.props.className}`}>
         <div className='song'>
           <div className='image'>
             <CoverImage

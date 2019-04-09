@@ -14,29 +14,35 @@ type Props = {
   onClick: () => any,
   dispatch: Dispatch,
   disableAddButton?: boolean,
+  disableCovers: boolean|null,
   style: any
 }
 
 const SongRow = (props: Props) => {
-  const { song } = props
+  const { song, disableCovers } = props
 
   const nonAvailable = <Translate value='song.row.na' />
+
+  const cover = (
+    <div
+      className='media-thumb'
+      onClick={props.onClick}
+    >
+      <CoverImage
+        cover={song.cover}
+        size='thumbnail'
+        albumName={song.album ? song.album.name : 'N/A'}
+      />
+    </div>
+  )
+
   return (
     <li
       className={`song-row ${ props.isCurrent ? 'current': ''}`}
       style={props.style}
     >
       <div>
-        <div
-          className='media-thumb'
-          onClick={props.onClick}
-        >
-          <CoverImage
-            cover={song.cover}
-            size='thumbnail'
-            albumName={song.album ? song.album.name : 'N/A'}
-          />
-        </div>
+        { disableCovers || cover }
         <ul className='media-info'>
           <li className='title-label'>
             <h4>

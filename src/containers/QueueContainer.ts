@@ -3,6 +3,7 @@ import Queue from '../components/Queue'
 
 export default connect(
   (state) => ({
+    app: state.app,
     queue: state.queue,
     playlist: state.playlist,
     player: state.player,

@@ -2,6 +2,7 @@
 export const INITIALIZED = 'INITIALIZED'
 export const INITIALIZE_SETTINGS = 'INITIALIZE_SETTINGS'
 export const TOGGLE_SIDEBAR = 'TOGGLE_SIDEBAR'
+export const SET_MQL  = 'SET_MQL'
 
 // Songs
 export const FILL_VISIBLE_SONGS = 'FILL_VISIBLE_SONGS'

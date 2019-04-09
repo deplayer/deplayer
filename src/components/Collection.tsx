@@ -25,6 +25,7 @@ const Collection = (props: Props) => {
         queue={props.queue}
         tableIds={props.visibleSongs}
         disableAddButton
+        disableCovers={false}
         {...props}
       />
     </div>

@@ -4,8 +4,12 @@ import history from '../store/configureHistory'
 
 import * as types from '../constants/ActionTypes'
 
-export const getQueue = (state: any): any => {
+const getQueue = (state: any): any => {
   return state ? state.queue : {}
+}
+
+const getApp = (state: any): any => {
+  return state ? state.app : {}
 }
 
 // Handling setCurrentPlaying saga
@@ -16,8 +20,12 @@ export function* setCurrentPlaying(action: any): any {
 }
 
 export function* goToViewPage(action: any): any {
-  const queue = yield select(getQueue)
-  yield history.push(routes.songView(queue.currentPlaying))
+  const app = yield select(getApp)
+
+  if (app.mqlMatch && history.location.pathname.match(/^\/song.*?$/)) {
+    const queue = yield select(getQueue)
+    yield history.push(routes.songView(queue.currentPlaying))
+  }
 }
 
 // Binding actions to sagas

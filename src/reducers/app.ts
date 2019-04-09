@@ -2,18 +2,22 @@ import * as types from '../constants/ActionTypes'
 
 type State = {
   sidebarToggled: Boolean,
-  showSongView: Boolean
+  mqlMatch: Boolean
 }
 
 export const defaultState = {
   sidebarToggled: false,
-  showSongView: false
+  mqlMatch: false
 }
 
 export default (state: State = defaultState, action) => {
   switch (action.type) {
     case types.TOGGLE_SIDEBAR: {
       return {...state, sidebarToggled: action.value ? action.value :!state.sidebarToggled}
+    }
+
+    case types.SET_MQL: {
+      return {...state, mqlMatch: action.value}
     }
 
     default:

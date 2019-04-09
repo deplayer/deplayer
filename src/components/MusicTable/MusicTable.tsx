@@ -10,6 +10,8 @@ export type Props = {
   tableIds: Array<string>,
   collection: any,
   dispatch: (action: any) => any,
+  disableCurrent?: boolean,
+  disableCovers: boolean|null,
   disableAddButton?: boolean,
 }
 
@@ -46,13 +48,14 @@ const MusicTable = (props: Props) => {
           props.dispatch({type: types.SET_CURRENT_PLAYING, songId: song.id})
         }}
         disableAddButton={props.disableAddButton}
+        disableCovers={props.disableCovers}
         dispatch={props.dispatch}
       />
     )
   }
 
   // Track the position of current playing to jump there
-  const currentIndex = props.tableIds.indexOf(props.queue.currentPlaying)
+  const currentIndex = !props.disableCurrent ? props.tableIds.indexOf(props.queue.currentPlaying) : null
 
   return (
     <React.Fragment>

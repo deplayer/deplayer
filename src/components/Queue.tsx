@@ -7,13 +7,25 @@ type Props = {
   queue: any,
   player: any,
   collection: any,
-  dispatch: Dispatch
+  dispatch: Dispatch,
+  slim: boolean|null,
+  className: string|null,
+  app: any,
 }
 
 const Queue = (props: Props) => {
+  // Is disabled for small screens
+  if (props.slim && !props.app.mqlMatch) {
+    return null
+  }
+
+  if (props.slim && !props.queue.trackIds.length) {
+    return null
+  }
+
   if (!props.queue.trackIds.length) {
     return (
-      <div className='queue no-results'>
+      <div className={`queue no-results ${props.className || ''}`}>
         <blockquote className='blockquote'>
           <p>Add songs from the collection or search for new ones</p>
         </blockquote>
@@ -22,9 +34,10 @@ const Queue = (props: Props) => {
   }
 
   return (
-    <div className='queue'>
+    <div className={`queue ${props.className || ''}`}>
       <MusicTable
         tableIds={props.queue.trackIds}
+        disableCovers={props.slim}
         {...props}
       />
     </div>

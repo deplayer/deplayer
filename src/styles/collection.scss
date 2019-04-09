@@ -7,6 +7,10 @@
   &.no-results {
     margin: auto;
   }
+
+  &.slim {
+    max-width: 300px;
+  }
 }
 
 .table-status {

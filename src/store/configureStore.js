@@ -26,8 +26,14 @@ import connectionSaga from '../sagas/connection'
 // Custom middlewares
 import alerts from './middlewares/alerts'
 
+const mql = window.matchMedia(`(min-width: 800px)`)
+
 export default function configureStore() {
-  let middlewares = [promise, thunk, alerts]
+  let middlewares = [
+    promise,
+    thunk,
+    alerts
+  ]
 
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
@@ -65,6 +71,11 @@ export default function configureStore() {
   sagaMiddleware.run(connectionSaga, store)
 
   store.dispatch({type: types.INITIALIZE_SETTINGS})
+  // Set breakpoint matching for responsive utilities
+  store.dispatch({type: types.SET_MQL, value: mql.matches})
+  mql.addListener(() => {
+    store.dispatch({type: types.SET_MQL, value: mql.matches})
+  })
 
   return store
 }

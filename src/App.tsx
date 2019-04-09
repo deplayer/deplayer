@@ -17,7 +17,6 @@ import history from './store/configureHistory'
 import SearchButton from './components/Buttons/SearchButton'
 import PlayAllButton from './components/Buttons/PlayAllButton'
 import ClearQueueButton from './components/Buttons/ClearQueueButton'
-import BackButton from './components/Buttons/BackButton'
 
 // Alerts
 import Alert from 'react-s-alert'
@@ -47,7 +46,9 @@ const Layout = (props: LayoutProps) => {
           <PlayAllButton />
         </TopbarContainer>
 
-        { props.children }
+        <div className='contents'>
+          { props.children }
+        </div>
         <Placeholder />
       </SidebarContainer>
     </React.Fragment>
@@ -58,39 +59,24 @@ const Layout = (props: LayoutProps) => {
 const Home = () => {
   return (
     <Layout title='Queue'>
-      <div className='contents'>
-        <QueueContainer />
-      </div>
-    </Layout>
-  )
-}
-
-type AppLayoutProps = {
-  title: string,
-  children: any
-}
-
-const AppLayout = (props: AppLayoutProps) => {
-  return (
-    <Layout title={props.title}>
-      { props.children }
+      <QueueContainer />
     </Layout>
   )
 }
 
 const Artists = () => {
   return (
-    <AppLayout title='Artists'>
+    <Layout title='Artists'>
       <ArtistsContainer />
-    </AppLayout>
+    </Layout>
   )
 }
 
 const Collection = () => {
   return (
-    <AppLayout title='Collection'>
-      <CollectionContainer />
-    </AppLayout>
+    <Layout title='Collection'>
+      <CollectionContainer disableCurrent />
+    </Layout>
   )
 }
 
@@ -126,20 +112,10 @@ const Settings = () => {
 
 const Song = () => {
   return (
-    <React.Fragment>
-      <SidebarContainer>
-        <TopbarContainer title='song'>
-          <SearchButton />
-          <BackButton />
-        </TopbarContainer>
-
-        <div className='contents'>
-          <QueueContainer />
-          <SongContainer />
-        </div>
-        <Placeholder />
-      </SidebarContainer>
-    </React.Fragment>
+    <Layout title='song'>
+      <SongContainer />
+      <QueueContainer slim className='slim' />
+    </Layout>
   )
 }
 
