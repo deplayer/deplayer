@@ -41,7 +41,7 @@ const SidebarContents = (props: ContentProps) => {
         <li>
           <ArtistsMenuItem
             current={inSection('artists')}
-            totalItems={props.collection.artists.length}
+            totalItems={Object.keys(props.collection.artists).length}
           />
         </li>
         <li>
