@@ -6,7 +6,7 @@ import {
 
 type State = {
   trackIds: Array<string>,
-  currentPlaying: any,
+  currentPlaying: string|null,
   nextSongId: string|null,
   prevSongId: string|null
 }

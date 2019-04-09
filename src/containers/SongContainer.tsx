@@ -8,6 +8,7 @@ const RoutedSongView = withRouter(props => <SongView {...props}/>)
 
 export default connect(
   (state) => ({
-    collection: state.collection
+    collection: state.collection,
+    queue: state.queue,
   })
 )(RoutedSongView)

@@ -2,20 +2,33 @@ import * as React from 'react'
 import { Translate } from 'react-redux-i18n'
 import { Redirect } from 'react-router-dom'
 
+import logger from '../utils/logger'
 import CoverImage from './MusicTable/CoverImage'
 import { getDurationStr } from '../utils/timeFormatter'
 
 type Props = {
   collection: any,
+  queue: any,
   match: any
+}
+
+const getSong = (match, collection, queue) => {
+  const songId = match.params.id
+  logger.log('SongView', 'songId: ', songId)
+  if (collection.rows[songId]) {
+    return collection.rows[songId]
+  }
+
+  return null
 }
 
 export default class SongView extends React.Component<Props> {
   render() {
-    const songId = this.props.match.params.id
-    const song = this.props.collection.rows[songId]
+    const { match, collection, queue } = this.props
+    const song = getSong(match, collection, queue)
 
     if (!song || !song.id) {
+      logger.log('SongView', 'Song not found redirecting to home ')
       return (
         <div>
           <Redirect to='/' />
