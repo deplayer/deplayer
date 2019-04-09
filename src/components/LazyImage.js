@@ -4,6 +4,7 @@ import Spinner from './Spinner'
 class LazyImage extends React.Component {
   state = {
     error: null,
+    isMounted: false,
     loading: false
   }
 
@@ -33,11 +34,14 @@ class LazyImage extends React.Component {
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
+    this.setState({isMounted: true})
     this.initializeLoading(this.props.src)
   }
 
   componentWillUnmount() {
+    /* eslint react/no-direct-mutation-state: 0 */
+    this.state.isMounted = false
     this.destroyLoading()
   }
 
@@ -52,20 +56,26 @@ class LazyImage extends React.Component {
 
   // Reset the loading parameters
   destroyLoading() {
-    this.image = null
+   this.image = null
+   this.handleLoad  = null
+   this.handleError = null
   }
 
   handleLoad(e) {
-    this.setState({
-      loading: false
-    })
+    if (this.state.isMounted) {
+      this.setState({
+        loading: false
+      })
+    }
   }
 
   handleError(e) {
-    this.setState({
-      error: `Failed to load ${this.props.src}`,
-      loading: false
-    })
+    if (this.state.isMounted) {
+      this.setState({
+        error: `Failed to load ${this.props.src}`,
+        loading: false
+      })
+    }
   }
 
   render() {

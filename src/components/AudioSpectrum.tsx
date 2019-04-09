@@ -1,3 +1,7 @@
+/**
+ * Spectum audio visual thanks to
+ * https://github.com/hu-ke/react-audio-spectrum
+ */
 import * as React from 'react'
 import logger from '../utils/logger'
 
