@@ -1,11 +1,13 @@
 import * as types from '../constants/ActionTypes'
 
 type State = {
-  sidebarToggled: Boolean
+  sidebarToggled: Boolean,
+  showSongView: Boolean
 }
 
 export const defaultState = {
-  sidebarToggled: false
+  sidebarToggled: false,
+  showSongView: false
 }
 
 export default (state: State = defaultState, action) => {

@@ -20,3 +20,11 @@
   position: relative;
   min-height: 122px;
 }
+
+.contents {
+  grid-area: contents;
+  position: relative;
+  overflow-y: auto;
+
+  @extend .d-flex;
+}

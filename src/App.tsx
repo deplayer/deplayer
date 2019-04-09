@@ -58,7 +58,9 @@ const Layout = (props: LayoutProps) => {
 const Home = () => {
   return (
     <Layout title='Queue'>
-      <QueueContainer />
+      <div className='contents'>
+        <QueueContainer />
+      </div>
     </Layout>
   )
 }
@@ -131,7 +133,10 @@ const Song = () => {
           <BackButton />
         </TopbarContainer>
 
-        <SongContainer />
+        <div className='contents'>
+          <QueueContainer />
+          <SongContainer />
+        </div>
         <Placeholder />
       </SidebarContainer>
     </React.Fragment>

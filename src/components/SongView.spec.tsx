@@ -14,6 +14,9 @@ const setup = (customProps: any) => {
     },
     collection: {
       rows: {}
+    },
+    queue: {
+      currentPlaying: null
     }
   }
 

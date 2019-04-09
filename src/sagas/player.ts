@@ -1,4 +1,5 @@
 import { takeLatest, put, select } from 'redux-saga/effects'
+import * as routes from '../routes'
 import history from '../store/configureHistory'
 
 import * as types from '../constants/ActionTypes'
@@ -16,7 +17,7 @@ export function* setCurrentPlaying(action: any): any {
 
 export function* goToViewPage(action: any): any {
   const queue = yield select(getQueue)
-  yield history.push(`/song/${ queue.currentPlaying }`)
+  yield history.push(routes.songView(queue.currentPlaying))
 }
 
 // Binding actions to sagas
