@@ -43,7 +43,7 @@ const ArtistTable = (props: Props) => {
   }
 
   return (
-    <React.Fragment>
+    <div className='collection'>
       <AutoSizer className='artists-table'>
         {({ height, width }) => (
           <List
@@ -61,7 +61,7 @@ const ArtistTable = (props: Props) => {
         Total items: <b>{ props.tableIds.length }</b>
       </div>
       {errors}
-    </React.Fragment>
+    </div>
   )
 }
 

@@ -9,7 +9,7 @@ export default class Subsonic implements ISettingsSection {
       {title: "labels.enabled", name: `providers.subsonic${ index }.enabled`, type: 'checkbox'},
       {title: "labels.subsonic.baseUrl", name: `providers.subsonic${ index }.baseUrl`, type: 'url'},
       {title: "labels.subsonic.user", name: `providers.subsonic${ index }.user`, type: 'text'},
-      {title: "labels.subsonic.password", name: `providers.subsonic${ index }.password`, type: 'password'},
+      {title: "labels.subsonic.password", name: `providers.subsonic${ index }.password`, type: 'password'}
     ]
   }
 }
