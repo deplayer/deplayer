@@ -14,7 +14,8 @@ type Props = {
   onClick: () => any,
   dispatch: Dispatch,
   disableAddButton?: boolean,
-  disableCovers: boolean|null,
+  disableCovers?: boolean,
+  slim?: boolean,
   style: any
 }
 
@@ -53,9 +54,12 @@ const SongRow = (props: Props) => {
             </li>
           <li><h5>{ song.album ? song.album.name: nonAvailable }</h5></li>
           <li><h6>{ song.artist ? song.artist.name: nonAvailable }</h6></li>
-          <li>{ getDurationStr(song.duration) }</li>
+          { props.slim ||  <li> { getDurationStr(song.duration) } </li> }
         </ul>
-        <ContextualMenu {...props} />
+        <div className='media-actions'>
+          <ContextualMenu {...props} />
+          { props.slim && <span>{ getDurationStr(song.duration) }</span> }
+        </div>
       </div>
     </li>
   )

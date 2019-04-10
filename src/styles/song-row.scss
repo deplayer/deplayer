@@ -60,6 +60,18 @@
     padding-bottom: 10px;
   }
 
+  &.slim {
+    .media-actions {
+      span {
+        font-size: 14px;
+        display: inline-block;
+        float: right;
+        margin-top: 10px;
+        margin-right: 10px;
+      }
+    }
+  }
+
   &.current {
     border-bottom: 1px solid $primary-color;
     border-top: 1px solid $greyscale-color;
@@ -86,6 +98,10 @@
     max-width: 40px;
 
     background: transparent;
+
+    span {
+      color: $secondary-color-lighter1;
+    }
   }
 
   .label {

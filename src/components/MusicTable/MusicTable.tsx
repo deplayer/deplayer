@@ -11,8 +11,9 @@ export type Props = {
   collection: any,
   dispatch: (action: any) => any,
   disableCurrent?: boolean,
-  disableCovers: boolean|null,
+  disableCovers?: boolean,
   disableAddButton?: boolean,
+  slim?: boolean,
 }
 
 const MusicTable = (props: Props) => {
@@ -49,6 +50,7 @@ const MusicTable = (props: Props) => {
         }}
         disableAddButton={props.disableAddButton}
         disableCovers={props.disableCovers}
+        slim={props.slim}
         dispatch={props.dispatch}
       />
     )

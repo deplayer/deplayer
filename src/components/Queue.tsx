@@ -8,7 +8,7 @@ type Props = {
   player: any,
   collection: any,
   dispatch: Dispatch,
-  slim: boolean|null,
+  slim?: boolean,
   className: string|null,
   app: any,
 }
