@@ -56,10 +56,11 @@ export default (state: State = defaultState, action: any  = {}): State => {
       }
 
     case types.ADD_SONGS_TO_QUEUE:
-      const tracks = [...state.trackIds, ...populateTracks(action.songs)]
+      const tracks = state.trackIds.concat(populateTracks(action.songs))
+      const cleanedTracks = tracks.filter((item, pos) => tracks.indexOf(item) === pos)
       return {
         ...state,
-        trackIds: tracks
+        trackIds: cleanedTracks
       }
 
     case types.SET_CURRENT_PLAYING:
