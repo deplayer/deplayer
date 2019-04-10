@@ -24,6 +24,12 @@ const SongRow = (props: Props) => {
 
   const nonAvailable = <Translate value='song.row.na' />
 
+  const onClick = () => {
+    if (props.slim) {
+      props.onClick()
+    }
+  }
+
   const cover = (
     <div
       className='media-thumb'
@@ -41,6 +47,7 @@ const SongRow = (props: Props) => {
     <li
       className={`song-row ${ props.isCurrent ? 'current': ''}`}
       style={props.style}
+      onClick={onClick}
     >
       <div>
         { disableCovers || cover }
