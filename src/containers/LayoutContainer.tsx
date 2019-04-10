@@ -40,9 +40,8 @@ const Layout = (props: LayoutProps) => {
       <SidebarContainer>
         <TopbarContainer title={ props.title }>
           <SearchButton />
-          <ClearQueueButton />
-          <Route path="/collection" component={() => <PlayAllButton /> } />
-          <Route path="/search-results" component={() => <PlayAllButton /> } />
+          <Route path="/queue" component={() => <ClearQueueButton /> } />
+          <Route path="/" component={() => <PlayAllButton /> } />
         </TopbarContainer>
 
         <div className='contents'>

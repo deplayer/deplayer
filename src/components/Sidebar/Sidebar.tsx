@@ -28,7 +28,7 @@ const SidebarContents = (props: ContentProps) => {
       <ul>
         <li>
           <QueueMenuItem
-            current={inSection('')}
+            current={inSection('(queue)?')}
             totalItems={props.queue.trackIds.length}
           />
         </li>

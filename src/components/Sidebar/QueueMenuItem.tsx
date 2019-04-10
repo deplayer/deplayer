@@ -12,7 +12,7 @@ const QueueMenuItem = ({current = false, totalItems}: Props) => {
     <MenuItem
       totalItems={totalItems}
       current={current}
-      url='/'
+      url='/queue'
       title='queue'
       label='Queue'
       iconClasses='icon music outline'
