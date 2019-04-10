@@ -32,6 +32,7 @@ export function* goToViewPage(action: any): any {
 function* playerSaga(): any {
   yield takeLatest(types.SET_CURRENT_PLAYING, setCurrentPlaying)
   yield takeLatest(types.PLAY_NEXT, setCurrentPlaying)
+  yield takeLatest(types.PLAY_PREV, setCurrentPlaying)
   yield takeLatest(types.PUSH_TO_VIEW, goToViewPage)
 }
 

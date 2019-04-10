@@ -11,11 +11,14 @@ import VolumeControl from './VolumeControl'
 import Spectrum from './../Spectrum'
 import * as types from '../../constants/ActionTypes'
 
+const PLAYER_RETRIES = 5
+
 type Props = {
   queue: any,
   player: {
     volume: number,
-    playing: boolean
+    playing: boolean,
+    errorCount: number
   },
   itemCount: number,
   collection: any,
@@ -43,14 +46,20 @@ class Player extends React.Component<Props, State> {
 
   onError(ev: any) {
     this.props.dispatch({
+      type: types.REGISTER_PLAYER_ERROR
+    })
+
+    this.props.dispatch({
       type: types.SEND_NOTIFICATION,
       notification: 'notifications.player.play_failed',
       level: 'warning'
     })
 
-    this.props.dispatch({
-      type: types.PLAY_NEXT
-    })
+    if (this.props.player.errorCount <= PLAYER_RETRIES) {
+      this.props.dispatch({
+        type: types.PLAY_NEXT
+      })
+    }
   }
 
   // Update current time state
