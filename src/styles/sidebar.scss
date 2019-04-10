@@ -1,6 +1,5 @@
 #left-sidebar {
   background-color: $greyscale-darker1;
-  padding-top: 10px;
   width: 100%;
 
   @include media-breakpoint-up(md) {
@@ -27,13 +26,25 @@
   h4 {
     clear: both;
     text-align: center;
-    line-height: 55px;
     color: $greyscale-color-100;
+    line-height: 56px;
+    padding-top: 20px;
+    margin-bottom: 0;
+
+    @include media-breakpoint-up(md) {
+      padding-top: 0px;
+      border-bottom: solid 4px $greyscale-lighter2;
+      background: $greyscale-darker2;
+    }
   }
 
   ul {
     @extend .list-unstyled;
     padding-top: 35px;
+
+    @include media-breakpoint-up(md) {
+      padding-top: 0;
+    }
 
     li {
       line-height: 60px;

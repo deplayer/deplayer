@@ -82,16 +82,9 @@ const Collection = () => {
 
 const SearchResults = () => {
   return (
-    <React.Fragment>
-      <SidebarContainer>
-        <TopbarContainer title='Search results'>
-          <SearchButton />
-          <PlayAllButton />
-        </TopbarContainer>
-        <SearchResultsContainer />
-        <Placeholder />
-      </SidebarContainer>
-    </React.Fragment>
+    <Layout title='Collection'>
+      <SearchResultsContainer />
+    </Layout>
   )
 }
 
