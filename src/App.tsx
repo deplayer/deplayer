@@ -41,14 +41,14 @@ class App extends React.Component<any> {
         <ConnectedRouter history={history} >
           <React.Fragment>
             <LayoutContainer>
-                <Route exact path="/" component={QueueContainer} />
-                <Route path="/queue" component={QueueContainer} />
-                <Route path="/index.html" component={QueueContainer} />
-                <Route path="/collection" component={CollectionContainer} disableCurrent />
-                <Route path="/search-results" component={SearchResultsContainer} />
-                <Route path="/song/:id" component={Song} />
-                <Route path="/artists" component={ArtistsContainer} />
-                <Route path="/settings" component={SettingsContainer} />
+              <Route exact path="/" component={QueueContainer} />
+              <Route path="/queue" component={QueueContainer} />
+              <Route path="/index.html" component={QueueContainer} />
+              <Route path="/collection" component={CollectionContainer} disableCurrent />
+              <Route path="/search-results" component={SearchResultsContainer} />
+              <Route path="/song/:id" component={Song} />
+              <Route path="/artists" component={ArtistsContainer} />
+              <Route path="/settings" component={SettingsContainer} />
             </LayoutContainer>
             <PlayerContainer />
             <Alert stack={{limit: 3}} />
