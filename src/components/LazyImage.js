@@ -83,14 +83,6 @@ class LazyImage extends React.Component {
       return (<Spinner />)
     }
 
-    if (this.state.error) {
-      return (
-        <i
-          className='cover-image fa fa-music'
-        />
-      )
-    }
-
     return (
       <div className="lazy-image fade-in one">
         { this.props.children }

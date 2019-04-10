@@ -7,7 +7,15 @@ import ClearQueueButton from '../components/Buttons/ClearQueueButton'
 import PlayAllButton from '../components/Buttons/PlayAllButton'
 import Placeholder from '../components/Player/Placeholder'
 
-const dynamicTitle = (router): string => {
+const dynamicTitle = (router, collection): string => {
+  const songFinder = router.location.pathname.match(/\/song\/(.*)/)
+
+  if (songFinder && songFinder[1]) {
+    // const song = collection.rows[songFinder[1]]
+
+    return 'Song'
+  }
+
   switch (router.location.pathname) {
     case '/settings':
       return 'Settings'
@@ -46,7 +54,7 @@ const Layout = (props: LayoutProps) => {
 
 export default connect(
   (state) => ({
-    title: dynamicTitle(state.router),
+    title: dynamicTitle(state.router, state.collection),
     queue: state.queue,
     player: state.player,
     collection: state.collection,
