@@ -1,7 +1,10 @@
 import { createStore, applyMiddleware, compose } from 'redux'
+import { routerMiddleware } from 'connected-react-router'
 import createSagaMiddleware from 'redux-saga'
 import thunk from 'redux-thunk'
 import promise from 'redux-promise'
+
+import history from './configureHistory'
 
 import {
   loadTranslations,
@@ -32,7 +35,8 @@ export default function configureStore() {
   let middlewares = [
     promise,
     thunk,
-    alerts
+    alerts,
+    routerMiddleware(history), // for dispatching history actions
   ]
 
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
@@ -41,7 +45,7 @@ export default function configureStore() {
   const sagaMiddleware = createSagaMiddleware()
   // Prepare store with all the middlewares
   const store = createStore(
-    rootReducer,
+    rootReducer(history),
     composeEnhancers(
       applyMiddleware(...middlewares, sagaMiddleware)
     )
