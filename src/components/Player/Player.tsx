@@ -41,11 +41,15 @@ class Player extends React.Component<Props, State> {
     this.playerRef = React.createRef()
   }
 
-  logError(ev: any) {
+  onError(ev: any) {
     this.props.dispatch({
       type: types.SEND_NOTIFICATION,
       notification: 'notifications.player.play_failed',
       level: 'warning'
+    })
+
+    this.props.dispatch({
+      type: types.PLAY_NEXT
     })
   }
 
@@ -144,7 +148,7 @@ class Player extends React.Component<Props, State> {
                   ref={this.playerRef}
                   src={streamUri}
                   crossOrigin="anonymous"
-                  onError={this.logError.bind(this)}
+                  onError={this.onError.bind(this)}
                   autoPlay={ this.props.player.playing }
                   onTimeUpdate={ this.onTimeUpdate }
                   onEnded={this.playNext}

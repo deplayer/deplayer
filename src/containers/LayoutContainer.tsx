@@ -6,6 +6,7 @@ import SearchButton from '../components/Buttons/SearchButton'
 import ClearQueueButton from '../components/Buttons/ClearQueueButton'
 import PlayAllButton from '../components/Buttons/PlayAllButton'
 import Placeholder from '../components/Player/Placeholder'
+import { Route } from 'react-router-dom'
 
 const dynamicTitle = (router, collection): string => {
   const songFinder = router.location.pathname.match(/\/song\/(.*)/)
@@ -40,7 +41,8 @@ const Layout = (props: LayoutProps) => {
         <TopbarContainer title={ props.title }>
           <SearchButton />
           <ClearQueueButton />
-          <PlayAllButton />
+          <Route path="/collection" component={() => <PlayAllButton /> } />
+          <Route path="/search-results" component={() => <PlayAllButton /> } />
         </TopbarContainer>
 
         <div className='contents'>

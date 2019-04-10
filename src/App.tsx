@@ -27,8 +27,8 @@ const appStore = configureStore()
 const Song = () => {
   return (
     <React.Fragment>
-      <SongContainer />
       <QueueContainer slim className='slim' />
+      <SongContainer />
     </React.Fragment>
   )
 }
