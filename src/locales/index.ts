@@ -1,5 +1,5 @@
-import * as en from './en.json'
+import en from './en.json'
 
 export default {
-  en
+  en: (<any>en)
 }

@@ -5,6 +5,10 @@
     "import": "Import",
     "collection": "Collection"
   },
+  "labels": {
+    "deleteCollection": "Delete collection",
+    "deleteSettings": "Delete settings"
+  },
   "song": {
     "label": {
       "song": "Song",

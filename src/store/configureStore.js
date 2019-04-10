@@ -51,11 +51,6 @@ export default function configureStore() {
     )
   )
 
-  // Setting up locales
-  syncTranslationWithStore(store)
-  store.dispatch(loadTranslations(translationsObject))
-  store.dispatch(setLocale('en'))
-
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers
     module.hot.accept('../reducers', () => {
@@ -80,6 +75,11 @@ export default function configureStore() {
   mql.addListener(() => {
     store.dispatch({type: types.SET_MQL, value: mql.matches})
   })
+
+  // Setting up locales
+  syncTranslationWithStore(store)
+  store.dispatch(loadTranslations(translationsObject))
+  store.dispatch(setLocale('en'))
 
   return store
 }
