@@ -14,17 +14,26 @@ type Props = {
 }
 
 const CoverImage = (props: Props) => {
+  const Content = (props: any) => {
+    const placeholderUrl = 'logo.png'
+    const imageUrl = props.loading ? placeholderUrl : props.src
+
+    return (
+      <div
+        className='cover-image'
+        style={{backgroundImage: `url(${imageUrl})`}}
+        data-alt={ props.alt }
+      />
+    )
+  }
+
   const Img = (props) => {
     return (
       <LazyImage
         src={props.src}
         srcAlt={props.alt}
       >
-        <div
-          className='cover-image'
-          style={{backgroundImage: `url(${props.src})`}}
-          data-alt={ props.alt }
-        />
+        <Content src={props.src} />
       </LazyImage>
     )
   }

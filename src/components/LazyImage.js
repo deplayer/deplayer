@@ -1,5 +1,4 @@
 import * as React from 'react'
-import Spinner from './Spinner'
 
 class LazyImage extends React.Component {
   state = {
@@ -49,6 +48,8 @@ class LazyImage extends React.Component {
   initializeLoading(src) {
     this.image = new Image()
 
+    /* eslint react/no-direct-mutation-state: 0 */
+    this.state.loading = true
     this.image.src = src
     this.image.onload = this.handleLoad
     this.image.onerror = this.handleError
@@ -62,7 +63,7 @@ class LazyImage extends React.Component {
   }
 
   handleLoad(e) {
-    if (this.state.isMounted) {
+    if (this.state.isMounted && this.image) {
       this.setState({
         loading: false
       })
@@ -79,13 +80,13 @@ class LazyImage extends React.Component {
   }
 
   render() {
-    if (this.state.loading) {
-      return (<Spinner />)
-    }
+    const childrenWithProps = React.Children.map(this.props.children, child =>
+      React.cloneElement(child, { loading: this.state.loading })
+    )
 
     return (
       <div className="lazy-image fade-in one">
-        { this.props.children }
+        { childrenWithProps }
       </div>
     )
   }

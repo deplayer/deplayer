@@ -71,6 +71,7 @@ const MusicTable = (props: Props) => {
             width={width}
             overscanRowCount={6}
             scrollToIndex={currentIndex}
+            isScrollingOptOut
             recomputeRowHeights
           />
         )}
