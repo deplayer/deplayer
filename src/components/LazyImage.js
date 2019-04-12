@@ -81,7 +81,9 @@ class LazyImage extends React.Component {
 
   render() {
     const childrenWithProps = React.Children.map(this.props.children, child =>
-      React.cloneElement(child, { loading: this.state.loading })
+      React.cloneElement(child, {
+        noImage: this.state.loading || this.state.error
+      })
     )
 
     return (

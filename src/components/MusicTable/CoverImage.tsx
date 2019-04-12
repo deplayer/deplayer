@@ -16,7 +16,7 @@ type Props = {
 const CoverImage = (props: Props) => {
   const Content = (props: any) => {
     const placeholderUrl = 'logo.png'
-    const imageUrl = props.loading ? placeholderUrl : props.src
+    const imageUrl = props.noImage ? placeholderUrl : props.src
 
     return (
       <div
