@@ -88,6 +88,18 @@ export default class SongView extends React.Component<Props> {
                     { song.genre }
                   </div>
                 </div>
+                <div>
+                  <div className='collapsed'>
+                    <span className='label'><Translate value='song.label.providers' /></span>
+                  </div>
+                  <ul>
+                    {
+                      song.stream.map((provider) => {
+                        return (<li key={provider.service}>{ provider.service }</li>)
+                      })
+                    }
+                  </ul>
+                </div>
               </div>
             </div>
 
