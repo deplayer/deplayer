@@ -30,6 +30,7 @@ const dynamicTitle = (router, collection): string => {
 }
 
 type LayoutProps = {
+  dispatch: any,
   title: string,
   children: any
 }
@@ -40,8 +41,8 @@ const Layout = (props: LayoutProps) => {
       <SidebarContainer>
         <TopbarContainer title={ props.title }>
           <SearchButton />
-          <Route path="/queue" component={() => <ClearQueueButton /> } />
-          <Route path="/" component={() => <PlayAllButton /> } />
+          <Route path="/queue" component={() => <ClearQueueButton dispatch={props.dispatch} /> } />
+          <Route path="/" component={() => <PlayAllButton dispatch={props.dispatch} /> } />
         </TopbarContainer>
 
         <div className='contents'>
