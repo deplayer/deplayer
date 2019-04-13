@@ -12,7 +12,7 @@ const ArtistRow = (props: Props) => {
   const { artist } = props
 
   return (
-    <li
+    <div
       className='artist-row'
       style={props.style}
     >
@@ -23,7 +23,7 @@ const ArtistRow = (props: Props) => {
           { props.songs.length }
         </span>
       </div>
-    </li>
+    </div>
   )
 }
 
