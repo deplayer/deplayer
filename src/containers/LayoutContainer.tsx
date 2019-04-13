@@ -20,6 +20,8 @@ const dynamicTitle = (router, collection): string => {
   switch (router.location.pathname) {
     case '/settings':
       return 'Settings'
+    case '/search-results':
+      return 'Search results'
     case '/collection':
       return 'Collection'
     case '/artists':

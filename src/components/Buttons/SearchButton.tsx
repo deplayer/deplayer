@@ -4,12 +4,17 @@ import { Dispatch, connect } from 'react-redux'
 import * as types from '../../constants/ActionTypes'
 
 type Props = {
-  dispatch: Dispatch
+  dispatch: Dispatch,
+  searchToggled: boolean
 }
 
-const SearchButton = ({dispatch}: Props) => {
+const SearchButton = ({dispatch, searchToggled}: Props) => {
   const toggleSearch = () => {
     dispatch({type: types.TOGGLE_SEARCH})
+  }
+
+  if (searchToggled) {
+    return null
   }
 
   return (
@@ -22,4 +27,8 @@ const SearchButton = ({dispatch}: Props) => {
   )
 }
 
-export default connect()(SearchButton)
+export default connect(
+  (state) => ({
+    searchToggled: state.search.searchToggled
+  })
+)(SearchButton)

@@ -17,15 +17,6 @@ class LazyImage extends React.Component {
     this.handleError = this.handleError.bind(this)
   }
 
-  // Update component only if the src has changed
-  shouldComponentUpdate(nextProps) {
-    if (nextProps.src !== this.props.src) {
-      return false
-    }
-
-    return true
-  }
-
   componentWillReceiveProps(nextProps) {
     if (nextProps.src !== this.props.src) {
       this.destroyLoading()

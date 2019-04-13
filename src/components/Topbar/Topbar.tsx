@@ -85,6 +85,7 @@ class Topbar extends React.Component<Props, State> {
 
   onFocusOut = () => {
     this.setState({focus: false})
+      this.props.dispatch( { type: types.TOGGLE_SEARCH })
   }
 
   renderSearch = (props) => {
@@ -97,6 +98,7 @@ class Topbar extends React.Component<Props, State> {
         className={`search-bar ui huge action icon input inverted ${this.props.loading ? 'loading': ''}`}
       >
         <input
+          autoFocus
           ref={(input) => { this.searchInput = input }}
           onChange={this.onSearchChange}
           onFocus={this.onFocus}

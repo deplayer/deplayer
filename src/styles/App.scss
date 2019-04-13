@@ -92,6 +92,7 @@ span.label {
 
 input.form-control:focus ,
 input.form-control {
+  font-family: $font-family;
   background-color: #000 !important;
   color: $primary-color-100;
 }
