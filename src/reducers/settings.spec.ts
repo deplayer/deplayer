@@ -57,10 +57,11 @@ describe('settings reducer', () => {
   })
 
   it('should handle ADD_PROVIDER', () => {
-    expect(reducer(undefined, {type: types.ADD_PROVIDER}))
+    expect(reducer(undefined, {type: types.ADD_PROVIDER, providerId: 'subsonic'}))
       .toEqual(
         {
-          ...defaultState
+          ...defaultState,
+          providers: [{key: 'subsonic-0'}]
         }
       )
   })

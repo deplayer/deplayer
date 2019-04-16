@@ -16,24 +16,7 @@ export const defaultState = {
   saving: false,
   settingsForm: settingsBuilder.getFormSchema(),
   settings: {
-    providers: [
-      {
-        key: 'itunes',
-        enabled: false
-      },
-      {
-        key: 'mstream',
-        enabled: false,
-        baseUrl: '',
-      },
-      {
-        key: 'subsonic',
-        enabled: false,
-        baseUrl: '',
-        user: '',
-        password: ''
-      }
-    ],
+    providers: [],
     app: {
       spectrum: {
         enabled: true
@@ -47,6 +30,19 @@ export default (state: State = defaultState, action: any = {}) => {
     case types.RECEIVE_SETTINGS:
     case types.SETTINGS_SAVED_SUCCESSFULLY: {
       return {...state, settings: action.settings}
+    }
+
+    case types.ADD_PROVIDER: {
+      const { settings } = state
+      let providerAutoinc = 0
+      for (let i = 0; i < settings.providers.length; i++) {
+        if (settings.providers[i].key === action.providerId + '-' + i) {
+          providerAutoinc++
+        }
+      }
+
+      const newProvider = {key: action.providerId + '-' + providerAutoinc}
+      return {...state, providers: [...state.settings.providers, newProvider]}
     }
 
     default:
