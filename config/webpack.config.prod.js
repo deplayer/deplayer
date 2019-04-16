@@ -284,7 +284,7 @@ module.exports = {
     // Generate a service worker script that will precache, and keep up to date,
     // the HTML & assets that are part of the Webpack build.
     new InjectManifest({
-      swSrc: path.join('src', 'service-worker.ts'),
+      swSrc: path.join('src', 'service-worker.js'),
       swDest: path.join('service-worker.js')
     }),
     // Moment.js is an extremely popular library that bundles large locale files
