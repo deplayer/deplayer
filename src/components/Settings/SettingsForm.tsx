@@ -3,8 +3,8 @@ import { Formik, Form } from 'formik'
 import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
 
-import FormField from './FormField'
-import { SAVE_SETTINGS } from '../../constants/ActionTypes'
+import FormField, { TYPES } from './FormField'
+import * as types from '../../constants/ActionTypes'
 
 type Props = {
   settings: any,
@@ -14,17 +14,20 @@ type Props = {
 
 const SettingsForm = (props: Props) => {
   const saveSettings = (form: any): any => {
-    props.dispatch({type: SAVE_SETTINGS, settingsPayload: form})
+    props.dispatch({type: types.SAVE_SETTINGS, settingsPayload: form})
   }
 
   // Convert schema object to form elements
   const populateFromSchema = (schema) => {
+    console.log(props.schema)
+
     const { fields } = props.schema
 
     const populatedFields = fields.map((field, index) => {
-      if (field.type === 'title') {
+      if (field.type === TYPES.title) {
         return <h2 key={index}><Translate value={field.title} /></h2>
       }
+
       return (
         <div
           key={field.name}

@@ -28,5 +28,8 @@
     "search": {
       "finished": "Search finished!"
     }
+  },
+  "buttons": {
+    "addProvider": "Set up new provider"
   }
 }

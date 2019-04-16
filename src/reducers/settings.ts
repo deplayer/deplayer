@@ -1,7 +1,4 @@
-import {
-  RECEIVE_SETTINGS,
-  SETTINGS_SAVED_SUCCESSFULLY
-} from '../constants/ActionTypes'
+import * as types from '../constants/ActionTypes'
 import { ISettings } from '../interfaces/ISettings'
 import SettingsBuilder from '../services/settings/SettingsBuilder'
 
@@ -19,21 +16,24 @@ export const defaultState = {
   saving: false,
   settingsForm: settingsBuilder.getFormSchema(),
   settings: {
-    providers: {
-      itunes: {
+    providers: [
+      {
+        key: 'itunes',
         enabled: false
       },
-      mstream: {
+      {
+        key: 'mstream',
         enabled: false,
         baseUrl: '',
       },
-      subsonic: {
+      {
+        key: 'subsonic',
         enabled: false,
         baseUrl: '',
         user: '',
         password: ''
       }
-    },
+    ],
     app: {
       spectrum: {
         enabled: true
@@ -44,8 +44,8 @@ export const defaultState = {
 
 export default (state: State = defaultState, action: any = {}) => {
   switch (action.type) {
-    case RECEIVE_SETTINGS:
-    case SETTINGS_SAVED_SUCCESSFULLY: {
+    case types.RECEIVE_SETTINGS:
+    case types.SETTINGS_SAVED_SUCCESSFULLY: {
       return {...state, settings: action.settings}
     }
 

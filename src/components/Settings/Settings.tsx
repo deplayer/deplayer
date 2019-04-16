@@ -21,6 +21,10 @@ class Settings extends React.Component<Props, State> {
     this.props.dispatch({type: types.DELETE_SETTINGS})
   }
 
+  addProvider = (form: any): any => {
+    this.props.dispatch({type: types.ADD_PROVIDER})
+  }
+
   render() {
     const settingsForm = this.props.settings.settingsForm
 
@@ -32,6 +36,9 @@ class Settings extends React.Component<Props, State> {
           dispatch={this.props.dispatch}
         />
         <div className='btn-group'>
+          <button className='with-bg' onClick={this.addProvider}>
+            <Translate value="buttons.addProvider" />
+          </button>
           <button className='with-bg btn btn-danger' onClick={this.deleteCollection}>
             <Translate value="labels.deleteCollection" />
           </button>

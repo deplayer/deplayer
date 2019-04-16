@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Dispatch } from 'redux'
-import Slider from 'rc-slider'
+import Range from 'rc-slider'
 import 'rc-slider/assets/index.css';
 
 import { getDurationStr } from '../../utils/timeFormatter'
@@ -9,20 +9,23 @@ type Props = {
   total: number,
   dispatch: Dispatch,
   onChange: (value: string) => any,
-  current: number
+  current: number,
+  buffered: number
 }
 
 const ProgressBar = (props: Props) => {
+  const step =  100 / props.total
+
   return (
     <div
       className='progress'
     >
-      <Slider
+      <Range
         className='bar'
         min={0}
         max={props.total}
-        step={ 100 / props.total }
-        type='range'
+        step={step}
+        count={1}
         value={ props.current }
         onChange={ props.onChange }
       />

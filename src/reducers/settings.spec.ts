@@ -1,9 +1,6 @@
 import reducer from './settings'
 
-import {
-  RECEIVE_SETTINGS,
-  SETTINGS_SAVED_SUCCESSFULLY
-} from '../constants/ActionTypes'
+import * as types from '../constants/ActionTypes'
 
 import { defaultState } from './settings'
 
@@ -19,7 +16,7 @@ describe('settings reducer', () => {
         baseUrl: 'http://localhost'
       }
     }
-    expect(reducer(undefined, {type: RECEIVE_SETTINGS, settings}))
+    expect(reducer(undefined, {type: types.RECEIVE_SETTINGS, settings}))
       .toEqual(
         {
           ...defaultState,
@@ -48,13 +45,22 @@ describe('settings reducer', () => {
         }
       }
     }
-    expect(reducer(undefined, {type: SETTINGS_SAVED_SUCCESSFULLY, settings}))
+    expect(reducer(undefined, {type: types.SETTINGS_SAVED_SUCCESSFULLY, settings}))
       .toEqual(
         {
           ...defaultState,
           error: '',
           saving: false,
           settings
+        }
+      )
+  })
+
+  it('should handle ADD_PROVIDER', () => {
+    expect(reducer(undefined, {type: types.ADD_PROVIDER}))
+      .toEqual(
+        {
+          ...defaultState
         }
       )
   })

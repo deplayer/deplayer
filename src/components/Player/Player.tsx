@@ -13,6 +13,29 @@ import * as types from '../../constants/ActionTypes'
 
 const PLAYER_RETRIES = 5
 
+const getBuffered = (audioRef): number => {
+  const { current } = audioRef
+
+  if (!current) {
+    return 0
+  }
+
+  const { duration, buffered } =  current
+
+  let result = 0
+  for (let i = 0; i < current.buffered.length; i++) {
+    if (duration > 0) {
+      result = (
+        buffered.end(
+          buffered.length - 1 - i
+        ) / duration
+      ) * 100
+    }
+  }
+
+  return result
+}
+
 type Props = {
   queue: any,
   player: {
@@ -127,14 +150,16 @@ class Player extends React.Component<Props, State> {
 
     // Getting desired volume
     const volume = this.state.volume ? this.state.volume : this.props.player.volume
+    const duration = this.playerRef.current ? this.playerRef.current.duration : 0
 
     return (
       <div className='player-container'>
         <ProgressBar
           dispatch={this.props.dispatch}
-          total={this.playerRef.current ? this.playerRef.current.duration : 0}
+          total={duration}
           current={this.state.currentTime}
           onChange={this.setCurrentTime}
+          buffered={getBuffered(this.playerRef)}
         />
         <div className='player-contents'>
           <div className='media-thumb'>

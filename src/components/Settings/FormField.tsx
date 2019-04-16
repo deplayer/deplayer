@@ -8,6 +8,11 @@ type Props = {
   field: any
 }
 
+export const TYPES = {
+  title: 'title',
+  checkbox: 'checkbox'
+}
+
 const FormikToggle = ({
   field,
   form: {touched, errors},
@@ -27,7 +32,7 @@ const FormikToggle = ({
 const FormField = (props: Props) => {
   const { field } = props
 
-  if (field.type === 'checkbox') {
+  if (field.type === TYPES.checkbox) {
     return (
       <div className='toggle-control'>
         <Field
@@ -40,7 +45,7 @@ const FormField = (props: Props) => {
 
   return (
     <Field
-      className={`${ field.type === 'checkbox' ? 'form-check': 'form-control'}`}
+      className={`${ field.type === TYPES.checkbox ? 'form-check': 'form-control'}`}
       name={field.name}
       type={field.type}
     />
