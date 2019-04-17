@@ -1,5 +1,10 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
+import { Route } from 'react-router-dom'
+import { ConnectedRouter } from 'connected-react-router'
+
+// Alerts
+import Alert from 'react-s-alert'
 
 import QueueContainer from './containers/QueueContainer'
 import CollectionContainer from './containers/CollectionContainer'
@@ -12,12 +17,6 @@ import LayoutContainer from './containers/LayoutContainer'
 
 import configureStore from './store/configureStore'
 import history from './store/configureHistory'
-
-// Alerts
-import Alert from 'react-s-alert'
-
-import { Route } from 'react-router-dom'
-import { ConnectedRouter } from 'connected-react-router'
 
 require('react-s-alert/dist/s-alert-default.css')
 require('./styles/App.scss')
