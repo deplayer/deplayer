@@ -21,8 +21,8 @@ class Settings extends React.Component<Props, State> {
     this.props.dispatch({type: types.DELETE_SETTINGS})
   }
 
-  addProvider = (form: any): any => {
-    this.props.dispatch({type: types.ADD_PROVIDER})
+  addProvider = (providerId: string): any => {
+    this.props.dispatch({type: types.ADD_PROVIDER, providerId})
   }
 
   render() {
@@ -36,7 +36,7 @@ class Settings extends React.Component<Props, State> {
           dispatch={this.props.dispatch}
         />
         <div className='btn-group'>
-          <button className='with-bg' onClick={this.addProvider}>
+          <button className='with-bg' onClick={() => this.addProvider('subsonic')}>
             <Translate value="buttons.addProvider" />
           </button>
           <button className='with-bg btn btn-danger' onClick={this.deleteCollection}>

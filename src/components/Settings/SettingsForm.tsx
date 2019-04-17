@@ -19,9 +19,7 @@ const SettingsForm = (props: Props) => {
 
   // Convert schema object to form elements
   const populateFromSchema = (schema) => {
-    console.log(props.schema)
-
-    const { fields } = props.schema
+    const { fields } = schema
 
     const populatedFields = fields.map((field, index) => {
       if (field.type === TYPES.title) {
