@@ -1,12 +1,10 @@
 import * as React from 'react'
 import { Translate } from 'react-redux-i18n'
 import { Dispatch } from 'redux'
-import { Route } from 'react-router-dom'
 
 import * as types from '../../constants/ActionTypes'
 import SettingsForm from './SettingsForm'
 import ProviderButton from './ProviderButton'
-import ProviderForm from './ProviderForm'
 
 type Props = {
   dispatch: Dispatch,
@@ -29,16 +27,17 @@ class Settings extends React.Component<Props, State> {
 
     return (
       <div className='settings'>
-        <Route path="/settings/providers/subsonic-0" component={ProviderForm} />
-        <Route exact path="/settings" component={() =>
-          <SettingsForm
-            schema={settingsForm}
-            settings={this.props.settings}
-            dispatch={this.props.dispatch}
-          />
-        } />
+        <div>
+          <ProviderButton providerKey='subsonic' />
+          <ProviderButton providerKey='mstream' />
+          <ProviderButton providerKey='itunes' />
+        </div>
+        <SettingsForm
+          schema={settingsForm}
+          settings={this.props.settings}
+          dispatch={this.props.dispatch}
+        />
         <div className='btn-group'>
-          <ProviderButton providerKey='subsonic-0' />
           <button className='with-bg btn btn-danger' onClick={this.deleteCollection}>
             <Translate value="labels.deleteCollection" />
           </button>

@@ -47,7 +47,7 @@ function* initializeSearchIndex() {
     const adapter = getAdapter()
     const settingsService = new SearchIndexService(new adapter())
     yield settingsService.initialize
-    const searchIndex = yield call(settingsService.get, 'search_index')
+    const searchIndex = yield settingsService.get()
     yield put({type: types.RECEIVE_SEARCH_INDEX, data: searchIndex})
   } catch (e) {
     yield put({type: types.RECEIVE_COLLECTION_REJECTED, error: e.message})

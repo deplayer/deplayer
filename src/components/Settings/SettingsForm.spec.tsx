@@ -9,6 +9,7 @@ configureEnzyme()
 
 const setup = (customProps: any) => {
   const schema = {
+    providers: {},
     fields: [
       {title: <Translate value="labels.mstream" />, type: 'title'},
       {title: <Translate value="labels.enabled" />, name: 'providers.mstream.enabled', type: 'checkbox'},
@@ -18,8 +19,9 @@ const setup = (customProps: any) => {
 
   const defaultProps = {
     settings: {
+      settingsForm: schema,
       settings: {
-        settingsForm: schema
+        providers: {}
       },
     },
     onSubmit: () => Promise.resolve()

@@ -46,23 +46,16 @@ describe('settings reducer', () => {
       }
     }
     expect(reducer(undefined, {type: types.SETTINGS_SAVED_SUCCESSFULLY, settings}))
-      .toEqual(
-        {
-          ...defaultState,
-          error: '',
-          saving: false,
-          settings
-        }
-      )
+      .toEqual(expect.objectContaining({settings}))
   })
 
   it('should handle ADD_PROVIDER', () => {
-    expect(reducer(undefined, {type: types.ADD_PROVIDER, providerId: 'subsonic'}))
-      .toEqual(
-        {
-          ...defaultState,
-          providers: [{key: 'subsonic-0'}]
-        }
-      )
+    const result = reducer(undefined, {
+      type: types.ADD_PROVIDER,
+      providerKey: 'subsonic'
+    })
+
+    expect(result.settingsForm).toBeDefined()
+    expect(result.settingsForm.providers['subsonic']).toBeDefined()
   })
 })

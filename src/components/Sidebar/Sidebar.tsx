@@ -7,6 +7,7 @@ import SettingsMenuItem from './SettingsMenuItem'
 import QueueMenuItem from './QueueMenuItem'
 import ArtistsMenuItem from './ArtistsMenuItem'
 import Sidebar from 'react-sidebar'
+import { inSection } from '../../utils/router'
 
 type ContentProps = {
   dispatch: Dispatch,
@@ -17,35 +18,30 @@ type ContentProps = {
 }
 
 const SidebarContents = (props: ContentProps) => {
-  const inSection = (section: string) => {
-    const pattern = '^/' + section + '$'
-    return props.location.pathname.match(new RegExp(pattern)) ? true : false
-  }
-
   return (
     <div onClick={() => props.onSetSidebarOpen()}>
       <h4>genar-radio</h4>
       <ul>
         <li>
           <QueueMenuItem
-            current={inSection('(queue)?')}
+            current={inSection(props.location, '(queue)?')}
             totalItems={props.queue.trackIds.length}
           />
         </li>
         <li>
           <CollectionMenuItem
-            current={inSection('collection')}
+            current={inSection(props.location, 'collection')}
             totalItems={props.collection.totalRows}
           />
         </li>
         <li>
           <ArtistsMenuItem
-            current={inSection('artists')}
+            current={inSection(props.location, 'artists')}
             totalItems={Object.keys(props.collection.artists).length}
           />
         </li>
         <li>
-          <SettingsMenuItem current={inSection('settings')} />
+          <SettingsMenuItem current={inSection(props.location, 'settings')} />
         </li>
       </ul>
 

@@ -1,22 +1,30 @@
 import * as React from 'react'
-import { Link } from 'react-router-dom'
+import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
+import { connect } from 'react-redux'
+import * as types from '../../constants/ActionTypes'
 
 type Props = {
+  dispatch: Dispatch,
+  history: any,
   providerKey: string
 }
 
 const ProviderButton = (props: Props) => {
+  const onClick = () => {
+    props.dispatch({type: types.ADD_PROVIDER, providerKey: props.providerKey})
+  }
+
   return (
-    <Link
+    <a
       className='btn btn-secondary'
-      to={`/settings/providers/${props.providerKey}`}
+      onClick={onClick}
       title={ props.providerKey }
     >
       <i className='fa fa-plus'></i>
       <Translate value={`buttons.addProvider.${props.providerKey}`} />
-    </Link>
+    </a>
   )
 }
 
-export default ProviderButton
+export default connect()(ProviderButton)

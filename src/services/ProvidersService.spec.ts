@@ -4,8 +4,8 @@ describe('ProvidersService', () => {
   it('should handle search against all providers', () => {
     const config = {
       providers: {
-        dummy: {
-          enabled: true
+        dummy0: {
+          enabled: true,
         }
       },
       app: {}

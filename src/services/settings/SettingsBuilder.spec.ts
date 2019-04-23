@@ -4,6 +4,9 @@ describe('SettingsBuilder', () => {
   it('should generate schema', () => {
     const settingsBuilder = new SettingsBuilder()
 
-    expect(settingsBuilder.getFormSchema()).toBeDefined()
+    const defaultSchema = settingsBuilder.getFormSchema()
+
+    expect(defaultSchema.providers).toBeDefined()
+    expect(defaultSchema.fields).toBeDefined()
   })
 })

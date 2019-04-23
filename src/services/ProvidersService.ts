@@ -1,26 +1,36 @@
-import { IProvider } from '../providers/IProvider'
 import { ISearchService } from './ISearchService'
 import { ISettings } from '../interfaces/ISettings'
-import providers from '../providers'
+import providersIndex from '../providers'
 
 export default class ProvidersService  implements ISearchService {
-  providers: Array<IProvider> = []
+  providers: any = {}
 
   constructor(config: ISettings) {
     Object.keys(config.providers).forEach((provider) => {
-      if (providers[provider]) {
+
+      const providerType = provider.replace(/[0-9]/g, '')
+
+      if (providersIndex[providerType]) {
         const parameters = config.providers[provider]
 
         if (parameters.enabled) {
-          this.providers.push(new providers[provider](parameters))
+          this.providers[provider] = new providersIndex[providerType](parameters, providerType)
         }
       }
     })
   }
 
   search = (searchTerm: string): Array<Promise<any>> => {
-    return this.providers.map((provider) => {
-      return provider.search(searchTerm)
+    return Object.keys(this.providers).map((provider) => {
+      return this.searchForProvider(searchTerm, provider)
     })
+  }
+
+  searchForProvider = (searchTerm: string, provider: string): Promise<any> => {
+    if (!this.providers[provider]) {
+      throw Error(`Provider ${provider} not found`)
+    }
+
+    return this.providers[provider].search(searchTerm)
   }
 }

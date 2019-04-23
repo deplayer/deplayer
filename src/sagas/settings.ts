@@ -22,11 +22,16 @@ function* initialize() {
 function* saveSettings(action: any) {
   const adapter = getAdapter()
   const settingsService = new SettingsService(new adapter())
-  yield call(settingsService.save, 'settings', action.settingsPayload)
+  try {
+    yield call(settingsService.save, 'settings', action.settingsPayload)
 
-  yield put({type: types.SETTINGS_SAVED_SUCCESSFULLY})
-  yield put({type: types.RECEIVE_SETTINGS, settings: action.settingsPayload})
-  yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.settings.saved'})
+    yield put({type: types.SETTINGS_SAVED_SUCCESSFULLY})
+    yield put({type: types.RECEIVE_SETTINGS, settings: action.settingsPayload})
+    yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.settings.saved'})
+  } catch (e) {
+    yield put({type: types.SETTINGS_SAVED_REJECTED, error: e.message})
+    yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.settings.error_saving', error: e.message})
+  }
 }
 
 export function* deleteSettings(): any {

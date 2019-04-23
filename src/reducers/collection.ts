@@ -41,19 +41,20 @@ export default (state: State = defaultState, action: any = {}) => {
       const songsByArtist = {}
       action.data.forEach((row) => {
         const song = new Song(row)
-        if (song.hasAnyProviderOf(state.enabledProviders)) {
-          rows[row.id] = song
-          artists[song.artist.id] = song.artist
-          if (!songsByArtist[song.artist.id]) {
-            songsByArtist[song.artist.id] = []
-          }
+        // if (song.hasAnyProviderOf(state.enabledProviders)) {
+        rows[row.id] = song
+        artists[song.artist.id] = song.artist
 
-          songsByArtist[song.artist.id].push(song.id)
+        if (!songsByArtist[song.artist.id]) {
+          songsByArtist[song.artist.id] = []
         }
+
+        songsByArtist[song.artist.id].push(song.id)
       })
       const totalRows = {...state.rows, ...rows}
       const totalArtists = {...state.artists, ...artists}
       const totalSongsByArtist  = {...state.songsByArtist, ...songsByArtist}
+
       return {
         ...state,
         rows: totalRows,

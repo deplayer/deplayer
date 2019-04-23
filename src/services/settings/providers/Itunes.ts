@@ -1,12 +1,14 @@
-import { ISettingsSection } from './ISettingsSection'
+import { ISettingsProvider } from './ISettingsProvider'
 
-export default class Itunes implements ISettingsSection {
+export default class Itunes implements ISettingsProvider {
   isRepeatable: false
 
   getFormSchema() {
-    return [
-      {title: "labels.itunes", type: 'title'},
-      {title: "labels.enabled", name: 'providers.itunes.enabled', type: 'checkbox'},
-    ]
+    return {
+      fields: [
+        {title: "labels.itunes", type: 'title'},
+        {title: "labels.enabled", name: 'providers.itunes.enabled', type: 'checkbox'},
+      ]
+    }
   }
 }
