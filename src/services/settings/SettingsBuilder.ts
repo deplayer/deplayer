@@ -15,6 +15,11 @@ export default class SettingsBuilder implements ISettingsBuilder {
     const providerFields = Object.keys(providers).reduce((accumulator, providerId: string) => {
       const providerType = providerId.replace(/[0-9]/g, '')
       const providerNum = Object.keys(providers).indexOf(providerId) || 0
+
+      if (!providerBuilders[providerType]) {
+        return accumulator
+      }
+
       accumulator[providerId] = providerBuilders[providerType].getFormSchema(providerNum)
 
       return accumulator

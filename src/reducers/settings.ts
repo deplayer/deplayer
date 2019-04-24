@@ -33,7 +33,7 @@ export default (state: State = defaultState, action: any = {}) => {
     case types.RECEIVE_SETTINGS:
     case types.SETTINGS_SAVED_SUCCESSFULLY: {
       const settingsForm = settingsBuilder.getFormSchema(
-        state.settingsForm.providers
+        action.settings ? action.settings.providers : state.settings.providers
       )
 
       return {
