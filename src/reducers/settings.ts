@@ -33,7 +33,7 @@ export default (state: State = defaultState, action: any = {}) => {
     case types.RECEIVE_SETTINGS:
     case types.SETTINGS_SAVED_SUCCESSFULLY: {
       const settingsForm = settingsBuilder.getFormSchema(
-        action.settings.providers
+        state.settingsForm.providers
       )
 
       return {
@@ -48,8 +48,6 @@ export default (state: State = defaultState, action: any = {}) => {
       providers[action.providerKey] = true
 
       const settingsForm = settingsBuilder.getFormSchema(providers)
-
-      console.log('ADD_PROVIDER', providers)
 
       return {
         ...state,

@@ -20,7 +20,6 @@ const SettingsForm = (props: Props) => {
     props.dispatch({type: types.SAVE_SETTINGS, settingsPayload: form})
   }
 
-  console.log('providers received by form: ', props.settings.settingsForm.providers)
   const providers = Object.keys(props.settings.settingsForm.providers).map((providerKey) => {
     return (
       <FormSchema key={providerKey} schema={props.settings.settingsForm.providers[providerKey]} />
