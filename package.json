@@ -25,6 +25,7 @@
     "classnames": "^2.2.6",
     "connected-react-router": "^6.3.2",
     "css-loader": "^2.1.0",
+    "deepmerge": "^3.2.0",
     "dotenv": "4.0.0",
     "dotenv-expand": "4.2.0",
     "elasticlunr": "^0.9.5",
