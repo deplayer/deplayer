@@ -34,7 +34,6 @@ export default class MediaMergerService {
       }
     }
     const merged = merge(this.mediaA, this.mediaB, options)
-    console.log(merged)
     return new Song(merged)
   }
 }

@@ -77,6 +77,13 @@ export default (state: State = defaultState, action: any = {}) => {
       }
     }
 
+    case types.SEARCH_FINISHED: {
+      return {
+        ...state,
+        searchResults: state.searchTerm !== '' ? filterSongs(state.rows, state.searchTerm) : []
+      }
+    }
+
     default:
       return state
   }

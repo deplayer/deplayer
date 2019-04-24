@@ -23,13 +23,12 @@ function* performSingleSearch(searchTerm: string, provider: string) {
     const settings = yield select(getSettings)
     const providerService= new ProvidersService(settings)
     const searchResults = yield providerService.searchForProvider(searchTerm, provider)
-
     yield putResolve({type: types.ADD_TO_COLLECTION, data: searchResults})
-    yield call(goToSearchResults)
   } catch (e) {
     yield put({type: types.SEARCH_REJECTED, message: e.message})
     yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.search.failed'})
   }
+  yield call(goToSearchResults)
 }
 
 // Handling search saga
