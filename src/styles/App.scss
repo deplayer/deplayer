@@ -42,6 +42,12 @@ body {
   font-smoothing: antialiased;
 }
 
+blockquote {
+  p {
+    text-align: center;
+  }
+}
+
 .library-controls {
   padding: 10px 0;
 }

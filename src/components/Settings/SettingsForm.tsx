@@ -4,6 +4,7 @@ import { Dispatch } from 'redux'
 import { Route } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import { Translate } from 'react-redux-i18n'
+import ProviderButton from './ProviderButton'
 
 import * as types from '../../constants/ActionTypes'
 import FormSchema from './FormSchema'
@@ -22,7 +23,9 @@ const SettingsForm = (props: Props) => {
 
   const providers = Object.keys(props.settings.settingsForm.providers).map((providerKey) => {
     return (
-      <FormSchema key={providerKey} schema={props.settings.settingsForm.providers[providerKey]} />
+      <div className='card provider-card'>
+        <FormSchema key={providerKey} schema={props.settings.settingsForm.providers[providerKey]} />
+      </div>
     )
   })
 
@@ -49,7 +52,21 @@ const SettingsForm = (props: Props) => {
           <Form
             className='settings-form'
           >
-            <FormSchema schema={props.schema} />
+            <h2><Translate value="labels.generalSettings" /></h2>
+
+
+            <div className='card app-settings'>
+              <FormSchema schema={props.schema} />
+            </div>
+
+            <h2><Translate value="labels.providers" /></h2>
+
+            <div className='btn-group provider-buttons'>
+              <ProviderButton providerKey='subsonic' />
+              <ProviderButton providerKey='mstream' />
+              <ProviderButton providerKey='itunes' />
+            </div>
+
             { providers }
 
             <Route path="/settings/providers" component={() =>

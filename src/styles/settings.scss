@@ -2,10 +2,41 @@
   padding: 40px;
   width: 100%;
   max-width: $body-max-width;
+  margin: 0 auto;
+
+  label {
+    text-align: right;
+  }
 
   button {
     margin-bottom: 40px;
     max-width: 200px;
+  }
+
+  button[type="submit"] {
+    margin-top: 40px;
+  }
+
+  h2 {
+    margin-top: 30px;
+    margin-bottom: 20px;
+  }
+
+  h3 {
+    margin-top: 0px;
+    margin-bottom: 20px;
+    color: $greyscale-color-200;
+    text-transform: capitalize;
+  }
+
+  .card {
+    background: $greyscale-darker1;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .provider-buttons {
+    margin-bottom: 20px;
   }
 
   @include media-breakpoint-up(md) {
@@ -18,7 +49,11 @@
     }
   }
 
-  > .btn-group {
+  .btn-group {
+    i {
+      margin-right: 10px;
+    }
+
     button {
       background: transparent;
       color: $warning;

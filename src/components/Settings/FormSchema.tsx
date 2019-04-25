@@ -13,7 +13,7 @@ const FormSchema = (props: Props) => {
 
   const populatedFields = fields.map((field, index) => {
     if (field.type === TYPES.title) {
-      return <h2 key={index}><Translate value={field.title} /></h2>
+      return <h3 key={index}><Translate value={field.title} /></h3>
     }
 
     return (
@@ -21,10 +21,10 @@ const FormSchema = (props: Props) => {
         key={field.name}
         className="form-group row"
       >
-        <label className='col-sm-2 col-form-label'>
+        <label className='col-sm-4 col-form-label'>
           <Translate value={field.title} />
         </label>
-        <div className='col-sm-10'>
+        <div className='col-sm-8'>
           <FormField
             field={field}
           />

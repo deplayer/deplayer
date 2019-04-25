@@ -6,8 +6,12 @@
     "collection": "Collection"
   },
   "labels": {
+    "enableSpectrum": "player spectrum",
     "deleteCollection": "Delete collection",
-    "deleteSettings": "Delete settings"
+    "deleteSettings": "Delete settings",
+    "addProviders": "Add providers",
+    "providers": "Providers",
+    "generalSettings": "General settings"
   },
   "song": {
     "label": {

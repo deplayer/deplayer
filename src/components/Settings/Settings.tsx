@@ -4,7 +4,6 @@ import { Dispatch } from 'redux'
 
 import * as types from '../../constants/ActionTypes'
 import SettingsForm from './SettingsForm'
-import ProviderButton from './ProviderButton'
 
 type Props = {
   dispatch: Dispatch,
@@ -27,11 +26,6 @@ class Settings extends React.Component<Props, State> {
 
     return (
       <div className='settings'>
-        <div>
-          <ProviderButton providerKey='subsonic' />
-          <ProviderButton providerKey='mstream' />
-          <ProviderButton providerKey='itunes' />
-        </div>
         <SettingsForm
           schema={settingsForm}
           settings={this.props.settings}
