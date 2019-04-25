@@ -44,7 +44,7 @@ const SongRow = (props: Props) => {
   )
 
   return (
-    <li
+    <div
       className={`song-row ${ props.isCurrent ? 'current': ''}`}
       style={props.style}
       onClick={onClick}
@@ -73,7 +73,7 @@ const SongRow = (props: Props) => {
           { props.slim && <span>{ getDurationStr(song.duration) }</span> }
         </div>
       </div>
-    </li>
+    </div>
   )
 }
 

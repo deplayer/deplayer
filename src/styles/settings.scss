@@ -4,10 +4,6 @@
   max-width: $body-max-width;
   margin: 0 auto;
 
-  label {
-    text-align: right;
-  }
-
   button {
     margin-bottom: 40px;
     max-width: 200px;
@@ -40,6 +36,10 @@
   }
 
   @include media-breakpoint-up(md) {
+    label {
+      text-align: right;
+    }
+
     h2 {
       margin-top: 60px;
 
