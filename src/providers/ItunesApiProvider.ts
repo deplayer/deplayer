@@ -1,12 +1,16 @@
-// @flow
-
 import axios from 'axios'
 
 import { IProvider } from './IProvider'
 import Song from '../entities/Song'
 
 export default class ItunesApiProvider implements IProvider {
-  baseUrl = 'https://itunes.apple.com'
+  baseUrl: string
+  providerKey: string
+
+  constructor(settings, providerKey = 'itunes') {
+    this.baseUrl = 'https://itunes.apple.com'
+    this.providerKey = providerKey
+  }
 
   populateUrl(searchTerm: string): string {
     return `${this.baseUrl}/search?term=${encodeURIComponent(searchTerm)}`
@@ -32,7 +36,7 @@ export default class ItunesApiProvider implements IProvider {
       currency: itSong.currency,
       shareUrl: itSong.trackViewUrl,
       stream: [
-        {service: 'itunes', uris: [{uri: itSong.previewUrl, quality: 'demo'}]}
+        {service: this.providerKey, uris: [{uri: itSong.previewUrl, quality: 'demo'}]}
       ]
     })
   }

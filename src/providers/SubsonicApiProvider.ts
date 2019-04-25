@@ -14,14 +14,16 @@ export default class SubsonicApiProvider implements IProvider {
   searchUrl: string
   streamBase: string
   coverBase: string
+  providerKey: string
 
-  constructor(settings: any) {
+  constructor(settings: any, providerKey: string) {
     const appName = 'genar-radio'
     const songCount = 1000
     const artistCount = 1000
     this.baseUrl = settings.baseUrl
     this.user = settings.user
     this.password = settings.password
+    this.providerKey = providerKey
     this.albumSongsUrl = `${settings.baseUrl}/rest/getMusicFolders.view?u=${settings.user}&p=${settings.password}&c=${appName}&v=1.11.0&f=json`
     this.searchUrl = `${settings.baseUrl}/rest/search3.view?songCount=${songCount}&artistCount=${artistCount}&u=${settings.user}&p=${settings.password}&c=${appName}&v=1.11.0&f=json`
     this.streamBase = `${settings.baseUrl}/rest/stream.view?u=${settings.user}&p=${settings.password}&c=${appName}&v=1.11.0&f=json`
@@ -29,6 +31,11 @@ export default class SubsonicApiProvider implements IProvider {
   }
 
   mapSongs = (songs: Array<any>): Array<any> => {
+    // Protect against empty responses
+    if (!songs) {
+      return []
+    }
+
     const secureSongs = songs instanceof Array ? songs : [songs]
     return secureSongs.map((song: any) => {
       return new Song({
@@ -40,7 +47,7 @@ export default class SubsonicApiProvider implements IProvider {
         duration: song.duration * 1000,
         stream: [
           {
-            service: 'subsonic',
+            service: this.providerKey,
             uris: [{uri: this.streamBase + '&id=' + song.id}]
           }
         ]

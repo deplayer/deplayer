@@ -4,6 +4,7 @@ import { Dispatch } from 'redux'
 
 import * as types from '../../constants/ActionTypes'
 import SettingsForm from './SettingsForm'
+import ProviderButton from './ProviderButton'
 
 type Props = {
   dispatch: Dispatch,
@@ -21,24 +22,22 @@ class Settings extends React.Component<Props, State> {
     this.props.dispatch({type: types.DELETE_SETTINGS})
   }
 
-  addProvider = (providerId: string): any => {
-    this.props.dispatch({type: types.ADD_PROVIDER, providerId})
-  }
-
   render() {
     const settingsForm = this.props.settings.settingsForm
 
     return (
       <div className='settings'>
+        <div>
+          <ProviderButton providerKey='subsonic' />
+          <ProviderButton providerKey='mstream' />
+          <ProviderButton providerKey='itunes' />
+        </div>
         <SettingsForm
           schema={settingsForm}
           settings={this.props.settings}
           dispatch={this.props.dispatch}
         />
         <div className='btn-group'>
-          <button className='with-bg' onClick={() => this.addProvider('subsonic')}>
-            <Translate value="buttons.addProvider" />
-          </button>
           <button className='with-bg btn btn-danger' onClick={this.deleteCollection}>
             <Translate value="labels.deleteCollection" />
           </button>

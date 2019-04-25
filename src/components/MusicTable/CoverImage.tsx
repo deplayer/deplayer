@@ -41,10 +41,10 @@ class CoverImage extends React.Component<Props> {
   // Update component only if the src has changed
   shouldComponentUpdate(nextProps) {
     if (nextProps.cover !== this.props.cover) {
-      return false
+      return true
     }
 
-    return true
+    return false
   }
 
   render() {

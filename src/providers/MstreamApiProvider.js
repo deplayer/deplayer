@@ -1,5 +1,3 @@
-// @flow
-
 import axios from 'axios'
 
 import Song from '../entities/Song'
@@ -11,10 +9,12 @@ import { IProvider } from './IProvider'
 export default class MstreamApiProvider implements IProvider {
   baseUrl: string
   albumSongsUrl: string
+  providerKey: string
 
-  constructor(settings: any) {
+  constructor(settings: any, providerKey: string) {
     this.albumSongsUrl = settings.baseUrl + '/db/album-songs'
     this.baseUrl = settings.baseUrl
+    this.providerKey = providerKey
   }
 
   matchSearch = (song: any, searchTerm: string) => {
@@ -42,7 +42,7 @@ export default class MstreamApiProvider implements IProvider {
         fullUrl: song.metadata['album-art'] ? this.baseUrl + '/album-art/' + song.metadata['album-art']: undefined,
         stream: [
           {
-            service: 'mstream',
+            service: this.providerKey,
             uris: [{uri: this.baseUrl + '/media/' + decodeURIComponent(song.filepath)}]
           }
         ]

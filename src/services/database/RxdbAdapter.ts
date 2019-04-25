@@ -9,9 +9,9 @@ export default class RxdbAdapter implements IAdapter {
 
   save = (model: string, id: string, payload: any): Promise<any> => {
     const fixedPayload = {_id: id, ...payload}
-    return db.get().then((instance) => {
-      return instance[model].atomicUpsert(fixedPayload)
-    })
+    return db.get().then((instance) =>
+      instance[model].atomicUpsert(fixedPayload)
+    )
   }
 
   addMany(model: string, payload: Array<any>): Promise<any> {

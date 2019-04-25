@@ -5,7 +5,7 @@ import MockAdapter from 'axios-mock-adapter'
 
 import ItunesApiProvider from './ItunesApiProvider'
 import Song from '../entities/Song'
-import exampleSong from './exampleSong'
+import exampleSong from './exampleSong.json'
 
 // Setting mock to default instance
 const mock = new MockAdapter(axios)
@@ -19,7 +19,7 @@ mock.onGet(/search/).reply(200, {
 })
 
 describe('ItunesApiProvider', () => {
-  const itunesRepo = new ItunesApiProvider()
+  const itunesRepo = new ItunesApiProvider('itunes-0')
 
   it('should handle song search', () => {
     expect(itunesRepo.search('Bad brains')).toBeInstanceOf(Promise)

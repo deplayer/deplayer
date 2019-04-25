@@ -5,14 +5,14 @@ import ConnectionService from '../services/ConnectionService'
 import * as types from '../constants/ActionTypes'
 
 // Application initialization routines
-function* initialize(dispatch) {
+function* initialize(dispatch, action) {
   const connectionService = new ConnectionService()
   yield call(connectionService.registerConnection, dispatch)
 }
 
 // Binding actions to sagas
 function* connectionSaga(store: any) {
-  yield takeLatest(types.INITIALIZED, initialize,  store.dispatch)
+  yield takeLatest(types.INITIALIZED, initialize, store.dispatch)
 }
 
 export default connectionSaga

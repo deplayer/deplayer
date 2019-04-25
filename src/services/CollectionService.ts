@@ -1,5 +1,6 @@
 import { IStorageService } from './IStorageService'
 import { IAdapter } from './database/IAdapter'
+import MediaMergerService from './MediaMergerService'
 
 import Media from '../entities/Media'
 
@@ -18,8 +19,18 @@ export default class CollectionService implements IStorageService {
     return this.storageAdapter.save('media', id, payload)
   }
 
-  bulkSave = (collection: Array<Media>): Promise<any> => {
+  bulkSave = (collection: Array<Media>, prevCollection: any): Promise<any> => {
     const collectionItems = collection.map((elem) => {
+      if (prevCollection.rows[elem.id]) {
+
+        const prevItem = prevCollection.rows[elem.id]
+        const mediaMergerService = new MediaMergerService(prevItem, elem)
+
+        const mergedMedia = mediaMergerService.getMerged()
+
+        return mergedMedia.toDocument()
+      }
+
       return elem.toDocument()
     })
     return this.storageAdapter.addMany('media', collectionItems)

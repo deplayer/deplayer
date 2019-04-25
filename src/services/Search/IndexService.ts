@@ -24,9 +24,8 @@ export default class IndexService {
     return this
   }
 
-  // This don't work because this method is not exposed in library
   loadIndex(indexDump: any) {
-    // TODO: Handle the empty index comming
+    // TODO: Handle the empty index comming from client
     if (!indexDump) {
       return this
     }

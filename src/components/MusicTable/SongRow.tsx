@@ -63,6 +63,11 @@ const SongRow = (props: Props) => {
           <li><h6>{ song.artist ? song.artist.name: nonAvailable }</h6></li>
           { props.slim ||  <li> { getDurationStr(song.duration) } </li> }
         </ul>
+        {
+          song.stream.map((provider) => {
+            return (<i key={provider.service}>{ provider.service }</i>)
+          })
+        }
         <div className='media-actions'>
           <ContextualMenu {...props} />
           { props.slim && <span>{ getDurationStr(song.duration) }</span> }

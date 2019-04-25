@@ -17,7 +17,7 @@ export default class SearchIndexService implements IStorageService {
     logger.log('search index saving: ', payload)
     return this.storageAdapter.save('search_index', 'search_index', payload)
       .catch((e) => {
-        logger.error('Error saving search_index', e.message)
+        logger.log('Error saving search_index', e.message)
       })
   }
 

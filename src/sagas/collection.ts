@@ -1,9 +1,10 @@
-import { takeLatest, put, call } from 'redux-saga/effects'
+import { takeLatest, put, call, select } from 'redux-saga/effects'
 
 import CollectionService from '../services/CollectionService'
 import SearchIndexService from '../services/SearchIndexService'
 import { getAdapter } from '../services/database'
 import IndexService from '../services/Search/IndexService'
+import logger from '../utils/logger'
 
 import * as types from '../constants/ActionTypes'
 
@@ -37,6 +38,7 @@ function* initializeCollection() {
     yield put({type: types.RECEIVE_COLLECTION, data: mappedData})
     yield put({type: types.INITIALIZED})
   } catch (e) {
+    logger.log('settings-saga', 'initializeCollection', e)
     yield put({type: types.RECEIVE_COLLECTION_REJECTED, error: e.message})
   }
 }
@@ -47,22 +49,29 @@ function* initializeSearchIndex() {
     const adapter = getAdapter()
     const settingsService = new SearchIndexService(new adapter())
     yield settingsService.initialize
-    const searchIndex = yield call(settingsService.get, 'search_index')
+    const searchIndex = yield settingsService.get()
     yield put({type: types.RECEIVE_SEARCH_INDEX, data: searchIndex})
   } catch (e) {
+    logger.log('settings-saga', 'initializeSearchIndex', e)
     yield put({type: types.RECEIVE_COLLECTION_REJECTED, error: e.message})
   }
+}
+
+const getCollection = (state: any): any => {
+  return state ? state.collection : {}
 }
 
 // Handling ADD_TO_COLLECTION saga
 export function* addToCollection(action: any): any {
   const adapter = getAdapter()
+  const prevCollection = yield select(getCollection)
   const collectionService = new CollectionService(new adapter())
-  const collection = yield collectionService.bulkSave(action.data)
+  const collection = yield collectionService.bulkSave(action.data, prevCollection)
   const mappedData = mapToMedia(collection)
   try {
     yield put({type: types.RECEIVE_COLLECTION, data: mappedData})
   } catch (e) {
+    logger.log('settings-saga', 'addToCollection', e)
     yield put({type: types.RECEIVE_COLLECTION_REJECTED, error: e.message})
   }
 }

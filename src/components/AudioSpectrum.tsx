@@ -172,7 +172,7 @@ class AudioSpectrum extends React.Component<Props> {
     try {
       this.audioContext = new AudioContext() // 1.set audioContext
     } catch (e) {
-      logger.error('!Your browser does not support AudioContext')
+      logger.log('!Your browser does not support AudioContext')
     }
   }
 

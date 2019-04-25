@@ -1,13 +1,16 @@
 import * as React from 'react'
 import { Formik, Form } from 'formik'
 import { Dispatch } from 'redux'
+import { Route } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Translate } from 'react-redux-i18n'
 
-import FormField, { TYPES } from './FormField'
 import * as types from '../../constants/ActionTypes'
+import FormSchema from './FormSchema'
+import { State as SettingsStateType } from '../../reducers/settings'
 
 type Props = {
-  settings: any,
+  settings: SettingsStateType,
   dispatch: Dispatch,
   schema: any
 }
@@ -17,34 +20,11 @@ const SettingsForm = (props: Props) => {
     props.dispatch({type: types.SAVE_SETTINGS, settingsPayload: form})
   }
 
-  // Convert schema object to form elements
-  const populateFromSchema = (schema) => {
-    const { fields } = schema
-
-    const populatedFields = fields.map((field, index) => {
-      if (field.type === TYPES.title) {
-        return <h2 key={index}><Translate value={field.title} /></h2>
-      }
-
-      return (
-        <div
-          key={field.name}
-          className="form-group row"
-        >
-          <label className='col-sm-2 col-form-label'>
-            <Translate value={field.title} />
-          </label>
-          <div className='col-sm-10'>
-            <FormField
-              field={field}
-            />
-          </div>
-        </div>
-      )
-    })
-
-    return populatedFields
-  }
+  const providers = Object.keys(props.settings.settingsForm.providers).map((providerKey) => {
+    return (
+      <FormSchema key={providerKey} schema={props.settings.settingsForm.providers[providerKey]} />
+    )
+  })
 
   const { settings } = props
 
@@ -69,7 +49,20 @@ const SettingsForm = (props: Props) => {
           <Form
             className='settings-form'
           >
-            { populateFromSchema(props.schema) }
+            <FormSchema schema={props.schema} />
+            { providers }
+
+            <Route path="/settings/providers" component={() =>
+              <Link
+                className='btn btn-secondary'
+                to="/settings"
+                title="settings"
+              >
+                <i className='fa fa-back'></i>
+                <Translate value="buttons.returnToSettings" />
+              </Link>
+            } />
+
             <button className='with-bg' disabled={isSubmitting} type='submit'>
               <Translate value="buttons.save" />
             </button>

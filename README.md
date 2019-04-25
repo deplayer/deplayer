@@ -8,7 +8,6 @@ Media player thought to run entirelly in the web browser.
 
 * Progressive Web App
 * Fulltext search support thanks to [elasticlunr](https://elasticlunr.com/).
-* Support for Subsonic API.
 * Desktop and mobile notifications thanks to [Notification Web API](https://developer.mozilla.org/en-US/docs/Web/API/notification)
 * Spectum audio visual thanks to [react-audio-spectrum](https://github.com/hu-ke/react-audio-spectrum)
 

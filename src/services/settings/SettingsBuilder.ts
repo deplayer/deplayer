@@ -1,10 +1,10 @@
 import { ISettingsBuilder } from '../../interfaces/ISettingsBuilder'
 import sections from './sections'
+import providerBuilders from './providers'
 
 export default class SettingsBuilder implements ISettingsBuilder {
-  getFormSchema(providers: Array<any> = []) {
+  getFormSchema(providers: any = {}) {
     const totalFields = Object.keys(sections).reduce((accumulator, sectionId: string) => {
-      console.log(sections[sectionId])
       if (sections[sectionId].isRepeatable) {
         return accumulator
       }
@@ -12,19 +12,22 @@ export default class SettingsBuilder implements ISettingsBuilder {
       return [...accumulator, ...sections[sectionId].getFormSchema()]
     }, [])
 
-    console.log('totalFields: ', totalFields)
+    const providerFields = Object.keys(providers).reduce((accumulator, providerId: string) => {
+      const providerType = providerId.replace(/[0-9]/g, '')
+      const providerNum = Object.keys(providers).indexOf(providerId) || 0
 
-    const providerFields = Object.keys(sections).reduce((accumulator, sectionId: string) => {
-      if (!sections[sectionId].isRepeatable) {
+      if (!providerBuilders[providerType]) {
         return accumulator
       }
 
-      return [...accumulator, ...sections[sectionId].getFormSchema()]
-    }, [])
+      accumulator[providerId] = providerBuilders[providerType].getFormSchema(providerNum)
+
+      return accumulator
+    }, {})
 
     return (
       {
-        providerFields,
+        providers: providerFields,
         fields: totalFields
       }
     )
