@@ -12,7 +12,7 @@ export default class MediaMergerService {
     this.mediaB = mediaB
   }
 
-  getMerged(): Media {
+  getMerged(): Song {
     const mergeStream = (streamA, streamB) => {
       const concatStreams = [...streamA, ...streamB]
       return concatStreams.filter((elem, index) => {

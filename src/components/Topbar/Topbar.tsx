@@ -107,7 +107,7 @@ class Topbar extends React.Component<Props, State> {
           placeholder={ I18n.t('placeholder.search') }
           type='text'
         />
-        { this.props.loading ? <i className='icon fa fa-spinner'></i> : <i className='icon search'></i> }
+        { this.props.loading ? <i className='icon fa fa-spinner fa-pulse'></i> : <i className='icon search'></i> }
       </div>
     )
   }
