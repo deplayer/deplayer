@@ -14,7 +14,7 @@ type Props = {
 }
 
 const Content = (props: any) => {
-  const placeholderUrl = 'logo.png'
+  const placeholderUrl = '/logo.png'
   const imageUrl = props.noImage ? placeholderUrl : props.src
 
   return (
@@ -67,8 +67,8 @@ class CoverImage extends React.Component<Props> {
     }
 
     return (
-      <i
-        className='cover-image fa fa-music'
+      <Img
+        noImage
       />
     )
   }
