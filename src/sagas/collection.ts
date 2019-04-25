@@ -5,25 +5,30 @@ import SearchIndexService from '../services/SearchIndexService'
 import { getAdapter } from '../services/database'
 import IndexService from '../services/Search/IndexService'
 import logger from '../utils/logger'
+import Song from '../entities/Song'
 
 import * as types from '../constants/ActionTypes'
 
-const mapToMedia = (collection: Array<any>) => {
+const rowToSong  = (elem): Song => {
+  return new Song({
+    ...elem.get(),
+    ...{
+      artist: { name: elem.artist.name },
+      albumName: elem.album.name,
+      artistName: elem.artist.name,
+      thumbnailUrl: elem.cover.thumbnailUrl,
+      fullUrl: elem.cover.thumbnailUrl
+    }
+  })
+}
+
+const mapToMedia = (collection: Array<Song>) => {
   if (!collection.length) {
     return []
   }
 
   return collection.map((elem) => {
-    return {
-      ...elem.get(),
-      ...{
-        artist: { name: elem.artist.name },
-        albumName: elem.album.name,
-        artistName: elem.artist.name,
-        thumbnailUrl: elem.cover.thumbnailUrl,
-        fullUrl: elem.cover.thumbnailUrl
-      }
-    }
+    return rowToSong(elem)
   })
 }
 
@@ -74,6 +79,8 @@ export function* addToCollection(action: any): any {
     logger.log('settings-saga', 'addToCollection', e)
     yield put({type: types.RECEIVE_COLLECTION_REJECTED, error: e.message})
   }
+
+  yield generateIndex(action)
 }
 
 // Handling REMOVE_FROM_COLLECTION saga
@@ -111,15 +118,13 @@ export function* generateIndex(action): any {
   } catch (e) {
     yield put({type: types.RECEIVE_SEARCH_INDEX_REJECTED, message: e.message})
   }
-
-  yield addToCollection(action)
 }
 
 // Binding actions to sagas
 function* collectionSaga(): any {
   yield takeLatest(types.RECEIVE_SETTINGS_FINISHED, initializeCollection)
   yield takeLatest(types.RECEIVE_SETTINGS_FINISHED, initializeSearchIndex)
-  yield takeLatest(types.ADD_TO_COLLECTION, generateIndex)
+  yield takeLatest(types.ADD_TO_COLLECTION, addToCollection)
   yield takeLatest(types.REMOVE_FROM_COLLECTION, removeFromCollection)
   yield takeLatest(types.DELETE_COLLECTION, deleteCollection)
 }

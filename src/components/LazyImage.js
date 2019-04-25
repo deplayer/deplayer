@@ -40,10 +40,10 @@ class LazyImage extends React.Component {
     this.image = new Image()
 
     if (src) {
-      /* eslint react/no-direct-mutation-state: 0 */
       this.image.src = src
     }
 
+    /* eslint react/no-direct-mutation-state: 0 */
     this.state.loading = true
     this.image.onload = this.handleLoad
     this.image.onerror = this.handleError

@@ -25,6 +25,7 @@ $greyscale-lighter1: lighten(adjust-hue($greyscale-base, 5), 10%);
 $greyscale-lighter2: lighten(adjust-hue($greyscale-base, 10), 20%);
 $greyscale-darker1: darken(adjust-hue($greyscale-base, -5), 10%);
 $greyscale-darker2: darken(adjust-hue($greyscale-base, -10), 20%);
+$greyscale-darker3: darken(adjust-hue($greyscale-base, -10), 40%);
 
 $warning-color: #dc3545;
 $yellow-color: #a50;

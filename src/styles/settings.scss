@@ -54,6 +54,13 @@
       margin-right: 10px;
     }
 
+    &.provider-buttons {
+      a {
+        background: transparent;
+        cursor: pointer;
+      }
+    }
+
     button {
       background: transparent;
       color: $warning;

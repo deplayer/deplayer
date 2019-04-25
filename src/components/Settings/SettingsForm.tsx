@@ -23,8 +23,8 @@ const SettingsForm = (props: Props) => {
 
   const providers = Object.keys(props.settings.settingsForm.providers).map((providerKey) => {
     return (
-      <div className='card provider-card'>
-        <FormSchema key={providerKey} schema={props.settings.settingsForm.providers[providerKey]} />
+      <div key={providerKey} className='card provider-card'>
+        <FormSchema schema={props.settings.settingsForm.providers[providerKey]} />
       </div>
     )
   })

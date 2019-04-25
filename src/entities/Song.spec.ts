@@ -13,7 +13,7 @@ describe('entities/Song', () => {
   })
 
   it('should create s Song with thumbnail and full size covers', () => {
-    const song = new Song({thumbnailUrl: 'http://some-songs-api/song.mp4'})
+    const song = new Song({cover: { thumbnailUrl: 'http://some-songs-api/song.mp4'}})
     expect(song.cover.thumbnailUrl).toEqual('http://some-songs-api/song.mp4')
   })
 

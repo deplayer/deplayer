@@ -7,11 +7,6 @@ type money = {
   currency: string
 }
 
-type cover = {
-  thumbnailUrl: string,
-  fullUrl: string
-}
-
 type album = {
   name: string
 }
@@ -23,7 +18,6 @@ export default class Song extends Media {
   shareUrl: string
   album: album
   albumName: string
-  cover: cover
   duration: number // In milliseconds
   price: money
   dateAdded: Date
@@ -35,11 +29,10 @@ export default class Song extends Media {
     super(songParams)
 
     const {
+      cover,
       forcedId,
       artistName,
       albumName,
-      thumbnailUrl,
-      fullUrl,
       duration,
       genre,
       price,
@@ -62,10 +55,6 @@ export default class Song extends Media {
     this.album = {
       name: albumName ? albumName : ''
     }
-    this.cover = {
-      thumbnailUrl: thumbnailUrl,
-      fullUrl: fullUrl
-    }
     if (typeof price === 'number') {
       this.price = {
         price: price || 0,
@@ -76,6 +65,7 @@ export default class Song extends Media {
     }
 
     this.stream = stream || []
+    this.cover = cover || {}
 
     // this must be the last assignment
     this.id = forcedId ? forcedId : new SongId(this).value

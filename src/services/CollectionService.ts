@@ -33,6 +33,7 @@ export default class CollectionService implements IStorageService {
 
       return elem.toDocument()
     })
+
     return this.storageAdapter.addMany('media', collectionItems)
   }
 

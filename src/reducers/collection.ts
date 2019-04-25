@@ -34,7 +34,6 @@ export default (state: State = defaultState, action: any = {}) => {
       }
     }
 
-    case types.ADD_TO_COLLECTION:
     case types.RECEIVE_COLLECTION: {
       const rows = {}
       const artists = {}

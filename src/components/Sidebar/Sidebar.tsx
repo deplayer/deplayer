@@ -72,7 +72,7 @@ type State = {
   sidebarDocked: boolean
 }
 
-const mql = window.matchMedia(`(min-width: 800px)`)
+const mql = window.matchMedia(`(min-width: 770px)`)
 
 class MSidebar extends React.Component<Props, State> {
   constructor(props) {

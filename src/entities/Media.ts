@@ -10,11 +10,17 @@ type stream = {
   uris: Array<streamUri>
 }
 
+type cover = {
+  thumbnailUrl: string,
+  fullUrl: string
+}
+
 export default class Media {
   id: string
   title: string
   author: any
   authorName: string
+  cover: cover
   duration: number
   externalId: string
   stream: Array<stream>
@@ -23,6 +29,8 @@ export default class Media {
     const {
       authorName,
       title,
+      thumbnailUrl,
+      fullUrl,
       id
     } = mediaParams
 
@@ -34,6 +42,11 @@ export default class Media {
       name: authorName ? authorName : ''
     }
     this.authorName = this.author.name
+
+    this.cover = {
+      thumbnailUrl: thumbnailUrl,
+      fullUrl: fullUrl
+    }
   }
 
   static toSchema(): any {
@@ -91,6 +104,7 @@ export default class Media {
       id: '' + this.id,
       title: this.title,
       artist: this.author,
+      cover: this.cover,
       stream: this.stream,
       duration: this.duration
     }
