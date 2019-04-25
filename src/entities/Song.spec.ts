@@ -29,4 +29,14 @@ describe('entities/Song', () => {
 
     expect(song.hasAnyProviderOf(['itunes'])).toEqual(true)
   })
+
+  it('should create proper song id from artist-album-title', () => {
+    const song = new Song({
+      artistName: 'artist',
+      albumName: 'album',
+      title: 'title'
+    })
+
+    expect(song.id).toEqual('artist-album-title')
+  })
 })

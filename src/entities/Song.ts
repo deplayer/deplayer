@@ -24,8 +24,7 @@ export default class Song extends Media {
   album: album
   albumName: string
   cover: cover
-  // In milliseconds
-  duration: number
+  duration: number // In milliseconds
   price: money
   dateAdded: Date
   artistName: string
@@ -54,7 +53,6 @@ export default class Song extends Media {
     })
     this.artistName = this.artist.name
 
-    this.id = forcedId ? forcedId : new SongId(this).value
     this.duration = duration
     this.genre = genre
     this.shareUrl = shareUrl
@@ -78,6 +76,9 @@ export default class Song extends Media {
     }
 
     this.stream = stream || []
+
+    // this must be the last assignment
+    this.id = forcedId ? forcedId : new SongId(this).value
   }
 
   hasAnyProviderOf(checkProviders: Array<string>): boolean {
