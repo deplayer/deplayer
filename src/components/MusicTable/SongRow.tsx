@@ -60,7 +60,11 @@ const SongRow = (props: Props) => {
               </h4>
             </li>
           <li><h5>{ song.album ? song.album.name: nonAvailable }</h5></li>
-          <li><h6>{ song.artist ? song.artist.name: nonAvailable }</h6></li>
+          <li>
+            <h6>
+              <Link to={`/artist/${song.artist.id}`}>{ song.artist ? song.artist.name: nonAvailable }</Link>
+            </h6>
+          </li>
           { props.slim ||  <li> { getDurationStr(song.duration) } </li> }
         </ul>
         {

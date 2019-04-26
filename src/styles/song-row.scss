@@ -39,6 +39,11 @@
   h5, h6 {
     font-size: 1rem;
     color: $greyscale-lighter1;
+
+    a {
+      color: $greyscale-lighter1;
+      font-weight: bold;
+    }
   }
 
   .media-thumb {
