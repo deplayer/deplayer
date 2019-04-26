@@ -12,6 +12,7 @@ describe('collection reducer', () => {
     const initialState = {...defaultState, enabledProviders: ['itunes']}
     const fixtureSong = new Song({
       artistName: 'The Doors',
+      albumName: 'LIght my fire',
       stream: [{uris: [{uri: 'http://some-songs-api/song.mp4'}], service: 'itunes'}]
     })
     const rows = {}
@@ -23,11 +24,15 @@ describe('collection reducer', () => {
     const songsByArtist = {}
     songsByArtist[fixtureSong.artist.id] = [fixtureSong.id]
 
+    const albumsByArtist = {}
+    albumsByArtist[fixtureSong.artist.id] = [fixtureSong.album.name]
+
     const expected = {
       ...initialState,
       totalRows: 1,
       artists,
       songsByArtist,
+      albumsByArtist,
       rows,
       visibleSongs: [fixtureSong.id]
     }

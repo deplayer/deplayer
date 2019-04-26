@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Dispatch } from 'redux'
 import { Redirect } from 'react-router-dom'
+import { Translate } from 'react-redux-i18n'
 
 import Song from '../../entities/Song'
 import Artist from '../../entities/Artist'
@@ -12,12 +13,13 @@ type Props = {
   collection: any,
   artist: Artist,
   songs: any,
+  albums: any,
   className: string|null
 }
 
 export default class ArtistView extends React.Component<Props> {
   render() {
-    const { artist, songs } = this.props
+    const { artist, songs, albums } = this.props
 
     if (!artist) {
       return (
@@ -28,8 +30,17 @@ export default class ArtistView extends React.Component<Props> {
     }
 
     return (
-      <div className={`artist-view ${this.props.className}`}>
-        { artist.name }
+      <div className={`artist-view ${this.props.className} main`}>
+        <h2>{ artist.name }</h2>
+        <h3><Translate value='label.albums'/></h3>
+        <ul>
+          {
+            albums.map((album) => {
+              return (<li>{ album }</li>)
+            })
+          }
+        </ul>
+        <h3><Translate value='label.songs'/></h3>
         {
           songs.map((songId) => {
             const songObj = new Song(this.props.collection.rows[songId])

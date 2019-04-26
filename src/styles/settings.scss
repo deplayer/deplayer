@@ -1,9 +1,4 @@
 .settings {
-  padding: 40px;
-  width: 100%;
-  max-width: $body-max-width;
-  margin: 0 auto;
-
   button {
     margin-bottom: 40px;
     max-width: 200px;
@@ -11,18 +6,6 @@
 
   button[type="submit"] {
     margin-top: 40px;
-  }
-
-  h2 {
-    margin-top: 30px;
-    margin-bottom: 20px;
-  }
-
-  h3 {
-    margin-top: 0px;
-    margin-bottom: 20px;
-    color: $greyscale-color-200;
-    text-transform: capitalize;
   }
 
   .card {

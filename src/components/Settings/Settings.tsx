@@ -25,7 +25,7 @@ class Settings extends React.Component<Props, State> {
     const settingsForm = this.props.settings.settingsForm
 
     return (
-      <div className='settings'>
+      <div className='settings main'>
         <SettingsForm
           schema={settingsForm}
           settings={this.props.settings}

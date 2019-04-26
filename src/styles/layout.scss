@@ -1,0 +1,20 @@
+.main {
+  padding: 40px;
+  width: 100%;
+
+  max-width: $body-max-width;
+  margin: 0 auto;
+
+  h2 {
+    margin-top: 30px;
+    margin-bottom: 20px;
+  }
+
+  h3 {
+    margin-top: 0px;
+    margin-bottom: 20px;
+    color: $greyscale-color-200;
+    text-transform: capitalize;
+  }
+
+}

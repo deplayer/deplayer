@@ -24,10 +24,20 @@ const getSongsByArtist = (match, collection) => {
   return null
 }
 
+const getAlbumsByArtist = (match, collection) => {
+  const artistId = match.params.id
+  if (collection.albumsByArtist[artistId]) {
+    return collection.albumsByArtist[artistId]
+  }
+
+  return null
+}
+
 export default connect(
   (state, ownProps) => ({
     artist: getArtist(ownProps.match, state.collection),
     songs: getSongsByArtist(ownProps.match, state.collection),
+    albums: getAlbumsByArtist(ownProps.match, state.collection),
     collection: state.collection,
     queue: state.queue,
   })

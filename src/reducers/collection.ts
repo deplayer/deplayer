@@ -6,6 +6,7 @@ import Song from '../entities/Song'
 type State = {
   rows: any,
   artists: any,
+  albumsByArtist: any,
   songsByArtist: any,
   searchTerm: string,
   visibleSongs: Array<string>,
@@ -18,6 +19,7 @@ export const defaultState = {
   rows: {},
   artists: {},
   songsByArtist: {},
+  albumsByArtist: {},
   searchTerm: '',
   visibleSongs: [],
   searchResults: [],
@@ -38,6 +40,7 @@ export default (state: State = defaultState, action: any = {}) => {
       const rows = {}
       const artists = {}
       const songsByArtist = {}
+      const albumsByArtist = {}
       action.data.forEach((row) => {
         const song = new Song(row)
         // if (song.hasAnyProviderOf(state.enabledProviders)) {
@@ -49,16 +52,26 @@ export default (state: State = defaultState, action: any = {}) => {
         }
 
         songsByArtist[song.artist.id].push(song.id)
+
+        if (!albumsByArtist[song.artist.id]) {
+          albumsByArtist[song.artist.id] = []
+        }
+
+        if (!albumsByArtist[song.artist.id].includes(song.album.name)) {
+          albumsByArtist[song.artist.id].push(song.album.name)
+        }
       })
       const totalRows = {...state.rows, ...rows}
       const totalArtists = {...state.artists, ...artists}
       const totalSongsByArtist  = {...state.songsByArtist, ...songsByArtist}
+      const totalAlbumsByArtist  = {...state.albumsByArtist, ...albumsByArtist}
 
       return {
         ...state,
         rows: totalRows,
         artists: totalArtists,
         songsByArtist: totalSongsByArtist,
+        albumsByArtist: totalAlbumsByArtist,
         visibleSongs: filterSongs(totalRows),
         searchResults: state.searchTerm !== '' ? filterSongs(totalRows, state.searchTerm) : [],
         totalRows: state.totalRows + action.data.length
