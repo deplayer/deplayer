@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import Artist from '../../entities/Artist'
+import { Link } from 'react-router-dom'
 
 type Props = {
   artist: Artist,
@@ -16,13 +17,13 @@ const ArtistRow = (props: Props) => {
       className='artist-row'
       style={props.style}
     >
-      <div>
+      <Link to={`/artist/${artist.id}`}>
         { artist.name }
 
         <span className='badge badge-secondary'>
           { props.songs.length }
         </span>
-      </div>
+      </Link>
     </div>
   )
 }

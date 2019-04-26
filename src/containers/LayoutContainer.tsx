@@ -10,11 +10,16 @@ import { Route } from 'react-router-dom'
 
 const dynamicTitle = (router, collection): string => {
   const songFinder = router.location.pathname.match(/\/song\/(.*)/)
+  const artistFinder = router.location.pathname.match(/\/artist\/(.*)/)
 
   if (songFinder && songFinder[1]) {
     // const song = collection.rows[songFinder[1]]
 
     return 'Song'
+  }
+
+  if (artistFinder && artistFinder[1]) {
+    return 'Artist'
   }
 
   switch (router.location.pathname) {

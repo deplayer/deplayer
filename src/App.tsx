@@ -11,6 +11,7 @@ import CollectionContainer from './containers/CollectionContainer'
 import SearchResultsContainer from './containers/SearchResultsContainer'
 import PlayerContainer from './containers/PlayerContainer'
 import SongContainer from './containers/SongContainer'
+import ArtistContainer from './containers/ArtistContainer'
 import SettingsContainer from './containers/SettingsContainer'
 import ArtistsContainer from './containers/ArtistsContainer'
 import LayoutContainer from './containers/LayoutContainer'
@@ -46,6 +47,7 @@ class App extends React.Component<any> {
               <Route path="/collection" component={CollectionContainer} disableCurrent />
               <Route path="/search-results" component={SearchResultsContainer} />
               <Route path="/song/:id" component={Song} />
+              <Route path="/artist/:id" component={ArtistContainer} />
               <Route path="/artists" component={ArtistsContainer} />
               <Route path="/settings" component={SettingsContainer} />
             </LayoutContainer>

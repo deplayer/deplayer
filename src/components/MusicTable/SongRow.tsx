@@ -10,7 +10,7 @@ import ContextualMenu from './ContextualMenu'
 
 type Props = {
   song: Song,
-  isCurrent: boolean,
+  isCurrent: boolean|null,
   onClick: () => any,
   dispatch: Dispatch,
   disableAddButton?: boolean,
