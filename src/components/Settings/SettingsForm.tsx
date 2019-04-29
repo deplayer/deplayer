@@ -22,9 +22,34 @@ const SettingsForm = (props: Props) => {
   }
 
   const providers = Object.keys(props.settings.settingsForm.providers).map((providerKey) => {
+    const RemoveProviderBtn = (props: any) => {
+      const onClick = () => {
+        props.dispatch({type: types.REMOVE_PROVIDER, providerKey: props.providerKey})
+      }
+      return (
+        <div className='float-right'>
+          <a
+            className='btn btn-secondary'
+            onClick={onClick}
+            title={ props.providerKey }
+          >
+            <i className='fa fa-remove'></i>
+          </a>
+        </div>
+      )
+    }
     return (
       <div key={providerKey} className='card provider-card'>
-        <FormSchema schema={props.settings.settingsForm.providers[providerKey]} />
+        <div className='card-body'>
+          <FormSchema schema={props.settings.settingsForm.providers[providerKey]} />
+        </div>
+
+        <div className='card-footer'>
+          <RemoveProviderBtn
+            providerKey={providerKey}
+            dispatch={props.dispatch}
+          />
+        </div>
       </div>
     )
   })

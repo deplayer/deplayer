@@ -55,6 +55,21 @@ export default (state: State = defaultState, action: any = {}) => {
       }
     }
 
+    case types.REMOVE_PROVIDER: {
+      const { providers } = state.settingsForm
+      delete providers[action.providerKey]
+
+      const { settings } = state
+      delete settings.providers[action.providerKey]
+
+      const settingsForm = settingsBuilder.getFormSchema(providers)
+
+      return {
+        ...state,
+        settingsForm
+      }
+    }
+
     default:
       return state
   }

@@ -58,4 +58,33 @@ describe('settings reducer', () => {
     expect(result.settingsForm).toBeDefined()
     expect(result.settingsForm.providers['subsonic']).toBeDefined()
   })
+
+  it('should handle REMOVE_PROVIDER', () => {
+    const initialState = {
+      ...defaultState,
+      settings: {
+        app: {},
+        providers: {
+          subsonic: {
+            something: 'something'
+          }
+        }
+      },
+      settingsForm: {
+        providers: {
+          subsonic: {
+            to: 'be removed'
+          }
+        },
+        fields: {}
+      }
+    }
+    const result = reducer(initialState, {
+      type: types.REMOVE_PROVIDER,
+      providerKey: 'subsonic'
+    })
+
+    expect(result.settingsForm).toBeDefined()
+    expect(result.settingsForm.providers['subsonic']).not.toBeDefined()
+  })
 })
