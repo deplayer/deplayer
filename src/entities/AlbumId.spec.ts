@@ -1,21 +1,15 @@
-import ArtistId from './ArtistId'
+import AlbumId from './AlbumId'
 
-describe('entities/ArtistId', () => {
+describe('entities/AlbumId', () => {
   it('should calculate value property', () => {
-    const artistId = new ArtistId({artistName: ''})
+    const albumId = new AlbumId({albumName: '', artistName: ''})
 
-    expect(artistId.value).toBeDefined()
+    expect(albumId.value).toBeDefined()
   })
 
-  it('should create the id from artist name', () => {
-    const artistId = new ArtistId({artistName: 'lorem'})
+  it('should create the id from album name', () => {
+    const albumId = new AlbumId({albumName: 'lorem', artistName: 'ipsum'})
 
-    expect(artistId.value).toBe('lorem')
-  })
-
-  it('should avoid spaces', () => {
-    const artistId = new ArtistId({artistName: 'lorem'})
-
-    expect(artistId.value).toBe('lorem')
+    expect(albumId.value).toBe('ipsum-lorem')
   })
 })

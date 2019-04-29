@@ -25,7 +25,10 @@ describe('collection reducer', () => {
     songsByArtist[fixtureSong.artist.id] = [fixtureSong.id]
 
     const albumsByArtist = {}
-    albumsByArtist[fixtureSong.artist.id] = [fixtureSong.album.name]
+    albumsByArtist[fixtureSong.artist.id] = [fixtureSong.album.id]
+
+    const songsByAlbum = {}
+    songsByAlbum[fixtureSong.album.id] = [fixtureSong.id]
 
     const expected = {
       ...initialState,
@@ -33,6 +36,7 @@ describe('collection reducer', () => {
       artists,
       songsByArtist,
       albumsByArtist,
+      songsByAlbum,
       rows,
       visibleSongs: [fixtureSong.id]
     }

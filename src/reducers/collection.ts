@@ -7,6 +7,7 @@ type State = {
   rows: any,
   artists: any,
   albumsByArtist: any,
+  songsByAlbum: any,
   songsByArtist: any,
   searchTerm: string,
   visibleSongs: Array<string>,
@@ -19,6 +20,7 @@ export const defaultState = {
   rows: {},
   artists: {},
   songsByArtist: {},
+  songsByAlbum: {},
   albumsByArtist: {},
   searchTerm: '',
   visibleSongs: [],
@@ -41,6 +43,7 @@ export default (state: State = defaultState, action: any = {}) => {
       const artists = {}
       const songsByArtist = {}
       const albumsByArtist = {}
+      const songsByAlbum = {}
       action.data.forEach((row) => {
         const song = new Song(row)
         // if (song.hasAnyProviderOf(state.enabledProviders)) {
@@ -57,20 +60,30 @@ export default (state: State = defaultState, action: any = {}) => {
           albumsByArtist[song.artist.id] = []
         }
 
-        if (!albumsByArtist[song.artist.id].includes(song.album.name)) {
-          albumsByArtist[song.artist.id].push(song.album.name)
+        if (!albumsByArtist[song.artist.id].includes(song.album.id)) {
+          albumsByArtist[song.artist.id].push(song.album.id)
+        }
+
+        if (!songsByAlbum[song.album.id]) {
+          songsByAlbum[song.album.id] = []
+        }
+
+        if (!songsByAlbum[song.album.id].includes(song.id)) {
+          songsByAlbum[song.album.id].push(song.id)
         }
       })
       const totalRows = {...state.rows, ...rows}
       const totalArtists = {...state.artists, ...artists}
       const totalSongsByArtist  = {...state.songsByArtist, ...songsByArtist}
       const totalAlbumsByArtist  = {...state.albumsByArtist, ...albumsByArtist}
+      const totalSongsByAlbum  = {...state.songsByAlbum, ...songsByAlbum}
 
       return {
         ...state,
         rows: totalRows,
         artists: totalArtists,
         songsByArtist: totalSongsByArtist,
+        songsByAlbum: totalSongsByAlbum,
         albumsByArtist: totalAlbumsByArtist,
         visibleSongs: filterSongs(totalRows),
         searchResults: state.searchTerm !== '' ? filterSongs(totalRows, state.searchTerm) : [],

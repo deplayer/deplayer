@@ -1,14 +1,11 @@
 import Media from './Media'
 import SongId from './SongId'
 import Artist from './Artist'
+import Album from './Album'
 
 type money = {
   price: number,
   currency: string
-}
-
-type album = {
-  name: string
 }
 
 export default class Song extends Media {
@@ -16,7 +13,7 @@ export default class Song extends Media {
   forcedId: string
   genre: string
   shareUrl: string
-  album: album
+  album: Album
   albumName: string
   duration: number // In milliseconds
   price: money
@@ -52,9 +49,10 @@ export default class Song extends Media {
     this.forcedId = forcedId
     this.albumName = albumName
 
-    this.album = {
-      name: albumName ? albumName : ''
-    }
+    this.album = new Album({
+      name: albumName ? albumName : '',
+      artist: this.artist
+    })
     if (typeof price === 'number') {
       this.price = {
         price: price || 0,
