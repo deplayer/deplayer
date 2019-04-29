@@ -30,6 +30,9 @@ describe('collection reducer', () => {
     const songsByAlbum = {}
     songsByAlbum[fixtureSong.album.id] = [fixtureSong.id]
 
+    const albums = {}
+    albums[fixtureSong.album.id] = fixtureSong.album
+
     const expected = {
       ...initialState,
       totalRows: 1,
@@ -37,6 +40,7 @@ describe('collection reducer', () => {
       songsByArtist,
       albumsByArtist,
       songsByAlbum,
+      albums,
       rows,
       visibleSongs: [fixtureSong.id]
     }

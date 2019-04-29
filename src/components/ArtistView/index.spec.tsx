@@ -9,6 +9,8 @@ configureEnzyme()
 const setup = (customProps: any) => {
   const defaultProps = {
     artist: new Artist(),
+    songsByAlbum: {},
+    albumsByArtist: [],
     albums: [],
     songs: []
   }

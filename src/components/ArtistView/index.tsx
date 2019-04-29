@@ -11,15 +11,22 @@ import * as types from '../../constants/ActionTypes'
 type Props = {
   dispatch: Dispatch,
   collection: any,
+  albumsByArtist: any,
   artist: Artist,
   songs: any,
+  songsByAlbum: any,
   albums: any,
   className: string|null
 }
 
 export default class ArtistView extends React.Component<Props> {
   render() {
-    const { artist, songs, albums } = this.props
+    const {
+      artist,
+      albumsByArtist,
+      albums,
+      songsByAlbum
+    } = this.props
 
     if (!artist) {
       return (
@@ -29,35 +36,46 @@ export default class ArtistView extends React.Component<Props> {
       )
     }
 
+    const extractSong = (album) => {
+      if (!songsByAlbum[album.id]) {
+        return null
+      }
+
+      return songsByAlbum[album.id].map((songId) => {
+        const songRow = this.props.collection.rows[songId]
+        const songObj = new Song(songRow)
+        return (
+          <SongRow
+            style={ {} }
+            key={ songId }
+            dispatch={this.props.dispatch}
+            isCurrent={ false }
+            slim={ true }
+            onClick={() => {
+              this.props.dispatch({type: types.SET_CURRENT_PLAYING, songId: songObj.id})
+              }}
+              song={songObj}
+            />
+            )
+      })
+    }
+
     return (
       <div className={`artist-view ${this.props.className} main`}>
         <h2>{ artist.name }</h2>
         <h3><Translate value='label.albums'/></h3>
-        <ul>
+        <ul className='unstyled-list'>
           {
-            albums.map((album) => {
-              return (<li>{ album }</li>)
+            albumsByArtist.map((albumId) => {
+              return (
+                <li key={albumId}>
+                  <h4>{ albums[albumId].name }</h4>
+                  { extractSong(albums[albumId]) }
+                </li>
+              )
             })
           }
         </ul>
-        <h3><Translate value='label.songs'/></h3>
-        {
-          songs.map((songId) => {
-            const songObj = new Song(this.props.collection.rows[songId])
-            return (
-              <SongRow
-                style={ {} }
-                dispatch={this.props.dispatch}
-                isCurrent={ false }
-                slim={ true }
-                onClick={() => {
-                  this.props.dispatch({type: types.SET_CURRENT_PLAYING, songId: songObj.id})
-                }}
-                song={songObj}
-              />
-            )
-          })
-        }
       </div>
     )
   }

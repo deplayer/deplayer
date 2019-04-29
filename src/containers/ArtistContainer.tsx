@@ -37,7 +37,9 @@ export default connect(
   (state, ownProps) => ({
     artist: getArtist(ownProps.match, state.collection),
     songs: getSongsByArtist(ownProps.match, state.collection),
-    albums: getAlbumsByArtist(ownProps.match, state.collection),
+    songsByAlbum: state.collection.songsByAlbum,
+    albumsByArtist: getAlbumsByArtist(ownProps.match, state.collection),
+    albums: state.collection.albums,
     collection: state.collection,
     queue: state.queue,
   })

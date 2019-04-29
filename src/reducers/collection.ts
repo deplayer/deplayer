@@ -6,6 +6,7 @@ import Song from '../entities/Song'
 type State = {
   rows: any,
   artists: any,
+  albums: any,
   albumsByArtist: any,
   songsByAlbum: any,
   songsByArtist: any,
@@ -19,6 +20,7 @@ type State = {
 export const defaultState = {
   rows: {},
   artists: {},
+  albums: {},
   songsByArtist: {},
   songsByAlbum: {},
   albumsByArtist: {},
@@ -41,6 +43,7 @@ export default (state: State = defaultState, action: any = {}) => {
     case types.RECEIVE_COLLECTION: {
       const rows = {}
       const artists = {}
+      const albums = {}
       const songsByArtist = {}
       const albumsByArtist = {}
       const songsByAlbum = {}
@@ -49,6 +52,7 @@ export default (state: State = defaultState, action: any = {}) => {
         // if (song.hasAnyProviderOf(state.enabledProviders)) {
         rows[row.id] = song
         artists[song.artist.id] = song.artist
+        albums[song.album.id] = song.album
 
         if (!songsByArtist[song.artist.id]) {
           songsByArtist[song.artist.id] = []
@@ -74,6 +78,7 @@ export default (state: State = defaultState, action: any = {}) => {
       })
       const totalRows = {...state.rows, ...rows}
       const totalArtists = {...state.artists, ...artists}
+      const totalAlbums = {...state.albums, ...albums}
       const totalSongsByArtist  = {...state.songsByArtist, ...songsByArtist}
       const totalAlbumsByArtist  = {...state.albumsByArtist, ...albumsByArtist}
       const totalSongsByAlbum  = {...state.songsByAlbum, ...songsByAlbum}
@@ -82,6 +87,7 @@ export default (state: State = defaultState, action: any = {}) => {
         ...state,
         rows: totalRows,
         artists: totalArtists,
+        albums: totalAlbums,
         songsByArtist: totalSongsByArtist,
         songsByAlbum: totalSongsByAlbum,
         albumsByArtist: totalAlbumsByArtist,
