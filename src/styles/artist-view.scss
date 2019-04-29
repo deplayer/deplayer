@@ -1,0 +1,9 @@
+.artist-view {
+  ul {
+    @extend .list-unstyled;
+
+    h3 {
+      margin-top: 40px;
+    }
+  }
+}

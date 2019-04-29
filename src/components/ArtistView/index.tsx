@@ -63,13 +63,12 @@ export default class ArtistView extends React.Component<Props> {
     return (
       <div className={`artist-view ${this.props.className} main`}>
         <h2>{ artist.name }</h2>
-        <h3><Translate value='label.albums'/></h3>
         <ul className='unstyled-list'>
           {
             albumsByArtist.map((albumId) => {
               return (
                 <li key={albumId}>
-                  <h4>{ albums[albumId].name }</h4>
+                  <h3>{ albums[albumId].name }</h3>
                   { extractSong(albums[albumId]) }
                 </li>
               )
