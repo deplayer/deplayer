@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import * as React from 'react'
 import { withRouter } from 'react-router-dom'
 
-import SongView from '../components/SongView'
+import SongView from '../components/SongView/SongView'
 
 const RoutedSongView = withRouter(props => <SongView {...props}/>)
 

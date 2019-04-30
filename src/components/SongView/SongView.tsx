@@ -1,10 +1,11 @@
 import * as React from 'react'
 import { Translate } from 'react-redux-i18n'
 import { Redirect } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
-import logger from '../utils/logger'
-import CoverImage from './MusicTable/CoverImage'
-import { getDurationStr } from '../utils/timeFormatter'
+import logger from '../../utils/logger'
+import CoverImage from '../MusicTable/CoverImage'
+import { getDurationStr } from '../../utils/timeFormatter'
 
 type Props = {
   collection: any,
@@ -57,19 +58,18 @@ export default class SongView extends React.Component<Props> {
                   </div>
                 </div>
                 <div>
+                  <div>
+                    <Link to={`/artist/${ song.artist.id }`}>
+                      <h3>{ song.artist.name }</h3>
+                    </Link>
+                  </div>
+                </div>
+                <div>
                   <div className='collapsed'>
                     <span className='label'><Translate value='song.label.album' /></span>
                   </div>
                   <div>
                     { song.albumName || 'N/A' }
-                  </div>
-                </div>
-                <div>
-                  <div className='collapsed'>
-                    <span className='label'><Translate value='song.label.artist' /></span>
-                  </div>
-                  <div>
-                    { song.artist.name }
                   </div>
                 </div>
                 <div>

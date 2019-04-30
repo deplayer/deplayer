@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
-import configureEnzyme from '../tests/configureEnzyme'
+import configureEnzyme from '../../tests/configureEnzyme'
 import SongView from './SongView'
-import Song from '../entities/Song'
+import Song from '../../entities/Song'
 
 configureEnzyme()
 
