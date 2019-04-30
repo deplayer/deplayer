@@ -81,7 +81,9 @@ const SettingsForm = (props: Props) => {
 
 
             <div className='card app-settings'>
-              <FormSchema schema={props.schema} />
+              <div className='card-body'>
+                <FormSchema schema={props.schema} />
+              </div>
             </div>
 
             <h2><Translate value="labels.providers" /></h2>
@@ -93,17 +95,6 @@ const SettingsForm = (props: Props) => {
             </div>
 
             { providers }
-
-            <Route path="/settings/providers" component={() =>
-              <Link
-                className='btn btn-secondary'
-                to="/settings"
-                title="settings"
-              >
-                <i className='fa fa-back'></i>
-                <Translate value="buttons.returnToSettings" />
-              </Link>
-            } />
 
             <button className='with-bg' disabled={isSubmitting} type='submit'>
               <Translate value="buttons.save" />
