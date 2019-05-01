@@ -3,6 +3,7 @@ import { routerMiddleware } from 'connected-react-router'
 import createSagaMiddleware from 'redux-saga'
 import thunk from 'redux-thunk'
 import promise from 'redux-promise'
+import perflogger from 'redux-perf-middleware';
 
 import history from './configureHistory'
 
@@ -32,11 +33,18 @@ import alerts from './middlewares/alerts'
 const mql = window.matchMedia(`(min-width: 800px)`)
 
 export default function configureStore() {
-  let middlewares = [
+  const testingMiddlewares = []
+
+  if (process.env.NODE_ENV === 'development') {
+    testingMiddlewares.push(perflogger)
+  }
+
+  const middlewares = [
+    ...testingMiddlewares,
     promise,
     thunk,
     alerts,
-    routerMiddleware(history), // for dispatching history actions
+    routerMiddleware(history) // for dispatching history actions
   ]
 
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
