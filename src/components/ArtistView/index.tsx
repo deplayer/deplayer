@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Dispatch } from 'redux'
 import { Redirect } from 'react-router-dom'
-import { Translate } from 'react-redux-i18n'
 
 import Song from '../../entities/Song'
 import Artist from '../../entities/Artist'
@@ -69,6 +68,13 @@ export default class ArtistView extends React.Component<Props> {
               return (
                 <li key={albumId}>
                   <h3>{ albums[albumId].name }</h3>
+                  <button
+                    onClick={() => {
+                      this.props.dispatch({type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
+                    }}
+                  >
+                    Play
+                  </button>
                   { extractSong(albums[albumId]) }
                 </li>
               )

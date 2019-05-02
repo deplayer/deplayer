@@ -1,6 +1,10 @@
 .song-view {
   width: 100%;
 
+  a {
+    text-decoration: underline;
+  }
+
   .image {
     grid-area: image;
     height: 100vw;

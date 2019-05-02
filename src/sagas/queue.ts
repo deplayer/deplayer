@@ -19,6 +19,10 @@ export const getQueue = (state: any): any => {
   return state ? state.queue : {}
 }
 
+export const getAlbumSongs = (state: any): any => {
+  return state ? state.collection.songsByAlbum : {}
+}
+
 // Handling playAll saga
 export function* playAll(action: any): any {
   const songs = yield select(getSongs, action)
@@ -43,6 +47,14 @@ export function* clearQueue(): any {
   yield queueService.save('queue', {})
 }
 
+export function* addAlbumToPlaylist(action: any): any {
+  const songsByAlbum = yield select(getAlbumSongs)
+  logger.log('queue-saga', songsByAlbum)
+  yield put({type: types.ADD_SONGS_TO_QUEUE, songs: songsByAlbum[action.albumId], replace: true })
+  yield put({type: types.SET_CURRENT_PLAYING, songId: songsByAlbum[action.albumId][0]})
+  yield put({type: types.START_PLAYING})
+}
+
 // Application initialization routines
 function* initialize() {
   yield queueService.initialize
@@ -64,6 +76,7 @@ function* queueSaga(): any {
   yield takeLatest(types.ADD_SONGS_TO_QUEUE, saveQueue)
   yield takeLatest(types.CLEAR_QUEUE, clearQueue)
   yield takeLatest(types.INITIALIZED, initialize)
+  yield takeLatest(types.ADD_ALBUM_TO_PLAYLIST, addAlbumToPlaylist)
 }
 
 export default queueSaga

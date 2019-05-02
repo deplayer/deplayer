@@ -56,8 +56,17 @@ export default (state: State = defaultState, action: any  = {}): State => {
       }
 
     case types.ADD_SONGS_TO_QUEUE:
+
+      if (action.replace) {
+        return {
+          ...state,
+          trackIds: populateTracks(action.songs)
+        }
+      }
+
       const tracks = state.trackIds.concat(populateTracks(action.songs))
       const cleanedTracks = tracks.filter((item, pos) => tracks.indexOf(item) === pos)
+
       return {
         ...state,
         trackIds: cleanedTracks

@@ -40,6 +40,7 @@ export default (state: State = defaultState, action: any = {}) => {
       }
     }
 
+    // FIXME: This is not performant, the state shouldn't block UI
     case types.RECEIVE_COLLECTION: {
       const rows = {}
       const artists = {}

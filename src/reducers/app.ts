@@ -2,12 +2,14 @@ import * as types from '../constants/ActionTypes'
 
 type State = {
   sidebarToggled: Boolean,
-  mqlMatch: Boolean
+  mqlMatch: Boolean,
+  loading: Boolean
 }
 
 export const defaultState = {
   sidebarToggled: false,
-  mqlMatch: false
+  mqlMatch: false,
+  loading: true
 }
 
 export default (state: State = defaultState, action) => {
@@ -18,6 +20,10 @@ export default (state: State = defaultState, action) => {
 
     case types.SET_MQL: {
       return {...state, mqlMatch: action.value}
+    }
+
+    case types.INITIALIZED: {
+      return {...state, loading: false}
     }
 
     default:
