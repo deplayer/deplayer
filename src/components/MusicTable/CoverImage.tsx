@@ -37,28 +37,20 @@ const Img = (props) => {
   )
 }
 
-const CoverImage = (props) => {
-  if (props.size === 'thumbnail' && props.cover && props.cover.thumbnailUrl) {
+const CoverImage = (props: Props) => {
+  if (!props.cover) {
     return (
       <Img
-        alt={ `${props.albumName} cover` }
-        src={ props.cover.thumbnailUrl }
+        noImage
       />
     )
   }
-
-  if (props.size === 'full' && props.cover && props.cover.fullUrl) {
-    return (
-      <Img
-        alt={ `${props.albumName} cover` }
-        src={ props.cover.fullUrl }
-      />
-    )
-  }
+  const src = props.size === 'full' ?  props.cover.fullUrl : props.cover.thumbnailUrl
 
   return (
     <Img
-      noImage
+      alt={ `${props.albumName} cover` }
+      src={ src }
     />
   )
 }

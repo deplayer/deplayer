@@ -15,8 +15,6 @@ const rowToSong  = (elem): Song => {
     ...{
       albumName: elem.album.name,
       artistName: elem.artist.name,
-      thumbnailUrl: elem.cover.thumbnailUrl,
-      fullUrl: elem.cover.thumbnailUrl
     }
   }
 
