@@ -69,6 +69,9 @@ export default class Media {
       album: {
         type: 'object',
         properties: {
+          id: {
+            type: 'string'
+          },
           name: {
             type: 'string'
           },
@@ -88,6 +91,9 @@ export default class Media {
       artist: {
         type: 'object',
         properties: {
+          id: {
+            type: 'string'
+          },
           name: {
             type: 'string'
           },

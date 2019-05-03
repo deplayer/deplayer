@@ -5,12 +5,12 @@ export default class Artist {
   name: string
 
   constructor(artistParams: any = {}) {
-    const { name } = artistParams
+    const { name, artistId } = artistParams
     this.name = name
-    const artistId = new ArtistId({
+
+    this.id = artistId ? artistId : new ArtistId({
       artistName: name
-    })
-    this.id = artistId.value
+    }).value
   }
 
   static toSchema(): any {

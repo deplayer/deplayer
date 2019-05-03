@@ -3,7 +3,9 @@ import * as types from '../constants/ActionTypes'
 import Song from '../entities/Song'
 
 import SongId from '../entities/SongId'
+import ArtistId from '../entities/ArtistId'
 jest.mock('../entities/SongId');
+jest.mock('../entities/ArtistId');
 
 describe('collection reducer', () => {
   it('should return the initial state', () => {
@@ -14,13 +16,14 @@ describe('collection reducer', () => {
   it('should handle RECEIVE_COLLECTION', () => {
     const initialState = {...defaultState, enabledProviders: ['itunes']}
     const fixtureSong = new Song({
-      forcedId: 'the-dors',
+      forcedId: 'the-doors',
       artistName: 'The Doors',
+      artistId: 'the-doors',
       albumName: 'LIght my fire',
       stream: [{uris: [{uri: 'http://some-songs-api/song.mp4'}], service: 'itunes'}]
     })
     const rows = {}
-    rows[fixtureSong.id] = new Song(fixtureSong)
+    rows[fixtureSong.id] = fixtureSong
 
     const artists = {}
     artists[fixtureSong.artist.id] = fixtureSong.artist
@@ -51,6 +54,7 @@ describe('collection reducer', () => {
 
     // slugify has a huge performance penalization, so should be avoided when RECEIVE_COLLECTION
     expect(SongId).not.toHaveBeenCalled()
+    expect(ArtistId).not.toHaveBeenCalled()
 
     expect(reducer(initialState, {type: types.RECEIVE_COLLECTION, data: [fixtureSong]}))
       .toEqual(expected)

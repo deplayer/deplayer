@@ -49,7 +49,14 @@ export default (state: State = defaultState, action: any = {}) => {
       const albumsByArtist = {}
       const songsByAlbum = {}
       action.data.forEach((row) => {
-        const song = new Song({forcedId: row.id, ...row})
+        const song = new Song({
+          ...row,
+          id: row.id,
+          forcedId:
+          row.id,
+          artistId: row.artist.id,
+          albumId: row.album.id
+        })
         // if (song.hasAnyProviderOf(state.enabledProviders)) {
         rows[row.id] = song
         artists[song.artist.id] = song.artist

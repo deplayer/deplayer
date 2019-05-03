@@ -10,17 +10,32 @@ import Song from '../entities/Song'
 import * as types from '../constants/ActionTypes'
 
 const rowToSong  = (elem): Song => {
-  return new Song({
-    forcedId: elem._id,
+  const songPayload = {
     ...elem.get(),
     ...{
-      artist: { name: elem.artist.name },
       albumName: elem.album.name,
       artistName: elem.artist.name,
       thumbnailUrl: elem.cover.thumbnailUrl,
       fullUrl: elem.cover.thumbnailUrl
     }
-  })
+  }
+
+  if (elem.artist.id) {
+    // Forcing id since its comming from database
+    songPayload['artistId'] = elem.artist.id
+  }
+
+  if (elem.album.id) {
+    // Forcing id since its comming from database
+    songPayload['albumId'] = elem.album.id
+  }
+
+  if (elem._id) {
+    // Forcing id since its comming from database
+    songPayload['forcedId'] = elem._id
+  }
+
+  return new Song(songPayload)
 }
 
 const mapToMedia = (collection: Array<Song>) => {

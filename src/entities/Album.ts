@@ -7,15 +7,16 @@ export default class Album {
   artist: Artist
 
   constructor(albumParams: any = {}) {
-    const { name, artist } = albumParams
+    const { name, artist, albumId } = albumParams
     this.name = name
     this.artist = artist
 
-    const albumId = new AlbumId({
+    const compAlbumId = albumId ? albumId : new AlbumId({
       albumName: name,
       artistName: artist.name
-    })
-    this.id = albumId.value
+    }).value
+
+    this.id = compAlbumId
   }
 
   static toSchema(): any {

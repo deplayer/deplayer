@@ -29,6 +29,8 @@ export default class Song extends Media {
       cover,
       forcedId,
       artistName,
+      artistId,
+      albumId,
       albumName,
       duration,
       genre,
@@ -38,9 +40,8 @@ export default class Song extends Media {
       shareUrl
     } = songParams
 
-    this.artist = new Artist({
-      name: artistName ? artistName : ''
-    })
+    this.setArtist(artistName, artistId)
+
     this.artistName = this.artist.name
 
     this.duration = duration
@@ -50,6 +51,7 @@ export default class Song extends Media {
     this.albumName = albumName
 
     this.album = new Album({
+      albumId: albumId,
       name: albumName ? albumName : '',
       artist: this.artist
     })
@@ -66,7 +68,21 @@ export default class Song extends Media {
     this.cover = cover || {}
 
     // this must be the last assignment
-    this.id = forcedId ? forcedId : new SongId(this).value
+    const id = forcedId ? forcedId : new SongId(this).value
+    this.id = id
+    this.externalId = id
+  }
+
+  setArtist(artistName, artistId) {
+    const artistPayload = {
+      name: artistName ? artistName : ''
+    }
+
+    if (artistId) {
+      artistPayload['artistId'] = artistId
+    }
+
+    this.artist = new Artist(artistPayload)
   }
 
   hasAnyProviderOf(checkProviders: Array<string>): boolean {
