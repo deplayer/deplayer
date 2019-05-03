@@ -19,7 +19,7 @@ export default class Song extends Media {
   price: money
   dateAdded: Date
   artistName: string
-
+  cover: any
   artist: Artist
 
   constructor(songParams: any = {}) {
@@ -65,7 +65,10 @@ export default class Song extends Media {
     }
 
     this.stream = stream || []
-    this.cover = cover || {}
+    this.cover = cover ? {
+      thumbnailUrl: cover.thumbnailUrl,
+      fullUrl: cover.fullUrl
+    } : {}
 
     // this must be the last assignment
     const id = forcedId ? forcedId : new SongId(this).value

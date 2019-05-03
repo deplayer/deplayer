@@ -42,8 +42,10 @@ export default class SubsonicApiProvider implements IProvider {
         title: song.title ? song.title : song.path,
         artistName: song.artist,
         albumName: song.album,
-        thumbnailUrl: this.coverBase + '&id=' + song.coverArt,
-        fullUrl: this.coverBase + '&id=' + song.coverArt,
+        cover: {
+          thumbnailUrl: this.coverBase + '&id=' + song.coverArt,
+          fullUrl: this.coverBase + '&id=' + song.coverArt,
+        },
         genre: song.genre,
         duration: song.duration * 1000,
         stream: [
