@@ -2,6 +2,9 @@ import reducer, { defaultState } from './collection'
 import * as types from '../constants/ActionTypes'
 import Song from '../entities/Song'
 
+import SongId from '../entities/SongId'
+jest.mock('../entities/SongId');
+
 describe('collection reducer', () => {
   it('should return the initial state', () => {
     expect(reducer(undefined, {}))
@@ -11,6 +14,7 @@ describe('collection reducer', () => {
   it('should handle RECEIVE_COLLECTION', () => {
     const initialState = {...defaultState, enabledProviders: ['itunes']}
     const fixtureSong = new Song({
+      forcedId: 'the-dors',
       artistName: 'The Doors',
       albumName: 'LIght my fire',
       stream: [{uris: [{uri: 'http://some-songs-api/song.mp4'}], service: 'itunes'}]
@@ -45,8 +49,12 @@ describe('collection reducer', () => {
       visibleSongs: [fixtureSong.id]
     }
 
+    // slugify has a huge performance penalization, so should be avoided when RECEIVE_COLLECTION
+    expect(SongId).not.toHaveBeenCalled()
+
     expect(reducer(initialState, {type: types.RECEIVE_COLLECTION, data: [fixtureSong]}))
       .toEqual(expected)
+
   })
 
   it('should handle RECEIVE_SETTINGS to filter by provider', () => {

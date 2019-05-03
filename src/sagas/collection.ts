@@ -11,6 +11,7 @@ import * as types from '../constants/ActionTypes'
 
 const rowToSong  = (elem): Song => {
   return new Song({
+    forcedId: elem._id,
     ...elem.get(),
     ...{
       artist: { name: elem.artist.name },
