@@ -1,8 +1,19 @@
 .artist-view {
+  .card {
+    background: $greyscale-darker1;
+  }
+
   ul {
     @extend .list-unstyled;
 
     h3 {
+      button {
+        float: right;
+        line-height: 20px;
+      }
+    }
+
+    .card {
       margin-top: 40px;
     }
   }

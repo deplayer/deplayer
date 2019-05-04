@@ -66,16 +66,20 @@ export default class ArtistView extends React.Component<Props> {
           {
             albumsByArtist.map((albumId) => {
               return (
-                <li key={albumId}>
-                  <h3>{ albums[albumId].name }</h3>
-                  <button
-                    onClick={() => {
-                      this.props.dispatch({type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
-                    }}
-                  >
-                    Play
-                  </button>
-                  { extractSong(albums[albumId]) }
+                <li className='card' key={albumId}>
+                  <h3 className='card-header'>
+                    { albums[albumId].name }
+                    <button
+                      onClick={() => {
+                        this.props.dispatch({type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
+                      }}
+                    >
+                      <i className='fa fa-play' />
+                    </button>
+                  </h3>
+                  <div className='card-body'>
+                    { extractSong(albums[albumId]) }
+                  </div>
                 </li>
               )
             })
