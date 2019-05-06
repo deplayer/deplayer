@@ -58,7 +58,7 @@ type State = {
 class Player extends React.Component<Props, State> {
   state = {
     currentTime: 0,
-    volume: 1,
+    volume: 100,
   }
   playerRef: { current: any }
 
