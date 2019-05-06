@@ -1,6 +1,6 @@
 {
   "name": "genar-radio",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "dependencies": {
     "@sindresorhus/slugify": "^0.9.0",
