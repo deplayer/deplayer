@@ -13,6 +13,7 @@ type ContentProps = {
   dispatch: Dispatch,
   collection: any,
   queue: any,
+  app: any,
   location: any,
   onSetSidebarOpen: Function
 }
@@ -53,6 +54,15 @@ const SidebarContents = (props: ContentProps) => {
         >
           <i className='fa fa-gitlab' />
         </a>
+
+        <a
+          href={'https://gitlab.com/gtrias/genar-radio/tags'}
+          title="Show me the code"
+          target="_blank"
+        >
+          { props.app.version }
+        </a>
+
       </section>
     </div>
   )
@@ -62,6 +72,7 @@ type Props = {
   sidebarToggled: boolean,
   collection: any,
   queue: any,
+  app: any,
   location: any,
   children: any,
   dispatch: Dispatch
@@ -108,6 +119,7 @@ class MSidebar extends React.Component<Props, State> {
 
     const contents = (
       <SidebarContents
+        app={this.props.app}
         location={location}
         collection={this.props.collection}
         queue={this.props.queue}

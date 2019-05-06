@@ -3,13 +3,15 @@ import * as types from '../constants/ActionTypes'
 type State = {
   sidebarToggled: Boolean,
   mqlMatch: Boolean,
-  loading: Boolean
+  loading: Boolean,
+  version: string
 }
 
 export const defaultState = {
   sidebarToggled: false,
   mqlMatch: false,
-  loading: true
+  loading: true,
+  version: process.env.REACT_APP_VERSION || 'development'
 }
 
 export default (state: State = defaultState, action) => {

@@ -7,6 +7,7 @@ export default withRouter(connect((state, ownProps) => {
   return {
     loading: state.search.loading,
     collection: state.collection,
+    app: state.app,
     queue: state.queue,
     sidebarToggled: state.app.sidebarToggled
   }
