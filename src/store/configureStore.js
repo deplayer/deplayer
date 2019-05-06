@@ -26,6 +26,7 @@ import notificationsSaga from '../sagas/notifications'
 import queueSaga from '../sagas/queue'
 import mediaSessionSaga from '../sagas/mediaSession'
 import connectionSaga from '../sagas/connection'
+import titleSaga from '../sagas/title'
 
 // Custom middlewares
 import alerts from './middlewares/alerts'
@@ -74,6 +75,7 @@ export default function configureStore() {
   sagaMiddleware.run(collectionSaga)
   sagaMiddleware.run(notificationsSaga)
   sagaMiddleware.run(queueSaga)
+  sagaMiddleware.run(titleSaga)
   sagaMiddleware.run(mediaSessionSaga, store)
   sagaMiddleware.run(connectionSaga, store)
 

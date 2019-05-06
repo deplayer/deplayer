@@ -21,9 +21,8 @@ export function* setCurrentPlaying(action: any): any {
 
 export function* goToViewPage(action: any): any {
   const app = yield select(getApp)
-
+  const queue = yield select(getQueue)
   if (app.mqlMatch && history.location.pathname.match(/^\/song.*?$/)) {
-    const queue = yield select(getQueue)
     yield history.push(routes.songView(queue.currentPlaying))
   }
 }
