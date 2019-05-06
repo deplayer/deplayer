@@ -28,8 +28,10 @@ export default class ItunesApiProvider implements IProvider {
       artistName: itSong.artistName,
       title: itSong.trackName,
       albumName: itSong.collectionName,
-      thumbnailUrl: itSong.artworkUrl60.replace(/60x60/, '250x250'),
-      fullUrl: itSong.artworkUrl100.replace(/100x100/, '600x600'),
+      cover: {
+        thumbnailUrl: itSong.artworkUrl60.replace(/60x60/, '250x250'),
+        fullUrl: itSong.artworkUrl100.replace(/100x100/, '600x600'),
+      },
       duration: itSong.trackTimeMillis,
       genre: itSong.primaryGenreName,
       price: itSong.trackPrice,

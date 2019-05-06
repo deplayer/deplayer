@@ -14,7 +14,7 @@ type Props = {
 }
 
 const SongView = (props: Props) => {
-  const { queue, song } = props
+  const { song } = props
 
   if (!song || !song.id) {
     logger.log('SongView', 'Song not found redirecting to home ')

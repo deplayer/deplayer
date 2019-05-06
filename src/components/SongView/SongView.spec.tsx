@@ -32,7 +32,7 @@ const setup = (customProps: any) => {
 
 describe('SongView', () => {
   it('redirect if no song found', () => {
-    const { enzymeWrapper } = setup({})
+    const { enzymeWrapper } = setup({ song: null })
     expect(enzymeWrapper.find('Redirect').exists()).toBe(true)
   })
 
