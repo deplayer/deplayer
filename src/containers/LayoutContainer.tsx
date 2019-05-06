@@ -8,7 +8,7 @@ import PlayAllButton from '../components/Buttons/PlayAllButton'
 import Placeholder from '../components/Player/Placeholder'
 import { Route } from 'react-router-dom'
 
-const dynamicTitle = (router, collection): string => {
+const dynamicTitle = (router, collection, searchTerm: ''): string => {
   const songFinder = router.location.pathname.match(/\/song\/(.*)/)
   const artistFinder = router.location.pathname.match(/\/artist\/(.*)/)
 
@@ -26,7 +26,7 @@ const dynamicTitle = (router, collection): string => {
     case '/settings':
       return 'Settings'
     case '/search-results':
-      return 'Search results'
+      return 'Search results: ' + searchTerm
     case '/collection':
       return 'Collection'
     case '/artists':
@@ -63,7 +63,7 @@ const Layout = (props: LayoutProps) => {
 
 export default connect(
   (state) => ({
-    title: dynamicTitle(state.router, state.collection),
+    title: dynamicTitle(state.router, state.collection, state.search.searchTerm),
     queue: state.queue,
     player: state.player,
     collection: state.collection,
