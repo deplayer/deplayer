@@ -18,7 +18,6 @@ const getSongId = (router) : string => {
 
 export default connect(
   (state, ownProps) => {
-    console.log(state)
     return {
       collection: state.collection,
       queue: state.queue,
