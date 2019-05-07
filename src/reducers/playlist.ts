@@ -5,12 +5,14 @@ import {
 } from './utils/queues'
 
 type State = {
-  trackIds: Array<string>
+  trackIds: Array<string>,
+  playlists: Array<any>
 }
 
-const defaultState = {
+export const defaultState = {
   trackIds: [],
-  currentPlaying: {}
+  currentPlaying: {},
+  playlists: []
 }
 
 export default (state: State = defaultState, action: any = {}): State => {
@@ -31,6 +33,9 @@ export default (state: State = defaultState, action: any = {}): State => {
 
     case types.SET_COLUMN_SORT:
       return {...state, trackIds: sortTrackIds(action.songs, action.column)}
+
+    case types.RECEIVE_PLAYLISTS:
+      return {...state, playlists: action.playlists}
 
     default:
       return state

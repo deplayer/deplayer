@@ -21,6 +21,6 @@ export default class PlaylistService implements IStorageService {
   }
 
   get = (): Promise<any> => {
-    return this.storageAdapter.get('playlist', 'playlist')
+    return this.storageAdapter.getAll('playlist', {})
   }
 }

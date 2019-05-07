@@ -1,4 +1,4 @@
-import { takeLatest, select } from 'redux-saga/effects'
+import { takeLatest, select, call, put } from 'redux-saga/effects'
 
 import { getAdapter } from '../services/database'
 import PlaylistService from '../services/PlaylistService'
@@ -15,18 +15,36 @@ export const getAlbumSongs = (state: any): any => {
 }
 
 const adapter = getAdapter()
-const queueService = new PlaylistService(new adapter())
+const playlistService = new PlaylistService(new adapter())
+
+// Application initialization routines
+function* initialize() {
+  yield playlistService.initialize
+  logger.log('playlist-saga', 'initializing playlists')
+  const playlists = yield call(playlistService.get)
+  if (!playlists) {
+    logger.log('playlists-saga', 'error retrieving playlists')
+    yield put({type: types.GET_PLAYLISTS_REJECTED})
+  } else {
+    const unserialized = JSON.parse(JSON.stringify(playlists))
+    logger.log('playlists-saga', 'playlists recieved and unserialized')
+    yield put({type: types.RECEIVE_PLAYLISTS, playlists: unserialized})
+  }
+}
+
 
 export function* savePlaylist(action: any): any {
   logger.log('playlist-saga', 'saving playlist')
   const queue = yield select(getQueue)
   const playlist = {_id: action.name, trackIds: queue.trackIds}
 
-  yield queueService.save('playlist', playlist)
+  yield playlistService.save('playlist', playlist)
+  yield initialize()
 }
 
 // Binding actions to sagas
 function* playlistSaga(): any {
+  yield takeLatest(types.INITIALIZED, initialize)
   yield takeLatest(types.SAVE_PLAYLIST, savePlaylist)
 }
 

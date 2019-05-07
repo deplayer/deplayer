@@ -1,28 +1,22 @@
-import reducer from './playlist'
+import reducer, { defaultState } from './playlist'
 import Song from '../entities/Song'
 import { sortTrackIds } from './utils/queues'
 
-import {
-  ADD_TO_PLAYLIST,
-  ADD_SONGS_TO_PLAYLIST,
-  SET_COLUMN_SORT
-} from '../constants/ActionTypes'
+import * as types from '../constants/ActionTypes'
 
 describe('collection reducer', () => {
   it('should return the initial state', () => {
     expect(reducer(undefined, {}))
-      .toEqual({
-        trackIds: [],
-        currentPlaying: {}
-      })
+      .toEqual(defaultState)
   })
 
   it('should handle ADD_TO_PLAYLIST action', () => {
     const songToAdd = new Song({forcedId: '1234'})
     const currPlaying = {}
     currPlaying['1234'] = songToAdd
-    expect(reducer(undefined, {type: ADD_TO_PLAYLIST, song: songToAdd}))
+    expect(reducer(undefined, {type: types.ADD_TO_PLAYLIST, song: songToAdd}))
       .toEqual({
+        ...defaultState,
         trackIds: ['1234'],
         currentPlaying: {}
       })
@@ -37,10 +31,11 @@ describe('collection reducer', () => {
       expectedObj[i] = song
     }
 
-    const addSongsState = reducer(undefined, {type: ADD_SONGS_TO_PLAYLIST, songs})
+    const addSongsState = reducer(undefined, {type: types.ADD_SONGS_TO_PLAYLIST, songs})
 
     expect(addSongsState)
       .toEqual({
+        ...defaultState,
         trackIds: Object.keys(expectedObj),
         currentPlaying: {}
       })
@@ -55,17 +50,25 @@ describe('collection reducer', () => {
       expectedObj[i] = song
     }
 
-    const addSongsState = reducer(undefined, {type: ADD_SONGS_TO_PLAYLIST, songs})
+    const addSongsState = reducer(undefined, {type: types.ADD_SONGS_TO_PLAYLIST, songs})
 
     // It should set prev and next songs Ids
     const sortedSongsIds = sortTrackIds(expectedObj, 'price', 'ASC')
 
-    expect(reducer(addSongsState, {type: SET_COLUMN_SORT, column: 'price', direction: 'ASC', songs: expectedObj}))
+    expect(reducer(addSongsState, {type: types.SET_COLUMN_SORT, column: 'price', direction: 'ASC', songs: expectedObj}))
       .toEqual({
+        ...defaultState,
         currentPlaying: {},
         trackIds: sortedSongsIds,
         prevSongId: undefined,
         nextSongId: undefined,
       })
+  })
+
+  it('should handle RECEIVE_PLAYLISTS action', () => {
+    const playlist = {foo: 'bar'}
+
+    expect(reducer(defaultState, {type: types.RECEIVE_PLAYLISTS, playlists: [playlist] }).playlists.length)
+      .toBe(1)
   })
 })

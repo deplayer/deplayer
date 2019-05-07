@@ -7,6 +7,7 @@ import { ConnectedRouter } from 'connected-react-router'
 import Alert from 'react-s-alert'
 
 import QueueContainer from './containers/QueueContainer'
+import PlaylistsContainer from './containers/PlaylistsContainer'
 import CollectionContainer from './containers/CollectionContainer'
 import SearchResultsContainer from './containers/SearchResultsContainer'
 import PlayerContainer from './containers/PlayerContainer'
