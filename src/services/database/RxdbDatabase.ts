@@ -79,6 +79,19 @@ const collections: Array<any> = [
       type: 'object',
       properties: Artist.toSchema()
     }
+  },
+  {
+    name: 'playlist',
+    schema: {
+      title: 'saved playlists',
+      version: 0,
+      type: 'object',
+      properties: {
+        trackIds: {
+          type: 'array'
+        }
+      },
+    }
   }
 ]
 

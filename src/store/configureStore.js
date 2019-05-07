@@ -24,6 +24,7 @@ import settingsSaga from '../sagas/settings'
 import collectionSaga from '../sagas/collection'
 import notificationsSaga from '../sagas/notifications'
 import queueSaga from '../sagas/queue'
+import playlistSaga from '../sagas/playlist'
 import mediaSessionSaga from '../sagas/mediaSession'
 import connectionSaga from '../sagas/connection'
 import titleSaga from '../sagas/title'
@@ -75,6 +76,7 @@ export default function configureStore() {
   sagaMiddleware.run(collectionSaga)
   sagaMiddleware.run(notificationsSaga)
   sagaMiddleware.run(queueSaga)
+  sagaMiddleware.run(playlistSaga)
   sagaMiddleware.run(titleSaga)
   sagaMiddleware.run(mediaSessionSaga, store)
   sagaMiddleware.run(connectionSaga, store)
