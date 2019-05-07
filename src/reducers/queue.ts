@@ -55,6 +55,19 @@ export default (state: State = defaultState, action: any  = {}): State => {
         trackIds: mergedTrackIds
       }
 
+    case types.ADD_SONGS_TO_QUEUE_BY_ID:
+      if (action.replace) {
+        return {
+          ...state,
+          trackIds: action.trackIds
+        }
+      }
+
+      return {
+        ...state,
+        trackIds: state.trackIds.concat(action.trackIds)
+      }
+
     case types.ADD_SONGS_TO_QUEUE:
 
       if (action.replace) {

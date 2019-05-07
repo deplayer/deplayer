@@ -27,6 +27,8 @@ $fa-font-path: "./fonts" !default;
 @import './audio-canvas.scss';
 @import './lazy-image.scss';
 @import './toggle.scss';
+@import './cards.scss';
+@import './playlists.scss';
 
 html, body {
   height: 100%;

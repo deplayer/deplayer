@@ -1,0 +1,30 @@
+.playlists {
+  @extend .main;
+
+  .card {
+    margin-bottom: 20px;
+
+    .badge {
+      float: right;
+    }
+  }
+
+  button {
+    i {
+      margin-left: 8px;
+    }
+  }
+
+  .media {
+    margin-top: 20px;
+    @extend .list-unstyled;
+    @extend .flex-wrap;
+
+    li {
+      @extend .song-row;
+      border-top: none;
+      width: 100%;
+      padding: 8px;
+    }
+  }
+}
