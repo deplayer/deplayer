@@ -43,8 +43,9 @@ class App extends React.Component<any> {
           <React.Fragment>
             <LayoutContainer>
               <Route exact path="/" component={QueueContainer} />
-              <Route path="/queue" component={QueueContainer} />
               <Route path="/index.html" component={QueueContainer} />
+              <Route path="/queue" component={QueueContainer} />
+              <Route path="/playlists" component={PlaylistsContainer} />
               <Route path="/collection" component={CollectionContainer} disableCurrent />
               <Route path="/search-results" component={SearchResultsContainer} />
               <Route path="/song/:id" component={Song} />
