@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Dispatch } from 'redux'
 import KeyHandler, {KEYPRESS} from 'react-key-handler'
 import { I18n } from 'react-redux-i18n'
 import SidebarButton from '../Buttons/SidebarButton'
@@ -12,7 +11,7 @@ type State = {
 
 type Props = {
   title?: string,
-  dispatch: Dispatch,
+  dispatch: any,
   loading: boolean,
   showInCenter: boolean,
   children: any,
