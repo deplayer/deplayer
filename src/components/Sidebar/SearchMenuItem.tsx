@@ -15,7 +15,7 @@ const SearchMenuItem = ({current = false, totalItems}: Props) => {
       url='/search-results'
       title='search'
       label='Search'
-      iconClasses='fa fa-bookmark'
+      iconClasses='fa fa-search'
     />
   )
 }
