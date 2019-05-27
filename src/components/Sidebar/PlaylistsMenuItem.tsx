@@ -12,7 +12,7 @@ const PlaylistsMenuItem = ({current = false}: Props) => {
       current={current}
       url='/playlists'
       title='playlists'
-      label='playlists'
+      label='Playlists'
       iconClasses='fa fa-bookmark'
     />
   )

@@ -35,7 +35,7 @@ function* performSingleSearch(searchTerm: string, provider: string) {
 export function* search(action: SearchAction): any {
   const settings = yield select(getSettings)
   const providersService = new ProvidersService(settings)
-  const searchPromises = yield Object.keys(providersService.providers).map((provider) => {
+  const searchPromises = Object.keys(providersService.providers).map((provider) => {
     return call(performSingleSearch, action.searchTerm, provider)
   })
   yield all(searchPromises)

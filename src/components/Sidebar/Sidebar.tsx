@@ -5,6 +5,7 @@ import * as types from '../../constants/ActionTypes'
 import CollectionMenuItem from './CollectionMenuItem'
 import SettingsMenuItem from './SettingsMenuItem'
 import PlaylistsMenuItem from './PlaylistsMenuItem'
+import SearchMenuItem from './SearchMenuItem'
 import QueueMenuItem from './QueueMenuItem'
 import ArtistsMenuItem from './ArtistsMenuItem'
 import Sidebar from 'react-sidebar'
@@ -28,6 +29,12 @@ const SidebarContents = (props: ContentProps) => {
           <QueueMenuItem
             current={inSection(props.location, '(queue)?')}
             totalItems={props.queue.trackIds.length}
+          />
+        </li>
+        <li>
+          <SearchMenuItem
+            current={inSection(props.location, 'search-results')}
+            totalItems={props.collection.searchResults.length}
           />
         </li>
         <li>

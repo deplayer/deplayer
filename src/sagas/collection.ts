@@ -66,9 +66,9 @@ function* initializeCollection() {
 function* initializeSearchIndex() {
   try {
     const adapter = getAdapter()
-    const settingsService = new SearchIndexService(new adapter())
-    yield settingsService.initialize
-    const searchIndex = yield settingsService.get()
+    const searchIndexService = new SearchIndexService(new adapter())
+    yield searchIndexService.initialize
+    const searchIndex = yield searchIndexService.get()
     yield put({type: types.RECEIVE_SEARCH_INDEX, data: searchIndex})
   } catch (e) {
     logger.log('settings-saga', 'initializeSearchIndex', e)
