@@ -25,36 +25,24 @@ const SidebarContents = (props: ContentProps) => {
     <div onClick={() => props.onSetSidebarOpen()}>
       <h4>genar-radio</h4>
       <ul>
-        <li>
-          <QueueMenuItem
-            current={inSection(props.location, '(queue)?')}
-            totalItems={props.queue.trackIds.length}
-          />
-        </li>
-        <li>
-          <SearchMenuItem
-            current={inSection(props.location, 'search-results')}
-            totalItems={props.collection.searchResults.length}
-          />
-        </li>
-        <li>
-          <PlaylistsMenuItem current={inSection(props.location, 'playlists')} />
-        </li>
-        <li>
-          <CollectionMenuItem
-            current={inSection(props.location, 'collection')}
-            totalItems={props.collection.totalRows}
-          />
-        </li>
-        <li>
-          <ArtistsMenuItem
-            current={inSection(props.location, 'artists')}
-            totalItems={Object.keys(props.collection.artists).length}
-          />
-        </li>
-        <li>
-          <SettingsMenuItem current={inSection(props.location, 'settings')} />
-        </li>
+        <QueueMenuItem
+          current={inSection(props.location, '(queue)?')}
+          totalItems={props.queue.trackIds.length}
+        />
+        <SearchMenuItem
+          current={inSection(props.location, 'search-results')}
+          totalItems={props.collection.searchResults.length}
+        />
+        <PlaylistsMenuItem current={inSection(props.location, 'playlists')} />
+        <CollectionMenuItem
+          current={inSection(props.location, 'collection')}
+          totalItems={props.collection.totalRows}
+        />
+        <ArtistsMenuItem
+          current={inSection(props.location, 'artists')}
+          totalItems={Object.keys(props.collection.artists).length}
+        />
+        <SettingsMenuItem current={inSection(props.location, 'settings')} />
       </ul>
 
       <section className='sidebar-meta'>

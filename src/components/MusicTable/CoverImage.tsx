@@ -45,7 +45,8 @@ const CoverImage = (props: Props) => {
       />
     )
   }
-  const src = props.size === 'full' ?  props.cover.fullUrl : props.cover.thumbnailUrl
+  const src = props.size === 'full' && props.cover.fullUrl ?
+    props.cover.fullUrl : props.cover.thumbnailUrl
 
   return (
     <Img

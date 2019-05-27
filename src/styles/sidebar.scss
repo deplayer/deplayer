@@ -1,26 +1,22 @@
 #left-sidebar {
   background-color: $greyscale-darker1;
   width: 100%;
+  align-items: center;
 
   @include media-breakpoint-up(md) {
     max-width: 200px;
   }
 
   button, .button, a {
+    @extend .d-flex;
+    align-items: center;
     color: $gray-100;
     background: transparent;
 
     .badge {
-      line-height: 57px;
-      float: right;
+      right: 20px;
     }
 
-    &.current {
-      a {
-        color: $white;
-        background-color: $greyscale-lighter1;
-      }
-    }
   }
 
   h4 {
@@ -33,7 +29,6 @@
 
     @include media-breakpoint-up(md) {
       padding-top: 0px;
-      border-bottom: solid 4px $greyscale-lighter2;
       background: $greyscale-darker2;
     }
   }
@@ -48,11 +43,19 @@
 
     li {
       line-height: 60px;
-      border-top: 2px solid $greyscale-color;
+      padding-right: 10px;
+
+      &.current {
+        background-color: $greyscale-lighter1;
+        a {
+          color: $white;
+        }
+      }
 
       a {
         padding-left: 20px;
         padding-right: 20px;
+        margin-right: auto;
         width: 100%;
         height: 100%;
         display: inline-block;

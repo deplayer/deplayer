@@ -18,18 +18,18 @@ const MenuItem = (props: Props) => {
     current: props.current
   })
   return (
-    <div className={ classNames }>
+    <li className={ classNames }>
       <Link
         to={ props.url }
         title={ props.title }
       >
         <i className={ props.iconClasses }></i>
         { props.label }
-        <span className='badge'>
-          { props.totalItems }
-        </span>
       </Link>
-    </div>
+      <span className='badge badge-secondary'>
+        { props.totalItems }
+      </span>
+    </li>
   )
 }
 
