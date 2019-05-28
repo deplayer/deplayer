@@ -24,6 +24,8 @@ export function* setCurrentPlaying(action: any): any {
 // Binding actions to sagas
 function* titleSaga(): any {
   yield takeLatest(types.SET_CURRENT_PLAYING, setCurrentPlaying)
+  yield takeLatest(types.PLAY_NEXT, setCurrentPlaying)
+  yield takeLatest(types.PLAY_PREV, setCurrentPlaying)
 }
 
 export default titleSaga
