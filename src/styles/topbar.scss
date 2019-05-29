@@ -2,6 +2,7 @@
   @extend .d-flex;
   justify-content: space-between;
   border-bottom: solid 4px $greyscale-lighter2;
+  overflow: hidden;
 
   & > div {
     @extend .d-flex;
