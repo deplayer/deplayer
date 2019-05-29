@@ -25,10 +25,11 @@ const MenuItem = (props: Props) => {
       >
         <i className={ props.iconClasses }></i>
         { props.label }
+
+        <span className='badge badge-secondary'>
+          { props.totalItems }
+        </span>
       </Link>
-      <span className='badge badge-secondary'>
-        { props.totalItems }
-      </span>
     </li>
   )
 }

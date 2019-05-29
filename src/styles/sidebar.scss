@@ -8,15 +8,13 @@
   }
 
   button, .button, a {
-    @extend .d-flex;
-    align-items: center;
     color: $gray-100;
     background: transparent;
 
     .badge {
-      right: 20px;
+      float: right;
+      margin-top: 22px;
     }
-
   }
 
   h4 {
@@ -43,7 +41,6 @@
 
     li {
       line-height: 60px;
-      padding-right: 10px;
 
       &.current {
         background-color: $greyscale-lighter1;
