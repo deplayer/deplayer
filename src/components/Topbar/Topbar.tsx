@@ -84,7 +84,7 @@ class Topbar extends React.Component<Props, State> {
 
   onFocusOut = () => {
     this.setState({focus: false})
-      this.props.dispatch( { type: types.TOGGLE_SEARCH })
+    this.props.dispatch( { type: types.TOGGLE_SEARCH })
   }
 
   renderSearch = (props) => {
@@ -120,7 +120,7 @@ class Topbar extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <div className={`topbar-container has-results`}>
+        <div className={`topbar-container`}>
           <SidebarButton />
           <KeyHandler
             keyEventName={KEYPRESS}

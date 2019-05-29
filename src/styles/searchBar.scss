@@ -1,5 +1,4 @@
 .search-bar {
-  grid-area: sidebar;
 
   &.ui.input {
     display: block;
@@ -11,15 +10,27 @@
 
   input {
     width: 100%;
-    @extend .form-control;
+    border: none;
+    box-shadow: none;
+    grid-area: sidebar;
+    font-size: 2rem;
+    background: transparent;
+
+    &:focus {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
   }
 
   .icon {
+    font-size: 2rem;
     position: absolute;
     display: inline;
-    top: 0;
     right: 10px;
+    top: 10px;
     line-height: 38px;
   }
+  border-bottom: solid 4px $greyscale-lighter2;
 }
 
