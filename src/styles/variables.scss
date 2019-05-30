@@ -23,6 +23,7 @@ $greyscale-color-100: lighten(adjust-hue($greyscale-base, 0), 60%);
 $greyscale-color-200: lighten(adjust-hue($greyscale-base, 0), 50%);
 $greyscale-lighter1: lighten(adjust-hue($greyscale-base, 5), 10%);
 $greyscale-lighter2: lighten(adjust-hue($greyscale-base, 10), 20%);
+$greyscale-lighter3: lighten(adjust-hue($greyscale-base, 10), 10%);
 $greyscale-darker1: darken(adjust-hue($greyscale-base, -5), 10%);
 $greyscale-darker2: darken(adjust-hue($greyscale-base, -10), 20%);
 $greyscale-darker3: darken(adjust-hue($greyscale-base, -10), 40%);
