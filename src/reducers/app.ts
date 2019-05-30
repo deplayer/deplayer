@@ -28,6 +28,20 @@ export default (state: State = defaultState, action) => {
       return {...state, loading: false}
     }
 
+    case types.START_SEARCH: {
+      return {
+        ...state,
+        loading: true
+      }
+    }
+
+    case types.RECEIVE_COLLECTION_FINISHED: {
+      return {
+        ...state,
+        loading: false
+      }
+    }
+
     default:
       return state
   }

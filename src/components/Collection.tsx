@@ -4,6 +4,7 @@ import { Dispatch } from 'redux'
 import MusicTable from './MusicTable/MusicTable'
 
 type Props = {
+  app: any,
   playlist: any,
   queue: any,
   player: any,
@@ -22,6 +23,7 @@ const Collection = (props: Props) => {
       className='collection'
     >
       <MusicTable
+        app={props.app}
         queue={props.queue}
         tableIds={props.visibleSongs}
         disableAddButton

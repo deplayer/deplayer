@@ -89,6 +89,7 @@ export function* addToCollection(action: any): any {
   const mappedData = mapToMedia(collection)
   try {
     yield put({type: types.RECEIVE_COLLECTION, data: mappedData})
+    yield put({type: types.RECEIVE_COLLECTION_FINISHED})
   } catch (e) {
     logger.log('settings-saga', 'addToCollection', e)
     yield put({type: types.RECEIVE_COLLECTION_REJECTED, error: e.message})

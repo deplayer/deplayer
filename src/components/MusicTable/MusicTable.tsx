@@ -3,10 +3,12 @@ import { AutoSizer, List } from 'react-virtualized'
 
 import * as types from '../../constants/ActionTypes'
 import SongRow from './SongRow'
+import Spinner from '../Spinner'
 
 export type Props = {
   error?: string,
   queue: any,
+  app: any,
   tableIds: Array<string>,
   collection: any,
   dispatch: (action: any) => any,
@@ -20,6 +22,16 @@ const MusicTable = (props: Props) => {
   const errors = props.error ?
     <div><div>{ props.error }</div></div>
     : null
+
+  if (props.app.loading) {
+    return (
+      <div className={`queue`}>
+        <blockquote className='blockquote'>
+          <Spinner />
+        </blockquote>
+      </div>
+    )
+  }
 
   const id = props.queue.currentPlaying
 

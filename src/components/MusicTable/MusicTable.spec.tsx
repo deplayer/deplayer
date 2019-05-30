@@ -9,6 +9,7 @@ configureEnzyme()
 
 const setup = () => {
   const props: Props = {
+    app: {},
     error: 'test',
     dispatch: (value) => value,
     tableIds: [],

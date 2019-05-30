@@ -3,6 +3,17 @@
 .collection {
   overflow: hidden;
   width: 100%;
+  height: 100%;
+
+  .blockquote {
+    height: 100%;
+    @extend .d-flex;
+    align-items: center;
+
+    p {
+      margin: 0 auto;
+    }
+  }
 
   &.no-results {
     margin: auto;
