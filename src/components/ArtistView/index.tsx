@@ -5,6 +5,7 @@ import { Redirect } from 'react-router-dom'
 import Song from '../../entities/Song'
 import Artist from '../../entities/Artist'
 import SongRow from '../MusicTable/SongRow'
+import CoverImage from '../MusicTable/CoverImage'
 import * as types from '../../constants/ActionTypes'
 
 type Props = {
@@ -45,6 +46,7 @@ export default class ArtistView extends React.Component<Props> {
         const songObj = new Song(songRow)
         return (
           <SongRow
+            disableCovers
             style={ {} }
             key={ songId }
             dispatch={this.props.dispatch}
@@ -68,7 +70,14 @@ export default class ArtistView extends React.Component<Props> {
               return (
                 <li className='card' key={albumId}>
                   <h3 className='card-header'>
-                    { albums[albumId].name }
+                    <CoverImage
+                      cover={
+                        this.props.collection.rows[songsByAlbum[albumId][0]].cover
+                      }
+                      size='thumbnail'
+                      albumName={'N/A'}
+                    />
+                    <span>{ albums[albumId].name }</span>
                     <button
                       onClick={() => {
                         this.props.dispatch({type: types.ADD_ALBUM_TO_PLAYLIST, albumId })

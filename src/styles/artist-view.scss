@@ -6,15 +6,39 @@
   ul {
     @extend .list-unstyled;
 
+    .card-header {
+      @extend .d-flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
     h3 {
+      .lazy-image {
+        width: 150px;
+        height: 150px;
+      }
+
       button {
-        float: right;
         line-height: 20px;
+        max-height: 40px;
+        width: 40px;
+      }
+
+      span {
+        min-width: 60%;
+        padding-left: 20px;
       }
     }
 
     .card {
       margin-top: 40px;
+    }
+
+    .song-row {
+      div {
+        padding-left: 0;
+        padding-right: 0;
+      }
     }
   }
 }
