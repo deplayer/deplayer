@@ -61,10 +61,10 @@ export default class ArtistView extends React.Component<Props> {
             slim={ true }
             onClick={() => {
               this.props.dispatch({type: types.SET_CURRENT_PLAYING, songId: songObj.id})
-              }}
-              song={songObj}
-            />
-            )
+            }}
+            song={songObj}
+          />
+        )
       })
     }
 
