@@ -1,8 +1,8 @@
 
-import { IMusicProvider } from './IMusicProvider'
+import { IMusicMetadataProvider } from './IMusicMetadataProvider'
 import axios from 'axios'
 
-export default class LastfmProvider implements IMusicProvider {
+export default class LastfmProvider implements IMusicMetadataProvider {
   baseUrl: string = 'https://ws.audioscrobbler.com/2.0/'
   apikey: string
   providerKey: string
@@ -16,7 +16,7 @@ export default class LastfmProvider implements IMusicProvider {
     this.artistInfoUrl = `${this.baseUrl}?method=artist.getinfo&api_key=${this.apikey}&format=json`
   }
 
-  search(searchTerm: string): Promise<any> {
+  searchArtistInfo(searchTerm: string): Promise<any> {
     return new Promise((resolve, reject) => {
       axios.get(`${this.artistInfoUrl}&artist=${searchTerm}`)
         .then((result) => {
