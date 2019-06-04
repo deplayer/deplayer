@@ -33,7 +33,7 @@ const dynamicTitle = (router, collection, searchTerm: ''): string => {
     case '/artists':
       return 'Artists'
     default:
-      return 'Home'
+      return 'Current playing'
   }
 }
 

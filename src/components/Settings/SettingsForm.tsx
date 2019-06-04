@@ -1,8 +1,6 @@
 import * as React from 'react'
 import { Formik, Form } from 'formik'
 import { Dispatch } from 'redux'
-import { Route } from 'react-router-dom'
-import { Link } from 'react-router-dom'
 import { Translate } from 'react-redux-i18n'
 import ProviderButton from './ProviderButton'
 
@@ -92,6 +90,7 @@ const SettingsForm = (props: Props) => {
               <ProviderButton providerKey='subsonic' />
               <ProviderButton providerKey='mstream' />
               <ProviderButton providerKey='itunes' />
+              <ProviderButton providerKey='lastfm' />
             </div>
 
             { providers }
