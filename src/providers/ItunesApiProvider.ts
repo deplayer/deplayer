@@ -1,9 +1,9 @@
 import axios from 'axios'
 
-import { IProvider } from './IProvider'
+import { IMusicProvider } from './IMusicProvider'
 import Song from '../entities/Song'
 
-export default class ItunesApiProvider implements IProvider {
+export default class ItunesApiProvider implements IMusicProvider {
   baseUrl: string
   providerKey: string
 

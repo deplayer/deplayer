@@ -1,8 +1,8 @@
 
-import { IProvider } from './IProvider'
+import { IMusicProvider } from './IMusicProvider'
 import axios from 'axios'
 
-export default class LastfmProvider implements IProvider {
+export default class LastfmProvider implements IMusicProvider {
   baseUrl: string = 'https://ws.audioscrobbler.com/2.0/'
   apikey: string
   providerKey: string

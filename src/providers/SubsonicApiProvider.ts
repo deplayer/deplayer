@@ -1,12 +1,12 @@
 import axios from 'axios'
 
 import Song from '../entities/Song'
-import { IProvider } from './IProvider'
+import { IMusicProvider } from './IMusicProvider'
 
 /**
  * It should implement the Subsonic API
  */
-export default class SubsonicApiProvider implements IProvider {
+export default class SubsonicApiProvider implements IMusicProvider {
   baseUrl: string
   user: string
   password: string

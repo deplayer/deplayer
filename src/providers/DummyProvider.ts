@@ -1,6 +1,6 @@
-import { IProvider } from './IProvider'
+import { IMusicProvider } from './IMusicProvider'
 
-export default class DummyProvider implements IProvider {
+export default class DummyProvider implements IMusicProvider {
   providerKey: string
   enabled: boolean
 
