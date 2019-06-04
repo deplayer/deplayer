@@ -20,6 +20,13 @@ type Props = {
 }
 
 export default class ArtistView extends React.Component<Props> {
+  componentDidMount() {
+    this.props.dispatch({
+      type: types.LOAD_ARTIST,
+      artist: this.props.artist
+    })
+  }
+
   render() {
     const {
       artist,
