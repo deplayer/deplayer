@@ -9,9 +9,7 @@ export default class Lastfm implements ISettingsProvider {
       [
         {title: "labels.lastfm", type: 'title'},
         {title: "labels.enabled", name: `providers.lastfm.enabled`, type: 'checkbox'},
-        {title: "labels.lastfm.baseUrl", name: `providers.lastfm.baseUrl`, type: 'url'},
-        {title: "labels.lastfm.user", name: `providers.lastfm.user`, type: 'text'},
-        {title: "labels.lastfm.password", name: `providers.lastfm.password`, type: 'password'}
+        {title: "labels.lastfm.apikey", name: `providers.lastfm.apikey`, type: 'text'},
       ]
     }
   }
