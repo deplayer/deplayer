@@ -6,8 +6,7 @@ export default class ArtistMetadataProviders  implements ISearchService {
   providers: any = {}
 
   constructor(config: ISettings) {
-    console.log('Providers: ', config)
-    Object.keys(config.providers).forEach((provider) => {
+    Object.keys(config.metadataProviders).forEach((provider) => {
 
       const providerType = provider.replace(/[0-9]/g, '')
 
