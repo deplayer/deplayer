@@ -8,8 +8,8 @@ export default class Lastfm implements ISettingsProvider {
       fields:
       [
         {title: "labels.lastfm", type: 'title'},
-        {title: "labels.enabled", name: `providers.lastfm.enabled`, type: 'checkbox'},
-        {title: "labels.lastfm.apikey", name: `providers.lastfm.apikey`, type: 'text'},
+        {title: "labels.enabled", name: `metadataProviders.lastfm.enabled`, type: 'checkbox'},
+        {title: "labels.lastfm.apikey", name: `metadataProviders.lastfm.apikey`, type: 'text'},
       ]
     }
   }

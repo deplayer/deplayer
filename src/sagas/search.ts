@@ -11,6 +11,7 @@ import history from '../store/configureHistory'
 
 import  * as types from '../constants/ActionTypes'
 import ProvidersService from '../services/ProvidersService'
+import { getSettings } from './selectors'
 
 type SearchAction = {
   type: string,
@@ -21,7 +22,7 @@ type SearchAction = {
 function* performSingleSearch(searchTerm: string, provider: string) {
   try {
     const settings = yield select(getSettings)
-    const providerService= new ProvidersService(settings)
+    const providerService = new ProvidersService(settings)
     const searchResults = yield providerService.searchForProvider(searchTerm, provider)
     yield putResolve({type: types.ADD_TO_COLLECTION, data: searchResults})
   } catch (e) {
@@ -46,11 +47,6 @@ export function* search(action: SearchAction): any {
 // Going to home page
 export function* goToSearchResults(): any {
   yield history.push('/search-results')
-}
-
-// Extract settings from state
-export const getSettings = (state: any) => {
-  return state ? state.settings.settings : {providers: {}}
 }
 
 // Binding actions to sagas

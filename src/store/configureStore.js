@@ -28,6 +28,7 @@ import playlistSaga from '../sagas/playlist'
 import mediaSessionSaga from '../sagas/mediaSession'
 import connectionSaga from '../sagas/connection'
 import titleSaga from '../sagas/title'
+import artistSaga from '../sagas/artist'
 
 // Custom middlewares
 import alerts from './middlewares/alerts'
@@ -78,6 +79,7 @@ export default function configureStore() {
   sagaMiddleware.run(queueSaga)
   sagaMiddleware.run(playlistSaga)
   sagaMiddleware.run(titleSaga)
+  sagaMiddleware.run(artistSaga)
   sagaMiddleware.run(mediaSessionSaga, store)
   sagaMiddleware.run(connectionSaga, store)
 
