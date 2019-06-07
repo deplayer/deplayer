@@ -31,19 +31,24 @@ describe('MediaMergerService', () => {
 
     expect(merged).toBeDefined()
     expect(merged.stream.length).toBe(2)
+    expect(merged.stream[0].service).toBe('itunes')
   })
 
-  it('should keep cover object', () => {
+  it('should combine cover object', () => {
     const song1 = new Song({
-      thumbnailUrl: 'test.png'
+      cover: { thumbnailUrl: 'test.png' }
     })
     const song2 = new Song({
-      thumbnailUrl: 'test.png',
-      fullUrl: 'test-full.png'
+      cover: {
+        thumbnailUrl: 'test.png',
+        fullUrl: 'test-full.png'
+      }
     })
     const mediaMergerService = new MediaMergerService(song1, song2)
     const merged = mediaMergerService.getMerged()
 
     expect(merged.cover).toBeDefined()
+    expect(merged.cover.thumbnailUrl).toBe('test.png')
+    expect(merged.cover.fullUrl).toBe('test-full.png')
   })
 })
