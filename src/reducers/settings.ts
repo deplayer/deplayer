@@ -20,10 +20,12 @@ export const defaultState = {
   settingsForm: settingsBuilder.getFormSchema(),
   settings: {
     providers: {},
-    metadataProviders: {},
     app: {
       spectrum: {
         enabled: true
+      },
+      lastfm: {
+        apikey: ''
       }
     }
   }

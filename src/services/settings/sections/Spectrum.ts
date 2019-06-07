@@ -5,6 +5,7 @@ export default class Spectrum implements ISettingsSection {
 
   getFormSchema() {
     return [
+      {title: "labels.player", type: 'title'},
       {title: "labels.enableSpectrum", name: 'app.spectrum.enabled', type: 'checkbox'}
     ]
   }

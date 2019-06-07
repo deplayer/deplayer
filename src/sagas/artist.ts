@@ -1,12 +1,13 @@
-import { takeLatest, select, putResolve } from 'redux-saga/effects'
+import { takeLatest, putResolve } from 'redux-saga/effects'
 
 import * as types from '../constants/ActionTypes'
-import ArtistMetadataProviders from '../services/ArtistMetadataProviders'
-import { getSettings } from './selectors'
+// import { getSettings } from './selectors'
 
 export function* fetchArtistMetadata(action: any): any {
-  const settings = yield select(getSettings)
-  const providerService = new ArtistMetadataProviders(settings)
+  // const settings = yield select(getSettings)
+  const providerService = {
+    search: (artistName: string) => artistName
+  }
   const artistMetadata = yield providerService.search(action.artist.name)
   yield putResolve({type: types.RECEIVE_ARTIST_METADATA, data: artistMetadata})
 }

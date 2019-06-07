@@ -15,9 +15,6 @@ const collections: Array<any> = [
         providers: {
           type: 'object'
         },
-        metadataProviders: {
-          type: 'object'
-        },
         app: {
           type: 'object'
         }

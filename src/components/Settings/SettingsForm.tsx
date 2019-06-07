@@ -110,15 +110,11 @@ const SettingsForm = (props: Props) => {
 
             { providers }
 
-            <h2><Translate value="labels.metadataProviders" /></h2>
-
-            <div className='btn-group provider-buttons'>
-              <ProviderButton providerKey='lastfm' />
+            <div>
+              <button className='with-bg' disabled={isSubmitting} type='submit'>
+                <Translate value="buttons.save" />
+              </button>
             </div>
-
-            <button className='with-bg' disabled={isSubmitting} type='submit'>
-              <Translate value="buttons.save" />
-            </button>
           </Form>
         )}
     />
