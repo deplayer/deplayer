@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Dispatch } from 'redux'
 
 import MusicTable from './MusicTable/MusicTable'
+import Spinner from './Spinner'
 
 type Props = {
   app: any,
@@ -14,6 +15,16 @@ type Props = {
 }
 
 const Collection = (props: Props) => {
+  if (props.app.loading) {
+    return (
+      <div className={`queue`}>
+        <blockquote className='blockquote'>
+          <Spinner />
+        </blockquote>
+      </div>
+    )
+  }
+
   if (!props.visibleSongs.length) {
     return null
   }

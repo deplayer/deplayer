@@ -35,6 +35,7 @@ export default (state: State = defaultState, action) => {
       }
     }
 
+    case types.ADD_TO_COLLECTION:
     case types.RECEIVE_COLLECTION_FINISHED: {
       return {
         ...state,
