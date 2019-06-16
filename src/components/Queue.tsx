@@ -3,6 +3,7 @@ import { Dispatch } from 'redux'
 
 import MusicTable from './MusicTable/MusicTable'
 import Spinner from './Spinner'
+import BodyMessage from './BodyMessage'
 
 type Props = {
   queue: any,
@@ -38,9 +39,7 @@ const Queue = (props: Props) => {
   if (!props.queue.trackIds.length) {
     return (
       <div className={`queue no-results ${props.className || ''}`}>
-        <blockquote className='blockquote'>
-          <p>Add songs from the collection or search for new ones</p>
-        </blockquote>
+        <BodyMessage message={'Add songs from the collection or search for new ones'} />
       </div>
     )
   }

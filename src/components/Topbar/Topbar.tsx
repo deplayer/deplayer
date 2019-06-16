@@ -2,6 +2,7 @@ import * as React from 'react'
 import KeyHandler, {KEYPRESS} from 'react-key-handler'
 import { I18n } from 'react-redux-i18n'
 import SidebarButton from '../Buttons/SidebarButton'
+import Title from './Title'
 
 import * as types from '../../constants/ActionTypes'
 
@@ -22,16 +23,6 @@ type Props = {
 
 const WAIT_INTERVAL = 1000
 const ENTER_KEY = 13
-
-const titleComponent = (title) => {
-  return (
-    <div>
-      <h2>
-        { title }
-      </h2>
-    </div>
-  )
-}
 
 class Topbar extends React.Component<Props, State> {
   state = {
@@ -87,6 +78,11 @@ class Topbar extends React.Component<Props, State> {
     this.props.dispatch( { type: types.TOGGLE_SEARCH })
   }
 
+  setSearchOn = () => {
+    this.props.dispatch( { type: types.TOGGLE_SEARCH })
+    this.setState({focus: true})
+  }
+
   renderSearch = (props) => {
     if (!props.searchToggled) {
       return null;
@@ -128,7 +124,7 @@ class Topbar extends React.Component<Props, State> {
             onKeyHandle={this.setFocus}
           />
           { this.renderSearch(this.props) }
-          {  !this.state.focus && !this.props.searchToggled  ? titleComponent(title): null }
+          {  !this.state.focus && !this.props.searchToggled  ? <Title title={title} onClick={this.setSearchOn} /> : null }
           <div>
             {  !this.state.focus ? childrenWithProps : null }
           </div>

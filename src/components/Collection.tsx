@@ -3,6 +3,7 @@ import { Dispatch } from 'redux'
 
 import MusicTable from './MusicTable/MusicTable'
 import Spinner from './Spinner'
+import BodyMessage from './BodyMessage'
 
 type Props = {
   app: any,
@@ -17,7 +18,7 @@ type Props = {
 const Collection = (props: Props) => {
   if (props.app.loading) {
     return (
-      <div className={`queue`}>
+      <div className={`collection`}>
         <blockquote className='blockquote'>
           <Spinner />
         </blockquote>
@@ -26,7 +27,9 @@ const Collection = (props: Props) => {
   }
 
   if (!props.visibleSongs.length) {
-    return null
+    return (
+      <BodyMessage message={'No songs found'} />
+    )
   }
 
   return (
