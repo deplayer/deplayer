@@ -35,6 +35,7 @@ const getAlbumsByArtist = (match, collection) => {
 
 export default connect(
   (state, ownProps) => ({
+    artistMetadata: state.artist.artistMetadata,
     artist: getArtist(ownProps.match, state.collection),
     songs: getSongsByArtist(ownProps.match, state.collection),
     songsByAlbum: state.collection.songsByAlbum,

@@ -37,6 +37,7 @@
 
   h2 {
     margin-bottom: 0;
+    white-space: nowrap;
 
     @include media-breakpoint-up(md) {
       &:before {

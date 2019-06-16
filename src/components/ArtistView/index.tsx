@@ -11,6 +11,7 @@ import * as types from '../../constants/ActionTypes'
 type Props = {
   dispatch: Dispatch,
   collection: any,
+  artistMetadata: any,
   albumsByArtist: any,
   artist: Artist,
   songs: any,
@@ -21,10 +22,12 @@ type Props = {
 
 export default class ArtistView extends React.Component<Props> {
   componentDidMount() {
-    this.props.dispatch({
-      type: types.LOAD_ARTIST,
-      artist: this.props.artist
-    })
+    if (this.props.artist && this.props.artist.name) {
+      this.props.dispatch({
+        type: types.LOAD_ARTIST,
+        artist: this.props.artist
+      })
+    }
   }
 
   render() {
@@ -68,9 +71,20 @@ export default class ArtistView extends React.Component<Props> {
       })
     }
 
+    const extractSummary = (): string => {
+      if (this.props.artistMetadata.artist) {
+        return this.props.artistMetadata.artist.bio.content
+      }
+
+      return ''
+    }
+
     return (
-      <div className={`artist-view ${this.props.className} main`}>
+      <div
+        className={`artist-view ${this.props.className} main`}
+      >
         <h2>{ artist.name }</h2>
+        <p>{ extractSummary() }</p>
         <ul className='unstyled-list'>
           {
             albumsByArtist.map((albumId) => {

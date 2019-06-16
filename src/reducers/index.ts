@@ -3,6 +3,7 @@ import { i18nReducer } from 'react-redux-i18n'
 import { connectRouter } from 'connected-react-router'
 
 import app from './app'
+import artist from './artist'
 import player from './player'
 import playlist from './playlist'
 import collection from './collection'
@@ -14,6 +15,7 @@ import queue from './queue'
 
 export default (history) => combineReducers({
   app,
+  artist,
   player,
   playlist,
   collection,

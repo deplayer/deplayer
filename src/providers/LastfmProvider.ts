@@ -17,11 +17,15 @@ export default class LastfmProvider implements IMusicMetadataProvider {
   }
 
   searchArtistInfo(searchTerm: string): Promise<any> {
+    if (!this.enabled) {
+      return Promise.resolve()
+    }
+
     return new Promise((resolve, reject) => {
       axios.get(`${this.artistInfoUrl}&artist=${searchTerm}`)
         .then((result) => {
           console.log('lastfm result', result)
-          resolve()
+          resolve(result.data)
         })
         .catch((err) => {
           reject(err)

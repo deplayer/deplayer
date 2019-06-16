@@ -25,6 +25,7 @@ export const defaultState = {
         enabled: true
       },
       lastfm: {
+        enabled: false,
         apikey: ''
       }
     }
