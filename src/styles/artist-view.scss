@@ -7,6 +7,7 @@
   z-index: -2;
   width: 100%;
   height: 100%;
+  display: table;
 
   .main {
     margin: 0 auto;
@@ -14,13 +15,11 @@
 
   &::before {
     content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: fixed;
     width: 100%;
     height: 100%;
     z-index: -1;
-    background-color: rgba($greyscale-darker1, 0.9);
+    background-color: rgba(0, 0, 0, 0.8);
   }
 
 

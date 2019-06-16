@@ -126,6 +126,7 @@ export default class ArtistView extends React.Component<Props> {
               })
             }
           </ul>
+          <div className='placeholder'></div>
         </div>
       </div>
     )
