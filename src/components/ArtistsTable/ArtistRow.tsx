@@ -18,7 +18,10 @@ const ArtistRow = (props: Props) => {
       style={props.style}
     >
       <Link to={`/artist/${artist.id}`}>
-        { artist.name }
+        <span>
+          <i style={{marginRight: '5px'}} className='fa fa-microphone' />
+          { artist.name }
+        </span>
 
         <span className='badge badge-secondary'>
           { props.songs.length }
