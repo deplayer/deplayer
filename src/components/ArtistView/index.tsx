@@ -71,6 +71,15 @@ export default class ArtistView extends React.Component<Props> {
       })
     }
 
+    const extractBackground = (): string => {
+      const albumId = albumsByArtist[0]
+      if (songsByAlbum[albumId]) {
+        return this.props.collection.rows[songsByAlbum[albumId][0]].cover.fullUrl
+      }
+
+        return ''
+    }
+
     const extractSummary = (): string => {
       if (this.props.artistMetadata.artist) {
         return this.props.artistMetadata.artist.bio.content
@@ -81,40 +90,43 @@ export default class ArtistView extends React.Component<Props> {
 
     return (
       <div
-        className={`artist-view ${this.props.className} main`}
+        className={`artist-view ${this.props.className}`}
+        style={{backgroundImage: `url(${extractBackground()})`}}
       >
-        <h2>{ artist.name }</h2>
-        <p>{ extractSummary() }</p>
-        <ul className='unstyled-list'>
-          {
-            albumsByArtist.map((albumId) => {
-              return (
-                <li className='card' key={albumId}>
-                  <h3 className='card-header'>
-                    <CoverImage
-                      cover={
-                        this.props.collection.rows[songsByAlbum[albumId][0]].cover
-                      }
-                      size='thumbnail'
-                      albumName={'N/A'}
-                    />
-                    <span>{ albums[albumId].name }</span>
-                    <button
-                      onClick={() => {
-                        this.props.dispatch({type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
-                      }}
-                    >
-                      <i className='fa fa-play' />
-                    </button>
-                  </h3>
-                  <div className='card-body'>
-                    { extractSong(albums[albumId]) }
-                  </div>
-                </li>
-              )
-            })
-          }
-        </ul>
+        <div className='main'>
+          <h2>{ artist.name }</h2>
+          <p>{ extractSummary() }</p>
+          <ul className='unstyled-list'>
+            {
+              albumsByArtist.map((albumId) => {
+                return (
+                  <li className='card' key={albumId}>
+                    <h3 className='card-header'>
+                      <CoverImage
+                        cover={
+                          this.props.collection.rows[songsByAlbum[albumId][0]].cover
+                        }
+                        size='thumbnail'
+                        albumName={'N/A'}
+                      />
+                      <span>{ albums[albumId].name }</span>
+                      <button
+                        onClick={() => {
+                          this.props.dispatch({type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
+                        }}
+                      >
+                        <i className='fa fa-play' />
+                      </button>
+                    </h3>
+                    <div className='card-body'>
+                      { extractSong(albums[albumId]) }
+                    </div>
+                  </li>
+                )
+              })
+            }
+          </ul>
+        </div>
       </div>
     )
   }

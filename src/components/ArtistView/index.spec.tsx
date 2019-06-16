@@ -8,6 +8,7 @@ configureEnzyme()
 
 const setup = (customProps: any) => {
   const defaultProps = {
+    collection: {},
     artist: new Artist(),
     artistMetadata: {},
     dispatch: () => {},
