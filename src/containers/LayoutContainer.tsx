@@ -32,6 +32,8 @@ const dynamicTitle = (router, collection, searchTerm: ''): string => {
       return 'Collection'
     case '/artists':
       return 'Artists'
+    case '/playlists':
+      return 'Playlists'
     default:
       return 'Current playing'
   }
