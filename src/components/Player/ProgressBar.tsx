@@ -9,8 +9,7 @@ type Props = {
   total: number,
   dispatch: Dispatch,
   onChange: (value: string) => any,
-  current: number,
-  buffered: number
+  current: number
 }
 
 const ProgressBar = (props: Props) => {

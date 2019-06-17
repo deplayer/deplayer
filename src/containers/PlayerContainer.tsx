@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import Player from '../components/Player/Player'
+import PlayerV2 from '../components/Player/PlayerV2'
 
 const ConnectedPlayer = connect(
   (state) => ({
@@ -10,7 +10,7 @@ const ConnectedPlayer = connect(
     collection: state.collection,
     itemCount: state.queue.trackIds ? state.queue.trackIds.length : 0
   })
-)(Player)
+)(PlayerV2)
 
 const RoutedPlayer = withRouter(props => <ConnectedPlayer {...props}/>)
 
