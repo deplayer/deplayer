@@ -6,6 +6,7 @@
     "collection": "Collection"
   },
   "labels": {
+    "enableReactPlayer": "use react-player (beta)",
     "enableSpectrum": "player spectrum",
     "deleteCollection": "Delete collection",
     "deleteSettings": "Delete settings",

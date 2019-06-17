@@ -27,6 +27,9 @@ export const defaultState = {
       lastfm: {
         enabled: false,
         apikey: ''
+      },
+      reactPlayer: {
+        enabled: false
       }
     }
   }

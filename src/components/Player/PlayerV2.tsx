@@ -1,8 +1,10 @@
 import React from 'react'
 import ReactPlayer from 'react-player'
 import { Dispatch } from 'redux'
+import { Link } from 'react-router-dom'
 
 import Controls from './Controls'
+import CoverImage from '../MusicTable/CoverImage'
 import ProgressBar from './ProgressBar'
 
 import * as types from '../../constants/ActionTypes'
@@ -74,8 +76,8 @@ class PlayerV2 extends React.Component<Props> {
   toggleLoop = () => {
     this.setState({ loop: !this.state.loop })
   }
-  setVolume = e => {
-    this.setState({ volume: parseFloat(e.target.value) })
+  setVolume = value => {
+    this.setState({ volume: value / 100 })
   }
   toggleMuted = () => {
     this.setState({ muted: !this.state.muted })
@@ -87,26 +89,22 @@ class PlayerV2 extends React.Component<Props> {
     this.setState({ pip: !this.state.pip })
   }
   onPlay = () => {
-    console.log('onPlay')
     this.setState({ playing: true })
   }
   onEnablePIP = () => {
-    console.log('onEnablePIP')
     this.setState({ pip: true })
   }
   onDisablePIP = () => {
-    console.log('onDisablePIP')
     this.setState({ pip: false })
   }
   onPause = () => {
-    console.log('onPause')
     this.setState({ playing: false })
   }
   onSeekMouseDown = e => {
     this.setState({ seeking: true })
   }
-  onSeekChange = e => {
-    this.setState({ played: parseFloat(e.target.value) })
+  onSeekChange = value => {
+    this.setState({ played: value })
   }
   onSeekMouseUp = e => {
     this.setState({ seeking: false })
@@ -166,43 +164,62 @@ class PlayerV2 extends React.Component<Props> {
         <ProgressBar
           dispatch={this.props.dispatch}
           total={duration}
-          current={played}
+          current={played * 100}
           onChange={this.onSeekChange}
         />
-        <ReactPlayer
-          ref={this.ref}
-          className='react-player'
-          url={streamUri}
-          pip={pip}
-          playing={playing}
-          controls={controls}
-          light={light}
-          loop={loop}
-          playbackRate={playbackRate}
-          volume={volume}
-          muted={muted}
-          onReady={() => console.log('onReady')}
-          onStart={() => console.log('onStart')}
-          onPlay={this.onPlay}
-          onEnablePIP={this.onEnablePIP}
-          onDisablePIP={this.onDisablePIP}
-          onPause={this.onPause}
-          onBuffer={() => console.log('onBuffer')}
-          onSeek={e => console.log('onSeek', e)}
-          onEnded={this.onEnded}
-          onError={e => console.log('onError', e)}
-          onProgress={this.onProgress}
-          onDuration={this.onDuration}
-        />
-        <Controls
-          playPrev={this.playPrev}
-          isPlaying={this.state.playing}
-          playPause={this.playPause}
-          playNext={this.playNext}
-          volume={volume}
-          setVolume={this.setVolume}
-          dispatch={this.props.dispatch}
-        />
+
+        <div className='player-contents'>
+          <div className='media-thumb'>
+            <CoverImage
+              cover={currentPlaying.cover}
+              size='thumbnail'
+              albumName={currentPlaying.album ? currentPlaying.album.name : 'N/A'}
+            />
+          </div>
+          <div className='player'>
+            <div className='player-tools'>
+              <div>
+                <Link to={`/song/${currentPlaying.id}`}>
+                  <h5 className='song-title'>
+                    { currentPlaying.title } - { currentPlaying.artist ? currentPlaying.artist.name : '' }
+                  </h5>
+                </Link>
+                <ReactPlayer
+                  ref={this.ref}
+                  className='react-player'
+                  url={streamUri}
+                  pip={pip}
+                  playing={playing}
+                  controls={controls}
+                  light={light}
+                  loop={loop}
+                  playbackRate={playbackRate}
+                  volume={volume}
+                  muted={muted}
+                  onPlay={this.onPlay}
+                  onEnablePIP={this.onEnablePIP}
+                  onDisablePIP={this.onDisablePIP}
+                  onPause={this.onPause}
+                  onEnded={this.onEnded}
+                  onError={e => console.log('onError', e)}
+                  onProgress={this.onProgress}
+                  onDuration={this.onDuration}
+                  width={0}
+                  height={0}
+                />
+                <Controls
+                  playPrev={this.playPrev}
+                  isPlaying={this.state.playing}
+                  playPause={this.playPause}
+                  playNext={this.playNext}
+                  volume={volume}
+                  setVolume={this.setVolume}
+                  dispatch={this.props.dispatch}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
