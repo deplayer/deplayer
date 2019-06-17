@@ -2,7 +2,10 @@ import React from 'react'
 import ReactPlayer from 'react-player'
 import { Dispatch } from 'redux'
 
+import Controls from './Controls'
 import ProgressBar from './ProgressBar'
+
+import * as types from '../../constants/ActionTypes'
 
 type Props = {
   queue: any,
@@ -127,6 +130,20 @@ class PlayerV2 extends React.Component<Props> {
     this.setState({ duration })
   }
 
+  // Play prev song of the player list
+  playPrev = () => {
+    if (this.props.queue.prevSongId) {
+      this.props.dispatch({type: types.PLAY_PREV})
+    }
+  }
+
+  // Play next song of the player list
+  playNext = () => {
+    if (this.props.queue.nextSongId) {
+      this.props.dispatch({type: types.PLAY_NEXT})
+    }
+  }
+
   render () {
     const { playing, controls, duration, light, volume, muted, loop, played, playbackRate, pip } = this.state
 
@@ -176,6 +193,15 @@ class PlayerV2 extends React.Component<Props> {
           onError={e => console.log('onError', e)}
           onProgress={this.onProgress}
           onDuration={this.onDuration}
+        />
+        <Controls
+          playPrev={this.playPrev}
+          isPlaying={this.state.playing}
+          playPause={this.playPause}
+          playNext={this.playNext}
+          volume={volume}
+          setVolume={this.setVolume}
+          dispatch={this.props.dispatch}
         />
       </div>
     )

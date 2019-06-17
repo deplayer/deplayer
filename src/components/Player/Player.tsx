@@ -3,12 +3,9 @@ import { Dispatch } from 'redux'
 import { Link } from 'react-router-dom'
 
 import ProgressBar from './ProgressBar'
-import PlayPauseButton from './PlayPauseButton'
-import ShuffleButton from './ShuffleButton'
 import CoverImage from '../MusicTable/CoverImage'
-import SkipButton from './SkipButton'
-import VolumeControl from './VolumeControl'
 import Spectrum from './../Spectrum'
+import Controls from './Controls'
 import * as types from '../../constants/ActionTypes'
 
 const PLAYER_RETRIES = 5
@@ -163,29 +160,15 @@ class Player extends React.Component<Props, State> {
                   onTimeUpdate={ this.onTimeUpdate }
                   onEnded={this.playNext}
                 />
-                <div className='ui icon buttons player-controls'>
-                  <SkipButton
-                    onClick={this.playPrev}
-                    keyValues={['ArrowLeft', 'k']}
-                    type="prev"
-                  />
-                  <PlayPauseButton
-                    playing={this.isPlaying()}
-                    onClick={this.playPause}
-                  />
-                  <SkipButton
-                    onClick={this.playNext}
-                    keyValues={['ArrowRight', 'j']}
-                    type="next"
-                  />
-                  <VolumeControl
-                    volume={ volume }
-                    onChange={this.setVolume}
-                  />
-                  <ShuffleButton
-                    dispatch={this.props.dispatch}
-                  />
-                </div>
+                <Controls
+                  playPrev={this.playPrev}
+                  isPlaying={this.isPlaying()}
+                  playPause={this.playPause}
+                  playNext={this.playNext}
+                  volume={volume}
+                  setVolume={this.setVolume}
+                  dispatch={this.props.dispatch}
+                />
               </div>
             </div>
           </div>
