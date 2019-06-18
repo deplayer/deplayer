@@ -9,6 +9,7 @@
     "enableReactPlayer": "use react-player (beta)",
     "enableSpectrum": "player spectrum",
     "deleteCollection": "Delete collection",
+    "exportCollection": "Export collection",
     "deleteSettings": "Delete settings",
     "addProviders": "Add providers",
     "providers": "Providers",
