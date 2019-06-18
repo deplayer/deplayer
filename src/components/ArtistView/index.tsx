@@ -95,7 +95,7 @@ export default class ArtistView extends React.Component<Props> {
       >
         <div className='main'>
           <h2>{ artist.name }</h2>
-          <p>{ extractSummary() }</p>
+          <p dangerouslySetInnerHTML={{__html: extractSummary()}} />
           <ul className='unstyled-list'>
             {
               albumsByArtist.map((albumId) => {
