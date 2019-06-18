@@ -1,9 +1,12 @@
 .main {
-  padding: 40px;
   width: 100%;
 
   max-width: $body-max-width;
   margin: 0 auto;
+
+  @include media-breakpoint-up(md) {
+    padding: 40px;
+  }
 
   h2 {
     margin-top: 30px;
@@ -11,8 +14,14 @@
     position: relative;
   }
 
+  h2,
   p {
     position: relative;
+    padding: 20px;
+
+    @include media-breakpoint-up(md) {
+      padding: 0px;
+    }
   }
 
   h3 {

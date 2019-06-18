@@ -4,15 +4,22 @@ import { Dispatch } from 'redux'
 
 import * as types from '../../constants/ActionTypes'
 import SettingsForm from './SettingsForm'
+import Importer from '../Importer'
 
 type Props = {
   dispatch: Dispatch,
   settings: any
 }
 
-type State = {}
+type State = {
+  showImporter: boolean
+}
 
 class Settings extends React.Component<Props, State> {
+  state = {
+    showImporter: false
+  }
+
   deleteCollection = () => {
     this.props.dispatch({type: types.DELETE_COLLECTION})
   }
@@ -22,6 +29,7 @@ class Settings extends React.Component<Props, State> {
   }
 
   importCollection = () => {
+    this.setState({showImporter: true})
     this.props.dispatch({type: types.IMPORT_COLLECTION})
   }
 
@@ -31,6 +39,7 @@ class Settings extends React.Component<Props, State> {
 
   render() {
     const settingsForm = this.props.settings.settingsForm
+    const ImporterComp = this.state.showImporter ? <Importer /> : null
 
     return (
       <div className='settings main'>
@@ -52,6 +61,9 @@ class Settings extends React.Component<Props, State> {
           <button className='with-bg btn btn-danger' onClick={this.deleteSettings}>
             <Translate value="labels.deleteSettings" />
           </button>
+        </div>
+        <div className='btn-group'>
+          { ImporterComp }
         </div>
       </div>
     )

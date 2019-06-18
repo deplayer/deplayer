@@ -10,6 +10,7 @@
     "enableSpectrum": "player spectrum",
     "deleteCollection": "Delete collection",
     "exportCollection": "Export collection",
+    "importCollection": "Import collection",
     "deleteSettings": "Delete settings",
     "addProviders": "Add providers",
     "providers": "Providers",
