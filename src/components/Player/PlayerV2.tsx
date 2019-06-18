@@ -141,7 +141,18 @@ class PlayerV2 extends React.Component<Props> {
   }
 
   render () {
-    const { playing, controls, duration, light, volume, muted, loop, played, playbackRate, pip } = this.state
+    const {
+      playing,
+      controls,
+      duration,
+      light,
+      volume,
+      muted,
+      loop,
+      played,
+      playbackRate,
+      pip
+    } = this.state
 
     const currentPlayingId = this.props.queue.currentPlaying
     const currentPlaying = this.props.collection.rows[currentPlayingId]
@@ -216,7 +227,7 @@ class PlayerV2 extends React.Component<Props> {
                   isPlaying={this.state.playing}
                   playPause={this.playPause}
                   playNext={this.playNext}
-                  volume={volume}
+                  volume={volume * 100}
                   setVolume={this.setVolume}
                   dispatch={this.props.dispatch}
                 />

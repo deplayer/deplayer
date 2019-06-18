@@ -20,7 +20,6 @@ type Props = {
   gap: number,
 }
 
-
 class AudioSpectrum extends React.Component<Props> {
   static defaultProps = {
     width: 300,
