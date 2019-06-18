@@ -13,7 +13,6 @@ const ConnectedPlayer = connect(
     itemCount: state.queue.trackIds ? state.queue.trackIds.length : 0
   })
 )((props: any) => {
-  console.log('props.settings:' ,props.settings)
   if (props.settings.settings.app.reactPlayer.enabled) {
     return (
       <PlayerV2 {...props} />

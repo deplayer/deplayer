@@ -106,7 +106,7 @@ class AudioSpectrum extends React.Component<Props> {
       gradient = this.props.meterColor
     }
 
-    let drawMeter = () => {
+    const drawMeter = () => {
       const array = new Uint8Array(analyser.frequencyBinCount); // item value of array: 0 - 255
       analyser.getByteFrequencyData(array);
       if (this.playStatus === 'PAUSED') {
@@ -164,8 +164,10 @@ class AudioSpectrum extends React.Component<Props> {
   }
 
   prepareElements = () => {
+    // Select audioelement by provided selector
     const selection = document.querySelectorAll(this.props.audioSelector);
     this.audioEle = Array.from(selection)[0]
+
     this.audioCanvas = document.getElementById(this.canvasId)
   }
 
