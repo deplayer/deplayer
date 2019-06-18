@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import Playlist from './Playlist'
+import BodyMessage from '../BodyMessage'
 
 type Props = {
   playlist: any,
@@ -11,6 +12,13 @@ type Props = {
 const Playlists = (props: Props) => {
   const { collection } = props
   const { playlists } = props.playlist
+
+  if (!playlists.length) {
+    return (
+      <BodyMessage message={'Add songs to now playing and save it as playlist'} />
+    )
+  }
+
 
   const playlistsComps = playlists.map((playlist) => {
     return (

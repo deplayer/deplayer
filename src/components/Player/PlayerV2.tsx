@@ -63,14 +63,6 @@ class PlayerV2 extends React.Component<Props> {
     this.setState({ url: null, playing: false })
   }
 
-  toggleControls = () => {
-    const url = this.state.url
-    this.setState({
-      controls: !this.state.controls,
-      url: null
-    }, () => this.load(url))
-  }
-
   toggleLight = () => {
     this.setState({ light: !this.state.light })
   }
@@ -107,9 +99,9 @@ class PlayerV2 extends React.Component<Props> {
   onSeekChange = value => {
     this.setState({ played: value })
   }
-  onSeekMouseUp = e => {
+  onSeekMouseUp = value => {
     this.setState({ seeking: false })
-    this.player.seekTo(parseFloat(e.target.value))
+    this.player.seekTo(parseFloat(value))
   }
   onProgress = state => {
     // We only want to update time slider if we are not currently seeking
@@ -174,7 +166,8 @@ class PlayerV2 extends React.Component<Props> {
           dispatch={this.props.dispatch}
           total={duration}
           current={played * 100}
-          onChange={this.onSeekChange}
+          onChange={this.onSeekMouseDown}
+          onAfterChange={this.onSeekMouseUp}
         />
 
         <div className='player-contents'>

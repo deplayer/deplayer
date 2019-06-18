@@ -8,7 +8,8 @@ import { getDurationStr } from '../../utils/timeFormatter'
 type Props = {
   total: number,
   dispatch: Dispatch,
-  onChange: (value: string) => any,
+  onChange?: (value: string) => any,
+  onAfterChange?: (value: string) => any,
   current: number
 }
 
@@ -27,6 +28,7 @@ const ProgressBar = (props: Props) => {
         count={1}
         value={ props.current }
         onChange={ props.onChange }
+        onAfterChange={ props.onAfterChange }
       />
       <span className='total-time'>
         -{ getDurationStr(props.total * 1000 - props.current * 1000) }
