@@ -17,6 +17,10 @@ class Settings extends React.Component<Props, State> {
     this.props.dispatch({type: types.DELETE_COLLECTION})
   }
 
+  exportCollection = () => {
+    this.props.dispatch({type: types.EXPORT_COLLECTION})
+  }
+
   deleteSettings = () => {
     this.props.dispatch({type: types.DELETE_SETTINGS})
   }
@@ -32,6 +36,9 @@ class Settings extends React.Component<Props, State> {
           dispatch={this.props.dispatch}
         />
         <div className='btn-group'>
+          <button className='with-bg btn btn-info' onClick={this.exportCollection}>
+            <Translate value="labels.exportCollection" />
+          </button>
           <button className='with-bg btn btn-danger' onClick={this.deleteCollection}>
             <Translate value="labels.deleteCollection" />
           </button>

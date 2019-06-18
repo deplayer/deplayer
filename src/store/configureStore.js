@@ -32,6 +32,7 @@ import artistSaga from '../sagas/artist'
 
 // Custom middlewares
 import alerts from './middlewares/alerts'
+import exports from './middlewares/exports'
 
 const mql = window.matchMedia(`(min-width: 800px)`)
 
@@ -47,6 +48,7 @@ export default function configureStore() {
     promise,
     thunk,
     alerts,
+    exports,
     routerMiddleware(history) // for dispatching history actions
   ]
 

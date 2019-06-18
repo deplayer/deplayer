@@ -133,4 +133,10 @@ export default class RxdbAdapter implements IAdapter {
       })
     })
   }
+
+  exportCollection = async (model: string): Promise<any> => {
+    const dbInstance = await db.get()
+
+    return dbInstance[model].dump()
+  }
 }

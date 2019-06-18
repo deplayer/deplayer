@@ -166,8 +166,7 @@ class PlayerV2 extends React.Component<Props> {
           dispatch={this.props.dispatch}
           total={duration}
           current={played * 100}
-          onChange={this.onSeekMouseDown}
-          onAfterChange={this.onSeekMouseUp}
+          onChange={this.onSeekMouseUp}
         />
 
         <div className='player-contents'>

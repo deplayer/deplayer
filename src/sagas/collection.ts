@@ -119,6 +119,17 @@ export function* deleteCollection(): any {
   }
 }
 
+export function* exportCollection(): any {
+  try {
+    const adapter = getAdapter()
+    const collectionService = new CollectionService(new adapter())
+    const exported = yield collectionService.export()
+    yield put({type: types.EXPORT_COLLECTION_FINISHED, exported})
+  } catch (e) {
+    yield put({type: types.EXPORT_COLLECTION_REJECTED, message: e.message})
+  }
+}
+
 // generate fulltext index
 export function* generateIndex(action): any {
   const adapter = getAdapter()
@@ -142,6 +153,7 @@ function* collectionSaga(): any {
   yield takeLatest(types.ADD_TO_COLLECTION, addToCollection)
   yield takeLatest(types.REMOVE_FROM_COLLECTION, removeFromCollection)
   yield takeLatest(types.DELETE_COLLECTION, deleteCollection)
+  yield takeLatest(types.EXPORT_COLLECTION, exportCollection)
 }
 
 export default collectionSaga
