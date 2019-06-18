@@ -173,7 +173,7 @@ class Player extends React.Component<Props, State> {
             </div>
           </div>
         </div>
-        <Spectrum />
+        <Spectrum audioSelector={'#player-audio'} />
       </div>
     )
   }

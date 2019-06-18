@@ -3,7 +3,8 @@ import { connect } from 'react-redux'
 import AudioSpectrum from './AudioSpectrum'
 
 type Props = {
-  appSettings: any
+  appSettings: any,
+  audioSelector: string
 }
 type State = {
   width: number
@@ -41,7 +42,7 @@ class Spectrum  extends React.Component<Props, State> {
     return (
       <AudioSpectrum
         id="audio-canvas"
-        audioId={'player-audio'}
+        audioSelector={this.props.audioSelector}
         capColor={'red'}
         capHeight={2}
         meterWidth={this.state.width / (this.state.width / widthFactor)}

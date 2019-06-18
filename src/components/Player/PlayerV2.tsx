@@ -4,6 +4,7 @@ import { Dispatch } from 'redux'
 import { Link } from 'react-router-dom'
 
 import Controls from './Controls'
+import Spectrum from './../Spectrum'
 import CoverImage from '../MusicTable/CoverImage'
 import ProgressBar from './ProgressBar'
 
@@ -111,7 +112,6 @@ class PlayerV2 extends React.Component<Props> {
     this.player.seekTo(parseFloat(e.target.value))
   }
   onProgress = state => {
-    console.log('onProgress', state)
     // We only want to update time slider if we are not currently seeking
     if (!this.state.seeking) {
       this.setState(state)
@@ -119,12 +119,10 @@ class PlayerV2 extends React.Component<Props> {
   }
 
   onEnded = () => {
-    console.log('onEnded')
     this.setState({ playing: this.state.loop })
   }
 
   onDuration = (duration) => {
-    console.log('onDuration', duration)
     this.setState({ duration })
   }
 
@@ -185,6 +183,12 @@ class PlayerV2 extends React.Component<Props> {
                   </h5>
                 </Link>
                 <ReactPlayer
+                  id='player-audio'
+                  config={{
+                    file: {
+                      forceAudio : true
+                    }
+                  }}
                   ref={this.ref}
                   className='react-player'
                   url={streamUri}
@@ -220,6 +224,7 @@ class PlayerV2 extends React.Component<Props> {
             </div>
           </div>
         </div>
+        <Spectrum audioSelector={'#player-audio audio'} />
       </div>
     )
   }

@@ -11,7 +11,7 @@ type Props = {
   id?: string,
   width?: number,
   height?: number,
-  audioId: string,
+  audioSelector: string,
   capColor?: string,
   capHeight: number,
   meterWidth: number,
@@ -164,7 +164,8 @@ class AudioSpectrum extends React.Component<Props> {
   }
 
   prepareElements = () => {
-    this.audioEle = document.getElementById(this.props.audioId)
+    const selection = document.querySelectorAll(this.props.audioSelector);
+    this.audioEle = Array.from(selection)[0]
     this.audioCanvas = document.getElementById(this.canvasId)
   }
 
