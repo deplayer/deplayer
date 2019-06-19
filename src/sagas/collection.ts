@@ -113,7 +113,8 @@ export function* deleteCollection(): any {
   try {
     const adapter = getAdapter()
     const collectionService = new CollectionService(new adapter())
-    yield collectionService.removeAll
+    yield collectionService.removeAll()
+    yield put({type: types.REMOVE_FROM_COLLECTION_FULFILLED})
   } catch (e) {
     yield put({type: types.REMOVE_FROM_COLLECTION_REJECTED, message: e.message})
   }
@@ -123,11 +124,21 @@ export function* exportCollection(): any {
   try {
     const adapter = getAdapter()
     const collectionService = new CollectionService(new adapter())
-    const exported = yield collectionService.export()
+    const exported = yield collectionService.exportCollection()
     yield put({type: types.EXPORT_COLLECTION_FINISHED, exported})
   } catch (e) {
     yield put({type: types.EXPORT_COLLECTION_REJECTED, message: e.message})
   }
+}
+
+export function* importCollection(action): any {
+  logger.log('settings-saga', 'importingCollection')
+  const adapter = getAdapter()
+  const collectionService = new CollectionService(new adapter())
+  // FIXME: This model name knowledge doesn't belongs here
+  logger.log('settings-saga', 'importing provided data')
+  yield collectionService.importCollection(action.data)
+  yield put({type: types.IMPORT_COLLECTION_FINISHED})
 }
 
 // generate fulltext index
@@ -154,6 +165,7 @@ function* collectionSaga(): any {
   yield takeLatest(types.REMOVE_FROM_COLLECTION, removeFromCollection)
   yield takeLatest(types.DELETE_COLLECTION, deleteCollection)
   yield takeLatest(types.EXPORT_COLLECTION, exportCollection)
+  yield takeLatest(types.IMPORT_COLLECTION, importCollection)
 }
 
 export default collectionSaga

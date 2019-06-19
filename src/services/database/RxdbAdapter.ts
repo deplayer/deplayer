@@ -97,12 +97,9 @@ export default class RxdbAdapter implements IAdapter {
     })
   }
 
-  removeCollection = (model: string): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      return db.get().then((instance) => {
-        return instance[model].remove()
-      })
-    })
+  removeCollection = async (model: string): Promise<any> => {
+    const dbInst  = await db.get()
+    await dbInst[model].remove()
   }
 
   getAll = (model: string, conditions: any = {}): Promise<any> => {
@@ -135,8 +132,19 @@ export default class RxdbAdapter implements IAdapter {
   }
 
   exportCollection = async (model: string): Promise<any> => {
-    const dbInstance = await db.get()
+    return new Promise((resolve, reject) => {
+      return db.get().then((instance) => {
+        resolve(instance[model].dump())
+      })
+    })
+  }
 
-    return dbInstance[model].dump()
+  importCollection = async (model: string, data: any): Promise<any> => {
+    console.log(model)
+    return new Promise((resolve, reject) => {
+      return db.get().then((instance) => {
+        resolve(instance[model].import(data))
+      })
+    })
   }
 }

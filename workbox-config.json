@@ -7,7 +7,7 @@
   ],
   "stripPrefix": "build/",
   "runtimeCaching": [{
-    "urlPattern": "(.*)",
+    "urlPattern": "(.*).png$",
     "handler": "StaleWhileRevalidate"
   }]
 }

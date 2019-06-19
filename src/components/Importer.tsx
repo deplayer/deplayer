@@ -1,6 +1,10 @@
 import * as React from 'react';
 
-export default class Importer extends React.Component {
+type Props = {
+  onLoaded: (data: any) => void
+}
+
+export default class Importer extends React.Component<Props> {
   fileInput = React.createRef<HTMLInputElement>()
 
   state = {
@@ -16,8 +20,8 @@ export default class Importer extends React.Component {
   loaded (evt) {
     // Obtain the read file data
     const fileString = evt.target.result
-    console.log('fileString', fileString)
     this.setState({status: 'File loaded!'})
+    this.props.onLoaded(fileString)
   }
 
   errorHandler (evt) {

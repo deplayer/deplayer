@@ -28,10 +28,16 @@ class Settings extends React.Component<Props, State> {
     this.props.dispatch({type: types.EXPORT_COLLECTION})
   }
 
-  importCollection = () => {
-    this.setState({showImporter: true})
-    this.props.dispatch({type: types.IMPORT_COLLECTION})
+  importCollection = (data) => {
+    try {
+      const collectionImport = JSON.parse(data)
+      this.props.dispatch({type: types.IMPORT_COLLECTION, data: collectionImport})
+    } catch(e) {
+      this.props.dispatch({type: types.IMPORT_COLLECTION_REJECTED, error: e.message})
+    }
   }
+
+  toggleImporter = () => this.setState({showImporter: true})
 
   deleteSettings = () => {
     this.props.dispatch({type: types.DELETE_SETTINGS})
@@ -39,7 +45,7 @@ class Settings extends React.Component<Props, State> {
 
   render() {
     const settingsForm = this.props.settings.settingsForm
-    const ImporterComp = this.state.showImporter ? <Importer /> : null
+    const ImporterComp = this.state.showImporter ? <Importer onLoaded={this.importCollection} /> : null
 
     return (
       <div className='settings main'>
@@ -52,7 +58,7 @@ class Settings extends React.Component<Props, State> {
           <button className='with-bg btn btn-info' onClick={this.exportCollection}>
             <Translate value="labels.exportCollection" />
           </button>
-          <button className='with-bg btn btn-success' onClick={this.importCollection}>
+          <button className='with-bg btn btn-success' onClick={this.toggleImporter}>
             <Translate value="labels.importCollection" />
           </button>
           <button className='with-bg btn btn-danger' onClick={this.deleteCollection}>

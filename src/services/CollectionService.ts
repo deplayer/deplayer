@@ -48,8 +48,12 @@ export default class CollectionService implements IStorageService {
     return this.storageAdapter.removeCollection('media')
   }
 
-  export = () => {
+  exportCollection = (): Promise<any> => {
     return this.storageAdapter.exportCollection('media')
+  }
+
+  importCollection = (data): Promise<any> => {
+    return this.storageAdapter.importCollection('media', data)
   }
 
   get = (id: string): Promise<any> => {
