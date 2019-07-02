@@ -137,8 +137,8 @@ export function* importCollection(action): any {
   const collectionService = new CollectionService(new adapter())
   // FIXME: This model name knowledge doesn't belongs here
   logger.log('settings-saga', 'importing provided data')
-  yield collectionService.importCollection(action.data)
-  yield put({type: types.IMPORT_COLLECTION_FINISHED})
+  const result = yield collectionService.importCollection(action.data)
+  yield put({type: types.IMPORT_COLLECTION_FINISHED, result})
 }
 
 // generate fulltext index

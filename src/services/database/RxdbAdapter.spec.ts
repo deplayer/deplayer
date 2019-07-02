@@ -13,4 +13,18 @@ describe('RxdbAdapter', () => {
     const result = await rxdbAdapter.save('media', '123', song.toDocument())
     expect(result).toBeDefined()
   })
+
+  it('should handle importCollection', async () => {
+    const rxdbAdapter = new RxdbAdapter()
+    await rxdbAdapter.initialize()
+    const data = {
+      name: "media",
+      schemaHash: "c032ef9335fd662e02c739ced84d74ac",
+      docs: []
+    }
+
+    expect.assertions(1)
+    const result = await rxdbAdapter.importCollection('media', data)
+    expect(result).toBeDefined()
+  })
 })

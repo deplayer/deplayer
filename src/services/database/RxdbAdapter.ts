@@ -1,5 +1,6 @@
 import { IAdapter } from './IAdapter'
 import * as db from './RxdbDatabase'
+import { createCollections } from './RxdbDatabase'
 import logger from '../../utils/logger'
 
 export default class RxdbAdapter implements IAdapter {
@@ -140,10 +141,13 @@ export default class RxdbAdapter implements IAdapter {
   }
 
   importCollection = async (model: string, data: any): Promise<any> => {
-    console.log(model)
     return new Promise((resolve, reject) => {
       return db.get().then((instance) => {
-        resolve(instance[model].import(data))
+        createCollections(instance, [model])
+        resolve(instance[model].importDump(data))
+      })
+      .catch((e) => {
+        reject(e)
       })
     })
   }
