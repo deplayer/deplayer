@@ -107,7 +107,7 @@ export const createCollections = async (db: any, filter: Array<string> = []) => 
     }
   ]
 
-  const filteredCollections = !filter.length ? collections :  collections.filter(({name: string}) =>
+  const filteredCollections = !filter.length ? collections :  collections.filter(({name}) =>
     filter.indexOf(name) >= 0
   )
 
