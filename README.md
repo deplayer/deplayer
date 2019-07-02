@@ -12,11 +12,15 @@ Media player thought to run entirelly in the web browser.
 * Spectum audio visual thanks to [react-audio-spectrum](https://github.com/hu-ke/react-audio-spectrum)
 * Import/Export your collection (thanks to [rxdb][rxdb]), allowing to share your collection between machines.
 
-## Music providers
+## Implemented Music providers
 
 * Subsonic API
 * mStream API
 * iTunes API (it has only samples, usefull for testing)
+
+## Implemented artists metadata providers
+
+* last.fm
 
 ## Keyboard hotkeys
 
@@ -42,17 +46,5 @@ yarn test
 ```bash
 yarn start
 ```
-
-## Libraries used
-
-* axios
-* [rxdb][rxdb]
-* react + redux
-* react-router
-* react-redux-i18n
-* redux-saga
-* bootstrap
-* react-simple-share
-* react-key-handler
 
 [rxdb]: https://rxdb.info
