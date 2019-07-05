@@ -30,6 +30,10 @@ export const defaultState = {
       },
       reactPlayer: {
         enabled: false
+      },
+      databaseSync: {
+        enabled: false,
+        remote: ''
       }
     }
   }

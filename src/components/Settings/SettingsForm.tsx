@@ -55,7 +55,6 @@ const SettingsForm = (props: Props) => {
           >
             <h2><Translate value="labels.generalSettings" /></h2>
 
-
             <div className='card app-settings'>
               <div className='card-body'>
                 <FormSchema schema={props.schema} />

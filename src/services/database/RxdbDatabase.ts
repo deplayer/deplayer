@@ -4,7 +4,6 @@ import Media from '../../entities/Media'
 import Artist from '../../entities/Artist'
 import logger from '../../utils/logger'
 
-
 let dbPromise: Promise<any>|null = null
 
 const createDB = (): Promise<any> => {
