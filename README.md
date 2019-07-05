@@ -6,13 +6,14 @@
 
 Media player thought to run entirelly in the web browser.
 
-## Current features
+## Features
 
 * Progressive Web App
 * Fulltext search support thanks to [elasticlunr](https://elasticlunr.com/).
 * Desktop and mobile notifications thanks to [Notification Web API](https://developer.mozilla.org/en-US/docs/Web/API/notification)
 * Spectum audio visual thanks to [react-audio-spectrum](https://github.com/hu-ke/react-audio-spectrum)
 * Import/Export your collection (thanks to [rxdb][rxdb]), allowing to share your collection between machines.
+* Sync with your remote [pouchdb](https://pouchdb.com/) / [couchdb](https://couchdb.apache.org/) your database as a backup and share your collection and session between devices and browsers!
 
 ## Implemented Music providers
 
