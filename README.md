@@ -1,5 +1,7 @@
 # genar-radio
 
+[![pipeline status](https://gitlab.com/gtrias/genar-radio/badges/master/pipeline.svg)](https://gitlab.com/gtrias/genar-radio/commits/master)
+
 * [Online version](http://genar-radio.surge.sh/)
 
 Media player thought to run entirelly in the web browser.

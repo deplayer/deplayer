@@ -51,4 +51,10 @@ export default class DummyAdapter implements IAdapter {
       resolve([])
     })
   }
+
+  getDb() {
+    return new Promise((resolve) => {
+      resolve([])
+    })
+  }
 }

@@ -18,17 +18,18 @@ import translationsObject from '../locales'
 import rootReducer from '../reducers'
 
 // Sagas
-import searchSaga from '../sagas/search'
-import playerSaga from '../sagas/player'
-import settingsSaga from '../sagas/settings'
-import collectionSaga from '../sagas/collection'
-import notificationsSaga from '../sagas/notifications'
-import queueSaga from '../sagas/queue'
-import playlistSaga from '../sagas/playlist'
-import mediaSessionSaga from '../sagas/mediaSession'
-import connectionSaga from '../sagas/connection'
-import titleSaga from '../sagas/title'
 import artistSaga from '../sagas/artist'
+import collectionSaga from '../sagas/collection'
+import connectionSaga from '../sagas/connection'
+import databaseSync from '../sagas/databaseSync'
+import mediaSessionSaga from '../sagas/mediaSession'
+import notificationsSaga from '../sagas/notifications'
+import playerSaga from '../sagas/player'
+import playlistSaga from '../sagas/playlist'
+import queueSaga from '../sagas/queue'
+import searchSaga from '../sagas/search'
+import settingsSaga from '../sagas/settings'
+import titleSaga from '../sagas/title'
 
 // Custom middlewares
 import alerts from './middlewares/alerts'
@@ -73,17 +74,18 @@ export default function configureStore() {
   }
 
   // Running sagas
-  sagaMiddleware.run(playerSaga)
-  sagaMiddleware.run(settingsSaga)
-  sagaMiddleware.run(searchSaga)
-  sagaMiddleware.run(collectionSaga)
-  sagaMiddleware.run(notificationsSaga)
-  sagaMiddleware.run(queueSaga)
-  sagaMiddleware.run(playlistSaga)
-  sagaMiddleware.run(titleSaga)
   sagaMiddleware.run(artistSaga)
-  sagaMiddleware.run(mediaSessionSaga, store)
+  sagaMiddleware.run(collectionSaga)
   sagaMiddleware.run(connectionSaga, store)
+  sagaMiddleware.run(databaseSync)
+  sagaMiddleware.run(mediaSessionSaga, store)
+  sagaMiddleware.run(notificationsSaga)
+  sagaMiddleware.run(playerSaga)
+  sagaMiddleware.run(playlistSaga)
+  sagaMiddleware.run(queueSaga)
+  sagaMiddleware.run(searchSaga)
+  sagaMiddleware.run(settingsSaga)
+  sagaMiddleware.run(titleSaga)
 
   store.dispatch({type: types.INITIALIZE_SETTINGS})
   // Set breakpoint matching for responsive utilities

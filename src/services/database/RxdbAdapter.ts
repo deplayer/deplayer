@@ -151,4 +151,8 @@ export default class RxdbAdapter implements IAdapter {
       })
     })
   }
+
+  getDb = (): Promise<any> => {
+    return db.get()
+  }
 }

@@ -49,6 +49,7 @@
     "playlist-parser": "^0.0.12",
     "postcss-flexbugs-fixes": "3.2.0",
     "postcss-loader": "^3.0.0",
+    "pouchdb-adapter-http": "^7.1.1",
     "pouchdb-adapter-idb": "^7.0.0",
     "pouchdb-adapter-memory": "^7.0.0",
     "promise": "8.0.1",
