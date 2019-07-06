@@ -40,6 +40,7 @@ export default connect(
     songs: getSongsByArtist(ownProps.match, state.collection),
     songsByAlbum: state.collection.songsByAlbum,
     albumsByArtist: getAlbumsByArtist(ownProps.match, state.collection),
+    backgroundImage: state.app.backgroundImage,
     albums: state.collection.albums,
     collection: state.collection,
     queue: state.queue,

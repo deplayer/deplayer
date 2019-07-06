@@ -5,6 +5,7 @@ export default connect(
   (state) => ({
     app: state.app,
     queue: state.queue,
+    backgroundImage: state.app.backgroundImage,
     playlist: state.playlist,
     player: state.player,
     collection: state.collection

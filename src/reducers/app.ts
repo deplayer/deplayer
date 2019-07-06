@@ -1,6 +1,7 @@
 import * as types from '../constants/ActionTypes'
 
 type State = {
+  backgroundImage: string,
   sidebarToggled: Boolean,
   mqlMatch: Boolean,
   loading: Boolean,
@@ -8,6 +9,7 @@ type State = {
 }
 
 export const defaultState = {
+  backgroundImage: '',
   sidebarToggled: false,
   mqlMatch: false,
   loading: true,
@@ -32,6 +34,13 @@ export default (state: State = defaultState, action) => {
       return {
         ...state,
         loading: true
+      }
+    }
+
+    case types.SET_BACKGROUND_IMAGE: {
+      return {
+        ...state,
+        backgroundImage: action.backgroundImage
       }
     }
 

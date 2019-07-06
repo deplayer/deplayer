@@ -7,6 +7,7 @@ export default connect(
     queue: state.queue,
     player: state.player,
     collection: state.collection,
+    backgroundImage: state.app.backgroundImage,
     visibleSongs: state.collection.visibleSongs
   })
 )(Collection)

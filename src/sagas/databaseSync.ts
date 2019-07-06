@@ -14,8 +14,6 @@ function* setupSync() {
   const databaseSyncService = new DatabaseSyncService(new adapter())
   const { settings } = yield select(getSettings)
 
-  console.log(settings)
-
   if (settings.app.databaseSync.enabled) {
     yield put({type: types.SETTING_UP_DATABASE_SYNC_STARTED})
 

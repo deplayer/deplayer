@@ -9,15 +9,25 @@ import CoverImage from '../MusicTable/CoverImage'
 import * as types from '../../constants/ActionTypes'
 
 type Props = {
-  dispatch: Dispatch,
-  collection: any,
-  artistMetadata: any,
+  albums: any,
   albumsByArtist: any,
   artist: Artist,
+  artistMetadata: any,
+  backgroundImage: string,
+  className: string|null,
+  collection: any,
+  dispatch: Dispatch,
   songs: any,
-  songsByAlbum: any,
-  albums: any,
-  className: string|null
+  songsByAlbum: any
+}
+
+const extractBackground = (collection, songsByAlbum, albumsByArtist = []): string => {
+  const albumId = albumsByArtist[0]
+  if (albumId && songsByAlbum[albumId]) {
+    return collection.rows[songsByAlbum[albumId][0]].cover.fullUrl
+  }
+
+    return ''
 }
 
 export default class ArtistView extends React.Component<Props> {
@@ -28,6 +38,17 @@ export default class ArtistView extends React.Component<Props> {
         artist: this.props.artist
       })
     }
+
+    const {
+      albumsByArtist,
+      songsByAlbum,
+      collection
+    } = this.props
+
+    this.props.dispatch({
+      type: types.SET_BACKGROUND_IMAGE,
+      backgroundImage: extractBackground(collection, songsByAlbum, albumsByArtist)
+    })
   }
 
   render() {
@@ -46,7 +67,7 @@ export default class ArtistView extends React.Component<Props> {
       )
     }
 
-    const extractSong = (album) => {
+    const extractSongs = (album) => {
       if (!songsByAlbum[album.id]) {
         return null
       }
@@ -71,15 +92,6 @@ export default class ArtistView extends React.Component<Props> {
       })
     }
 
-    const extractBackground = (): string => {
-      const albumId = albumsByArtist[0]
-      if (songsByAlbum[albumId]) {
-        return this.props.collection.rows[songsByAlbum[albumId][0]].cover.fullUrl
-      }
-
-        return ''
-    }
-
     const extractSummary = (): string => {
       if (this.props.artistMetadata && this.props.artistMetadata.artist) {
         return this.props.artistMetadata.artist.bio.content
@@ -91,7 +103,7 @@ export default class ArtistView extends React.Component<Props> {
     return (
       <div
         className={`artist-view ${this.props.className}`}
-        style={{backgroundImage: `url(${extractBackground()})`}}
+        style={{backgroundImage: `url(${ this.props.backgroundImage })`}}
       >
         <div className='main'>
           <h2>{ artist.name }</h2>
@@ -119,7 +131,7 @@ export default class ArtistView extends React.Component<Props> {
                       </button>
                     </h3>
                     <div className='card-body'>
-                      { extractSong(albums[albumId]) }
+                      { extractSongs(albums[albumId]) }
                     </div>
                   </li>
                 )

@@ -12,7 +12,6 @@ export default class DatabaseSyncService {
     const db = await this.storageAdapter.getDb()
 
     RxDB.plugin(require('pouchdb-adapter-http'))
-    console.log(db)
 
     const collection = db['media']
 
