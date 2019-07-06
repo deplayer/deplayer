@@ -18,6 +18,8 @@ $secondary-color-lighter1: lighten(adjust-hue($secondary-base, 5), 10%);
 $secondary-color-lighter2: lighten(adjust-hue($secondary-base, 10), 20%);
 $secondary-color-darker1: darken(adjust-hue($secondary-base, -5), 10%);
 $secondary-color-darker2: darken(adjust-hue($secondary-base, -10), 20%);
+$secondary-color-darker3: darken(adjust-hue($secondary-base, -10), 30%);
+$secondary-color-darker4: darken(adjust-hue($secondary-base, -10), 40%);
 
 $greyscale-base: #2f5263;
 $greyscale-color: $greyscale-base;
