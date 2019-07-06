@@ -3,13 +3,13 @@ import { Translate } from 'react-redux-i18n'
 import { Redirect } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 
+import Song from '../../entities/Song'
 import logger from '../../utils/logger'
-import CoverImage from '../MusicTable/CoverImage'
 import { getDurationStr } from '../../utils/timeFormatter'
 
 type Props = {
   queue: any,
-  song: any,
+  song: Song,
   className: string|null
 }
 
@@ -29,10 +29,10 @@ const SongView = (props: Props) => {
     <div className={`song-view ${props.className}`}>
       <div className='song'>
         <div className='image'>
-          <CoverImage
-            cover={song.cover}
-            size='full'
-            albumName={song.album ? song.album.name: 'N/A'}
+          <img
+            className='artist-image'
+            alt={song.title}
+            src={song.cover.fullUrl}
           />
         </div>
         <div className='content'>

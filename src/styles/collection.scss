@@ -27,11 +27,11 @@
 
 .table-status {
   position: absolute;
-  bottom: 0;
   width: 100%;
-  background-color: $greyscale-color;
+  background-color: rgba($greyscale-lighter1, 0.7);
   color: $secondary-color-lighter2;
-  padding-right: 5px;
+  text-align: center;
+  padding-right: 40px;
   padding-left: 5px;
   text-align: right;
 }
