@@ -12,6 +12,7 @@ const PLAYER_RETRIES = 5
 
 type Props = {
   queue: any,
+  slim: boolean,
   player: {
     volume: number,
     playing: boolean,
@@ -108,6 +109,7 @@ class Player extends React.Component<Props, State> {
   }
 
   render() {
+    const { slim } = this.props
     const currentPlayingId = this.props.queue.currentPlaying
     const currentPlaying = this.props.collection.rows[currentPlayingId]
 
@@ -126,8 +128,18 @@ class Player extends React.Component<Props, State> {
     const volume = this.state.volume ? this.state.volume : this.props.player.volume
     const duration = this.playerRef.current ? this.playerRef.current.duration : 0
 
+    const cover = !slim &&  (
+      <div className='media-thumb'>
+        <CoverImage
+          cover={currentPlaying.cover}
+          size='thumbnail'
+          albumName={currentPlaying.album ? currentPlaying.album.name : 'N/A'}
+          />
+        </div>
+    )
+
     return (
-      <div className='player-container'>
+      <div className={`player-container ${slim ? 'slim': ''}`}>
         <ProgressBar
           dispatch={this.props.dispatch}
           total={duration}
@@ -135,15 +147,9 @@ class Player extends React.Component<Props, State> {
           onChange={this.setCurrentTime}
         />
         <div className='player-contents'>
-          <div className='media-thumb'>
-            <CoverImage
-              cover={currentPlaying.cover}
-              size='thumbnail'
-              albumName={currentPlaying.album ? currentPlaying.album.name : 'N/A'}
-            />
-          </div>
+         { cover }
           <div className='player'>
-            <div className='player-tools'>
+            <div className={`player-tools ${slim ? 'slim': ''}`}>
               <div>
                 <Link to={`/song/${currentPlaying.id}`}>
                   <h5 className='song-title'>

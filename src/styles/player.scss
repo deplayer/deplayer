@@ -1,3 +1,34 @@
+.player-container.slim {
+  padding: 0;
+}
+
+.player-tools {
+  .rc-slider {
+    height: 19px;
+  }
+
+  &.slim {
+    height: 40px;
+
+
+    & > div {
+      @extend .d-flex;
+
+      & > a {
+        width: 100%;
+      }
+
+      .player-controls {
+        width: 100%;
+
+        button {
+          font-size: 24px;
+        }
+      }
+    }
+  }
+}
+
 .player-container {
   position: relative;
   border-top: solid 2px $primary-color;
@@ -56,6 +87,12 @@
 }
 
 .volume-control {
+
+  @include media-breakpoint-up(md) {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
   width: 20%;
   @extend .form-group;
   align-self: flex-end;

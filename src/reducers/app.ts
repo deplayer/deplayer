@@ -13,6 +13,7 @@ export const defaultState = {
   sidebarToggled: false,
   mqlMatch: false,
   loading: true,
+  slimPlayer: false,
   version: process.env.REACT_APP_VERSION || 'development'
 }
 

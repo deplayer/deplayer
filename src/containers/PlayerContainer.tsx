@@ -7,6 +7,7 @@ import PlayerV2 from '../components/Player/PlayerV2'
 const ConnectedPlayer = connect(
   (state) => ({
     settings: state.settings,
+    slim: state.app.slimPlayer,
     player: state.player,
     queue: state.queue,
     collection: state.collection,
