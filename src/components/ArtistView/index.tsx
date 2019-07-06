@@ -13,7 +13,6 @@ type Props = {
   albumsByArtist: any,
   artist: Artist,
   artistMetadata: any,
-  backgroundImage: string,
   className: string|null,
   collection: any,
   dispatch: Dispatch,
@@ -22,7 +21,7 @@ type Props = {
 }
 
 const extractBackground = (collection, songsByAlbum, albumsByArtist = []): string => {
-  const albumId = albumsByArtist[0]
+  const albumId = albumsByArtist.length && albumsByArtist[0]
   if (albumId && songsByAlbum[albumId]) {
     return collection.rows[songsByAlbum[albumId][0]].cover.fullUrl
   }
@@ -101,10 +100,7 @@ export default class ArtistView extends React.Component<Props> {
     }
 
     return (
-      <div
-        className={`artist-view ${this.props.className}`}
-        style={{backgroundImage: `url(${ this.props.backgroundImage })`}}
-      >
+      <div className={`artist-view ${this.props.className}`}>
         <div className='main'>
           <h2>{ artist.name }</h2>
           <p dangerouslySetInnerHTML={{__html: extractSummary()}} />

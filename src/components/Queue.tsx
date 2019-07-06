@@ -9,7 +9,6 @@ type Props = {
   queue: any,
   player: any,
   collection: any,
-  backgroundImage: string,
   dispatch: Dispatch,
   slim?: boolean,
   className: string|null,
@@ -46,10 +45,7 @@ const Queue = (props: Props) => {
   }
 
   return (
-    <div
-      style={{backgroundImage: `url(${ props.backgroundImage })`}}
-      className={`queue ${props.className || ''}`}
-    >
+    <div className={`queue ${props.className || ''}`}>
       <MusicTable
         tableIds={props.queue.trackIds}
         disableCovers={props.slim}

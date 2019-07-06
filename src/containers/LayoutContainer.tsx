@@ -40,6 +40,7 @@ const dynamicTitle = (router, collection, searchTerm: ''): string => {
 }
 
 type LayoutProps = {
+  backgroundImage: string,
   dispatch: any,
   title: string,
   children: any
@@ -56,7 +57,10 @@ const Layout = (props: LayoutProps) => {
           <Route path="/" component={() => <PlayAllButton dispatch={props.dispatch} /> } />
         </TopbarContainer>
 
-        <div className='contents'>
+        <div
+          style={{backgroundImage: `url(${ props.backgroundImage })`}}
+          className='contents'
+        >
           { props.children }
         </div>
         <Placeholder />
@@ -68,6 +72,7 @@ const Layout = (props: LayoutProps) => {
 export default connect(
   (state) => ({
     title: dynamicTitle(state.router, state.collection, state.search.searchTerm),
+    backgroundImage: state.app.backgroundImage,
     queue: state.queue,
     player: state.player,
     collection: state.collection,
