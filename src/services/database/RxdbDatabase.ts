@@ -58,8 +58,17 @@ export const createCollections = async (db: any, filter: Array<string> = []) => 
         migrationStrategies: {
         },
         properties: {
+          orderedIds: {
+            type: 'array'
+          },
           trackIds: {
             type: 'array'
+          },
+          shuffleEnabled: {
+            type: ['boolean']
+          },
+          repeatEnabled: {
+            type: ['boolean']
           },
           currentPlaying: {
             type: ['string', 'null']
