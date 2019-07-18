@@ -21,6 +21,7 @@ export default class Song extends Media {
   artistName: string
   cover: any
   artist: Artist
+  filePath: string
 
   constructor(songParams: any = {}) {
     super(songParams)
@@ -37,7 +38,8 @@ export default class Song extends Media {
       price,
       currency,
       stream,
-      shareUrl
+      shareUrl,
+      filePath
     } = songParams
 
     this.setArtist(artistName, artistId)
@@ -49,6 +51,7 @@ export default class Song extends Media {
     this.shareUrl = shareUrl
     this.forcedId = forcedId
     this.albumName = albumName
+    this.filePath = filePath
 
     this.album = new Album({
       albumId: albumId,

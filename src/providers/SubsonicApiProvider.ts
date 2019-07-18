@@ -49,6 +49,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
         genre: song.genre,
         duration: song.duration * 1000,
         track: song.track,
+        filePath: song.path,
         stream: [
           {
             service: this.providerKey,
