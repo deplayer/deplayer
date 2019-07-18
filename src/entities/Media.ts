@@ -66,6 +66,9 @@ export default class Media {
       shareUrl: {
         type: 'string'
       },
+      filePath: {
+        type: 'string'
+      },
       album: {
         type: 'object',
         properties: {

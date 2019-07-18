@@ -113,6 +113,8 @@ export default class Song extends Media {
       artist: this.artist,
       cover: this.cover,
       album: this.album,
+      genre: this.genre,
+      filePath: this.filePath,
       duration: this.duration,
     }
   }
