@@ -42,9 +42,10 @@ class Player extends React.Component<Props, State> {
     this.playerRef = React.createRef()
   }
 
-  onError(ev: any) {
+  onError(error: any) {
     this.props.dispatch({
-      type: types.REGISTER_PLAYER_ERROR
+      type: types.REGISTER_PLAYER_ERROR,
+      error: this.playerRef.current.error
     })
 
     this.props.dispatch({
@@ -161,7 +162,7 @@ class Player extends React.Component<Props, State> {
                   ref={this.playerRef}
                   src={streamUri}
                   crossOrigin="anonymous"
-                  onError={this.onError.bind(this)}
+                  onError={(e) => this.onError(e)}
                   autoPlay={ this.props.player.playing }
                   onTimeUpdate={ this.onTimeUpdate }
                   onEnded={this.playNext}
