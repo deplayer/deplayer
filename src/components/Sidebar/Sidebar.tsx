@@ -23,7 +23,12 @@ type State = {
 
 class MSidebar extends React.Component<Props, State> {
   onSetSidebarOpen = (open) => {
-    this.props.dispatch({type: types.TOGGLE_SIDEBAR, value: open})
+    const { sidebarToggled, mqlMatch } = this.props
+    const docked = mqlMatch && sidebarToggled
+
+    if (!docked) {
+      this.props.dispatch({type: types.TOGGLE_SIDEBAR, value: open})
+    }
   }
 
   render() {

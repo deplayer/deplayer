@@ -20,8 +20,8 @@ type ContentProps = {
 
 const SidebarContents = (props: ContentProps) => {
   return (
-    <div>
-      <h4 onClick={() => props.onSetSidebarOpen()}>genar-radio</h4>
+    <div onClick={() => props.onSetSidebarOpen()}>
+      <h4>genar-radio</h4>
       <ul>
         <QueueMenuItem
           current={inSection(props.location, '(queue)?')}
