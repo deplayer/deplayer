@@ -49,6 +49,7 @@ describe('collection reducer', () => {
       songsByAlbum,
       albums,
       rows,
+      loading: false,
       visibleSongs: [fixtureSong.id]
     }
 

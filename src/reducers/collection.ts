@@ -14,6 +14,7 @@ type State = {
   visibleSongs: Array<string>,
   searchResults: Array<string>,
   enabledProviders: Array<string>,
+  loading: boolean,
   totalRows: number
 }
 
@@ -28,6 +29,7 @@ export const defaultState = {
   visibleSongs: [],
   searchResults: [],
   enabledProviders: [],
+  loading: true,
   totalRows: 0
 }
 
@@ -101,7 +103,8 @@ export default (state: State = defaultState, action: any = {}) => {
         albumsByArtist: totalAlbumsByArtist,
         visibleSongs: filterSongs(totalRows),
         searchResults: state.searchTerm !== '' ? filterSongs(totalRows, state.searchTerm) : [],
-        totalRows: state.totalRows + action.data.length
+        totalRows: state.totalRows + action.data.length,
+        loading: false
       }
     }
 

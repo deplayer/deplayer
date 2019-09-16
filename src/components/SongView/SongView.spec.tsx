@@ -31,9 +31,9 @@ const setup = (customProps: any) => {
 }
 
 describe('SongView', () => {
-  it('redirect if no song found', () => {
-    const { enzymeWrapper } = setup({ song: null })
-    expect(enzymeWrapper.find('Redirect').exists()).toBe(true)
+  it('spinner if app loading', () => {
+    const { enzymeWrapper } = setup({ loading: true })
+    expect(enzymeWrapper.find('Spinner').exists()).toBe(true)
   })
 
   it('render song without crash', () => {

@@ -21,6 +21,7 @@ export default connect(
     return {
       collection: state.collection,
       queue: state.queue,
+      loading: state.collection.loading,
       song: state.collection.rows[getSongId(state.router)] || state.collection.rows[state.queue.currentPlaying]
     }
   }

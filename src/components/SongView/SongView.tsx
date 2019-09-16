@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { Translate } from 'react-redux-i18n'
-import { Redirect } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 
+import Spinner from '..//Spinner'
 import Song from '../../entities/Song'
 import logger from '../../utils/logger'
 import { getDurationStr } from '../../utils/timeFormatter'
@@ -10,19 +10,25 @@ import { getDurationStr } from '../../utils/timeFormatter'
 type Props = {
   queue: any,
   song: Song,
+  loading: boolean,
   className: string|null
 }
 
 const SongView = (props: Props) => {
   const { song } = props
 
-  if (!song || !song.id) {
-    logger.log('SongView', 'Song not found redirecting to home ')
+  if (props.loading) {
     return (
-      <div>
-        <Redirect to='/' />
+      <div className={`collection`}>
+        <blockquote className='blockquote'>
+          <Spinner />
+        </blockquote>
       </div>
     )
+  }
+
+  if (!song || !song.id) {
+    logger.log('SongView', 'Song not found redirecting to home ')
   }
 
   return (
