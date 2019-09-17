@@ -54,6 +54,7 @@ class Player extends React.Component<Props, State> {
       level: 'warning'
     })
 
+    // Stop playing when too many errors
     if (this.props.player.errorCount <= PLAYER_RETRIES) {
       this.props.dispatch({
         type: types.PLAY_NEXT
@@ -150,11 +151,14 @@ class Player extends React.Component<Props, State> {
           <div className='player'>
             <div className={`player-tools ${slim ? 'slim': ''}`}>
               <div>
-                <Link to={`/song/${currentPlaying.id}`}>
-                  <h5 className='song-title'>
+                <h5 className='song-title'>
+                  <Link to={`/song/${currentPlaying.id}`}>
                     { currentPlaying.title } - { currentPlaying.artist ? currentPlaying.artist.name : '' }
-                  </h5>
-                </Link>
+                  </Link>
+                  <Link className='song-count' to={'/queue'}>
+                    { this.props.queue.trackIds.indexOf(currentPlaying.id) + 1 } / { this.props.queue.trackIds.length }
+                  </Link>
+                </h5>
                 <audio
                   id='player-audio'
                   ref={this.playerRef}

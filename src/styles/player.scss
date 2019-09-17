@@ -60,6 +60,12 @@
   @include media-breakpoint-up(md) {
     font-size: 20px;
   }
+
+  .song-count {
+    color: darken($primary-color-100, 20%);
+    margin-left: 10px;
+    font-size: 12px;
+  }
 }
 
 .player-controls {
