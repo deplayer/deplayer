@@ -7,17 +7,14 @@ import CoverImage from '../MusicTable/CoverImage'
 import Spectrum from './../Spectrum'
 import Controls from './Controls'
 import * as types from '../../constants/ActionTypes'
+import { State as PlayerState } from '../../reducers/player'
 
 const PLAYER_RETRIES = 5
 
 type Props = {
   queue: any,
   slim: boolean,
-  player: {
-    volume: number,
-    playing: boolean,
-    errorCount: number
-  },
+  player: PlayerState,
   itemCount: number,
   collection: any,
   dispatch: Dispatch,
@@ -42,7 +39,7 @@ class Player extends React.Component<Props, State> {
     this.playerRef = React.createRef()
   }
 
-  onError(error: any) {
+  onError() {
     this.props.dispatch({
       type: types.REGISTER_PLAYER_ERROR,
       error: this.playerRef.current.error
@@ -70,9 +67,11 @@ class Player extends React.Component<Props, State> {
   }
 
   playPause = () => {
-    this.isPlaying() ?
-      this.playerRef.current.pause():
+    if (this.isPlaying()) {
+      this.playerRef.current.pause()
+    } else {
       this.playerRef.current.play()
+    }
   }
 
   isPlaying = () => {
@@ -114,6 +113,10 @@ class Player extends React.Component<Props, State> {
     const currentPlaying = this.props.collection.rows[currentPlayingId]
 
     if (!this.props.itemCount || !currentPlaying) {
+      return null
+    }
+
+    if (!this.props.player.showPlayer) {
       return null
     }
 
@@ -164,7 +167,7 @@ class Player extends React.Component<Props, State> {
                   ref={this.playerRef}
                   src={streamUri}
                   crossOrigin="anonymous"
-                  onError={(e) => this.onError(e)}
+                  onError={() => this.onError()}
                   autoPlay={ this.props.player.playing }
                   onTimeUpdate={ this.onTimeUpdate }
                   onEnded={this.playNext}

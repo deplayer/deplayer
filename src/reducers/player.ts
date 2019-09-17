@@ -1,7 +1,8 @@
 import * as types from '../constants/ActionTypes'
 
-type State = {
+export type State = {
   playing: boolean,
+  showPlayer: boolean,
   currentTime: number,
   errorCount: number,
   volume: number
@@ -9,6 +10,7 @@ type State = {
 
 export const defaultState = {
   playing: false,
+  showPlayer: false,
   currentTime: 0,
   errorCount: 0,
   volume: 100
@@ -17,7 +19,10 @@ export const defaultState = {
 export default (state: State = defaultState, action: any): State => {
   switch (action.type) {
     case types.START_PLAYING:
-      return {...state, playing: true}
+      return {...state, playing: true, showPlayer: true}
+
+    case types.HIDE_PLAYER:
+      return {...state, showPlayer: false}
 
     case types.VOLUME_SET:
       return {...state, volume: action.value}

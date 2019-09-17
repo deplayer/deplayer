@@ -6,6 +6,7 @@ import ShuffleButton from './ShuffleButton'
 import RepeatButton from './RepeatButton'
 import SkipButton from './SkipButton'
 import VolumeControl from './VolumeControl'
+import * as types from '../../constants/ActionTypes'
 
 type ControlProps = {
   playPrev: () => void,
@@ -18,6 +19,14 @@ type ControlProps = {
 }
 
 const Controls = (props: ControlProps) => {
+  const TogglePlayer = () => {
+    return (
+      <button className='xs' onClick={() => props.dispatch({type: types.HIDE_PLAYER})}>
+        <i className='fa fa-eye-slash'></i>
+      </button>
+    )
+  }
+
   return (
     <div className='ui icon buttons player-controls'>
       <SkipButton
@@ -44,6 +53,7 @@ const Controls = (props: ControlProps) => {
       <RepeatButton
         dispatch={props.dispatch}
       />
+      <TogglePlayer />
     </div>
   )
 }

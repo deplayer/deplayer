@@ -13,7 +13,7 @@ describe('collection reducer', () => {
   })
 
   it('should handle START_PLAYING action', () => {
-    const expected = {...defaultState, playing: true}
+    const expected = {...defaultState, playing: true, showPlayer: true}
     expect(reducer(undefined, {type: START_PLAYING}))
       .toEqual(expected)
   })

@@ -1,16 +1,14 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 
+import { State } from '../../reducers/player'
+
 type Props = {
-  queue: any,
-  collection: any
+  player: State,
 }
 
 const Placeholder = (props: Props) => {
-  const currentPlayingId = props.queue.currentPlaying
-  const currentPlaying = props.collection.rows[currentPlayingId]
-
-  if (!currentPlaying) {
+  if (!props.player.showPlayer) {
     return null
   }
 
@@ -22,7 +20,6 @@ const Placeholder = (props: Props) => {
 
 export default connect(
   (state: Props) => ({
-    queue: state.queue,
-    collection: state.collection
+    player: state.player
   })
 )(Placeholder)

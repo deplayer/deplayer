@@ -8,7 +8,9 @@ configureEnzyme()
 
 const setup = (definedProps: any): {props: any, enzymeWrapper: any} => {
   const props = {
-    player: {},
+    player: {
+      showPlayer: false
+    },
     dispatch: jest.fn(),
     queue: {
       trackIds: [],
@@ -37,7 +39,7 @@ const setup = (definedProps: any): {props: any, enzymeWrapper: any} => {
 }
 
 it('renders without crashing', () => {
-  const { enzymeWrapper } = setup({itemCount: 1})
+  const { enzymeWrapper } = setup({itemCount: 1, player: { showPlayer: true }})
   expect(enzymeWrapper.find('.player').exists())
     .toBe(true)
 })
