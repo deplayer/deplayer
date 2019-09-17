@@ -95,6 +95,11 @@ export default (state: State = defaultState, action: any  = {}): State => {
         return setCurrentPlaying(state, {songId: state.nextSongId})
       }
 
+      // Handling repeat
+      if (state.repeat && state.trackIds[0]) {
+        return setCurrentPlaying(state, {songId: state.trackIds[0]})
+      }
+
       return state
 
     case types.PLAY_PREV:

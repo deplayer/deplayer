@@ -84,9 +84,7 @@ class Player extends React.Component<Props, State> {
 
   // Play next song of the player list
   playNext = () => {
-    if (this.props.queue.nextSongId) {
-      this.props.dispatch({type: types.PLAY_NEXT})
-    }
+    this.props.dispatch({type: types.PLAY_NEXT})
   }
 
   // Play prev song of the player list
