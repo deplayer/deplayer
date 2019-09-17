@@ -7,6 +7,7 @@ import {
 type State = {
   trackIds: Array<string>,
   currentPlaying: string|null,
+  repeat: boolean,
   nextSongId: string|null,
   prevSongId: string|null
 }
@@ -14,6 +15,7 @@ type State = {
 export const defaultState = {
   trackIds: [],
   currentPlaying: null,
+  repeat: false,
   nextSongId: null,
   prevSongId: null
 }
@@ -109,6 +111,12 @@ export default (state: State = defaultState, action: any  = {}): State => {
       return {
         ...state,
         trackIds: shuffleArray(state.trackIds)
+      }
+
+    case types.REPEAT:
+      return {
+        ...state,
+        repeat: !state.repeat
       }
 
     default:

@@ -60,6 +60,7 @@ export const PLAY_NEXT = 'PLAY_NEXT'
 export const PLAY_PREV = 'PLAY_PREV'
 export const CLEAR_QUEUE = 'CLEAR_QUEUE'
 export const SHUFFLE = 'SHUFFLE'
+export const REPEAT = 'REPEAT'
 
 // Search
 export const TOGGLE_SEARCH = 'TOGGLE_SEARCH'

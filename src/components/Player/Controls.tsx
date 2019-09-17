@@ -3,6 +3,7 @@ import { Dispatch } from 'redux'
 
 import PlayPauseButton from './PlayPauseButton'
 import ShuffleButton from './ShuffleButton'
+import RepeatButton from './RepeatButton'
 import SkipButton from './SkipButton'
 import VolumeControl from './VolumeControl'
 
@@ -38,6 +39,9 @@ const Controls = (props: ControlProps) => {
         onChange={props.setVolume}
       />
       <ShuffleButton
+        dispatch={props.dispatch}
+      />
+      <RepeatButton
         dispatch={props.dispatch}
       />
     </div>
