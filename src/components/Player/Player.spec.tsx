@@ -11,6 +11,7 @@ const setup = (definedProps: any): {props: any, enzymeWrapper: any} => {
     player: {},
     dispatch: jest.fn(),
     queue: {
+      trackIds: [],
       currentPlaying: 'test'
     },
     itemCount: 0,
