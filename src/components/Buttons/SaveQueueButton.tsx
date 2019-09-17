@@ -30,7 +30,7 @@ const SaveQueueButton = (props: Props) => {
 }
 
 export default connect(
-  (state) => ({
+  (state: { queue: any }) => ({
     queue: state.queue
   })
 )(SaveQueueButton)

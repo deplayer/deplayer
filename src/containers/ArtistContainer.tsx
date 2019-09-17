@@ -1,10 +1,6 @@
 import { connect } from 'react-redux'
-import * as React from 'react'
-import { withRouter } from 'react-router-dom'
 
 import ArtistView from '../components/ArtistView'
-
-const RoutedArtistView = withRouter(props => <ArtistView {...props}/>)
 
 const getArtist = (match, collection) => {
   const artistId = match.params.id
@@ -34,7 +30,7 @@ const getAlbumsByArtist = (match, collection) => {
 }
 
 export default connect(
-  (state, ownProps) => ({
+  (state: any, ownProps: any) => ({
     artistMetadata: state.artist.artistMetadata,
     artist: getArtist(ownProps.match, state.collection),
     songs: getSongsByArtist(ownProps.match, state.collection),
@@ -45,4 +41,4 @@ export default connect(
     collection: state.collection,
     queue: state.queue,
   })
-)(RoutedArtistView)
+)(ArtistView)

@@ -21,7 +21,7 @@ const Placeholder = (props: Props) => {
 }
 
 export default connect(
-  (state) => ({
+  (state: Props) => ({
     queue: state.queue,
     collection: state.collection
   })

@@ -11,7 +11,7 @@ type State = {
 }
 
 class Spectrum  extends React.Component<Props, State> {
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
     this.state = { width: 0 };
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this)
@@ -59,8 +59,12 @@ class Spectrum  extends React.Component<Props, State> {
   }
 }
 
+type ConnectState = {
+  settings: any
+}
+
 export default connect(
-  (state) => ({
-    appSettings: state.settings
+  ({ settings }: ConnectState) => ({
+    appSettings: settings
   })
 )(Spectrum)

@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom'
 
 import SongView from '../components/SongView/SongView'
 
-const RoutedSongView = withRouter(props => <SongView {...props}/>)
+const RoutedSongView = withRouter((props: any) => <SongView {...props}/>)
 
 const getSongId = (router) : string => {
   const songFinder = router.location.pathname.match(/\/song\/(.*)/)
@@ -17,7 +17,7 @@ const getSongId = (router) : string => {
 }
 
 export default connect(
-  (state, ownProps) => {
+  (state: any, ownProps: any) => {
     return {
       collection: state.collection,
       queue: state.queue,

@@ -4,6 +4,8 @@ import { Dispatch } from 'redux'
 import MusicTable from './MusicTable/MusicTable'
 import Spinner from './Spinner'
 import BodyMessage from './BodyMessage'
+import { Link } from 'react-router-dom'
+import { Translate } from 'react-redux-i18n'
 
 type Props = {
   queue: any,
@@ -40,6 +42,15 @@ const Queue = (props: Props) => {
     return (
       <div className={`queue no-results ${props.className || ''}`}>
         <BodyMessage message={'Add songs from the collection or search for new ones'} />
+
+        <Link
+          className='btn'
+          to="/collection"
+          title="collection"
+        >
+          <Translate value="application.title"/>
+          <i className='icon database outline'></i>
+        </Link>
       </div>
     )
   }

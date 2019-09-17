@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import Queue from '../components/Queue'
 
 export default connect(
-  (state) => ({
+  (state: any) => ({
     app: state.app,
     queue: state.queue,
     backgroundImage: state.app.backgroundImage,

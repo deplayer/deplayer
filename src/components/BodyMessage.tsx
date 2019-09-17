@@ -1,6 +1,10 @@
 import * as React from 'react'
 
-const BodyMessage = (props: any) => {
+type Props = {
+  message: string
+}
+
+const BodyMessage = (props: Props) => {
   return (
     <div className={`queue`}>
       <blockquote className='blockquote'>

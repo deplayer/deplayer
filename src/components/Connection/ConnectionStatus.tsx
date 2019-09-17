@@ -26,7 +26,7 @@ const ConnectionStatus = (props: Props) => {
 }
 
 export default connect(
-  (state) => ({
+  (state: Props) => ({
     connection: state.connection
   })
 )(ConnectionStatus)

@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom'
 
 import Sidebar from '../components/Sidebar/Sidebar'
 
-export default withRouter(connect((state, ownProps) => {
+export default withRouter(connect((state: any, ownProps: any) => {
   return {
     mqlMatch: state.app.mqlMatch,
     loading: state.search.loading,

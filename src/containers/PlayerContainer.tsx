@@ -5,7 +5,7 @@ import Player from '../components/Player/Player'
 import PlayerV2 from '../components/Player/PlayerV2'
 
 const ConnectedPlayer = connect(
-  (state) => ({
+  (state: any) => ({
     settings: state.settings,
     slim: state.app.slimPlayer,
     player: state.player,

@@ -28,6 +28,6 @@ const PlayAllButton = (props: Props) => {
   )
 }
 
-const RoutedButton = withRouter(props => <PlayAllButton {...props}/>)
+const RoutedButton = withRouter((props: any) => <PlayAllButton {...props}/>)
 
 export default RoutedButton

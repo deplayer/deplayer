@@ -15,7 +15,9 @@ const Playlists = (props: Props) => {
 
   if (!playlists.length) {
     return (
-      <BodyMessage message={'Add songs to now playing and save it as playlist'} />
+      <React.Fragment>
+        <BodyMessage message={'Add songs to now playing and save it as playlist'} />
+      </React.Fragment>
     )
   }
 

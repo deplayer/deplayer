@@ -1,5 +1,6 @@
 import { connect } from 'react-redux'
 import * as React from 'react'
+import { Dispatch } from 'redux'
 import SidebarContainer from './SidebarContainer'
 import TopbarContainer from './TopbarContainer'
 import SearchButton from '../components/Buttons/SearchButton'
@@ -41,7 +42,7 @@ const dynamicTitle = (router, collection, searchTerm: ''): string => {
 
 type LayoutProps = {
   backgroundImage: string,
-  dispatch: any,
+  dispatch: Dispatch,
   title: string,
   children: any
 }
@@ -52,7 +53,7 @@ const Layout = (props: LayoutProps) => {
       <SidebarContainer>
         <TopbarContainer title={ props.title }>
           <SearchButton />
-          <Route path="/queue" component={() => <ClearQueueButton dispatch={props.dispatch} /> } />
+          <Route path="/queue" component={() => <ClearQueueButton /> } />
           <Route path="/queue" component={() => <SaveQueueButton /> } />
           <Route path="/" component={() => <PlayAllButton dispatch={props.dispatch} /> } />
         </TopbarContainer>
@@ -70,7 +71,7 @@ const Layout = (props: LayoutProps) => {
 }
 
 export default connect(
-  (state) => ({
+  (state: any) => ({
     title: dynamicTitle(state.router, state.collection, state.search.searchTerm),
     backgroundImage: state.app.backgroundImage,
     queue: state.queue,

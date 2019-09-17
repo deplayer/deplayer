@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom'
 
 import Topbar from '../components/Topbar/Topbar'
 
-export default withRouter(connect((state, ownProps) => {
+export default withRouter(connect((state: any, ownProps: any) => {
   const hasResults = state.queue.trackIds && state.queue.trackIds.length ? true : false
   const inHome = ownProps.location.pathname === '/' ? true : false
   return {

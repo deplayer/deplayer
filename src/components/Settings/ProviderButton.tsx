@@ -6,7 +6,6 @@ import * as types from '../../constants/ActionTypes'
 
 type Props = {
   dispatch: Dispatch,
-  history: any,
   providerKey: string
 }
 

@@ -34,6 +34,9 @@
   "notifications": {
     "search": {
       "finished": "Search finished!"
+    },
+    "settings": {
+      "saved": "Settings saved!"
     }
   },
   "buttons": {

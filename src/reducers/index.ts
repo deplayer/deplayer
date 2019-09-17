@@ -12,8 +12,9 @@ import search from './search'
 import settings from './settings'
 import queue from './queue'
 
+type State = any
 
-export default (history) => combineReducers({
+export default (history: any): State => combineReducers({
   app,
   artist,
   player,

@@ -10,13 +10,13 @@
 
 .s-alert-box,
 .s-alert-box * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .s-alert-box {
     position: fixed;
     background: $secondary-color-darker2;
-    padding: 8px 22px;
+    padding: 8px;
     line-height: 22px;
     padding-right: 40px;
     z-index: 9999;
@@ -32,18 +32,18 @@
 }
 
 .s-alert-box a {
-    color: inherit;
-    opacity: 0.7;
-    font-weight: 700;
+  color: inherit;
+  opacity: 0.7;
+  font-weight: 700;
 }
 
 .s-alert-box a:hover,
 .s-alert-box a:focus {
-    opacity: 1;
+  opacity: 1;
 }
 
 .s-alert-box p {
-    margin: 0;
+  margin: 0;
 }
 
 .s-alert-box.s-alert-show,
@@ -96,7 +96,7 @@
 }
 
 /* positions */
-$alert-offset: 30px;
+$alert-offset: 40px;
 
 .s-alert-bottom-left {
     top: auto;
@@ -122,14 +122,21 @@ $alert-offset: 30px;
     bottom: $alert-offset;
     left: auto;
 }
-.s-alert-bottom {
-    width: 100%;
-    max-width: 100%;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    top: auto;
+
+.s-alert-wrapper {
+  margin-bottom: 10px;
 }
+
+.s-alert-bottom {
+  max-width: 40%;
+  width: auto;
+  bottom: 0;
+  border-radius: 4px;
+  padding: 4px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
 .s-alert-top {
     width: 100%;
     max-width: 100%;

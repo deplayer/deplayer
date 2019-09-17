@@ -3,7 +3,7 @@ import { routerMiddleware } from 'connected-react-router'
 import createSagaMiddleware from 'redux-saga'
 import thunk from 'redux-thunk'
 import promise from 'redux-promise'
-import perflogger from 'redux-perf-middleware';
+import perflogger from 'redux-perf-middleware'
 
 import history from './configureHistory'
 
@@ -37,8 +37,10 @@ import exports from './middlewares/exports'
 
 const mql = window.matchMedia(`(min-width: 800px)`)
 
+type StoreState = {}
+
 export default function configureStore() {
-  const testingMiddlewares = []
+  const testingMiddlewares: Array<any> = []
 
   if (process.env.NODE_ENV === 'development') {
     testingMiddlewares.push(perflogger)
@@ -53,21 +55,21 @@ export default function configureStore() {
     routerMiddleware(history) // for dispatching history actions
   ]
 
-  const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+  const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
   // Instantiate sagaMiddleware
   const sagaMiddleware = createSagaMiddleware()
   // Prepare store with all the middlewares
-  const store = createStore(
+	const store = createStore<StoreState, any, any, any>(
     rootReducer(history),
     composeEnhancers(
       applyMiddleware(...middlewares, sagaMiddleware)
     )
-  )
+	)
 
-  if (module.hot) {
+  if ((module as any).hot) {
     // Enable Webpack hot module replacement for reducers
-    module.hot.accept('../reducers', () => {
+    (module as any).hot.accept('../reducers', () => {
       const nextReducer = require('../reducers')
       store.replaceReducer(nextReducer)
     })
