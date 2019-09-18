@@ -137,6 +137,7 @@
     ]
   },
   "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
     "extends": [
       "react-app"
     ],
@@ -144,6 +145,7 @@
       "jest": true
     },
     "plugins": [
+      "@typescript-eslint",
       "flowtype",
       "jest"
     ]
@@ -156,6 +158,8 @@
     "@types/react-router-dom": "^4.3.5",
     "@types/react-s-alert": "^1.3.2",
     "@types/redux-promise": "^0.5.28",
+    "@typescript-eslint/eslint-plugin": "^2.3.0",
+    "@typescript-eslint/parser": "^2.3.0",
     "axios-mock-adapter": "^1.15.0",
     "babel-preset-flow": "^6.23.0",
     "enzyme": "^3.3.0",
