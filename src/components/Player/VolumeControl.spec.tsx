@@ -7,7 +7,7 @@ import VolumeControl from './VolumeControl'
 
 configureEnzyme()
 
-const setup = (customProps) => {
+const setup = (customProps: any) => {
   const defaultProps = {
     keyValues: [],
     onChange: jest.fn()

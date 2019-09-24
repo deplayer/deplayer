@@ -79,7 +79,7 @@ export default class Song extends Media {
     this.externalId = id
   }
 
-  setArtist(artistName, artistId) {
+  setArtist(artistName: string, artistId: string) {
     const artistPayload = {
       name: artistName ? artistName : ''
     }

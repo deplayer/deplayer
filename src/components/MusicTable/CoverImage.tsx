@@ -26,11 +26,10 @@ const Content = (props: any) => {
   )
 }
 
-const Img = (props) => {
+const Img = (props: { src?: string, alt?: string, noImage?: boolean}) => {
   return (
     <LazyImage
       src={props.src}
-      srcAlt={props.alt}
     >
       <Content src={props.src} />
     </LazyImage>

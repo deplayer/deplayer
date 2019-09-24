@@ -1,8 +1,7 @@
-
 // deprecate
-export const populateTracks = (songs): Array<string> => {
-  const tracks = []
-  songs.forEach((song) => {
+export const populateTracks = (songs: Array<any>): Array<string> => {
+  const tracks: Array<string> = []
+  songs.forEach((song: any) => {
     if (song.id) {
       tracks.push(song.id)
     } else {
@@ -14,7 +13,7 @@ export const populateTracks = (songs): Array<string> => {
 }
 
 // Get sibling songs ids to know which is the next and prev song
-export const getSiblingSong = (trackIds: Array<string>, song, next = false) => {
+export const getSiblingSong = (trackIds: Array<string>, song: string, next = false) => {
   const tracksIndex = {}
   const position = trackIds.indexOf(song) ? trackIds.indexOf(song) : 0
   trackIds.forEach((trackId, index) => {
@@ -28,8 +27,8 @@ export const getSiblingSong = (trackIds: Array<string>, song, next = false) => {
   return tracksIndex[position-1]
 }
 
-export const extractField = (song, field) => {
-  return field.split('.').reduce((obj: any, i): any => {
+export const extractField = (song: any, field: any) => {
+  return field.split('.').reduce((obj: any, i: number): any => {
     return obj[i] ? obj[i]: '0'
   }, song)
 }
@@ -52,4 +51,3 @@ export const sortTrackIds = (tracks: any, field: string, direction: string = 'AS
     return 0
   })
 }
-

@@ -9,7 +9,7 @@ import Song from '../entities/Song'
 
 import * as types from '../constants/ActionTypes'
 
-const rowToSong  = (elem): Song => {
+const rowToSong  = (elem: any): Song => {
   const songPayload = {
     ...elem.get(),
     ...{
@@ -95,7 +95,7 @@ export function* addToCollection(action: any): any {
     yield put({type: types.RECEIVE_COLLECTION_REJECTED, error: e.message})
   }
 
-  yield generateIndex(action)
+  yield generateIndex()
 }
 
 // Handling REMOVE_FROM_COLLECTION saga
@@ -142,7 +142,7 @@ export function* importCollection(action): any {
 }
 
 // generate fulltext index
-export function* generateIndex(action): any {
+export function* generateIndex(): any {
   const adapter = getAdapter()
   const collectionService = new CollectionService(new adapter())
   yield collectionService.initialize

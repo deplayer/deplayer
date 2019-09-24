@@ -1,9 +1,12 @@
-import React from 'react'
-import { Menu, Item, MenuProvider } from 'react-contexify'
-import { Translate } from 'react-redux-i18n'
 import 'react-contexify/dist/ReactContexify.min.css'
 
+import { Menu, Item, MenuProvider } from 'react-contexify'
+import { Dispatch } from 'redux'
+import { Translate } from 'react-redux-i18n'
+import React from 'react'
+
 import { ADD_TO_COLLECTION, REMOVE_FROM_COLLECTION } from '../../constants/ActionTypes'
+import Song from '../../entities/Song';
 
 type MenuProps = {
   dispatch: Dispatch,

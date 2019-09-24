@@ -1,6 +1,4 @@
-// @flow
-
-import React from 'react'
+import * as React from 'react'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../../tests/configureEnzyme'
 
@@ -8,7 +6,7 @@ import ContextualMenu from './ContextualMenu'
 
 configureEnzyme()
 
-const setup = (customProps) => {
+const setup = (customProps: any = {}) => {
   const props = {
     song: {},
     disableAddButton: false

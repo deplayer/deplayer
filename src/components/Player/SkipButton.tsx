@@ -1,7 +1,5 @@
-// @flow
-
-import React from 'react'
 import KeyHandler, {KEYPRESS} from 'react-key-handler'
+import * as React from 'react'
 
 type Props = {
   onClick: () => void,

@@ -81,7 +81,7 @@ export default function configureStore() {
   sagaMiddleware.run(connectionSaga, store)
   sagaMiddleware.run(databaseSync)
   sagaMiddleware.run(mediaSessionSaga, store)
-  sagaMiddleware.run(notificationsSaga)
+  sagaMiddleware.run(notificationsSaga, store)
   sagaMiddleware.run(playerSaga)
   sagaMiddleware.run(playlistSaga)
   sagaMiddleware.run(queueSaga)

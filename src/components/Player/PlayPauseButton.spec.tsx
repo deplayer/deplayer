@@ -1,13 +1,11 @@
-// @flow
-
-import React from 'react'
+import * as React from 'react'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../../tests/configureEnzyme'
 import PlayPauseButton from './PlayPauseButton'
 
 configureEnzyme()
 
-const setup = (customProps) => {
+const setup = (customProps: any) => {
   const defaultProps = {
     onClick: () => {}
   }

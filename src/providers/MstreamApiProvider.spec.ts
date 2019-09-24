@@ -1,5 +1,3 @@
-// @flow
-
 import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
 
@@ -14,7 +12,7 @@ const mock = new MockAdapter(axios)
 mock.onPost(/db\/album-songs/).reply(200, exampleSongs)
 
 describe('MstreamApiProvider', () => {
-  const mstreamRepo = new MstreamApiProvider({baseUrl: ''})
+  const mstreamRepo = new MstreamApiProvider({baseUrl: ''}, '')
 
   it('should matchSearch against song', () => {
     expect(mstreamRepo.matchSearch(exampleSongs[1], 'Commando 9MM')).toBe(true)
@@ -22,14 +20,11 @@ describe('MstreamApiProvider', () => {
     expect(mstreamRepo.matchSearch(exampleSongs[0], 'Commando 9MM')).toBe(false)
   })
 
-  it('should handle song search', () => {
-    expect.assertions(3)
-
+  it('should handle song search', async () => {
     expect(mstreamRepo.search('Bad brains')).toBeInstanceOf(Promise)
 
-    return mstreamRepo.search('Commando 9mm').then((results) => {
-      expect(results).toBeInstanceOf(Array)
-      expect(results.length).toBe(1)
-    })
+    const results = await  mstreamRepo.search('Commando 9mm')
+    expect(results).toBeInstanceOf(Array)
+    expect(results.length).toBe(1)
   })
 })

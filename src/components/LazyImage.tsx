@@ -1,6 +1,10 @@
 import * as React from 'react'
 
-class LazyImage extends React.Component {
+type Props = {
+  src?: string
+}
+
+class LazyImage extends React.Component<Props> {
   state = {
     error: null,
     isMounted: false,
@@ -8,16 +12,16 @@ class LazyImage extends React.Component {
   }
 
   // The Image object to check the loading will be stored here
-  image = null
+  image: HTMLImageElement | null = null
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
 
     this.handleLoad = this.handleLoad.bind(this)
     this.handleError = this.handleError.bind(this)
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: Props) {
     if (nextProps.src !== this.props.src) {
       this.destroyLoading()
       this.initializeLoading(nextProps.src)
@@ -36,7 +40,7 @@ class LazyImage extends React.Component {
   }
 
   // Initialize the loading parameters
-  initializeLoading(src) {
+  initializeLoading(src: string | undefined) {
     this.image = new Image()
 
     if (src) {
@@ -52,8 +56,6 @@ class LazyImage extends React.Component {
   // Reset the loading parameters
   destroyLoading() {
    this.image = null
-   this.handleLoad  = null
-   this.handleError = null
   }
 
   handleLoad(e) {
@@ -64,7 +66,7 @@ class LazyImage extends React.Component {
     }
   }
 
-  handleError(e) {
+  handleError() {
     if (this.state.isMounted) {
       this.setState({
         error: `Failed to load ${this.props.src}`,
@@ -74,7 +76,7 @@ class LazyImage extends React.Component {
   }
 
   render() {
-    const childrenWithProps = React.Children.map(this.props.children, child =>
+    const childrenWithProps = React.Children.map(this.props.children, (child: any) =>
       React.cloneElement(child, {
         noImage: this.state.loading || this.state.error
       })
