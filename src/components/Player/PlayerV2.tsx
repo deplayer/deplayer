@@ -188,9 +188,6 @@ class PlayerV2 extends React.Component<Props> {
                 <ReactPlayer
                   id='player-audio'
                   config={{
-                    file: {
-                      forceAudio : true
-                    }
                   }}
                   ref={this.ref}
                   className='react-player'
