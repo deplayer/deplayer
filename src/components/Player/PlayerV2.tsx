@@ -7,16 +7,13 @@ import Controls from './Controls'
 import Spectrum from './../Spectrum'
 import CoverImage from '../MusicTable/CoverImage'
 import ProgressBar from './ProgressBar'
+import { State as PlayerState } from '../../reducers/player'
 
 import * as types from '../../constants/ActionTypes'
 
 type Props = {
   queue: any,
-  player: {
-    volume: number,
-    playing: boolean,
-    errorCount: number
-  },
+  player: PlayerState,
   itemCount: number,
   collection: any,
   dispatch: Dispatch,
@@ -46,7 +43,7 @@ class PlayerV2 extends React.Component<Props> {
     this.player = player
   }
 
-  load = url => {
+  load = (url: string) => {
     this.setState({
       url,
       played: 0,
@@ -69,7 +66,7 @@ class PlayerV2 extends React.Component<Props> {
   toggleLoop = () => {
     this.setState({ loop: !this.state.loop })
   }
-  setVolume = value => {
+  setVolume = (value: number) => {
     this.setState({ volume: value / 100 })
   }
   toggleMuted = () => {
@@ -187,8 +184,7 @@ class PlayerV2 extends React.Component<Props> {
                 </Link>
                 <ReactPlayer
                   id='player-audio'
-                  config={{
-                  }}
+                  config={{ }}
                   ref={this.ref}
                   className='react-player'
                   url={streamUri}

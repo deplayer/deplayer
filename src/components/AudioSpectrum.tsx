@@ -68,8 +68,11 @@ class AudioSpectrum extends React.Component<Props> {
   componentDidMount() {
     this.prepareAPIs()
     this.prepareElements()
-    const analyser = this.setupAudioNode(this.audioEle)
-    this.initAudioEvents(analyser)
+
+    if (this.audioEle) {
+      const analyser = this.setupAudioNode(this.audioEle)
+      this.initAudioEvents(analyser)
+    }
   }
 
   componentWillUnmount() {
