@@ -107,11 +107,7 @@ class PlayerV2 extends React.Component<Props> {
     }
   }
 
-  onEnded = () => {
-    this.setState({ playing: this.state.loop })
-  }
-
-  onDuration = (duration) => {
+  onDuration = (duration: number) => {
     this.setState({ duration })
   }
 
@@ -127,6 +123,10 @@ class PlayerV2 extends React.Component<Props> {
     if (this.props.queue.nextSongId) {
       this.props.dispatch({type: types.PLAY_NEXT})
     }
+  }
+
+  saveTrackPlayed = (songId: string) => {
+    this.props.dispatch({type: types.SONG_PLAYED, songId})
   }
 
   render () {
@@ -200,7 +200,10 @@ class PlayerV2 extends React.Component<Props> {
                   onEnablePIP={this.onEnablePIP}
                   onDisablePIP={this.onDisablePIP}
                   onPause={this.onPause}
-                  onEnded={this.onEnded}
+                  onEnded={() => {
+                    this.saveTrackPlayed(currentPlayingId)
+                    this.playNext()
+                  }}
                   onError={e => console.log('onError', e)}
                   onProgress={this.onProgress}
                   onDuration={this.onDuration}

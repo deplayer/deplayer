@@ -21,6 +21,7 @@ export const SET_CURRENT_TIME = 'SET_CURRENT_TIME'
 export const PLAY_ALL = 'PLAY_ALL'
 export const REGISTER_PLAYER_ERROR = 'REGISTER_PLAYER_ERROR'
 export const HIDE_PLAYER = 'HIDE_PLAYER'
+export const SONG_PLAYED = 'SONG_PLAYED'
 
 // Collection
 export const GET_COLLECTION = 'GET_COLLECTION'

@@ -87,6 +87,10 @@ class Player extends React.Component<Props, State> {
     this.props.dispatch({type: types.PLAY_NEXT})
   }
 
+  saveTrackPlayed = (songId: string) => {
+    this.props.dispatch({type: types.SONG_PLAYED, songId})
+  }
+
   // Play prev song of the player list
   playPrev = () => {
     if (this.props.queue.prevSongId) {
@@ -170,7 +174,10 @@ class Player extends React.Component<Props, State> {
                   onError={() => this.onError()}
                   autoPlay={ this.props.player.playing }
                   onTimeUpdate={ this.onTimeUpdate }
-                  onEnded={this.playNext}
+                  onEnded={() => {
+                    this.saveTrackPlayed(currentPlayingId)
+                    this.playNext()
+                  }}
                 />
                 <Controls
                   playPrev={this.playPrev}
