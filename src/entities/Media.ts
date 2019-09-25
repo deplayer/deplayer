@@ -24,6 +24,7 @@ export default class Media {
   duration: number
   externalId: string
   stream: Array<stream>
+  playCount: number
 
   constructor(mediaParams: any = {}) {
     const {
@@ -31,12 +32,14 @@ export default class Media {
       title,
       thumbnailUrl,
       fullUrl,
+      playCount,
       id
     } = mediaParams
 
     this.title = title
     this.externalId = id
     this.id = new MediaId(this).value
+    this.playCount = playCount
 
     this.author = {
       name: authorName ? authorName : ''
@@ -58,6 +61,9 @@ export default class Media {
         type: 'string'
       },
       duration: {
+        type: 'number'
+      },
+      playCount: {
         type: 'number'
       },
       genre: {

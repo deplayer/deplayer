@@ -114,6 +114,7 @@ export default class Song extends Media {
       cover: this.cover,
       album: this.album,
       genre: this.genre,
+      playCount: this.playCount,
       filePath: this.filePath,
       duration: this.duration,
     }

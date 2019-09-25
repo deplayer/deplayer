@@ -4,7 +4,7 @@ import Song from '../../entities/Song'
 describe('RxdbAdapter', () => {
   it('should handle save a song', async () => {
     const rxdbAdapter = new RxdbAdapter()
-    await rxdbAdapter.initialize()
+    rxdbAdapter.initialize()
 
     expect.assertions(1)
 
@@ -16,14 +16,13 @@ describe('RxdbAdapter', () => {
 
   it('should handle importCollection', async () => {
     const rxdbAdapter = new RxdbAdapter()
-    await rxdbAdapter.initialize()
+    rxdbAdapter.initialize()
     const data = {
       name: "media",
-      schemaHash: "a12564645954362d88bafd117eb7f537",
+      schemaHash: "6558e1d1c742cfa4c6cef2c62df87d94",
       docs: []
     }
 
-    expect.assertions(1)
     const result = await rxdbAdapter.importCollection('media', data)
     expect(result).toBeDefined()
   })
