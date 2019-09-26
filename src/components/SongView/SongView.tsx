@@ -1,15 +1,18 @@
-import * as React from 'react'
-import { Translate } from 'react-redux-i18n'
 import { Link } from 'react-router-dom'
+import { Dispatch } from 'redux'
+import { Translate } from 'react-redux-i18n'
+import * as React from 'react'
 
-import Spinner from '..//Spinner'
-import Song from '../../entities/Song'
-import logger from '../../utils/logger'
+import * as types from '../../constants/ActionTypes'
 import { getDurationStr } from '../../utils/timeFormatter'
+import Song from '../../entities/Song'
+import Spinner from '..//Spinner'
+import logger from '../../utils/logger'
 
 type Props = {
   queue: any,
   song: Song,
+  dispatch: Dispatch,
   loading: boolean,
   className: string|null
 }
@@ -99,6 +102,17 @@ const SongView = (props: Props) => {
                       })
                   }
                 </ul>
+              </div>
+
+              <div className='btn-group'>
+                <button
+                  className='btn btn-info'
+                  onClick={() => {
+                    props.dispatch({type: types.SET_CURRENT_PLAYING, songId: song.id})
+                  }}
+                >
+                  <Translate value="common.play" />
+                </button>
               </div>
             </div>
           </div>
