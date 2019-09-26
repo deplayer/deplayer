@@ -151,7 +151,8 @@ function* trackSongPlayed(action: {type: string, songId: string}): any {
   yield collectionService.initialize
   const songRow = yield call(collectionService.get, action.songId)
   const song = rowToSong(songRow)
-  song.playCount = song.playCount || 0 + 1
+  const prevCount = song.playCount || 0
+  song.playCount = prevCount + 1
   yield call(collectionService.save, action.songId, song.toDocument())
   yield call(initializeCollection)
 }
