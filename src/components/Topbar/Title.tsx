@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-const Title = (props) => {
+const Title = (props: { onClick: () => void, title?: string }) => {
   return (
     <div>
       <h2 onClick={props.onClick}>

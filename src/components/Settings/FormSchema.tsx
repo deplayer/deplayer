@@ -11,7 +11,7 @@ type Props = {
 const FormSchema = (props: Props) => {
   const { fields } = props.schema
 
-  const populatedFields = fields.map((field, index) => {
+  const populatedFields = fields.map((field, index: number) => {
     if (field.type === TYPES.title) {
       return <h3 key={index}><Translate value={field.title} /></h3>
     }

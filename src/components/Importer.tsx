@@ -11,7 +11,7 @@ export default class Importer extends React.Component<Props> {
     status: ''
   }
 
-  constructor (props) {
+  constructor (props: Props) {
     super(props)
     // create a ref to store the textInput DOM element
     this.fileInput = React.createRef()

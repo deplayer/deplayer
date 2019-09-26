@@ -12,7 +12,7 @@ const Playlist = (props: Props) => {
 
   const [showSongs, setShowSongs] = React.useState(false)
 
-  const songs = playlist.trackIds.map((songId) => {
+  const songs = playlist.trackIds.map((songId: string) => {
     const song = collection.rows[songId]
 
     return (

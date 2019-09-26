@@ -1,5 +1,5 @@
 import * as React from 'react'
-import KeyHandler, {KEYPRESS} from 'react-key-handler'
+import KeyHandler, { KEYPRESS } from 'react-key-handler'
 import { I18n } from 'react-redux-i18n'
 import SidebarButton from '../Buttons/SidebarButton'
 import Title from './Title'
@@ -83,7 +83,7 @@ class Topbar extends React.Component<Props, State> {
     this.setState({focus: true})
   }
 
-  renderSearch = (props) => {
+  renderSearch = (props: Props) => {
     if (!props.searchToggled) {
       return null;
     }

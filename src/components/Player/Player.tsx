@@ -1,13 +1,13 @@
-import * as React from 'react'
 import { Dispatch } from 'redux'
 import { Link } from 'react-router-dom'
+import * as React from 'react'
 
-import ProgressBar from './ProgressBar'
-import CoverImage from '../MusicTable/CoverImage'
-import Spectrum from './../Spectrum'
-import Controls from './Controls'
-import * as types from '../../constants/ActionTypes'
 import { State as PlayerState } from '../../reducers/player'
+import Controls from './Controls'
+import CoverImage from '../MusicTable/CoverImage'
+import ProgressBar from './ProgressBar'
+import Spectrum from './../Spectrum'
+import * as types from '../../constants/ActionTypes'
 
 const PLAYER_RETRIES = 5
 

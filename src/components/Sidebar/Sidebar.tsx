@@ -22,7 +22,7 @@ type State = {
 }
 
 class MSidebar extends React.Component<Props, State> {
-  onSetSidebarOpen = (open) => {
+  onSetSidebarOpen = (open: boolean) => {
     const { sidebarToggled, mqlMatch } = this.props
     const docked = mqlMatch && sidebarToggled
 
