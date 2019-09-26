@@ -1,3 +1,5 @@
+import { RxDocument } from 'rxdb'
+
 import { IStorageService } from './IStorageService'
 import { IAdapter } from './database/IAdapter'
 import MediaMergerService from './MediaMergerService'
@@ -52,7 +54,7 @@ export default class CollectionService implements IStorageService {
     return this.storageAdapter.exportCollection('media')
   }
 
-  importCollection = (data): Promise<any> => {
+  importCollection = (data: any): Promise<any> => {
     return this.storageAdapter.importCollection('media', data)
   }
 
@@ -60,7 +62,7 @@ export default class CollectionService implements IStorageService {
     return this.storageAdapter.get('media', id)
   }
 
-  getAll = (excludeProviders: any = {}): Promise<any> => {
+  getAll = (): Promise<Array<RxDocument<any, any>>> => {
     return this.storageAdapter.getAll('media', {})
   }
 }

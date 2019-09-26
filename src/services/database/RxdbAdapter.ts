@@ -1,3 +1,5 @@
+import { RxDocument } from 'rxdb'
+
 import { IAdapter } from './IAdapter'
 import * as db from './RxdbDatabase'
 import { createCollections } from './RxdbDatabase'
@@ -102,7 +104,7 @@ export default class RxdbAdapter implements IAdapter {
     await dbInst[model].remove()
   }
 
-  getAll = (model: string, conditions: any = {}): Promise<any> => {
+  getAll = (model: string, conditions: any = {}): Promise<RxDocument<any, any>> => {
     return new Promise((resolve, reject) => {
       return db.get().then((instance) => {
 
@@ -115,7 +117,7 @@ export default class RxdbAdapter implements IAdapter {
 
           resolve(null)
         })
-          .catch((err) => {
+          .catch((err: Error) => {
             logger.warn('RxdbDatabase', err)
             reject(err)
           })
@@ -124,31 +126,19 @@ export default class RxdbAdapter implements IAdapter {
   }
 
   getQueryObj = (model: string): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      return db.get().then((instance) => {
-        resolve(instance[model].find())
-      })
-    })
+    const instance = db.get()
+    return instance[model].find()
   }
 
   exportCollection = async (model: string): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      return db.get().then((instance) => {
-        resolve(instance[model].dump())
-      })
-    })
+    const instance = await db.get()
+    return instance[model].dump()
   }
 
   importCollection = async (model: string, data: any): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      return db.get().then((instance) => {
-        createCollections(instance, [model])
-        resolve(instance[model].importDump(data))
-      })
-      .catch((e) => {
-        reject(e)
-      })
-    })
+    const instance = await db.get()
+    await createCollections(instance, [model])
+    return instance[model].importDump(data)
   }
 
   getDb = (): Promise<any> => {

@@ -1,4 +1,5 @@
 import { takeLatest, put, call, select } from 'redux-saga/effects'
+import RxDB, { RxDocument } from 'rxdb'
 
 import CollectionService from '../services/CollectionService'
 import SearchIndexService from '../services/SearchIndexService'
@@ -9,9 +10,12 @@ import Song from '../entities/Song'
 
 import * as types from '../constants/ActionTypes'
 
-const rowToSong  = (elem: any): Song => {
+const adapter = getAdapter()
+const collectionService = new CollectionService(new adapter())
+
+const rowToSong  = (elem: RxDocument<any, any>): Song => {
   const songPayload = {
-    ...elem.get(),
+    ...elem,
     ...{
       albumName: elem.album.name,
       artistName: elem.artist.name,
@@ -36,21 +40,19 @@ const rowToSong  = (elem: any): Song => {
   return new Song(songPayload)
 }
 
-const mapToMedia = (collection: Array<Song>) => {
+const mapToMedia = (collection: Array<RxDocument<any, any>>) => {
   if (!collection.length) {
     return []
   }
 
   return collection.map((elem) => {
-    return rowToSong(elem)
+    return rowToSong(elem.get())
   })
 }
 
 // Application initialization routines
 function* initializeCollection() {
   try {
-    const adapter = getAdapter()
-    const collectionService = new CollectionService(new adapter())
     yield collectionService.initialize
     const collection = yield call(collectionService.getAll)
     const mappedData = mapToMedia(collection)
@@ -82,9 +84,7 @@ const getCollection = (state: any): any => {
 
 // Handling ADD_TO_COLLECTION saga
 export function* addToCollection(action: any): any {
-  const adapter = getAdapter()
   const prevCollection = yield select(getCollection)
-  const collectionService = new CollectionService(new adapter())
   const collection = yield collectionService.bulkSave(action.data, prevCollection)
   const mappedData = mapToMedia(collection)
   try {
@@ -101,8 +101,6 @@ export function* addToCollection(action: any): any {
 // Handling REMOVE_FROM_COLLECTION saga
 export function* removeFromCollection(action: any): any {
   try {
-    const adapter = getAdapter()
-    const collectionService = new CollectionService(new adapter())
     yield collectionService.bulkRemove(action.data)
   } catch (e) {
     yield put({type: types.REMOVE_FROM_COLLECTION_REJECTED, message: e.message})
@@ -111,8 +109,6 @@ export function* removeFromCollection(action: any): any {
 
 export function* deleteCollection(): any {
   try {
-    const adapter = getAdapter()
-    const collectionService = new CollectionService(new adapter())
     yield collectionService.removeAll()
     yield put({type: types.REMOVE_FROM_COLLECTION_FULFILLED})
   } catch (e) {
@@ -122,8 +118,6 @@ export function* deleteCollection(): any {
 
 export function* exportCollection(): any {
   try {
-    const adapter = getAdapter()
-    const collectionService = new CollectionService(new adapter())
     const exported = yield collectionService.exportCollection()
     yield put({type: types.EXPORT_COLLECTION_FINISHED, exported})
   } catch (e) {
@@ -131,10 +125,8 @@ export function* exportCollection(): any {
   }
 }
 
-export function* importCollection(action): any {
+export function* importCollection(action: {type: string, data: any}): any {
   logger.log('settings-saga', 'importingCollection')
-  const adapter = getAdapter()
-  const collectionService = new CollectionService(new adapter())
   // FIXME: This model name knowledge doesn't belongs here
   logger.log('settings-saga', 'importing provided data')
   const result = yield collectionService.importCollection(action.data)
@@ -143,8 +135,6 @@ export function* importCollection(action): any {
 
 // generate fulltext index
 export function* generateIndex(): any {
-  const adapter = getAdapter()
-  const collectionService = new CollectionService(new adapter())
   yield collectionService.initialize
   const collection = yield call(collectionService.getAll)
   const mappedData = mapToMedia(collection)
@@ -157,6 +147,15 @@ export function* generateIndex(): any {
   }
 }
 
+function* trackSongPlayed(action: {type: string, songId: string}): any {
+  yield collectionService.initialize
+  const songRow = yield call(collectionService.get, action.songId)
+  const song = rowToSong(songRow)
+  song.playCount = song.playCount || 0 + 1
+  yield call(collectionService.save, action.songId, song.toDocument())
+  yield call(initializeCollection)
+}
+
 // Binding actions to sagas
 function* collectionSaga(): any {
   yield takeLatest(types.RECEIVE_SETTINGS_FINISHED, initializeCollection)
@@ -166,6 +165,7 @@ function* collectionSaga(): any {
   yield takeLatest(types.DELETE_COLLECTION, deleteCollection)
   yield takeLatest(types.EXPORT_COLLECTION, exportCollection)
   yield takeLatest(types.IMPORT_COLLECTION, importCollection)
+  yield takeLatest(types.SONG_PLAYED, trackSongPlayed)
 }
 
 export default collectionSaga

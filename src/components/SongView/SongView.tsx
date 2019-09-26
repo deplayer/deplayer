@@ -82,6 +82,14 @@ const SongView = (props: Props) => {
               </div>
               <div>
                 <div className='collapsed'>
+                  <span className='label'><Translate value='song.label.playCount' /></span>
+                </div>
+                <div>
+                  { song.playCount || 0 }
+                </div>
+              </div>
+              <div>
+                <div className='collapsed'>
                   <span className='label'><Translate value='song.label.providers' /></span>
                 </div>
                 <ul>
