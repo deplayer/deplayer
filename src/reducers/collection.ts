@@ -103,7 +103,7 @@ export default (state: State = defaultState, action: any = {}) => {
         albumsByArtist: totalAlbumsByArtist,
         visibleSongs: filterSongs(totalRows),
         searchResults: state.searchTerm !== '' ? filterSongs(totalRows, state.searchTerm) : [],
-        totalRows: state.totalRows + action.data.length,
+        totalRows: Object.keys(totalRows).length,
         loading: false
       }
     }
