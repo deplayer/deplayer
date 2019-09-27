@@ -28,7 +28,11 @@ class Settings extends React.Component<Props, State> {
     this.props.dispatch({type: types.EXPORT_COLLECTION})
   }
 
-  importCollection = (data) => {
+  scanSources = () => {
+    this.props.dispatch({type: types.START_SCAN_SOURCES})
+  }
+
+  importCollection = (data: any) => {
     try {
       const collectionImport = JSON.parse(data)
       this.props.dispatch({type: types.IMPORT_COLLECTION, data: collectionImport})
@@ -54,6 +58,11 @@ class Settings extends React.Component<Props, State> {
           settings={this.props.settings}
           dispatch={this.props.dispatch}
         />
+        <div className='btn-group'>
+          <button className='with-bg btn btn-info' onClick={this.scanSources}>
+            <Translate value="labels.scanSources" />
+          </button>
+        </div>
         <div className='btn-group'>
           <button className='with-bg btn btn-info' onClick={this.exportCollection}>
             <Translate value="labels.exportCollection" />
