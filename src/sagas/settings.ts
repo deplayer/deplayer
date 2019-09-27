@@ -46,7 +46,6 @@ export function* deleteSettings(): any {
   }
 }
 
-
 // Binding actions to sagas
 function* settingsSaga(): any {
   yield takeLatest(types.INITIALIZE_SETTINGS, initialize)

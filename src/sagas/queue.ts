@@ -7,7 +7,7 @@ import logger from '../utils/logger'
 import * as types from '../constants/ActionTypes'
 
 // Extract songs from collection state
-export const getSongs = (state: any, action): Array<string> => {
+export const getSongs = (state: any, action: { path: string }): Array<string> => {
   if (action.path === 'search-results') {
     return state ? state.collection.searchResults : []
   }

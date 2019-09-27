@@ -30,6 +30,7 @@ import queueSaga from '../sagas/queue'
 import searchSaga from '../sagas/search'
 import settingsSaga from '../sagas/settings'
 import titleSaga from '../sagas/title'
+import providersSaga from '../sagas/providers'
 
 // Custom middlewares
 import alerts from './middlewares/alerts'
@@ -88,6 +89,7 @@ export default function configureStore() {
   sagaMiddleware.run(searchSaga)
   sagaMiddleware.run(settingsSaga)
   sagaMiddleware.run(titleSaga)
+  sagaMiddleware.run(providersSaga)
 
   store.dispatch({type: types.INITIALIZE_SETTINGS})
   // Set breakpoint matching for responsive utilities
