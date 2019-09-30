@@ -1,13 +1,24 @@
-import { takeLatest } from 'redux-saga/effects'
+import { all, put, takeLatest, select } from 'redux-saga/effects'
 import ipfsClient from 'ipfs-http-client'
-import logger from '../utils/logger'
 
 import  * as types from '../constants/ActionTypes'
 
+const getIpfsSettings = (state: any): any => {
+  return state ? state.settings : {}
+}
+
 export function* startProvidersScan(): any {
-  const ipfs = ipfsClient('localhost', '5001', { protocol: 'http' })
-  const files = yield ipfs.ls('QmacAfVrN2g5ArUmneqbQLkzTfdhNCLP1iraDaQJd6dULk')
-  logger.log(files)
+  const settings = yield select(getIpfsSettings)
+  const ipfsSettings = settings.settings.providers['ipfs1']
+  const ipfs = ipfsClient({
+    host: ipfsSettings.host,
+    port: ipfsSettings.port,
+    protocol: 'http'
+  })
+  const files = yield ipfs.ls(ipfsSettings.hash)
+  yield all(files.map((file: any) => {
+    return put({ type: types.LOAD_IPFS_FILE, file: file.path })
+  }))
 }
 
 // Binding actions to sagas
