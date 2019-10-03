@@ -18,19 +18,20 @@ const getIpfsSettings = (state: any): any => {
 // FIXME: This method should run in serial
 export function* startFolderScan(hash: string): any {
   const settings = yield select(getIpfsSettings)
-  const files = yield call(scanFolder, hash, settings)
 
-  if (!files) {
-    yield put({ type: 'NO FILES RETRIEVED' })
-  }
+  try {
+    const files = yield call(scanFolder, hash, settings)
 
-  for (let file of files) {
-    if (file.type === 'dir') {
-      // Recursive execution
-      yield put({ type: types.IPFS_FOLDER_FOUND, folder: file })
-    } else {
-      yield put({ type: types.IPFS_FILE_FOUND, file })
+    for (let file of files) {
+      if (file.type === 'dir') {
+        // Recursive execution
+        yield put({ type: types.IPFS_FOLDER_FOUND, folder: file })
+      } else {
+        yield put({ type: types.IPFS_FILE_FOUND, file })
+      }
     }
+  } catch(e) {
+    yield put({ type: types.IPFS_FOLDER_SCAN_FAILED, e })
   }
 }
 
