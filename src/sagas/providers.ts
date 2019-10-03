@@ -1,10 +1,11 @@
 import {
+  actionChannel,
   all,
+  call,
   put,
   fork,
   take,
   takeLatest,
-  takeEvery,
   select
 } from 'redux-saga/effects'
 import ipfsClient, { isIPFS } from 'ipfs-http-client'
@@ -17,8 +18,8 @@ const getIpfsSettings = (state: any): any => {
   return state ? state.settings : {}
 }
 
-export function* scanFolder(hash: string) {
-  const settings = yield select(getIpfsSettings)
+export const scanFolder = async (hash: string, settings: any) => {
+  console.log('scanning folder')
   const ipfsSettings = settings.settings.providers['ipfs1']
   const ipfs = ipfsClient({
     host: ipfsSettings.host,
@@ -26,60 +27,46 @@ export function* scanFolder(hash: string) {
     protocol: 'http'
   })
 
-  if (!isIPFS.cidPath(hash)) {
-    yield put({ type: types.IPFS_NON_SUPPORTED_ITEM, file: hash })
-  }
-
-  try {
-    const files = yield ipfs.ls(hash)
-    yield put({ type: types.IPFS_FOLDER_SCANNED, files })
-  } catch (e) {
-    yield put({ type: types.IPFS_FOLDER_SCAN_FAILED, error: e })
-  }
+  const files = await ipfs.ls(hash)
+  return files
 }
 
-export function* startFolderScan(action: any): any {
-  yield fork(scanFolder, action.file.hash)
-  const { files } = yield take([types.IPFS_FOLDER_SCANNED])
+// FIXME: This method should run in serial
+export function* startFolderScan(hash: string): any {
+  const settings = yield select(getIpfsSettings)
+  const files = yield call(scanFolder, hash, settings)
 
-  yield all(files.map((file: any) => {
+  if (!files) {
+    yield put({ type: 'NO FILES RETRIEVED' })
+  }
+
+  for (let file of files) {
     if (file.type === 'dir') {
-      return put({ type: types.START_IPFS_FOLDER_SCAN, file })
+      // Recursive execution
+      yield put({ type: types.IPFS_FOLDER_FOUND, folder: file })
+    } else {
+      yield put({ type: types.IPFS_FILE_FOUND, file })
     }
-
-    console.log(file.name)
-
-    if (mediaExp.test(file.name)) {
-      return put({ type: types.LOAD_IPFS_FILE, file })
-    }
-
-    return put({ type: types.IPFS_NON_SUPPORTED_ITEM, file: file.path })
-  }))
+  }
 }
 
+// Watcher
 export function* startProvidersScan(): any {
   const settings = yield select(getIpfsSettings)
   const ipfsSettings = settings.settings.providers['ipfs1']
 
-  yield fork(scanFolder, ipfsSettings.hash)
-  const { files } = yield take([types.IPFS_FOLDER_SCANNED])
-
-  yield all(files.map((file: any) => {
-    if (file.type === 'dir') {
-      return put({ type: types.START_IPFS_FOLDER_SCAN, file })
-    }
-
-    console.log(file.name)
-
-    if (mediaExp.test(file.name)) {
-      return put({ type: types.LOAD_IPFS_FILE, file })
-    }
-
-    return put({ type: types.IPFS_NON_SUPPORTED_ITEM, file: file.path })
-  }))
+  yield fork(handleIPFSFolderScan)
+  yield put({type: types.START_IPFS_FOLDER_SCAN, hash: ipfsSettings.hash })
 }
 
-function* loadIPFSFile(action: any): any {
+// FIXME: This method should run in serial
+function* loadIPFSFile(file: any): any {
+  console.log(file.path)
+  if (!mediaExp.test(file.path)) {
+    return yield put({ type: types.IPFS_NON_SUPPORTED_ITEM, file: file.path })
+  }
+
+    // return put({ type: types.IPFS_NON_SUPPORTED_ITEM, file: file.path })
   const settings = yield select(getIpfsSettings)
   const ipfsSettings = settings.settings.providers['ipfs1']
 
@@ -88,26 +75,43 @@ function* loadIPFSFile(action: any): any {
     port: ipfsSettings.port,
     protocol: 'http'
   })
-  const file = yield ipfs.get(action.file.path)
-  const contents = yield file.content.toString('utf8')
+  const fileContent = yield ipfs.get(file.path)
+  const contents = yield fileContent.content.toString('utf8')
+}
 
-  const jsmediatags = (window as any).jsmediatags
-  new jsmediatags.Reader(contents)
-  .read({
-    onSuccess: function(tag) {
-      console.log(tag);
-    },
-    onError: function(error) {
-      console.log(':(', error.type, error.info);
-    }
-  })
+// IPFS file scan Queue
+// Watcher
+function* handleIPFSFileLoad(): any {
+  console.log('starting handleIPFSFileLoad')
+  const handleChannel = yield actionChannel(types.LOAD_IPFS_FILE)
+
+  while (true) {
+    // 2- take from the channel
+    const { file } = yield take(handleChannel)
+    // 3- Note that we're using a blocking call
+    yield call(loadIPFSFile, file)
+  }
+}
+
+// IPFS Folder scan Queue
+// Watcher
+function* handleIPFSFolderScan(): any {
+  const handleChannel = yield actionChannel(types.START_IPFS_FOLDER_SCAN)
+
+  while (true) {
+    // 2- take from the channel
+    const { hash } = yield take(handleChannel)
+    // 3- Note that we're using a blocking call
+    const file = yield fork(startFolderScan, hash)
+    const action = yield take([types.IPFS_FOLDER_FOUND])
+
+    console.log(action)
+  }
 }
 
 // Binding actions to sagas
 function* providersSaga(): any {
-  yield takeEvery(types.START_IPFS_FOLDER_SCAN, startFolderScan)
   yield takeLatest(types.START_SCAN_SOURCES, startProvidersScan)
-  yield takeLatest(types.LOAD_IPFS_FILE, loadIPFSFile)
 }
 
 export default providersSaga
