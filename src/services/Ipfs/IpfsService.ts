@@ -1,5 +1,4 @@
 import ipfsClient from 'ipfs-http-client'
-import * as musicMetadata from 'music-metadata-browser';
 
 export const scanFolder = async (hash: string, settings: any): Promise<any> => {
   const ipfsSettings = settings.settings.providers['ipfs1']
@@ -34,9 +33,3 @@ export const loadIPFSFile = async(file: any, settings: any): Promise<any> => {
   return contents
 }
 
-export const getFileMetadata = async (file: any, settings) => {
-  const ipfsSettings = settings.settings.providers['ipfs1']
-
-  const metadata = await musicMetadata.fetchFromUrl(`http://${ipfsSettings.host}:8080/ipfs/${file.path}`)
-  return metadata
-}

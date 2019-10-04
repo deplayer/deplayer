@@ -8,7 +8,10 @@ import {
   select
 } from 'redux-saga/effects'
 
-import { loadIPFSFile, scanFolder, getFileMetadata } from '../services/Ipfs/IpfsService'
+import { getAdapter } from '../services/database';
+import { getFileMetadata, metadataToSong } from '../services/ID3Tag/ID3TagService'
+import { scanFolder } from '../services/Ipfs/IpfsService'
+import CollectionService from '../services/CollectionService';
 import  * as types from '../constants/ActionTypes'
 
 const getIpfsSettings = (state: any): any => {
@@ -52,8 +55,17 @@ function* handleIPFSFileLoad(): any {
       const settings = yield select(getIpfsSettings)
       // const contents = yield call(loadIPFSFile, file, settings)
       // console.log('contents: ', contents)
+      console.log('requesting song metadata')
       const metadata = yield call(getFileMetadata, file, settings)
-      console.log('metadata: ', metadata)
+      const song = yield call(metadataToSong, metadata, file)
+
+      const adapter = getAdapter()
+      const collectionService = new CollectionService(new adapter())
+
+      // Save song
+      console.log('saving song: ', song)
+      yield call(collectionService.save, song.id, song.toDocument())
+      console.log('song: ', song)
     } catch(e) {
       yield put({ type: types.IPFS_NON_SUPPORTED_ITEM, e })
     }
