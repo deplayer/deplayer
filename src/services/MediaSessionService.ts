@@ -1,3 +1,4 @@
+import Song from '../entities/Song'
 import * as actions from '../constants/ActionTypes'
 import logger from '../utils/logger'
 
@@ -6,7 +7,7 @@ declare var navigator: any
 declare var window: any
 
 export default class MediaSessionService {
-  updateMetadata = (media, dispatch) => {
+  updateMetadata = (media: Song, dispatch: any) => {
     if (this.getMediaSession()) {
       navigator.mediaSession.metadata = new window.MediaMetadata({
         title: media.title,

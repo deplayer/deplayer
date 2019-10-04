@@ -53,10 +53,9 @@ function* handleIPFSFileLoad(): any {
     // 3- Note that we're using a blocking call
     try {
       const settings = yield select(getIpfsSettings)
-      // const contents = yield call(loadIPFSFile, file, settings)
-      // console.log('contents: ', contents)
-      console.log('requesting song metadata')
       const metadata = yield call(getFileMetadata, file, settings)
+      console.log('song metadata: ', metadata)
+
       const song = yield call(metadataToSong, metadata, file)
 
       const adapter = getAdapter()
@@ -65,7 +64,8 @@ function* handleIPFSFileLoad(): any {
       // Save song
       console.log('saving song: ', song)
       yield call(collectionService.save, song.id, song.toDocument())
-      console.log('song: ', song)
+
+      yield put({ type: types.IPFS_SONG_SAVED, song })
     } catch(e) {
       yield put({ type: types.IPFS_NON_SUPPORTED_ITEM, e })
     }

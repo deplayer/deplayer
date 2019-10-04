@@ -20,7 +20,7 @@ function* rootSaga(store: any) {
     collectionSaga(),
     connectionSaga(store),
     databaseSyncSaga(),
-    mediaSessionSaga(store),
+    // mediaSessionSaga(store),
     notificationsSaga(store),
     playerSaga(),
     playlistSaga(),

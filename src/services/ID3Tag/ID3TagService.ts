@@ -16,19 +16,22 @@ export const metadataToSong = (
   const song = new Song({
     title: metadata.common.title,
     artistName:  metadata.common.artist,
-    genre: metadata.common.genre,
+    // FIXME: genre is an array, we should extract only if its defined
+    // genre: metadata.common.genre,
     albumName: metadata.common.album,
-    stream: {
-      // FIXME: This could be anything
-      service: 'ipfs',
-      iris: [
-        {
-          // FIXME: Make it configurable
-          uri: `http://gateway.ipfs.io/ipfs/${file.path}`,
-          quality: 'unknown'
-        }
-      ]
-    }
+    stream: [
+      {
+        // FIXME: This could be anything
+        service: 'ipfs',
+        uris: [
+          {
+            // FIXME: Make it configurable
+            uri: `http://gateway.ipfs.io/ipfs/${file.path}`,
+              quality: 'unknown'
+          }
+        ]
+      }
+    ]
   })
 
   return song
