@@ -8,7 +8,7 @@ import {
   select
 } from 'redux-saga/effects'
 
-import { loadIPFSFile, scanFolder } from '../services/Ipfs/IpfsService'
+import { loadIPFSFile, scanFolder, getFileMetadata } from '../services/Ipfs/IpfsService'
 import  * as types from '../constants/ActionTypes'
 
 const getIpfsSettings = (state: any): any => {
@@ -42,19 +42,18 @@ export function* startProvidersScan(): any {
 // IPFS file scan Queue
 // Watcher
 function* handleIPFSFileLoad(): any {
-  console.log('starting handleIPFSFileLoad')
   const handleChannel = yield actionChannel(types.IPFS_FILE_FOUND)
-  const settings = yield select(getIpfsSettings)
-  const ipfsSettings = settings.settings.providers['ipfs1']
 
   while (true) {
     // 2- take from the channel
     const { file } = yield take(handleChannel)
     // 3- Note that we're using a blocking call
     try {
-      console.log('file: ', file)
-      const contents = yield call(loadIPFSFile, file, ipfsSettings)
-      console.log('contents: ', contents)
+      const settings = yield select(getIpfsSettings)
+      // const contents = yield call(loadIPFSFile, file, settings)
+      // console.log('contents: ', contents)
+      const metadata = yield call(getFileMetadata, file, settings)
+      console.log('metadata: ', metadata)
     } catch(e) {
       yield put({ type: types.IPFS_NON_SUPPORTED_ITEM, e })
     }
