@@ -16,7 +16,6 @@ export const scanFolder = async (hash: string, settings: any): Promise<any> => {
 const mediaExp = new RegExp(/.*(.mp3|.wav|.avi)$/)
 
 export const loadIPFSFile = async(file: any, ipfsSettings: any): Promise<any> => {
-  console.log(file.path)
   if (!mediaExp.test(file.path)) {
     throw new Error('media not supported')
   }
