@@ -22,14 +22,14 @@ code_quality:
 
 test:
   stage: test
-  image: node:8
+  image: node:10
   script:
   - yarn
   - yarn test
 
 deploy:
   stage: deploy
-  image: node:8
+  image: node:10
   script:
   - yarn
   - yarn build
