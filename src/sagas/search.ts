@@ -1,7 +1,6 @@
 import {
   call,
   put,
-  putResolve,
   takeLatest,
   select,
   all
@@ -23,8 +22,8 @@ function* performSingleSearch(searchTerm: string, provider: string) {
   try {
     const settings = yield select(getSettings)
     const providerService = new ProvidersService(settings)
-    const searchResults = yield providerService.searchForProvider(searchTerm, provider)
-    yield putResolve({type: types.ADD_TO_COLLECTION, data: searchResults})
+    const searchResults = yield call(providerService.searchForProvider, searchTerm, provider)
+    yield put({type: types.ADD_TO_COLLECTION, data: searchResults})
   } catch (e) {
     yield put({type: types.SEARCH_REJECTED, message: e.message})
     yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.search.failed'})

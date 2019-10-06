@@ -66,6 +66,11 @@ function* handleIPFSFileLoad(): any {
       yield call(collectionService.save, song.id, song.toDocument())
 
       yield put({ type: types.IPFS_SONG_SAVED, song })
+      yield put({
+        type: types.SEND_NOTIFICATION,
+        notification: song.title + ' - ' + song.artistName + 'saved',
+        level: 'warning'
+      })
     } catch(e) {
       yield put({ type: types.IPFS_NON_SUPPORTED_ITEM, e })
     }
