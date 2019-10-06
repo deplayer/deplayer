@@ -17,6 +17,7 @@ Media player thought to run entirelly in the web browser.
 
 ## Implemented Music providers
 
+* IPFS folder (work-in-progress)
 * Subsonic API
 * mStream API
 * iTunes API (it has only samples, usefull for testing)

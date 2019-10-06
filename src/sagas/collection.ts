@@ -1,5 +1,5 @@
 import { takeLatest, put, call, select } from 'redux-saga/effects'
-import RxDB, { RxDocument } from 'rxdb'
+import { RxDocument } from 'rxdb'
 
 import CollectionService from '../services/CollectionService'
 import SearchIndexService from '../services/SearchIndexService'
@@ -127,8 +127,6 @@ export function* exportCollection(): any {
 
 export function* importCollection(action: {type: string, data: any}): any {
   logger.log('settings-saga', 'importingCollection')
-  // FIXME: This model name knowledge doesn't belongs here
-  logger.log('settings-saga', 'importing provided data')
   const result = yield collectionService.importCollection(action.data)
   yield put({type: types.IMPORT_COLLECTION_FINISHED, result})
 }

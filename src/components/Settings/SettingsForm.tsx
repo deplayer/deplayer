@@ -42,12 +42,6 @@ const SettingsForm = (props: Props) => {
       enableReinitialize
       render=
         {({
-          values,
-          errors,
-          touched,
-          handleChange,
-          handleBlur,
-          handleSubmit,
           isSubmitting
         }) => (
           <Form
@@ -67,6 +61,7 @@ const SettingsForm = (props: Props) => {
               <ProviderButton providerKey='subsonic' />
               <ProviderButton providerKey='mstream' />
               <ProviderButton providerKey='itunes' />
+              <ProviderButton providerKey='ipfs' />
             </div>
 
             { providers }
