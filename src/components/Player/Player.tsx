@@ -40,6 +40,12 @@ class Player extends React.Component<Props, State> {
     this.playerRef = React.createRef()
   }
 
+  componentWillMount() {
+    if (this.props.player.playing && !this.isPlaying()) {
+      this.playPause()
+    }
+  }
+
   onError() {
     this.props.dispatch({
       type: types.REGISTER_PLAYER_ERROR,

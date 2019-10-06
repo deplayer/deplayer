@@ -43,6 +43,12 @@ class PlayerV2 extends React.Component<Props> {
     this.player = player
   }
 
+  componentWillMount() {
+    if (this.props.player.playing && !this.state.playing) {
+      this.playPause()
+    }
+  }
+
   load = (url: string) => {
     this.setState({
       url,
