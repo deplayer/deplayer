@@ -18,7 +18,6 @@ const getIpfsSettings = (state: any): any => {
   return state ? state.settings : {}
 }
 
-// FIXME: This method should run in serial
 export function* startFolderScan(hash: string): any {
   const settings = yield select(getIpfsSettings)
 
@@ -36,7 +35,7 @@ export function* startFolderScan(hash: string): any {
 // Watcher should enque tasks to avoid concurrency
 export function* startProvidersScan(): any {
   const settings = yield select(getIpfsSettings)
-  const providerKey = 'ipfs1'
+  const providerKey = 'ipfs0'
   const ipfsSettings = settings.settings.providers[providerKey]
   yield put({ type: 'PROVIDER_SCAN_STARTED', providerKey })
 
@@ -71,7 +70,7 @@ function* handleIPFSFileLoad(): any {
       yield put({ type: types.IPFS_SONG_SAVED, song })
       yield put({
         type: types.SEND_NOTIFICATION,
-        notification: song.title + ' - ' + song.artistName + 'saved',
+        notification: song.title + ' - ' + song.artistName + ' saved',
         level: 'warning'
       })
     } catch(e) {

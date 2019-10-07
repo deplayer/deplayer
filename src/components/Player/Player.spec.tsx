@@ -17,6 +17,7 @@ const setup = (definedProps: any): {props: any, enzymeWrapper: any} => {
       currentPlaying: 'test'
     },
     itemCount: 0,
+    settings: { settings: { app: { ipfs: {} } } },
     collection: {
       rows: {
         'test': {

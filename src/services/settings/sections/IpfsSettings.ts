@@ -6,7 +6,9 @@ export default class IpfsSettings implements ISettingsSection {
   getFormSchema() {
     return [
       {title: "labels.ipfs", type: 'title'},
-      {title: "labels.ipfs.gateway", name: `app.ipfs.gateway`, type: 'text'},
+      {title: "labels.ipfs.host", name: `app.ipfs.host`, type: 'text', default: 'ipfs.io'},
+      {title: "labels.ipfs.port", name: `app.ipfs.port`, type: 'number', default: '80'},
+      {title: "labels.ipfs.proto", name: `app.ipfs.proto`, type: 'text', default: 'https'},
     ]
   }
 }

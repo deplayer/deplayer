@@ -2,7 +2,7 @@ import Song from '../../entities/Song'
 
 export const getStreamUri = (song: Song, settings: any): any => {
   const ipfsGateway = settings.settings.app.ipfs.gateway
-  const prepend = song.stream[0].service === 'ipfs' ? ipfsGateway : ''
+  const prepend = song.stream && song.stream[0].service === 'ipfs' ? ipfsGateway + '/ipfs/' : ''
 
   const streamUri = song
     && song.stream
