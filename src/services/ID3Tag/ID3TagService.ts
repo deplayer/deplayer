@@ -25,7 +25,7 @@ export const metadataToSong = (
         uris: [
           {
             // FIXME: Make it configurable
-            uri: `${file.path}`,
+            uri: `${file.hash}`,
             quality: 'unknown'
           }
         ]
