@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import * as React from 'react'
 
 import { State as PlayerState } from '../../reducers/player'
+import { State as SettingsState } from '../../reducers/settings'
 import { getStreamUri } from '../../services/Song/StreamUriService'
 import Controls from './Controls'
 import CoverImage from '../MusicTable/CoverImage'
@@ -16,6 +17,7 @@ type Props = {
   queue: any,
   slim: boolean,
   player: PlayerState,
+  settings: SettingsState,
   itemCount: number,
   collection: any,
   dispatch: Dispatch,
@@ -133,7 +135,7 @@ class Player extends React.Component<Props, State> {
 
     // Getting the first stream URI, in the future will be choosen based on
     // priorities
-    const streamUri = getStreamUri(currentPlaying)
+    const streamUri = getStreamUri(currentPlaying, this.props.settings)
 
     // Getting desired volume
     const volume = this.state.volume ? this.state.volume : this.props.player.volume

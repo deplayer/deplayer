@@ -8,12 +8,15 @@ import Spectrum from './../Spectrum'
 import CoverImage from '../MusicTable/CoverImage'
 import ProgressBar from './ProgressBar'
 import { State as PlayerState } from '../../reducers/player'
+import { State as SettingsState } from '../../reducers/settings'
+import { getStreamUri } from '../../services/Song/StreamUriService'
 
 import * as types from '../../constants/ActionTypes'
 
 type Props = {
   queue: any,
   player: PlayerState,
+  settings: SettingsState,
   itemCount: number,
   collection: any,
   dispatch: Dispatch,
@@ -158,10 +161,7 @@ class PlayerV2 extends React.Component<Props> {
 
     // Getting the first stream URI, in the future will be choosen based on
     // priorities
-    const streamUri = currentPlaying
-      && currentPlaying.stream
-      && currentPlaying.stream.length ?
-      currentPlaying.stream[0].uris[0].uri: null
+    const streamUri = getStreamUri(currentPlaying, this.props.settings)
 
     return (
       <div className='player-container'>

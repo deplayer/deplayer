@@ -36,10 +36,13 @@ export function* startFolderScan(hash: string): any {
 // Watcher should enque tasks to avoid concurrency
 export function* startProvidersScan(): any {
   const settings = yield select(getIpfsSettings)
-  const ipfsSettings = settings.settings.providers['ipfs1']
+  const providerKey = 'ipfs1'
+  const ipfsSettings = settings.settings.providers[providerKey]
+  yield put({ type: 'PROVIDER_SCAN_STARTED', providerKey })
 
   // Dispatching an event with configured ipfs hash
   yield put({type: types.IPFS_FOLDER_FOUND, hash: ipfsSettings.hash })
+  yield put({ type: 'PROVIDER_SCAN_FINISHED',  providerKey })
 }
 
 // IPFS file scan Queue

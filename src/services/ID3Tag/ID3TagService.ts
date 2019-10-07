@@ -3,9 +3,8 @@ import * as musicMetadata from 'music-metadata-browser';
 import Song from '../../entities/Song'
 
 export const getFileMetadata = async (file: any, settings: any) => {
-  const ipfsSettings = settings.settings.providers['ipfs1']
-
-  const metadata = await musicMetadata.fetchFromUrl(`http://${ipfsSettings.host}:8080/ipfs/${file.path}`)
+  const ipfsGateway = settings.settings.app.ipfs.gateway
+  const metadata = await musicMetadata.fetchFromUrl(`${ipfsGateway}/ipfs/${file.path}`)
   return metadata
 }
 
@@ -26,8 +25,8 @@ export const metadataToSong = (
         uris: [
           {
             // FIXME: Make it configurable
-            uri: `http://gateway.ipfs.io/ipfs/${file.path}`,
-              quality: 'unknown'
+            uri: `${file.path}`,
+            quality: 'unknown'
           }
         ]
       }
