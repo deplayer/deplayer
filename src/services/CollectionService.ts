@@ -3,7 +3,6 @@ import { RxDocument } from 'rxdb'
 import { IStorageService } from './IStorageService'
 import { IAdapter } from './database/IAdapter'
 import MediaMergerService from './MediaMergerService'
-
 import Media from '../entities/Media'
 
 export default class CollectionService implements IStorageService {

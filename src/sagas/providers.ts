@@ -14,7 +14,7 @@ import { scanFolder } from '../services/Ipfs/IpfsService'
 import CollectionService from '../services/CollectionService';
 import  * as types from '../constants/ActionTypes'
 
-const getIpfsSettings = (state: any): any => {
+export const getIpfsSettings = (state: any): any => {
   return state ? state.settings : {}
 }
 
@@ -28,6 +28,12 @@ export function* startFolderScan(hash: string): any {
   } catch(e) {
     yield put({ type: types.IPFS_FOLDER_SCAN_FAILED, e })
 
+    yield put({
+      type: types.SEND_NOTIFICATION,
+      notification: `failed scanning: ${ hash }`,
+      level: 'warning'
+    })
+
     return e
   }
 }
@@ -35,13 +41,26 @@ export function* startFolderScan(hash: string): any {
 // Watcher should enque tasks to avoid concurrency
 export function* startProvidersScan(): any {
   const settings = yield select(getIpfsSettings)
-  const providerKey = 'ipfs0'
-  const ipfsSettings = settings.settings.providers[providerKey]
-  yield put({ type: 'PROVIDER_SCAN_STARTED', providerKey })
+  const providerKeys = Object.keys(settings.settings.providers).filter((key: string) => {
+    return key.match(/ipfs/)
+  })
 
-  // Dispatching an event with configured ipfs hash
-  yield put({type: types.IPFS_FOLDER_FOUND, hash: ipfsSettings.hash })
-  yield put({ type: 'PROVIDER_SCAN_FINISHED',  providerKey })
+  for (let key of providerKeys) {
+    const ipfsSettings = settings.settings.providers[key]
+    yield put({ type: 'PROVIDER_SCAN_STARTED', key })
+
+    const { hash } = ipfsSettings
+
+    yield put({
+      type: types.SEND_NOTIFICATION,
+      notification: `starting to scan hash: ${ hash }`,
+      level: 'info'
+    })
+
+    // Dispatching an event with configured ipfs hash
+    yield put({type: types.IPFS_FOLDER_FOUND, hash })
+    yield put({ type: 'PROVIDER_SCAN_FINISHED',  key })
+  }
 }
 
 // IPFS file scan Queue
@@ -64,14 +83,13 @@ function* handleIPFSFileLoad(): any {
       const collectionService = new CollectionService(new adapter())
 
       // Save song
-      console.log('saving song: ', song)
       yield call(collectionService.save, song.id, song.toDocument())
 
       yield put({ type: types.IPFS_SONG_SAVED, song })
       yield put({
         type: types.SEND_NOTIFICATION,
         notification: song.title + ' - ' + song.artistName + ' saved',
-        level: 'warning'
+        level: 'info'
       })
     } catch(e) {
       yield put({ type: types.IPFS_NON_SUPPORTED_ITEM, e })
