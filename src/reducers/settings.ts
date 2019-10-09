@@ -34,6 +34,11 @@ export const defaultState = {
       databaseSync: {
         enabled: false,
         remote: ''
+      },
+      ipfs: {
+        host: 'ipfs.io',
+        port: 443,
+        proto: 'https'
       }
     }
   }

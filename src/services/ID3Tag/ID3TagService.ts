@@ -1,10 +1,11 @@
-import * as musicMetadata from 'music-metadata-browser';
+import * as musicMetadata from 'music-metadata-browser'
 
 import Song from '../../entities/Song'
+import { State as SettingsState } from '../../reducers/settings'
 
-export const getFileMetadata = async (file: any, settings: any) => {
-  const ipfsGateway = settings.settings.app.ipfs.gateway
-  const metadata = await musicMetadata.fetchFromUrl(`${ipfsGateway}/ipfs/${file.path}`)
+export const getFileMetadata = async (file: any, settings: SettingsState) => {
+  const { proto, host, port } = settings.settings.app.ipfs
+  const metadata = await musicMetadata.fetchFromUrl(`${proto}://${host}:${port}/ipfs/${file.path}`)
   return metadata
 }
 
