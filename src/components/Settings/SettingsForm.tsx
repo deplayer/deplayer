@@ -23,6 +23,7 @@ const SettingsForm = (props: Props) => {
   const providers = Object.keys(props.settings.settingsForm.providers).map((providerKey) => {
     return (
       <ProviderForm
+        key={providerKey}
         settings={props.settings}
         dispatch={props.dispatch}
         providerKey={providerKey}
