@@ -22,9 +22,18 @@ export function* fetchArtistMetadata(action: any): any {
   }
 }
 
+export function* loadMoreArtistSongsFromProvider(action: any): any {
+  yield put({
+    type: types.START_SEARCH,
+    searchTerm: action.artist.name,
+    noRedirect: true
+  })
+}
+
 // Binding actions to sagas
 function* artistSaga(): any {
   yield takeLatest(types.LOAD_ARTIST, fetchArtistMetadata)
+  yield takeLatest(types.LOAD_ARTIST, loadMoreArtistSongsFromProvider)
 }
 
 export default artistSaga

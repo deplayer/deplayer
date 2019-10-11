@@ -12,13 +12,12 @@ import  * as types from '../constants/ActionTypes'
 import ProvidersService from '../services/ProvidersService'
 import { getSettings } from './selectors'
 
-type SearchAction = {
-  type: string,
-  searchTerm: string
-}
-
 // Handle every provider as independent thread
-function* performSingleSearch(searchTerm: string, provider: string) {
+function* performSingleSearch(
+  searchTerm: string,
+  provider: string,
+  redirect: boolean = true
+) {
   try {
     const settings = yield select(getSettings)
     const providerService = new ProvidersService(settings)
@@ -28,15 +27,26 @@ function* performSingleSearch(searchTerm: string, provider: string) {
     yield put({type: types.SEARCH_REJECTED, message: e.message})
     yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.search.failed'})
   }
-  yield call(goToSearchResults)
+
+  if (redirect) {
+    yield call(goToSearchResults)
+  }
+}
+
+type SearchAction = {
+  type: string,
+  searchTerm: string,
+  noRedirect?: boolean
 }
 
 // Handling search saga
 export function* search(action: SearchAction): any {
   const settings = yield select(getSettings)
   const providersService = new ProvidersService(settings)
+  const redirect = !action.noRedirect
+
   const searchPromises = Object.keys(providersService.providers).map((provider) => {
-    return call(performSingleSearch, action.searchTerm, provider)
+    return call(performSingleSearch, action.searchTerm, provider, redirect)
   })
   yield all(searchPromises)
   yield put({type: types.SEARCH_FINISHED, searchTerm: action.searchTerm})
