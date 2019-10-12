@@ -19,7 +19,7 @@ const filterSongs = (songs: any, term: string = '') => {
     .generateIndexFrom(songsArray)
     .search(term)
 
-  const mappedResults = results.map((result) => {
+  const mappedResults = results.map((result: any) => {
     return result.ref
   })
 
