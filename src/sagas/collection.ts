@@ -1,13 +1,12 @@
-import { takeLatest, put, call, select } from 'redux-saga/effects'
 import { RxDocument } from 'rxdb'
+import { actionChannel, fork, take, takeLatest, put, call, select } from 'redux-saga/effects'
 
-import CollectionService from '../services/CollectionService'
-import SearchIndexService from '../services/SearchIndexService'
 import { getAdapter } from '../services/database'
+import CollectionService from '../services/CollectionService'
 import IndexService from '../services/Search/IndexService'
-import logger from '../utils/logger'
+import SearchIndexService from '../services/SearchIndexService'
 import Song from '../entities/Song'
-
+import logger from '../utils/logger'
 import * as types from '../constants/ActionTypes'
 
 const adapter = getAdapter()
@@ -83,9 +82,9 @@ const getCollection = (state: any): any => {
 }
 
 // Handling ADD_TO_COLLECTION saga
-export function* addToCollection(action: any): any {
+export function* addToCollection(data: any): any {
   const prevCollection = yield select(getCollection)
-  const collection = yield collectionService.bulkSave(action.data, prevCollection)
+  const collection = yield collectionService.bulkSave(data, prevCollection)
   const mappedData = mapToMedia(collection)
   try {
     yield put({type: types.RECEIVE_COLLECTION, data: mappedData})
@@ -96,6 +95,20 @@ export function* addToCollection(action: any): any {
   }
 
   yield generateIndex()
+}
+
+export function* addToCollectionHandler(): any {
+  const handleChannel = yield actionChannel(types.ADD_TO_COLLECTION)
+
+  while (true) {
+    const { data } = yield take(handleChannel)
+
+    try {
+      yield fork(addToCollection, data)
+    } catch(error) {
+      yield put({type: 'ADD_TO_COLLECTION_HANDLER_FAILED', error})
+    }
+  }
 }
 
 // Handling REMOVE_FROM_COLLECTION saga
@@ -159,7 +172,7 @@ function* trackSongPlayed(action: {type: string, songId: string}): any {
 function* collectionSaga(): any {
   yield takeLatest(types.RECEIVE_SETTINGS_FINISHED, initializeCollection)
   yield takeLatest(types.RECEIVE_SETTINGS_FINISHED, initializeSearchIndex)
-  yield takeLatest(types.ADD_TO_COLLECTION, addToCollection)
+  yield fork(addToCollectionHandler)
   yield takeLatest(types.REMOVE_FROM_COLLECTION, removeFromCollection)
   yield takeLatest(types.DELETE_COLLECTION, deleteCollection)
   yield takeLatest(types.EXPORT_COLLECTION, exportCollection)

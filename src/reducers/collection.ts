@@ -42,16 +42,9 @@ export default (state: State = defaultState, action: any = {}) => {
       }
     }
 
-    // FIXME: This is not performant, the state shouldn't block UI
     case types.RECEIVE_COLLECTION: {
-      const rows = {}
-      const artists = {}
-      const albums = {}
-      const songsByArtist = {}
-      const albumsByArtist = {}
-      const songsByAlbum = {}
-      action.data.forEach((row) => {
-        const song = new Song({
+      const songs = action.data.map((row: any) => {
+        return new Song({
           ...row,
           id: row.id,
           forcedId:
@@ -59,8 +52,19 @@ export default (state: State = defaultState, action: any = {}) => {
           artistId: row.artist.id,
           albumId: row.album.id
         })
-        // if (song.hasAnyProviderOf(state.enabledProviders)) {
-        rows[row.id] = song
+
+      })
+      const rows = {}
+      const artists = {}
+      const albums = {}
+      const songsByArtist = {}
+      const albumsByArtist = {}
+      const songsByAlbum = {}
+      // FIXME: Convert this in a functional way
+      // using map instead of forEach for better performance
+      // https://jsperf.com/map-vs-foreach-speed-test
+      songs.forEach((song: Song) => {
+        rows[song.id] = song
         artists[song.artist.id] = song.artist
         albums[song.album.id] = song.album
 
