@@ -1,9 +1,9 @@
 import { takeLatest, put, select, call } from 'redux-saga/effects'
 
 import { getAdapter } from '../services/database'
+import { getAlbumSongs, getQueue } from './selectors'
 import QueueService from '../services/QueueService'
 import logger from '../utils/logger'
-
 import * as types from '../constants/ActionTypes'
 
 // Extract songs from collection state
@@ -13,14 +13,6 @@ export const getSongs = (state: any, action: { path: string }): Array<string> =>
   }
 
   return state ? state.collection.visibleSongs : []
-}
-
-export const getQueue = (state: any): any => {
-  return state ? state.queue : {}
-}
-
-export const getAlbumSongs = (state: any): any => {
-  return state ? state.collection.songsByAlbum : {}
 }
 
 // Handling playAll saga

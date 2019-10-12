@@ -1,26 +1,9 @@
 import { takeLatest, put, select } from 'redux-saga/effects'
-import * as routes from '../routes'
+
+import { getApp, getQueue, getSongBg } from './selectors';
 import history from '../store/configureHistory'
-
+import * as routes from '../routes'
 import * as types from '../constants/ActionTypes'
-
-const getQueue = (state: any): any => {
-  return state ? state.queue : {}
-}
-
-const getApp = (state: any): any => {
-  return state ? state.app : {}
-}
-
-const getSongBg = (state: any): any => {
-  const { collection: { rows }, queue: { currentPlaying } } = state
-  if (rows[currentPlaying]) {
-    const song = rows[currentPlaying]
-    const { cover: { fullUrl } } = song
-    return fullUrl
-  }
-  return ''
-}
 
 // Handling setCurrentPlaying saga
 export function* setCurrentPlaying(action: any): any {

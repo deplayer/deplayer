@@ -8,18 +8,15 @@ import {
   select
 } from 'redux-saga/effects'
 
-import { getAdapter } from '../services/database';
+import { getAdapter } from '../services/database'
 import { getFileMetadata, metadataToSong } from '../services/ID3Tag/ID3TagService'
+import { getSettings } from './selectors'
 import { scanFolder } from '../services/Ipfs/IpfsService'
-import CollectionService from '../services/CollectionService';
+import CollectionService from '../services/CollectionService'
 import  * as types from '../constants/ActionTypes'
 
-export const getIpfsSettings = (state: any): any => {
-  return state ? state.settings : {}
-}
-
 export function* startFolderScan(hash: string): any {
-  const settings = yield select(getIpfsSettings)
+  const settings = yield select(getSettings)
 
   try {
     const files = yield call(scanFolder, hash, settings)
@@ -40,7 +37,7 @@ export function* startFolderScan(hash: string): any {
 
 // Watcher should enque tasks to avoid concurrency
 export function* startProvidersScan(): any {
-  const settings = yield select(getIpfsSettings)
+  const settings = yield select(getSettings)
   const providerKeys = Object.keys(settings.settings.providers).filter((key: string) => {
     return key.match(/ipfs/)
   })
@@ -73,7 +70,7 @@ function* handleIPFSFileLoad(): any {
     const { file } = yield take(handleChannel)
     // 3- Note that we're using a blocking call
     try {
-      const settings = yield select(getIpfsSettings)
+      const settings = yield select(getSettings)
       const metadata = yield call(getFileMetadata, file, settings)
       console.log('song metadata: ', metadata)
 

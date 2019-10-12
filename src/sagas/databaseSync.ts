@@ -1,18 +1,15 @@
 import { takeLatest, put, call, select } from 'redux-saga/effects'
-import  * as types from '../constants/ActionTypes'
-import { getAdapter } from '../services/database'
-import DatabaseSyncService from '../services/database/DatabaseSyncService'
-import { State as SettingsState }  from '../reducers/settings'
 
-const getSettings = (state: any): SettingsState => {
-  return state ? state.settings : {}
-}
+import { getAdapter } from '../services/database'
+import { getSettings } from './selectors'
+import DatabaseSyncService from '../services/database/DatabaseSyncService'
+import  * as types from '../constants/ActionTypes'
 
 // Database sync setup routines
 function* setupSync() {
   const adapter = getAdapter()
   const databaseSyncService = new DatabaseSyncService(new adapter())
-  const { settings } = yield select(getSettings)
+  const settings = yield select(getSettings)
 
   if (settings.app.databaseSync.enabled) {
     yield put({type: types.SETTING_UP_DATABASE_SYNC_STARTED})

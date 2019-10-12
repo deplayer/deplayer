@@ -14,23 +14,23 @@ const getCurrentSong = (state: any) => {
 }
 
 // Handling START_PLAYING saga
-export function* sendCurrentPlayingNotification(dispatch: any, action: any): any {
+export function* sendCurrentPlayingNotification(): any {
   const notificationService = new NotificatoinService()
   const currentSong = yield select(getCurrentSong)
   yield call(notificationService.sendNotification, currentSong)
 }
 
-export function* setupNotifications(dispatch: any, action: any): any {
+export function* setupNotifications(): any {
   const notificationService = new NotificatoinService()
   yield call(notificationService.requestPermission)
 }
 
 // Binding actions to sagas
 function* notificationSaga(store: any): any {
-  yield takeLatest(types.PLAY_NEXT, sendCurrentPlayingNotification, store.dispatch)
-  yield takeLatest(types.PLAY_PREV, sendCurrentPlayingNotification, store.dispatch)
-  yield takeLatest(types.SET_CURRENT_PLAYING, sendCurrentPlayingNotification, store.dispatch)
-  yield takeLatest(types.INITIALIZED, setupNotifications, store.dispatch)
+  yield takeLatest(types.PLAY_NEXT, sendCurrentPlayingNotification)
+  yield takeLatest(types.PLAY_PREV, sendCurrentPlayingNotification)
+  yield takeLatest(types.SET_CURRENT_PLAYING, sendCurrentPlayingNotification)
+  yield takeLatest(types.INITIALIZED, setupNotifications)
 }
 
 export default notificationSaga
