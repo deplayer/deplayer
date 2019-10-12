@@ -1,3 +1,4 @@
+import Media from '../entities/Media'
 import Song from '../entities/Song'
 import * as actions from '../constants/ActionTypes'
 import logger from '../utils/logger'
@@ -8,7 +9,7 @@ declare var window: any
 
 export default class MediaSessionService {
   updateMetadata = (media: Song, dispatch: any) => {
-    if (this.getMediaSession()) {
+    if (this.canSetMediaSession(media)) {
       navigator.mediaSession.metadata = new window.MediaMetadata({
         title: media.title,
         artist: media.artist.name,
@@ -38,6 +39,10 @@ export default class MediaSessionService {
       navigator.mediaSession.setActionHandler('seekbackward', () => { })
       navigator.mediaSession.setActionHandler('seekforward', () => {})
     }
+  }
+
+  canSetMediaSession (media: Media) {
+    return this.getMediaSession() && media.cover && media.cover.fullUrl
   }
 
   getMediaSession () {

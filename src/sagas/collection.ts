@@ -53,7 +53,7 @@ const mapToMedia = (collection: Array<RxDocument<any, any>>) => {
 // Application initialization routines
 function* initializeCollection() {
   try {
-    yield collectionService.initialize
+    yield call(collectionService.initialize)
     const collection = yield call(collectionService.getAll)
     const mappedData = mapToMedia(collection)
     yield put({type: types.RECEIVE_COLLECTION, data: mappedData})
@@ -69,7 +69,7 @@ function* initializeSearchIndex() {
   try {
     const adapter = getAdapter()
     const searchIndexService = new SearchIndexService(new adapter())
-    yield searchIndexService.initialize
+    yield call(collectionService.initialize)
     const searchIndex = yield searchIndexService.get()
     yield put({type: types.RECEIVE_SEARCH_INDEX, data: searchIndex})
   } catch (e) {
@@ -133,7 +133,7 @@ export function* importCollection(action: {type: string, data: any}): any {
 
 // generate fulltext index
 export function* generateIndex(): any {
-  yield collectionService.initialize
+  yield call(collectionService.initialize)
   const collection = yield call(collectionService.getAll)
   const mappedData = mapToMedia(collection)
   const service = new IndexService()
@@ -146,7 +146,7 @@ export function* generateIndex(): any {
 }
 
 function* trackSongPlayed(action: {type: string, songId: string}): any {
-  yield collectionService.initialize
+  yield call(collectionService.initialize)
   const songRow = yield call(collectionService.get, action.songId)
   const song = rowToSong(songRow)
   const prevCount = song.playCount || 0
