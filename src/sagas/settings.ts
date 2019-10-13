@@ -8,8 +8,9 @@ import { getAdapter } from '../services/database'
 function* initialize() {
   const adapter = getAdapter()
   const settingsService = new SettingsService(new adapter())
-  yield settingsService.initialize
+  yield call(settingsService.initialize)
   const settings = yield call(settingsService.get)
+
   if (!settings) {
     yield put({type: types.GET_SETTINGS_REJECTED})
   } else {

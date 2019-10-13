@@ -1,10 +1,10 @@
+import Media from '../entities/Media'
+import Song from '../entities/Song'
+import filterSongs from '../utils/filter-songs'
 import * as types from '../constants/ActionTypes'
 
-import filterSongs from '../utils/filter-songs'
-import Song from '../entities/Song'
-
 type State = {
-  rows: any,
+  rows: { [key: string]: Media },
   artists: any,
   albums: any,
   albumsByArtist: any,
@@ -52,8 +52,8 @@ export default (state: State = defaultState, action: any = {}) => {
           artistId: row.artist.id,
           albumId: row.album.id
         })
-
       })
+
       const rows = {}
       const artists = {}
       const albums = {}
@@ -63,7 +63,8 @@ export default (state: State = defaultState, action: any = {}) => {
       // FIXME: Convert this in a functional way
       // using map instead of forEach for better performance
       // https://jsperf.com/map-vs-foreach-speed-test
-      songs.forEach((song: Song) => {
+      for (let i = 0; i < songs.length; i++) {
+        const song = songs[i]
         rows[song.id] = song
         artists[song.artist.id] = song.artist
         albums[song.album.id] = song.album
@@ -89,7 +90,8 @@ export default (state: State = defaultState, action: any = {}) => {
         if (!songsByAlbum[song.album.id].includes(song.id)) {
           songsByAlbum[song.album.id].push(song.id)
         }
-      })
+      }
+
       const totalRows = {...state.rows, ...rows}
       const totalArtists = {...state.artists, ...artists}
       const totalAlbums = {...state.albums, ...albums}
