@@ -19,7 +19,7 @@ function* rootSaga(store: any) {
     artistSaga(),
     collectionSaga(),
     connectionSaga(store),
-    databaseSyncSaga(),
+    databaseSyncSaga(store),
     mediaSessionSaga(store),
     notificationsSaga(store),
     playerSaga(),
