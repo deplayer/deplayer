@@ -1,18 +1,10 @@
 import { takeLatest, select, call, put } from 'redux-saga/effects'
 
 import { getAdapter } from '../services/database'
+import { getQueue } from './selectors'
 import PlaylistService from '../services/PlaylistService'
 import logger from '../utils/logger'
-
 import * as types from '../constants/ActionTypes'
-
-export const getQueue = (state: any): any => {
-  return state ? state.queue : {}
-}
-
-export const getAlbumSongs = (state: any): any => {
-  return state ? state.collection.songsByAlbum : {}
-}
 
 const adapter = getAdapter()
 const playlistService = new PlaylistService(new adapter())

@@ -1,14 +1,7 @@
 import { takeLatest, select } from 'redux-saga/effects'
 
+import { getCollection, getQueue } from './selectors';
 import * as types from '../constants/ActionTypes'
-
-const getQueue = (state: any): any => {
-  return state ? state.queue : {}
-}
-
-const getCollection = (state: any): any => {
-  return state ? state.collection : {}
-}
 
 // Handling setCurrentPlaying saga
 export function* setCurrentPlaying(action: any): any {

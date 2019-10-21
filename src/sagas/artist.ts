@@ -1,10 +1,16 @@
 import { takeLatest, putResolve, put, select } from 'redux-saga/effects'
 
-import * as types from '../constants/ActionTypes'
 import { getSettings } from './selectors'
+import Artist from '../entities/Artist'
 import LastfmProvider from '../providers/LastfmProvider'
+import * as types from '../constants/ActionTypes'
 
-export function* fetchArtistMetadata(action: any): any {
+type LoadArtistAction = {
+  type: string,
+  artist: Artist
+}
+
+export function* fetchArtistMetadata(action: LoadArtistAction): any {
   const { app: { lastfm } } = yield select(getSettings)
 
   try {
@@ -22,7 +28,7 @@ export function* fetchArtistMetadata(action: any): any {
   }
 }
 
-export function* loadMoreArtistSongsFromProvider(action: any): any {
+export function* loadMoreArtistSongsFromProvider(action: LoadArtistAction): any {
   yield put({
     type: types.START_SEARCH,
     searchTerm: action.artist.name,

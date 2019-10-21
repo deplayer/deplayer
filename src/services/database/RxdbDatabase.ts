@@ -6,6 +6,106 @@ import logger from '../../utils/logger'
 
 let dbPromise: Promise<any>|null = null
 
+const collections: Array<any> = [
+  {
+    name: 'settings',
+    schema: {
+      title: 'settings schema',
+      version: 0,
+      type: 'object',
+      properties: {
+        providers: {
+          type: 'object'
+        },
+        app: {
+          type: 'object'
+        }
+      },
+      migrationStrategies: {
+      }
+    }
+  },
+  {
+    name: 'search_index',
+    schema: {
+      title: 'search_index',
+      version: 0,
+      type: 'object',
+      migrationStrategies: {
+      },
+      properties: {
+        index: {
+          type: 'object'
+        }
+      },
+    }
+  },
+  {
+    name: 'queue',
+    schema: {
+      title: 'playing queue',
+      version: 0,
+      type: 'object',
+      migrationStrategies: {
+      },
+      properties: {
+        orderedIds: {
+          type: 'array'
+        },
+        trackIds: {
+          type: 'array'
+        },
+        shuffleEnabled: {
+          type: ['boolean']
+        },
+        repeatEnabled: {
+          type: ['boolean']
+        },
+        currentPlaying: {
+          type: ['string', 'null']
+        },
+        nextSongId: {
+          type: ['string', 'null']
+        },
+        prevSongId: {
+          type: ['string', 'null']
+        }
+      },
+    }
+  },
+  {
+    name: 'media',
+    schema: {
+      title: 'collection schema',
+      version: 0,
+      type: 'object',
+      properties: Media.toSchema()
+    }
+  },
+  {
+    name: 'artist',
+    schema: {
+      title: 'media artists',
+      version: 0,
+      type: 'object',
+      properties: Artist.toSchema()
+    }
+  },
+  {
+    name: 'playlist',
+    schema: {
+      title: 'saved playlists',
+      version: 0,
+      type: 'object',
+      properties: {
+        trackIds: {
+          type: 'array'
+        }
+      },
+    }
+  }
+]
+
 const createDB = (): Promise<any> => {
   if (process.env.NODE_ENV === 'test') {
     return RxDB.create({name: 'player_data', adapter: 'memory'})
@@ -15,106 +115,6 @@ const createDB = (): Promise<any> => {
 }
 
 export const createCollections = async (db: any, filter: Array<string> = []) => {
-  const collections: Array<any> = [
-    {
-      name: 'settings',
-      schema: {
-        title: 'settings schema',
-        version: 0,
-        type: 'object',
-        properties: {
-          providers: {
-            type: 'object'
-          },
-          app: {
-            type: 'object'
-          }
-        },
-        migrationStrategies: {
-        }
-      }
-    },
-    {
-      name: 'search_index',
-      schema: {
-        title: 'search_index',
-        version: 0,
-        type: 'object',
-        migrationStrategies: {
-        },
-        properties: {
-          index: {
-            type: 'object'
-          }
-        },
-      }
-    },
-    {
-      name: 'queue',
-      schema: {
-        title: 'playing queue',
-        version: 0,
-        type: 'object',
-        migrationStrategies: {
-        },
-        properties: {
-          orderedIds: {
-            type: 'array'
-          },
-          trackIds: {
-            type: 'array'
-          },
-          shuffleEnabled: {
-            type: ['boolean']
-          },
-          repeatEnabled: {
-            type: ['boolean']
-          },
-          currentPlaying: {
-            type: ['string', 'null']
-          },
-          nextSongId: {
-            type: ['string', 'null']
-          },
-          prevSongId: {
-            type: ['string', 'null']
-          }
-        },
-      }
-    },
-    {
-      name: 'media',
-      schema: {
-        title: 'collection schema',
-        version: 0,
-        type: 'object',
-        properties: Media.toSchema()
-      }
-    },
-    {
-      name: 'artist',
-      schema: {
-        title: 'media artists',
-        version: 0,
-        type: 'object',
-        properties: Artist.toSchema()
-      }
-    },
-    {
-      name: 'playlist',
-      schema: {
-        title: 'saved playlists',
-        version: 0,
-        type: 'object',
-        properties: {
-          trackIds: {
-            type: 'array'
-          }
-        },
-      }
-    }
-  ]
-
   const filteredCollections = !filter.length ? collections :  collections.filter(({name}) =>
     filter.indexOf(name) >= 0
   )
@@ -122,8 +122,8 @@ export const createCollections = async (db: any, filter: Array<string> = []) => 
   // create collections
   logger.log('DatabaseService', 'create collections')
   try {
-    await Promise.all(filteredCollections.map(colData =>
-      db.collection(colData)
+    await Promise.all(filteredCollections.map(async (colData) =>
+      await db.collection(colData)
     ))
   } catch(e) {
     logger.log('DatabaseService', 'Error creating collections', e.message)

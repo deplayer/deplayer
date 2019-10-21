@@ -3,7 +3,8 @@ import {
   put,
   takeLatest,
   select,
-  all
+  all,
+  fork
 } from 'redux-saga/effects'
 
 import history from '../store/configureHistory'
@@ -46,7 +47,7 @@ export function* search(action: SearchAction): any {
   const redirect = !action.noRedirect
 
   const searchPromises = Object.keys(providersService.providers).map((provider) => {
-    return call(performSingleSearch, action.searchTerm, provider, redirect)
+    return fork(performSingleSearch, action.searchTerm, provider, redirect)
   })
   yield all(searchPromises)
   yield put({type: types.SEARCH_FINISHED, searchTerm: action.searchTerm})

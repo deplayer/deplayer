@@ -21,7 +21,7 @@ type Props = {
 }
 
 const extractBackground = (collection, songsByAlbum, albumsByArtist = []): string => {
-  const albumId = albumsByArtist.length && albumsByArtist[0]
+  const albumId = albumsByArtist && albumsByArtist.length && albumsByArtist[0]
   if (albumId && songsByAlbum[albumId]) {
     return collection.rows[songsByAlbum[albumId][0]].cover.fullUrl
   }
