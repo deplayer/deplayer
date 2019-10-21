@@ -146,11 +146,11 @@ module.exports = {
           {
             test: /\.tsx?$/,
             exclude: /node_modules/,
-            loader: 'ts-loader',
+            loader: require.resolve('babel-loader'),
             include: paths.appSrc,
             options: {
-              configFile: "tsconfig.prod.json"
-            }
+              presets: [['@babel/react']],
+            },
           },
           // Process JS with Babel.
           {
