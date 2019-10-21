@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@sindresorhus/slugify": "^0.9.0",
+    "@storybook/react": "^5.2.4",
     "@types/enzyme-adapter-react-16": "^1.0.3",
     "@types/js-yaml": "^3.12.0",
     "@types/react": "^16.7.20",
@@ -93,7 +94,8 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom --forceExit",
-    "postversion": "git push && git push --tags --no-verify"
+    "postversion": "git push && git push --tags --no-verify",
+    "storybook": "start-storybook"
   },
   "jest": {
     "collectCoverageFrom": [
