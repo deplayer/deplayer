@@ -114,8 +114,7 @@
     "transform": {
       "^.+\\.(ts|tsx)$": "ts-jest",
       "^.+\\.(js|jsx|mjs)$": "<rootDir>/node_modules/babel-jest",
-      "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
-      "^(?!.*\\.(js|jsx|mjs|css|json,ts,tsx)$)": "<rootDir>/config/jest/fileTransform.js"
+      "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js"
     },
     "transformIgnorePatterns": [
       "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs)$"
@@ -168,8 +167,8 @@
     "@typescript-eslint/eslint-plugin": "^2.3.0",
     "@typescript-eslint/parser": "^2.3.0",
     "axios-mock-adapter": "^1.15.0",
-    "enzyme": "^3.3.0",
-    "enzyme-adapter-react-16": "^1.1.1",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.15.1",
     "eslint-plugin-jest": "^21.22.1",
     "flow-bin": "^0.81.0",
     "js-yaml": "^3.12.2",
@@ -180,7 +179,7 @@
     "redux-thunk": "^2.3.0",
     "sass-loader": "^7.1.0",
     "surge": "^0.20.1",
-    "ts-jest": "^23.10.5",
+    "ts-jest": "24",
     "typescript": "^3.5.2",
     "workbox-webpack-plugin": "^4.2.0"
   }
