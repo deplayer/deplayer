@@ -2,7 +2,9 @@ import * as React from 'react'
 
 const Tag = () => {
   return (
-    <div />
+    <div>
+      Tag contents here
+    </div>
   )
 }
 
