@@ -143,20 +143,26 @@ module.exports = {
           {
             test: /\.(js|jsx|mjs)$/,
             include: paths.appSrc,
-            loader: require.resolve('babel-loader'),
-            options: {
-
-              // This is a feature of `babel-loader` for webpack (not Babel itself).
-              // It enables caching results in ./node_modules/.cache/babel-loader/
-              // directory for faster rebuilds.
-              cacheDirectory: true,
-            },
+            use: {
+              loader: require.resolve('babel-loader'),
+              options: {
+                // This is a feature of `babel-loader` for webpack (not Babel itself).
+                // It enables caching results in ./node_modules/.cache/babel-loader/
+                // directory for faster rebuilds.
+                cacheDirectory: true,
+              },
+            }
           },
           // Typescript
           {
             test: /\.(ts|tsx)$/,
-            loader: ['react-hot-loader/webpack', 'ts-loader'],
             include: paths.appSrc,
+            use: {
+              loader: require.resolve('babel-loader'),
+              options: {
+                presets: [['@babel/react']],
+              }
+            }
           },
           // SASS support
           {
