@@ -1,18 +1,21 @@
-import * as React from 'react'
-import classNames from 'classnames/bind'
-
-import styles from './index.module.scss'
-
-const cx = classNames.bind(styles)
+/** @jsx jsx */
+import { jsx, css } from '@emotion/core'
+import fonts from '../../../styles/fonts'
 
 type Props = {
   children: any
   type?: 'primary'
 }
 
+const style = css`
+  padding: 4px;
+  font-size: ${fonts.small};
+  border: solid 1px;
+`
+
 const Tag = (props: Props) => {
   return (
-    <span className={cx(styles.tag, props.type)}>
+    <span css={style}>
       { props.children }
     </span>
   )

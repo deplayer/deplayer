@@ -1,9 +1,0 @@
-@import "bootstrap/scss/bootstrap.scss";
-
-.tag {
-  @extend .badge;
-
-  &.primary {
-    @extend .badge-primary;
-  }
-}
