@@ -1,5 +1,9 @@
+@import "bootstrap/scss/bootstrap.scss";
 
 .tag {
-  color: red;
-  font-size: 40px;
+  @extend .badge;
+
+  &.primary {
+    @extend .badge-primary;
+  }
 }

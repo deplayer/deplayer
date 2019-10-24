@@ -4,7 +4,12 @@ import Tag from './index'
 
 const stories = storiesOf('Tag', module);
 
-stories.add(
-  'Tag',
-  () => <Tag>Lorem Ipsum</Tag>
-)
+stories
+  .add(
+    'plain Tag',
+    () => <Tag>Lorem Ipsum</Tag>
+  )
+  .add(
+    'primary Tag',
+    () => <Tag type='primary'>Lorem Ipsum</Tag>
+  )

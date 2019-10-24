@@ -98,7 +98,7 @@ const SongView = (props: Props) => {
                 </div>
                   {
                     song.stream.map((provider) => {
-                      return (<Tag key={provider.service}>{ provider.service }</Tag>)
+                      return (<Tag type='primary' key={provider.service}>{ provider.service }</Tag>)
                       })
                   }
               </div>
