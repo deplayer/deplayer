@@ -83,6 +83,7 @@
     "sass-semantic-ui": "^2.2.12-3",
     "source-map-loader": "^0.2.4",
     "style-loader": "0.19.0",
+    "typings-for-css-modules-loader": "^1.7.0",
     "url-loader": "0.6.2",
     "uuid": "^3.3.2",
     "webpack": "^4.29.0",
@@ -181,6 +182,7 @@
     "surge": "^0.20.1",
     "ts-jest": "24",
     "typescript": "^3.5.2",
+    "typescript-plugin-css-modules": "^2.0.0",
     "workbox-webpack-plugin": "^4.2.0"
   }
 }

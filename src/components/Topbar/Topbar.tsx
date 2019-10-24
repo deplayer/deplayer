@@ -3,6 +3,7 @@ import KeyHandler, { KEYPRESS } from 'react-key-handler'
 import { I18n } from 'react-redux-i18n'
 import SidebarButton from '../Buttons/SidebarButton'
 import Title from './Title'
+import styles from './index.module.scss'
 
 import * as types from '../../constants/ActionTypes'
 
@@ -116,7 +117,7 @@ class Topbar extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <div className={`topbar-container has-results`}>
+        <div className={styles.topbarContainer}>
           <SidebarButton />
           <KeyHandler
             keyEventName={KEYPRESS}

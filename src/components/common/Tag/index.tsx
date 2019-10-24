@@ -1,10 +1,16 @@
 import * as React from 'react'
 
-const Tag = () => {
+import styles from './index.module.scss'
+
+type Props = {
+  children: any
+}
+
+const Tag = (props: Props) => {
   return (
-    <div>
-      Tag contents here
-    </div>
+    <span className={styles.tag}>
+      { props.children }
+    </span>
   )
 }
 

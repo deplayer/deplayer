@@ -1,4 +1,7 @@
-.topbar-container {
+@import "bootstrap/scss/bootstrap.scss";
+@import '../../styles/variables.scss';
+
+.topbarContainer {
   @extend .d-flex;
   justify-content: space-between;
   border-bottom: solid 4px $greyscale-lighter2;
@@ -22,15 +25,8 @@
   button,
   .button {
     background: transparent;
-    &.sidebar-button,
     &.connection-btn {
       margin-left: 0;
-    }
-
-    &.sidebar-button {
-      @include media-breakpoint-up(md) {
-        // display: none;
-      }
     }
   }
 

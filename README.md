@@ -24,7 +24,7 @@ Media player thought to run entirelly in the web browser.
 
 ## Implemented artists metadata providers
 
-* last.fm
+* last.fm (not very usefull)
 
 ## Keyboard hotkeys
 
@@ -49,6 +49,12 @@ yarn test
 
 ```bash
 yarn start
+```
+
+## Run storybook
+
+```bash
+yarn storybook
 ```
 
 [rxdb]: https://rxdb.info

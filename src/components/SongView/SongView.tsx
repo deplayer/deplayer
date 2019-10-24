@@ -1,13 +1,14 @@
-import { Link } from 'react-router-dom'
 import { Dispatch } from 'redux'
+import { Link } from 'react-router-dom'
 import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
 
-import * as types from '../../constants/ActionTypes'
 import { getDurationStr } from '../../utils/timeFormatter'
 import Song from '../../entities/Song'
 import Spinner from '..//Spinner'
+import Tag from '../common/Tag'
 import logger from '../../utils/logger'
+import * as types from '../../constants/ActionTypes'
 
 type Props = {
   queue: any,
@@ -95,13 +96,11 @@ const SongView = (props: Props) => {
                 <div className='collapsed'>
                   <span className='label'><Translate value='song.label.providers' /></span>
                 </div>
-                <ul>
                   {
                     song.stream.map((provider) => {
-                      return (<li key={provider.service}>{ provider.service }</li>)
+                      return (<Tag key={provider.service}>{ provider.service }</Tag>)
                       })
                   }
-                </ul>
               </div>
 
               <div className='btn-group'>

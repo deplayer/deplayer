@@ -6,5 +6,5 @@ const stories = storiesOf('Tag', module);
 
 stories.add(
   'Tag',
-  () => <Tag  />
+  () => <Tag>Lorem Ipsum</Tag>
 )

@@ -2,6 +2,8 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { Route } from 'react-router-dom'
 import { ConnectedRouter } from 'connected-react-router'
+import './styles/App.scss'
+import 'react-s-alert/dist/s-alert-default.css'
 
 // Alerts
 import Alert from 'react-s-alert'
@@ -19,9 +21,6 @@ import LayoutContainer from './containers/LayoutContainer'
 
 import configureStore from './store/configureStore'
 import history from './store/configureHistory'
-
-require('react-s-alert/dist/s-alert-default.css')
-require('./styles/App.scss')
 
 const appStore = configureStore()
 

@@ -1,0 +1,31 @@
+@import "bootstrap/scss/bootstrap.scss";
+@import "../../../styles/variables.scss";
+
+.button {
+  @extend .btn;
+  color: $primary-color-100;
+
+  background-color: $primary-color;
+  font-weight: bold;
+
+  &:hover {
+    color: $primary-color-100;
+    background-color: $primary-color-800;
+  }
+
+  &.circle {
+    border-radius: 100%;
+
+    i {
+      margin: 0;
+      display: inline;
+    }
+  }
+
+  &.spaced {
+    margin-right: 5px;
+  }
+
+  &.with-bg {
+  }
+}
