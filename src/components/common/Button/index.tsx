@@ -1,7 +1,5 @@
 import * as React from 'react'
 
-import styles from './index.module.scss'
-
 type Props = {
   onClick?: () => any,
   children: any
@@ -10,7 +8,7 @@ type Props = {
 const Button = (props: Props) => {
   return (
     <button
-      className={styles.button}
+      className={''}
       onClick={props.onClick}
     >
       { props.children }

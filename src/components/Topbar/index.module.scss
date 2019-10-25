@@ -1,26 +1,4 @@
-@import "bootstrap/scss/bootstrap.scss";
-@import '../../styles/variables.scss';
-
 .topbarContainer {
-  @extend .d-flex;
-  justify-content: space-between;
-  border-bottom: solid 4px $greyscale-lighter2;
-  overflow: hidden;
-
-  & > div {
-    @extend .d-flex;
-    justify-content: flex-end;
-  }
-
-  z-index: 1;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 10px;
-  padding-right: 10px;
-
-  grid-area: topbar;
-
-  align-items: center;
 
   button,
   .button {
