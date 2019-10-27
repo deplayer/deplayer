@@ -3,11 +3,12 @@ import { Link } from 'react-router-dom'
 import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
 
-import { getDurationStr } from '../../utils/timeFormatter'
-import ContextualMenu from './ContextualMenu'
-import CoverImage from './CoverImage'
-import Song from '../../entities/Song'
-import Tag from '../common/Tag'
+import { getDurationStr } from '../../../utils/timeFormatter'
+import ContextualMenu from './../ContextualMenu'
+import CoverImage from './../CoverImage'
+import Song from '../../../entities/Song'
+import Tag from '../../common/Tag'
+import { SongRowContainer } from './index.styles'
 
 type Props = {
   song: Song,
@@ -45,7 +46,7 @@ const SongRow = (props: Props) => {
   )
 
   return (
-    <div
+    <SongRowContainer
       className={`song-row ${ props.isCurrent ? 'current': ''}`}
       style={props.style}
       onClick={onClick}
@@ -70,7 +71,7 @@ const SongRow = (props: Props) => {
         </ul>
         <div>
         {
-          song.stream.map((provider) => {
+          props.slim || song.stream.map((provider) => {
             return (<Tag key={provider.service}>{ provider.service }</Tag>)
           })
         }
@@ -80,7 +81,7 @@ const SongRow = (props: Props) => {
           { props.slim && <span>{ getDurationStr(song.duration) }</span> }
         </div>
       </div>
-    </div>
+    </SongRowContainer>
   )
 }
 

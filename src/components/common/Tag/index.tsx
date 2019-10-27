@@ -9,6 +9,7 @@ type Props = {
 }
 
 const style = css`
+  line-height: 1.5;
   padding: 4px;
   color: white;
   background-color: ${colors.primary};
