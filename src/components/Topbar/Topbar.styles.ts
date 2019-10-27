@@ -11,8 +11,6 @@ const TopbarContainer = styled.div`
   padding-right: 10px;
   grid-area: topbar;
   align-items: center;
-  color: ${(props: any) =>
-    props.primary ? 'hotpink' : 'turquoise'};
 `
 
 const TopbarContents = styled.div`

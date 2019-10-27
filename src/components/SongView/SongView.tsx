@@ -4,6 +4,7 @@ import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
 
 import { getDurationStr } from '../../utils/timeFormatter'
+import Button from '../common/Button'
 import Song from '../../entities/Song'
 import Spinner from '..//Spinner'
 import Tag from '../common/Tag'
@@ -15,7 +16,7 @@ type Props = {
   song: Song,
   dispatch: Dispatch,
   loading: boolean,
-  className: string|null
+  className?: string|null
 }
 
 const SongView = (props: Props) => {
@@ -104,14 +105,13 @@ const SongView = (props: Props) => {
               </div>
 
               <div className='btn-group'>
-                <button
-                  className='btn btn-info'
+                <Button
                   onClick={() => {
                     props.dispatch({type: types.SET_CURRENT_PLAYING, songId: song.id})
                   }}
                 >
                   <Translate value="common.play" />
-                </button>
+                </Button>
               </div>
             </div>
           </div>

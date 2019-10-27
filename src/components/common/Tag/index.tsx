@@ -1,6 +1,7 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core'
 import fonts from '../../../styles/fonts'
+import colors from '../../../styles/colors'
 
 type Props = {
   children: any
@@ -9,6 +10,8 @@ type Props = {
 
 const style = css`
   padding: 4px;
+  color: white;
+  background-color: ${colors.primary};
   font-family: ${fonts.fontFamily};
   font-size: ${fonts.small};
   border: solid 1px;
