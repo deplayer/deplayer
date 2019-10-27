@@ -46,7 +46,8 @@ export default (state: State = defaultState, action) => {
     }
 
     case types.ADD_TO_COLLECTION:
-    case types.RECEIVE_COLLECTION_FINISHED: {
+    case types.RECEIVE_COLLECTION_FINISHED:
+    case types.SEARCH_FINISHED: {
       return {
         ...state,
         loading: false

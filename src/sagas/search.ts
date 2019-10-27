@@ -16,8 +16,7 @@ import { getSettings } from './selectors'
 // Handle every provider as independent thread
 function* performSingleSearch(
   searchTerm: string,
-  provider: string,
-  redirect: boolean = true
+  provider: string
 ) {
   try {
     const settings = yield select(getSettings)
@@ -27,10 +26,6 @@ function* performSingleSearch(
   } catch (e) {
     yield put({type: types.SEARCH_REJECTED, message: e.message})
     yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.search.failed'})
-  }
-
-  if (redirect) {
-    yield call(goToSearchResults)
   }
 }
 
@@ -47,11 +42,15 @@ export function* search(action: SearchAction): any {
   const redirect = !action.noRedirect
 
   const searchPromises = Object.keys(providersService.providers).map((provider) => {
-    return fork(performSingleSearch, action.searchTerm, provider, redirect)
+    return fork(performSingleSearch, action.searchTerm, provider)
   })
   yield all(searchPromises)
   yield put({type: types.SEARCH_FINISHED, searchTerm: action.searchTerm})
   yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.search.finished'})
+
+  if (redirect) {
+    yield call(goToSearchResults)
+  }
 }
 
 // Going to home page

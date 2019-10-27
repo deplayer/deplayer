@@ -16,7 +16,7 @@ export default class IndexService {
     this.index.saveDocument(false)
   }
 
-  generateIndexFrom(collection) {
+  generateIndexFrom = (collection: Array<any>) => {
     collection.forEach((doc) => {
       this.index.addDoc(doc)
     })

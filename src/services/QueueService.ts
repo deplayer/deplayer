@@ -22,7 +22,6 @@ export default class QueueService implements IStorageService {
 
   get = async (): Promise<any> => {
     const queue = await this.storageAdapter.get('queue', 'queue')
-    console.log(queue)
     return queue
   }
 }

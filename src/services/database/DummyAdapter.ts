@@ -1,7 +1,7 @@
 import { IAdapter } from './IAdapter'
 
 export default class DummyAdapter implements IAdapter {
-  initialize() {
+  async initialize() {
   }
 
   save(model: string, id: string, payload: any): Promise<any> {

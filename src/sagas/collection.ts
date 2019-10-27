@@ -4,7 +4,6 @@ import { actionChannel, fork, take, takeLatest, put, call, select } from 'redux-
 import { getAdapter } from '../services/database'
 import CollectionService from '../services/CollectionService'
 import IndexService from '../services/Search/IndexService'
-import SearchIndexService from '../services/SearchIndexService'
 import Song from '../entities/Song'
 import logger from '../utils/logger'
 import * as types from '../constants/ActionTypes'
@@ -63,23 +62,6 @@ function* initializeCollection() {
   }
 }
 
-// SearchIndex initialization
-function* initializeSearchIndex() {
-  try {
-    const adapter = getAdapter()
-    const searchIndexService = new SearchIndexService(new adapter())
-    yield call(collectionService.initialize)
-    const searchIndex = yield call(searchIndexService.get)
-
-    console.log('searchIndex: ', searchIndex)
-
-    yield put({type: types.RECEIVE_SEARCH_INDEX, data: searchIndex})
-  } catch (e) {
-    logger.log('settings-saga', 'initializeSearchIndex', e)
-    yield put({type: types.RECEIVE_SEARCH_INDEX_REJECTED, error: e.message})
-  }
-}
-
 const getCollection = (state: any): any => {
   return state ? state.collection : {}
 }
@@ -124,6 +106,8 @@ export function* deleteCollection(): any {
   try {
     yield collectionService.removeAll()
     yield put({type: types.REMOVE_FROM_COLLECTION_FULFILLED})
+    yield put({type: types.ADD_TO_COLLECTION, data: []})
+    yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.collection_deleted'})
   } catch (e) {
     yield put({type: types.REMOVE_FROM_COLLECTION_REJECTED, message: e.message})
   }
@@ -150,12 +134,13 @@ export function* generateIndex(): any {
   const collection = yield call(collectionService.getAll)
   const mappedData = yield call(mapToMedia, collection)
   const service = new IndexService()
-  const { index } = yield call(service.generateIndexFrom, mappedData)
-
-  console.log('index: ', index)
+  const index = yield call(service.generateIndexFrom, mappedData)
 
   try {
-    yield put({type: types.RECEIVE_SEARCH_INDEX, data: index.toJSON()})
+    const data = JSON.parse(
+      JSON.stringify(index)
+    )
+    yield put({type: types.RECEIVE_SEARCH_INDEX, data})
   } catch (e) {
     yield put({type: types.RECEIVE_SEARCH_INDEX_REJECTED, message: e.message})
   }
@@ -174,13 +159,12 @@ function* trackSongPlayed(action: {type: string, songId: string}): any {
 // Binding actions to sagas
 function* collectionSaga(): any {
   yield takeLatest(types.RECEIVE_SETTINGS_FINISHED, initializeCollection)
-  yield takeLatest(types.RECEIVE_SETTINGS_FINISHED, initializeSearchIndex)
   yield fork(addToCollectionHandler)
   yield takeLatest(types.REMOVE_FROM_COLLECTION, removeFromCollection)
   yield takeLatest(types.DELETE_COLLECTION, deleteCollection)
   yield takeLatest(types.EXPORT_COLLECTION, exportCollection)
   yield takeLatest(types.IMPORT_COLLECTION, importCollection)
-  yield takeLatest(types.RECEIVE_COLLECTION_FINISHED, generateIndex)
+  yield takeLatest(types.RECEIVE_COLLECTION, generateIndex)
   yield takeLatest(types.SONG_PLAYED, trackSongPlayed)
 }
 
