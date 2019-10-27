@@ -2,6 +2,7 @@ import Media from '../entities/Media'
 import Song from '../entities/Song'
 import filterSongs from '../utils/filter-songs'
 import * as types from '../constants/ActionTypes'
+import IndexService from '../services/Search/IndexService'
 
 type State = {
   rows: { [key: string]: Media },
@@ -14,6 +15,7 @@ type State = {
   visibleSongs: Array<string>,
   searchResults: Array<string>,
   enabledProviders: Array<string>,
+  searchIndex: object | null,
   loading: boolean,
   totalRows: number
 }
@@ -29,8 +31,18 @@ export const defaultState = {
   visibleSongs: [],
   searchResults: [],
   enabledProviders: [],
+  searchIndex: null,
   loading: true,
   totalRows: 0
+}
+
+const getIndexService = (index: any) => {
+  const indexService = new IndexService()
+  if (!index) {
+    return indexService
+  }
+
+  return indexService.loadIndex(index.index)
 }
 
 export default (state: State = defaultState, action: any = {}) => {
@@ -39,6 +51,13 @@ export default (state: State = defaultState, action: any = {}) => {
       return {
         ...state,
         searchTerm: action.searchTerm
+      }
+    }
+
+    case types.RECEIVE_SEARCH_INDEX: {
+      return {
+        ...state,
+        searchIndex: action.data
       }
     }
 
@@ -97,6 +116,7 @@ export default (state: State = defaultState, action: any = {}) => {
       const totalSongsByArtist  = {...state.songsByArtist, ...songsByArtist}
       const totalAlbumsByArtist  = {...state.albumsByArtist, ...albumsByArtist}
       const totalSongsByAlbum  = {...state.songsByAlbum, ...songsByAlbum}
+      const indexService = getIndexService(state.searchIndex)
 
       return {
         ...state,
@@ -106,8 +126,11 @@ export default (state: State = defaultState, action: any = {}) => {
         songsByArtist: totalSongsByArtist,
         songsByAlbum: totalSongsByAlbum,
         albumsByArtist: totalAlbumsByArtist,
-        visibleSongs: filterSongs(totalRows),
-        searchResults: state.searchTerm !== '' ? filterSongs(totalRows, state.searchTerm) : [],
+        visibleSongs: filterSongs(
+          indexService,
+          totalRows
+        ),
+        searchResults: state.searchTerm !== '' ? filterSongs(indexService, totalRows, state.searchTerm) : [],
         totalRows: Object.keys(totalRows).length,
         loading: false
       }
@@ -125,9 +148,11 @@ export default (state: State = defaultState, action: any = {}) => {
     }
 
     case types.SEARCH_FINISHED: {
+      const indexService = getIndexService(state.searchIndex)
       return {
         ...state,
-        searchResults: state.searchTerm !== '' ? filterSongs(state.rows, state.searchTerm) : []
+        loading: false,
+        searchResults: state.searchTerm !== '' ? filterSongs(indexService, state.rows, state.searchTerm) : []
       }
     }
 
