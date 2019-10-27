@@ -1,10 +1,23 @@
-import * as React from 'react'
+/** @jsx jsx */
+import { jsx, css } from '@emotion/core'
+import fonts from '../../../styles/fonts'
 
-const Tag = () => {
+type Props = {
+  children: any
+  type?: 'primary'
+}
+
+const style = css`
+  padding: 4px;
+  font-size: ${fonts.small};
+  border: solid 1px;
+`
+
+const Tag = (props: Props) => {
   return (
-    <div>
-      Tag contents here
-    </div>
+    <span css={style}>
+      { props.children }
+    </span>
   )
 }
 

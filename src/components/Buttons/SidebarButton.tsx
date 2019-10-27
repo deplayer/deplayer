@@ -1,7 +1,8 @@
-import * as React from 'react'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
+import * as React from 'react'
 
+import Button from '../common/Button'
 import * as types from '../../constants/ActionTypes'
 
 type Props = {
@@ -14,12 +15,11 @@ const SidebarButton = ({dispatch}: Props) => {
   }
 
   return (
-    <button
-      className='button sidebar-button'
+    <Button
       onClick={toggleSidebar}
     >
       <i className="fa fa-bars"></i>
-    </button>
+    </Button>
   )
 }
 

@@ -11,8 +11,17 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "target": "es5",
-    "allowJs": true
+    "target": "esnext",
+    "allowJs": true,
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules" ,
+        "options": {
+          "customMatcher": "\\.(sc|c)ss$",
+          "camelCase": "only"
+        }
+      }
+    ]
   },
   "include": [
     "./src/"

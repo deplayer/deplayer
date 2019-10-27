@@ -1,26 +1,26 @@
 // your app's webpack.config.js
-const custom = require('../config/webpack.config.dev.js')
+const cssRules = require('../config/cssRules.js')
+const paths = require('../config/paths.js')
 
 module.exports = ({ config }) => {
   const typescriptRules = {
     test: /\.(ts|tsx)$/,
-    use: [
-      {
-        loader: require.resolve('awesome-typescript-loader'),
-      },
-      // Optional
-      {
-        loader: require.resolve('react-docgen-typescript-loader'),
-      },
-    ],
+    include: paths.appSrc,
+    use: {
+      loader: require.resolve('babel-loader'),
+      options: {
+        presets: [['@babel/react']],
+      }
+    }
   }
   config.resolve.extensions.push('.ts', '.tsx')
+
 
   return {
     ...config,
     module: {
       ...config.module,
-      rules: [typescriptRules]
+      rules: [typescriptRules, ...cssRules]
     }
   }
 }

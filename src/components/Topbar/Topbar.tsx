@@ -3,6 +3,10 @@ import KeyHandler, { KEYPRESS } from 'react-key-handler'
 import { I18n } from 'react-redux-i18n'
 import SidebarButton from '../Buttons/SidebarButton'
 import Title from './Title'
+import {
+  TopbarContainer,
+  TopbarContents
+} from './Topbar.styles'
 
 import * as types from '../../constants/ActionTypes'
 
@@ -115,21 +119,19 @@ class Topbar extends React.Component<Props, State> {
     )
 
     return (
-      <React.Fragment>
-        <div className={`topbar-container has-results`}>
-          <SidebarButton />
-          <KeyHandler
-            keyEventName={KEYPRESS}
-            keyValue='/'
-            onKeyHandle={this.setFocus}
-          />
-          { this.renderSearch(this.props) }
-          {  !this.state.focus && !this.props.searchToggled  ? <Title title={title} onClick={this.setSearchOn} /> : null }
-          <div>
-            {  !this.state.focus ? childrenWithProps : null }
-          </div>
-        </div>
-      </React.Fragment>
+      <TopbarContainer>
+        <SidebarButton />
+        <KeyHandler
+          keyEventName={KEYPRESS}
+          keyValue='/'
+          onKeyHandle={this.setFocus}
+        />
+        { this.renderSearch(this.props) }
+        {  !this.state.focus && !this.props.searchToggled  ? <Title title={title} onClick={this.setSearchOn} /> : null }
+        <TopbarContents>
+          {  !this.state.focus ? childrenWithProps : null }
+        </TopbarContents>
+      </TopbarContainer>
     )
   }
 }
