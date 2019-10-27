@@ -6,7 +6,7 @@ import SongView from '../components/SongView/SongView'
 
 const RoutedSongView = withRouter((props: any) => <SongView {...props}/>)
 
-const getSongId = (router) : string => {
+const getSongId = (router: any) : string => {
   const songFinder = router.location.pathname.match(/\/song\/(.*)/)
 
   if (songFinder && songFinder[1]) {
@@ -17,7 +17,7 @@ const getSongId = (router) : string => {
 }
 
 export default connect(
-  (state: any, ownProps: any) => {
+  (state: any) => {
     return {
       collection: state.collection,
       queue: state.queue,

@@ -60,6 +60,7 @@ const Queue = (props: Props) => {
       <MusicTable
         tableIds={props.queue.trackIds}
         disableCovers={props.slim}
+        slim={props.slim}
         {...props}
       />
     </div>
