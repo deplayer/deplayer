@@ -1,5 +1,7 @@
-import * as React from 'react'
 import KeyHandler, {KEYPRESS} from 'react-key-handler'
+import * as React from 'react'
+
+import Button from '../common/Button'
 
 type Props = {
   playing: boolean,
@@ -14,12 +16,12 @@ const PlayPauseButton = (props: Props) => {
         keyValue=" "
         onKeyHandle={props.onClick}
       />
-      <button
+      <Button
         className='play-pause'
         onClick={props.onClick}
       >
         <i className={`icon ${props.playing ? 'pause': 'play'} circle`}></i>
-      </button>
+      </Button>
     </React.Fragment>
   )
 }

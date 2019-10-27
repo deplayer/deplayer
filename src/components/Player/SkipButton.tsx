@@ -1,6 +1,8 @@
 import KeyHandler, {KEYPRESS} from 'react-key-handler'
 import * as React from 'react'
 
+import Button from '../common/Button'
+
 type Props = {
   onClick: () => void,
   type: string,
@@ -21,11 +23,11 @@ const SkipButton = (props: Props) => {
   return (
     <React.Fragment>
       { keyHandlers }
-      <button
+      <Button
         onClick={props.onClick}
       >
         <i className={`icon step ${ props.type === 'next' ? 'forward': 'backward'}`}></i>
-      </button>
+      </Button>
     </React.Fragment>
   )
 }
