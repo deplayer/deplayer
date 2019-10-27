@@ -58,7 +58,7 @@ const collections: Array<any> = [
         shuffleEnabled: {
           type: ['boolean']
         },
-        repeatEnabled: {
+        repeat: {
           type: ['boolean']
         },
         currentPlaying: {
@@ -120,7 +120,7 @@ export const createCollections = async (db: any, filter: Array<string> = []) => 
   )
 
   // create collections
-  logger.log('DatabaseService', 'create collections')
+  logger.log('DatabaseService', 'create database collections')
   try {
     await Promise.all(filteredCollections.map(async (colData) =>
       await db.collection(colData)
@@ -128,7 +128,7 @@ export const createCollections = async (db: any, filter: Array<string> = []) => 
   } catch(e) {
     logger.log('DatabaseService', 'Error creating collections', e.message)
   }
-  logger.log('DatabaseService', 'collections created')
+  logger.log('DatabaseService', 'database collections created')
 }
 
 const _create = async (): Promise<any> => {

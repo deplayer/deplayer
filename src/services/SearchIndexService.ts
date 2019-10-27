@@ -21,7 +21,7 @@ export default class SearchIndexService implements IStorageService {
       })
   }
 
-  get = (): Promise<any> => {
-    return this.storageAdapter.get('search_index', 'search_index')
+  get = async () => {
+    return await this.storageAdapter.get('search_index', 'search_index')
   }
 }

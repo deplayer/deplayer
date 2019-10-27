@@ -47,8 +47,7 @@ export default (state: State = defaultState, action: any = {}) => {
         return new Song({
           ...row,
           id: row.id,
-          forcedId:
-          row.id,
+          forcedId: row.id,
           artistId: row.artist.id,
           albumId: row.album.id
         })

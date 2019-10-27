@@ -10,8 +10,8 @@ export default class SettingsService implements IStorageService {
     this.storageAdapter = storageAdapter
   }
 
-  initialize = (model: string = MODEL) => {
-    this.storageAdapter.initialize(model)
+  initialize = async (model: string = MODEL) => {
+    await this.storageAdapter.initialize(model)
   }
 
   save = (id: string, payload: any): Promise<any> => {

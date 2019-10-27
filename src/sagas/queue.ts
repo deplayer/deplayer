@@ -29,14 +29,24 @@ const adapter = getAdapter()
 const queueService = new QueueService(new adapter())
 
 export function* saveQueue(): any {
-  logger.log('queue-saga', 'saving queue')
   const queue = yield select(getQueue)
-  yield queueService.save('queue', queue)
+  logger.log('queue-saga', 'saving queue', queue)
+
+  // FIXME Fix this with rxdb pre-insert hook
+  // https://redux-saga.js.org/docs/advanced/NonBlockingCalls.html
+  yield call(queueService.save, 'queue', {
+    trackIds: queue.trackIds,
+    shuffleEnabled: false,
+    currentPlaying: queue.currentPlaying,
+    repeat: queue.repeat,
+    nextSongId: queue.nextSongId,
+    prevSongId: queue.prevSongId
+  })
 }
 
 export function* clearQueue(): any {
   logger.log('queue-saga', 'removing queue')
-  yield queueService.save('queue', {})
+  yield call(queueService.save, 'queue', {})
 }
 
 export function* addAlbumToPlaylist(action: any): any {
@@ -53,7 +63,7 @@ function* initialize() {
   logger.log('queue-saga', 'initializing queue')
   const queue = yield call(queueService.get)
   if (!queue) {
-    logger.log('queue-saga', 'error retrieving queue')
+    logger.log('queue-saga', 'error retrieving queue', queue)
     yield put({type: types.GET_QUEUE_REJECTED})
   } else {
     const unserialized = JSON.parse(JSON.stringify(queue))

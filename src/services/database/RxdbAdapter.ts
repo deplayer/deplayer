@@ -6,8 +6,8 @@ import { createCollections } from './RxdbDatabase'
 import logger from '../../utils/logger'
 
 export default class RxdbAdapter implements IAdapter {
-  initialize = () => {
-    db.get()
+  initialize = async () => {
+    await db.get()
   }
 
   save = async (model: string, id: string, payload: any): Promise<any> => {
@@ -59,44 +59,27 @@ export default class RxdbAdapter implements IAdapter {
     return this.save(model, item.id, item)
   }
 
-  get = (model: string, id: string): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      return db.get().then((instance) => {
-        this.getDocObj(model, id).then((result) => {
-          if (!result) {
-            logger.log('RxdbDatabase', 'Result for %s with id %s not found', model, id)
-            return resolve()
-          }
+  get = async (model: string, id: string): Promise<any> => {
+    await db.get()
 
-          return resolve(result.get())
-        })
-          .catch((err) => {
-            logger.log('RxdbDatabase', err)
-            reject(err)
-          })
-      })
-    })
+    const result = await this.getDocObj(model, id)
+    if (!result) {
+      logger.log('RxdbAdapter', 'Result for %s with id %s not found', model, id)
+      return
+    }
+
+    return result.get()
   }
 
-  getDocObj = (model: string, id: string): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      return db.get().then((instance) => {
+  getDocObj = async (model: string, id: string): Promise<any> => {
+    const instance = await db.get()
 
-        const query = instance[model].findOne({_id: id})
+    if (!instance[model]) {
+      logger.log('RxdbAdapter', 'no instance model found for', model)
+      return
+    }
 
-        query.exec().then((result) => {
-          if (result) {
-            resolve(result)
-          }
-
-          resolve()
-        })
-          .catch((err) => {
-            logger.log('RxdbDatabase', err)
-            reject(err)
-          })
-      })
-    })
+    return instance[model].findOne({_id: id}).exec()
   }
 
   removeCollection = async (model: string): Promise<any> => {
