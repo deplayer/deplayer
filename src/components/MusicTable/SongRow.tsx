@@ -1,12 +1,13 @@
-import * as React from 'react'
-import { Translate } from 'react-redux-i18n'
 import { Dispatch } from 'redux'
 import { Link } from 'react-router-dom'
+import { Translate } from 'react-redux-i18n'
+import * as React from 'react'
 
 import { getDurationStr } from '../../utils/timeFormatter'
-import Song from '../../entities/Song'
-import CoverImage from './CoverImage'
 import ContextualMenu from './ContextualMenu'
+import CoverImage from './CoverImage'
+import Song from '../../entities/Song'
+import Tag from '../common/Tag'
 
 type Props = {
   song: Song,
@@ -67,11 +68,13 @@ const SongRow = (props: Props) => {
           </li>
           { props.slim ||  <li> { getDurationStr(song.duration) } </li> }
         </ul>
+        <div>
         {
           song.stream.map((provider) => {
-            return (<i key={provider.service}>{ provider.service }</i>)
+            return (<Tag key={provider.service}>{ provider.service }</Tag>)
           })
         }
+        </div>
         <div className='media-actions'>
           <ContextualMenu {...props} />
           { props.slim && <span>{ getDurationStr(song.duration) }</span> }

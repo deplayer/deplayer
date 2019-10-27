@@ -9,6 +9,7 @@ type Props = {
 
 const style = css`
   padding: 4px;
+  font-family: ${fonts.fontFamily};
   font-size: ${fonts.small};
   border: solid 1px;
 `
