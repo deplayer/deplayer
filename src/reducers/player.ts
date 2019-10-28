@@ -5,6 +5,8 @@ export type State = {
   showPlayer: boolean,
   currentTime: number,
   errorCount: number,
+  streamUri: string | null,
+  providers: object,
   volume: number
 }
 
@@ -12,6 +14,8 @@ export const defaultState = {
   playing: false,
   showPlayer: false,
   currentTime: 0,
+  providers: {},
+  streamUri: null,
   errorCount: 0,
   volume: 100
 }
