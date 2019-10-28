@@ -61,6 +61,7 @@ export default (state: State = defaultState, action: any = {}) => {
       }
     }
 
+    case types.RECEIVE_COLLECTION_ITEM:
     case types.RECEIVE_COLLECTION: {
       const songs = action.data.map((row: any) => {
         return new Song({
@@ -111,21 +112,16 @@ export default (state: State = defaultState, action: any = {}) => {
       }
 
       const totalRows = {...state.rows, ...rows}
-      const totalArtists = {...state.artists, ...artists}
-      const totalAlbums = {...state.albums, ...albums}
-      const totalSongsByArtist  = {...state.songsByArtist, ...songsByArtist}
-      const totalAlbumsByArtist  = {...state.albumsByArtist, ...albumsByArtist}
-      const totalSongsByAlbum  = {...state.songsByAlbum, ...songsByAlbum}
       const indexService = getIndexService(state.searchIndex)
 
       return {
         ...state,
         rows: totalRows,
-        artists: totalArtists,
-        albums: totalAlbums,
-        songsByArtist: totalSongsByArtist,
-        songsByAlbum: totalSongsByAlbum,
-        albumsByArtist: totalAlbumsByArtist,
+        artists: {...state.artists, ...artists},
+        albums: {...state.albums, ...albums},
+        songsByArtist: {...state.songsByArtist, ...songsByArtist},
+        songsByAlbum: {...state.songsByAlbum, ...songsByAlbum},
+        albumsByArtist: {...state.albumsByArtist, ...albumsByArtist},
         visibleSongs: filterSongs(
           indexService,
           totalRows
@@ -144,15 +140,6 @@ export default (state: State = defaultState, action: any = {}) => {
       return {
         ...state,
         enabledProviders
-      }
-    }
-
-    case types.SEARCH_FINISHED: {
-      const indexService = getIndexService(state.searchIndex)
-      return {
-        ...state,
-        loading: false,
-        searchResults: state.searchTerm !== '' ? filterSongs(indexService, state.rows, state.searchTerm) : []
       }
     }
 

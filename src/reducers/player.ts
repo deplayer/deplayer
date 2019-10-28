@@ -25,6 +25,15 @@ export default (state: State = defaultState, action: any): State => {
     case types.START_PLAYING:
       return {...state, playing: true, showPlayer: true}
 
+    /* case types.RECEIVE_COLLECTION:
+      const providers = {}
+      for (let i = 0; i < action.data.length; i++) {
+        const row = action.data[i]
+        providers[row.id] = row.providers
+      }
+      return {...state, providers}
+    */
+
     case types.HIDE_PLAYER:
       return {...state, showPlayer: false}
 

@@ -4,7 +4,8 @@ import {
   takeLatest,
   select,
   all,
-  fork
+  fork,
+  take
 } from 'redux-saga/effects'
 
 import history from '../store/configureHistory'
@@ -22,6 +23,7 @@ function* performSingleSearch(
     const settings = yield select(getSettings)
     const providerService = new ProvidersService(settings)
     const searchResults = yield call(providerService.searchForProvider, searchTerm, provider)
+    yield put({type: types.RECEIVE_COLLECTION, data: searchResults})
     yield put({type: types.ADD_TO_COLLECTION, data: searchResults})
   } catch (e) {
     yield put({type: types.SEARCH_REJECTED, message: e.message})
@@ -45,6 +47,7 @@ export function* search(action: SearchAction): any {
     return fork(performSingleSearch, action.searchTerm, provider)
   })
   yield all(searchPromises)
+  yield take([types.ADD_TO_COLLECTION, types.SEARCH_REJECTED])
   yield put({type: types.SEARCH_FINISHED, searchTerm: action.searchTerm})
   yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.search.finished'})
 
