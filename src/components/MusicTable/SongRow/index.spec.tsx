@@ -2,8 +2,8 @@ import * as React from 'react'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../../tests/configureEnzyme'
 
-import Song from '../../entities/Song'
-import SongRow from './SongRow'
+import Song from '../../../entities/Song'
+import SongRow from './index'
 
 configureEnzyme()
 
