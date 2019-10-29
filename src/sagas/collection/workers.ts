@@ -3,7 +3,7 @@ import { put, call, select } from 'redux-saga/effects'
 
 import { getAdapter } from '../../services/database'
 import { getCollection } from '../selectors'
-import { initializeCollection } from './handlers'
+import { receiveSettingsWatcher } from './watchers'
 import CollectionService from '../../services/CollectionService'
 import IndexService from '../../services/Search/IndexService'
 import logger from '../../utils/logger'
@@ -14,9 +14,9 @@ import * as types from '../../constants/ActionTypes'
 const adapter = getAdapter()
 const collectionService = new CollectionService(new adapter())
 
-export function* saveToDbWorker(data: any): any {
+export function* saveToDbWorker(data: Array<any>): any {
   const prevCollection = yield select(getCollection)
-  yield call (collectionService.bulkSave, data, prevCollection)
+  yield call(collectionService.bulkSave, data, prevCollection)
   try {
     yield put({type: types.SAVE_COLLECTION_FULLFILLED})
   } catch (e) {
@@ -26,15 +26,16 @@ export function* saveToDbWorker(data: any): any {
 }
 
 // Handling REMOVE_FROM_COLLECTION saga
-export function* removeFromCollection(action: any): any {
+export function* removeFromDbWorker(action: any): any {
   try {
     yield collectionService.bulkRemove(action.data)
+    yield put({type: types.REMOVE_FROM_COLLECTION_FULFILLED})
   } catch (e) {
     yield put({type: types.REMOVE_FROM_COLLECTION_REJECTED, message: e.message})
   }
 }
 
-export function* deleteCollection(): any {
+export function* deleteCollectionWorker(): any {
   try {
     yield collectionService.removeAll()
     yield put({type: types.REMOVE_FROM_COLLECTION_FULFILLED})
@@ -45,7 +46,7 @@ export function* deleteCollection(): any {
   }
 }
 
-export function* exportCollection(): any {
+export function* exportCollectionWorker(): any {
   try {
     const exported = yield collectionService.exportCollection()
     yield put({type: types.EXPORT_COLLECTION_FINISHED, exported})
@@ -85,5 +86,5 @@ export function* trackSongPlayed(action: {type: string, songId: string}): any {
   const prevCount = song.playCount || 0
   song.playCount = prevCount + 1
   yield call(collectionService.save, action.songId, song.toDocument())
-  yield call(initializeCollection)
+  yield call(receiveSettingsWatcher)
 }

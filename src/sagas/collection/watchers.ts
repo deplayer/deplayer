@@ -10,7 +10,7 @@ import * as types from '../../constants/ActionTypes'
 const adapter = getAdapter()
 const collectionService = new CollectionService(new adapter())
 
-export function* addToCollectionHandler(): any {
+export function* addToCollectionWatcher(): any {
   const handleChannel = yield actionChannel(types.ADD_TO_COLLECTION)
 
   while (true) {
@@ -26,7 +26,7 @@ export function* addToCollectionHandler(): any {
 }
 
 // Application initialization routines
-export function* initializeCollection() {
+export function* receiveSettingsWatcher() {
   try {
     yield call(collectionService.initialize)
     const collection = yield call(collectionService.getAll)
