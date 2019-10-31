@@ -5,7 +5,7 @@ import { addToCollectionWatcher, receiveSettingsWatcher} from './watchers'
 import {
   deleteCollectionWorker,
   exportCollectionWorker,
-  generateIndex,
+  generateIndexWorker,
   importCollectionWorker,
   removeFromDbWorker,
   trackSongPlayed,
@@ -17,8 +17,8 @@ function* collectionSaga(): any {
   yield takeLatest(types.REMOVE_FROM_COLLECTION, removeFromDbWorker)
   yield takeLatest(types.DELETE_COLLECTION, deleteCollectionWorker)
   yield takeLatest(types.EXPORT_COLLECTION, exportCollectionWorker)
-  yield takeLatest(types.IMPORT_COLLECTION, importCollection)
-  yield takeLatest(types.RECEIVE_COLLECTION, generateIndex)
+  yield takeLatest(types.IMPORT_COLLECTION, importCollectionWorker)
+  yield takeLatest(types.RECEIVE_COLLECTION, generateIndexWorker)
   yield takeLatest(types.SONG_PLAYED, trackSongPlayed)
 }
 
