@@ -8,11 +8,11 @@ import {
   take
 } from 'redux-saga/effects'
 
-import history from '../store/configureHistory'
+import history from '../../store/configureHistory'
 
-import  * as types from '../constants/ActionTypes'
-import ProvidersService from '../services/ProvidersService'
-import { getSettings } from './selectors'
+import  * as types from '../../constants/ActionTypes'
+import ProvidersService from '../../services/ProvidersService'
+import { getSettings } from './../selectors'
 
 // Handle every provider as independent thread
 function* performSingleSearch(

@@ -1,29 +1,23 @@
-/** @jsx jsx */
-import { jsx, css } from '@emotion/core'
-import fonts from '../../../styles/fonts'
-import colors from '../../../styles/colors'
-import distances from '../../../styles/distances'
+import React from 'react'
+import classnames from 'classnames'
 
 type Props = {
   onClick?: () => any,
   children: any,
+  inverted?: boolean,
   className?: string
 }
 
-const styles = css`
-  border: none;
-  cursor: pointer;
-  padding: ${distances.base};
-  font-family: ${fonts.fontFamily};
-  color: ${colors.primary100};
-  background-color: ${colors.primary};
-`
-
 const Button = (props: Props) => {
+  const classNames = classnames({
+    'bg-blue-700': true,
+    'p-2': true,
+    'bg-transparent': props.inverted
+  })
+
   return (
     <button
-      css={styles}
-      className={props.className}
+      className={classNames}
       onClick={props.onClick}
     >
       { props.children }
