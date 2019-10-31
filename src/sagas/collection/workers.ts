@@ -55,18 +55,17 @@ export function* exportCollectionWorker(): any {
   }
 }
 
-export function* importCollection(action: {type: string, data: any}): any {
+export function* importCollectionWorker(action: {type: string, data: any}): any {
   logger.log('settings-saga', 'importingCollection')
   const result = yield collectionService.importCollection(action.data)
   yield put({type: types.IMPORT_COLLECTION_FINISHED, result})
 }
 
 // generate fulltext index
-export function* generateIndex(): any {
+export function* generateIndexWorker(service = new IndexService()): any {
   yield call(collectionService.initialize)
   const collection = yield call(collectionService.getAll)
   const mappedData = yield call(mapToMedia, collection)
-  const service = new IndexService()
   const index = yield call(service.generateIndexFrom, mappedData)
 
   try {

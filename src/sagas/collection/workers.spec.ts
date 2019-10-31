@@ -1,11 +1,15 @@
 import { expectSaga } from 'redux-saga-test-plan'
+import * as matchers from 'redux-saga-test-plan/matchers'
 
 import {
-  saveToDbWorker,
-  removeFromDbWorker,
   deleteCollectionWorker,
-  exportCollectionWorker
+  exportCollectionWorker,
+  generateIndexWorker,
+  importCollectionWorker,
+  removeFromDbWorker,
+  saveToDbWorker
 } from './workers'
+import IndexService from '../../services/Search/IndexService'
 import * as types from '../../constants/ActionTypes'
 
 describe('saveToDbWorker', () => {
@@ -40,6 +44,27 @@ describe('exportCollectionWorker', () => {
   it('works', () => {
     return expectSaga(exportCollectionWorker)
       .put({type: types.EXPORT_COLLECTION_FINISHED, exported: {}})
+      .run()
+  })
+})
+
+describe('importCollectionWorker', () => {
+  it('works', () => {
+    return expectSaga(importCollectionWorker, {type: 'TO_BE_FIXED', data: {}})
+      .put({type: types.IMPORT_COLLECTION_FINISHED, result: {}})
+      .run()
+  })
+})
+
+describe('generateIndexWorker', () => {
+  const service = new IndexService()
+  const fakeIndex = {}
+  it('works', () => {
+    return expectSaga(generateIndexWorker, service)
+      .provide([
+        [matchers.call.fn(service.generateIndexFrom), fakeIndex],
+      ])
+      .put({type: types.RECEIVE_SEARCH_INDEX, data: { }})
       .run()
   })
 })

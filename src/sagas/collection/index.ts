@@ -6,7 +6,7 @@ import {
   deleteCollectionWorker,
   exportCollectionWorker,
   generateIndex,
-  importCollection,
+  importCollectionWorker,
   removeFromDbWorker,
   trackSongPlayed,
 } from './workers'
