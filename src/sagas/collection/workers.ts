@@ -78,6 +78,7 @@ export function* generateIndexWorker(service = new IndexService()): any {
   }
 }
 
+// FIXME: Add spec for this worker
 export function* trackSongPlayed(action: {type: string, songId: string}): any {
   yield call(collectionService.initialize)
   const songRow = yield call(collectionService.get, action.songId)
