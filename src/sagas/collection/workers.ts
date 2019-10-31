@@ -62,7 +62,7 @@ export function* importCollectionWorker(action: {type: string, data: any}): any 
 }
 
 // generate fulltext index
-export function* generateIndexWorker(service = new IndexService()): any {
+export function* generateIndexWorker(service: IndexService): any {
   yield call(collectionService.initialize)
   const collection = yield call(collectionService.getAll)
   const mappedData = yield call(mapToMedia, collection)
@@ -78,7 +78,6 @@ export function* generateIndexWorker(service = new IndexService()): any {
   }
 }
 
-// FIXME: Add spec for this worker
 export function* trackSongPlayed(action: {type: string, songId: string}): any {
   yield call(collectionService.initialize)
   const songRow = yield call(collectionService.get, action.songId)

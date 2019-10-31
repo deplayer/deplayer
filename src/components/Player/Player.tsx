@@ -42,7 +42,7 @@ class Player extends React.Component<Props, State> {
     this.playerRef = React.createRef()
   }
 
-  componentWillMount() {
+  componentDidMount() {
     if (this.props.player.playing && !this.isPlaying()) {
       this.playPause()
     }
