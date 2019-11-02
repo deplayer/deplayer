@@ -1,4 +1,4 @@
-import 'react-contexify/dist/ReactContexify.min.css'
+// import 'react-contexify/dist/ReactContexify.min.css'
 
 import { Menu, Item, MenuProvider } from 'react-contexify'
 import { Dispatch } from 'redux'

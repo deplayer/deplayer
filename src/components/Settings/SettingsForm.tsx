@@ -1,13 +1,14 @@
-import * as React from 'react'
-import { Formik, Form } from 'formik'
 import { Dispatch } from 'redux'
+import { Formik, Form } from 'formik'
 import { Translate } from 'react-redux-i18n'
-import ProviderButton from './ProviderButton'
+import * as React from 'react'
 
-import * as types from '../../constants/ActionTypes'
-import FormSchema from './FormSchema'
 import { State as SettingsStateType } from '../../reducers/settings'
+import Button from '../common/Button'
+import FormSchema from './FormSchema'
+import ProviderButton from './ProviderButton'
 import ProviderForm from './ProviderForm'
+import * as types from '../../constants/ActionTypes'
 
 type Props = {
   settings: SettingsStateType,
@@ -68,9 +69,9 @@ const SettingsForm = (props: Props) => {
             { providers }
 
             <div>
-              <button className='with-bg' disabled={isSubmitting} type='submit'>
+              <Button className='with-bg' disabled={isSubmitting} type='submit'>
                 <Translate value="buttons.save" />
-              </button>
+              </Button>
             </div>
           </Form>
         )}

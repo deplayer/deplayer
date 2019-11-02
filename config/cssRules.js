@@ -2,19 +2,6 @@ const paths = require('./paths');
 const autoprefixer = require('autoprefixer');
 
 module.exports = [
-  // SASS support
-  {
-    test: /\.module\.scss$/,
-    include: paths.appSrc,
-    use: ["style-loader", {
-        loader: 'css-loader',
-        options: {
-          modules: true
-        },
-      },
-      "sass-loader"
-    ]
-  },
   {
     test: /\.scss$/,
     exclude: /\.module\.scss$/,
@@ -28,6 +15,7 @@ module.exports = [
   // in development "style" loader enables hot editing of CSS.
   {
     test: /\.css$/,
+    include: paths.appSrc,
     use: [
       require.resolve('style-loader'),
       {
@@ -41,8 +29,10 @@ module.exports = [
         options: {
           // Necessary for external CSS imports to work
           // https://github.com/facebookincubator/create-react-app/issues/2677
+          sourceMap: true,
           ident: 'postcss',
           plugins: () => [
+            require('tailwindcss'),
             require('postcss-flexbugs-fixes'),
             autoprefixer({
               browsers: [

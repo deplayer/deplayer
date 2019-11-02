@@ -24,6 +24,7 @@ function* performSingleSearch(
     const providerService = new ProvidersService(settings)
     const searchResults = yield call(providerService.searchForProvider, searchTerm, provider)
     yield put({type: types.RECEIVE_COLLECTION, data: searchResults})
+    yield put({type: types.RECREATE_INDEX})
     yield put({type: types.ADD_TO_COLLECTION, data: searchResults})
   } catch (e) {
     yield put({type: types.SEARCH_REJECTED, message: e.message})

@@ -63,10 +63,8 @@ export function* importCollectionWorker(action: {type: string, data: any}): any 
 
 // generate fulltext index
 export function* generateIndexWorker(service: IndexService): any {
-  yield call(collectionService.initialize)
-  const collection = yield call(collectionService.getAll)
-  const mappedData = yield call(mapToMedia, collection)
-  const index = yield call(service.generateIndexFrom, mappedData)
+  const collection = yield select(getCollection)
+  const index = yield call(service.generateIndexFrom, Object.values(collection.rows))
 
   try {
     const data = JSON.parse(
