@@ -37,16 +37,16 @@ const SongView = (props: Props) => {
   }
 
   return (
-    <div className={`song-view ${props.className}`}>
-      <div className='song'>
-        <div className='image'>
+    <div className={`song-view ${props.className} w-full`}>
+      <div className="song lg:flex">
+        <div className="w-full md:p-6 lg:w-1/2 image">
           <img
-            className='artist-image'
+            className='artist-image w-full'
             alt={song.title}
             src={song.cover.fullUrl}
           />
         </div>
-        <div className='content'>
+        <div className="w-full lg:w1/2 p-6 content">
           <div>
             <div>
               <div>

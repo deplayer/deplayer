@@ -2,9 +2,9 @@ const paths = require('./paths');
 const autoprefixer = require('autoprefixer');
 
 module.exports = [
+  // SASS support
   {
     test: /\.scss$/,
-    exclude: /\.module\.scss$/,
     include: paths.appSrc,
     loaders: ["style-loader", "css-loader", "sass-loader"]
   },
@@ -15,7 +15,6 @@ module.exports = [
   // in development "style" loader enables hot editing of CSS.
   {
     test: /\.css$/,
-    include: paths.appSrc,
     use: [
       require.resolve('style-loader'),
       {

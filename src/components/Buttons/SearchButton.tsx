@@ -1,7 +1,8 @@
-import * as React from 'react'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
+import * as React from 'react'
 
+import Button from '../common/Button'
 import * as types from '../../constants/ActionTypes'
 
 type Props = {
@@ -19,12 +20,13 @@ const SearchButton = ({dispatch, searchToggled}: Props) => {
   }
 
   return (
-    <button
+    <Button
+      inverted
       className='search-button button'
       onClick={toggleSearch}
     >
       <i className='fa fa-search'></i>
-    </button>
+    </Button>
   )
 }
 

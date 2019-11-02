@@ -173,7 +173,7 @@ class PlayerV2 extends React.Component<Props> {
         />
 
         <div className='player-contents'>
-          <div className='media-thumb'>
+          <div className='media-thumb p-3'>
             <CoverImage
               cover={currentPlaying.cover}
               size='thumbnail'

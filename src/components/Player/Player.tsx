@@ -142,7 +142,7 @@ class Player extends React.Component<Props, State> {
     const duration = this.playerRef.current ? this.playerRef.current.duration : 0
 
     const cover = !slim &&  (
-      <div className='media-thumb'>
+      <div className='media-thumb p-3'>
         <CoverImage
           cover={currentPlaying.cover}
           size='thumbnail'

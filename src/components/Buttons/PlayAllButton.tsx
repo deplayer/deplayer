@@ -1,8 +1,9 @@
-import * as React from 'react'
 import { Dispatch } from 'redux'
 import { withRouter } from 'react-router-dom'
+import * as React from 'react'
 
 import { PLAY_ALL } from '../../constants/ActionTypes'
+import Button from '../common/Button'
 
 type Props = {
   dispatch: Dispatch,
@@ -19,12 +20,13 @@ const PlayAllButton = (props: Props) => {
   }
 
   return (
-    <button
+    <Button
+      inverted
       className='playall-button button'
       onClick={playAll}
     >
       <i className='fa fa-caret-right'></i>
-    </button>
+    </Button>
   )
 }
 

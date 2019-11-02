@@ -1,11 +1,19 @@
 .progress {
   background: transparent;
-  height: 20px;
+  margin-top: -2px;
+  overflow: visible;
+  margin-bottom: 0px;
+}
+
+.rc-slider {
+  padding: 0 !important;
 }
 
 .rc-slider-track,
 .rc-slider-rail {
-  height: 8px;
+  height: 6px !important;
+  border-radius: none !important;
+  background-color: $primary-color !important;
 }
 
 .rc-slider-handle {
@@ -14,9 +22,9 @@
 
 .rc-slider-handle {
   border: solid 2px $primary-color-100;
-  top: 6px;
-  width: 16px;
-  height: 16px;
+  margin-top: -7px !important;
+  width: 20px !important;
+  height: 20px !important;
   background-color: $primary-color;
 }
 

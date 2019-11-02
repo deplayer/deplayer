@@ -30,7 +30,7 @@ const ProgressBar = (props: Props) => {
         onChange={ props.onChange }
         onAfterChange={ props.onAfterChange }
       />
-      <span className='total-time'>
+      <span className='absolute bottom-auto right-0 p-2'>
         -{ getDurationStr(props.total * 1000 - props.current * 1000) }
       </span>
     </div>
