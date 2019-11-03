@@ -58,13 +58,14 @@ describe('importCollectionWorker', () => {
 
 describe('generateIndexWorker', () => {
   const service = new IndexService()
-  const fakeIndex = {}
+  const fakeIndex = {rows: {}}
   it('works', () => {
     return expectSaga(generateIndexWorker, service)
+      .withState({ collection: {rows: {}} })
       .provide([
         [matchers.call.fn(service.generateIndexFrom), fakeIndex],
       ])
-      .put({type: types.RECEIVE_SEARCH_INDEX, data: { }})
+      .put({type: types.RECEIVE_SEARCH_INDEX, data: { rows: {} }})
       .run()
   })
 })
