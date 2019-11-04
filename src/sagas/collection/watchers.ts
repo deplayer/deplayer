@@ -19,6 +19,10 @@ export function* addToCollectionWatcher(): any {
 
     try {
       yield fork(saveToDbWorker, data)
+      yield take([
+        types.SAVE_COLLECTION_FULLFILLED,
+        types.SAVE_COLLECTION_FAILED
+      ])
       yield put({type: types.RECEIVE_COLLECTION_FINISHED})
     } catch(error) {
       yield put({type: 'ADD_TO_COLLECTION_HANDLER_FAILED', error})
@@ -28,7 +32,8 @@ export function* addToCollectionWatcher(): any {
 
 // Application initialization routines
 export function* initializeWatcher() {
-  try {
+  while (true) {
+    yield take(types.INITIALIZE)
     yield call(initialize)
     yield call(collectionService.initialize)
     const collection = yield call(collectionService.getAll)
@@ -37,8 +42,5 @@ export function* initializeWatcher() {
     // FIXME: Handle RECEIVE_COLLECTION instead of call every time
     yield put({type: types.RECREATE_INDEX})
     yield put({type: types.INITIALIZED})
-  } catch (e) {
-    logger.log('settings-saga', 'initializeCollection', e)
-    yield put({type: types.RECEIVE_COLLECTION_REJECTED, error: e.message})
   }
 }

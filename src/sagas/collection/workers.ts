@@ -3,11 +3,9 @@ import { put, call, select } from 'redux-saga/effects'
 
 import { getAdapter } from '../../services/database'
 import { getCollection } from '../selectors'
-import { initializeWatcher } from './watchers'
 import CollectionService from '../../services/CollectionService'
 import IndexService from '../../services/Search/IndexService'
 import logger from '../../utils/logger'
-import mapToMedia from '../../mappers/mapToMedia'
 import rowToSong from '../../mappers/rowToSong'
 import * as types from '../../constants/ActionTypes'
 

@@ -15,7 +15,7 @@ import {
 const indexService = new IndexService()
 
 function* collectionSaga(): any {
-  yield takeLatest(types.INITIALIZE, initializeWatcher)
+  yield fork(initializeWatcher)
   yield fork(addToCollectionWatcher)
   yield takeLatest(types.REMOVE_FROM_COLLECTION, removeFromDbWorker)
   yield takeLatest(types.DELETE_COLLECTION, deleteCollectionWorker)

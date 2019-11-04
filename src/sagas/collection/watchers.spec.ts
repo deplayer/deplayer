@@ -19,6 +19,7 @@ describe('addToCollectionWatcher', () => {
 describe('initializeWatcher', () => {
   it('works', () => {
     return expectSaga(initializeWatcher)
+      .dispatch({type: types.INITIALIZE})
       .put({type: types.RECEIVE_COLLECTION, data: []})
       .put({type: types.INITIALIZED})
       .run()
