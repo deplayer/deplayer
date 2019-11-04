@@ -27,7 +27,6 @@ function* saveSettings(action: any) {
     const settings = yield call(settingsService.save, 'settings', action.settingsPayload)
 
     yield put({type: types.SETTINGS_SAVED_SUCCESSFULLY, settings})
-    yield call(initialize)
     yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.settings.saved'})
   } catch (e) {
     yield put({type: types.SETTINGS_SAVED_REJECTED, error: e.message})
