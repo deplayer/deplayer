@@ -3,20 +3,18 @@ import { put, call, select } from 'redux-saga/effects'
 
 import { getAdapter } from '../../services/database'
 import { getCollection } from '../selectors'
-import { initializeCollection } from './handlers'
 import CollectionService from '../../services/CollectionService'
 import IndexService from '../../services/Search/IndexService'
 import logger from '../../utils/logger'
-import mapToMedia from '../../mappers/mapToMedia'
 import rowToSong from '../../mappers/rowToSong'
 import * as types from '../../constants/ActionTypes'
 
 const adapter = getAdapter()
 const collectionService = new CollectionService(new adapter())
 
-export function* saveToDbWorker(data: any): any {
+export function* saveToDbWorker(data: Array<any>): any {
   const prevCollection = yield select(getCollection)
-  yield call (collectionService.bulkSave, data, prevCollection)
+  yield call(collectionService.bulkSave, data, prevCollection)
   try {
     yield put({type: types.SAVE_COLLECTION_FULLFILLED})
   } catch (e) {
@@ -26,15 +24,16 @@ export function* saveToDbWorker(data: any): any {
 }
 
 // Handling REMOVE_FROM_COLLECTION saga
-export function* removeFromCollection(action: any): any {
+export function* removeFromDbWorker(action: any): any {
   try {
     yield collectionService.bulkRemove(action.data)
+    yield put({type: types.REMOVE_FROM_COLLECTION_FULFILLED})
   } catch (e) {
     yield put({type: types.REMOVE_FROM_COLLECTION_REJECTED, message: e.message})
   }
 }
 
-export function* deleteCollection(): any {
+export function* deleteCollectionWorker(): any {
   try {
     yield collectionService.removeAll()
     yield put({type: types.REMOVE_FROM_COLLECTION_FULFILLED})
@@ -45,7 +44,7 @@ export function* deleteCollection(): any {
   }
 }
 
-export function* exportCollection(): any {
+export function* exportCollectionWorker(): any {
   try {
     const exported = yield collectionService.exportCollection()
     yield put({type: types.EXPORT_COLLECTION_FINISHED, exported})
@@ -54,19 +53,16 @@ export function* exportCollection(): any {
   }
 }
 
-export function* importCollection(action: {type: string, data: any}): any {
+export function* importCollectionWorker(action: {type: string, data: any}): any {
   logger.log('settings-saga', 'importingCollection')
   const result = yield collectionService.importCollection(action.data)
   yield put({type: types.IMPORT_COLLECTION_FINISHED, result})
 }
 
 // generate fulltext index
-export function* generateIndex(): any {
-  yield call(collectionService.initialize)
-  const collection = yield call(collectionService.getAll)
-  const mappedData = yield call(mapToMedia, collection)
-  const service = new IndexService()
-  const index = yield call(service.generateIndexFrom, mappedData)
+export function* generateIndexWorker(service: IndexService): any {
+  const collection = yield select(getCollection)
+  const index = yield call(service.generateIndexFrom, Object.values(collection.rows))
 
   try {
     const data = JSON.parse(
@@ -85,5 +81,4 @@ export function* trackSongPlayed(action: {type: string, songId: string}): any {
   const prevCount = song.playCount || 0
   song.playCount = prevCount + 1
   yield call(collectionService.save, action.songId, song.toDocument())
-  yield call(initializeCollection)
 }

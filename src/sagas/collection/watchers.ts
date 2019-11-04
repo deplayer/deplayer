@@ -1,5 +1,6 @@
 import { call, actionChannel, fork, take, put } from 'redux-saga/effects'
 
+import { initialize } from '../settings'
 import { getAdapter } from '../../services/database'
 import { saveToDbWorker } from './workers'
 import CollectionService from '../../services/CollectionService'
@@ -10,7 +11,7 @@ import * as types from '../../constants/ActionTypes'
 const adapter = getAdapter()
 const collectionService = new CollectionService(new adapter())
 
-export function* addToCollectionHandler(): any {
+export function* addToCollectionWatcher(): any {
   const handleChannel = yield actionChannel(types.ADD_TO_COLLECTION)
 
   while (true) {
@@ -18,6 +19,10 @@ export function* addToCollectionHandler(): any {
 
     try {
       yield fork(saveToDbWorker, data)
+      yield take([
+        types.SAVE_COLLECTION_FULLFILLED,
+        types.SAVE_COLLECTION_FAILED
+      ])
       yield put({type: types.RECEIVE_COLLECTION_FINISHED})
     } catch(error) {
       yield put({type: 'ADD_TO_COLLECTION_HANDLER_FAILED', error})
@@ -26,15 +31,16 @@ export function* addToCollectionHandler(): any {
 }
 
 // Application initialization routines
-export function* initializeCollection() {
-  try {
+export function* initializeWatcher() {
+  while (true) {
+    yield take(types.INITIALIZE)
+    yield call(initialize)
     yield call(collectionService.initialize)
     const collection = yield call(collectionService.getAll)
     const mappedData = mapToMedia(collection)
     yield put({type: types.RECEIVE_COLLECTION, data: mappedData})
+    // FIXME: Handle RECEIVE_COLLECTION instead of call every time
+    yield put({type: types.RECREATE_INDEX})
     yield put({type: types.INITIALIZED})
-  } catch (e) {
-    logger.log('settings-saga', 'initializeCollection', e)
-    yield put({type: types.RECEIVE_COLLECTION_REJECTED, error: e.message})
   }
 }

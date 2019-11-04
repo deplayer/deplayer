@@ -1,10 +1,11 @@
-import * as React from 'react'
-import { Translate } from 'react-redux-i18n'
 import { Dispatch } from 'redux'
+import { Translate } from 'react-redux-i18n'
+import * as React from 'react'
 
-import * as types from '../../constants/ActionTypes'
-import SettingsForm from './SettingsForm'
+import Button from '../common/Button'
 import Importer from '../Importer'
+import SettingsForm from './SettingsForm'
+import * as types from '../../constants/ActionTypes'
 
 type Props = {
   dispatch: Dispatch,
@@ -59,23 +60,23 @@ class Settings extends React.Component<Props, State> {
           dispatch={this.props.dispatch}
         />
         <div className='btn-group'>
-          <button className='with-bg btn btn-info' onClick={this.scanSources}>
+          <Button className='btn btn-info' onClick={this.scanSources} inverted>
             <Translate value="labels.scanSources" />
-          </button>
+          </Button>
         </div>
         <div className='btn-group'>
-          <button className='with-bg btn btn-info' onClick={this.exportCollection}>
+          <Button className='btn btn-info' onClick={this.exportCollection} inverted>
             <Translate value="labels.exportCollection" />
-          </button>
-          <button className='with-bg btn btn-success' onClick={this.toggleImporter}>
+          </Button>
+          <Button className='btn btn-success' onClick={this.toggleImporter} inverted>
             <Translate value="labels.importCollection" />
-          </button>
-          <button className='with-bg btn btn-danger' onClick={this.deleteCollection}>
+          </Button>
+          <Button className='btn btn-danger' onClick={this.deleteCollection} inverted>
             <Translate value="labels.deleteCollection" />
-          </button>
-          <button className='with-bg btn btn-danger' onClick={this.deleteSettings}>
+          </Button>
+          <Button className='btn btn-danger' onClick={this.deleteSettings} inverted>
             <Translate value="labels.deleteSettings" />
-          </button>
+          </Button>
         </div>
         <div className='btn-group'>
           { ImporterComp }

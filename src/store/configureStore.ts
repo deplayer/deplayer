@@ -67,7 +67,7 @@ export default function configureStore() {
   // Running sagas
   sagaMiddleware.run(rootSaga, store)
 
-  store.dispatch({type: types.INITIALIZE_SETTINGS})
+  store.dispatch({type: types.INITIALIZE})
   // Set breakpoint matching for responsive utilities
   store.dispatch({type: types.SET_MQL, value: mql.matches})
   mql.addListener(() => {

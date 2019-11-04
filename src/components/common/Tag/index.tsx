@@ -7,9 +7,9 @@ type Props = {
 
 const Tag = (props: Props) => {
   return (
-    <Tag type={props.type}>
+    <div className={props.type}>
       { props.children }
-    </Tag>
+    </div>
   )
 }
 

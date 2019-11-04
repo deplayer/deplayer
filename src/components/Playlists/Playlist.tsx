@@ -1,4 +1,6 @@
 import * as React from 'react'
+
+import Button from '../common/Button'
 import * as types from '../../constants/ActionTypes'
 
 type Props = {
@@ -33,15 +35,15 @@ const Playlist = (props: Props) => {
         </h3>
 
         <div className='btn-group'>
-          <button
+          <Button
             className='btn-secondary'
             onClick={() => setShowSongs(!showSongs)}
           >
             Show songs
             <i className={`fa ${showSongs ? 'fa-chevron-down' : 'fa-chevron-right' }`} />
-          </button>
+          </Button>
 
-          <button
+          <Button
             className='btn-info'
             onClick={() => {
               dispatch({
@@ -57,7 +59,7 @@ const Playlist = (props: Props) => {
           >
             Play
             <i className='fa fa-play' />
-          </button>
+          </Button>
         </div>
 
         { showSongs &&

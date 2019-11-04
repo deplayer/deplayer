@@ -54,10 +54,21 @@ export default (state: State = defaultState, action: any = {}) => {
       }
     }
 
-    case types.RECEIVE_SEARCH_INDEX: {
+    case types.START_SEARCH:
+    case types.SEARCH_FINISHED:  {
+      const indexService = getIndexService(state.searchIndex)
       return {
         ...state,
-        searchIndex: action.data
+        searchResults: state.searchTerm !== '' ? filterSongs(indexService, state.rows, state.searchTerm) : []
+      }
+    }
+
+    case types.RECEIVE_SEARCH_INDEX: {
+      const indexService = getIndexService(action.data)
+      return {
+        ...state,
+        searchIndex: action.data,
+        searchResults: state.searchTerm !== '' ? filterSongs(indexService, state.rows, state.searchTerm) : []
       }
     }
 

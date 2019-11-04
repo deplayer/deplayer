@@ -1,4 +1,7 @@
-import * as React from 'react';
+import { data } from 'autoprefixer'
+import * as React from 'react'
+
+import Button from './common/Button'
 
 type Props = {
   onLoaded: (data: any) => void
@@ -77,7 +80,7 @@ export default class Importer extends React.Component<Props> {
           name='import-playlist'
           ref={this.fileInput}
         />
-        <button className='btn with-bg btn-info' onClick={this.startImport.bind(this)}>Start import</button>
+        <Button className='btn btn-info' onClick={this.startImport.bind(this)}>Start import</Button>
         { message }
       </React.Fragment>
     )

@@ -8,11 +8,11 @@ import {
   take
 } from 'redux-saga/effects'
 
-import history from '../store/configureHistory'
+import history from '../../store/configureHistory'
 
-import  * as types from '../constants/ActionTypes'
-import ProvidersService from '../services/ProvidersService'
-import { getSettings } from './selectors'
+import  * as types from '../../constants/ActionTypes'
+import ProvidersService from '../../services/ProvidersService'
+import { getSettings } from './../selectors'
 
 // Handle every provider as independent thread
 function* performSingleSearch(
@@ -24,6 +24,7 @@ function* performSingleSearch(
     const providerService = new ProvidersService(settings)
     const searchResults = yield call(providerService.searchForProvider, searchTerm, provider)
     yield put({type: types.RECEIVE_COLLECTION, data: searchResults})
+    yield put({type: types.RECREATE_INDEX})
     yield put({type: types.ADD_TO_COLLECTION, data: searchResults})
   } catch (e) {
     yield put({type: types.SEARCH_REJECTED, message: e.message})
@@ -46,6 +47,11 @@ export function* search(action: SearchAction): any {
   const searchPromises = Object.keys(providersService.providers).map((provider) => {
     return fork(performSingleSearch, action.searchTerm, provider)
   })
+
+  if (!Object.keys(providersService.providers).length) {
+    searchPromises.push( yield put({ type: types.ADD_TO_COLLECTION, data: [] }) )
+  }
+
   yield all(searchPromises)
   yield take([types.ADD_TO_COLLECTION, types.SEARCH_REJECTED])
   yield put({type: types.SEARCH_FINISHED, searchTerm: action.searchTerm})

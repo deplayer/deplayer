@@ -1,7 +1,3 @@
-.player-container.slim {
-  padding: 0;
-}
-
 .player-tools {
   .rc-slider {
     height: 19px;
@@ -31,10 +27,8 @@
 
 .player-container {
   position: relative;
-  border-top: solid 2px $primary-color;
   grid-area: player;
   background-color: $gray-900;
-  padding: 10px;
   z-index: 1000;
 
   .player-contents {
@@ -44,7 +38,6 @@
 
     .media-thumb {
       display: block;
-      margin-top: 10px;
       background-color: darken($greyscale-color, 20%);
     }
   }

@@ -11,6 +11,7 @@ $primary-color-100: lighten(adjust-hue($primary-base, 0), 50%);
 $primary-color-400: lighten(adjust-hue($primary-base, 10), 20%);
 $primary-color-600: darken(adjust-hue($primary-base, -5), 10%);
 $primary-color-800: darken(adjust-hue($primary-base, -5), 10%);
+$primary-color-900: darken(adjust-hue($primary-base, -5), 25%);
 
 $secondary-base: #fefe54;
 $secondary-color: $secondary-base;

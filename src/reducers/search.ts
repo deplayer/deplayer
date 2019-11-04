@@ -50,7 +50,8 @@ export default (state: State = defaultState, action: any = {}) => {
     case types.SEARCH_REJECTED: {
       return {
         ...state,
-        error: action.message
+        error: action.message,
+        loading: false
       }
     }
 

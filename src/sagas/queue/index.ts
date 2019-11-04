@@ -1,10 +1,12 @@
 import { takeLatest, put, select, call } from 'redux-saga/effects'
 
-import { getAdapter } from '../services/database'
-import { getAlbumSongs, getQueue } from './selectors'
-import QueueService from '../services/QueueService'
-import logger from '../utils/logger'
-import * as types from '../constants/ActionTypes'
+import { getAdapter } from '../../services/database'
+import { getAlbumSongs, getQueue } from '../selectors'
+import QueueService from '../../services/QueueService'
+import logger from '../../utils/logger'
+import * as types from '../../constants/ActionTypes'
+
+import { initialize } from './workers'
 
 // Extract songs from collection state
 export const getSongs = (state: any, action: { path: string }): Array<string> => {
@@ -55,21 +57,6 @@ export function* addAlbumToPlaylist(action: any): any {
   yield put({type: types.ADD_SONGS_TO_QUEUE, songs: songsByAlbum[action.albumId], replace: true })
   yield put({type: types.SET_CURRENT_PLAYING, songId: songsByAlbum[action.albumId][0]})
   yield put({type: types.START_PLAYING})
-}
-
-// Application initialization routines
-function* initialize() {
-  yield queueService.initialize
-  logger.log('queue-saga', 'initializing queue')
-  const queue = yield call(queueService.get)
-  if (!queue) {
-    logger.log('queue-saga', 'error retrieving queue', queue)
-    yield put({type: types.GET_QUEUE_REJECTED})
-  } else {
-    const unserialized = JSON.parse(JSON.stringify(queue))
-    logger.log('queue-saga', 'queue recieved and unserialized')
-    yield put({type: types.RECEIVE_QUEUE, queue: unserialized})
-  }
 }
 
 // Binding actions to sagas

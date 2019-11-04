@@ -1,9 +1,9 @@
 import { takeLatest, putResolve, put, select } from 'redux-saga/effects'
 
-import { getSettings } from './selectors'
-import Artist from '../entities/Artist'
-import LastfmProvider from '../providers/LastfmProvider'
-import * as types from '../constants/ActionTypes'
+import { getSettings } from './../selectors'
+import Artist from '../../entities/Artist'
+import LastfmProvider from '../../providers/LastfmProvider'
+import * as types from '../../constants/ActionTypes'
 
 type LoadArtistAction = {
   type: string,
