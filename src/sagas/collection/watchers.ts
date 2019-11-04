@@ -26,12 +26,14 @@ export function* addToCollectionWatcher(): any {
 }
 
 // Application initialization routines
-export function* receiveSettingsWatcher() {
+export function* initializeWatcher() {
   try {
     yield call(collectionService.initialize)
     const collection = yield call(collectionService.getAll)
     const mappedData = mapToMedia(collection)
     yield put({type: types.RECEIVE_COLLECTION, data: mappedData})
+    // FIXME: Handle RECEIVE_COLLECTION instead of call every time
+    yield put({type: types.RECREATE_INDEX})
     yield put({type: types.INITIALIZED})
   } catch (e) {
     logger.log('settings-saga', 'initializeCollection', e)

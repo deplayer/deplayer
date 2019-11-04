@@ -1,7 +1,7 @@
 // Binding actions to sagas
 import { takeLatest, fork } from 'redux-saga/effects'
 import * as types from '../../constants/ActionTypes'
-import { addToCollectionWatcher, receiveSettingsWatcher} from './watchers'
+import { addToCollectionWatcher, initializeWatcher} from './watchers'
 import IndexService from '../../services/Search/IndexService'
 import {
   deleteCollectionWorker,
@@ -15,7 +15,7 @@ import {
 const indexService = new IndexService()
 
 function* collectionSaga(): any {
-  yield takeLatest(types.RECEIVE_SETTINGS_FINISHED, receiveSettingsWatcher)
+  yield takeLatest(types.INITIALIZE, initializeWatcher)
   yield fork(addToCollectionWatcher)
   yield takeLatest(types.REMOVE_FROM_COLLECTION, removeFromDbWorker)
   yield takeLatest(types.DELETE_COLLECTION, deleteCollectionWorker)

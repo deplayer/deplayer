@@ -54,6 +54,14 @@ export default (state: State = defaultState, action: any = {}) => {
       }
     }
 
+    case types.SEARCH_FINISHED:  {
+      const indexService = getIndexService(state.searchIndex)
+      return {
+        ...state,
+        searchResults: state.searchTerm !== '' ? filterSongs(indexService, state.rows, state.searchTerm) : []
+      }
+    }
+
     case types.RECEIVE_SEARCH_INDEX: {
       const indexService = getIndexService(action.data)
       return {
@@ -115,8 +123,6 @@ export default (state: State = defaultState, action: any = {}) => {
 
       const totalRows = {...state.rows, ...rows}
       const indexService = getIndexService(state.searchIndex)
-
-      console.log('searchTerm: ', state.searchTerm)
 
       return {
         ...state,

@@ -14,7 +14,7 @@ describe('search reducer', () => {
   })
   it('should handle SEARCH_REJECTED', () => {
     expect(reducer({...defaultState, loading: true, searchToggled: false}, {type: types.SEARCH_REJECTED, message: 'Testing error'}))
-      .toEqual({...defaultState, loading: true, error: 'Testing error', searchTerm: '', searchToggled: false})
+      .toEqual({...defaultState, loading: false, error: 'Testing error', searchTerm: '', searchToggled: false})
   })
   it('should handle SEARCH_FINISHED', () => {
     expect(reducer({...defaultState, error: 'whatever', loading: true}, {type: types.SEARCH_FINISHED}))

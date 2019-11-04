@@ -15,7 +15,7 @@ function* initialize() {
     yield put({type: types.GET_SETTINGS_REJECTED})
   } else {
     const unserialized = JSON.parse(JSON.stringify(settings))
-    yield put({type: types.RECEIVE_SETTINGS, settings: unserialized})
+    yield put({type: types.INITIALIZE, settings: unserialized})
   }
   yield put({type: types.RECEIVE_SETTINGS_FINISHED})
 }

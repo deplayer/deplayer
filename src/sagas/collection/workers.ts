@@ -3,7 +3,7 @@ import { put, call, select } from 'redux-saga/effects'
 
 import { getAdapter } from '../../services/database'
 import { getCollection } from '../selectors'
-import { receiveSettingsWatcher } from './watchers'
+import { initializeWatcher } from './watchers'
 import CollectionService from '../../services/CollectionService'
 import IndexService from '../../services/Search/IndexService'
 import logger from '../../utils/logger'
@@ -83,5 +83,5 @@ export function* trackSongPlayed(action: {type: string, songId: string}): any {
   const prevCount = song.playCount || 0
   song.playCount = prevCount + 1
   yield call(collectionService.save, action.songId, song.toDocument())
-  yield call(receiveSettingsWatcher)
+  yield put({type: types.ADD_TO_COLLECTION, data: [song]})
 }

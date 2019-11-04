@@ -2,7 +2,7 @@ import { expectSaga } from 'redux-saga-test-plan'
 
 import {
   addToCollectionWatcher,
-  receiveSettingsWatcher
+  initializeWatcher
 } from './watchers'
 import * as types from '../../constants/ActionTypes'
 
@@ -16,9 +16,9 @@ describe('addToCollectionWatcher', () => {
 })
 
 
-describe('receiveSettingsWatcher', () => {
+describe('initializeWatcher', () => {
   it('works', () => {
-    return expectSaga(receiveSettingsWatcher)
+    return expectSaga(initializeWatcher)
       .put({type: types.RECEIVE_COLLECTION, data: []})
       .put({type: types.INITIALIZED})
       .run()
