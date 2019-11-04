@@ -7,14 +7,14 @@ stages:
 
 test:
   stage: test
-  image: node:10.16.3
+  image: node:12
   script:
   - yarn
   - yarn test
 
 deploy:
   stage: deploy
-  image: node:10.16.3
+  image: node:12
   script:
   - yarn
   - yarn build
