@@ -5,7 +5,7 @@ import SettingsService from '../../services/settings/SettingsService'
 import { getAdapter } from '../../services/database'
 
 // Application initialization routines
-function* initialize() {
+export function* initialize() {
   const adapter = getAdapter()
   const settingsService = new SettingsService(new adapter())
   yield call(settingsService.initialize)
@@ -15,7 +15,7 @@ function* initialize() {
     yield put({type: types.GET_SETTINGS_REJECTED})
   } else {
     const unserialized = JSON.parse(JSON.stringify(settings))
-    yield put({type: types.INITIALIZE, settings: unserialized})
+    yield put({type: types.RECEIVE_SETTINGS, settings: unserialized})
   }
   yield put({type: types.RECEIVE_SETTINGS_FINISHED})
 }
@@ -27,6 +27,7 @@ function* saveSettings(action: any) {
     const settings = yield call(settingsService.save, 'settings', action.settingsPayload)
 
     yield put({type: types.SETTINGS_SAVED_SUCCESSFULLY, settings})
+    yield put({type: types.INITIALIZE, settings})
     yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.settings.saved'})
   } catch (e) {
     yield put({type: types.SETTINGS_SAVED_REJECTED, error: e.message})

@@ -44,18 +44,14 @@ export function* search(action: SearchAction): any {
   const providersService = new ProvidersService(settings)
   const redirect = !action.noRedirect
 
-  if (!providersService.providers.length) {
-    yield put({type: types.RECEIVE_COLLECTION, data: []})
-    yield put({type: types.SEARCH_FINISHED, searchTerm: action.searchTerm})
-
-    if (redirect) {
-      yield call(goToSearchResults)
-    }
-  }
-
   const searchPromises = Object.keys(providersService.providers).map((provider) => {
     return fork(performSingleSearch, action.searchTerm, provider)
   })
+
+  if (!Object.keys(providersService.providers).length) {
+    searchPromises.push( yield put({ type: types.ADD_TO_COLLECTION, data: [] }) )
+  }
+
   yield all(searchPromises)
   yield take([types.ADD_TO_COLLECTION, types.SEARCH_REJECTED])
   yield put({type: types.SEARCH_FINISHED, searchTerm: action.searchTerm})

@@ -83,5 +83,4 @@ export function* trackSongPlayed(action: {type: string, songId: string}): any {
   const prevCount = song.playCount || 0
   song.playCount = prevCount + 1
   yield call(collectionService.save, action.songId, song.toDocument())
-  yield put({type: types.ADD_TO_COLLECTION, data: [song]})
 }

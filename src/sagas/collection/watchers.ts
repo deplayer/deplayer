@@ -1,5 +1,6 @@
 import { call, actionChannel, fork, take, put } from 'redux-saga/effects'
 
+import { initialize } from '../settings'
 import { getAdapter } from '../../services/database'
 import { saveToDbWorker } from './workers'
 import CollectionService from '../../services/CollectionService'
@@ -28,6 +29,7 @@ export function* addToCollectionWatcher(): any {
 // Application initialization routines
 export function* initializeWatcher() {
   try {
+    yield call(initialize)
     yield call(collectionService.initialize)
     const collection = yield call(collectionService.getAll)
     const mappedData = mapToMedia(collection)

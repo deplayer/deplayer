@@ -31,26 +31,10 @@ export default (state: State = defaultState, action) => {
       return {...state, loading: false}
     }
 
-    case types.START_SEARCH: {
-      return {
-        ...state,
-        loading: true
-      }
-    }
-
     case types.SET_BACKGROUND_IMAGE: {
       return {
         ...state,
         backgroundImage: action.backgroundImage
-      }
-    }
-
-    case types.ADD_TO_COLLECTION:
-    case types.RECEIVE_COLLECTION_FINISHED:
-    case types.SEARCH_FINISHED: {
-      return {
-        ...state,
-        loading: false
       }
     }
 

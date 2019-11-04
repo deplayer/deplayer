@@ -54,6 +54,7 @@ export default (state: State = defaultState, action: any = {}) => {
       }
     }
 
+    case types.START_SEARCH:
     case types.SEARCH_FINISHED:  {
       const indexService = getIndexService(state.searchIndex)
       return {
