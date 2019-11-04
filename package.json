@@ -1,6 +1,6 @@
 {
   "name": "genar-radio",
-  "version": "0.10.8",
+  "version": "0.10.9",
   "private": true,
   "dependencies": {
     "@babel/core": "^7.0.0",
