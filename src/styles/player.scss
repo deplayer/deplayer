@@ -2,27 +2,6 @@
   .rc-slider {
     height: 19px;
   }
-
-  &.slim {
-    height: 40px;
-
-
-    & > div {
-      @extend .d-flex;
-
-      & > a {
-        width: 100%;
-      }
-
-      .player-controls {
-        width: 100%;
-
-        button {
-          font-size: 24px;
-        }
-      }
-    }
-  }
 }
 
 .player-container {
