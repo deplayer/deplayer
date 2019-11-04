@@ -2,9 +2,10 @@ import * as types from '../constants/ActionTypes'
 
 type State = {
   backgroundImage: string,
-  sidebarToggled: Boolean,
-  mqlMatch: Boolean,
-  loading: Boolean,
+  sidebarToggled: boolean,
+  mqlMatch: boolean,
+  loading: boolean,
+  slim: boolean,
   version: string
 }
 
@@ -24,7 +25,11 @@ export default (state: State = defaultState, action) => {
     }
 
     case types.SET_MQL: {
-      return {...state, mqlMatch: action.value}
+      return {
+        ...state,
+        mqlMatch: action.value,
+        slimPlayer: !action.value
+      }
     }
 
     case types.INITIALIZED: {

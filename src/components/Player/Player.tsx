@@ -6,9 +6,9 @@ import { State as PlayerState } from '../../reducers/player'
 import { State as SettingsState } from '../../reducers/settings'
 import { getStreamUri } from '../../services/Song/StreamUriService'
 import Controls from './Controls'
-import CoverImage from '../MusicTable/CoverImage'
 import ProgressBar from './ProgressBar'
 import Spectrum from './../Spectrum'
+import Cover from './Cover'
 import * as types from '../../constants/ActionTypes'
 
 const PLAYER_RETRIES = 5
@@ -141,18 +141,8 @@ class Player extends React.Component<Props, State> {
     const volume = this.state.volume ? this.state.volume : this.props.player.volume
     const duration = this.playerRef.current ? this.playerRef.current.duration : 0
 
-    const cover = !slim &&  (
-      <div className='media-thumb p-3'>
-        <CoverImage
-          cover={currentPlaying.cover}
-          size='thumbnail'
-          albumName={currentPlaying.album ? currentPlaying.album.name : 'N/A'}
-          />
-        </div>
-    )
-
     return (
-      <div className={`player-container ${slim ? 'slim': ''}`}>
+      <div className='player-container'>
         <ProgressBar
           dispatch={this.props.dispatch}
           total={duration}
@@ -160,7 +150,7 @@ class Player extends React.Component<Props, State> {
           onChange={this.setCurrentTime}
         />
         <div className='player-contents'>
-         { cover }
+          <Cover slim={slim} song={currentPlaying} />
           <div className='player'>
             <div className={`player-tools ${slim ? 'slim': ''}`}>
               <div>

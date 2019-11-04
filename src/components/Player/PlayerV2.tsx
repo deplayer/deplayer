@@ -5,11 +5,11 @@ import { Link } from 'react-router-dom'
 
 import Controls from './Controls'
 import Spectrum from './../Spectrum'
-import CoverImage from '../MusicTable/CoverImage'
 import ProgressBar from './ProgressBar'
 import { State as PlayerState } from '../../reducers/player'
 import { State as SettingsState } from '../../reducers/settings'
 import { getStreamUri } from '../../services/Song/StreamUriService'
+import Cover from './Cover'
 
 import * as types from '../../constants/ActionTypes'
 
@@ -173,13 +173,7 @@ class PlayerV2 extends React.Component<Props> {
         />
 
         <div className='player-contents'>
-          <div className='media-thumb p-3'>
-            <CoverImage
-              cover={currentPlaying.cover}
-              size='thumbnail'
-              albumName={currentPlaying.album ? currentPlaying.album.name : 'N/A'}
-            />
-          </div>
+          <Cover slim={slim} song={currentPlaying} />
           <div className='player'>
             <div className='player-tools'>
               <div>
