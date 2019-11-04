@@ -15,6 +15,7 @@ import * as types from '../../constants/ActionTypes'
 
 type Props = {
   queue: any,
+  slim: boolean,
   player: PlayerState,
   settings: SettingsState,
   itemCount: number,
@@ -173,7 +174,7 @@ class PlayerV2 extends React.Component<Props> {
         />
 
         <div className='player-contents'>
-          <Cover slim={slim} song={currentPlaying} />
+          <Cover slim={this.props.slim} song={currentPlaying} />
           <div className='player'>
             <div className='player-tools'>
               <div>

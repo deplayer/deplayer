@@ -152,7 +152,7 @@ class Player extends React.Component<Props, State> {
         <div className='player-contents'>
           <Cover slim={slim} song={currentPlaying} />
           <div className='player'>
-            <div className={`player-tools ${slim ? 'slim': ''}`}>
+            <div className='player-tools'>
               <div>
                 <h5 className='song-title'>
                   <Link to={`/song/${currentPlaying.id}`}>
