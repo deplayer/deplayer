@@ -6,7 +6,6 @@ const PlayerV2 = (props: Props) => {
   return (
     <ReactPlayer
       id='player-audio'
-      config={{ }}
       ref={props.ref}
       className='react-player'
       url={props.url}
@@ -20,7 +19,8 @@ const PlayerV2 = (props: Props) => {
       onPlay={props.onPlay}
       onPause={props.onPause}
       onEnded={props.onEnded}
-      onError={e => console.log('onError', e)}
+      config={{ }}
+      onError={(e: Error) => console.log('onError', e)}
       onProgress={props.onProgress}
       onDuration={props.onDuration}
       width={0}

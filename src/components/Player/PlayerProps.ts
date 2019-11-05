@@ -3,25 +3,18 @@ import { State as SettingsState } from '../../reducers/settings'
 import { Dispatch } from 'redux'
 
 interface Props {
-  queue: any,
-  slim: boolean,
-  player: PlayerState,
-  settings: SettingsState,
+  id: string,
   ref: React.Ref<any>,
   playing: boolean,
   url: string,
   volume: number,
-  itemCount: number,
   onPlay: () => any,
   onPause: () => any,
   onEnded: () => any,
-  onError: () => any,
+  onError: (e: Error) => any,
   onTimeUpdate: () => any,
-  onProgress: () => any,
-  onDuration: () => any,
-  collection: any,
-  dispatch: Dispatch,
-  match: any
+  onProgress: (state: any) => any,
+  onDuration: (state: any) => any
 }
 
 export default Props

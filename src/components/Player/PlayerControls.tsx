@@ -44,9 +44,7 @@ class PlayerControls extends React.Component<Props> {
     loop: false
   }
 
-  ref = (player: any) => {
-    this.player = player
-  }
+  ref = React.createRef()
 
   componentWillMount() {
     if (this.props.player.playing && !this.state.playing) {
@@ -111,7 +109,7 @@ class PlayerControls extends React.Component<Props> {
     this.setState({ seeking: false })
     this.player.seekTo(parseFloat(value))
   }
-  onProgress = state => {
+  onProgress = (state: any) => {
     // We only want to update time slider if we are not currently seeking
     if (!this.state.seeking) {
       this.setState(state)
@@ -143,18 +141,14 @@ class PlayerControls extends React.Component<Props> {
   render () {
     const {
       playing,
-      controls,
       duration,
-      light,
       volume,
-      muted,
-      loop,
       played,
-      playbackRate,
-      pip
     } = this.state
 
-    const { PlayerComponent } = this.props
+    const {
+      PlayerComponent,
+    } = this.props
 
     const currentPlayingId = this.props.queue.currentPlaying
     const currentPlaying = this.props.collection.rows[currentPlayingId]
@@ -166,6 +160,32 @@ class PlayerControls extends React.Component<Props> {
     // Getting the first stream URI, in the future will be choosen based on
     // priorities
     const streamUri = getStreamUri(currentPlaying, this.props.settings)
+
+    const player = React.forwardRef((_props, ref) => {
+      return (
+        <PlayerComponent
+          id='player-audio'
+          ref={ref}
+          url={streamUri}
+          playing={playing}
+          volume={volume}
+          onPlay={this.onPlay}
+          onPause={this.onPause}
+          onEnded={() => {
+            this.saveTrackPlayed(currentPlayingId)
+            this.playNext()
+          }}
+          onTimeUpdate={() => console.log('on time update')}
+          onError={(e: Error) => console.log('onError', e)}
+          onProgress={this.onProgress}
+          onDuration={this.onDuration}
+        />
+      )
+    })
+
+    if (!this.props.player.showPlayer) {
+      return player
+    }
 
     return (
       <div className='player-container'>
@@ -186,34 +206,7 @@ class PlayerControls extends React.Component<Props> {
                     { currentPlaying.title } - { currentPlaying.artist ? currentPlaying.artist.name : '' }
                   </h5>
                 </Link>
-                <PlayerComponent
-                  id='player-audio'
-                  config={{ }}
-                  ref={this.ref}
-                  className='react-player'
-                  url={streamUri}
-                  pip={pip}
-                  playing={playing}
-                  controls={controls}
-                  light={light}
-                  loop={loop}
-                  playbackRate={playbackRate}
-                  volume={volume}
-                  muted={muted}
-                  onPlay={this.onPlay}
-                  onEnablePIP={this.onEnablePIP}
-                  onDisablePIP={this.onDisablePIP}
-                  onPause={this.onPause}
-                  onEnded={() => {
-                    this.saveTrackPlayed(currentPlayingId)
-                    this.playNext()
-                  }}
-                  onError={(e: Error) => console.log('onError', e)}
-                  onProgress={this.onProgress}
-                  onDuration={this.onDuration}
-                  width={0}
-                  height={0}
-                />
+                  { player }
                 <Controls
                   playPrev={this.playPrev}
                   isPlaying={this.state.playing}
