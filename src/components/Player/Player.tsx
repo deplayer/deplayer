@@ -9,7 +9,6 @@ const Player = (props: Props) => {
       ref={props.ref}
       src={props.url}
       crossOrigin="anonymous"
-      onError={props.onError}
       autoPlay={ props.playing }
       onTimeUpdate={ props.onTimeUpdate }
       onEnded={ props.onEnded }
