@@ -1,8 +1,11 @@
 import * as React from 'react'
+import jest from 'jest'
+
 import { shallow } from 'enzyme'
 
-import configureEnzyme from '../../tests/configureEnzyme'
+import PlayerControls from './PlayerControls'
 import Player from './Player'
+import configureEnzyme from '../../tests/configureEnzyme'
 
 configureEnzyme()
 
@@ -11,7 +14,8 @@ const setup = (definedProps: any): {props: any, enzymeWrapper: any} => {
     player: {
       showPlayer: false
     },
-    dispatch: jest.fn(),
+    dispatch: () => {},
+    PlayerComponent: Player,
     queue: {
       trackIds: [],
       currentPlaying: 'test'
@@ -31,7 +35,7 @@ const setup = (definedProps: any): {props: any, enzymeWrapper: any} => {
     ...definedProps
   }
 
-  const enzymeWrapper = shallow(<Player {...props}/>)
+  const enzymeWrapper = shallow(<PlayerControls {...props}/>)
 
   return {
     props,
