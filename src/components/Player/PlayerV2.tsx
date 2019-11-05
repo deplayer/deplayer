@@ -1,54 +1,32 @@
 import React from 'react'
 import ReactPlayer from 'react-player'
-import { Dispatch } from 'redux'
+import Props from './PlayerProps'
 
-import { State as PlayerState } from '../../reducers/player'
-import { State as SettingsState } from '../../reducers/settings'
-
-type Props = {
-  queue: any,
-  slim: boolean,
-  player: PlayerState,
-  settings: SettingsState,
-  itemCount: number,
-  collection: any,
-  dispatch: Dispatch,
-  match: any
-}
-
-class PlayerV2 extends React.Component<Props> {
-  render () {
-    return (
-      <ReactPlayer
-        id='player-audio'
-        config={{ }}
-        ref={this.ref}
-        className='react-player'
-        url={streamUri}
-        pip={pip}
-        playing={playing}
-        controls={controls}
-        light={light}
-        loop={loop}
-        playbackRate={playbackRate}
-        volume={volume}
-        muted={muted}
-        onPlay={this.onPlay}
-        onEnablePIP={this.onEnablePIP}
-        onDisablePIP={this.onDisablePIP}
-        onPause={this.onPause}
-        onEnded={() => {
-          this.saveTrackPlayed(currentPlayingId)
-          this.playNext()
-        }}
-        onError={e => console.log('onError', e)}
-        onProgress={this.onProgress}
-        onDuration={this.onDuration}
-        width={0}
-        height={0}
-      />
-    )
-  }
+const PlayerV2 = (props: Props) => {
+  return (
+    <ReactPlayer
+      id='player-audio'
+      config={{ }}
+      ref={props.ref}
+      className='react-player'
+      url={props.url}
+      playing={props.playing}
+      controls={false}
+      light={false}
+      loop={false}
+      playbackRate={1}
+      volume={props.volume}
+      muted={false}
+      onPlay={props.onPlay}
+      onPause={props.onPause}
+      onEnded={props.onEnded}
+      onError={e => console.log('onError', e)}
+      onProgress={props.onProgress}
+      onDuration={props.onDuration}
+      width={0}
+      height={0}
+    />
+  )
 }
 
 export default PlayerV2

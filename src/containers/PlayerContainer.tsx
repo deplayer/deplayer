@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
+import PlayerControls from '../components/Player/PlayerControls'
 import Player from '../components/Player/Player'
 import PlayerV2 from '../components/Player/PlayerV2'
 
@@ -16,11 +17,11 @@ const ConnectedPlayer = connect(
 )((props: any) => {
   if (props.settings.settings.app.reactPlayer.enabled) {
     return (
-      <PlayerV2 {...props} />
+      <PlayerControls PlayerComponent={PlayerV2} {...props} />
     )
   }
 
-  return <Player {...props} />
+  return <PlayerControls PlayerComponent={Player} {...props} />
 })
 
 const RoutedPlayer = withRouter(props => <ConnectedPlayer {...props}/>)

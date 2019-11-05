@@ -1,23 +1,23 @@
-import React from 'react'
-import ReactPlayer from 'react-player'
 import { Dispatch } from 'redux'
 import { Link } from 'react-router-dom'
+import React from 'react'
 
-import Controls from './Controls'
-import Spectrum from './../Spectrum'
-import ProgressBar from './ProgressBar'
 import { State as PlayerState } from '../../reducers/player'
 import { State as SettingsState } from '../../reducers/settings'
 import { getStreamUri } from '../../services/Song/StreamUriService'
+import Controls from './Controls'
 import Cover from './Cover'
-
+import Player from './Player'
+import PlayerV2 from './PlayerV2'
+import ProgressBar from './ProgressBar'
+import Spectrum from './../Spectrum'
 import * as types from '../../constants/ActionTypes'
 
 type Props = {
   queue: any,
   slim: boolean,
   player: PlayerState,
-  PlayerComponent: React.ReactNode,
+  PlayerComponent: typeof Player | typeof PlayerV2,
   settings: SettingsState,
   itemCount: number,
   collection: any,
@@ -25,7 +25,7 @@ type Props = {
   match: any
 }
 
-class PlayerV2 extends React.Component<Props> {
+class PlayerControls extends React.Component<Props> {
   player: any
 
   state = {
@@ -44,7 +44,7 @@ class PlayerV2 extends React.Component<Props> {
     loop: false
   }
 
-  ref = player => {
+  ref = (player: any) => {
     this.player = player
   }
 
@@ -208,7 +208,7 @@ class PlayerV2 extends React.Component<Props> {
                     this.saveTrackPlayed(currentPlayingId)
                     this.playNext()
                   }}
-                  onError={e => console.log('onError', e)}
+                  onError={(e: Error) => console.log('onError', e)}
                   onProgress={this.onProgress}
                   onDuration={this.onDuration}
                   width={0}
@@ -233,4 +233,4 @@ class PlayerV2 extends React.Component<Props> {
   }
 }
 
-export default PlayerV2
+export default PlayerControls
