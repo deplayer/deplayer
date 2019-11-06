@@ -154,6 +154,22 @@ export default (state: State = defaultState, action: any = {}) => {
       }
     }
 
+    case types.CLEAR_COLLECTION: {
+      return {
+        ...state,
+        rows: {},
+        artists: {},
+        albums: {},
+        songsByArtist: {},
+        songsByAlbum: {},
+        albumsByArtist: {},
+        visibleSongs: [],
+        searchResults: [],
+        totalRows: 0,
+        loading: false
+      }
+    }
+
     default:
       return state
   }

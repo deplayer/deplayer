@@ -37,7 +37,8 @@ export function* deleteCollectionWorker(): any {
   try {
     yield collectionService.removeAll()
     yield put({type: types.REMOVE_FROM_COLLECTION_FULFILLED})
-    yield put({type: types.ADD_TO_COLLECTION, data: []})
+    yield put({type: types.CLEAR_COLLECTION})
+    yield put({type: types.CLEAR_QUEUE})
     yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.collection_deleted'})
   } catch (e) {
     yield put({type: types.REMOVE_FROM_COLLECTION_REJECTED, message: e.message})
