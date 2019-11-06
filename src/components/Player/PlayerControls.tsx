@@ -75,15 +75,10 @@ class PlayerControls extends React.Component<Props> {
     this.setState({ seeking: false })
   }
   onProgress = (state: any) => {
-    console.log('onProgress')
     // We only want to update time slider if we are not currently seeking
     if (!this.state.seeking) {
-      console.log('onProgress: ', state)
       this.setState(state)
     }
-  }
-  onProgressEvent = (event: any) => {
-    console.log(event.currentTime)
   }
   onDuration = (duration: number) => {
     this.setState({ duration })

@@ -8,14 +8,17 @@ import * as types from '../../constants/ActionTypes'
 
 describe('setCurrentPlaying', () => {
   it('works', () => {
+    const streamUrl = 'https://foo.bar'
+    const streams = [
+      {
+        service: 'subsonic',
+        uris: [{uri: streamUrl}]
+      }
+    ]
+
     const song = new Song({
       forcedId: 'foo',
-      stream: [
-        {
-          service: 'subsonic',
-          uris: [{uri: 'https://foo.bar'}]
-        }
-      ]
+      stream: streams
     })
     const state = {
       collection: {
@@ -41,6 +44,9 @@ describe('setCurrentPlaying', () => {
     }
     return expectSaga(setCurrentPlaying, action)
       .withState(state)
+      .put({type: types.PUSH_TO_VIEW, song: action.songId})
+      .put({type: types.SET_CURRENT_PLAYING_URL, url: streamUrl})
+      .put({type: types.SET_CURRENT_PLAYING_STREAMS, streams: streams})
       .put({type: types.START_PLAYING})
       .run()
   })

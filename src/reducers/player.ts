@@ -6,6 +6,7 @@ export type State = {
   currentTime: number,
   errorCount: number,
   streamUri: string | null,
+  streams: object,
   providers: object,
   volume: number
 }
@@ -15,6 +16,7 @@ export const defaultState = {
   showPlayer: false,
   currentTime: 0,
   providers: {},
+  streams: {},
   streamUri: null,
   errorCount: 0,
   volume: 100
@@ -24,15 +26,6 @@ export default (state: State = defaultState, action: any): State => {
   switch (action.type) {
     case types.START_PLAYING:
       return {...state, playing: true, showPlayer: true}
-
-    /* case types.RECEIVE_COLLECTION:
-      const providers = {}
-      for (let i = 0; i < action.data.length; i++) {
-        const row = action.data[i]
-        providers[row.id] = row.providers
-      }
-      return {...state, providers}
-    */
 
     case types.HIDE_PLAYER:
       return {...state, showPlayer: false}
@@ -48,6 +41,9 @@ export default (state: State = defaultState, action: any): State => {
 
     case types.SET_CURRENT_PLAYING_URL:
       return {...state, streamUri: action.url}
+
+    case types.SET_CURRENT_PLAYING_STREAMS:
+      return {...state, streams: action.streams}
 
     default:
       return state

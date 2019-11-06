@@ -11,7 +11,6 @@ import * as types from '../../constants/ActionTypes'
 // Handling setCurrentPlaying saga
 export function* setCurrentPlaying(action: any): any {
   // Redirect to song view page
-  yield put({type: types.START_PLAYING})
   yield put({type: types.PUSH_TO_VIEW, song: action.songId})
   const fullUrl = yield select(getSongBg)
   const settings = yield select(getSettings)
@@ -22,6 +21,8 @@ export function* setCurrentPlaying(action: any): any {
   // priorities
   const streamUri = getStreamUri(currentPlaying, settings)
   yield put({type: types.SET_CURRENT_PLAYING_URL, url: streamUri})
+  yield put({type: types.SET_CURRENT_PLAYING_STREAMS, streams: currentPlaying.stream})
+  yield put({type: types.START_PLAYING})
 
   yield put({
     type: types.SET_BACKGROUND_IMAGE,
