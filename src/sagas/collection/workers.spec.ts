@@ -34,7 +34,8 @@ describe('deleteCollectionWorker', () => {
   it('works', () => {
     return expectSaga(deleteCollectionWorker)
       .put({type: types.REMOVE_FROM_COLLECTION_FULFILLED})
-      .put({type: types.ADD_TO_COLLECTION, data: []})
+      .put({type: types.CLEAR_COLLECTION})
+      .put({type: types.CLEAR_QUEUE})
       .put({type: types.SEND_NOTIFICATION, notification: 'notifications.collection_deleted'})
       .run()
   })

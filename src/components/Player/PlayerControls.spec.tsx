@@ -1,8 +1,10 @@
 import * as React from 'react'
+import jest from 'jest'
+
 import { shallow } from 'enzyme'
 
+import PlayerControls from './PlayerControls'
 import configureEnzyme from '../../tests/configureEnzyme'
-import Player from './Player'
 
 configureEnzyme()
 
@@ -11,7 +13,7 @@ const setup = (definedProps: any): {props: any, enzymeWrapper: any} => {
     player: {
       showPlayer: false
     },
-    dispatch: jest.fn(),
+    dispatch: () => {},
     queue: {
       trackIds: [],
       currentPlaying: 'test'
@@ -31,7 +33,7 @@ const setup = (definedProps: any): {props: any, enzymeWrapper: any} => {
     ...definedProps
   }
 
-  const enzymeWrapper = shallow(<Player {...props}/>)
+  const enzymeWrapper = shallow(<PlayerControls {...props}/>)
 
   return {
     props,
@@ -41,8 +43,9 @@ const setup = (definedProps: any): {props: any, enzymeWrapper: any} => {
 
 it('renders without crashing', () => {
   const { enzymeWrapper } = setup({itemCount: 1, player: { showPlayer: true }})
-  expect(enzymeWrapper.find('.player').exists())
-    .toBe(true)
+  console.log(enzymeWrapper.debug())
+  expect(enzymeWrapper.find('.react-player').exists())
+    .toBe(false)
 })
 
 it('renders handle playNext', () => {

@@ -24,6 +24,7 @@ const SkipButton = (props: Props) => {
     <React.Fragment>
       { keyHandlers }
       <Button
+        transparent
         onClick={props.onClick}
       >
         <i className={`icon step ${ props.type === 'next' ? 'forward': 'backward'}`}></i>

@@ -17,6 +17,7 @@ const PlayPauseButton = (props: Props) => {
         onKeyHandle={props.onClick}
       />
       <Button
+        transparent
         className='play-pause'
         onClick={props.onClick}
       >

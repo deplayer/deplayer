@@ -15,6 +15,7 @@ const ShuffleButton = (props: Props) => {
 
   return (
     <Button
+      transparent
       className='back-shuffle shuffle'
       onClick={onClick}
     >

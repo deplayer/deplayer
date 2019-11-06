@@ -2,27 +2,6 @@
   .rc-slider {
     height: 19px;
   }
-
-  &.slim {
-    height: 40px;
-
-
-    & > div {
-      @extend .d-flex;
-
-      & > a {
-        width: 100%;
-      }
-
-      .player-controls {
-        width: 100%;
-
-        button {
-          font-size: 24px;
-        }
-      }
-    }
-  }
 }
 
 .player-container {
@@ -30,17 +9,6 @@
   grid-area: player;
   background-color: $gray-900;
   z-index: 1000;
-
-  .player-contents {
-    @extend .d-flex;
-    justify-content: flex-start;
-    align-items: center;
-
-    .media-thumb {
-      display: block;
-      background-color: darken($greyscale-color, 20%);
-    }
-  }
 }
 
 .song-title {

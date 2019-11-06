@@ -26,7 +26,7 @@ export function* setupNotifications(): any {
 }
 
 // Binding actions to sagas
-function* notificationSaga(store: any): any {
+function* notificationSaga(_store: any): any {
   yield takeLatest(types.PLAY_NEXT, sendCurrentPlayingNotification)
   yield takeLatest(types.PLAY_PREV, sendCurrentPlayingNotification)
   yield takeLatest(types.SET_CURRENT_PLAYING, sendCurrentPlayingNotification)
