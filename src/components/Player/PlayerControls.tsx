@@ -1,14 +1,13 @@
 import { Dispatch } from 'redux'
 import { Link } from 'react-router-dom'
 import React from 'react'
+import ReactPlayer from 'react-player'
 
 import { State as PlayerState } from '../../reducers/player'
 import { State as SettingsState } from '../../reducers/settings'
 import { getStreamUri } from '../../services/Song/StreamUriService'
 import Controls from './Controls'
 import Cover from './Cover'
-import Player from './Player'
-import PlayerV2 from './PlayerV2'
 import ProgressBar from './ProgressBar'
 import Spectrum from './../Spectrum'
 import * as types from '../../constants/ActionTypes'
@@ -17,7 +16,6 @@ type Props = {
   queue: any,
   slim: boolean,
   player: PlayerState,
-  PlayerComponent: typeof Player | typeof PlayerV2,
   settings: SettingsState,
   itemCount: number,
   collection: any,
@@ -107,15 +105,18 @@ class PlayerControls extends React.Component<Props> {
   }
   onSeekMouseUp = value => {
     this.setState({ seeking: false })
-    this.player.seekTo(parseFloat(value))
   }
   onProgress = (state: any) => {
+    console.log('onProgress')
     // We only want to update time slider if we are not currently seeking
     if (!this.state.seeking) {
+      console.log('onProgress: ', state)
       this.setState(state)
     }
   }
-
+  onProgressEvent = (event: any) => {
+    console.log(event.currentTime)
+  }
   onDuration = (duration: number) => {
     this.setState({ duration })
   }
@@ -130,7 +131,9 @@ class PlayerControls extends React.Component<Props> {
   // Play next song of the player list
   playNext = () => {
     if (this.props.queue.nextSongId) {
+      // Force player playing refresh
       this.props.dispatch({type: types.PLAY_NEXT})
+      this.setState({ playing: true })
     }
   }
 
@@ -146,10 +149,6 @@ class PlayerControls extends React.Component<Props> {
       played,
     } = this.state
 
-    const {
-      PlayerComponent,
-    } = this.props
-
     const currentPlayingId = this.props.queue.currentPlaying
     const currentPlaying = this.props.collection.rows[currentPlayingId]
 
@@ -161,67 +160,68 @@ class PlayerControls extends React.Component<Props> {
     // priorities
     const streamUri = getStreamUri(currentPlaying, this.props.settings)
 
-    const player = React.forwardRef((_props, ref) => {
-      return (
-        <PlayerComponent
-          id='player-audio'
-          ref={ref}
+    return (
+      <React.Fragment>
+        <ReactPlayer
+          ref={this.ref}
+          className='react-player'
           url={streamUri}
           playing={playing}
+          controls={false}
+          light={false}
+          loop={false}
+          playbackRate={1}
           volume={volume}
+          muted={false}
           onPlay={this.onPlay}
           onPause={this.onPause}
           onEnded={() => {
             this.saveTrackPlayed(currentPlayingId)
             this.playNext()
           }}
-          onTimeUpdate={() => console.log('on time update')}
+          config={{ }}
           onError={(e: Error) => console.log('onError', e)}
           onProgress={this.onProgress}
           onDuration={this.onDuration}
+          width={0}
+          height={0}
         />
-      )
-    })
+        { this.props.player.showPlayer &&
+          <div className='player-container'>
+            <ProgressBar
+              dispatch={this.props.dispatch}
+              total={duration}
+              current={played * 100}
+              onChange={this.onSeekMouseUp}
+            />
 
-    if (!this.props.player.showPlayer) {
-      return player
-    }
-
-    return (
-      <div className='player-container'>
-        <ProgressBar
-          dispatch={this.props.dispatch}
-          total={duration}
-          current={played * 100}
-          onChange={this.onSeekMouseUp}
-        />
-
-        <div className='player-contents'>
-          <Cover slim={this.props.slim} song={currentPlaying} />
-          <div className='player'>
-            <div className='player-tools'>
-              <div>
-                <Link to={`/song/${currentPlaying.id}`}>
-                  <h5 className='song-title'>
-                    { currentPlaying.title } - { currentPlaying.artist ? currentPlaying.artist.name : '' }
-                  </h5>
-                </Link>
-                  { player }
-                <Controls
-                  playPrev={this.playPrev}
-                  isPlaying={this.state.playing}
-                  playPause={this.playPause}
-                  playNext={this.playNext}
-                  volume={volume * 100}
-                  setVolume={this.setVolume}
-                  dispatch={this.props.dispatch}
-                />
+            <div className='player-contents'>
+              <Cover slim={this.props.slim} song={currentPlaying} />
+              <div className='player'>
+                <div className='player-tools'>
+                  <div>
+                    <Link to={`/song/${currentPlaying.id}`}>
+                      <h5 className='song-title'>
+                        { currentPlaying.title } - { currentPlaying.artist ? currentPlaying.artist.name : '' }
+                      </h5>
+                    </Link>
+                    <Controls
+                      playPrev={this.playPrev}
+                      isPlaying={this.state.playing}
+                      playPause={this.playPause}
+                      playNext={this.playNext}
+                      volume={volume * 100}
+                      setVolume={this.setVolume}
+                      dispatch={this.props.dispatch}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
+            <Spectrum audioSelector={'#player-audio audio'} />
           </div>
-        </div>
-        <Spectrum audioSelector={'#player-audio audio'} />
-      </div>
+        }
+      </React.Fragment>
     )
   }
 }

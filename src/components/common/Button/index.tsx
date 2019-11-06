@@ -7,6 +7,7 @@ type Props = {
   children: any,
   inverted?: boolean,
   disabled?: boolean,
+  transparent?: boolean,
   type?: 'submit' | 'button',
   className?: string
 }
@@ -18,7 +19,8 @@ const Button = (props: Props) => {
     'p-2': true,
     'rounded': true,
     'border-blue-100': props.inverted,
-    'bg-transparent': props.inverted
+    'border-transparent': props.transparent,
+    'bg-transparent': props.inverted || props.transparent
   })
 
   return (

@@ -1,8 +1,9 @@
-import * as React from 'react'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
+import * as React from 'react'
 
 import { SAVE_PLAYLIST } from '../../constants/ActionTypes'
+import Button from '../common/Button'
 
 type Props = {
   dispatch: Dispatch,
@@ -20,12 +21,13 @@ const SaveQueueButton = (props: Props) => {
   }
 
   return (
-    <button
+    <Button
+      transparent
       className='clearqueue-button button'
       onClick={saveQueue}
     >
       <i className='fa fa-save'></i>
-    </button>
+    </Button>
   )
 }
 

@@ -21,7 +21,7 @@ const PlayAllButton = (props: Props) => {
 
   return (
     <Button
-      inverted
+      transparent
       className='playall-button button'
       onClick={playAll}
     >

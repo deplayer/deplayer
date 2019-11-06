@@ -28,9 +28,6 @@ export const defaultState = {
         enabled: false,
         apikey: ''
       },
-      reactPlayer: {
-        enabled: false
-      },
       databaseSync: {
         enabled: false,
         remote: ''
