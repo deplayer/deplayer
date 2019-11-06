@@ -16,7 +16,7 @@ const SidebarButton = ({dispatch}: Props) => {
 
   return (
     <Button
-      inverted
+      transparent
       onClick={toggleSidebar}
     >
       <i className="fa fa-bars"></i>
