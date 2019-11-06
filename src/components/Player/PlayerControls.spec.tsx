@@ -4,7 +4,6 @@ import jest from 'jest'
 import { shallow } from 'enzyme'
 
 import PlayerControls from './PlayerControls'
-import Player from './Player'
 import configureEnzyme from '../../tests/configureEnzyme'
 
 configureEnzyme()
@@ -15,7 +14,6 @@ const setup = (definedProps: any): {props: any, enzymeWrapper: any} => {
       showPlayer: false
     },
     dispatch: () => {},
-    PlayerComponent: Player,
     queue: {
       trackIds: [],
       currentPlaying: 'test'
@@ -45,8 +43,9 @@ const setup = (definedProps: any): {props: any, enzymeWrapper: any} => {
 
 it('renders without crashing', () => {
   const { enzymeWrapper } = setup({itemCount: 1, player: { showPlayer: true }})
-  expect(enzymeWrapper.find('.player').exists())
-    .toBe(true)
+  console.log(enzymeWrapper.debug())
+  expect(enzymeWrapper.find('.react-player').exists())
+    .toBe(false)
 })
 
 it('renders handle playNext', () => {

@@ -5,7 +5,6 @@ import ReactPlayer from 'react-player'
 
 import { State as PlayerState } from '../../reducers/player'
 import { State as SettingsState } from '../../reducers/settings'
-import { getStreamUri } from '../../services/Song/StreamUriService'
 import Controls from './Controls'
 import Cover from './Cover'
 import ProgressBar from './ProgressBar'
@@ -27,12 +26,8 @@ class PlayerControls extends React.Component<Props> {
   player: any
 
   state = {
-    url: null,
-    pip: false,
     playing: true,
-    controls: false,
     seeking: false,
-    light: false,
     volume: 0.8,
     muted: false,
     played: 0,
@@ -42,34 +37,16 @@ class PlayerControls extends React.Component<Props> {
     loop: false
   }
 
-  ref = React.createRef()
-
   componentWillMount() {
     if (this.props.player.playing && !this.state.playing) {
       this.playPause()
     }
   }
 
-  load = (url: string) => {
-    this.setState({
-      url,
-      played: 0,
-      loaded: 0,
-      pip: false
-    })
-  }
-
   playPause = () => {
     this.setState({ playing: !this.state.playing })
   }
 
-  stop = () => {
-    this.setState({ url: null, playing: false })
-  }
-
-  toggleLight = () => {
-    this.setState({ light: !this.state.light })
-  }
   toggleLoop = () => {
     this.setState({ loop: !this.state.loop })
   }
@@ -82,17 +59,8 @@ class PlayerControls extends React.Component<Props> {
   setPlaybackRate = e => {
     this.setState({ playbackRate: parseFloat(e.target.value) })
   }
-  togglePIP = () => {
-    this.setState({ pip: !this.state.pip })
-  }
   onPlay = () => {
     this.setState({ playing: true })
-  }
-  onEnablePIP = () => {
-    this.setState({ pip: true })
-  }
-  onDisablePIP = () => {
-    this.setState({ pip: false })
   }
   onPause = () => {
     this.setState({ playing: false })
@@ -151,24 +119,19 @@ class PlayerControls extends React.Component<Props> {
 
     const currentPlayingId = this.props.queue.currentPlaying
     const currentPlaying = this.props.collection.rows[currentPlayingId]
+    const { streamUri } = this.props.player
 
-    if (!this.props.itemCount || !currentPlaying) {
+    if (!this.props.itemCount || !currentPlaying || !streamUri) {
       return null
     }
-
-    // Getting the first stream URI, in the future will be choosen based on
-    // priorities
-    const streamUri = getStreamUri(currentPlaying, this.props.settings)
 
     return (
       <React.Fragment>
         <ReactPlayer
-          ref={this.ref}
           className='react-player'
           url={streamUri}
           playing={playing}
           controls={false}
-          light={false}
           loop={false}
           playbackRate={1}
           volume={volume}

@@ -1,9 +1,12 @@
 import { takeLatest, put, select } from 'redux-saga/effects'
 
-import { getApp, getQueue, getSongBg } from './selectors';
-import history from '../store/configureHistory'
-import * as routes from '../routes'
-import * as types from '../constants/ActionTypes'
+import { getApp, getQueue, getSongBg } from '../selectors'
+import { getCollection } from '../selectors'
+import { getSettings } from '../selectors'
+import { getStreamUri } from '../../services/Song/StreamUriService'
+import history from '../../store/configureHistory'
+import * as routes from '../../routes'
+import * as types from '../../constants/ActionTypes'
 
 // Handling setCurrentPlaying saga
 export function* setCurrentPlaying(action: any): any {
@@ -11,6 +14,14 @@ export function* setCurrentPlaying(action: any): any {
   yield put({type: types.START_PLAYING})
   yield put({type: types.PUSH_TO_VIEW, song: action.songId})
   const fullUrl = yield select(getSongBg)
+  const settings = yield select(getSettings)
+  const collection = yield select(getCollection)
+  const currentPlaying = collection.rows[action.songId]
+
+  // Getting the first stream URI, in the future will be choosen based on
+  // priorities
+  const streamUri = getStreamUri(currentPlaying, settings)
+  yield put({type: types.SET_CURRENT_PLAYING_URL, url: streamUri})
 
   yield put({
     type: types.SET_BACKGROUND_IMAGE,
