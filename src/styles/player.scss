@@ -9,17 +9,6 @@
   grid-area: player;
   background-color: $gray-900;
   z-index: 1000;
-
-  .player-contents {
-    @extend .d-flex;
-    justify-content: flex-start;
-    align-items: center;
-
-    .media-thumb {
-      display: block;
-      background-color: darken($greyscale-color, 20%);
-    }
-  }
 }
 
 .song-title {

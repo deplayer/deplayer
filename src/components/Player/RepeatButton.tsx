@@ -15,6 +15,7 @@ const RepeatButton = (props: Props) => {
 
   return (
     <Button
+      transparent
       className='back-repeat repeat'
       onClick={onClick}
     >

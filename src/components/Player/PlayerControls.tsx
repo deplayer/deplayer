@@ -153,7 +153,7 @@ class PlayerControls extends React.Component<Props> {
               onChange={this.onSeekMouseUp}
             />
 
-            <div className='player-contents'>
+            <div className='flex'>
               <Cover slim={this.props.slim} song={currentPlaying} />
               <div className='player'>
                 <div className='player-tools'>

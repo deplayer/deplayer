@@ -1,9 +1,10 @@
-import * as React from 'react'
 import { Dispatch } from 'redux'
+import * as React from 'react'
 
+import Button from '../common/Button'
 import PlayPauseButton from './PlayPauseButton'
-import ShuffleButton from './ShuffleButton'
 import RepeatButton from './RepeatButton'
+import ShuffleButton from './ShuffleButton'
 import SkipButton from './SkipButton'
 import VolumeControl from './VolumeControl'
 import * as types from '../../constants/ActionTypes'
@@ -21,9 +22,9 @@ type ControlProps = {
 const Controls = (props: ControlProps) => {
   const TogglePlayer = () => {
     return (
-      <button className='xs' onClick={() => props.dispatch({type: types.HIDE_PLAYER})}>
+      <Button className='xs' onClick={() => props.dispatch({type: types.HIDE_PLAYER})}>
         <i className='fa fa-eye-slash'></i>
-      </button>
+      </Button>
     )
   }
 
