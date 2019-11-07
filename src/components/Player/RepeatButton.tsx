@@ -1,4 +1,5 @@
 import { Dispatch } from 'redux'
+import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
 
 import { REPEAT } from '../../constants/ActionTypes'
@@ -16,10 +17,10 @@ const RepeatButton = (props: Props) => {
   return (
     <Button
       transparent
-      className='back-repeat repeat'
       onClick={onClick}
     >
-      <i className='fa fa-repeat'></i>
+      <i className='fa fa-repeat -mx-1'></i>
+      <Translate value='buttons.repeat' />
     </Button>
   )
 }

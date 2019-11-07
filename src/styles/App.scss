@@ -99,9 +99,6 @@ span.label {
   font-size: 4em;
 }
 
-input.form-control:focus ,
-input.form-control {
-  font-family: $font-family;
-  background-color: #000 !important;
-  color: $primary-color-100;
+.react-contexify {
+  z-index: 1000;
 }

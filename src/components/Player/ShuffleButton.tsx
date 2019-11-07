@@ -1,4 +1,5 @@
 import { Dispatch } from 'redux'
+import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
 
 import { SHUFFLE } from '../../constants/ActionTypes'
@@ -16,10 +17,10 @@ const ShuffleButton = (props: Props) => {
   return (
     <Button
       transparent
-      className='back-shuffle shuffle'
       onClick={onClick}
     >
       <i className='fa fa-random'></i>
+      <Translate value='buttons.shuffle' />
     </Button>
   )
 }

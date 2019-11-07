@@ -20,7 +20,7 @@ const ProgressBar = (props: Props) => {
 
   return (
     <div
-      className='progress'
+      className='progress player-progress'
     >
       <Range
         className='bar'

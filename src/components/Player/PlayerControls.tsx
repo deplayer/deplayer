@@ -10,6 +10,7 @@ import Cover from './Cover'
 import ProgressBar from './ProgressBar'
 import Spectrum from './../Spectrum'
 import * as types from '../../constants/ActionTypes'
+import ContextualMenu from './ContextualMenu'
 
 type Props = {
   queue: any,
@@ -155,28 +156,29 @@ class PlayerControls extends React.Component<Props> {
               onChange={this.onSeekMouseUp}
             />
 
-            <div className='flex'>
+            <div className='flex justify-between items-center'>
               <Cover slim={this.props.slim} song={currentPlaying} />
               <div className='player'>
                 <div className='player-tools'>
-                  <div>
-                    <Link to={`/song/${currentPlaying.id}`}>
-                      <h5 className='song-title'>
-                        { currentPlaying.title } - { currentPlaying.artist ? currentPlaying.artist.name : '' }
-                      </h5>
-                    </Link>
-                    <Controls
-                      playPrev={this.playPrev}
-                      isPlaying={this.state.playing}
-                      playPause={this.playPause}
-                      playNext={this.playNext}
-                      volume={volume * 100}
-                      setVolume={this.setVolume}
-                      dispatch={this.props.dispatch}
-                    />
-                  </div>
+                  <Link to={`/song/${currentPlaying.id}`}>
+                    <h5 className='song-title'>
+                      { currentPlaying.title } - { currentPlaying.artist ? currentPlaying.artist.name : '' }
+                    </h5>
+                  </Link>
+                  <Controls
+                    playPrev={this.playPrev}
+                    isPlaying={this.state.playing}
+                    playPause={this.playPause}
+                    playNext={this.playNext}
+                    dispatch={this.props.dispatch}
+                  />
                 </div>
               </div>
+              <ContextualMenu
+                volume={volume * 100}
+                dispatch={this.props.dispatch}
+                setVolume={this.setVolume}
+              />
             </div>
             <Spectrum audioSelector={'#player-audio audio'} />
           </div>

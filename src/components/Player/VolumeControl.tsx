@@ -8,7 +8,7 @@ type Props = {
 
 const VolumeControl = (props: Props) => {
   return (
-    <div className='volume-control'>
+    <div className='volume-control w-full my-2 -my-2'>
       <Slider
         className='bar'
         min={0}
