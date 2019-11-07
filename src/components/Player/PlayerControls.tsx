@@ -30,7 +30,7 @@ class PlayerControls extends React.Component<Props> {
     seeking: false,
     volume: 0.8,
     muted: false,
-    played: 0,
+    playedSeconds: 0,
     loaded: 0,
     duration: 0,
     playbackRate: 1.0,
@@ -69,7 +69,7 @@ class PlayerControls extends React.Component<Props> {
     this.setState({ seeking: true })
   }
   onSeekChange = value => {
-    this.setState({ played: value })
+    this.setState({ playedSeconds: value })
   }
   onSeekMouseUp = value => {
     this.setState({ seeking: false })
@@ -109,7 +109,7 @@ class PlayerControls extends React.Component<Props> {
       playing,
       duration,
       volume,
-      played,
+      playedSeconds
     } = this.state
 
     const currentPlayingId = this.props.queue.currentPlaying
@@ -141,6 +141,8 @@ class PlayerControls extends React.Component<Props> {
           onError={(e: Error) => console.log('onError', e)}
           onProgress={this.onProgress}
           onDuration={this.onDuration}
+          onSeek={this.onSeekChange}
+          progressInterval={1000}
           width={0}
           height={0}
         />
@@ -148,8 +150,8 @@ class PlayerControls extends React.Component<Props> {
           <div className='player-container'>
             <ProgressBar
               dispatch={this.props.dispatch}
-              total={duration}
-              current={played * 100}
+              total={duration * 1000}
+              current={playedSeconds * 1000}
               onChange={this.onSeekMouseUp}
             />
 

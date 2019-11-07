@@ -15,6 +15,7 @@ export function* setCurrentPlaying(action: any): any {
   const fullUrl = yield select(getSongBg)
   const settings = yield select(getSettings)
   const collection = yield select(getCollection)
+  console.log('songId', action)
   const currentPlaying = collection.rows[action.songId]
 
   // Getting the first stream URI, in the future will be choosen based on
@@ -30,6 +31,12 @@ export function* setCurrentPlaying(action: any): any {
   })
 }
 
+export function* handlePlayNext(): any {
+  const queue = yield select(getQueue)
+  const songId = queue.nextSongId
+  yield put({type: types.SET_CURRENT_PLAYING, songId})
+}
+
 export function* goToViewPage(): any {
   const app = yield select(getApp)
   const queue = yield select(getQueue)
@@ -41,7 +48,7 @@ export function* goToViewPage(): any {
 // Binding actions to sagas
 function* playerSaga(): any {
   yield takeLatest(types.SET_CURRENT_PLAYING, setCurrentPlaying)
-  yield takeLatest(types.PLAY_NEXT, setCurrentPlaying)
+  yield takeLatest(types.PLAY_NEXT, handlePlayNext)
   yield takeLatest(types.PLAY_PREV, setCurrentPlaying)
   yield takeLatest(types.PUSH_TO_VIEW, goToViewPage)
 }

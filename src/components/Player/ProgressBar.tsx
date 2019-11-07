@@ -6,15 +6,17 @@ import 'rc-slider/assets/index.css';
 import { getDurationStr } from '../../utils/timeFormatter'
 
 type Props = {
-  total: number,
+  total: number, // Milliseconds
   dispatch: Dispatch,
   onChange?: (value: string) => any,
   onAfterChange?: (value: string) => any,
-  current: number
+  current: number // Milliseconds
 }
 
 const ProgressBar = (props: Props) => {
-  const step =  100 / props.total
+  const step = 100 / props.total
+
+  const diff = props.total - props.current
 
   return (
     <div
@@ -31,7 +33,7 @@ const ProgressBar = (props: Props) => {
         onAfterChange={ props.onAfterChange }
       />
       <span className='absolute bottom-auto right-0 p-2'>
-        -{ getDurationStr(props.total * 1000 - props.current * 1000) }
+        -{ getDurationStr(diff) }
       </span>
     </div>
   )

@@ -1,6 +1,4 @@
 .song-view {
-  background: $greyscale-base;
-
   a:hover {
     text-decoration: underline;
   }
@@ -11,11 +9,6 @@
     img {
       width: 100%;
     }
-  }
-
-  @include media-breakpoint-up(md) {
-    padding-left: 10px;
-    padding-right: 10px;
   }
 
   .song {
