@@ -51,37 +51,6 @@ describe('queue reducer', () => {
       })
   })
 
-  it('should handle PLAY_NEXT action', () => {
-    const trackIds = ['1234', '4321']
-    const props = {...defaultState, trackIds, currentPlaying: '1234', nextSongId: '4321'}
-    expect(reducer(props, {type: types.PLAY_NEXT}))
-      .toEqual({
-        ...props,
-        trackIds,
-        currentPlaying: '4321',
-        nextSongId: undefined,
-        prevSongId: '1234'
-      })
-  })
-
-  it('should handle PLAY_PREV action', () => {
-    const trackIds = ['1234', '4321']
-    const props = {
-      ...defaultState,
-      trackIds,
-      currentPlaying: '1234',
-      prevSongId: '4321'
-    }
-    expect(reducer(props, {type: types.PLAY_PREV}))
-      .toEqual({
-        ...props,
-        trackIds,
-        currentPlaying: '4321',
-        nextSongId: undefined,
-        prevSongId: '1234'
-      })
-  })
-
   it('should handle CLEAR_QUEUE action', () => {
     const trackIds = ['1234', '4321']
     const props = {...defaultState, trackIds}

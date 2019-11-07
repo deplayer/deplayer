@@ -37,6 +37,12 @@ export function* handlePlayNext(): any {
   yield put({type: types.SET_CURRENT_PLAYING, songId})
 }
 
+export function* handlePlayPrev(): any {
+  const queue = yield select(getQueue)
+  const songId = queue.prevSongId
+  yield put({type: types.SET_CURRENT_PLAYING, songId})
+}
+
 export function* goToViewPage(): any {
   const app = yield select(getApp)
   const queue = yield select(getQueue)
@@ -49,7 +55,7 @@ export function* goToViewPage(): any {
 function* playerSaga(): any {
   yield takeLatest(types.SET_CURRENT_PLAYING, setCurrentPlaying)
   yield takeLatest(types.PLAY_NEXT, handlePlayNext)
-  yield takeLatest(types.PLAY_PREV, setCurrentPlaying)
+  yield takeLatest(types.PLAY_PREV, handlePlayPrev)
   yield takeLatest(types.PUSH_TO_VIEW, goToViewPage)
 }
 
