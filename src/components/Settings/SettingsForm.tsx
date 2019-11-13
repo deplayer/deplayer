@@ -2,6 +2,7 @@ import { Dispatch } from 'redux'
 import { Formik, Form } from 'formik'
 import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
+import classNames from 'classnames'
 
 import { State as SettingsStateType } from '../../reducers/settings'
 import Button from '../common/Button'
@@ -15,6 +16,14 @@ type Props = {
   dispatch: Dispatch,
   schema: any
 }
+
+export const settingsCard = classNames({
+  'relative': true,
+  'bg-gray-900': true,
+  'p-10': true,
+  'mb-4': true,
+  'rounded-lg': true
+})
 
 const SettingsForm = (props: Props) => {
   const saveSettings = (form: any): any => {
@@ -51,10 +60,8 @@ const SettingsForm = (props: Props) => {
           >
             <h2><Translate value="labels.generalSettings" /></h2>
 
-            <div className='card app-settings'>
-              <div className='card-body'>
-                <FormSchema schema={props.schema} />
-              </div>
+            <div className={settingsCard}>
+              <FormSchema schema={props.schema} />
             </div>
 
             <h2><Translate value="labels.providers" /></h2>

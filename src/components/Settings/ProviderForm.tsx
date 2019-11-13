@@ -1,8 +1,11 @@
-import * as React from 'react'
 import { Dispatch } from 'redux'
+import * as React from 'react'
+
 import { State as SettingsStateType } from '../../reducers/settings'
-import * as types from '../../constants/ActionTypes'
+import { settingsCard } from './SettingsForm'
+import Button from '../common/Button'
 import FormSchema from './FormSchema'
+import * as types from '../../constants/ActionTypes'
 
 type ProviderFormProps = {
   providerKey: string,
@@ -16,28 +19,25 @@ const ProviderForm = (props: ProviderFormProps) => {
       props.dispatch({type: types.REMOVE_PROVIDER, providerKey: props.providerKey})
     }
     return (
-      <div className='float-right'>
-        <a
-          onClick={onClick}
-          title={ props.providerKey }
-        >
-          <i className='fa fa-remove'></i>
-        </a>
-      </div>
+      <Button
+        transparent
+        onClick={onClick}
+        title={ props.providerKey }
+      >
+        <i className='fa fa-remove'></i>
+      </Button>
     )
   }
   return (
-    <div key={props.providerKey} className='card provider-card'>
-      <div className='card-body'>
-        <FormSchema schema={props.settings.settingsForm.providers[props.providerKey]} />
-      </div>
-
-      <div className='card-footer'>
+    <div key={props.providerKey} className={settingsCard}>
+      <div className='top-0 right-0 absolute'>
         <RemoveProviderBtn
           providerKey={props.providerKey}
           dispatch={props.dispatch}
         />
       </div>
+
+      <FormSchema schema={props.settings.settingsForm.providers[props.providerKey]} />
     </div>
   )
 }
