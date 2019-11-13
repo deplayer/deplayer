@@ -18,7 +18,6 @@ const ProviderForm = (props: ProviderFormProps) => {
     return (
       <div className='float-right'>
         <a
-          className='btn btn-secondary'
           onClick={onClick}
           title={ props.providerKey }
         >

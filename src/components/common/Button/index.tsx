@@ -14,12 +14,15 @@ type Props = {
 
 const Button = (props: Props) => {
   const classNames = classnames({
-    'text-blue-100': true,
+    'text-blue-200': true,
     'bg-blue-700': true,
     'p-2': true,
-    'px-3': true,
+    'px-4': true,
     'rounded': true,
-    'border-blue-100': props.inverted,
+    'border': !props.transparent,
+    'border-blue-500': !props.inverted,
+    'border-blue-200': props.inverted,
+    'border-solid': props.inverted,
     'border-transparent': props.transparent,
     'bg-transparent': props.inverted || props.transparent
   })

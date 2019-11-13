@@ -1,14 +1,5 @@
 .settings {
-  button {
-    margin-bottom: 40px;
-    max-width: 200px;
-  }
-
-  button[type="submit"] {
-    margin-top: 40px;
-  }
-
-  .provider-buttons {
+  .card {
     margin-bottom: 20px;
   }
 
@@ -29,19 +20,6 @@
   .btn-group {
     i {
       margin-right: 10px;
-    }
-
-    &.provider-buttons {
-      a {
-        background: transparent;
-        cursor: pointer;
-      }
-    }
-
-    button {
-      background: transparent;
-      color: $warning;
-      font-weight: normal;
     }
   }
 }

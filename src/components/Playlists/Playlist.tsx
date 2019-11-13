@@ -36,7 +36,6 @@ const Playlist = (props: Props) => {
 
         <div className='btn-group'>
           <Button
-            className='btn-secondary'
             onClick={() => setShowSongs(!showSongs)}
           >
             Show songs
@@ -44,7 +43,6 @@ const Playlist = (props: Props) => {
           </Button>
 
           <Button
-            className='btn-info'
             onClick={() => {
               dispatch({
                 type: types.ADD_SONGS_TO_QUEUE_BY_ID,
