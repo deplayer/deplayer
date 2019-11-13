@@ -1,8 +1,8 @@
-# genar-radio
+# decentraplayer
 
-[![pipeline status](https://gitlab.com/gtrias/genar-radio/badges/master/pipeline.svg)](https://gitlab.com/gtrias/genar-radio/commits/master)
+[![pipeline status](https://gitlab.com/decentraplayer/decentraplayer/badges/master/pipeline.svg)](https://gitlab.com/decentraplayer/decentraplayer/commits/master)
 
-* [Online version](http://genar-radio.surge.sh/)
+* [Online version](http://decentraplayer.surge.sh/)
 
 Media player thought to run entirelly in the web browser.
 
