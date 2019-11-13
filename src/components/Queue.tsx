@@ -44,7 +44,6 @@ const Queue = (props: Props) => {
         <BodyMessage message={'Add songs from the collection or search for new ones'} />
 
         <Link
-          className='btn'
           to="/collection"
           title="collection"
         >

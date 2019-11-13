@@ -59,7 +59,7 @@ const SettingsForm = (props: Props) => {
 
             <h2><Translate value="labels.providers" /></h2>
 
-            <div className='btn-group provider-buttons'>
+            <div className='my-3'>
               <ProviderButton providerKey='subsonic' />
               <ProviderButton providerKey='mstream' />
               <ProviderButton providerKey='itunes' />

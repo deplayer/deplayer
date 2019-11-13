@@ -80,7 +80,7 @@ export default class Importer extends React.Component<Props> {
           name='import-playlist'
           ref={this.fileInput}
         />
-        <Button className='btn btn-info' onClick={this.startImport.bind(this)}>Start import</Button>
+        <Button onClick={this.startImport.bind(this)}>Start import</Button>
         { message }
       </React.Fragment>
     )

@@ -19,11 +19,10 @@ const ProviderButton = (props: Props) => {
   return (
     <Button
       inverted
-      className='btn btn-secondary'
       onClick={onClick}
       title={ props.providerKey }
     >
-      <i className='fa fa-plus'></i>
+      <i className='fa fa-plus mr-2'></i>
       <Translate value={`buttons.addProvider.${props.providerKey}`} />
     </Button>
   )

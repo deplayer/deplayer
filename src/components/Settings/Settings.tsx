@@ -59,26 +59,26 @@ class Settings extends React.Component<Props, State> {
           settings={this.props.settings}
           dispatch={this.props.dispatch}
         />
-        <div className='btn-group'>
-          <Button className='btn btn-info' onClick={this.scanSources} inverted>
+        <div className='my-4'>
+          <Button onClick={this.scanSources} inverted>
             <Translate value="labels.scanSources" />
           </Button>
         </div>
-        <div className='btn-group'>
-          <Button className='btn btn-info' onClick={this.exportCollection} inverted>
+        <div className='my-4'>
+          <Button onClick={this.exportCollection} inverted>
             <Translate value="labels.exportCollection" />
           </Button>
-          <Button className='btn btn-success' onClick={this.toggleImporter} inverted>
+          <Button onClick={this.toggleImporter} inverted>
             <Translate value="labels.importCollection" />
           </Button>
-          <Button className='btn btn-danger' onClick={this.deleteCollection} inverted>
+          <Button onClick={this.deleteCollection} inverted>
             <Translate value="labels.deleteCollection" />
           </Button>
-          <Button className='btn btn-danger' onClick={this.deleteSettings} inverted>
+          <Button onClick={this.deleteSettings} inverted>
             <Translate value="labels.deleteSettings" />
           </Button>
         </div>
-        <div className='btn-group'>
+        <div className='my-4'>
           { ImporterComp }
         </div>
       </div>

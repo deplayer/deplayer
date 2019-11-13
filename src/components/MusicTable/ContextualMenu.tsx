@@ -28,7 +28,7 @@ const ContextualMenu = (props: MenuProps) => {
 
   return (
     <React.Fragment>
-      <MenuProvider event="onClick" id={`context-menu-${song.id}`} className='media-actions btn'>
+      <MenuProvider event="onClick" id={`context-menu-${song.id}`} className='media-actions'>
         <i className='fa fa-ellipsis-v' />
       </MenuProvider>
       <Menu id={`context-menu-${song.id}`} className='song-menu'>
