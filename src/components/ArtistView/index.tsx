@@ -100,16 +100,16 @@ export default class ArtistView extends React.Component<Props> {
     }
 
     return (
-      <div className={`artist-view ${this.props.className}`}>
+      <div className={`artist-view ${this.props.className} z-50`}>
         <div className='main'>
-          <h2>{ artist.name }</h2>
+          <h2 className='text-center'>{ artist.name }</h2>
           <p dangerouslySetInnerHTML={{__html: extractSummary()}} />
           <ul className='unstyled-list'>
             {
               albumsByArtist.map((albumId) => {
                 return (
-                  <li className='card' key={albumId}>
-                    <h3 className='card-header'>
+                  <li className='mx-10 md:mx-0 z-4 flex flex-col items-center' key={albumId}>
+                    <div className='h-40 w-40 md:h-56 md:w-56'>
                       <CoverImage
                         cover={
                           this.props.collection.rows[songsByAlbum[albumId][0]].cover
@@ -117,6 +117,8 @@ export default class ArtistView extends React.Component<Props> {
                         size='thumbnail'
                         albumName={'N/A'}
                       />
+                    </div>
+                    <h3>
                       <span>{ albums[albumId].name }</span>
                       <button
                         onClick={() => {
@@ -126,7 +128,7 @@ export default class ArtistView extends React.Component<Props> {
                         <i className='fa fa-play' />
                       </button>
                     </h3>
-                    <div className='card-body'>
+                    <div className='card-body mb-10'>
                       { extractSongs(albums[albumId]) }
                     </div>
                   </li>

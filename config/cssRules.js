@@ -5,7 +5,6 @@ module.exports = [
   // SASS support
   {
     test: /\.scss$/,
-    include: paths.appSrc,
     loaders: ["style-loader", "css-loader", "sass-loader"]
   },
   // "postcss" loader applies autoprefixer to our CSS.

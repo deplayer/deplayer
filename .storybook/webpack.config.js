@@ -25,7 +25,12 @@ module.exports = async ({ config, mode }) => {
     ...config,
     module: {
       ...config.module,
-      rules: [typescriptRules, ...cssRules]
+      rules: [typescriptRules, ...cssRules,
+        {
+          test: /\.(png|woff|woff2|eot|ttf|svg)$/,
+          loaders: ['file-loader']
+        }
+      ]
     }
   }
 }

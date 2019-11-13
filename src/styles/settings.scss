@@ -12,10 +12,6 @@
     margin-bottom: 20px;
   }
 
-  .card {
-    margin-bottom: 20px;
-  }
-
   @include media-breakpoint-up(md) {
     label {
       text-align: right;

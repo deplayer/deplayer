@@ -5,6 +5,7 @@ import * as React from 'react'
 
 import { getDurationStr } from '../../utils/timeFormatter'
 import Button from '../common/Button'
+import Icon from '../common/Icon'
 import Song from '../../entities/Song'
 import Spinner from '..//Spinner'
 import Tag from '../common/Tag'
@@ -51,31 +52,31 @@ const SongView = (props: Props) => {
             <div>
               <div>
                 <div>
-                  <h2>{ song.title }</h2>
+                  <h2 className='text-lg'>{ song.title }</h2>
                 </div>
               </div>
               <div>
                 <div>
                   <Link to={`/artist/${ song.artist.id }`}>
-                    <h3>{ song.artist.name }</h3>
+                    <h3>
+                      <Icon
+                        icon='faMicrophoneAlt'
+                        className='mr-1 w-8'
+                      />
+                      <span>{ song.artist.name }</span>
+                    </h3>
                   </Link>
                 </div>
               </div>
-              <div>
-                <div className='collapsed'>
-                  <span className='label'><Translate value='song.label.album' /></span>
-                </div>
-                <div>
-                  { song.albumName || 'N/A' }
-                </div>
+              <div className='color-white text-lg'>
+                <Icon
+                  className='mr-1 w-8'
+                  icon='faCompactDisc'
+                />
+                { song.albumName || 'N/A' }
               </div>
               <div>
-                <div className='collapsed'>
-                  <span className='label'><Translate value='song.label.duration' /></span>
-                </div>
-                <div>
-                  { getDurationStr(song.duration) }
-                </div>
+                <Icon icon='faStopwatch' /> { getDurationStr(song.duration) }
               </div>
               <div>
                 <div className='collapsed'>
@@ -97,11 +98,13 @@ const SongView = (props: Props) => {
                 <div className='collapsed'>
                   <span className='label'><Translate value='song.label.providers' /></span>
                 </div>
+                <div>
                   {
                     song.stream.map((provider) => {
                       return (<Tag type='primary' key={provider.service}>{ provider.service }</Tag>)
-                      })
+                    })
                   }
+                </div>
               </div>
 
               <div className='btn-group'>

@@ -1,13 +1,10 @@
-import * as React from 'react'
-import KeyHandler, { KEYPRESS } from 'react-key-handler'
 import { I18n } from 'react-redux-i18n'
+import KeyHandler, { KEYPRESS } from 'react-key-handler'
+import * as React from 'react'
+
+import SearchInput from './SearchInput'
 import SidebarButton from '../Buttons/SidebarButton'
 import Title from './Title'
-import {
-  TopbarContainer,
-  TopbarContents
-} from './Topbar.styles'
-
 import * as types from '../../constants/ActionTypes'
 
 type State = {
@@ -40,6 +37,7 @@ class Topbar extends React.Component<Props, State> {
     super(props);
 
     this.props = props
+    this.searchInput = React.createRef()
     this.timer = null
   }
 
@@ -87,51 +85,41 @@ class Topbar extends React.Component<Props, State> {
     this.setState({focus: true})
   }
 
-  renderSearch = (props: Props) => {
-    if (!props.searchToggled) {
-      return null;
-    }
-
-    return (
-      <div
-        className={`search-bar ui huge action icon input inverted ${this.props.loading ? 'loading': ''}`}
-      >
-        <input
-          autoFocus
-          ref={(input) => { this.searchInput = input }}
-          onChange={this.onSearchChange}
-          onFocus={this.onFocus}
-          onBlur={this.onFocusOut}
-          value={this.props.searchTerm}
-          placeholder={ I18n.t('placeholder.search') }
-          type='text'
-        />
-        { this.props.loading ? <i className='icon fa fa-spinner fa-pulse'></i> : <i className='icon search'></i> }
-      </div>
-    )
-  }
-
   render() {
-    const { children, title } = this.props
+    const {
+      children,
+      title,
+      searchTerm,
+      searchToggled,
+      loading
+    } = this.props
 
     const childrenWithProps = React.Children.map(children, child =>
       React.cloneElement(child, { dispatch: this.props.dispatch })
     )
 
     return (
-      <TopbarContainer>
+      <div className='flex justify-between overflow-hidden z-10 items-center' style={{gridArea: 'topbar'}}>
         <SidebarButton />
         <KeyHandler
           keyEventName={KEYPRESS}
           keyValue='/'
           onKeyHandle={this.setFocus}
         />
-        { this.renderSearch(this.props) }
+          <SearchInput
+            searchToggled={searchToggled}
+            loading={loading}
+            ref={this.searchInput}
+            onSearchChange={this.onSearchChange}
+            onFocus={this.onFocus}
+            onBlur={this.onFocusOut}
+            value={searchTerm}
+          />
         {  !this.state.focus && !this.props.searchToggled  ? <Title title={title} onClick={this.setSearchOn} /> : null }
-        <TopbarContents>
+        <div className='flex justify-end'>
           {  !this.state.focus ? childrenWithProps : null }
-        </TopbarContents>
-      </TopbarContainer>
+        </div>
+      </div>
     )
   }
 }
