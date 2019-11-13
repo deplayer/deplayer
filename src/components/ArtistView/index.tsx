@@ -1,11 +1,12 @@
-import * as React from 'react'
 import { Dispatch } from 'redux'
 import { Redirect } from 'react-router-dom'
+import * as React from 'react'
 
-import Song from '../../entities/Song'
 import Artist from '../../entities/Artist'
-import SongRow from '../MusicTable/SongRow'
+import Button from '../common/Button'
 import CoverImage from '../MusicTable/CoverImage'
+import Song from '../../entities/Song'
+import SongRow from '../MusicTable/SongRow'
 import * as types from '../../constants/ActionTypes'
 
 type Props = {
@@ -102,33 +103,40 @@ export default class ArtistView extends React.Component<Props> {
     return (
       <div className={`artist-view ${this.props.className} z-50`}>
         <div className='main'>
-          <h2 className='text-center'>{ artist.name }</h2>
+          <h2 className='text-center text-xl'>{ artist.name }</h2>
           <p dangerouslySetInnerHTML={{__html: extractSummary()}} />
           <ul className='unstyled-list'>
             {
-              albumsByArtist.map((albumId) => {
+              albumsByArtist.map((albumId: string) => {
                 return (
-                  <li className='mx-10 md:mx-0 z-4 flex flex-col items-center' key={albumId}>
-                    <div className='h-40 w-40 md:h-56 md:w-56'>
-                      <CoverImage
-                        cover={
-                          this.props.collection.rows[songsByAlbum[albumId][0]].cover
-                        }
-                        size='thumbnail'
-                        albumName={'N/A'}
-                      />
-                    </div>
-                    <h3>
-                      <span>{ albums[albumId].name }</span>
-                      <button
+                  <li className='mx-0 z-4 flex flex-col md:flex-row items-center md:items-start mb-16' key={albumId}>
+                    <div className='flex flex-col items-center md:mr-8'>
+                      <h3 className='text-lg mb-2'>{ albums[albumId].name }</h3>
+                      <div
+                        className='h-56 w-56 mb-2 md:h-56 md:w-56 cursor-pointer'
+                        onClick={() => {
+                          this.props.dispatch({type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
+                        }}
+                      >
+                        <CoverImage
+                          cover={
+                            this.props.collection.rows[songsByAlbum[albumId][0]].cover
+                          }
+                          size='thumbnail'
+                          albumName={'N/A'}
+                        />
+                      </div>
+
+                      <Button
+                        transparent
                         onClick={() => {
                           this.props.dispatch({type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
                         }}
                       >
                         <i className='fa fa-play' />
-                      </button>
-                    </h3>
-                    <div className='card-body mb-10'>
+                      </Button>
+                    </div>
+                    <div className='w-100'>
                       { extractSongs(albums[albumId]) }
                     </div>
                   </li>

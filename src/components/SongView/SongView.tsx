@@ -50,64 +50,43 @@ const SongView = (props: Props) => {
         <div className="w-full lg:w1/2 p-6 content">
           <div>
             <div>
-              <div>
-                <div>
-                  <h2 className='text-lg'>{ song.title }</h2>
-                </div>
+              <h2 className='text-2xl'>{ song.title }</h2>
+              <div className='mt-2'>
+                <Link to={`/artist/${ song.artist.id }`}>
+                  <h3>
+                    <Icon
+                      icon='faMicrophoneAlt'
+                      className='mr-1 w-8'
+                    />
+                    <span>{ song.artist.name }</span>
+                  </h3>
+                </Link>
               </div>
-              <div>
-                <div>
-                  <Link to={`/artist/${ song.artist.id }`}>
-                    <h3>
-                      <Icon
-                        icon='faMicrophoneAlt'
-                        className='mr-1 w-8'
-                      />
-                      <span>{ song.artist.name }</span>
-                    </h3>
-                  </Link>
-                </div>
-              </div>
-              <div className='color-white text-lg'>
+              <div className='color-white text-lg mt-2'>
                 <Icon
                   className='mr-1 w-8'
                   icon='faCompactDisc'
                 />
                 { song.albumName || 'N/A' }
               </div>
-              <div>
+              <div className='mt-4'>
                 <Icon icon='faStopwatch' /> { getDurationStr(song.duration) }
               </div>
-              <div>
-                <div className='collapsed'>
-                  <span className='label'><Translate value='song.label.genre' /></span>
-                </div>
-                <div>
-                  { song.genre }
-                </div>
+              <div className='mt-2'>
+                <Tag>{ song.genre }</Tag>
               </div>
-              <div>
-                <div className='collapsed'>
-                  <span className='label'><Translate value='song.label.playCount' /></span>
-                </div>
-                <div>
-                  { song.playCount || 0 }
-                </div>
+              <div className='mt-2'>
+                <Translate value='song.label.played' /> { song.playCount || 0 } <Translate value='song.label.times' />
               </div>
-              <div>
-                <div className='collapsed'>
-                  <span className='label'><Translate value='song.label.providers' /></span>
-                </div>
-                <div>
-                  {
-                    song.stream.map((provider) => {
-                      return (<Tag type='primary' key={provider.service}>{ provider.service }</Tag>)
-                    })
-                  }
-                </div>
+              <div className='mt-2'>
+                {
+                  song.stream.map((provider) => {
+                    return (<Tag type='primary' key={provider.service}>{ provider.service }</Tag>)
+                  })
+                }
               </div>
 
-              <div className='btn-group'>
+              <div className='btn-group mt-10'>
                 <Button
                   onClick={() => {
                     props.dispatch({type: types.SET_CURRENT_PLAYING, songId: song.id})
