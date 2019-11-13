@@ -21,7 +21,7 @@ type ContentProps = {
 const SidebarContents = (props: ContentProps) => {
   return (
     <div onClick={() => props.onSetSidebarOpen()}>
-      <h4>genar-radio</h4>
+      <h4>decentraplayer</h4>
       <ul>
         <QueueMenuItem
           current={inSection(props.location, '(queue)?')}
@@ -45,7 +45,7 @@ const SidebarContents = (props: ContentProps) => {
 
       <section className='sidebar-meta'>
         <a
-          href={'https://gitlab.com/gtrias/genar-radio'}
+          href={'https://gitlab.com/decentraplayer/decentraplayer'}
           title="Show me the code"
           target="_blank"
         >
@@ -53,7 +53,7 @@ const SidebarContents = (props: ContentProps) => {
         </a>
 
         <a
-          href={'https://gitlab.com/gtrias/genar-radio/tags'}
+          href={'https://gitlab.com/decentraplayer/decentraplayer/tags'}
           title="Show me the code"
           target="_blank"
         >
