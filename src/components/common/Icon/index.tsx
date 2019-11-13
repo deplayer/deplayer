@@ -15,7 +15,7 @@ const icons = {
 
 type Props = {
   icon: keyof typeof icons,
-  className: string
+  className?: string
 }
 
 const Icon = (props: Props) => {
