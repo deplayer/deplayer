@@ -1,5 +1,6 @@
 import * as React from 'react'
 
+import { settingsCard } from '../Settings/SettingsForm'
 import Button from '../common/Button'
 import * as types from '../../constants/ActionTypes'
 
@@ -25,7 +26,7 @@ const Playlist = (props: Props) => {
   })
 
   return (
-    <div className='card'>
+    <div className={settingsCard}>
       <div className='card-body'>
         <h3>
           { playlist._id }

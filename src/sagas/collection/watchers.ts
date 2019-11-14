@@ -8,6 +8,22 @@ import logger from '../../utils/logger'
 import mapToMedia from '../../mappers/mapToMedia'
 import * as types from '../../constants/ActionTypes'
 
+/**
+ * Returns an array with arrays of the given size.
+ *
+ * @param myArray {Array} Array to split
+ * @param chunkSize {Integer} Size of every group
+ */
+const chunkArray = (myArray: Array<any>, chunk_size: number) => {
+    const results: Array<any> = []
+
+    while (myArray.length) {
+      results.push(myArray.splice(0, chunk_size))
+    }
+
+    return results
+}
+
 const adapter = getAdapter()
 const collectionService = new CollectionService(new adapter())
 
@@ -38,9 +54,13 @@ export function* initializeWatcher() {
     yield call(collectionService.initialize)
     const collection = yield call(collectionService.getAll)
     const mappedData = mapToMedia(collection)
-    yield put({type: types.RECEIVE_COLLECTION, data: mappedData})
-    // FIXME: Handle RECEIVE_COLLECTION instead of call every time
-    yield put({type: types.RECREATE_INDEX})
+
+    const chunks = chunkArray(mappedData, 100)
+    for (let i = 0; i < chunks.length; i++) {
+      yield put({type: types.RECEIVE_COLLECTION, data: chunks[i]})
+    }
+
     yield put({type: types.INITIALIZED})
+    yield put({type: types.RECREATE_INDEX})
   }
 }
