@@ -1,10 +1,10 @@
 import { call, actionChannel, fork, take, put } from 'redux-saga/effects'
 
-import { initialize } from '../settings'
+import { generateIndexWorker, saveToDbWorker } from './workers'
 import { getAdapter } from '../../services/database'
-import { saveToDbWorker } from './workers'
+import { initialize } from '../settings'
 import CollectionService from '../../services/CollectionService'
-import logger from '../../utils/logger'
+import IndexService from '../../services/Search/IndexService'
 import mapToMedia from '../../mappers/mapToMedia'
 import * as types from '../../constants/ActionTypes'
 
@@ -55,12 +55,13 @@ export function* initializeWatcher() {
     const collection = yield call(collectionService.getAll)
     const mappedData = mapToMedia(collection)
 
-    const chunks = chunkArray(mappedData, 100)
+    const chunks = chunkArray(mappedData, 1000)
     for (let i = 0; i < chunks.length; i++) {
       yield put({type: types.RECEIVE_COLLECTION, data: chunks[i]})
     }
 
     yield put({type: types.INITIALIZED})
-    yield put({type: types.RECREATE_INDEX})
+    const indexService = new IndexService()
+    yield fork(generateIndexWorker, indexService)
   }
 }

@@ -109,11 +109,11 @@ export default class ArtistView extends React.Component<Props> {
           {
             albumsByArtist.map((albumId: string) => {
               return (
-                <StickyContainer>
-                  <div className='mx-0 z-4 flex flex-col md:flex-row items-center md:items-start mb-16' key={albumId}>
+                <StickyContainer className='mx-0 z-4 flex flex-col md:flex-row items-center md:items-start mb-16' key={albumId}>
+                  <>
                     <Sticky topOffset={80}>
                       {(style: any) => (
-                        <div style={style} className='flex flex-col items-center md:mr-8'>
+                        <div style={{...style}} className='flex flex-col items-center md:mr-8'>
                           <h3 className='text-lg mb-2'>{ albums[albumId].name }</h3>
                           <div
                             className='h-56 w-56 mb-2 md:h-56 md:w-56 cursor-pointer'
@@ -144,7 +144,7 @@ export default class ArtistView extends React.Component<Props> {
                     <div className='w-100'>
                       { extractSongs(albums[albumId]) }
                     </div>
-                  </div>
+                  </>
                 </StickyContainer>
               )
             })
