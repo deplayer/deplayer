@@ -39,6 +39,9 @@ export default (state: State = defaultState, action: any): State => {
     case types.REGISTER_PLAYER_ERROR:
       return {...state, errorCount: state.errorCount + 1}
 
+    case types.SONG_PLAYED:
+      return {...state, errorCount: 0}
+
     case types.SET_CURRENT_PLAYING_URL:
       return {...state, streamUri: action.url}
 

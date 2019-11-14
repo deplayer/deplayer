@@ -105,6 +105,10 @@ class PlayerControls extends React.Component<Props> {
     this.props.dispatch({type: types.SONG_PLAYED, songId})
   }
 
+  onError = (e: Error) => {
+    this.props.dispatch({type: types.PLAY_ERROR, error: e})
+  }
+
   render () {
     const {
       playing,
@@ -139,7 +143,7 @@ class PlayerControls extends React.Component<Props> {
             this.playNext()
           }}
           config={{ }}
-          onError={(e: Error) => console.log('onError', e)}
+          onError={this.onError}
           onProgress={this.onProgress}
           onDuration={this.onDuration}
           onSeek={this.onSeekChange}

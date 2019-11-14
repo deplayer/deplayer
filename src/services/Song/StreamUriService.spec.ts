@@ -16,7 +16,7 @@ const prepareData = (streams: Array<any>) => {
     forcedId: 'foo',
     stream: streams
   })
-  return getStreamUri(song, settings)
+  return getStreamUri(song, settings, 0)
 }
 
 describe('getStreamUri', () => {

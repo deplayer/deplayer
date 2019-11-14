@@ -19,6 +19,10 @@ export const getApp = (state: any): any => {
   return state ? state.app : {}
 }
 
+export const getPlayer = (state: any): any => {
+  return state ? state.player : {}
+}
+
 export const getSongBg = (state: any): any => {
   const { collection: { rows }, queue: { currentPlaying } } = state
   if (rows[currentPlaying]) {
