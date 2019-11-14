@@ -1,6 +1,5 @@
 import { Dispatch } from 'redux'
 import { Redirect } from 'react-router-dom'
-import { Sticky, StickyContainer } from 'react-sticky'
 import * as React from 'react'
 
 import Artist from '../../entities/Artist'
