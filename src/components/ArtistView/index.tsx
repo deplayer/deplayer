@@ -109,43 +109,37 @@ export default class ArtistView extends React.Component<Props> {
           {
             albumsByArtist.map((albumId: string) => {
               return (
-                <StickyContainer className='mx-0 z-4 flex flex-col md:flex-row items-center md:items-start mb-16' key={albumId}>
-                  <>
-                    <Sticky topOffset={80}>
-                      {(style: any) => (
-                        <div style={{...style}} className='flex flex-col items-center md:mr-8'>
-                          <h3 className='text-lg mb-2'>{ albums[albumId].name }</h3>
-                          <div
-                            className='h-56 w-56 mb-2 md:h-56 md:w-56 cursor-pointer'
-                            onClick={() => {
-                              this.props.dispatch({type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
-                            }}
-                          >
-                            <CoverImage
-                              cover={
-                                this.props.collection.rows[songsByAlbum[albumId][0]].cover
-                              }
-                              size='thumbnail'
-                              albumName={'N/A'}
-                            />
-                          </div>
-
-                          <Button
-                            transparent
-                            onClick={() => {
-                              this.props.dispatch({type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
-                            }}
-                          >
-                            <i className='fa fa-play' />
-                          </Button>
-                        </div>
-                      )}
-                    </Sticky>
-                    <div className='w-100'>
-                      { extractSongs(albums[albumId]) }
+                <div className='mx-0 z-4 flex flex-col md:flex-row items-center md:items-start mb-16' key={albumId}>
+                  <div style={{ top: 50 }} className='md:sticky flex flex-col items-center md:mr-8'>
+                    <h3 className='text-lg mb-2'>{ albums[albumId].name }</h3>
+                    <div
+                      className='h-56 w-56 mb-2 md:h-56 md:w-56 cursor-pointer'
+                      onClick={() => {
+                        this.props.dispatch({type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
+                      }}
+                    >
+                      <CoverImage
+                        cover={
+                          this.props.collection.rows[songsByAlbum[albumId][0]].cover
+                        }
+                        size='thumbnail'
+                        albumName={'N/A'}
+                      />
                     </div>
-                  </>
-                </StickyContainer>
+
+                    <Button
+                      transparent
+                      onClick={() => {
+                        this.props.dispatch({type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
+                      }}
+                    >
+                      <i className='fa fa-play' />
+                    </Button>
+                  </div>
+                  <div className='w-100'>
+                    { extractSongs(albums[albumId]) }
+                  </div>
+                </div>
               )
             })
           }
