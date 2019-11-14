@@ -77,6 +77,7 @@ export default class ArtistView extends React.Component<Props> {
         const songObj = new Song(songRow)
         return (
           <SongRow
+            mqlMatch={false}
             disableCovers
             style={ {} }
             key={ songId }
