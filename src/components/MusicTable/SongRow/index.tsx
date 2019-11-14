@@ -16,6 +16,7 @@ type Props = {
   dispatch: Dispatch,
   disableAddButton?: boolean,
   disableCovers?: boolean,
+  mqlMatch: boolean,
   slim?: boolean,
   style: any
 }
@@ -52,9 +53,9 @@ const SongRow = (props: Props) => {
     >
       <div>
         { disableCovers || cover }
-        <ul className='media-info'>
+        <ul className='media-info truncate'>
           <li className='title-label'>
-            <h4>
+            <h4 className=''>
               <Link to={`/song/${song.id}`}>
                 { song.title }
               </Link>
@@ -66,19 +67,25 @@ const SongRow = (props: Props) => {
               <Link to={`/artist/${song.artist.id}`}>{ song.artist ? song.artist.name: nonAvailable }</Link>
             </h6>
           </li>
-          { props.slim ||  <li> { getDurationStr(song.duration) } </li> }
+          <li>
+            {
+              props.slim || (
+                <div className='inline-block mr-5'>{ getDurationStr(song.duration) }</div>
+              )
+            }
+          </li>
         </ul>
-        <div>
-        {
-          props.slim ||
-          song.stream.map((provider) => {
-            return (<Tag key={provider.service}>{ provider.service }</Tag>)
-          })
-        }
-        </div>
-        <div className='media-actions'>
+        <div className=''>
           <ContextualMenu {...props} />
-          { props.slim && <span>{ getDurationStr(song.duration) }</span> }
+          <div>
+            {
+              props.mqlMatch &&
+                song.stream.map((provider) => {
+                  return (<Tag key={provider.service}>{ provider.service }</Tag>)
+                })
+            }
+            { props.slim && <span>{ getDurationStr(song.duration) }</span> }
+          </div>
         </div>
       </div>
     </div>

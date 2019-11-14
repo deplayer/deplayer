@@ -53,6 +53,7 @@ const MusicTable = (props: Props) => {
 
     return (
       <SongRow
+        mqlMatch={props.app.mqlMatch}
         key={key}
         song={song}
         isCurrent={id === song.id}
