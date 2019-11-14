@@ -79,7 +79,7 @@ const SongRow = (props: Props) => {
           <ContextualMenu {...props} />
           <div>
             {
-              props.mqlMatch &&
+              !props.slim && props.mqlMatch &&
                 song.stream.map((provider) => {
                   return (<Tag key={provider.service}>{ provider.service }</Tag>)
                 })
