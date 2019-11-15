@@ -17,14 +17,6 @@ Decentralized mediaplayer which runs entirely in the browser.
 * Offline first, sync with your remote [pouchdb](https://pouchdb.com/) / [couchdb](https://couchdb.apache.org/) your database as a backup and share your collection and session between devices and browsers!
 * Multi provider, add your data sources and listen the music from there. Keep reading to see the list of available providers.
 
-## Screenshots
-
-![playlist](img/playlist-desktop.png)
-![song-view](img/song-view.png)
-![artist-view](img/artist-view.png)
-![playlist-mobile](img/playlist-mobile.png)
-![song-view-mobile](img/song-view-mobile.png)
-
 ## Implemented Music providers
 
 * IPFS folder (work-in-progress)
@@ -35,6 +27,14 @@ Decentralized mediaplayer which runs entirely in the browser.
 ## Implemented artists metadata providers
 
 * last.fm (not very usefull)
+
+## Screenshots
+
+![playlist](img/playlist-desktop.png)
+![song-view](img/song-view.png)
+![artist-view](img/artist-view.png)
+![playlist-mobile](img/playlist-mobile.png)
+![song-view-mobile](img/song-view-mobile.png)
 
 ## Keyboard hotkeys
 
