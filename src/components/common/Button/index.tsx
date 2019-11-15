@@ -17,7 +17,7 @@ const Button = (props: Props) => {
     'text-blue-200': true,
     'bg-blue-700': true,
     'p-2': true,
-    'px-4': true,
+    'px-2': true,
     'rounded': true,
     'border': !props.transparent,
     'border-blue-500': !props.inverted,
