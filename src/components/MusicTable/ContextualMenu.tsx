@@ -1,12 +1,13 @@
 import 'react-contexify/dist/ReactContexify.min.css'
 
-import { Menu, Item, MenuProvider } from 'react-contexify'
 import { Dispatch } from 'redux'
+import { Menu, Item, MenuProvider } from 'react-contexify'
 import { Translate } from 'react-redux-i18n'
 import React from 'react'
 
-import { ADD_TO_COLLECTION, REMOVE_FROM_COLLECTION } from '../../constants/ActionTypes'
-import Song from '../../entities/Song';
+import * as types from '../../constants/ActionTypes'
+import Button from '../common/Button'
+import Song from '../../entities/Song'
 
 type MenuProps = {
   dispatch: Dispatch,
@@ -18,49 +19,52 @@ type MenuProps = {
 const ContextualMenu = (props: MenuProps) => {
   const { onClick, disableAddButton, song } = props
 
-  const addToCollection = () => {
-    props.dispatch({type: ADD_TO_COLLECTION, data: [props.song]})
+  const addToQueue = () => {
+    props.dispatch({type: types.ADD_TO_QUEUE, song: [props.song]})
   }
 
-  const removeFromCollection = () => {
-    props.dispatch({type: REMOVE_FROM_COLLECTION, data: [props.song]})
+  const removeFromQueue = () => {
+    props.dispatch({type: types.REMOVE_FROM_QUEUE, data: [props.song]})
   }
 
   return (
     <React.Fragment>
       <MenuProvider event="onClick" id={`context-menu-${song.id}`}>
-        <i className='fa fa-ellipsis-v p-3 cursor-pointer float-right' />
+        <i className='fa fa-ellipsis-v p-1 mx-1 text-blue-400 cursor-pointer float-right' />
       </MenuProvider>
       <Menu id={`context-menu-${song.id}`} className='song-menu'>
         <Item>
-          <button
-            className='play spaced'
+          <Button
+            fullWidth
+            transparent
             onClick={onClick}
           >
-            <i className='icon play '></i>
+            <i className='icon play mr-2'></i>
             <Translate value='buttons.play' />
-          </button>
+          </Button>
         </Item>
         { !disableAddButton &&
             <Item>
-              <button
-                className='add-to-collection spaced'
-                onClick={addToCollection}
+              <Button
+                fullWidth
+                transparent
+                onClick={addToQueue}
               >
-                <i className='icon add '></i>
-                <Translate value='buttons.addToCollection' />
-              </button>
+                <i className='icon add mr-2'></i>
+                <Translate value='buttons.addToQueue' />
+              </Button>
             </Item>
         }
         { disableAddButton &&
             <Item>
-              <button
-                className='remove-from-collection spaced'
-                onClick={removeFromCollection}
+              <Button
+                fullWidth
+                transparent
+                onClick={removeFromQueue}
               >
-                <i className='icon remove '></i>
+                <i className='icon remove mr-2'></i>
                 <Translate value='buttons.remove' />
-              </button>
+              </Button>
             </Item>
         }
       </Menu>

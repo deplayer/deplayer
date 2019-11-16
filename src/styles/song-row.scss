@@ -14,8 +14,16 @@
   }
 }
 
-.artist-row,
-.song-row {
+.media-thumb {
+  cursor: pointer;
+  position: relative;
+
+  &:hover {
+    @extend .show-cover;
+  }
+}
+
+.artist-row {
   h4, h5, h6 {
     margin: 0;
     padding: 0;
@@ -36,15 +44,6 @@
     }
   }
 
-  .media-thumb {
-    cursor: pointer;
-    position: relative;
-
-    &:hover {
-      @extend .show-cover;
-    }
-  }
-
   & > a,
   & > div {
     width: 100%;
@@ -54,18 +53,6 @@
     padding-right: 10px;
     padding-top: 10px;
     padding-bottom: 10px;
-  }
-
-  &.slim {
-    .media-actions {
-      span {
-        font-size: 14px;
-        display: inline-block;
-        float: right;
-        margin-top: 10px;
-        margin-right: 10px;
-      }
-    }
   }
 
   &.current {

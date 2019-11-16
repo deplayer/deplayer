@@ -8,6 +8,7 @@ type Props = {
   inverted?: boolean,
   disabled?: boolean,
   transparent?: boolean,
+  fullWidth?: boolean,
   type?: 'submit' | 'button',
   className?: string
 }
@@ -19,6 +20,7 @@ const Button = (props: Props) => {
     'p-2': true,
     'px-2': true,
     'rounded': true,
+    'w-full': props.fullWidth,
     'border': !props.transparent,
     'border-blue-500': !props.inverted,
     'border-blue-200': props.inverted,

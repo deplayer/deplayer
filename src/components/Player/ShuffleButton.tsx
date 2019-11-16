@@ -16,10 +16,11 @@ const ShuffleButton = (props: Props) => {
 
   return (
     <Button
+      fullWidth
       transparent
       onClick={onClick}
     >
-      <i className='fa fa-random'></i>
+      <i className='fa fa-random mx-2'></i>
       <Translate value='buttons.shuffle' />
     </Button>
   )

@@ -1,6 +1,7 @@
 import 'react-contexify/dist/ReactContexify.min.css'
 
 import { Menu, MenuProvider, Item } from 'react-contexify'
+import { Translate } from 'react-redux-i18n'
 import React from 'react'
 
 import Button from '../common/Button'
@@ -18,8 +19,9 @@ type MenuProps = {
 const ContextualMenu = (props: MenuProps) => {
   const TogglePlayer = () => {
     return (
-      <Button className='xs' onClick={() => props.dispatch({type: types.HIDE_PLAYER})}>
-        <i className='fa fa-eye-slash'></i>
+      <Button transparent fullWidth onClick={() => props.dispatch({type: types.HIDE_PLAYER})}>
+        <i className='fa fa-eye-slash mx-2'></i>
+          <Translate value='buttons.hidePlayer' />
       </Button>
     )
   }
@@ -27,12 +29,12 @@ const ContextualMenu = (props: MenuProps) => {
   return (
     <React.Fragment>
       <MenuProvider event="onClick" id='context-menu-player' className='w-8 m-4'>
-        <Button transparent>
+        <Button transparent fullWidth>
           <i className='fa fa-ellipsis-v' />
         </Button>
       </MenuProvider>
       <Menu id='context-menu-player'>
-        <Item>
+        <Item className='w-full'>
           <VolumeControl
             volume={ props.volume }
             onChange={props.setVolume}

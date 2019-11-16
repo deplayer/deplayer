@@ -21,7 +21,9 @@ type ContentProps = {
 const SidebarContents = (props: ContentProps) => {
   return (
     <div onClick={() => props.onSetSidebarOpen()}>
-      <h4 className='text-xl'>decentraplayer</h4>
+      <h4 className="text-xl">
+        { 'DecentraPlayer' }
+      </h4>
       <ul>
         <QueueMenuItem
           current={inSection(props.location, '(queue)?')}

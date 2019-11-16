@@ -1,7 +1,9 @@
 import * as React from 'react'
+import classNames from 'classnames'
 
 type Props = {
-  src?: string
+  src?: string,
+  className: string
 }
 
 class LazyImage extends React.Component<Props> {
@@ -58,7 +60,7 @@ class LazyImage extends React.Component<Props> {
    this.image = null
   }
 
-  handleLoad(e) {
+  handleLoad(_e: any) {
     if (this.state.isMounted && this.image) {
       this.setState({
         loading: false
@@ -82,8 +84,18 @@ class LazyImage extends React.Component<Props> {
       })
     )
 
+    const className = classNames({
+      "lazy-image": true,
+      "fade-in": true,
+      "w-full": true,
+      "bg-no-repeat": true,
+      "bg-center": true,
+      "cursor-pointer": true,
+      one: true
+    })
+
     return (
-      <div className="lazy-image fade-in one">
+      <div className={className}>
         { childrenWithProps }
       </div>
     )

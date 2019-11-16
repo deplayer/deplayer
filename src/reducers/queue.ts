@@ -57,6 +57,18 @@ export default (state: State = defaultState, action: any  = {}): State => {
         trackIds: mergedTrackIds
       }
 
+    case types.REMOVE_FROM_QUEUE:
+      const queueTracks = [
+        ...state.trackIds.splice(
+          state.trackIds.indexOf(action.song.id)
+        )
+      ]
+      return {
+        ...state,
+        trackIds: queueTracks
+      }
+
+
     case types.ADD_SONGS_TO_QUEUE_BY_ID:
       if (action.replace) {
         return {

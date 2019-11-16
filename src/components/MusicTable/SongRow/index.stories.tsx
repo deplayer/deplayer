@@ -2,11 +2,11 @@ import { storiesOf } from '@storybook/react'
 import { withKnobs, boolean } from '@storybook/addon-knobs'
 import * as React from 'react'
 
-import Song from '../../../entities/Song'
 import SongRow from './index'
+import exampleSong from '../../../utils/exampleSong'
 import withProvider from '../../../utils/withProvider'
 
-const stories = storiesOf('SongRow', module);
+const stories = storiesOf('SongRow', module)
 
 stories
   .addDecorator(withKnobs)
@@ -14,15 +14,17 @@ stories
   .add(
     'default',
     () => (
-      <SongRow
-        song={new Song()}
-        dispatch={() => null}
-        onClick={() => console.log('song row')}
-        isCurrent={boolean('isCurrent', false)}
-        disableAddButton={boolean('disableAddButton', false)}
-        disableCovers={boolean('disableCovers', false)}
-        slim={boolean('slim', false)}
-        style={{}}
-      />
+      <div className='bg-blue-900'>
+        <SongRow
+          song={exampleSong}
+          dispatch={() => console.log('dispatch')}
+          onClick={() => console.log('song row')}
+          isCurrent={boolean('isCurrent', false)}
+          disableAddButton={boolean('disableAddButton', false)}
+          disableCovers={boolean('disableCovers', false)}
+          slim={boolean('slim', false)}
+          style={{}}
+        />
+      </div>
     )
   )

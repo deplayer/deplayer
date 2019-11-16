@@ -16,10 +16,11 @@ const RepeatButton = (props: Props) => {
 
   return (
     <Button
+      fullWidth
       transparent
       onClick={onClick}
     >
-      <i className='fa fa-repeat -mx-1'></i>
+      <i className='fa fa-repeat mx-2'></i>
       <Translate value='buttons.repeat' />
     </Button>
   )
