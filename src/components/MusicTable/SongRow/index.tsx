@@ -34,7 +34,7 @@ const SongRow = (props: Props) => {
 
   const cover = (
     <div
-      className='media-thumb relative'
+      className='media-thumb relative mr-3'
       style={{ minWidth: '80px', height: '80px' }}
     >
       <CoverImage
@@ -53,7 +53,7 @@ const SongRow = (props: Props) => {
       onClick={onClick}
     >
       { disableCovers || cover }
-      <ul className='media-info truncate w-full mx-3'>
+      <ul className='media-info truncate w-full whitespace-no-wrap m-1'>
         <li className='title-label'>
           <h4 className='text-blue-400 text-lg'>
             <Link to={`/song/${song.id}`}>

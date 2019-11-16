@@ -79,7 +79,7 @@ const MusicTable = (props: Props) => {
           <List
             height={height}
             rowCount={props.tableIds.length}
-            rowHeight={100}
+            rowHeight={props.slim ? 80 : 100}
             rowRenderer={rowRenderer}
             width={width}
             overscanRowCount={6}

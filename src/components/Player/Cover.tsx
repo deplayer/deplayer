@@ -14,7 +14,7 @@ const Cover = (props: Props) => {
   }
 
   return (
-    <div className='media-thumb m-1'>
+    <div className='media-thumb m-1' style={{ width: '80px', height: '80px' }}>
       <CoverImage
         cover={props.song.cover}
         size='thumbnail'

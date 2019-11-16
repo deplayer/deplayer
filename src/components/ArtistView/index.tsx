@@ -109,8 +109,8 @@ export default class ArtistView extends React.Component<Props> {
           {
             albumsByArtist.map((albumId: string) => {
               return (
-                <div className='mx-0 z-4 flex flex-col md:flex-row items-center md:items-start mb-16' key={albumId}>
-                  <div style={{ top: 50 }} className='md:sticky flex flex-col items-center md:mr-8'>
+                <div className='mx-0 z-4 flex flex-col md:flex-row items-center md:items-start md:items-start mb-16' key={albumId}>
+                  <div style={{ top: 50 }} className='md:sticky flex flex-col items-center md:mr-8 w-40'>
                     <h3 className='text-lg mb-2'>{ albums[albumId].name }</h3>
                     <div
                       className='h-56 w-56 mb-2 md:h-56 md:w-56 cursor-pointer'
@@ -136,7 +136,7 @@ export default class ArtistView extends React.Component<Props> {
                       <i className='fa fa-play' />
                     </Button>
                   </div>
-                  <div className='w-100'>
+                  <div className='w-100 ml-3'>
                     { extractSongs(albums[albumId]) }
                   </div>
                 </div>

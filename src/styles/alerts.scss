@@ -14,17 +14,17 @@
 }
 
 .s-alert-box {
-    position: fixed;
-    background: $secondary-color-darker2;
-    padding: 8px;
-    line-height: 22px;
-    padding-right: 40px;
-    z-index: 9999;
-    pointer-events: none;
-    color: rgba(250,251,255,0.95);
-    max-width: 300px;
-    -webkit-transition: top .4s, bottom .4s;
-    transition: top .4s, bottom .4s;
+  position: fixed;
+  background: $greyscale-darker2;
+  padding: 12px;
+  z-index: 9999;
+  pointer-events: none;
+  color: rgba(250,251,255,0.95);
+  max-width: 300px;
+  -webkit-transition: top .4s, bottom .4s;
+  transition: top .4s, bottom .4s;
+  border-radius: 4px;
+  border: 2px solid !important;
 }
 
 .s-alert-box.s-alert-show {
@@ -138,18 +138,18 @@ $alert-offset: 40px;
 }
 
 .s-alert-top {
-    width: 100%;
-    max-width: 100%;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: auto;
+  margin: 0 auto;
 }
 
 /* conditions */
 
 .s-alert-info {
-    background: $info;
+    background: $primary-color-900 !important;
+    border-color: $primary-color-600 !important;
     color: #fff;
 }
 .s-alert-success {
