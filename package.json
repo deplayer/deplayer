@@ -1,6 +1,6 @@
 {
   "name": "decentraplayer",
-  "version": "0.10.39",
+  "version": "0.10.40",
   "private": true,
   "dependencies": {
     "@babel/core": "^7.0.0",
