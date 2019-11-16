@@ -1,37 +1,6 @@
 .main {
-  width: 100%;
-  z-index: 2;
-
   max-width: $body-max-width;
   margin: 0 auto;
-
-  @include media-breakpoint-up(md) {
-    padding: 40px;
-  }
-
-  h2 {
-    margin-top: 30px;
-    margin-bottom: 20px;
-    position: relative;
-  }
-
-  h2,
-  p {
-    position: relative;
-    padding: 20px;
-
-    @include media-breakpoint-up(md) {
-      padding: 0px;
-    }
-  }
-
-  h3 {
-    margin-top: 0px;
-    margin-bottom: 20px;
-    color: $greyscale-color-200;
-    text-transform: capitalize;
-  }
-
 }
 
 .contents {

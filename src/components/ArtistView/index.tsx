@@ -103,8 +103,8 @@ export default class ArtistView extends React.Component<Props> {
 
     return (
       <div className={`artist-view ${this.props.className} z-50`}>
-        <div className='main'>
-          <h2 className='text-center text-xl'>{ artist.name }</h2>
+        <div className='main w-full z-10 md:p-4'>
+          <h2 className='text-center text-3xl py-3'>{ artist.name }</h2>
           <p dangerouslySetInnerHTML={{__html: extractSummary()}} />
           {
             albumsByArtist.map((albumId: string) => {
