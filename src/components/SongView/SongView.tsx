@@ -50,8 +50,8 @@ const SongView = (props: Props) => {
         <div className="w-full lg:w1/2 p-6 content">
           <div>
             <div>
-              <h2 className='text-2xl'>{ song.title }</h2>
-              <div className='mt-2'>
+              <h2 className='text-3xl'>{ song.title }</h2>
+              <div className='text-lg mt-2'>
                 <Link to={`/artist/${ song.artist.id }`}>
                   <h3>
                     <Icon

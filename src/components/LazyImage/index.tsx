@@ -2,8 +2,7 @@ import * as React from 'react'
 import classNames from 'classnames'
 
 type Props = {
-  src?: string,
-  className: string
+  src?: string
 }
 
 class LazyImage extends React.Component<Props> {

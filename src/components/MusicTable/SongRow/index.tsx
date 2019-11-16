@@ -47,7 +47,7 @@ const SongRow = (props: Props) => {
 
   return (
     <div
-      className={`song-row ${ props.isCurrent ? 'current': ''} p-2 flex justify-between`}
+      className={`song-row ${ props.isCurrent ? 'current': ''} p-3 flex justify-between`}
       style={props.style}
       onClick={onClick}
     >

@@ -1,8 +1,6 @@
 #left-sidebar {
   z-index: 9999 !important;
 
-  background-color: $greyscale-darker1;
-  width: 100%;
   align-items: center;
 
   @include media-breakpoint-up(md) {

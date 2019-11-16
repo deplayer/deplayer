@@ -24,6 +24,7 @@ const SearchInput = (props: Props) => {
     'p-3': true,
     'bg-transparent': true,
     'text-blue-100': true,
+    'text-xl': true,
     'font-sans': true,
     'focus:outline-none': true,
     huge: true,
