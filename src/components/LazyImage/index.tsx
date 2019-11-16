@@ -2,7 +2,8 @@ import * as React from 'react'
 import classNames from 'classnames'
 
 type Props = {
-  src?: string
+  src?: string,
+  onClick?: () => void
 }
 
 class LazyImage extends React.Component<Props> {
@@ -94,7 +95,10 @@ class LazyImage extends React.Component<Props> {
     })
 
     return (
-      <div className={className}>
+      <div
+        className={className}
+        onClick={this.props.onClick}
+      >
         { childrenWithProps }
       </div>
     )

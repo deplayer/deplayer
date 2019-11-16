@@ -10,6 +10,7 @@ type cover = {
 type Props = {
   cover: cover,
   size: string,
+  onClick?: () => void,
   albumName: string
 }
 
@@ -26,10 +27,11 @@ const Content = (props: any) => {
   )
 }
 
-const Img = (props: { src?: string, alt?: string, noImage?: boolean}) => {
+const Img = (props: { src?: string, alt?: string, noImage?: boolean, onClick?: () => void}) => {
   return (
     <LazyImage
       src={props.src}
+      onClick={props.onClick}
     >
       <Content src={props.src} />
     </LazyImage>
@@ -40,6 +42,7 @@ const CoverImage = (props: Props) => {
   if (!props.cover) {
     return (
       <Img
+        onClick={props.onClick}
         noImage
       />
     )
@@ -49,6 +52,7 @@ const CoverImage = (props: Props) => {
 
   return (
     <Img
+        onClick={props.onClick}
       alt={ `${props.albumName} cover` }
       src={ src }
     />

@@ -27,6 +27,7 @@ export default (state: State = defaultState, action: any): State => {
     case types.START_PLAYING:
       return {...state, playing: true, showPlayer: true}
 
+    case types.CLEAR_QUEUE:
     case types.HIDE_PLAYER:
       return {...state, showPlayer: false}
 

@@ -63,13 +63,6 @@ blockquote {
   @include media-breakpoint-up(md) {
     display: block;
   }
-
-  width: 76px;
-  height: 76px;
-
-  div {
-    min-width: 40px;
-  }
 }
 
 .lazy-image {

@@ -34,10 +34,10 @@ const SongRow = (props: Props) => {
 
   const cover = (
     <div
-      className='media-thumb flex-grow-0 w-24 h-24'
-      onClick={props.onClick}
+      className='media-thumb relative'
     >
       <CoverImage
+        onClick={props.onClick}
         cover={song.cover}
         size='thumbnail'
         albumName={song.album ? song.album.name : 'N/A'}
@@ -47,12 +47,12 @@ const SongRow = (props: Props) => {
 
   return (
     <div
-      className={`song-row ${ props.isCurrent ? 'current': ''} p-3 flex justify-between`}
+      className={`song-row ${ props.isCurrent ? 'current': ''} p-1 flex justify-between`}
       style={props.style}
       onClick={onClick}
     >
       { disableCovers || cover }
-      <ul className='media-info truncate w-full p-2'>
+      <ul className='media-info truncate w-full mx-3'>
         <li className='title-label'>
           <h4 className='text-blue-400 text-lg'>
             <Link to={`/song/${song.id}`}>
@@ -71,11 +71,9 @@ const SongRow = (props: Props) => {
           </h6>
         </li>
         <li>
-          {
-            props.slim || (
-              <div className='inline-block mr-5 text-yellow-400'>{ getDurationStr(song.duration) }</div>
-            )
-          }
+          { props.slim || (
+            <div className='inline-block text-yellow-400'>{ getDurationStr(song.duration) }</div>
+          )}
         </li>
       </ul>
       <div className='relative'>
