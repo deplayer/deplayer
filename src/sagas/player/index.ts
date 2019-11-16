@@ -1,4 +1,4 @@
-import { call, takeLatest, put, select } from 'redux-saga/effects'
+import { call, takeLatest, takeEvery, put, select } from 'redux-saga/effects'
 
 import {
   getApp,
@@ -76,7 +76,7 @@ export function* goToViewPage(): any {
 // Binding actions to sagas
 function* playerSaga(): any {
   yield takeLatest(types.SET_CURRENT_PLAYING, setCurrentPlaying)
-  yield takeLatest(types.PLAY_ERROR, handleError)
+  yield takeEvery(types.PLAY_ERROR, handleError)
   yield takeLatest(types.PLAY_NEXT, handlePlayNext)
   yield takeLatest(types.PLAY_PREV, handlePlayPrev)
   yield takeLatest(types.PUSH_TO_VIEW, goToViewPage)

@@ -76,6 +76,9 @@ class PlayerControls extends React.Component<Props> {
     this.setState({ seeking: false })
   }
   onProgress = (state: any) => {
+    if (this.props.player.errorCount) {
+      this.props.dispatch({ type: types.CLEAR_PLAYER_ERRORS })
+    }
     // We only want to update time slider if we are not currently seeking
     if (!this.state.seeking) {
       this.setState(state)

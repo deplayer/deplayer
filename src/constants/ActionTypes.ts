@@ -26,6 +26,7 @@ export const PLAY_ERROR = 'PLAY_ERROR'
 export const REGISTER_PLAYER_ERROR = 'REGISTER_PLAYER_ERROR'
 export const HIDE_PLAYER = 'HIDE_PLAYER'
 export const SONG_PLAYED = 'SONG_PLAYED'
+export const CLEAR_PLAYER_ERRORS = 'CLEAR_PLAYER_ERRORS'
 
 // Collection
 export const GET_COLLECTION = 'GET_COLLECTION'

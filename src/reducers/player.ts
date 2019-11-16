@@ -39,6 +39,7 @@ export default (state: State = defaultState, action: any): State => {
     case types.REGISTER_PLAYER_ERROR:
       return {...state, errorCount: state.errorCount + 1}
 
+    case types.CLEAR_PLAYER_ERRORS:
     case types.SONG_PLAYED:
       return {...state, errorCount: 0}
 
