@@ -4,10 +4,15 @@
   }
 }
 
+.player-container,
+.topbar {
+  background-color: transparentize($gray-900, .3);
+}
+
 .player-container {
   position: relative;
   grid-area: player;
-  background-color: $gray-900;
+
   z-index: 1000;
 }
 
@@ -16,11 +21,6 @@
   padding-top: 5px;
   padding-bottom: 0;
   margin-bottom: 0;
-  font-size: 14px;
-
-  @include media-breakpoint-up(md) {
-    font-size: 20px;
-  }
 
   .song-count {
     color: darken($primary-color-100, 20%);

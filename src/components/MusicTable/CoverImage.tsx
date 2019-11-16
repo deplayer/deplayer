@@ -52,7 +52,7 @@ const CoverImage = (props: Props) => {
 
   return (
     <Img
-        onClick={props.onClick}
+      onClick={props.onClick}
       alt={ `${props.albumName} cover` }
       src={ src }
     />

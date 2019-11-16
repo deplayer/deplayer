@@ -49,8 +49,12 @@ type LayoutProps = {
 
 const Layout = (props: LayoutProps) => {
   return (
-    <React.Fragment>
-      <SidebarContainer>
+    <div
+      className='bg-handler absolute w-full h-full bg-cover bg-center bg-no-repeat bg-fixed'
+      style={{backgroundImage: `url(${ props.backgroundImage })`}}
+    >
+      <SidebarContainer
+      >
         <TopbarContainer title={ props.title }>
           <SearchButton />
           <Route path="/queue" component={() => <ClearQueueButton /> } />
@@ -59,14 +63,13 @@ const Layout = (props: LayoutProps) => {
         </TopbarContainer>
 
         <div
-          style={{backgroundImage: `url(${ props.backgroundImage })`}}
           className='contents'
         >
           { props.children }
         </div>
         <Placeholder />
       </SidebarContainer>
-    </React.Fragment>
+    </div>
   )
 }
 

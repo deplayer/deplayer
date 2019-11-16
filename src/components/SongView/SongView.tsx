@@ -5,6 +5,7 @@ import * as React from 'react'
 
 import { getDurationStr } from '../../utils/timeFormatter'
 import Button from '../common/Button'
+import CoverImage from '../MusicTable/CoverImage'
 import Icon from '../common/Icon'
 import Song from '../../entities/Song'
 import Spinner from '..//Spinner'
@@ -40,11 +41,11 @@ const SongView = (props: Props) => {
   return (
     <div className={`song-view ${props.className} w-full overflow-y-auto z-10`}>
       <div className="song lg:flex">
-        <div className="w-full md:p-6 lg:w-1/2 image">
-          <img
-            className='artist-image w-full'
-            alt={song.title}
-            src={song.cover.fullUrl}
+        <div className="w-full md:m-6 lg:w-1/2 image border border-gray-900">
+          <CoverImage
+            cover={song.cover}
+            size='thumbnail'
+            albumName={song.album ? song.album.name : 'N/A'}
           />
         </div>
         <div className="w-full lg:w1/2 p-6 content">
