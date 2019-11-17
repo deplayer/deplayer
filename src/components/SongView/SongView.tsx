@@ -43,6 +43,7 @@ const SongView = (props: Props) => {
       <div className="song lg:flex">
         <div className="w-full md:m-6 lg:w-1/2 image border border-gray-900">
           <CoverImage
+            useImage
             cover={song.cover}
             size='thumbnail'
             albumName={song.album ? song.album.name : 'N/A'}

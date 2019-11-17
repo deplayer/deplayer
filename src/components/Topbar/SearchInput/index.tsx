@@ -3,11 +3,10 @@ import * as React from 'react'
 import classNames from 'classnames'
 
 type Props = {
-  ref: any,
   loading: boolean,
   searchToggled: boolean,
   onSearchChange: (event:  React.FormEvent<HTMLInputElement>) => void,
-  onFocus: () => void,
+  onFocus?: () => void,
   onBlur: () => void,
   value: string,
 }
@@ -41,8 +40,7 @@ const SearchInput = (props: Props) => {
     >
       <input
         className={classes}
-        autoFocus
-        ref={props.ref}
+        autoFocus={props.searchToggled}
         onChange={props.onSearchChange}
         onFocus={props.onFocus}
         onBlur={props.onBlur}

@@ -58,7 +58,7 @@ const SettingsForm = (props: Props) => {
           <Form
             className='settings-form'
           >
-            <h2><Translate value="labels.generalSettings" /></h2>
+            <h2 className='text-2xl py-3'><Translate value="labels.generalSettings" /></h2>
 
             <div className={settingsCard}>
               <FormSchema schema={props.schema} />

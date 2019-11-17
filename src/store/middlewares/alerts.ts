@@ -12,7 +12,7 @@ type Action = {
 const alerts = () => next => (action: Action) => {
   if (action.type === types.SEND_NOTIFICATION) {
     const options = {
-      position: 'top',
+      position: 'top-right',
       offset: 0
     }
     Alert.info(I18n.t(action.notification), options)

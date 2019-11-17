@@ -54,12 +54,11 @@ export function* search(action: SearchAction): any {
 
   yield all(searchPromises)
   yield take([types.ADD_TO_COLLECTION, types.SEARCH_REJECTED])
-  yield put({type: types.SEARCH_FINISHED, searchTerm: action.searchTerm})
-  yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.search.finished'})
-
   if (redirect) {
     yield call(goToSearchResults)
   }
+  yield put({type: types.SEARCH_FINISHED, searchTerm: action.searchTerm})
+  yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.search.finished'})
 }
 
 // Going to home page

@@ -16,7 +16,7 @@
 .s-alert-box {
   position: fixed;
   background: $greyscale-darker2;
-  padding: 12px;
+  padding: 12px !important;
   z-index: 9999;
   pointer-events: none;
   color: rgba(250,251,255,0.95);

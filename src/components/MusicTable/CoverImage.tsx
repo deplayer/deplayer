@@ -11,12 +11,23 @@ type Props = {
   cover: cover,
   size: string,
   onClick?: () => void,
+  useImage?: boolean,
   albumName: string
 }
 
 const Content = (props: any) => {
   const placeholderUrl = '/logo.png'
   const imageUrl = props.noImage ? placeholderUrl : props.src
+
+  if (props.useImage) {
+    return (
+      <img
+        className='cover-image'
+        src={imageUrl}
+        alt={ props.alt }
+      />
+    )
+  }
 
   return (
     <div
@@ -27,13 +38,21 @@ const Content = (props: any) => {
   )
 }
 
-const Img = (props: { src?: string, alt?: string, noImage?: boolean, onClick?: () => void}) => {
+type ImgProps = {
+  src?: string,
+  alt?: string,
+  noImage?: boolean,
+  onClick?: () => void,
+  useImage?: boolean
+}
+
+const Img = (props: ImgProps) => {
   return (
     <LazyImage
       src={props.src}
       onClick={props.onClick}
     >
-      <Content src={props.src} />
+      <Content useImage={props.useImage} src={props.src} />
     </LazyImage>
   )
 }
@@ -42,6 +61,7 @@ const CoverImage = (props: Props) => {
   if (!props.cover) {
     return (
       <Img
+        useImage={props.useImage}
         onClick={props.onClick}
         noImage
       />
@@ -52,6 +72,7 @@ const CoverImage = (props: Props) => {
 
   return (
     <Img
+      useImage={props.useImage}
       onClick={props.onClick}
       alt={ `${props.albumName} cover` }
       src={ src }

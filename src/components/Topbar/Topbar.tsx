@@ -1,5 +1,5 @@
 import { I18n } from 'react-redux-i18n'
-import KeyHandler, { KEYPRESS } from 'react-key-handler'
+import KeyHandler, { KEYUP } from 'react-key-handler'
 import * as React from 'react'
 
 import SearchInput from './SearchInput'
@@ -30,14 +30,12 @@ class Topbar extends React.Component<Props, State> {
     focus: false
   }
   timer: any
-  searchInput: any
   props: Props
 
   constructor(props: Props){
     super(props);
 
     this.props = props
-    this.searchInput = React.createRef()
     this.timer = null
   }
 
@@ -67,14 +65,6 @@ class Topbar extends React.Component<Props, State> {
     }
   }
 
-  setFocus = () => {
-    this.searchInput.focus()
-  }
-
-  onFocus = () => {
-    this.setState({focus: true})
-  }
-
   onFocusOut = () => {
     this.setState({focus: false})
     this.props.dispatch( { type: types.TOGGLE_SEARCH })
@@ -102,19 +92,17 @@ class Topbar extends React.Component<Props, State> {
       <div className='topbar flex justify-between overflow-hidden z-10 items-center px-2' style={{gridArea: 'topbar'}}>
         <SidebarButton />
         <KeyHandler
-          keyEventName={KEYPRESS}
+          keyEventName={KEYUP}
           keyValue='/'
-          onKeyHandle={this.setFocus}
+          onKeyHandle={this.setSearchOn}
         />
-          <SearchInput
-            searchToggled={searchToggled}
-            loading={loading}
-            ref={this.searchInput}
-            onSearchChange={this.onSearchChange}
-            onFocus={this.onFocus}
-            onBlur={this.onFocusOut}
-            value={searchTerm}
-          />
+        <SearchInput
+          searchToggled={searchToggled}
+          loading={loading}
+          onSearchChange={this.onSearchChange}
+          onBlur={this.onFocusOut}
+          value={searchTerm}
+        />
         {  !this.state.focus && !this.props.searchToggled  ? <Title title={title} onClick={this.setSearchOn} /> : null }
         <div className='flex justify-end'>
           {  !this.state.focus ? childrenWithProps : null }
