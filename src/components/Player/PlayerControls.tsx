@@ -151,8 +151,8 @@ class PlayerControls extends React.Component<Props> {
           onDuration={this.onDuration}
           onSeek={this.onSeekChange}
           progressInterval={1000}
-          width={0}
-          height={0}
+          width={'100%'}
+          height={'100%'}
         />
         { this.props.player.showPlayer &&
           <div className='player-container'>
