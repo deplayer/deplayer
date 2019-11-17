@@ -1,7 +1,7 @@
 import 'react-contexify/dist/ReactContexify.min.css'
 
 import { Dispatch } from 'redux'
-import { Menu, Item, MenuProvider } from 'react-contexify'
+import { Menu, Item, MenuProvider, theme } from 'react-contexify'
 import { Translate } from 'react-redux-i18n'
 import React from 'react'
 
@@ -32,7 +32,7 @@ const ContextualMenu = (props: MenuProps) => {
       <MenuProvider event="onClick" id={`context-menu-${song.id}`}>
         <i className='fa fa-ellipsis-v p-1 mx-1 text-blue-400 cursor-pointer float-right' />
       </MenuProvider>
-      <Menu id={`context-menu-${song.id}`} className='song-menu'>
+      <Menu id={`context-menu-${song.id}`} className='song-menu' theme={theme.dark}>
         <Item>
           <Button
             fullWidth

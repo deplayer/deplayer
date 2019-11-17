@@ -1,6 +1,6 @@
 import 'react-contexify/dist/ReactContexify.min.css'
 
-import { Menu, MenuProvider, Item } from 'react-contexify'
+import { Menu, MenuProvider, Item, theme } from 'react-contexify'
 import { Translate } from 'react-redux-i18n'
 import React from 'react'
 
@@ -33,7 +33,7 @@ const ContextualMenu = (props: MenuProps) => {
           <i className='fa fa-ellipsis-v' />
         </Button>
       </MenuProvider>
-      <Menu id='context-menu-player'>
+      <Menu id='context-menu-player' theme={theme.dark}>
         <Item className='w-full'>
           <VolumeControl
             volume={ props.volume }
