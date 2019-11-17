@@ -17,7 +17,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
   providerKey: string
 
   constructor(settings: any, providerKey: string) {
-    const appName = 'decentraplayer'
+    const appName = 'deplay'
     const songCount = 1000
     const artistCount = 1000
     this.baseUrl = settings.baseUrl

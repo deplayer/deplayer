@@ -47,7 +47,7 @@ const SidebarContents = (props: ContentProps) => {
 
       <section className='sidebar-meta'>
         <a
-          href={'https://gitlab.com/decentraplayer/decentraplayer'}
+          href={'https://gitlab.com/deplay/deplay'}
           title="Show me the code"
           target="_blank"
         >
@@ -55,7 +55,7 @@ const SidebarContents = (props: ContentProps) => {
         </a>
 
         <a
-          href={'https://gitlab.com/decentraplayer/decentraplayer/tags'}
+          href={'https://gitlab.com/deplay/deplay/tags'}
           title="Show me the code"
           target="_blank"
         >
