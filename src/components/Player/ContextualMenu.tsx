@@ -28,7 +28,7 @@ const ContextualMenu = (props: MenuProps) => {
 
   return (
     <React.Fragment>
-      <MenuProvider event="onClick" id='context-menu-player' className='w-8 m-4'>
+      <MenuProvider event="onClick" id='context-menu-player' className='w-8 m-2'>
         <Button transparent fullWidth>
           <i className='fa fa-ellipsis-v' />
         </Button>

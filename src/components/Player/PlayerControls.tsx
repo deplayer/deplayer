@@ -196,7 +196,7 @@ class PlayerControls extends React.Component<Props> {
             />
 
             <div className='flex justify-between items-center'>
-              <Cover slim={this.props.slim} song={currentPlaying} />
+              <Cover song={currentPlaying} />
               <div className='player'>
                 <div className='player-tools'>
                   <Link to={`/song/${currentPlaying.id}`}>
@@ -213,20 +213,22 @@ class PlayerControls extends React.Component<Props> {
                   />
                 </div>
               </div>
-              <Button
-                transparent
-                onClick={() => this.props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
-              >
-                <Icon
-                  icon='faExpand'
-                  className='mr-1 w-8'
+              <div className='flex'>
+                <Button
+                  transparent
+                  onClick={() => this.props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
+                >
+                  <Icon
+                    icon='faExpand'
+                    className='mr-1 w-8'
+                  />
+                </Button>
+                <ContextualMenu
+                  volume={volume * 100}
+                  dispatch={this.props.dispatch}
+                  setVolume={this.setVolume}
                 />
-              </Button>
-              <ContextualMenu
-                volume={volume * 100}
-                dispatch={this.props.dispatch}
-                setVolume={this.setVolume}
-              />
+              </div>
             </div>
             <Spectrum audioSelector={'#player-audio audio'} />
           </div>
