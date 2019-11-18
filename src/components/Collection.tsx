@@ -18,7 +18,7 @@ type Props = {
 const Collection = (props: Props) => {
   if (props.app.loading) {
     return (
-      <div className={`collection`}>
+      <div className={`collection z-10`}>
         <blockquote className='blockquote'>
           <Spinner />
         </blockquote>
@@ -34,7 +34,7 @@ const Collection = (props: Props) => {
 
   return (
     <div
-      className='collection'
+      className='collection z-10'
     >
       <MusicTable
         app={props.app}
