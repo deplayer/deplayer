@@ -22,7 +22,7 @@ const SidebarContents = (props: ContentProps) => {
   return (
     <div onClick={() => props.onSetSidebarOpen()}>
       <h4 className="text-xl">
-        { 'DecentraPlayer' }
+        { 'deplay' }
       </h4>
       <ul>
         <QueueMenuItem
