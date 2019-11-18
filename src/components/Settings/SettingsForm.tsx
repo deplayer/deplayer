@@ -76,7 +76,7 @@ const SettingsForm = (props: Props) => {
             { providers }
 
             <div>
-              <Button className='with-bg' disabled={isSubmitting} type='submit'>
+              <Button long disabled={isSubmitting} type='submit'>
                 <Translate value="buttons.save" />
               </Button>
             </div>

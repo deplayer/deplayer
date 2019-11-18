@@ -1,4 +1,5 @@
 import { call, takeLatest, takeEvery, put, select } from 'redux-saga/effects'
+import screenfull from 'screenfull'
 
 import {
   getApp,
@@ -73,12 +74,28 @@ export function* goToViewPage(): any {
   }
 }
 
+function* handleFullscreen(): any {
+  const player = yield select(getPlayer)
+
+  if (!screenfull.isEnabled) {
+    return
+  }
+
+  if (player.fullscreen) {
+    yield screenfull.request()
+  } else {
+    yield screenfull.exit()
+  }
+}
+
 // Binding actions to sagas
 function* playerSaga(): any {
   yield takeLatest(types.SET_CURRENT_PLAYING, setCurrentPlaying)
   yield takeEvery(types.PLAY_ERROR, handleError)
   yield takeLatest(types.PLAY_NEXT, handlePlayNext)
   yield takeLatest(types.PLAY_PREV, handlePlayPrev)
+  yield takeLatest(types.TOGGLE_FULL_SCREEN, handleFullscreen)
+  yield takeLatest(types.SET_FULL_SCREEN, handleFullscreen)
   yield takeLatest(types.PUSH_TO_VIEW, goToViewPage)
 }
 

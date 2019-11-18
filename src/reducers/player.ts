@@ -3,6 +3,7 @@ import * as types from '../constants/ActionTypes'
 export type State = {
   playing: boolean,
   showPlayer: boolean,
+  fullscreen: boolean,
   currentTime: number,
   errorCount: number,
   streamUri: string | null,
@@ -14,6 +15,7 @@ export type State = {
 export const defaultState = {
   playing: false,
   showPlayer: false,
+  fullscreen: false,
   currentTime: 0,
   providers: {},
   streams: {},
@@ -31,6 +33,9 @@ export default (state: State = defaultState, action: any): State => {
     case types.HIDE_PLAYER:
       return {...state, showPlayer: false}
 
+    case types.SHOW_PLAYER:
+      return {...state, showPlayer: true}
+
     case types.VOLUME_SET:
       return {...state, volume: action.value}
 
@@ -46,6 +51,12 @@ export default (state: State = defaultState, action: any): State => {
 
     case types.SET_CURRENT_PLAYING_URL:
       return {...state, streamUri: action.url}
+
+    case types.TOGGLE_FULL_SCREEN:
+      return {...state, fullscreen: !state.fullscreen}
+
+    case types.SET_FULL_SCREEN:
+      return {...state, fullscreen: true}
 
     case types.SET_CURRENT_PLAYING_STREAMS:
       return {...state, streams: action.streams}

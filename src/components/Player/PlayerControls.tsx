@@ -2,15 +2,19 @@ import { Dispatch } from 'redux'
 import { Link } from 'react-router-dom'
 import React from 'react'
 import ReactPlayer from 'react-player'
+import classNames from 'classnames'
+import KeyHandler, {KEYPRESS} from 'react-key-handler'
 
 import { State as PlayerState } from '../../reducers/player'
 import { State as SettingsState } from '../../reducers/settings'
+import Button from '../common/Button'
+import ContextualMenu from './ContextualMenu'
 import Controls from './Controls'
 import Cover from './Cover'
+import Icon from '../common/Icon'
 import ProgressBar from './ProgressBar'
 import Spectrum from './../Spectrum'
 import * as types from '../../constants/ActionTypes'
-import ContextualMenu from './ContextualMenu'
 
 type Props = {
   queue: any,
@@ -34,6 +38,7 @@ class PlayerControls extends React.Component<Props> {
     playedSeconds: 0,
     loaded: 0,
     duration: 0,
+    timeShown: 0,
     playbackRate: 1.0,
     loop: false
   }
@@ -70,12 +75,19 @@ class PlayerControls extends React.Component<Props> {
     this.setState({ seeking: true })
   }
   onSeekChange = value => {
-    this.setState({ playedSeconds: value })
+    this.setState({ playedSeconds: value / 1000 })
   }
   onSeekMouseUp = value => {
     this.setState({ seeking: false })
   }
   onProgress = (state: any) => {
+    if (this.props.player.fullscreen && this.state.timeShown > 2) {
+      this.props.dispatch({ type: types.HIDE_PLAYER })
+      this.setState({ timeShown: 0})
+    } else {
+      this.setState({ timeShown: this.state.timeShown + 1})
+    }
+
     if (this.props.player.errorCount) {
       this.props.dispatch({ type: types.CLEAR_PLAYER_ERRORS })
     }
@@ -112,6 +124,12 @@ class PlayerControls extends React.Component<Props> {
     this.props.dispatch({type: types.PLAY_ERROR, error: e})
   }
 
+  showPlayer = () => {
+    if (!this.props.player.showPlayer) {
+      this.props.dispatch({ type: types.SHOW_PLAYER })
+    }
+  }
+
   render () {
     const {
       playing,
@@ -128,12 +146,26 @@ class PlayerControls extends React.Component<Props> {
       return null
     }
 
+    const playerClassnames = classNames({
+      'react-player': true,
+      'fullscreen': this.props.player.fullscreen
+    })
+
+    const showControls = this.props.player.showPlayer
+
     return (
       <React.Fragment>
+        <KeyHandler
+          keyEventName={KEYPRESS}
+          keyValue="f"
+          onKeyHandle={() => this.props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
+        />
         <ReactPlayer
-          className='react-player'
+          className={playerClassnames}
           url={streamUri}
           playing={playing}
+          onClick={this.playPause}
+          onMouseMove={this.showPlayer}
           controls={false}
           loop={false}
           playbackRate={1}
@@ -154,13 +186,13 @@ class PlayerControls extends React.Component<Props> {
           width={'100%'}
           height={'100%'}
         />
-        { this.props.player.showPlayer &&
+        { showControls &&
           <div className='player-container'>
             <ProgressBar
               dispatch={this.props.dispatch}
               total={duration * 1000}
               current={playedSeconds * 1000}
-              onChange={this.onSeekMouseUp}
+              onChange={this.onSeekChange}
             />
 
             <div className='flex justify-between items-center'>
@@ -181,6 +213,15 @@ class PlayerControls extends React.Component<Props> {
                   />
                 </div>
               </div>
+              <Button
+                transparent
+                onClick={() => this.props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
+              >
+                <Icon
+                  icon='faExpand'
+                  className='mr-1 w-8'
+                />
+              </Button>
               <ContextualMenu
                 volume={volume * 100}
                 dispatch={this.props.dispatch}

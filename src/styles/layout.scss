@@ -7,16 +7,39 @@
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-.react-player.fullscreen video {
-  background: black;
-  position: absolute;
+.react-player {
   top: 0;
   left: 0;
   bottom: 0;
   top: 0;
-  z-index: 50;
   width: 100%;
   height: 100%;
+
+  video {
+    position: absolute;
+    z-index: 0;
+
+    &::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      pointer-events: none;
+    }
+  }
+
+  &.fullscreen {
+    video {
+      background: black;
+      z-index: 50;
+
+      &::before {
+        background-color: transparent;
+      }
+    }
+  }
 }
 
 .contents {

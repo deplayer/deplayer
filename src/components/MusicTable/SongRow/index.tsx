@@ -36,9 +36,9 @@ const SongRow = (props: Props) => {
     <div
       className='media-thumb relative mr-3'
       style={{ minWidth: '80px', height: '80px' }}
+      onClick={props.onClick}
     >
       <CoverImage
-        onClick={props.onClick}
         cover={song.cover}
         size='thumbnail'
         albumName={song.album ? song.album.name : 'N/A'}

@@ -40,7 +40,7 @@ const Queue = (props: Props) => {
 
   if (!props.queue.trackIds.length) {
     return (
-      <div className={`queue no-results ${props.className || ''}`}>
+      <div className={`queue z-10 no-results ${props.className || ''}`}>
         <BodyMessage message={'Add songs from the collection or search for new ones'} />
 
         <Link
@@ -55,7 +55,7 @@ const Queue = (props: Props) => {
   }
 
   return (
-    <div className={`queue ${props.className || ''}`}>
+    <div className={`queue z-10 ${props.className || ''}`}>
       <MusicTable
         tableIds={props.queue.trackIds}
         disableCovers={props.slim}

@@ -90,6 +90,7 @@ const SongView = (props: Props) => {
 
               <div className='btn-group mt-10'>
                 <Button
+                  large
                   onClick={() => {
                     props.dispatch({type: types.SET_CURRENT_PLAYING, songId: song.id})
                   }}

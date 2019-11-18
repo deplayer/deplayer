@@ -9,7 +9,7 @@ export function* setCurrentPlaying(action: any): any {
   const queue = yield select(getQueue)
   const collection = yield select(getCollection)
   const song = collection.rows[queue.currentPlaying]
-  if (song.title) {
+  if (song && song.title) {
     document.title = song.title + ' - ' + song.artist.name
   }
 }

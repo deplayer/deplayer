@@ -1,16 +1,17 @@
-import React from 'react'
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   faCompactDisc,
   faStopwatch,
-  faMicrophoneAlt
+  faMicrophoneAlt,
+  faExpand
 } from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import React from 'react'
 
 const icons = {
   faCompactDisc: faCompactDisc,
   faStopwatch: faStopwatch,
-  faMicrophoneAlt: faMicrophoneAlt
+  faMicrophoneAlt: faMicrophoneAlt,
+  faExpand: faExpand
 }
 
 type Props = {
