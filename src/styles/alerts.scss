@@ -1,11 +1,3 @@
-.alert {
-  @extend .alert;
-  &.search {
-    @extend .alert-warning;
-    width: 100%;
-  }
-}
-
 /* Common, default styles for the notification box */
 
 .s-alert-box,

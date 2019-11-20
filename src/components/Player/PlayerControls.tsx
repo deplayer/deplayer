@@ -82,7 +82,7 @@ class PlayerControls extends React.Component<Props> {
   }
   onProgress = (state: any) => {
     if (this.props.player.fullscreen && this.state.timeShown > 2) {
-      this.props.dispatch({ type: types.HIDE_PLAYER })
+      this.props.player.showPlayer && this.props.dispatch({ type: types.HIDE_PLAYER })
       this.setState({ timeShown: 0})
     } else {
       this.setState({ timeShown: this.state.timeShown + 1})
@@ -187,7 +187,7 @@ class PlayerControls extends React.Component<Props> {
           height={'100%'}
         />
         { showControls &&
-          <div className='player-container'>
+          <div className={ classNames({'player-container': true, transparent: this.props.player.fullscreen }) } >
             <ProgressBar
               dispatch={this.props.dispatch}
               total={duration * 1000}

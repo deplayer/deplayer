@@ -7,7 +7,7 @@ type Props = {
 const BodyMessage = (props: Props) => {
   return (
     <div className={`queue`}>
-      <blockquote className='blockquote'>
+      <blockquote className='blockquote flex'>
         <p>{ props.message }</p>
       </blockquote>
     </div>

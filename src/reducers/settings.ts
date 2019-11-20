@@ -36,6 +36,9 @@ export const defaultState = {
         host: 'ipfs.io',
         port: 443,
         proto: 'https'
+      },
+      'youtube-dl-server': {
+        host: 'http://localhost'
       }
     }
   }

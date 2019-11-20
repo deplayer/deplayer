@@ -5,6 +5,7 @@ import {
   fork,
   take,
   takeLatest,
+  takeEvery,
   select
 } from 'redux-saga/effects'
 
@@ -12,6 +13,7 @@ import { getAdapter } from '../services/database'
 import { getFileMetadata, metadataToSong } from '../services/ID3Tag/ID3TagService'
 import { getSettings } from './selectors'
 import { scanFolder } from '../services/Ipfs/IpfsService'
+import YoutubeDlServerProvider from '../providers/YoutubeDlServerProvider'
 import CollectionService from '../services/CollectionService'
 import  * as types from '../constants/ActionTypes'
 
@@ -38,25 +40,31 @@ export function* startFolderScan(hash: string): any {
 // Watcher should enque tasks to avoid concurrency
 export function* startProvidersScan(): any {
   const settings = yield select(getSettings)
-  const providerKeys = Object.keys(settings.settings.providers).filter((key: string) => {
-    return key.match(/ipfs/)
+  const providerKeys = Object.keys(settings.providers).filter((key: string) => {
+    return key.match(/ipfs|youtube-dl-server/)
   })
 
   for (let key of providerKeys) {
-    const ipfsSettings = settings.settings.providers[key]
-    yield put({ type: 'PROVIDER_SCAN_STARTED', key })
+    if (key.match(/youtube-dl-server/)) {
+      yield put({ type: 'START_YOUTUBE_DL_SERVER_SCAN', data: settings.providers[key], key })
+    }
 
-    const { hash } = ipfsSettings
+    if (key.match(/ipfs/)) {
+      const ipfsSettings = settings.providers[key]
+      yield put({ type: 'PROVIDER_SCAN_STARTED', key })
 
-    yield put({
-      type: types.SEND_NOTIFICATION,
-      notification: `starting to scan hash: ${ hash }`,
-      level: 'info'
-    })
+      const { hash } = ipfsSettings
 
-    // Dispatching an event with configured ipfs hash
-    yield put({type: types.IPFS_FOLDER_FOUND, hash })
-    yield put({ type: 'PROVIDER_SCAN_FINISHED',  key })
+      yield put({
+        type: types.SEND_NOTIFICATION,
+        notification: `starting to scan hash: ${ hash }`,
+        level: 'info'
+      })
+
+      // Dispatching an event with configured ipfs hash
+      yield put({type: types.IPFS_FOLDER_FOUND, hash })
+      yield put({ type: 'PROVIDER_SCAN_FINISHED',  key })
+    }
   }
 }
 
@@ -116,9 +124,21 @@ function* handleIPFSFolderScan(): any {
   }
 }
 
+function* startYoutubeDlScan(action: any) {
+  const settings = yield select(getSettings)
+  const service = new YoutubeDlServerProvider(
+    settings.app['youtube-dl-server'],
+    action.key
+  )
+
+  const result = yield service.search(action.data.url)
+  yield put({type: types.ADD_TO_COLLECTION, data: result})
+}
+
 // Binding actions to sagas
 function* providersSaga(): any {
   yield takeLatest(types.START_SCAN_SOURCES, startProvidersScan)
+  yield takeEvery('START_YOUTUBE_DL_SERVER_SCAN', startYoutubeDlScan)
   yield fork(handleIPFSFolderScan)
   yield fork(handleIPFSFileLoad)
 }

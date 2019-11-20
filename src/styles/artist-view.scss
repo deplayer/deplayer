@@ -12,15 +12,6 @@
   }
 
   ul {
-    @extend .list-unstyled;
-
-    .card-header {
-      @extend .d-flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      background-color: $greyscale-color;
-    }
-
     h3 {
       .lazy-image {
         width: 150px;

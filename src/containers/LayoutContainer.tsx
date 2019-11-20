@@ -63,7 +63,7 @@ const Layout = (props: LayoutProps) => {
         </TopbarContainer>
 
         <div
-          className='contents'
+          className='contents flex'
         >
           { props.children }
         </div>

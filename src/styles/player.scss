@@ -7,6 +7,10 @@
 .player-container,
 .topbar {
   background-color: transparentize($gray-900, .3);
+
+  &.transparent {
+    background-color: transparent;
+  }
 }
 
 .player-container {

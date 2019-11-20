@@ -71,6 +71,7 @@ const SettingsForm = (props: Props) => {
               <ProviderButton providerKey='mstream' />
               <ProviderButton providerKey='itunes' />
               <ProviderButton providerKey='ipfs' />
+              <ProviderButton providerKey='youtube-dl-server' />
             </div>
 
             { providers }

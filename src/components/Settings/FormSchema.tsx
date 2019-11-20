@@ -13,7 +13,9 @@ const FormSchema = (props: Props) => {
 
   const populatedFields = fields.map((field, index: number) => {
     if (field.type === TYPES.title) {
-      return <h3 key={index}><Translate value={field.title} /></h3>
+      return (
+        <h3 className='text-2xl leading-loose py-2 uppercase tracking-wide py-2' key={index}><Translate value={field.title} /></h3>
+      )
     }
 
     return (
