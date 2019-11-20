@@ -75,6 +75,11 @@ class Topbar extends React.Component<Props, State> {
     this.setState({focus: true})
   }
 
+  setSearchOff = () => {
+    this.props.dispatch( { type: types.TOGGLE_SEARCH_OFF })
+    this.setState({focus: false})
+  }
+
   render() {
     const {
       children,
@@ -97,6 +102,7 @@ class Topbar extends React.Component<Props, State> {
           onKeyHandle={this.setSearchOn}
         />
         <SearchInput
+          setSearchOff={this.setSearchOff}
           searchToggled={searchToggled}
           loading={loading}
           onSearchChange={this.onSearchChange}
@@ -105,7 +111,7 @@ class Topbar extends React.Component<Props, State> {
         />
         {  !this.state.focus && !this.props.searchToggled  ? <Title title={title} onClick={this.setSearchOn} /> : null }
         <div className='flex justify-end'>
-          {  !this.state.focus ? childrenWithProps : null }
+          {  !this.state.focus && childrenWithProps }
         </div>
       </div>
     )

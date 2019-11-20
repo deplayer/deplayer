@@ -51,13 +51,6 @@ blockquote {
   padding: 10px 0;
 }
 
-.music-table {
-  color: $primary-color !important;
-  margin: 0;
-  padding: 0;
-  @extend .list-unstyled;
-}
-
 .media-thumb {
   display: none;
   @include media-breakpoint-up(md) {

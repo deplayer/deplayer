@@ -5,6 +5,7 @@ import classNames from 'classnames'
 type Props = {
   loading: boolean,
   searchToggled: boolean,
+  setSearchOff: () => void,
   onSearchChange: (event:  React.FormEvent<HTMLInputElement>) => void,
   onFocus?: () => void,
   onBlur: () => void,
@@ -44,6 +45,7 @@ const SearchInput = (props: Props) => {
         onChange={props.onSearchChange}
         onFocus={props.onFocus}
         onBlur={props.onBlur}
+        onKeyUp={(e) => e.key === 'Escape' && props.setSearchOff() }
         value={props.value}
         placeholder={ I18n.t('placeholder.search') }
         type='text'

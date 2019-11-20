@@ -48,11 +48,12 @@ export function* search(action: SearchAction): any {
     return fork(performSingleSearch, action.searchTerm, provider)
   })
 
+  yield all(searchPromises)
+
   if (!Object.keys(providersService.providers).length) {
-    searchPromises.push( yield put({ type: types.ADD_TO_COLLECTION, data: [] }) )
+    yield put({ type: types.ADD_TO_COLLECTION, data: [] })
   }
 
-  yield all(searchPromises)
   yield take([types.ADD_TO_COLLECTION, types.SEARCH_REJECTED])
   if (redirect) {
     yield call(goToSearchResults)

@@ -32,6 +32,13 @@ export default (state: State = defaultState, action: any = {}) => {
       }
     }
 
+    case types.TOGGLE_SEARCH_OFF: {
+      return {
+        ...state,
+        searchToggled: false
+      }
+    }
+
     case types.TOGGLE_SEARCH: {
       return {
         ...state,
