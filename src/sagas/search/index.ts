@@ -32,6 +32,10 @@ function* performSingleSearch(
   }
 }
 
+function* emptySearch() {
+  yield put({ type: types.ADD_TO_COLLECTION, data: [] })
+}
+
 type SearchAction = {
   type: string,
   searchTerm: string,
@@ -43,18 +47,16 @@ export function* search(action: SearchAction): any {
   const settings = yield select(getSettings)
   const providersService = new ProvidersService(settings)
   const redirect = !action.noRedirect
+  const hasProviders = Object.keys(providersService.providers).length
 
-  const searchPromises = Object.keys(providersService.providers).map((provider) => {
+  const searchPromises = hasProviders ? Object.keys(providersService.providers).map((provider) => {
     return fork(performSingleSearch, action.searchTerm, provider)
-  })
+  }) : [yield fork(emptySearch)]
 
   yield all(searchPromises)
 
-  if (!Object.keys(providersService.providers).length) {
-    yield put({ type: types.ADD_TO_COLLECTION, data: [] })
-  }
-
   yield take([types.ADD_TO_COLLECTION, types.SEARCH_REJECTED])
+
   if (redirect) {
     yield call(goToSearchResults)
   }
