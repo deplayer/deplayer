@@ -144,18 +144,6 @@ $alert-offset: 40px;
     border-color: $primary-color-600 !important;
     color: #fff;
 }
-.s-alert-success {
-    background: $success;
-    color: #fff;
-}
-.s-alert-warning {
-    background: $warning;
-    color: #fff;
-}
-.s-alert-error {
-    background: $danger;
-    color: #fff;
-}
 
 [class^="s-alert-effect-"].s-alert-hide,
 [class*=" s-alert-effect-"].s-alert-hide {

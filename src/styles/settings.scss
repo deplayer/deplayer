@@ -3,20 +3,6 @@
     margin-bottom: 20px;
   }
 
-  @include media-breakpoint-up(md) {
-    label {
-      text-align: right;
-    }
-
-    h2 {
-      margin-top: 60px;
-
-      &:first-child {
-        margin-top: 20px;
-      }
-    }
-  }
-
   .btn-group {
     i {
       margin-right: 10px;
@@ -25,7 +11,6 @@
 }
 
 .toggle-control {
-  @extend .form-control;
   background: transparent;
   border: none;
 }

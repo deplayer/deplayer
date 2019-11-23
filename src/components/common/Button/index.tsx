@@ -5,6 +5,7 @@ type Props = {
   onClick?: () => any,
   title?: string,
   children: any,
+  size?: 'lg' | '4xl' | '2xl',
   inverted?: boolean,
   long?: boolean,
   large?: boolean,
@@ -17,8 +18,11 @@ type Props = {
 
 const Button = (props: Props) => {
   const classNames = classnames({
-    'text-blue-200': true,
-    'bg-blue-700': true,
+    'text-blue-200': !props.transparent,
+    'bg-blue-700': !props.transparent,
+    'text-xl': props.size === 'lg',
+    'text-4xl': props.size === '4xl',
+    'text-2xl': props.size === '2xl',
     'p-2': true,
     'px-2': true,
     'px-4': props.long || props.large,

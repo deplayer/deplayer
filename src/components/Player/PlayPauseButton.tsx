@@ -18,7 +18,7 @@ const PlayPauseButton = (props: Props) => {
       />
       <Button
         transparent
-        className='play-pause'
+        size='4xl'
         onClick={props.onClick}
       >
         <i className={`icon ${props.playing ? 'pause': 'play'} circle`}></i>

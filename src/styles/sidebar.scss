@@ -3,48 +3,16 @@
 
   align-items: center;
 
-  @include media-breakpoint-up(md) {
-    max-width: 200px;
-    z-index: 2 !important;
-  }
-
   button, .button, a {
-    color: $gray-100;
-    background: transparent;
-
     .badge {
       float: right;
       margin-top: 22px;
     }
   }
 
-  h4 {
-    clear: both;
-    text-align: center;
-    color: $greyscale-color-100;
-    line-height: 56px;
-    padding-top: 20px;
-    margin-bottom: 0;
-
-    @include media-breakpoint-up(md) {
-      padding-top: 0px;
-      background: $greyscale-darker2;
-    }
-  }
-
   ul {
-    @extend .list-unstyled;
-    padding-top: 35px;
-
-    @include media-breakpoint-up(md) {
-      padding-top: 0;
-    }
-
     li {
-      line-height: 60px;
-
       &.current {
-        background-color: $greyscale-lighter1;
         a {
           color: $white;
         }
@@ -54,9 +22,6 @@
         padding-left: 20px;
         padding-right: 20px;
         margin-right: auto;
-        width: 100%;
-        height: 100%;
-        display: inline-block;
 
         i {
           margin-right: 10px;

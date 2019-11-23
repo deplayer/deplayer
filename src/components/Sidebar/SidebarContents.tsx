@@ -21,7 +21,7 @@ type ContentProps = {
 const SidebarContents = (props: ContentProps) => {
   return (
     <div onClick={() => props.onSetSidebarOpen()}>
-      <h4 className="text-xl">
+      <h4 className="text-xl text-center py-4">
         { 'deplay' }
       </h4>
       <ul>

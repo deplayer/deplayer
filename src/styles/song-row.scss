@@ -24,31 +24,10 @@
 }
 
 .artist-row {
-  h4, h5, h6 {
-    margin: 0;
-    padding: 0;
-  }
-
-  h4 {
-    font-size: 1.1rem;
-    color: $greyscale-lighter1;
-  }
-
-  h5, h6 {
-    font-size: 1rem;
-    color: $secondary-color-darker3;
-
-    a {
-      color: $secondary-color-darker3;
-      font-weight: bold;
-    }
-  }
-
   & > a,
   & > div {
     width: 100%;
-    @extend .d-flex;
-    @extend .justify-content-between;
+    display: flex;
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 10px;
@@ -70,10 +49,8 @@
 
   .media-info {
     color: $secondary-color-lighter1;
-    @extend .flex-grow-1;
     padding-left: 10px;
     padding-right: 10px;
-    @extend .list-unstyled;
   }
 
   .media-actions {
@@ -83,21 +60,4 @@
       color: $secondary-color-lighter1;
     }
   }
-
-  .label {
-    margin-right: 5px;
-
-    @include media-breakpoint-up(md) {
-      display: none;
-    }
-  }
-
-  .collapsing {
-    width: 100vw;
-
-    @include media-breakpoint-up(md) {
-      height: 60px;
-    }
-  }
-
 }

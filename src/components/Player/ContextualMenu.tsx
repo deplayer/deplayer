@@ -5,6 +5,7 @@ import { Translate } from 'react-redux-i18n'
 import React from 'react'
 
 import Button from '../common/Button'
+import Icon from '../common/Icon'
 import RepeatButton from './RepeatButton'
 import ShuffleButton from './ShuffleButton'
 import VolumeControl from './VolumeControl'
@@ -34,24 +35,36 @@ const ContextualMenu = (props: MenuProps) => {
         </Button>
       </MenuProvider>
       <Menu id='context-menu-player' theme={theme.dark}>
-        <Item className='w-full'>
+        <Item className='flex w-full'>
           <VolumeControl
             volume={ props.volume }
             onChange={props.setVolume}
           />
         </Item>
-        <Item>
+        <Item className='flex w-full'>
           <ShuffleButton
             dispatch={props.dispatch}
           />
         </Item>
-        <Item>
+        <Item className='flex w-full'>
           <RepeatButton
             dispatch={props.dispatch}
           />
         </Item>
-        <Item>
+        <Item className='flex w-full'>
           <TogglePlayer />
+        </Item>
+        <Item className='flex w-full'>
+          <Button
+            transparent
+            onClick={() => props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
+          >
+            <Icon
+              icon='faExpand'
+              className='mr-1 pr-1 w-8'
+            />
+            <Translate value='buttons.fullScreen' />
+          </Button>
         </Item>
       </Menu>
     </React.Fragment>

@@ -1,7 +1,8 @@
+import { Link } from 'react-router-dom'
 import * as React from 'react'
 import classnames from 'classnames'
 
-import { Link } from 'react-router-dom'
+import Tag from '../common/Tag'
 
 type Props = {
   totalItems?: number,
@@ -15,20 +16,28 @@ type Props = {
 const MenuItem = (props: Props) => {
   const classNames = classnames({
     button: true,
-    current: props.current
+    'bg-gray-900': props.current
   })
   return (
     <li className={ classNames }>
       <Link
+        className='flex justify-between items-center'
         to={ props.url }
         title={ props.title }
       >
-        <i className={ props.iconClasses }></i>
-        { props.label }
+        <div className='py-4'>
+          <i className={ props.iconClasses }></i>
+          { props.label }
+        </div>
 
-        <span className='badge badge-secondary'>
-          { props.totalItems }
-        </span>
+          { props.totalItems &&
+            props.totalItems > 0  &&
+          <div className=''>
+            <Tag>
+              { props.totalItems }
+            </Tag>
+          </div>
+        }
       </Link>
     </li>
   )

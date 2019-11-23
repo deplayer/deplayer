@@ -15,8 +15,6 @@
 
   .media {
     margin-top: 20px;
-    @extend .list-unstyled;
-    @extend .flex-wrap;
 
     li {
       @extend .song-row;

@@ -25,7 +25,7 @@ const SkipButton = (props: Props) => {
       { keyHandlers }
       <Button
         transparent
-        className='m-0'
+        size='2xl'
         onClick={props.onClick}
       >
         <i className={`icon step ${ props.type === 'next' ? 'forward': 'backward'}`}></i>

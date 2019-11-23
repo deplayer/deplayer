@@ -34,7 +34,7 @@ const SongRow = (props: Props) => {
 
   const cover = (
     <div
-      className='media-thumb relative mr-3'
+      className='media-thumb hidden md:block relative mr-3'
       style={{ minWidth: '80px', height: '80px' }}
       onClick={props.onClick}
     >
@@ -83,7 +83,7 @@ const SongRow = (props: Props) => {
           {
             !props.slim && props.mqlMatch &&
               song.stream.map((provider) => {
-                return (<Tag key={provider.service}>{ provider.service }</Tag>)
+                return (<Tag transparent key={provider.service}>{ provider.service }</Tag>)
               })
           }
           { props.slim && (

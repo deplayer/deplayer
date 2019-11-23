@@ -30,7 +30,7 @@ module.exports = [
           sourceMap: true,
           ident: 'postcss',
           plugins: () => [
-            require('tailwindcss'),
+            require('tailwindcss')(paths.tailwindcss),
             require('postcss-flexbugs-fixes'),
             autoprefixer({
               browsers: [

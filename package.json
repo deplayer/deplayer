@@ -99,9 +99,9 @@
     "winston": "^3.2.1"
   },
   "scripts": {
-    "start": "yarn run tailwind:css && node scripts/start.js",
+    "start": "node scripts/start.js",
     "tailwind:css": "tailwind build src/tailwind.css -c tailwind.config.js -o src/App.css",
-    "build": "npm run tailwind:css && node scripts/build.js",
+    "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom --forceExit",
     "postversion": "git push && git push --tags --no-verify",
     "storybook": "start-storybook"

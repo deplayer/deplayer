@@ -7,6 +7,7 @@ import SkipButton from './SkipButton'
 type ControlProps = {
   playPrev: () => void,
   isPlaying: boolean,
+  mqlMatch: boolean,
   playPause: () => void,
   playNext: () => void,
   dispatch: Dispatch
@@ -14,12 +15,14 @@ type ControlProps = {
 
 const Controls = (props: ControlProps) => {
   return (
-    <div className='ui icon buttons player-controls'>
-      <SkipButton
-        onClick={props.playPrev}
-        keyValues={['ArrowLeft', 'k']}
-        type="prev"
-      />
+    <div className='ui icon buttons flex fustify-center'>
+      { props.mqlMatch &&
+        <SkipButton
+          onClick={props.playPrev}
+          keyValues={['ArrowLeft', 'k']}
+          type="prev"
+        />
+      }
       <PlayPauseButton
         playing={props.isPlaying}
         onClick={props.playPause}

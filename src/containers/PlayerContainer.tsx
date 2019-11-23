@@ -5,6 +5,7 @@ import PlayerControls from '../components/Player/PlayerControls'
 
 const ConnectedPlayer = connect(
   (state: any) => ({
+    app: state.app,
     settings: state.settings,
     slim: state.app.slimPlayer,
     player: state.player,

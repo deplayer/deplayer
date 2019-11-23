@@ -32,7 +32,7 @@ const ProgressBar = (props: Props) => {
         onChange={ props.onChange }
         onAfterChange={ props.onAfterChange }
       />
-      <span className='absolute bottom-auto right-0 p-2'>
+      <span className='absolute right-0 top-2 text-xs'>
         -{ getDurationStr(diff) }
       </span>
     </div>

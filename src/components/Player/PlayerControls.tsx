@@ -17,6 +17,7 @@ import Spectrum from './../Spectrum'
 import * as types from '../../constants/ActionTypes'
 
 type Props = {
+  app: any,
   queue: any,
   slim: boolean,
   player: PlayerState,
@@ -187,7 +188,7 @@ class PlayerControls extends React.Component<Props> {
           height={'100%'}
         />
         { showControls &&
-          <div className={ classNames({'player-container': true, transparent: this.props.player.fullscreen }) } >
+          <div className={ classNames({'player-container': true, transparent: this.props.player.fullscreen, 'z-20': true }) } >
             <ProgressBar
               dispatch={this.props.dispatch}
               total={duration * 1000}
@@ -196,33 +197,34 @@ class PlayerControls extends React.Component<Props> {
             />
 
             <div className='flex justify-between items-center'>
-              <Cover song={currentPlaying} />
-              <div className='player'>
-                <div className='player-tools'>
-                  <Link to={`/song/${currentPlaying.id}`}>
-                    <h5 className='song-title'>
-                      { currentPlaying.title } - { currentPlaying.artist ? currentPlaying.artist.name : '' }
+              <div className='flex w-full items-center'>
+                <Cover song={currentPlaying} />
+                <div className='mx-2 md:text-center md:w-full'>
+                  <Link to={`/song/${currentPlaying.id}`} className='text-lg md:text-xl w-full text-blue-500 min-w-0'>
+                    <h5 className='truncate'>
+                      { currentPlaying.title }
                     </h5>
                   </Link>
-                  <Controls
-                    playPrev={this.playPrev}
-                    isPlaying={this.state.playing}
-                    playPause={this.playPause}
-                    playNext={this.playNext}
-                    dispatch={this.props.dispatch}
-                  />
+                  { currentPlaying.artist &&
+                    <Link to={`/artist/${currentPlaying.artist.id}`} className='w-full min-w-0'>
+                      <h6 className='truncate'>
+                        {  currentPlaying.artist.name }
+                      </h6>
+                    </Link>
+                  }
                 </div>
               </div>
+              <div className='player-tools'>
+                <Controls
+                  mqlMatch={this.props.app.mqlMatch}
+                  playPrev={this.playPrev}
+                  isPlaying={this.state.playing}
+                  playPause={this.playPause}
+                  playNext={this.playNext}
+                  dispatch={this.props.dispatch}
+                />
+              </div>
               <div className='flex'>
-                <Button
-                  transparent
-                  onClick={() => this.props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
-                >
-                  <Icon
-                    icon='faExpand'
-                    className='mr-1 w-8'
-                  />
-                </Button>
                 <ContextualMenu
                   volume={volume * 100}
                   dispatch={this.props.dispatch}
@@ -230,7 +232,7 @@ class PlayerControls extends React.Component<Props> {
                 />
               </div>
             </div>
-            <Spectrum audioSelector={'#player-audio audio'} />
+            <Spectrum audioSelector={'audio'} />
           </div>
         }
       </React.Fragment>
