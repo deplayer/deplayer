@@ -1,6 +1,6 @@
 {
   "name": "deplay",
-  "version": "0.11.4",
+  "version": "0.11.5",
   "private": true,
   "dependencies": {
     "@babel/core": "^7.0.0",
