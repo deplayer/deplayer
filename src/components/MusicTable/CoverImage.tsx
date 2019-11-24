@@ -22,7 +22,6 @@ const Content = (props: any) => {
   if (props.useImage) {
     return (
       <img
-        className='cover-image'
         src={imageUrl}
         alt={ props.alt }
       />
