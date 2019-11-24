@@ -19,11 +19,11 @@ deploy:
   - yarn
   - yarn build
   - cp build/index.html build/200.html # Creating fallback page
-  - node_modules/.bin/surge build deplay.surge.sh
+  - node_modules/.bin/surge build deplayer.surge.sh
   only:
   - tags
   variables:
     SURGE_LOGIN: $SURGE_LOGIN
     SURGE_TOKEN: $SURGE_TOKEN
-    PUBLIC_URL: https://deplay.surge.sh
+    PUBLIC_URL: https://deplayer.surge.sh
     REACT_APP_VERSION: $CI_COMMIT_TAG

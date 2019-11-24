@@ -1,8 +1,8 @@
-# deplay
+# deplayer
 
-[![pipeline status](https://gitlab.com/deplay/deplay/badges/master/pipeline.svg)](https://gitlab.com/deplay/deplay/commits/master)
+[![pipeline status](https://gitlab.com/deplayer/deplayer/badges/master/pipeline.svg)](https://gitlab.com/deplayer/deplayer/commits/master)
 
-* [Online version](http://deplay.surge.sh/)
+* [Online version](http://deplayer.surge.sh/)
 
 Decentralized mediaplayer which runs entirely in the browser.
 

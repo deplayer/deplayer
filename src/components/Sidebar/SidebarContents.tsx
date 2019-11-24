@@ -22,7 +22,7 @@ const SidebarContents = (props: ContentProps) => {
   return (
     <div onClick={() => props.onSetSidebarOpen()}>
       <h4 className="text-xl text-center py-4">
-        { 'deplay' }
+        { 'deplayer' }
       </h4>
       <ul>
         <QueueMenuItem
@@ -47,7 +47,7 @@ const SidebarContents = (props: ContentProps) => {
 
       <section className='sidebar-meta'>
         <a
-          href={'https://gitlab.com/deplay/deplay'}
+          href={'https://gitlab.com/deplayer/deplayer'}
           title="Show me the code"
           target="_blank"
         >
@@ -55,7 +55,7 @@ const SidebarContents = (props: ContentProps) => {
         </a>
 
         <a
-          href={'https://gitlab.com/deplay/deplay/tags'}
+          href={'https://gitlab.com/deplayer/deplayer/tags'}
           title="Show me the code"
           target="_blank"
         >
