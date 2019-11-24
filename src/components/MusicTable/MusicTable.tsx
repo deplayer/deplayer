@@ -1,9 +1,13 @@
-import * as React from 'react'
 import { AutoSizer, List } from 'react-virtualized'
+import { Route } from 'react-router-dom'
+import * as React from 'react'
 
-import * as types from '../../constants/ActionTypes'
+import ClearQueueButton from '../Buttons/ClearQueueButton'
+import PlayAllButton from '../Buttons/PlayAllButton'
+import SaveQueueButton from '../Buttons/SaveQueueButton'
 import SongRow from './SongRow'
 import Spinner from '../Spinner'
+import * as types from '../../constants/ActionTypes'
 
 export type Props = {
   error?: string,
@@ -19,9 +23,7 @@ export type Props = {
 }
 
 const MusicTable = (props: Props) => {
-  const errors = props.error ?
-    <div><div>{ props.error }</div></div>
-    : null
+  const errors = props.error && <div>{ props.error }</div>
 
   if (props.app.loading) {
     return (
@@ -74,6 +76,16 @@ const MusicTable = (props: Props) => {
 
   return (
     <React.Fragment>
+      <div className='p-2 h-8 toolbar flex justify-between items-center'>
+        <div className='p-2'>
+          Total items: <b>{ props.tableIds.length }</b>
+        </div>
+        <div className='actions'>
+          <Route path="/queue" component={() => <ClearQueueButton /> } />
+          <Route path="/queue" component={() => <SaveQueueButton /> } />
+          <Route path="/" component={() => <PlayAllButton dispatch={props.dispatch} /> } />
+        </div>
+      </div>
       <AutoSizer className='music-table'>
         {({ height, width }) => (
           <List
@@ -88,9 +100,6 @@ const MusicTable = (props: Props) => {
           />
         )}
       </AutoSizer>
-      <div className="table-status">
-        Total items: <b>{ props.tableIds.length }</b>
-      </div>
       {errors}
     </React.Fragment>
   )

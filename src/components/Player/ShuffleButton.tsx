@@ -18,6 +18,7 @@ const ShuffleButton = (props: Props) => {
     <Button
       fullWidth
       transparent
+      alignLeft
       onClick={onClick}
     >
       <i className='fa fa-random mx-2'></i>

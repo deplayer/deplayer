@@ -43,6 +43,7 @@ const dynamicTitle = (router, collection, searchTerm: ''): string => {
 type LayoutProps = {
   backgroundImage: string,
   dispatch: Dispatch,
+  app: any,
   title: string,
   children: any
 }
@@ -57,9 +58,6 @@ const Layout = (props: LayoutProps) => {
       >
         <TopbarContainer title={ props.title }>
           <SearchButton />
-          <Route path="/queue" component={() => <ClearQueueButton /> } />
-          <Route path="/queue" component={() => <SaveQueueButton /> } />
-          <Route path="/" component={() => <PlayAllButton dispatch={props.dispatch} /> } />
         </TopbarContainer>
 
         <div
@@ -67,7 +65,7 @@ const Layout = (props: LayoutProps) => {
         >
           { props.children }
         </div>
-        <Placeholder />
+        <Placeholder mqlMatch={props.app.mqlMatch} />
       </SidebarContainer>
     </div>
   )
@@ -78,6 +76,7 @@ export default connect(
     title: dynamicTitle(state.router, state.collection, state.search.searchTerm),
     backgroundImage: state.app.backgroundImage,
     queue: state.queue,
+    app: state.app,
     player: state.player,
     collection: state.collection,
     tableIds: Object.keys(state.collection.artists),

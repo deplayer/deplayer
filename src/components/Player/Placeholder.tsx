@@ -1,10 +1,12 @@
-import * as React from 'react'
 import { connect } from 'react-redux'
+import * as React from 'react'
+import classNames from 'classnames'
 
 import { State } from '../../reducers/player'
 
 type Props = {
   player: State,
+  mqlMatch?: boolean
 }
 
 const Placeholder = (props: Props) => {
@@ -12,8 +14,13 @@ const Placeholder = (props: Props) => {
     return null
   }
 
+  const classes = classNames({
+    placeholder: true,
+    small: !props.mqlMatch
+  })
+
   return (
-    <div className='placeholder'>
+    <div className={classes}>
     </div>
   )
 }

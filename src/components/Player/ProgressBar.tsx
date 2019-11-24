@@ -32,8 +32,8 @@ const ProgressBar = (props: Props) => {
         onChange={ props.onChange }
         onAfterChange={ props.onAfterChange }
       />
-      <span className='absolute right-0 top-2 text-xs'>
-        -{ getDurationStr(diff) }
+      <span className='absolute bg-black px-2 right-0 mr-0 -mt-8 text-xs text-yellow-400'>
+        { getDurationStr(props.current)} - { getDurationStr(props.total) }
       </span>
     </div>
   )

@@ -41,7 +41,7 @@ const SongView = (props: Props) => {
   return (
     <div className={`song-view ${props.className} w-full overflow-y-auto z-10`}>
       <div className="song lg:flex">
-        <div className="w-full md:m-6 lg:w-1/2 image border border-gray-900">
+        <div className="w-full md:px-6 lg:w-1/2 image">
           <CoverImage
             useImage
             cover={song.cover}

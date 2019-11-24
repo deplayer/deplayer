@@ -5,9 +5,10 @@ import { Menu, Item, MenuProvider, theme } from 'react-contexify'
 import { Translate } from 'react-redux-i18n'
 import React from 'react'
 
-import * as types from '../../constants/ActionTypes'
 import Button from '../common/Button'
+import Icon from '../common/Icon'
 import Song from '../../entities/Song'
+import * as types from '../../constants/ActionTypes'
 
 type MenuProps = {
   dispatch: Dispatch,
@@ -48,9 +49,13 @@ const ContextualMenu = (props: MenuProps) => {
               <Button
                 fullWidth
                 transparent
+                alignLeft
                 onClick={addToQueue}
               >
-                <i className='icon add mr-2'></i>
+                <Icon
+                  icon='faPlusCircle'
+                  className='mx-2'
+                />
                 <Translate value='buttons.addToQueue' />
               </Button>
             </Item>
@@ -60,6 +65,7 @@ const ContextualMenu = (props: MenuProps) => {
               <Button
                 fullWidth
                 transparent
+                alignLeft
                 onClick={removeFromQueue}
               >
                 <i className='icon remove mr-2'></i>

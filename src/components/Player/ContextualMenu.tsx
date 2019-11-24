@@ -20,7 +20,7 @@ type MenuProps = {
 const ContextualMenu = (props: MenuProps) => {
   const TogglePlayer = () => {
     return (
-      <Button transparent fullWidth onClick={() => props.dispatch({type: types.HIDE_PLAYER})}>
+      <Button alignLeft transparent fullWidth onClick={() => props.dispatch({type: types.HIDE_PLAYER})}>
         <i className='fa fa-eye-slash mx-2'></i>
           <Translate value='buttons.hidePlayer' />
       </Button>
@@ -35,7 +35,7 @@ const ContextualMenu = (props: MenuProps) => {
         </Button>
       </MenuProvider>
       <Menu id='context-menu-player' theme={theme.dark}>
-        <Item className='flex w-full'>
+        <Item className='flex w-full mt-5'>
           <VolumeControl
             volume={ props.volume }
             onChange={props.setVolume}
@@ -57,11 +57,13 @@ const ContextualMenu = (props: MenuProps) => {
         <Item className='flex w-full'>
           <Button
             transparent
+            alignLeft
+            fullWidth
             onClick={() => props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
           >
             <Icon
               icon='faExpand'
-              className='mr-1 pr-1 w-8'
+              className='mx-2'
             />
             <Translate value='buttons.fullScreen' />
           </Button>

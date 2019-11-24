@@ -7,9 +7,15 @@
   }
 }
 
+.toolbar {
+  background-color: rgba(#4299e1, 0.2);
+
+  &.transparent {
+    background-color: transparent;
+  }
+}
+
 .player-container {
   position: relative;
   grid-area: player;
-
-  z-index: 1000;
 }

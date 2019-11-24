@@ -33,7 +33,7 @@
   &.fullscreen {
     video {
       background: black;
-      z-index: 50;
+      z-index: 30;
 
       &::before {
         background-color: transparent;

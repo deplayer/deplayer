@@ -1,14 +1,6 @@
 #left-sidebar {
-  z-index: 9999 !important;
-
+  z-index: 100 !important;
   align-items: center;
-
-  button, .button, a {
-    .badge {
-      float: right;
-      margin-top: 22px;
-    }
-  }
 
   ul {
     li {

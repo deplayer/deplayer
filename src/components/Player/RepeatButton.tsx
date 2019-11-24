@@ -18,6 +18,7 @@ const RepeatButton = (props: Props) => {
     <Button
       fullWidth
       transparent
+      alignLeft
       onClick={onClick}
     >
       <i className='fa fa-repeat mx-2'></i>

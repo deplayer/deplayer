@@ -1,4 +1,5 @@
 import { Dispatch } from 'redux'
+import { Translate } from 'react-redux-i18n'
 import { withRouter } from 'react-router-dom'
 import * as React from 'react'
 
@@ -25,7 +26,8 @@ const PlayAllButton = (props: Props) => {
       className='playall-button button'
       onClick={playAll}
     >
-      <i className='fa fa-caret-right'></i>
+      <i className='fa fa-caret-right mr-2'></i>
+      <Translate className='hidden md:inline' value='buttons.playAll' />
     </Button>
   )
 }

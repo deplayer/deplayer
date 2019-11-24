@@ -3,7 +3,8 @@ import {
   faCompactDisc,
   faStopwatch,
   faMicrophoneAlt,
-  faExpand
+  faExpand,
+  faPlusCircle
 } from "@fortawesome/free-solid-svg-icons"
 import React from 'react'
 
@@ -11,7 +12,8 @@ const icons = {
   faCompactDisc: faCompactDisc,
   faStopwatch: faStopwatch,
   faMicrophoneAlt: faMicrophoneAlt,
-  faExpand: faExpand
+  faExpand: faExpand,
+  faPlusCircle: faPlusCircle
 }
 
 type Props = {

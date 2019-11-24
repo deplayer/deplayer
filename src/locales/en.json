@@ -40,6 +40,14 @@
     }
   },
   "buttons": {
-    "addProvider": "Set up new provider"
+    "addProvider": "Set up new provider",
+    "playAll": "play all",
+    "clearQueue": "clear queue",
+    "saveAsPlaylist": "save as playlist",
+    "addToQueue": "add to queue",
+    "shuffle": "shuffle",
+    "hidePlayer": "hide",
+    "repeat": "repeat",
+    "fullScreen": "fullscreen"
   }
 }

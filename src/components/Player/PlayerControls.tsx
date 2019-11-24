@@ -188,7 +188,7 @@ class PlayerControls extends React.Component<Props> {
           height={'100%'}
         />
         { showControls &&
-          <div className={ classNames({'player-container': true, transparent: this.props.player.fullscreen, 'z-20': true }) } >
+          <div className={ classNames({'player-container': true, transparent: this.props.player.fullscreen }) } style={{ zIndex: 100 }}>
             <ProgressBar
               dispatch={this.props.dispatch}
               total={duration * 1000}
@@ -200,14 +200,14 @@ class PlayerControls extends React.Component<Props> {
               <div className='flex w-full items-center'>
                 <Cover song={currentPlaying} />
                 <div className='mx-2 md:text-center md:w-full'>
-                  <Link to={`/song/${currentPlaying.id}`} className='text-lg md:text-xl w-full text-blue-500 min-w-0'>
+                  <Link to={`/song/${currentPlaying.id}`} className='text-lg md:text-xl w-full text-blue-200 min-w-0'>
                     <h5 className='truncate'>
                       { currentPlaying.title }
                     </h5>
                   </Link>
                   { currentPlaying.artist &&
                     <Link to={`/artist/${currentPlaying.artist.id}`} className='w-full min-w-0'>
-                      <h6 className='truncate'>
+                      <h6 className='truncate text-blue-600'>
                         {  currentPlaying.artist.name }
                       </h6>
                     </Link>

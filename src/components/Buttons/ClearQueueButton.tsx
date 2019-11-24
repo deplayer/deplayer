@@ -1,4 +1,5 @@
 import { Dispatch } from 'redux'
+import { Translate } from 'react-redux-i18n'
 import { connect } from 'react-redux'
 import * as React from 'react'
 
@@ -25,7 +26,8 @@ const ClearQueueButton = (props: Props) => {
       className='clearqueue-button button'
       onClick={clearQueue}
     >
-      <i className='fa fa-trash'></i>
+      <i className='fa fa-trash mr-2'></i>
+      <Translate className='hidden md:inline' value='buttons.clearQueue' />
     </Button>
   )
 }
