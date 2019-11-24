@@ -197,16 +197,16 @@ class PlayerControls extends React.Component<Props> {
             />
 
             <div className='flex justify-between items-center'>
-              <div className='flex w-full items-center'>
+              <div className='flex flex-initial items-center flex-grow min-w-0'>
                 <Cover song={currentPlaying} />
-                <div className='mx-2 md:text-center md:w-full'>
-                  <Link to={`/song/${currentPlaying.id}`} className='text-lg md:text-xl w-full text-blue-200 min-w-0'>
+                <div className='mx-2 pr-2 md:text-center w-full'>
+                  <Link to={`/song/${currentPlaying.id}`} className='text-lg md:text-xl text-blue-200 block'>
                     <h5 className='truncate'>
                       { currentPlaying.title }
                     </h5>
                   </Link>
                   { currentPlaying.artist &&
-                    <Link to={`/artist/${currentPlaying.artist.id}`} className='w-full min-w-0'>
+                    <Link to={`/artist/${currentPlaying.artist.id}`} className='block'>
                       <h6 className='truncate text-blue-600'>
                         {  currentPlaying.artist.name }
                       </h6>
@@ -214,7 +214,7 @@ class PlayerControls extends React.Component<Props> {
                   }
                 </div>
               </div>
-              <div className='player-tools'>
+              <div className='player-tools ui icon buttons flex flex-grow-0 fustify-center'>
                 <Controls
                   mqlMatch={this.props.app.mqlMatch}
                   playPrev={this.playPrev}
@@ -224,7 +224,7 @@ class PlayerControls extends React.Component<Props> {
                   dispatch={this.props.dispatch}
                 />
               </div>
-              <div className='flex'>
+              <div className='flex flex-grow-0'>
                 <ContextualMenu
                   volume={volume * 100}
                   dispatch={this.props.dispatch}

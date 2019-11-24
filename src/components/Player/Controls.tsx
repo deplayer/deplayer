@@ -15,7 +15,7 @@ type ControlProps = {
 
 const Controls = (props: ControlProps) => {
   return (
-    <div className='ui icon buttons flex fustify-center'>
+    <>
       { props.mqlMatch &&
         <SkipButton
           onClick={props.playPrev}
@@ -32,7 +32,7 @@ const Controls = (props: ControlProps) => {
         keyValues={['ArrowRight', 'j']}
         type="next"
       />
-    </div>
+    </>
   )
 }
 
