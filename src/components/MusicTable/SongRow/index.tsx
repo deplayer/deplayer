@@ -53,8 +53,8 @@ const SongRow = (props: Props) => {
       onClick={onClick}
     >
       { disableCovers || cover }
-      <div className='media-info truncate w-full whitespace-no-wrap m-1'>
-        <h4 className='text-blue-400 text-lg'>
+      <div className='media-info truncate w-full whitespace-no-wrap'>
+        <h4 className='text-blue-400 text-lg -mt-1'>
           <Link to={`/song/${song.id}`}>
             { song.title }
           </Link>
