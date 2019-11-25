@@ -20,6 +20,7 @@ export default class YoutubeDlServerProvider implements IMusicProvider {
     this.baseUrl = settings.host
     this.providerKey = providerKey
     this.searchUrl = `${settings.host}/api/info`
+    this.playUrl = `${settings.host}/api/play`
   }
 
   mapSong = (songInfo: any): Song => {
@@ -38,7 +39,7 @@ export default class YoutubeDlServerProvider implements IMusicProvider {
       stream: [
         {
           service: this.providerKey,
-          uris: [{uri: songInfo.url}]
+          uris: [{uri: `${this.playUrl}?url=${escape(songInfo.webpage_url)}`}]
         }
       ]
     })
