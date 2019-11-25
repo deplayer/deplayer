@@ -48,35 +48,27 @@ const SongRow = (props: Props) => {
 
   return (
     <div
-      className={`song-row ${ props.isCurrent ? 'current': ''} p-2 flex justify-between`}
+      className={`song-row ${ props.isCurrent && 'current' } p-2 flex justify-between`}
       style={props.style}
       onClick={onClick}
     >
       { disableCovers || cover }
-      <ul className='media-info truncate w-full whitespace-no-wrap m-1'>
-        <li className='title-label'>
-          <h4 className='text-blue-400 text-lg'>
-            <Link to={`/song/${song.id}`}>
-              { song.title }
-            </Link>
-          </h4>
-        </li>
-        <li>
-          <h5 className='text-yellow-600'>
-            { song.album ? song.album.name: nonAvailable }
-          </h5>
-        </li>
-        <li>
-          <h6 className='text-yellow-600'>
-            <Link to={`/artist/${song.artist.id}`}>{ song.artist ? song.artist.name: nonAvailable }</Link>
-          </h6>
-        </li>
-        <li>
-          { props.slim || (
-            <div className='inline-block text-yellow-400'>{ getDurationStr(song.duration) }</div>
-          )}
-        </li>
-      </ul>
+      <div className='media-info truncate w-full whitespace-no-wrap m-1'>
+        <h4 className='text-blue-400 text-lg'>
+          <Link to={`/song/${song.id}`}>
+            { song.title }
+          </Link>
+        </h4>
+        <h5 className='text-yellow-600'>
+          { song.album ? song.album.name: nonAvailable }
+        </h5>
+        <h6 className='text-yellow-600'>
+          <Link to={`/artist/${song.artist.id}`}>{ song.artist ? song.artist.name: nonAvailable }</Link>
+        </h6>
+        { props.slim || (
+          <div className='inline-block text-yellow-400'>{ getDurationStr(song.duration) }</div>
+        )}
+      </div>
       <div className='relative'>
         <ContextualMenu {...props} />
         <div>

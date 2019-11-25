@@ -1,4 +1,3 @@
-import KeyHandler, {KEYPRESS} from 'react-key-handler'
 import * as React from 'react'
 
 import Button from '../common/Button'
@@ -11,11 +10,6 @@ type Props = {
 const PlayPauseButton = (props: Props) => {
   return (
     <React.Fragment>
-      <KeyHandler
-        keyEventName={KEYPRESS}
-        keyValue=" "
-        onKeyHandle={props.onClick}
-      />
       <Button
         transparent
         size='4xl'

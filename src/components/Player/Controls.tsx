@@ -1,6 +1,7 @@
 import { Dispatch } from 'redux'
 import * as React from 'react'
 
+import KeyHandler, {KEYPRESS} from 'react-key-handler'
 import PlayPauseButton from './PlayPauseButton'
 import SkipButton from './SkipButton'
 
@@ -16,6 +17,11 @@ type ControlProps = {
 const Controls = (props: ControlProps) => {
   return (
     <>
+      <KeyHandler
+        keyEventName={KEYPRESS}
+        keyValue=" "
+        onKeyHandle={props.playPause}
+      />
       { props.mqlMatch &&
         <SkipButton
           onClick={props.playPrev}

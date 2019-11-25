@@ -136,7 +136,7 @@ export default class ArtistView extends React.Component<Props> {
                       <i className='fa fa-play' />
                     </Button>
                   </div>
-                  <div className='w-100 ml-3'>
+                  <div className='w-full m-2'>
                     { extractSongs(albums[albumId]) }
                   </div>
                 </div>

@@ -2,9 +2,9 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { Route } from 'react-router-dom'
 import { ConnectedRouter } from 'connected-react-router'
-// FIXME: Deprecate sass usage
 import './styles/App.scss'
 import './App.css'
+import 'react-s-alert/dist/s-alert-css-effects/stackslide.css'
 import 'react-s-alert/dist/s-alert-default.css'
 
 // Alerts

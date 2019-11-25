@@ -29,7 +29,7 @@ type Props = {
 }
 
 class PlayerControls extends React.Component<Props> {
-  player: any
+  playerRef: any
 
   state = {
     playing: true,
@@ -48,6 +48,8 @@ class PlayerControls extends React.Component<Props> {
     if (this.props.player.playing && !this.state.playing) {
       this.playPause()
     }
+
+    this.playerRef = React.createRef()
   }
 
   playPause = () => {
@@ -77,6 +79,9 @@ class PlayerControls extends React.Component<Props> {
   }
   onSeekChange = value => {
     this.setState({ playedSeconds: value / 1000 })
+    this.playerRef.current.seekTo(
+      value / 1000
+    )
   }
   onSeekMouseUp = value => {
     this.setState({ seeking: false })
@@ -163,6 +168,7 @@ class PlayerControls extends React.Component<Props> {
         />
         <ReactPlayer
           className={playerClassnames}
+          ref={this.playerRef}
           url={streamUri}
           playing={playing}
           onClick={this.playPause}
@@ -178,11 +184,14 @@ class PlayerControls extends React.Component<Props> {
             this.saveTrackPlayed(currentPlayingId)
             this.playNext()
           }}
-          config={{ }}
+          config={{
+            file: {
+              // forceAudio: true
+            }
+          }}
           onError={this.onError}
           onProgress={this.onProgress}
           onDuration={this.onDuration}
-          onSeek={this.onSeekChange}
           progressInterval={1000}
           width={'100%'}
           height={'100%'}

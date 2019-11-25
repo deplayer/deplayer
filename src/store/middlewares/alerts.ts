@@ -12,8 +12,9 @@ type Action = {
 const alerts = () => next => (action: Action) => {
   if (action.type === types.SEND_NOTIFICATION) {
     const options = {
+      effect: 'stackslide',
       position: 'top-right',
-      offset: 0
+      offset: 50
     }
     Alert.info(I18n.t(action.notification), options)
   }
