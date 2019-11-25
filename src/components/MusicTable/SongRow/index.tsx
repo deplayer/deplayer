@@ -59,14 +59,14 @@ const SongRow = (props: Props) => {
             { song.title }
           </Link>
         </h4>
-        <h5 className='text-yellow-600'>
+        <h5 className='text-yellow-600 text-sm'>
           { song.album ? song.album.name: nonAvailable }
         </h5>
-        <h6 className='text-yellow-600'>
+        <h6 className='text-yellow-600 text-sm'>
           <Link to={`/artist/${song.artist.id}`}>{ song.artist ? song.artist.name: nonAvailable }</Link>
         </h6>
         { props.slim || (
-          <div className='inline-block text-yellow-400'>{ getDurationStr(song.duration) }</div>
+          <div className='inline-block text-yellow-400 text-sm'>{ getDurationStr(song.duration) }</div>
         )}
       </div>
       <div className='relative'>
