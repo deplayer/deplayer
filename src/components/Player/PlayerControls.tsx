@@ -223,7 +223,7 @@ class PlayerControls extends React.Component<Props> {
                   }
                 </div>
               </div>
-              <div className='player-tools ui icon buttons flex flex-grow-0 fustify-center'>
+              <div className='player-tools ui icon buttons flex fustify-center'>
                 <Controls
                   mqlMatch={this.props.app.mqlMatch}
                   playPrev={this.playPrev}
