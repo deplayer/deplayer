@@ -18,6 +18,7 @@
   video {
     position: absolute;
     z-index: 0;
+    pointer-events: none;
 
     &::before {
       content: "";
@@ -27,13 +28,15 @@
       height: 100%;
       background-color: rgba(0, 0, 0, 0.8);
       pointer-events: none;
+      z-index: 1;
     }
   }
 
   &.fullscreen {
     video {
       background: black;
-      z-index: 30;
+      z-index: 101;
+      pointer-events: initial;
 
       &::before {
         background-color: transparent;
@@ -54,5 +57,6 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.8);
     pointer-events: none;
+    z-index: 0;
   }
 }

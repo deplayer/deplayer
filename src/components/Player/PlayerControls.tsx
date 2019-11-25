@@ -197,7 +197,7 @@ class PlayerControls extends React.Component<Props> {
           height={'100%'}
         />
         { showControls &&
-          <div className={ classNames({'player-container': true }) } style={{ zIndex: 100 }}>
+          <div className={ classNames({'player-container': true }) } style={{ zIndex: 102 }}>
             <ProgressBar
               dispatch={this.props.dispatch}
               total={duration * 1000}
