@@ -40,6 +40,7 @@ export function* startFolderScan(hash: string): any {
 // Watcher should enque tasks to avoid concurrency
 export function* startProvidersScan(): any {
   const settings = yield select(getSettings)
+
   const providerKeys = Object.keys(settings.providers).filter((key: string) => {
     return key.match(/ipfs|youtube-dl-server/)
   })

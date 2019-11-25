@@ -6,7 +6,7 @@ export default class IpfsSettings implements ISettingsSection {
   getFormSchema() {
     return [
       {title: "labels.youtube-dl-server", type: 'title'},
-      {title: "labels.youtube-dl-server.host", name: `app.youtube-dl-server.host.host`, type: 'text', default: 'http://localhost'},
+      {title: "labels.youtube-dl-server.host", name: `app.youtube-dl-server.host`, type: 'text', default: 'http://localhost'},
     ]
   }
 }

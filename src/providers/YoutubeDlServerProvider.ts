@@ -17,20 +17,19 @@ export default class YoutubeDlServerProvider implements IMusicProvider {
   providerKey: string
 
   constructor(settings: any, providerKey: string) {
-    console.log(settings)
-    this.baseUrl = settings.host.host // FIXME
+    this.baseUrl = settings.host
     this.providerKey = providerKey
-    this.searchUrl = `${settings.host.host}/api/info`
+    this.searchUrl = `${settings.host}/api/info`
   }
 
-  mapSongs = (info: any): Array<any> => {
-    const song = new Song({
-      title: info.title,
-      artistName: info.artist,
-      albumName: info.album,
+  mapSong = (songInfo: any): Song => {
+    return new Song({
+      title: songInfo.title,
+      artistName: songInfo.artist,
+      albumName: songInfo.album,
       cover: {
-        thumbnailUrl: info.thumbnails[0].url,
-        fullUrl: info.thumbnails[0].url,
+        thumbnailUrl: songInfo.thumbnails[0].url,
+        fullUrl: songInfo.thumbnails[0].url,
       },
       genre: '',
       duration: 0,
@@ -39,16 +38,24 @@ export default class YoutubeDlServerProvider implements IMusicProvider {
       stream: [
         {
           service: this.providerKey,
-          uris: [{uri: info.url}]
+          uris: [{uri: songInfo.url}]
         }
       ]
     })
+  }
 
-    return [song]
+  mapSongs = (info: any): Array<any> => {
+    if (info._type === 'playlist') {
+      return info.entries.map((entry: any) => {
+        return this.mapSong(entry)
+      })
+    } else {
+      return this.mapSong(info)
+    }
   }
 
   search(searchTerm: string): Promise<Array<any>> {
-    return axios.get(`${this.searchUrl}?url=${searchTerm}`)
+    return axios.get(`${this.searchUrl}?url=${escape(searchTerm)}`)
       .then((result) => {
         const response = result.data.info
         return this.mapSongs(response)
