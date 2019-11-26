@@ -38,6 +38,7 @@ const ContextualMenu = (props: MenuProps) => {
           <Button
             fullWidth
             transparent
+            alignLeft
             onClick={onClick}
           >
             <i className='icon play mr-2'></i>

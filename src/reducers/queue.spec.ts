@@ -17,6 +17,14 @@ describe('queue reducer', () => {
       })
   })
 
+  it('should handle ADD_TO_QUEUE not repeat ids', () => {
+    expect(reducer({ ...defaultState, trackIds: ['1234'] }, {type: types.ADD_TO_QUEUE, song: { id: '1234' }}))
+      .toEqual({
+        ...defaultState,
+        trackIds: ['1234'],
+      })
+  })
+
   it('should handle ADD_SONGS_TO_QUEUE action', () => {
     const songs: any = []
     const expectedObj = {}

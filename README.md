@@ -28,14 +28,6 @@ Decentralized mediaplayer which runs entirely in the browser.
 
 * last.fm (not very usefull)
 
-## Screenshots
-
-![playlist](img/playlist-desktop.png)
-![song-view](img/song-view.png)
-![artist-view](img/artist-view.png)
-![playlist-mobile](img/playlist-mobile.png)
-![song-view-mobile](img/song-view-mobile.png)
-
 ## Keyboard hotkeys
 
 * Play/Pause: `space`

@@ -8,6 +8,7 @@ import Button from '../common/Button'
 import Icon from '../common/Icon'
 import RepeatButton from './RepeatButton'
 import ShuffleButton from './ShuffleButton'
+import ToggleMiniQueueButton from '../Buttons/ToggleMiniQueueButton'
 import VolumeControl from './VolumeControl'
 import * as types from '../../constants/ActionTypes'
 
@@ -21,8 +22,11 @@ const ContextualMenu = (props: MenuProps) => {
   const TogglePlayer = () => {
     return (
       <Button alignLeft transparent fullWidth onClick={() => props.dispatch({type: types.HIDE_PLAYER})}>
-        <i className='fa fa-eye-slash mx-2'></i>
-          <Translate value='buttons.hidePlayer' />
+        <Icon
+          icon='faEyeSlash'
+          className='mx-2'
+        />
+        <Translate value='buttons.hidePlayer' />
       </Button>
     )
   }
@@ -51,6 +55,9 @@ const ContextualMenu = (props: MenuProps) => {
         </Item>
         <Item className='flex w-full'>
           <TogglePlayer />
+        </Item>
+        <Item className='flex w-full items-center'>
+          <ToggleMiniQueueButton />
         </Item>
         <Item className='flex w-full'>
           <Button

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import KeyHandler, {KEYPRESS} from 'react-key-handler'
+import KeyHandler, {KEYPRESS, KEYUP} from 'react-key-handler'
 
 type Props = {
   playPrev: () => void,
@@ -12,7 +12,7 @@ const KeyHandlers = (props: Props) => {
   return (
     <>
       <KeyHandler
-        keyEventName={KEYPRESS}
+        keyEventName={KEYUP}
         keyValue=" "
         onKeyHandle={props.playPause}
       />

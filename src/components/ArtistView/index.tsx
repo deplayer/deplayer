@@ -1,10 +1,12 @@
 import { Dispatch } from 'redux'
 import { Redirect } from 'react-router-dom'
+import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
 
 import Artist from '../../entities/Artist'
 import Button from '../common/Button'
 import CoverImage from '../MusicTable/CoverImage'
+import Icon from '../common/Icon'
 import Song from '../../entities/Song'
 import SongRow from '../MusicTable/SongRow'
 import * as types from '../../constants/ActionTypes'
@@ -113,7 +115,7 @@ export default class ArtistView extends React.Component<Props> {
                   <div style={{ top: 50 }} className='md:sticky flex flex-col items-center md:mr-8 w-40'>
                     <h3 className='text-lg mb-2'>{ albums[albumId].name }</h3>
                     <div
-                      className='h-56 w-56 mb-2 md:h-56 md:w-56 cursor-pointer'
+                      className='h-56 w-56 mb-2 md:h-56 md:w-56 cursor-pointer md:mr-4'
                       onClick={() => {
                         this.props.dispatch({type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
                       }}
@@ -133,7 +135,11 @@ export default class ArtistView extends React.Component<Props> {
                         this.props.dispatch({type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
                       }}
                     >
-                      <i className='fa fa-play' />
+                      <Icon
+                        icon='faFolderPlus'
+                        className='mx-2'
+                      />
+                      <Translate value='buttons.addToQueue' />
                     </Button>
                   </div>
                   <div className='w-full m-2'>

@@ -28,6 +28,10 @@ const Queue = (props: Props) => {
     return null
   }
 
+  if (props.slim && !props.app.displayMiniQueue) {
+    return null
+  }
+
   if (props.app.loading) {
     return (
       <div className={`queue`}>

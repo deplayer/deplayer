@@ -54,7 +54,7 @@ export function* clearQueue(): any {
 export function* addAlbumToPlaylist(action: any): any {
   const songsByAlbum = yield select(getAlbumSongs)
   logger.log('queue-saga', songsByAlbum)
-  yield put({type: types.ADD_SONGS_TO_QUEUE, songs: songsByAlbum[action.albumId], replace: true })
+  yield put({type: types.ADD_SONGS_TO_QUEUE, songs: songsByAlbum[action.albumId], replace: false })
   yield put({type: types.SET_CURRENT_PLAYING, songId: songsByAlbum[action.albumId][0]})
   yield put({type: types.START_PLAYING})
 }

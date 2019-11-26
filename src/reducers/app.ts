@@ -5,7 +5,7 @@ type State = {
   sidebarToggled: boolean,
   mqlMatch: boolean,
   loading: boolean,
-  slim: boolean,
+  displayMiniQueue: boolean,
   version: string
 }
 
@@ -15,10 +15,11 @@ export const defaultState = {
   mqlMatch: false,
   loading: true,
   slimPlayer: false,
+  displayMiniQueue: true,
   version: process.env.REACT_APP_VERSION || 'development'
 }
 
-export default (state: State = defaultState, action) => {
+export default (state: State = defaultState, action: any) => {
   switch (action.type) {
     case types.TOGGLE_SIDEBAR: {
       return {...state, sidebarToggled: action.value ? action.value :!state.sidebarToggled}
@@ -34,6 +35,10 @@ export default (state: State = defaultState, action) => {
 
     case types.INITIALIZED: {
       return {...state, loading: false}
+    }
+
+    case types.TOGGLE_MINI_QUEUE: {
+      return {...state, displayMiniQueue: !state.displayMiniQueue}
     }
 
     case types.SET_BACKGROUND_IMAGE: {

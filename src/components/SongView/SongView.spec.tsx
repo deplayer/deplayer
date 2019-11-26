@@ -16,7 +16,8 @@ const setup = (customProps: any) => {
       rows: {}
     },
     queue: {
-      currentPlaying: null
+      currentPlaying: null,
+      trackIds: []
     }
   }
 

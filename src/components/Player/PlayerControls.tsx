@@ -90,8 +90,10 @@ class PlayerControls extends React.Component<Props> {
     if (this.props.player.fullscreen && this.state.timeShown > 2) {
       this.props.player.showPlayer && this.props.dispatch({ type: types.HIDE_PLAYER })
       this.setState({ timeShown: 0})
-    } else {
+    } else if (this.props.player.fullscreen) {
       this.setState({ timeShown: this.state.timeShown + 1})
+    } else {
+      !this.props.player.showPlayer && this.props.dispatch({ type: types.SHOW_PLAYER })
     }
 
     if (this.props.player.errorCount) {

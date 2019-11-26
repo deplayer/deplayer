@@ -7,6 +7,7 @@ import PlayAllButton from '../Buttons/PlayAllButton'
 import SaveQueueButton from '../Buttons/SaveQueueButton'
 import SongRow from './SongRow'
 import Spinner from '../Spinner'
+import ToggleMiniQueueButton from '../Buttons/ToggleMiniQueueButton'
 import * as types from '../../constants/ActionTypes'
 
 export type Props = {
@@ -39,10 +40,7 @@ const MusicTable = (props: Props) => {
 
   const rowRenderer = ({
     index,       // Index of row
-    isScrolling, // The List is currently being scrolled
-    isVisible,   // This row is visible within the List (eg it is not an overscanned row)
     key,         // Unique key within array of rendered rows
-    parent,      // Reference to the parent List (instance)
     style        // Style object to be applied to row (to position it);
     // This must be passed through to the rendered row element.
   }) => {
@@ -81,9 +79,18 @@ const MusicTable = (props: Props) => {
           Total items: <b>{ props.tableIds.length }</b>
         </div>
         <div className='actions'>
-          <Route path="/queue" component={() => <ClearQueueButton /> } />
-          <Route path="/queue" component={() => <SaveQueueButton /> } />
-          <Route path="/" component={() => <PlayAllButton dispatch={props.dispatch} /> } />
+          <Route
+            path="/queue"
+            component={() => (
+              <>
+                <ClearQueueButton />
+                <SaveQueueButton />
+                <PlayAllButton dispatch={props.dispatch} />
+              </>
+            )}
+          />
+          <Route path="/song/:id" component={() => <ToggleMiniQueueButton /> } />
+          <Route path="/collection" component={() => <PlayAllButton dispatch={props.dispatch} /> } />
         </div>
       </div>
       <AutoSizer className='music-table'>

@@ -14,7 +14,7 @@ import logger from '../../utils/logger'
 import * as types from '../../constants/ActionTypes'
 
 type Props = {
-  queue: any,
+  queue: { trackIds: any },
   song: Song,
   dispatch: Dispatch,
   loading: boolean,
@@ -22,7 +22,7 @@ type Props = {
 }
 
 const SongView = (props: Props) => {
-  const { song } = props
+  const { song, queue: { trackIds } } = props
 
   if (props.loading) {
     return (
@@ -95,8 +95,44 @@ const SongView = (props: Props) => {
                     props.dispatch({type: types.SET_CURRENT_PLAYING, songId: song.id})
                   }}
                 >
+                  <Icon
+                    icon='faPlay'
+                    className='mr-4'
+                  />
                   <Translate value="common.play" />
                 </Button>
+
+                { !trackIds[song.id] &&
+                  <Button
+                    transparent
+                    alignLeft
+                    onClick={() => {
+                      props.dispatch({type: types.ADD_TO_QUEUE, song})
+                    }}
+                  >
+                    <Icon
+                      icon='faPlusCircle'
+                      className='mx-2'
+                    />
+                    <Translate value='buttons.addToQueue' />
+                  </Button>
+                }
+
+                { trackIds[song.id] &&
+                  <Button
+                    transparent
+                    alignLeft
+                    onClick={() => {
+                      props.dispatch({type: types.REMOVE_FROM_QUEUE, song})
+                    }}
+                  >
+                    <Icon
+                      icon='faMinusCircle'
+                      className='mx-2'
+                    />
+                    <Translate value='buttons.removeFromQueue' />
+                  </Button>
+                }
               </div>
             </div>
           </div>

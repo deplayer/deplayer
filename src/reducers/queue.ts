@@ -52,20 +52,21 @@ export default (state: State = defaultState, action: any  = {}): State => {
 
     case types.ADD_TO_QUEUE:
       const mergedTrackIds = [...state.trackIds, ...populateTracks([action.song])]
+      const filteredTracks = new Set(mergedTrackIds)
       return {
         ...state,
-        trackIds: mergedTrackIds
+        trackIds: [...filteredTracks]
       }
 
     case types.REMOVE_FROM_QUEUE:
-      const queueTracks = [
+      const queueTracks = new Set([
         ...state.trackIds.splice(
           state.trackIds.indexOf(action.song.id)
         )
-      ]
+      ])
       return {
         ...state,
-        trackIds: queueTracks
+        trackIds: [...queueTracks]
       }
 
 

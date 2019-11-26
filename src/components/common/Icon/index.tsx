@@ -4,7 +4,12 @@ import {
   faStopwatch,
   faMicrophoneAlt,
   faExpand,
-  faPlusCircle
+  faPlusCircle,
+  faMinusCircle,
+  faFolderPlus,
+  faEyeSlash,
+  faPlay,
+  faPlayCircle
 } from "@fortawesome/free-solid-svg-icons"
 import React from 'react'
 
@@ -13,7 +18,12 @@ const icons = {
   faStopwatch: faStopwatch,
   faMicrophoneAlt: faMicrophoneAlt,
   faExpand: faExpand,
-  faPlusCircle: faPlusCircle
+  faPlusCircle: faPlusCircle,
+  faMinusCircle: faMinusCircle,
+  faEyeSlash: faEyeSlash,
+  faPlay: faPlay,
+  faPlayCircle: faPlayCircle,
+  faFolderPlus: faFolderPlus
 }
 
 type Props = {
