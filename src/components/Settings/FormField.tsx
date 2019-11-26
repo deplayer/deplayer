@@ -45,7 +45,7 @@ const FormField = (props: Props) => {
 
   return (
     <Field
-      className={`${ field.type === TYPES.checkbox ? 'form-check': 'form-control'} p-3 bg-blue-900 text-blue-100 font-sans`}
+      className={`${ field.type === TYPES.checkbox ? 'form-check': 'form-control'} p-3 w-full bg-blue-900 text-blue-100 font-sans rounded`}
       name={field.name}
       type={field.type}
     />

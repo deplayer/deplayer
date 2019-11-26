@@ -11,22 +11,22 @@ type Props = {
 const FormSchema = (props: Props) => {
   const { fields } = props.schema
 
-  const populatedFields = fields.map((field, index: number) => {
+  const populatedFields = fields.map((field: any, index: number) => {
     if (field.type === TYPES.title) {
       return (
-        <h3 className='text-2xl leading-loose py-2 uppercase tracking-wide py-2' key={index}><Translate value={field.title} /></h3>
+        <h3 className='text-2xl leading-loose py-2 uppercase tracking-wide pt-4 pb-2' key={index}><Translate value={field.title} /></h3>
       )
     }
 
     return (
       <div
         key={field.name}
-        className="form-group row"
+        className="my-3"
       >
-        <label className='col-sm-4 col-form-label'>
+        <label className='w-full block mb-2'>
           <Translate value={field.title} />
         </label>
-        <div className='col-sm-8'>
+        <div className='w-full'>
           <FormField
             field={field}
           />

@@ -16,8 +16,6 @@ type Props = {
 const ProgressBar = (props: Props) => {
   const step = 100 / props.total
 
-  const diff = props.total - props.current
-
   return (
     <div
       className='progress player-progress'

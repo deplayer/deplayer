@@ -25,6 +25,7 @@
 }
 
 .rc-slider-handle {
+  z-index: 1;
   border: solid 2px $primary-color-100;
   margin-top: -7px !important;
   width: 20px !important;

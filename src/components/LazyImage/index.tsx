@@ -23,13 +23,6 @@ class LazyImage extends React.Component<Props> {
     this.handleError = this.handleError.bind(this)
   }
 
-  componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.src !== this.props.src) {
-      this.destroyLoading()
-      this.initializeLoading(nextProps.src)
-    }
-  }
-
   componentDidMount() {
     this.setState({isMounted: true})
     this.initializeLoading(this.props.src)

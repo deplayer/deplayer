@@ -1,17 +1,17 @@
 import { Dispatch } from 'redux'
 import { Link } from 'react-router-dom'
+import KeyHandler, {KEYPRESS} from 'react-key-handler'
 import React from 'react'
 import ReactPlayer from 'react-player'
 import classNames from 'classnames'
-import KeyHandler, {KEYPRESS} from 'react-key-handler'
+import { CSSTransitionGroup } from 'react-transition-group'
 
 import { State as PlayerState } from '../../reducers/player'
 import { State as SettingsState } from '../../reducers/settings'
-import Button from '../common/Button'
 import ContextualMenu from './ContextualMenu'
 import Controls from './Controls'
 import Cover from './Cover'
-import Icon from '../common/Icon'
+import KeyHandlers from './KeyHandlers'
 import ProgressBar from './ProgressBar'
 import Spectrum from './../Spectrum'
 import * as types from '../../constants/ActionTypes'
@@ -148,8 +148,23 @@ class PlayerControls extends React.Component<Props> {
     const currentPlaying = this.props.collection.rows[currentPlayingId]
     const { streamUri } = this.props.player
 
+    const handlers = (
+      <>
+        <KeyHandler
+          keyEventName={KEYPRESS}
+          keyValue="f"
+          onKeyHandle={() => this.props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
+        />
+        <KeyHandlers
+          playPrev={this.playPrev}
+          playPause={this.playPause}
+          playNext={this.playNext}
+        />
+      </>
+    )
+
     if (!this.props.itemCount || !currentPlaying || !streamUri) {
-      return null
+      return handlers
     }
 
     const playerClassnames = classNames({
@@ -161,17 +176,16 @@ class PlayerControls extends React.Component<Props> {
 
     return (
       <React.Fragment>
-        <KeyHandler
-          keyEventName={KEYPRESS}
-          keyValue="f"
-          onKeyHandle={() => this.props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
-        />
+        { handlers }
         <ReactPlayer
           className={playerClassnames}
           ref={this.playerRef}
           url={streamUri}
           playing={playing}
           onClick={this.playPause}
+          onDoubleClick={() => {
+            this.props.dispatch({type: types.TOGGLE_FULL_SCREEN})
+          }}
           onMouseMove={this.showPlayer}
           controls={false}
           loop={false}
@@ -198,50 +212,65 @@ class PlayerControls extends React.Component<Props> {
         />
         { showControls &&
           <div className={ classNames({'player-container': true }) } style={{ zIndex: 102 }}>
-            <ProgressBar
-              dispatch={this.props.dispatch}
-              total={duration * 1000}
-              current={playedSeconds * 1000}
-              onChange={this.onSeekChange}
-            />
+            <CSSTransitionGroup
+              transitionName="player"
+              transitionAppear={true}
+              transitionAppearTimeout={500}
+              transitionEnterTimeout={500}
+              transitionLeaveTimeout={500}
+              transitionEnter={true}
+              transitionLeave={true}
+            >
+              <div key='player-controls' className='flex justify-between items-center'>
+                <div className='absolute top-0 w-full'>
+                  <ProgressBar
+                    dispatch={this.props.dispatch}
+                    total={duration * 1000}
+                    current={playedSeconds * 1000}
+                    onChange={this.onSeekChange}
+                  />
+                </div>
 
-            <div className='flex justify-between items-center'>
-              <div className='flex flex-initial items-center flex-grow min-w-0'>
-                <Cover song={currentPlaying} />
-                <div className='mx-2 pr-2 md:text-center w-full'>
-                  <Link to={`/song/${currentPlaying.id}`} className='text-lg md:text-xl text-blue-200 block'>
-                    <h5 className='truncate'>
-                      { currentPlaying.title }
-                    </h5>
-                  </Link>
-                  { currentPlaying.artist &&
-                    <Link to={`/artist/${currentPlaying.artist.id}`} className='block'>
-                      <h6 className='truncate text-blue-600'>
-                        {  currentPlaying.artist.name }
-                      </h6>
+                <div className='flex flex-initial items-center flex-grow min-w-0'>
+                  <Cover song={currentPlaying} />
+                  <div className='mx-2 pr-2 md:text-center w-full'>
+                    <Link to={`/song/${currentPlaying.id}`} className='text-lg md:text-xl text-blue-200 block'>
+                      <h5 className='truncate'>
+                        { currentPlaying.title }
+                      </h5>
                     </Link>
-                  }
+                    { currentPlaying.artist &&
+                      <Link to={`/artist/${currentPlaying.artist.id}`} className='block'>
+                        <h6 className='truncate text-blue-600'>
+                          {  currentPlaying.artist.name }
+                        </h6>
+                      </Link>
+                    }
+                  </div>
+                </div>
+                <div className='player-tools flex fustify-center items-center'>
+                  <Controls
+                    mqlMatch={this.props.app.mqlMatch}
+                    playPrev={this.playPrev}
+                    isPlaying={this.state.playing}
+                    playPause={this.playPause}
+                    playNext={this.playNext}
+                    dispatch={this.props.dispatch}
+                  />
+                </div>
+                <div className='flex flex-grow-0'>
+                  <ContextualMenu
+                    volume={volume * 100}
+                    dispatch={this.props.dispatch}
+                    setVolume={this.setVolume}
+                  />
                 </div>
               </div>
-              <div className='player-tools flex fustify-center items-center'>
-                <Controls
-                  mqlMatch={this.props.app.mqlMatch}
-                  playPrev={this.playPrev}
-                  isPlaying={this.state.playing}
-                  playPause={this.playPause}
-                  playNext={this.playNext}
-                  dispatch={this.props.dispatch}
-                />
-              </div>
-              <div className='flex flex-grow-0'>
-                <ContextualMenu
-                  volume={volume * 100}
-                  dispatch={this.props.dispatch}
-                  setVolume={this.setVolume}
-                />
-              </div>
-            </div>
-            <Spectrum audioSelector={'audio'} />
+              {
+                this.playerRef.current &&
+                  <Spectrum audioSelector='video, audio' />
+              }
+            </CSSTransitionGroup>
           </div>
         }
       </React.Fragment>

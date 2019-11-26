@@ -1,7 +1,8 @@
+import { Link } from 'react-router-dom'
 import * as React from 'react'
 
 import Artist from '../../entities/Artist'
-import { Link } from 'react-router-dom'
+import Tag from '../common/Tag'
 
 type Props = {
   artist: Artist,
@@ -14,18 +15,18 @@ const ArtistRow = (props: Props) => {
 
   return (
     <div
-      className='artist-row'
+      className='artist-row w-full'
       style={props.style}
     >
-      <Link to={`/artist/${artist.id}`}>
+      <Link className='flex justify-between' to={`/artist/${artist.id}`}>
         <span>
           <i style={{marginRight: '5px'}} className='fa fa-microphone' />
           { artist.name }
         </span>
 
-        <span className='badge badge-secondary'>
+        <Tag>
           { props.songs.length }
-        </span>
+        </Tag>
       </Link>
     </div>
   )

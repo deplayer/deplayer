@@ -43,7 +43,7 @@ const ArtistTable = (props: Props) => {
   }
 
   return (
-    <div className='collection'>
+    <div className='collection z-10'>
       <AutoSizer className='artists-table'>
         {({ height, width }) => (
           <List

@@ -35,12 +35,10 @@ const ContextualMenu = (props: MenuProps) => {
         </Button>
       </MenuProvider>
       <Menu id='context-menu-player' theme={theme.dark}>
-        <Item className='flex w-full mt-5'>
-          <VolumeControl
-            volume={ props.volume }
-            onChange={props.setVolume}
-          />
-        </Item>
+        <VolumeControl
+          volume={ props.volume }
+          onChange={props.setVolume}
+        />
         <Item className='flex w-full'>
           <ShuffleButton
             dispatch={props.dispatch}

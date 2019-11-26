@@ -1,3 +1,4 @@
+import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
 import Slider from 'rc-slider'
 
@@ -9,6 +10,9 @@ type Props = {
 const VolumeControl = (props: Props) => {
   return (
     <div className='volume-control w-full my-2 -my-2'>
+      <p className='text-center pt-4 pb-2'>
+        <Translate value='common.volume' />
+      </p>
       <Slider
         className='bar'
         min={0}

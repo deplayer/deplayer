@@ -19,3 +19,30 @@
   position: relative;
   grid-area: player;
 }
+
+.player-enter {
+  opacity: 0.01;
+}
+
+.player-enter.player-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.player-leave {
+  opacity: 1;
+}
+
+.player-leave.player-leave-active {
+  opacity: 0.01;
+  transition: opacity 300ms ease-in;
+}
+
+.player-appear {
+  opacity: 0.01;
+}
+
+.player-appear.player-appear-active {
+  opacity: 1;
+  transition: opacity .5s ease-in;
+}
