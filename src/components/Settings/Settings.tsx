@@ -59,12 +59,12 @@ class Settings extends React.Component<Props, State> {
           settings={this.props.settings}
           dispatch={this.props.dispatch}
         />
-        <div className='my-4'>
+        <div className='my-12'>
           <Button onClick={this.scanSources} inverted>
             <Translate value="labels.scanSources" />
           </Button>
         </div>
-        <div className='my-4'>
+        <div className='my-12'>
           <Button onClick={this.exportCollection} inverted>
             <Translate value="labels.exportCollection" />
           </Button>

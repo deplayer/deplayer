@@ -9,13 +9,13 @@ import {
   select
 } from 'redux-saga/effects'
 
-import { getAdapter } from '../services/database'
-import { getFileMetadata, metadataToSong } from '../services/ID3Tag/ID3TagService'
-import { getSettings } from './selectors'
-import { scanFolder } from '../services/Ipfs/IpfsService'
-import YoutubeDlServerProvider from '../providers/YoutubeDlServerProvider'
-import CollectionService from '../services/CollectionService'
-import  * as types from '../constants/ActionTypes'
+import { getAdapter } from '../../services/database'
+import { getFileMetadata, metadataToSong } from '../../services/ID3Tag/ID3TagService'
+import { getSettings } from '../selectors'
+import { scanFolder } from '../../services/Ipfs/IpfsService'
+import CollectionService from '../../services/CollectionService'
+import YoutubeDlServerProvider from '../../providers/YoutubeDlServerProvider'
+import  * as types from '../../constants/ActionTypes'
 
 export function* startFolderScan(hash: string): any {
   const settings = yield select(getSettings)
@@ -105,22 +105,26 @@ function* handleIPFSFileLoad(): any {
 
 // IPFS Folder scan Queue
 // Watcher
-function* handleIPFSFolderScan(): any {
+export function* handleIPFSFolderScan(): any {
   const handleChannel = yield actionChannel(types.IPFS_FOLDER_FOUND)
 
   while (true) {
     // 2- take from the channel
     const { hash } = yield take(handleChannel)
     // 3- Note that we're using a blocking call
-    const files = yield call(startFolderScan, hash)
+    try {
+      const files = yield call(startFolderScan, hash)
 
-    for (let file of files) {
-      if (file.type === 'dir') {
-        // Recursive execution
-        yield put({ type: types.IPFS_FOLDER_FOUND, hash: file.hash })
-      } else {
-        yield put({ type: types.IPFS_FILE_FOUND, file })
+      for (let file of files) {
+        if (file.type === 'dir') {
+          // Recursive execution
+          yield put({ type: types.IPFS_FOLDER_FOUND, hash: file.hash })
+        } else {
+          yield put({ type: types.IPFS_FILE_FOUND, file })
+        }
       }
+    } catch(e) {
+      yield put({ type: types.IPFS_FOLDER_SCAN_FAILED, e })
     }
   }
 }

@@ -4,7 +4,7 @@ import Song from '../entities/Song'
 import { IMusicProvider } from './IMusicProvider'
 
 /**
- * It should implement the Subsonic API
+ * Implement the Subsonic API
  */
 export default class SubsonicApiProvider implements IMusicProvider {
   baseUrl: string

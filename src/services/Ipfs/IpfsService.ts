@@ -1,7 +1,10 @@
 import ipfsClient from 'ipfs-http-client'
 
-export const scanFolder = async (hash: string, settings: any): Promise<any> => {
-  const { host, port, proto } = settings.settings.app.ipfs
+export const scanFolder = async (
+  hash: string,
+  settings: any
+): Promise<any> => {
+  const { host, port, proto } = settings.app.ipfs
   const ipfs = ipfsClient({
     host,
     port,

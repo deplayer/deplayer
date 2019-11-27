@@ -15,6 +15,7 @@ export default class YoutubeDlServerProvider implements IMusicProvider {
   streamBase: string
   coverBase: string
   providerKey: string
+  playUrl: string
 
   constructor(settings: any, providerKey: string) {
     this.baseUrl = settings.host
@@ -51,7 +52,9 @@ export default class YoutubeDlServerProvider implements IMusicProvider {
         return this.mapSong(entry)
       })
     } else {
-      return this.mapSong(info)
+      return [
+        this.mapSong(info)
+      ]
     }
   }
 
