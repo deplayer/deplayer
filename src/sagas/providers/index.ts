@@ -71,7 +71,7 @@ export function* startProvidersScan(): any {
 
 // IPFS file scan Queue
 // Watcher
-function* handleIPFSFileLoad(): any {
+export function* handleIPFSFileLoad(): any {
   const handleChannel = yield actionChannel(types.IPFS_FILE_FOUND)
 
   while (true) {
@@ -81,7 +81,6 @@ function* handleIPFSFileLoad(): any {
     try {
       const settings = yield select(getSettings)
       const metadata = yield call(getFileMetadata, file, settings)
-      console.log('song metadata: ', metadata)
 
       const song = yield call(metadataToSong, metadata, file)
 
