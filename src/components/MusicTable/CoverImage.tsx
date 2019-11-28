@@ -9,7 +9,7 @@ type cover = {
 
 type Props = {
   cover: cover,
-  size: string,
+  size?: string,
   onClick?: () => void,
   useImage?: boolean,
   albumName: string

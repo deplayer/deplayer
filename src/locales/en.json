@@ -5,6 +5,9 @@
     "import": "Import",
     "collection": "Collection"
   },
+  "titles": {
+    "relatedAlbums": "Related albums"
+  },
   "labels": {
     "enableReactPlayer": "use react-player (beta)",
     "enableSpectrum": "player spectrum",

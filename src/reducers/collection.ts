@@ -97,7 +97,10 @@ export default (state: State = defaultState, action: any = {}) => {
         const song = songs[i]
         rows[song.id] = song
         artists[song.artist.id] = song.artist
-        albums[song.album.id] = song.album
+        albums[song.album.id] = {
+          ...song.album,
+          thumbnailUrl: song.cover.thumbnailUrl
+        }
 
         if (!songsByArtist[song.artist.id]) {
           songsByArtist[song.artist.id] = []

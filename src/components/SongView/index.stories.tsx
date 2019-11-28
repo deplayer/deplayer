@@ -3,7 +3,7 @@ import { withKnobs, boolean } from '@storybook/addon-knobs';
 import * as React from 'react'
 
 import Song from '../../entities/Song'
-import SongView from './SongView'
+import SongView from './index'
 import withProvider from '../../utils/withProvider'
 
 const stories = storiesOf('SongView', module);
@@ -17,7 +17,7 @@ stories
     () => (
       <SongView
         dispatch={() => console.log('story')}
-        queue={{}}
+        queue={{ trackIds: [] }}
         song={song}
         loading={boolean('loading', false)}
       />

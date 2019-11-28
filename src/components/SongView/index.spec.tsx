@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../../tests/configureEnzyme'
-import SongView from './SongView'
+import SongView from './index'
 import Song from '../../entities/Song'
+import { defaultState as collectionDefaultState } from '../../reducers/collection'
 
 configureEnzyme()
 
@@ -12,9 +13,7 @@ const setup = (customProps: any) => {
     match: {
       params: {}
     },
-    collection: {
-      rows: {}
-    },
+    collection: collectionDefaultState,
     queue: {
       currentPlaying: null,
       trackIds: []
