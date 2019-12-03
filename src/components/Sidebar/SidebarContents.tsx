@@ -20,11 +20,11 @@ type ContentProps = {
 
 const SidebarContents = (props: ContentProps) => {
   return (
-    <div onClick={() => props.onSetSidebarOpen()}>
+    <div className='flex flex-col' onClick={() => props.onSetSidebarOpen()}>
       <h4 className="text-xl text-center py-4">
         { 'deplayer' }
       </h4>
-      <ul>
+      <ul className='flex flex-col'>
         <QueueMenuItem
           current={inSection(props.location, '(queue)?')}
           totalItems={props.queue.trackIds.length}
@@ -45,7 +45,7 @@ const SidebarContents = (props: ContentProps) => {
         <SettingsMenuItem current={inSection(props.location, 'settings')} />
       </ul>
 
-      <section className='sidebar-meta'>
+      <section className='p-6 absolute bottom-0 text-xs text-center w-full'>
         <a
           href={'https://gitlab.com/deplayer/deplayer'}
           title="Show me the code"
@@ -61,7 +61,6 @@ const SidebarContents = (props: ContentProps) => {
         >
           { props.app.version }
         </a>
-
       </section>
     </div>
   )

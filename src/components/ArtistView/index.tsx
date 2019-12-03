@@ -73,23 +73,23 @@ export default class ArtistView extends React.Component<Props> {
       return ''
     }
 
+    const albumRows = albumsByArtist.map((albumId: string) => {
+      return (
+        <Album
+          album={albums[albumId]}
+          dispatch={this.props.dispatch}
+          collection={this.props.collection}
+          songs={songsByAlbum[albumId]}
+        />
+      )
+    })
+
     return (
       <div className={`artist-view ${this.props.className} z-50`}>
         <div className='main w-full z-10 md:p-4'>
           <h2 className='text-center text-3xl py-3'>{ artist.name }</h2>
           <p dangerouslySetInnerHTML={{__html: extractSummary()}} />
-          {
-            albumsByArtist.map((albumId: string) => {
-              return (
-                <Album
-                  album={albums[albumId]}
-                  dispatch={this.props.dispatch}
-                  collection={this.props.collection}
-                  songs={songsByAlbum[albumId]}
-                />
-              )
-            })
-          }
+          { albumRows }
           <div className='placeholder'></div>
         </div>
       </div>
