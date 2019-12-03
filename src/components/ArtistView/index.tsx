@@ -1,14 +1,9 @@
 import { Dispatch } from 'redux'
 import { Redirect } from 'react-router-dom'
-import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
 
+import Album from './Album'
 import Artist from '../../entities/Artist'
-import Button from '../common/Button'
-import CoverImage from '../MusicTable/CoverImage'
-import Icon from '../common/Icon'
-import Song from '../../entities/Song'
-import SongRow from '../MusicTable/SongRow'
 import * as types from '../../constants/ActionTypes'
 
 type Props = {
@@ -31,6 +26,7 @@ const extractBackground = (collection, songsByAlbum, albumsByArtist = []): strin
 
     return ''
 }
+
 
 export default class ArtistView extends React.Component<Props> {
   componentDidMount() {
@@ -69,32 +65,6 @@ export default class ArtistView extends React.Component<Props> {
       )
     }
 
-    const extractSongs = (album) => {
-      if (!songsByAlbum[album.id]) {
-        return null
-      }
-
-      return songsByAlbum[album.id].map((songId) => {
-        const songRow = this.props.collection.rows[songId]
-        const songObj = new Song(songRow)
-        return (
-          <SongRow
-            mqlMatch={false}
-            disableCovers
-            style={ {} }
-            key={ songId }
-            dispatch={this.props.dispatch}
-            isCurrent={ false }
-            slim={ true }
-            onClick={() => {
-              this.props.dispatch({type: types.SET_CURRENT_PLAYING, songId: songObj.id})
-            }}
-            song={songObj}
-          />
-        )
-      })
-    }
-
     const extractSummary = (): string => {
       if (this.props.artistMetadata && this.props.artistMetadata.artist) {
         return this.props.artistMetadata.artist.bio.content
@@ -111,41 +81,12 @@ export default class ArtistView extends React.Component<Props> {
           {
             albumsByArtist.map((albumId: string) => {
               return (
-                <div className='mx-0 z-4 flex flex-col md:flex-row items-center md:items-start md:items-start mb-16' key={albumId}>
-                  <div style={{ top: 50 }} className='md:sticky flex flex-col items-center md:mr-8 w-40'>
-                    <h3 className='text-lg mb-2'>{ albums[albumId].name }</h3>
-                    <div
-                      className='h-56 w-56 mb-2 md:h-56 md:w-56 cursor-pointer md:mr-4'
-                      onClick={() => {
-                        this.props.dispatch({type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
-                      }}
-                    >
-                      <CoverImage
-                        cover={
-                          this.props.collection.rows[songsByAlbum[albumId][0]].cover
-                        }
-                        size='thumbnail'
-                        albumName={'N/A'}
-                      />
-                    </div>
-
-                    <Button
-                      transparent
-                      onClick={() => {
-                        this.props.dispatch({type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
-                      }}
-                    >
-                      <Icon
-                        icon='faFolderPlus'
-                        className='mx-2'
-                      />
-                      <Translate value='buttons.addToQueue' />
-                    </Button>
-                  </div>
-                  <div className='w-full m-2'>
-                    { extractSongs(albums[albumId]) }
-                  </div>
-                </div>
+                <Album
+                  album={albums[albumId]}
+                  dispatch={this.props.dispatch}
+                  collection={this.props.collection}
+                  songs={songsByAlbum[albumId]}
+                />
               )
             })
           }
