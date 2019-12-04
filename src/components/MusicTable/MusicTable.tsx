@@ -91,6 +91,7 @@ const MusicTable = (props: Props) => {
           />
           <Route path="/song/:id" component={() => <ToggleMiniQueueButton /> } />
           <Route path="/collection" component={() => <PlayAllButton dispatch={props.dispatch} /> } />
+          <Route path="/search-results" component={() => <PlayAllButton dispatch={props.dispatch} /> } />
         </div>
       </div>
       <AutoSizer className='music-table'>

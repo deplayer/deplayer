@@ -22,7 +22,7 @@ const Playlists = (props: Props) => {
   }
 
 
-  const playlistsComps = playlists.map((playlist) => {
+  const playlistsComps = playlists.map((playlist: any) => {
     return (
       <Playlist
         dispatch={props.dispatch}
@@ -35,7 +35,7 @@ const Playlists = (props: Props) => {
 
 
   return (
-    <div className='playlists'>
+    <div className='playlists z-10'>
       { playlistsComps }
     </div>
   )

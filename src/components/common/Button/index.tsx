@@ -35,7 +35,7 @@ const Button = (props: Props) => {
     'border-blue-200': props.inverted,
     'border-solid': props.inverted,
     'border-transparent': props.transparent,
-    'bg-transparent': props.inverted || props.transparent
+    'bg-transparent': props.inverted || props.transparent,
   })
 
   return (

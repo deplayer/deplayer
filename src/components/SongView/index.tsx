@@ -45,7 +45,7 @@ const SongView = (props: Props) => {
   })
 
   return (
-    <div className={`song-view ${props.className} w-full overflow-y-auto z-10`}>
+    <div className={`song-view ${props.className} w-full overflow-y-auto z-10 flex flex-col`}>
       <div className="song lg:flex">
         <div className="w-full md:p-6 lg:w-1/2 image">
           <CoverImage
@@ -141,9 +141,11 @@ const SongView = (props: Props) => {
 
             </div>
 
-            <RelatedAlbums albums={relatedAlbums} />
           </div>
         </div>
+      </div>
+      <div className='p-6'>
+        <RelatedAlbums albums={relatedAlbums} />
       </div>
     </div>
   )

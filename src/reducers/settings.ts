@@ -22,7 +22,7 @@ export const defaultState = {
     providers: {},
     app: {
       spectrum: {
-        enabled: true
+        enabled: false
       },
       lastfm: {
         enabled: false,

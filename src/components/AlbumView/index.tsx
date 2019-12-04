@@ -2,6 +2,7 @@ import { Dispatch } from 'redux'
 import { Redirect } from 'react-router-dom'
 import * as React from 'react'
 
+import RelatedAlbums from '../RelatedAlbums'
 import Album from '../ArtistView/Album'
 import * as types from '../../constants/ActionTypes'
 
@@ -19,7 +20,7 @@ type Props = {
 
 export default class AlbumView extends React.Component<Props> {
   render() {
-    const { album } = this.props
+    const { album, collection: { albums, albumsByArtist } } = this.props
 
     if (!album) {
       return (
@@ -28,6 +29,10 @@ export default class AlbumView extends React.Component<Props> {
         </div>
       )
     }
+
+    const relatedAlbums = albumsByArtist && albumsByArtist[album.artist.id] && albumsByArtist[album.artist.id].map((albumId: string) => {
+      return albums[albumId]
+    })
 
     return (
       <div className={`artist-view ${this.props.className} z-50`}>
@@ -39,6 +44,9 @@ export default class AlbumView extends React.Component<Props> {
             collection={this.props.collection}
             songs={this.props.songsByAlbum[album.id]}
           />
+          <div className='w-full'>
+            <RelatedAlbums albums={relatedAlbums} />
+          </div>
           <div className='placeholder'></div>
         </div>
       </div>

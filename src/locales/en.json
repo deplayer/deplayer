@@ -6,7 +6,7 @@
     "collection": "Collection"
   },
   "titles": {
-    "relatedAlbums": "Related albums"
+    "relatedAlbums": "Same artist albums"
   },
   "labels": {
     "enableReactPlayer": "use react-player (beta)",

@@ -15,7 +15,7 @@ type AlbumProps = {
 }
 
 const Album = (props: AlbumProps) => {
-  const albumId = props.album.albumId
+  const albumId = props.album.id
 
   const extractSongs = () => {
     if (!props.songs) {

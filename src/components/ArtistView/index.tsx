@@ -76,6 +76,7 @@ export default class ArtistView extends React.Component<Props> {
     const albumRows = albumsByArtist.map((albumId: string) => {
       return (
         <Album
+          key={albumId}
           album={albums[albumId]}
           dispatch={this.props.dispatch}
           collection={this.props.collection}

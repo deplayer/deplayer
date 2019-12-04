@@ -18,6 +18,10 @@ const Playlist = (props: Props) => {
   const songs = playlist.trackIds.map((songId: string) => {
     const song = collection.rows[songId]
 
+    if (!song) {
+      return null
+    }
+
     return (
       <li key={songId}>
         { song.title + ' - ' + song.artist.name }

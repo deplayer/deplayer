@@ -6,6 +6,8 @@ import {
   faExpand,
   faPlusCircle,
   faMinusCircle,
+  faArrowLeft,
+  faArrowRight,
   faFolderPlus,
   faEyeSlash,
   faPlay,
@@ -22,18 +24,25 @@ const icons = {
   faMinusCircle: faMinusCircle,
   faEyeSlash: faEyeSlash,
   faPlay: faPlay,
+  faArrowRight: faArrowRight,
+  faArrowLeft: faArrowLeft,
   faPlayCircle: faPlayCircle,
   faFolderPlus: faFolderPlus
 }
 
 type Props = {
   icon: keyof typeof icons,
-  className?: string
+  className?: string,
+  fixedWidth?: boolean
 }
 
 const Icon = (props: Props) => {
   return (
-    <FontAwesomeIcon className={props.className} icon={icons[props.icon]} />
+    <FontAwesomeIcon
+      className={props.className}
+      icon={icons[props.icon]}
+      fixedWidth={props.fixedWidth}
+    />
   )
 }
 
