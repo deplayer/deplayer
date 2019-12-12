@@ -11,6 +11,7 @@ import 'react-s-alert/dist/s-alert-default.css'
 import Alert from 'react-s-alert'
 
 import QueueContainer from './containers/QueueContainer'
+import DashboardContainer from './containers/DashboardContainer'
 import PlaylistsContainer from './containers/PlaylistsContainer'
 import CollectionContainer from './containers/CollectionContainer'
 import SearchResultsContainer from './containers/SearchResultsContainer'
@@ -44,8 +45,8 @@ class App extends React.Component<any> {
         <ConnectedRouter history={history} >
           <React.Fragment>
             <LayoutContainer>
-              <Route exact path="/" component={QueueContainer} />
-              <Route path="/index.html" component={QueueContainer} />
+              <Route exact path="/" component={DashboardContainer} />
+              <Route path="/index.html" component={DashboardContainer} />
               <Route path="/queue" component={QueueContainer} />
               <Route path="/playlists" component={PlaylistsContainer} />
               <Route path="/collection" component={CollectionContainer} disableCurrent />

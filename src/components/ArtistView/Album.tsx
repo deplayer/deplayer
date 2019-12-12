@@ -45,7 +45,7 @@ const Album = (props: AlbumProps) => {
 
   return (
     <div className='mx-0 z-4 flex flex-col md:flex-row items-center md:items-start md:items-start mb-16' key={albumId}>
-      <div style={{ top: 50 }} className='md:sticky flex flex-col items-center md:mr-8 w-40'>
+      <div style={{ top: 50 }} className='md:sticky flex flex-col items-center md:mr-8'>
         <h3 className='text-lg mb-2'>{ props.album.name }</h3>
         <div
           className='h-56 w-56 mb-2 md:h-56 md:w-56 cursor-pointer md:mr-4'

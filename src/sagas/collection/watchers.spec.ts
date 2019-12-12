@@ -24,6 +24,7 @@ describe('initializeWatcher', () => {
       .dispatch({type: types.INITIALIZE})
       .put({type: types.RECEIVE_SETTINGS, settings: {}})
       .put({type: types.INITIALIZED})
+      .put({type: types.APPLY_MOST_PLAYED_SORT})
       .run()
   })
 })

@@ -10,6 +10,7 @@ type State = {
   albums: any,
   albumsByArtist: any,
   songsByAlbum: any,
+  songsByNumberOfPlays: Array<string>,
   songsByArtist: any,
   searchTerm: string,
   visibleSongs: Array<string>,
@@ -27,6 +28,7 @@ export const defaultState = {
   songsByArtist: {},
   songsByAlbum: {},
   albumsByArtist: {},
+  songsByNumberOfPlays: [],
   searchTerm: '',
   visibleSongs: [],
   searchResults: [],
@@ -170,6 +172,25 @@ export default (state: State = defaultState, action: any = {}) => {
         searchResults: [],
         totalRows: 0,
         loading: false
+      }
+    }
+
+    case types.APPLY_MOST_PLAYED_SORT: {
+      const songsByNumberOfPlays = Object.keys(state.rows).sort((songId1, songId2) => {
+        const song1 = state.rows[songId1]
+        const song2 = state.rows[songId2]
+
+        if (song1.playCount > song2.playCount) return 1
+        if (song1.playCount < song2.playCount) return -1
+
+        return 0
+      }).filter((songId) => {
+        return state.rows[songId].playCount > 0
+      })
+
+      return {
+        ...state,
+        songsByNumberOfPlays
       }
     }
 

@@ -6,22 +6,22 @@ import Icon from '../common/Icon'
 
 const ArrowLeft = (
   <div
-    className='text-5xl h-full z-10 absolute inset-y-0 flex left-0'
-    style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+    className='text-4xl h-full z-10 absolute inset-y-0 flex left-0'
+    style={{ backgroundImage: 'linear-gradient(to left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5))' }}
   >
     <Button transparent>
-      <Icon icon='faArrowLeft' className='arrow-prev text-blue-400' />
+      <Icon icon='faArrowCircleLeft' className='arrow-prev text-blue-200' />
     </Button>
   </div>
 )
 
 const ArrowRight = (
   <div
-    className='text-5xl h-full z-10 absolute inset-y-0 flex right-0'
-    style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+    className='text-4xl h-full z-10 absolute inset-y-0 flex right-0'
+    style={{ backgroundImage: 'linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5))' }}
   >
     <Button transparent>
-      <Icon icon='faArrowRight' className='arrow-prev text-blue-400' />
+      <Icon icon='faArrowCircleRight' className='arrow-prev text-blue-200' />
     </Button>
   </div>
 )

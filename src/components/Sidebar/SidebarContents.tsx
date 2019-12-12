@@ -7,6 +7,7 @@ import PlaylistsMenuItem from './PlaylistsMenuItem'
 import SearchMenuItem from './SearchMenuItem'
 import QueueMenuItem from './QueueMenuItem'
 import ArtistsMenuItem from './ArtistsMenuItem'
+import MenuItem from './MenuItem'
 import { inSection } from '../../utils/router'
 
 type ContentProps = {
@@ -25,8 +26,15 @@ const SidebarContents = (props: ContentProps) => {
         { 'deplayer' }
       </h4>
       <ul className='flex flex-col'>
+        <MenuItem
+          current={inSection(props.location, '$')}
+          url='/'
+          title='Explore'
+          label='Explore'
+          iconClasses='icon fa fa-globe'
+        />
         <QueueMenuItem
-          current={inSection(props.location, '(queue)?')}
+          current={inSection(props.location, 'queue')}
           totalItems={props.queue.trackIds.length}
         />
         <SearchMenuItem

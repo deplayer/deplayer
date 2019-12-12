@@ -4,7 +4,7 @@ import { getCollection, getQueue } from './selectors';
 import * as types from '../constants/ActionTypes'
 
 // Handling setCurrentPlaying saga
-export function* setCurrentPlaying(action: any): any {
+export function* setCurrentPlaying(): any {
   // Setting current playing title
   const queue = yield select(getQueue)
   const collection = yield select(getCollection)

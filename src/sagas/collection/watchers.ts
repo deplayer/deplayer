@@ -63,5 +63,6 @@ export function* initializeWatcher() {
     yield put({type: types.INITIALIZED})
     const indexService = new IndexService()
     yield fork(generateIndexWorker, indexService)
+    yield put({type: types.APPLY_MOST_PLAYED_SORT})
   }
 }

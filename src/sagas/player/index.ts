@@ -2,7 +2,6 @@ import { call, takeLatest, takeEvery, put, select } from 'redux-saga/effects'
 import screenfull from 'screenfull'
 
 import {
-  getApp,
   getCollection,
   getPlayer,
   getQueue,
@@ -67,9 +66,8 @@ export function* handlePlayPrev(): any {
 }
 
 export function* goToViewPage(): any {
-  const app = yield select(getApp)
   const queue = yield select(getQueue)
-  if (app.mqlMatch && history.location.pathname.match(/^\/song.*?$/)) {
+  if (history.location.pathname.match(/^\/song.*?$/)) {
     yield history.push(routes.songView(queue.currentPlaying))
   }
 }

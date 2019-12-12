@@ -8,6 +8,8 @@ import {
   faMinusCircle,
   faArrowLeft,
   faArrowRight,
+  faArrowCircleLeft,
+  faArrowCircleRight,
   faFolderPlus,
   faEyeSlash,
   faPlay,
@@ -26,6 +28,8 @@ const icons = {
   faPlay: faPlay,
   faArrowRight: faArrowRight,
   faArrowLeft: faArrowLeft,
+  faArrowCircleRight: faArrowCircleRight,
+  faArrowCircleLeft: faArrowCircleLeft,
   faPlayCircle: faPlayCircle,
   faFolderPlus: faFolderPlus
 }

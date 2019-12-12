@@ -6,7 +6,8 @@
     "collection": "Collection"
   },
   "titles": {
-    "relatedAlbums": "Same artist albums"
+    "relatedAlbums": "Same artist albums",
+    "mostPlayedSongs": "Most played songs"
   },
   "labels": {
     "enableReactPlayer": "use react-player (beta)",
