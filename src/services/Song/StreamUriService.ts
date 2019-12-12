@@ -1,7 +1,7 @@
-import Song from '../../entities/Song'
+import Media from '../../entities/Media'
 
 export const getStreamUri = (
-  song: Song,
+  song: Media,
   settings: any,
   providerNum: number
 ): any => {

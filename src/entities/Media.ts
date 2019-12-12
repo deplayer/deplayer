@@ -1,8 +1,15 @@
 import MediaId from './MediaId'
+import Album from './Album'
+import Artist from './Artist'
 
 type streamUri = {
   uri: string,
   quality: string
+}
+
+type money = {
+  price: number,
+  currency: string
 }
 
 type stream = {
@@ -20,36 +27,74 @@ export default class Media {
   title: string
   author: any
   authorName: string
-  cover: cover
+  cover: any
+  artist: Artist
+  album: Album
+  artistName: string
   duration: number
   externalId: string
   stream: Array<stream>
   playCount: number
+  genre: string
+  forcedId: string
+  shareUrl: string
+  albumName: string
+  price: money
+  dateAdded: Date
+  filePath: string
 
-  constructor(mediaParams: any = {}) {
+  constructor(songParams: any = {}) {
     const {
-      authorName,
+      cover,
       title,
-      thumbnailUrl,
-      fullUrl,
-      playCount,
-      id
-    } = mediaParams
+      forcedId,
+      artistName,
+      artistId,
+      albumId,
+      albumName,
+      duration,
+      genre,
+      price,
+      currency,
+      stream,
+      shareUrl,
+      filePath
+    } = songParams
 
     this.title = title
+    this.setArtist(artistName, artistId)
+    this.artistName = this.artist.name
+    this.duration = duration
+    this.genre = genre
+    this.shareUrl = shareUrl
+    this.forcedId = forcedId
+    this.albumName = albumName
+    this.filePath = filePath
+
+    this.album = new Album({
+      albumId: albumId,
+      name: albumName ? albumName : '',
+      artist: this.artist
+    })
+    if (typeof price === 'number') {
+      this.price = {
+        price: price || 0,
+        currency: currency || 'USD'
+      }
+    } else {
+      this.price = price
+    }
+
+    this.stream = stream || []
+    this.cover = cover ? {
+      thumbnailUrl: cover.thumbnailUrl,
+      fullUrl: cover.fullUrl
+    } : {}
+
+    // this must be the last assignment
+    const id = forcedId ? forcedId : new MediaId(this).value
+    this.id = id
     this.externalId = id
-    this.id = new MediaId(this).value
-    this.playCount = playCount
-
-    this.author = {
-      name: authorName ? authorName : ''
-    }
-    this.authorName = this.author.name
-
-    this.cover = {
-      thumbnailUrl: thumbnailUrl,
-      fullUrl: fullUrl
-    }
   }
 
   static toSchema(): any {
@@ -114,14 +159,44 @@ export default class Media {
     }
   }
 
+  setArtist(artistName: string, artistId: string) {
+    const artistPayload = {
+      name: artistName ? artistName : ''
+    }
+
+    if (artistId) {
+      artistPayload['artistId'] = artistId
+    }
+
+    this.artist = new Artist(artistPayload)
+  }
+
+  hasAnyProviderOf(checkProviders: Array<string>): boolean {
+    const providers = this.stream.map((stream) => stream.service)
+
+    let result = false
+
+    providers.forEach((prov) => {
+      if (checkProviders.indexOf(prov) !== -1) {
+        result = true
+      }
+    })
+
+    return result
+  }
+
   toDocument(): any {
     return {
-      id: '' + this.id,
+      id: this.id,
       title: this.title,
-      artist: this.author,
-      cover: this.cover,
       stream: this.stream,
-      duration: this.duration
+      artist: this.artist,
+      cover: this.cover,
+      album: this.album,
+      genre: this.genre,
+      playCount: this.playCount,
+      filePath: this.filePath,
+      duration: this.duration,
     }
   }
 }

@@ -1,5 +1,4 @@
 import Media from '../entities/Media'
-import Song from '../entities/Song'
 import filterSongs from '../utils/filter-songs'
 import * as types from '../constants/ActionTypes'
 import IndexService from '../services/Search/IndexService'
@@ -77,7 +76,7 @@ export default (state: State = defaultState, action: any = {}) => {
     case types.RECEIVE_COLLECTION_ITEM:
     case types.RECEIVE_COLLECTION: {
       const songs = action.data.map((row: any) => {
-        return new Song({
+        return new Media({
           ...row,
           id: row.id,
           forcedId: row.id,

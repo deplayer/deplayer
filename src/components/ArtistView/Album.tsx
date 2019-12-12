@@ -3,7 +3,7 @@ import * as types from '../../constants/ActionTypes'
 import Button from '../common/Button'
 import { Translate } from 'react-redux-i18n'
 import Icon from '../common/Icon'
-import Song from '../../entities/Song'
+import Media from '../../entities/Media'
 import SongRow from '../MusicTable/SongRow'
 import CoverImage from '../MusicTable/CoverImage'
 
@@ -24,7 +24,7 @@ const Album = (props: AlbumProps) => {
 
     return props.songs.map((songId) => {
       const songRow = props.collection.rows[songId]
-      const songObj = new Song(songRow)
+      const songObj = new Media(songRow)
       return (
         <SongRow
           mqlMatch={false}

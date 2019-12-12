@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import Song from '../entities/Song'
+import Media from '../entities/Media'
 import { IMusicProvider } from './IMusicProvider'
 
 /**
@@ -33,7 +33,7 @@ export default class MstreamApiProvider implements IMusicProvider {
 
   mapSongs = (songs: Array<any>): Array<any> => {
     return songs.map((song: any) => {
-      return new Song({
+      return new Media({
         id: song.metadata.hash,
         title: song.metadata.title ? song.metadata.title : song.filepath,
         artistName: song.metadata.artist,

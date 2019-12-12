@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import Song from '../entities/Song'
+import Media from '../entities/Media'
 import { IMusicProvider } from './IMusicProvider'
 
 /**
@@ -38,7 +38,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
 
     const secureSongs = songs instanceof Array ? songs : [songs]
     return secureSongs.map((song: any) => {
-      return new Song({
+      return new Media({
         title: song.title ? song.title : song.path,
         artistName: song.artist,
         albumName: song.album,

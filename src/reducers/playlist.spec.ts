@@ -1,5 +1,5 @@
 import reducer, { defaultState } from './playlist'
-import Song from '../entities/Song'
+import Media from '../entities/Media'
 import { sortTrackIds } from './utils/queues'
 
 import * as types from '../constants/ActionTypes'
@@ -11,7 +11,7 @@ describe('collection reducer', () => {
   })
 
   it('should handle ADD_TO_PLAYLIST action', () => {
-    const songToAdd = new Song({forcedId: '1234'})
+    const songToAdd = new Media({forcedId: '1234'})
     const currPlaying = {}
     currPlaying['1234'] = songToAdd
     expect(reducer(undefined, {type: types.ADD_TO_PLAYLIST, song: songToAdd}))
@@ -23,10 +23,10 @@ describe('collection reducer', () => {
   })
 
   it('should handle ADD_SONGS_TO_PLAYLIST action', () => {
-    const songs: Array<Song> = []
+    const songs: Array<Media> = []
     const expectedObj = {}
     for (let i = 1; i <= 20; i++) {
-      const song = new Song({forcedId: i.toString()})
+      const song = new Media({forcedId: i.toString()})
       songs.push(song)
       expectedObj[i] = song
     }
@@ -42,10 +42,10 @@ describe('collection reducer', () => {
   })
 
   it('should handle SET_COLUMN_SORT action', () => {
-    const songs: Array<Song> = []
+    const songs: Array<Media> = []
     const expectedObj = {}
     for (let i = 1; i <= 20; i++) {
-      const song = new Song({forcedId: i.toString(), price: {price: i%2}})
+      const song = new Media({forcedId: i.toString(), price: {price: i%2}})
       songs.push(song)
       expectedObj[i] = song
     }

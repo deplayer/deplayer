@@ -9,7 +9,7 @@ import {
 import { getSettings } from '../selectors'
 import { scanFolder } from '../../services/Ipfs/IpfsService'
 import { startFolderScan, handleIPFSFileLoad } from './index'
-import Song from '../../entities/Song'
+import Media from '../../entities/Media'
 import  * as types from '../../constants/ActionTypes'
 
 describe('startFolderScan', () => {
@@ -29,11 +29,11 @@ describe('handleIPFSFileLoad', () => {
     const dummySong = {
       metadata: {
         common: {
-          title: 'Song metadata title'
+          title: 'Media metadata title'
         }
       }
     }
-    const resultSong = new Song()
+    const resultSong = new Media()
 
     return expectSaga(handleIPFSFileLoad)
       .withState(defaultState)

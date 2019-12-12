@@ -2,14 +2,14 @@ import * as React from 'react'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../../tests/configureEnzyme'
 
-import Song from '../../entities/Song'
+import Media from '../../entities/Media'
 import CoverImage from './CoverImage'
 
 configureEnzyme()
 
 const setup = () => {
   const props = {
-    song: new Song(),
+    song: new Media(),
     size: 'thumbnail',
     albumName: 'My album',
     cover: {

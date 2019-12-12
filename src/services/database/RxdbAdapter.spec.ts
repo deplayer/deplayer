@@ -1,5 +1,5 @@
 import RxdbAdapter from './RxdbAdapter'
-import Song from '../../entities/Song'
+import Media from '../../entities/Media'
 
 describe('RxdbAdapter', () => {
   it('should handle save a song', async () => {
@@ -8,7 +8,7 @@ describe('RxdbAdapter', () => {
 
     expect.assertions(1)
 
-    const song = new Song()
+    const song = new Media()
 
     const result = await rxdbAdapter.save('media', '123', song.toDocument())
     expect(result).toBeDefined()

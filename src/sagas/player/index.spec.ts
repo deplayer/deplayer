@@ -3,7 +3,7 @@ import { expectSaga } from 'redux-saga-test-plan'
 import {
  setCurrentPlaying
 } from './index'
-import Song from '../../entities/Song'
+import Media from '../../entities/Media'
 import * as types from '../../constants/ActionTypes'
 
 describe('setCurrentPlaying', () => {
@@ -16,7 +16,7 @@ describe('setCurrentPlaying', () => {
       }
     ]
 
-    const song = new Song({
+    const song = new Media({
       forcedId: 'foo',
       stream: streams
     })

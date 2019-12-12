@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import Song from '../entities/Song'
+import Media from '../entities/Media'
 import { IMusicProvider } from './IMusicProvider'
 
 /**
@@ -24,8 +24,8 @@ export default class YoutubeDlServerProvider implements IMusicProvider {
     this.playUrl = `${settings.host}/api/play`
   }
 
-  mapSong = (songInfo: any): Song => {
-    return new Song({
+  mapSong = (songInfo: any): Media => {
+    return new Media({
       title: songInfo.title,
       artistName: songInfo.artist,
       albumName: songInfo.album,

@@ -2,12 +2,12 @@ import { storiesOf } from '@storybook/react'
 import { withKnobs, boolean } from '@storybook/addon-knobs';
 import * as React from 'react'
 
-import Song from '../../entities/Song'
+import Media from '../../entities/Media'
 import SongView from './index'
 import withProvider from '../../utils/withProvider'
 
 const stories = storiesOf('SongView', module);
-const song = new Song()
+const song = new Media()
 
 stories
   .addDecorator(withKnobs)

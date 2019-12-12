@@ -1,7 +1,6 @@
 import merge from 'deepmerge'
 
 import Media from '../entities/Media'
-import Song from '../entities/Song'
 
 export default class MediaMergerService {
   mediaA: Media
@@ -12,7 +11,7 @@ export default class MediaMergerService {
     this.mediaB = mediaB
   }
 
-  getMerged(): Song {
+  getMerged(): Media {
     const mergeStream = (streamA, streamB) => {
       const concatStreams = [...streamA, ...streamB]
       return concatStreams.filter((elem, index) => {
@@ -35,6 +34,6 @@ export default class MediaMergerService {
     }
 
     const merged = merge(this.mediaA, this.mediaB, options)
-    return new Song(merged)
+    return new Media(merged)
   }
 }

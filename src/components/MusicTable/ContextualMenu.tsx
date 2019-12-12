@@ -7,14 +7,14 @@ import React from 'react'
 
 import Button from '../common/Button'
 import Icon from '../common/Icon'
-import Song from '../../entities/Song'
+import Media from '../../entities/Media'
 import * as types from '../../constants/ActionTypes'
 
 type MenuProps = {
   dispatch: Dispatch,
   disableAddButton?: boolean,
   onClick: () => any,
-  song: Song,
+  song: Media,
 }
 
 const ContextualMenu = (props: MenuProps) => {

@@ -1,15 +1,15 @@
 import IndexService from './IndexService'
-import Song from '../../entities/Song'
+import Media from '../../entities/Media'
 
 describe('IndexService', () => {
   it('should handle generateIndex and search', () => {
     const indexService = new IndexService()
 
-    const song1 = new Song({
+    const song1 = new Media({
       title: 'California Uber alles',
       artistName: 'Dead Kennedys test'
     })
-    const song2 = new Song({
+    const song2 = new Media({
       title: 'Uber',
       artistName: 'dead kennedys',
       albumName: 'best'

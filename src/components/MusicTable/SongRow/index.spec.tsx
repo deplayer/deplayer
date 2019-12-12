@@ -2,7 +2,7 @@ import * as React from 'react'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../../../tests/configureEnzyme'
 
-import Song from '../../../entities/Song'
+import Media from '../../../entities/Media'
 import SongRow from './index'
 
 configureEnzyme()
@@ -10,7 +10,7 @@ configureEnzyme()
 
 const setup = (customProps) => {
   const props = {
-    song: new Song(),
+    song: new Media(),
     onClick: () => {},
     isCurrent: false,
     style: {},

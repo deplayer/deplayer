@@ -1,6 +1,6 @@
 import CollectionService from './CollectionService'
 import DummyAdapter from './database/DummyAdapter'
-import Song from '../entities/Song'
+import Media from '../entities/Media'
 
 describe('CollectionService', () => {
   it('should handle save', () => {
@@ -17,7 +17,7 @@ describe('CollectionService', () => {
   it('should handle bulkSave', async () => {
     const collectionService = new CollectionService(new DummyAdapter())
 
-    const song = new Song({forceId: 'test', thumbnailUrl: 'test.png'})
+    const song = new Media({forceId: 'test', thumbnailUrl: 'test.png'})
 
     const result = await collectionService.bulkSave([song], {rows: []})
 

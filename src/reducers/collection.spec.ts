@@ -1,10 +1,10 @@
 import reducer, { defaultState } from './collection'
 import * as types from '../constants/ActionTypes'
-import Song from '../entities/Song'
+import Media from '../entities/Media'
 
-import SongId from '../entities/SongId'
+import MediaId from '../entities/MediaId'
 import ArtistId from '../entities/ArtistId'
-jest.mock('../entities/SongId');
+jest.mock('../entities/MediaId');
 jest.mock('../entities/ArtistId');
 
 describe('collection reducer', () => {
@@ -15,7 +15,7 @@ describe('collection reducer', () => {
 
   it('should handle RECEIVE_COLLECTION', () => {
     const initialState = {...defaultState, enabledProviders: ['itunes']}
-    const fixtureSong = new Song({
+    const fixtureSong = new Media({
       forcedId: 'the-doors',
       artistName: 'The Doors',
       artistId: 'the-doors',
@@ -54,7 +54,7 @@ describe('collection reducer', () => {
     }
 
     // slugify has a huge performance penalization, so should be avoided when RECEIVE_COLLECTION
-    expect(SongId).not.toHaveBeenCalled()
+    expect(MediaId).not.toHaveBeenCalled()
     expect(ArtistId).not.toHaveBeenCalled()
 
     expect(reducer(initialState, {type: types.RECEIVE_COLLECTION, data: [fixtureSong]}))

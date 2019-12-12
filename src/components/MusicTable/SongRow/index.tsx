@@ -6,11 +6,11 @@ import * as React from 'react'
 import { getDurationStr } from '../../../utils/timeFormatter'
 import ContextualMenu from './../ContextualMenu'
 import CoverImage from './../CoverImage'
-import Song from '../../../entities/Song'
+import Media from '../../../entities/Media'
 import Tag from '../../common/Tag'
 
 type Props = {
-  song: Song,
+  song: Media,
   isCurrent: boolean|null,
   onClick: () => any,
   dispatch: Dispatch,

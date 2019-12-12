@@ -1,4 +1,6 @@
 import elasticlunr from 'elasticlunr'
+
+import Media from '../../entities/Media'
 import logger from '../../utils/logger'
 
 export default class IndexService {
@@ -16,7 +18,7 @@ export default class IndexService {
     this.index.saveDocument(false)
   }
 
-  generateIndexFrom = (collection: Array<any>) => {
+  generateIndexFrom = (collection: Array<Media>) => {
     collection.forEach((doc) => {
       this.index.addDoc(doc)
     })

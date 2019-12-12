@@ -1,5 +1,5 @@
 import { getStreamUri } from './StreamUriService'
-import Song from '../../entities/Song'
+import Media from '../../entities/Media'
 
 const prepareData = (streams: Array<any>) => {
   const settings = {
@@ -12,7 +12,7 @@ const prepareData = (streams: Array<any>) => {
     }
   }
 
-  const song = new Song({
+  const song = new Media({
     forcedId: 'foo',
     stream: streams
   })

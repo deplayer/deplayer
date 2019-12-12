@@ -4,7 +4,7 @@ import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
 
 import ItunesApiProvider from './ItunesApiProvider'
-import Song from '../entities/Song'
+import Media from '../entities/Media'
 import exampleSong from './exampleSong.json'
 
 // Setting mock to default instance
@@ -31,12 +31,12 @@ describe('ItunesApiProvider', () => {
 
   it('search should return an array of songs', () => {
     expect.assertions(1)
-    return itunesRepo.search('Bad brains').then((results: Array<Song>) => {
+    return itunesRepo.search('Bad brains').then((results: Array<Media>) => {
       expect(results.length).toBe(1)
     })
   })
 
   it('should convert itunes song to entity song', () => {
-    expect(itunesRepo.songFromItSong(exampleSong)).toBeInstanceOf(Song)
+    expect(itunesRepo.songFromItSong(exampleSong)).toBeInstanceOf(Media)
   })
 })

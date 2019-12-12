@@ -1,7 +1,7 @@
-import Song from '../entities/Song'
+import Media from '../entities/Media'
 import { RxDocument } from 'rxdb'
 
-const rowToSong  = (elem: RxDocument<any, any>): Song => {
+const rowToSong  = (elem: RxDocument<any, any>): Media => {
   const songPayload = {
     ...elem,
     ...{
@@ -25,7 +25,7 @@ const rowToSong  = (elem: RxDocument<any, any>): Song => {
     songPayload['forcedId'] = elem._id
   }
 
-  return new Song(songPayload)
+  return new Media(songPayload)
 }
 
 export default rowToSong

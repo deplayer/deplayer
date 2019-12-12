@@ -8,7 +8,7 @@ import Button from '../common/Button'
 import CoverImage from '../MusicTable/CoverImage'
 import RelatedAlbums from '../RelatedAlbums'
 import Icon from '../common/Icon'
-import Song from '../../entities/Song'
+import Media from '../../entities/Media'
 import Spinner from '..//Spinner'
 import Tag from '../common/Tag'
 import logger from '../../utils/logger'
@@ -17,7 +17,7 @@ import * as types from '../../constants/ActionTypes'
 type Props = {
   collection: { albumsByArtist: Array<string>, albums: any },
   queue: { trackIds: any },
-  song: Song,
+  song: Media,
   dispatch: Dispatch,
   loading: boolean,
   className?: string|null
@@ -37,7 +37,7 @@ const SongView = (props: Props) => {
   }
 
   if (!song || !song.id) {
-    logger.log('SongView', 'Song not found redirecting to home ')
+    logger.log('SongView', 'Media not found redirecting to home ')
   }
 
   const relatedAlbums = albumsByArtist && albumsByArtist[song.artist.id] && albumsByArtist[song.artist.id].map((albumId: string) => {

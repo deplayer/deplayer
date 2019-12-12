@@ -1,6 +1,6 @@
-import Song from '../entities/Song'
+import Media from '../entities/Media'
 
-const exampleSong = new Song({
+const exampleSong = new Media({
   title: 'Whiplash',
   artistName: 'Metallica',
   albumName: 'Kill\'em all',

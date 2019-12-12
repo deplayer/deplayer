@@ -1,11 +1,11 @@
 import * as React from 'react'
 
 import CoverImage from '../MusicTable/CoverImage'
-import Song from '../../entities/Song'
+import Media from '../../entities/Media'
 
 type Props = {
   slim?: boolean,
-  song: Song
+  song: Media
 }
 
 const Cover = (props: Props) => {

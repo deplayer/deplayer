@@ -2,14 +2,14 @@ import * as React from 'react'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../../tests/configureEnzyme'
 import SongView from './index'
-import Song from '../../entities/Song'
+import Media from '../../entities/Media'
 import { defaultState as collectionDefaultState } from '../../reducers/collection'
 
 configureEnzyme()
 
 const setup = (customProps: any) => {
   const defaultProps = {
-    song: new Song(),
+    song: new Media(),
     match: {
       params: {}
     },
@@ -37,7 +37,7 @@ describe('SongView', () => {
   })
 
   it('render song without crash', () => {
-    const song = new Song()
+    const song = new Media()
     const collection = { rows: {} }
     collection.rows[song.id] = song
     const { enzymeWrapper } = setup({

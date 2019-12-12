@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import { IMusicProvider } from './IMusicProvider'
-import Song from '../entities/Song'
+import Media from '../entities/Media'
 
 export default class ItunesApiProvider implements IMusicProvider {
   baseUrl: string
@@ -16,7 +16,7 @@ export default class ItunesApiProvider implements IMusicProvider {
     return `${this.baseUrl}/search?term=${encodeURIComponent(searchTerm)}`
   }
 
-  mapResponse(result: any): Array<Song> {
+  mapResponse(result: any): Array<Media> {
     return result.data.results.map((itSong) => {
       return this.songFromItSong(itSong)
     })
@@ -24,7 +24,7 @@ export default class ItunesApiProvider implements IMusicProvider {
 
   // Map itunes song to entity song params
   songFromItSong(itSong: any) {
-    return new Song({
+    return new Media({
       artistName: itSong.artistName,
       title: itSong.trackName,
       albumName: itSong.collectionName,
