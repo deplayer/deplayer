@@ -22,6 +22,8 @@ type cover = {
   fullUrl: string
 }
 
+type MediaType = 'video' | 'audio'
+
 export default class Media {
   id: string
   title: string
@@ -177,12 +179,22 @@ export default class Media {
     let result = false
 
     providers.forEach((prov) => {
-      if (checkProviders.indexOf(prov) !== -1) {
-        result = true
-      }
+      checkProviders.forEach((checkProv: string) => {
+        if (prov.startsWith(checkProv)) {
+          result = true
+        }
+      })
     })
 
     return result
+  }
+
+  get type(): MediaType {
+    if (this.hasAnyProviderOf(['youtube'])) {
+      return 'video'
+    }
+
+    return 'audio'
   }
 
   toDocument(): any {

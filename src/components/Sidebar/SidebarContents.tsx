@@ -22,8 +22,8 @@ type ContentProps = {
 const SidebarContents = (props: ContentProps) => {
   return (
     <div className='flex flex-col' onClick={() => props.onSetSidebarOpen()}>
-      <h4 className="text-xl text-center py-4">
-        { 'deplayer' }
+      <h4 className="text-xl text-center py-4 bg-gray-900 text-blue-500 tracking-wider">
+        <span className='text-blue-200'>d</span>eplayer
       </h4>
       <ul className='flex flex-col'>
         <MenuItem
