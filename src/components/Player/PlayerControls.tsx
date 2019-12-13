@@ -202,7 +202,10 @@ class PlayerControls extends React.Component<Props> {
           }}
           config={{
             file: {
-              forceAudio: currentPlaying.type === 'audio'
+              forceAudio: currentPlaying.type === 'audio',
+              attributes: {
+                className: currentPlaying.type === 'video' ? 'video-element': 'video-element'
+              }
             }
           }}
           onError={this.onError}

@@ -37,7 +37,7 @@ const SongView = (props: Props) => {
   }
 
   if (!song || !song.id) {
-    logger.log('SongView', 'Media not found redirecting to home ')
+    return null
   }
 
   const relatedAlbums = albumsByArtist && albumsByArtist[song.artist.id] && albumsByArtist[song.artist.id].map((albumId: string) => {
@@ -70,11 +70,13 @@ const SongView = (props: Props) => {
               </Link>
             </div>
             <div className='color-white text-lg mt-2'>
-              <Icon
-                className='mr-1 w-8'
-                icon='faCompactDisc'
-              />
-              { song.albumName || 'N/A' }
+              <Link to={`/album/${ song.album.id }`}>
+                <Icon
+                  className='mr-1 w-8'
+                  icon='faCompactDisc'
+                />
+                { song.albumName || 'N/A' }
+              </Link>
             </div>
             <div className='mt-4'>
               <Icon icon='faStopwatch' /> { getDurationStr(song.duration) }
@@ -144,7 +146,7 @@ const SongView = (props: Props) => {
           </div>
         </div>
       </div>
-      <div className='p-6'>
+      <div className='py-6'>
         <RelatedAlbums albums={relatedAlbums} />
       </div>
     </div>
