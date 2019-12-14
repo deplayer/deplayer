@@ -6,31 +6,74 @@ import TopbarContainer from './TopbarContainer'
 import SearchButton from '../components/Buttons/SearchButton'
 import Placeholder from '../components/Player/Placeholder'
 
-const dynamicTitle = (router, collection, searchTerm: ''): string => {
+const dynamicTitle = (router, collection, searchTerm: ''): string | React.ReactNode => {
   const songFinder = router.location.pathname.match(/\/song\/(.*)/)
   const artistFinder = router.location.pathname.match(/\/artist\/(.*)/)
 
   if (songFinder && songFinder[1]) {
-    // const song = collection.rows[songFinder[1]]
+    const song = collection.rows[songFinder[1]]
 
-    return 'Song'
+    if (!song) {
+      return 'Song'
+    }
+
+    return (
+      <>
+        <i className='icon music outline mr-4'></i>
+        { song.title }
+      </>
+    )
   }
 
   if (artistFinder && artistFinder[1]) {
-    return 'Artist'
+    // return 'Artist'
+    const artist = collection.artists[artistFinder[1]]
+
+    if (!artist) {
+      return 'Artist'
+    }
+
+    return artist.name
   }
 
   switch (router.location.pathname) {
     case '/settings':
-      return 'Settings'
+      return (
+        <>
+          <i className='icon cogs outline outline mr-4'></i>
+          Settings
+        </>
+      )
     case '/search-results':
       return 'Search results: ' + searchTerm
     case '/collection':
-      return 'Collection'
+      return (
+        <>
+          <i className='icon database outline outline mr-4'></i>
+          Collection
+        </>
+      )
     case '/artists':
-      return 'Artists'
+      return (
+        <>
+          <i className='icon fa fa-microphone outline outline mr-4'></i>
+          Artists
+        </>
+      )
     case '/playlists':
-      return 'Playlists'
+      return (
+        <>
+          <i className='fa fa-bookmark outline outline mr-4'></i>
+          Playlists
+        </>
+      )
+    case '/providers':
+      return (
+        <>
+          <i className='fa fa-plug outline outline mr-4'></i>
+          Providers
+        </>
+      )
     default:
       return 'Current playing'
   }

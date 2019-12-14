@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-const Title = (props: { onClick: () => void, title?: string }) => {
+const Title = (props: { onClick: () => void, title?: React.ReactNode }) => {
   return (
     <div className='text-xl text-sans truncate'>
       <h2 onClick={props.onClick}>
