@@ -19,8 +19,10 @@ type Props = {
 
 const Button = (props: Props) => {
   const classNames = classnames({
-    'text-blue-200': !props.transparent,
+    'text-blue-200': !props.transparent || props.inverted,
+    'hover:text-blue-200': !props.transparent || props.inverted,
     'bg-blue-700': !props.transparent && !props.inverted,
+    'hover:bg-blue-500': !props.transparent && !props.inverted,
     'text-xl': props.size === 'lg',
     'text-4xl': props.size === '4xl',
     'text-2xl': props.size === '2xl',
@@ -30,9 +32,10 @@ const Button = (props: Props) => {
     'px-4': props.long || props.large,
     'rounded': true,
     'w-full': props.fullWidth,
-    'border': !props.transparent,
+    'border': !props.transparent || props.inverted,
     'border-blue-500': !props.inverted,
-    'border-blue-200': props.inverted,
+    'border-blue-400': props.inverted,
+    'hover:border-blue-200': props.inverted,
     'border-solid': props.inverted,
     'border-transparent': props.transparent,
     'bg-transparent': props.inverted || props.transparent,

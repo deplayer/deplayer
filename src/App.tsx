@@ -20,6 +20,7 @@ import SongContainer from './containers/SongContainer'
 import ArtistContainer from './containers/ArtistContainer'
 import AlbumContainer from './containers/AlbumContainer'
 import SettingsContainer from './containers/SettingsContainer'
+import ProvidersContainer from './containers/ProvidersContainer'
 import ArtistsContainer from './containers/ArtistsContainer'
 import LayoutContainer from './containers/LayoutContainer'
 
@@ -55,6 +56,7 @@ class App extends React.Component<any> {
               <Route path="/album/:id" component={AlbumContainer} />
               <Route path="/artist/:id" component={ArtistContainer} />
               <Route path="/artists" component={ArtistsContainer} />
+              <Route path="/providers" component={ProvidersContainer} />
               <Route path="/settings" component={SettingsContainer} />
             </LayoutContainer>
             <PlayerContainer />

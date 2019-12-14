@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import Button from '../common/Button'
 import Importer from '../Importer'
+import MainContainer from '../common/MainContainer'
 import SettingsForm from './SettingsForm'
 import * as types from '../../constants/ActionTypes'
 
@@ -53,7 +54,7 @@ class Settings extends React.Component<Props, State> {
     const ImporterComp = this.state.showImporter ? <Importer onLoaded={this.importCollection} /> : null
 
     return (
-      <div className='settings main z-30 px-4 md:p-0'>
+      <MainContainer>
         <SettingsForm
           schema={settingsForm}
           settings={this.props.settings}
@@ -81,7 +82,7 @@ class Settings extends React.Component<Props, State> {
         <div className='my-4'>
           { ImporterComp }
         </div>
-      </div>
+      </MainContainer>
     )
   }
 }

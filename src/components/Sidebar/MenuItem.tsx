@@ -16,12 +16,14 @@ type Props = {
 const MenuItem = (props: Props) => {
   const classNames = classnames({
     button: true,
+    'hover:text-blue-900': true,
+    'hover:bg-blue-400': true,
     'bg-gray-900': props.current
   })
   return (
     <li className={ classNames }>
       <Link
-        className='flex justify-between items-center'
+        className='flex justify-between items-center focus:bg-blue-400 focus:text-blue-900'
         to={ props.url }
         title={ props.title }
       >

@@ -10,7 +10,7 @@ const ArrowLeft = (
     style={{ backgroundImage: 'linear-gradient(to left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8))' }}
   >
     <Button transparent>
-      <Icon icon='faArrowCircleLeft' className='arrow-prev text-blue-200' />
+      <Icon icon='faArrowCircleLeft' className='arrow-prev text-blue-200 hover:text-blue-800' />
     </Button>
   </div>
 )
@@ -21,7 +21,7 @@ const ArrowRight = (
     style={{ backgroundImage: 'linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8))' }}
   >
     <Button transparent>
-      <Icon icon='faArrowCircleRight' className='arrow-prev text-blue-200' />
+      <Icon icon='faArrowCircleRight' className='arrow-prev text-blue-200 hover:text-blue-800' />
     </Button>
   </div>
 )

@@ -7,7 +7,6 @@ import classNames from 'classnames'
 import { State as SettingsStateType } from '../../reducers/settings'
 import Button from '../common/Button'
 import FormSchema from './FormSchema'
-import ProviderButton from './ProviderButton'
 import ProviderForm from './ProviderForm'
 import * as types from '../../constants/ActionTypes'
 
@@ -29,17 +28,6 @@ const SettingsForm = (props: Props) => {
   const saveSettings = (form: any): any => {
     props.dispatch({type: types.SAVE_SETTINGS, settingsPayload: form})
   }
-
-  const providers = Object.keys(props.settings.settingsForm.providers).map((providerKey) => {
-    return (
-      <ProviderForm
-        key={providerKey}
-        settings={props.settings}
-        dispatch={props.dispatch}
-        providerKey={providerKey}
-      />
-    )
-  })
 
   const { settings } = props
 
@@ -63,18 +51,6 @@ const SettingsForm = (props: Props) => {
             <div className={settingsCard}>
               <FormSchema schema={props.schema} />
             </div>
-
-            <h2><Translate value="labels.providers" /></h2>
-
-            <div className='my-3'>
-              <ProviderButton providerKey='subsonic' />
-              <ProviderButton providerKey='mstream' />
-              <ProviderButton providerKey='itunes' />
-              <ProviderButton providerKey='ipfs' />
-              <ProviderButton providerKey='youtube-dl-server' />
-            </div>
-
-            { providers }
 
             <div>
               <Button long disabled={isSubmitting} type='submit'>

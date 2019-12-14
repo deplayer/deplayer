@@ -50,6 +50,13 @@ const SidebarContents = (props: ContentProps) => {
           current={inSection(props.location, 'artists')}
           totalItems={Object.keys(props.collection.artists).length}
         />
+        <MenuItem
+          current={inSection(props.location, 'providers')}
+          url='/providers'
+          title='Providers'
+          label='Providers'
+          iconClasses='icon fa fa-plug'
+        />
         <SettingsMenuItem current={inSection(props.location, 'settings')} />
       </ul>
 
