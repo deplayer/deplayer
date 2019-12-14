@@ -33,41 +33,46 @@ const Providers = (props: Props) => {
 
   return (
     <MainContainer>
-      <h2><Translate value="labels.providers" /></h2>
+      <div className='md:px-20'>
+        <div className='my-3'>
+          <h2 className='py-4'><Translate value="labels.lazyProviders" /></h2>
+          <ProviderButton providerKey='subsonic' />
+          <ProviderButton providerKey='mstream' />
+          <ProviderButton providerKey='itunes' />
 
-      <div className='my-3'>
-        <ProviderButton providerKey='subsonic' />
-        <ProviderButton providerKey='mstream' />
-        <ProviderButton providerKey='itunes' />
-        <ProviderButton providerKey='ipfs' />
-        <ProviderButton providerKey='youtube-dl-server' />
+          <h2 className='py-4'><Translate value="labels.oneOffProviders" /></h2>
+          <ProviderButton providerKey='ipfs' />
+          <ProviderButton providerKey='youtube-dl-server' />
+        </div>
+
+        <Formik
+          initialValues={props.settings.settings}
+          onSubmit={(values, actions) => {
+            saveSettings(values)
+            actions.setSubmitting(false)
+          }}
+          enableReinitialize
+          render=
+            {({
+              isSubmitting
+            }) => (
+              <Form
+                className='settings-form'
+              >
+
+                <div className='flex flex-wrap'>
+                  { providers }
+                </div>
+
+                <div>
+                  <Button long disabled={isSubmitting} type='submit'>
+                    <Translate value="buttons.save" />
+                  </Button>
+                </div>
+              </Form>
+            )}
+        />
       </div>
-
-      <Formik
-        initialValues={props.settings.settings}
-        onSubmit={(values, actions) => {
-          saveSettings(values)
-          actions.setSubmitting(false)
-        }}
-        enableReinitialize
-        render=
-          {({
-            isSubmitting
-          }) => (
-            <Form
-              className='settings-form'
-            >
-
-              { providers }
-
-              <div>
-                <Button long disabled={isSubmitting} type='submit'>
-                  <Translate value="buttons.save" />
-                </Button>
-              </div>
-            </Form>
-          )}
-      />
     </MainContainer>
   )
 }

@@ -54,7 +54,7 @@ class Settings extends React.Component<Props, State> {
     const ImporterComp = this.state.showImporter ? <Importer onLoaded={this.importCollection} /> : null
 
     return (
-      <MainContainer>
+      <MainContainer centerContents>
         <SettingsForm
           schema={settingsForm}
           settings={this.props.settings}

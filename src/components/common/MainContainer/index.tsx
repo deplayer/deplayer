@@ -1,8 +1,10 @@
 import React from 'react'
+import classNames from 'classnames'
 
-const MainContainer = (props: { children: React.ReactNode}) => {
+const MainContainer = (props: { children: React.ReactNode, centerContents?: boolean }) => {
+  const classes = classNames({'z-30': true, 'px-4': true, 'mx-auto': props.centerContents})
   return (
-    <div className='main z-30 px-4 md:p-0'>
+    <div className={classes}>
       { props.children }
     </div>
   )

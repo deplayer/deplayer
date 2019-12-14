@@ -29,7 +29,7 @@ const ProviderForm = (props: ProviderFormProps) => {
     )
   }
   return (
-    <div key={props.providerKey} className={settingsCard}>
+    <div key={props.providerKey} className={`${settingsCard} mr-4`}>
       <div className='top-0 right-0 absolute'>
         <RemoveProviderBtn
           providerKey={props.providerKey}

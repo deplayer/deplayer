@@ -9,6 +9,7 @@ import Placeholder from '../components/Player/Placeholder'
 const dynamicTitle = (router, collection, searchTerm: ''): string | React.ReactNode => {
   const songFinder = router.location.pathname.match(/\/song\/(.*)/)
   const artistFinder = router.location.pathname.match(/\/artist\/(.*)/)
+  const albumFinder = router.location.pathname.match(/\/album\/(.*)/)
 
   if (songFinder && songFinder[1]) {
     const song = collection.rows[songFinder[1]]
@@ -34,6 +35,22 @@ const dynamicTitle = (router, collection, searchTerm: ''): string | React.ReactN
     }
 
     return artist.name
+  }
+
+  if (albumFinder && albumFinder[1]) {
+    // return 'Artist'
+    const album = collection.albums[albumFinder[1]]
+
+    if (!album) {
+      return 'Album'
+    }
+
+    return (
+      <>
+        <i className='icon music outline mr-4'></i>
+        { album.name }
+      </>
+    )
   }
 
   switch (router.location.pathname) {
@@ -75,7 +92,7 @@ const dynamicTitle = (router, collection, searchTerm: ''): string | React.ReactN
         </>
       )
     default:
-      return 'Current playing'
+      return 'Explore'
   }
 }
 
