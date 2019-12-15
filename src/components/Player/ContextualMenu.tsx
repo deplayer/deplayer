@@ -9,6 +9,7 @@ import Icon from '../common/Icon'
 import RepeatButton from './RepeatButton'
 import ShuffleButton from './ShuffleButton'
 import ToggleMiniQueueButton from '../Buttons/ToggleMiniQueueButton'
+import AddNewMediaButton from '../Buttons/AddNewMediaButton'
 import VolumeControl from './VolumeControl'
 import * as types from '../../constants/ActionTypes'
 
@@ -58,6 +59,9 @@ const ContextualMenu = (props: MenuProps) => {
         </Item>
         <Item className='flex w-full'>
           <ToggleMiniQueueButton />
+        </Item>
+        <Item className='flex w-full'>
+          <AddNewMediaButton />
         </Item>
         <Item className='flex w-full'>
           <Button

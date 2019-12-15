@@ -55,7 +55,7 @@ const ContextualMenu = (props: MenuProps) => {
               >
                 <Icon
                   icon='faPlusCircle'
-                  className='mx-2'
+                  className='mr-2'
                 />
                 <Translate value='buttons.addToQueue' />
               </Button>

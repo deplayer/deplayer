@@ -3,6 +3,8 @@ import ReactModal from 'react-modal'
 
 import Button from '../Button'
 
+ReactModal.setAppElement('#modal')
+
 const customStyles = {
   content: {
     zIndex: 10
@@ -17,7 +19,7 @@ type Props = {
 }
 
 const Modal = (props: Props) => {
-  const [modalIsOpen,setIsOpen] = React.useState(true)
+  const [modalIsOpen, setIsOpen] = React.useState(true)
 
   return (
     <ReactModal

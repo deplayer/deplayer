@@ -25,7 +25,7 @@ const ToggleMiniQueue = (props: Props) => {
         icon='faEyeSlash'
         className='mx-2'
       />
-      <Translate className='hidden md:inline' value='buttons.toggleMiniQueue' />
+      <Translate value='buttons.toggleMiniQueue' />
     </Button>
   )
 }
