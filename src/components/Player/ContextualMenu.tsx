@@ -56,7 +56,7 @@ const ContextualMenu = (props: MenuProps) => {
         <Item className='flex w-full'>
           <TogglePlayer />
         </Item>
-        <Item className='flex w-full items-center'>
+        <Item className='flex w-full'>
           <ToggleMiniQueueButton />
         </Item>
         <Item className='flex w-full'>

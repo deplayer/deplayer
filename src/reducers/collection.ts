@@ -175,16 +175,16 @@ export default (state: State = defaultState, action: any = {}) => {
     }
 
     case types.APPLY_MOST_PLAYED_SORT: {
-      const songsByNumberOfPlays = Object.keys(state.rows).sort((songId1, songId2) => {
+      const songsByNumberOfPlays = Object.keys(state.rows).filter((songId) => {
+        return state.rows[songId].playCount > 0
+      }).sort((songId1, songId2) => {
         const song1 = state.rows[songId1]
         const song2 = state.rows[songId2]
 
-        if (song1.playCount > song2.playCount) return 1
-        if (song1.playCount < song2.playCount) return -1
+        if (song1.playCount < song2.playCount) return 1
+        if (song1.playCount > song2.playCount) return -1
 
         return 0
-      }).filter((songId) => {
-        return state.rows[songId].playCount > 0
       })
 
       return {
