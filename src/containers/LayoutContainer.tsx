@@ -77,6 +77,13 @@ const dynamicTitle = (router, collection, searchTerm: ''): string | React.ReactN
           Artists
         </>
       )
+    case '/queue':
+      return (
+        <>
+          <i className='icon icon-music outline outline mr-4'></i>
+          Current playing
+        </>
+      )
     case '/playlists':
       return (
         <>
@@ -92,7 +99,12 @@ const dynamicTitle = (router, collection, searchTerm: ''): string | React.ReactN
         </>
       )
     default:
-      return 'Explore'
+      return (
+        <>
+          <i className='fa fa-globe outline outline mr-4'></i>
+          Explore
+        </>
+      )
   }
 }
 

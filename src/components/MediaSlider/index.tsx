@@ -16,10 +16,10 @@ const MediaCover = ({ media }) => {
             fullUrl: media.cover.thumbnailUrl
           }}
         />
-        <p className='py-4 whitespace-normal text-center truncate w-32'>
-          <Tag>{ media.playCount } times played</Tag>
+        <Tag>{ media.playCount } times played</Tag>
+        <div className='py-4 whitespace-normal text-center truncate w-32'>
           { media.title }
-        </p>
+        </div>
       </Link>
     </div>
   )
