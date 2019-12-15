@@ -59,11 +59,13 @@ export default class Media {
       price,
       currency,
       stream,
+      playCount,
       shareUrl,
       filePath
     } = songParams
 
     this.title = title
+    this.playCount = playCount
     this.setArtist(artistName, artistId)
     this.artistName = this.artist.name
     this.duration = duration

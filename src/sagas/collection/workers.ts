@@ -83,4 +83,5 @@ export function* trackSongPlayed(action: {type: string, songId: string}): any {
   song.playCount = prevCount + 1
   yield call(collectionService.save, action.songId, song.toDocument())
   yield put({type: 'SONG_SAVED'})
+  yield put({type: types.UPDATE_MEDIA, media: song})
 }
