@@ -1,9 +1,11 @@
-import * as React from 'react'
 import { Dispatch } from 'redux'
+import { Translate } from 'react-redux-i18n'
+import * as React from 'react'
 
+import AddNewMediaButton from './Buttons/AddNewMediaButton'
+import BodyMessage from './BodyMessage'
 import MusicTable from './MusicTable/MusicTable'
 import Spinner from './Spinner'
-import BodyMessage from './BodyMessage'
 
 type Props = {
   app: any,
@@ -28,7 +30,12 @@ const Collection = (props: Props) => {
 
   if (!props.visibleSongs.length) {
     return (
-      <BodyMessage message={'No songs found'} />
+        <BodyMessage message={
+          <div>
+            <Translate value='message.noCollectionItems' />
+            <AddNewMediaButton />
+          </div>
+        }/>
     )
   }
 

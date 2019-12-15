@@ -15,20 +15,30 @@ const customStyles = {
 }
 
 type Props = {
-  children: React.ReactNode
+  children: React.ReactNode,
+  onClose?: () => void
 }
 
 const Modal = (props: Props) => {
   const [modalIsOpen, setIsOpen] = React.useState(true)
 
+  const close = () => {
+    setIsOpen(false)
+    props.onClose && props.onClose()
+  }
+
   return (
     <ReactModal
       shouldCloseOnOverlayClick
       isOpen={modalIsOpen}
-      onRequestClose={() => setIsOpen(false)}
+      onRequestClose={() => close()}
       style={customStyles}
     >
-      <Button onClick={() => setIsOpen(false)}>close</Button>
+        <Button
+          onClick={() => close()}
+        >
+          <i className='fa fa-remove' />
+        </Button>
       {props.children}
     </ReactModal>
   )

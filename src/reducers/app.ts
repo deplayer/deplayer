@@ -3,6 +3,7 @@ import * as types from '../constants/ActionTypes'
 type State = {
   backgroundImage: string,
   sidebarToggled: boolean,
+  showAddMediaModal: boolean,
   mqlMatch: boolean,
   loading: boolean,
   displayMiniQueue: boolean,
@@ -12,6 +13,7 @@ type State = {
 export const defaultState = {
   backgroundImage: '',
   sidebarToggled: false,
+  showAddMediaModal: false,
   mqlMatch: false,
   loading: true,
   slimPlayer: false,
@@ -24,6 +26,15 @@ export default (state: State = defaultState, action: any) => {
     case types.TOGGLE_SIDEBAR: {
       return {...state, sidebarToggled: action.value ? action.value :!state.sidebarToggled}
     }
+
+    case types.SHOW_ADD_MEDIA_MODAL: {
+      return {...state, showAddMediaModal: true}
+    }
+
+    case types.HIDE_ADD_MEDIA_MODAL: {
+      return {...state, showAddMediaModal: false}
+    }
+
 
     case types.SET_MQL: {
       return {

@@ -18,8 +18,6 @@ const SearchInput = (props: Props) => {
   }
 
   const classes = classNames({
-    'search-bar': true,
-    ui: true,
     'w-full': true,
     'p-3': true,
     'bg-transparent': true,
@@ -27,10 +25,6 @@ const SearchInput = (props: Props) => {
     'text-xl': true,
     'font-sans': true,
     'focus:outline-none': true,
-    huge: true,
-    icon: true,
-    input: true,
-    inverted: true,
     loading: props.loading,
     action: true
   })
@@ -50,7 +44,7 @@ const SearchInput = (props: Props) => {
         placeholder={ I18n.t('placeholder.search') }
         type='text'
       />
-      <div className='p-3'>
+      <div className='p-2'>
         { props.loading ? <i className='icon fa fa-spinner fa-pulse'></i> : <i className='icon search'></i> }
       </div>
     </div>

@@ -1,29 +1,29 @@
-import * as React from 'react'
-import { Provider } from 'react-redux'
-import { Route } from 'react-router-dom'
-import { ConnectedRouter } from 'connected-react-router'
-import './styles/App.scss'
-import './App.css'
 import 'react-s-alert/dist/s-alert-css-effects/stackslide.css'
 import 'react-s-alert/dist/s-alert-default.css'
 
-// Alerts
+import './App.css'
+import './styles/App.scss'
+
+import { ConnectedRouter } from 'connected-react-router'
+import { Provider } from 'react-redux'
+import { Route } from 'react-router-dom'
 import Alert from 'react-s-alert'
+import * as React from 'react'
 
-import QueueContainer from './containers/QueueContainer'
-import DashboardContainer from './containers/DashboardContainer'
-import PlaylistsContainer from './containers/PlaylistsContainer'
-import CollectionContainer from './containers/CollectionContainer'
-import SearchResultsContainer from './containers/SearchResultsContainer'
-import PlayerContainer from './containers/PlayerContainer'
-import SongContainer from './containers/SongContainer'
-import ArtistContainer from './containers/ArtistContainer'
+import AddMediaModal from './components/AddMediaModal'
 import AlbumContainer from './containers/AlbumContainer'
-import SettingsContainer from './containers/SettingsContainer'
-import ProvidersContainer from './containers/ProvidersContainer'
+import ArtistContainer from './containers/ArtistContainer'
 import ArtistsContainer from './containers/ArtistsContainer'
+import CollectionContainer from './containers/CollectionContainer'
+import DashboardContainer from './containers/DashboardContainer'
 import LayoutContainer from './containers/LayoutContainer'
-
+import PlayerContainer from './containers/PlayerContainer'
+import PlaylistsContainer from './containers/PlaylistsContainer'
+import ProvidersContainer from './containers/ProvidersContainer'
+import QueueContainer from './containers/QueueContainer'
+import SearchResultsContainer from './containers/SearchResultsContainer'
+import SettingsContainer from './containers/SettingsContainer'
+import SongContainer from './containers/SongContainer'
 import configureStore from './store/configureStore'
 import history from './store/configureHistory'
 
@@ -60,6 +60,7 @@ class App extends React.Component<any> {
               <Route path="/settings" component={SettingsContainer} />
             </LayoutContainer>
             <PlayerContainer />
+            <AddMediaModal />
             <Alert stack={{limit: 3}} />
           </React.Fragment>
         </ConnectedRouter>

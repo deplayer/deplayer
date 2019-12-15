@@ -56,5 +56,8 @@
     "repeat": "repeat",
     "fullScreen": "fullscreen",
     "toggleMiniQueue": "toggle queue"
+  },
+  "message": {
+    "noCollectionItems": "No collection items found, try adding more by searching or adding them manually: "
   }
 }

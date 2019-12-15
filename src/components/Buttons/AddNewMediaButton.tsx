@@ -1,24 +1,24 @@
 import { Translate } from 'react-redux-i18n'
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { connect, Dispatch } from 'react-redux'
 import * as React from 'react'
 
 import Button from '../common/Button'
 import Icon from '../common/Icon'
+import * as types from '../../constants/ActionTypes'
 
 type Props = {
-  history: any
+  dispatch: Dispatch
 }
 
 const AddNewMediaButton = (props: Props) => {
-  const goBack = () => {
-    props.history.push('/add-new-media')
+  const openModal = () => {
+    props.dispatch({ type: types.SHOW_ADD_MEDIA_MODAL })
   }
 
   return (
     <Button
       transparent
-      onClick={goBack}
+      onClick={openModal}
     >
       <Icon
         icon='faPlusCircle'
@@ -29,5 +29,4 @@ const AddNewMediaButton = (props: Props) => {
   )
 }
 
-const RoutedButton = withRouter(props => <AddNewMediaButton {...props}/>)
-export default connect()(RoutedButton)
+export default connect()(AddNewMediaButton)

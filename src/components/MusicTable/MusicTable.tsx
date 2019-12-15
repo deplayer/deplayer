@@ -2,6 +2,7 @@ import { AutoSizer, List } from 'react-virtualized'
 import { Route } from 'react-router-dom'
 import * as React from 'react'
 
+import AddNewMediaButton from '../Buttons/AddNewMediaButton'
 import ClearQueueButton from '../Buttons/ClearQueueButton'
 import PlayAllButton from '../Buttons/PlayAllButton'
 import SaveQueueButton from '../Buttons/SaveQueueButton'
@@ -89,6 +90,7 @@ const MusicTable = (props: Props) => {
               </>
             )}
           />
+          <Route path="/collection" component={() => <AddNewMediaButton /> } />
           <Route path="/song/:id" component={() => <ToggleMiniQueueButton /> } />
           <Route path="/collection" component={() => <PlayAllButton dispatch={props.dispatch} /> } />
           <Route path="/search-results" component={() => <PlayAllButton dispatch={props.dispatch} /> } />
