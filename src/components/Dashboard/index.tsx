@@ -1,5 +1,5 @@
-import React from 'react'
 import { Translate } from 'react-redux-i18n'
+import React from 'react'
 
 import MediaSlider from '../MediaSlider'
 
