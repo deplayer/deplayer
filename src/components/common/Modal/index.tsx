@@ -40,16 +40,19 @@ const Modal = (props: Props) => {
     <ReactModal
       shouldCloseOnOverlayClick
       isOpen={modalIsOpen}
-      className='absolute overflow-auto bg-gray-900 p-4 rounded-sm'
+      className='absolute overflow-auto bg-gray-900 p-4 rounded-sm max-w-md mx-auto'
       overlayClassName='fixed'
       onRequestClose={() => close()}
       style={customStyles}
     >
+      <div className='w-full flex justify-end'>
         <Button
+          transparent
           onClick={() => close()}
         >
           <i className='fa fa-remove' />
         </Button>
+      </div>
       {props.children}
     </ReactModal>
   )

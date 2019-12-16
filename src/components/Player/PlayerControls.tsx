@@ -36,7 +36,9 @@ class PlayerControls extends React.Component<Props> {
     seeking: false,
     volume: 0.8,
     muted: false,
+    buffered: 0,
     playedSeconds: 0,
+    loadedSeconds: 0,
     loaded: 0,
     duration: 0,
     timeShown: 0,
@@ -83,9 +85,11 @@ class PlayerControls extends React.Component<Props> {
       value / 1000
     )
   }
+
   onSeekMouseUp = value => {
     this.setState({ seeking: false })
   }
+
   onProgress = (state: any) => {
     if (this.props.player.fullscreen && this.state.timeShown > 2) {
       this.props.player.showPlayer && this.props.dispatch({ type: types.HIDE_PLAYER })
@@ -143,6 +147,7 @@ class PlayerControls extends React.Component<Props> {
       playing,
       duration,
       volume,
+      loadedSeconds,
       playedSeconds
     } = this.state
 
@@ -231,6 +236,7 @@ class PlayerControls extends React.Component<Props> {
                   <ProgressBar
                     dispatch={this.props.dispatch}
                     total={duration * 1000}
+                    buffered={loadedSeconds * 1000}
                     current={playedSeconds * 1000}
                     onChange={this.onSeekChange}
                   />

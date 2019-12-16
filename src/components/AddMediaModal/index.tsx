@@ -21,7 +21,7 @@ const AddMediaModal = (props: Props) => {
         props.dispatch({type: types.HIDE_ADD_MEDIA_MODAL})
       }}
     >
-      Select media type
+      <h2>Select media to add:</h2>
     </Modal>
   )
 }
