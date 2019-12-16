@@ -1,5 +1,6 @@
 import { Translate } from 'react-redux-i18n'
-import { connect, Dispatch } from 'react-redux'
+import { Dispatch } from 'redux'
+import { connect } from 'react-redux'
 import * as React from 'react'
 
 import Button from '../common/Button'
