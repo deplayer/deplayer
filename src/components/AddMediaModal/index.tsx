@@ -1,9 +1,9 @@
+import { Dispatch, connect } from 'react-redux'
 import React from 'react'
-import { Dispatch } from 'react-redux'
-import { connect } from 'react-redux'
 
-import * as types from '../../constants/ActionTypes'
+import Button from '../common/Button'
 import Modal from '../common/Modal'
+import * as types from '../../constants/ActionTypes'
 
 type Props = {
   showAddMediaModal: boolean,
@@ -11,6 +11,8 @@ type Props = {
 }
 
 const AddMediaModal = (props: Props) => {
+  const [magnetLink, setMagnetLink] = React.useState('')
+
   if (!props.showAddMediaModal) {
     return null
   }
@@ -22,6 +24,22 @@ const AddMediaModal = (props: Props) => {
       }}
     >
       <h2>Select media to add:</h2>
+      <h3>Magnet link</h3>
+
+      <input
+        type="text"
+        value={magnetLink}
+        onChange={(event) => setMagnetLink(event.target.value)}
+      />
+      <Button
+        type='submit'
+        onClick={() => {
+          props.dispatch({type: types.ADD_WEBTORRENT_MEDIA, magnet: magnetLink})
+          props.dispatch({type: types.HIDE_ADD_MEDIA_MODAL})
+        }}
+      >
+        Add
+      </Button>
     </Modal>
   )
 }

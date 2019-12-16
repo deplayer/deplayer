@@ -13,8 +13,6 @@ export default class RxdbAdapter implements IAdapter {
   save = async (model: string, id: string, payload: any): Promise<any> => {
     const fixedPayload = {_id: id, ...payload}
 
-    logger.log('RxdbDatabase', `saving ${id}`)
-
     const instance = await db.get()
     return instance[model].atomicUpsert(fixedPayload)
   }

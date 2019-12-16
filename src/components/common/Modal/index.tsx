@@ -7,14 +7,14 @@ ReactModal.setAppElement('#modal')
 
 const customStyles = {
   content: {
-    zIndex: 10,
+    zIndex: 51,
     top: '40px',
     bottom: '40px',
     left: '40px',
     right: '40px'
   },
   overlay: {
-    zIndex: 10,
+    zIndex: 100,
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
     top: '0px',
     bottom: '0px',

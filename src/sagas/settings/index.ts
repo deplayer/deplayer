@@ -1,6 +1,6 @@
 import { takeLatest, put, call } from 'redux-saga/effects'
 
-import  * as types from '../../constants/ActionTypes'
+import * as types from '../../constants/ActionTypes'
 import SettingsService from '../../services/settings/SettingsService'
 import { getAdapter } from '../../services/database'
 

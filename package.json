@@ -99,6 +99,7 @@
     "webpack": "^4.29.0",
     "webpack-dev-server": "2.9.4",
     "webpack-manifest-plugin": "2.0.0-rc.2",
+    "webtorrent": "^0.107.17",
     "whatwg-fetch": "2.0.3",
     "winston": "^3.2.1"
   },
