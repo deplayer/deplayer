@@ -62,7 +62,7 @@ const dynamicTitle = (router, collection, searchTerm: ''): string | React.ReactN
         </>
       )
     case '/search-results':
-      return 'Search results: ' + searchTerm
+      return `Search results for ${searchTerm}`
     case '/collection':
       return (
         <>

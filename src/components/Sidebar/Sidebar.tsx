@@ -53,8 +53,10 @@ class MSidebar extends React.Component<Props, State> {
         open={sidebarToggled}
         sidebarId='left-sidebar'
         sidebarClassName='bg-blue-900 w-64 z-50'
+        overlayClassName='z-50'
         overlayId='left-sidebar-overlay'
         contentId='left-sidebar-content'
+        styles={{ overlay: { zIndex: 50 } }}
         onSetOpen={this.onSetSidebarOpen}
         transitions={true}
         docked={docked}
