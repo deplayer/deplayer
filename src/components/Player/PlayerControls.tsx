@@ -17,7 +17,7 @@ import Spectrum from './../Spectrum'
 import WebtorrentPlayer from './CustomPlayers/WebtorrentPlayer'
 import * as types from '../../constants/ActionTypes'
 
-ReactPlayer.addCustomPlayer(WebtorrentPlayer)
+ReactPlayer.addCustomPlayer((WebtorrentPlayer as any))
 
 type Props = {
   app: any,

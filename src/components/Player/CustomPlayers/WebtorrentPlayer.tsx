@@ -18,7 +18,7 @@ function canPlay (url: string) {
   return typeof url === 'string' && url.startsWith('magnet:')
 }
 
-function canEnablePIP (url: any) {
+function canEnablePIP () {
   return false
 }
 
@@ -26,7 +26,7 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
   static displayName = 'TorrentPlayer'
   static canPlay = canPlay
   static canEnablePIP = canEnablePIP
-  player: HTMLMediaElement
+  player: any
   prevPlayer: any
   client: any
 
@@ -142,7 +142,7 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
       return 0
     }
     const end = buffered.end(buffered.length - 1)
-    const duration = this.getDuration()
+    const duration = this.getDuration() || 0
     if (end > duration) {
       return duration
     }
