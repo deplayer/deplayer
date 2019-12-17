@@ -1759,6 +1759,13 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
+"@types/bittorrent-protocol@*":
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/@types/bittorrent-protocol/-/bittorrent-protocol-2.2.4.tgz#7dc0716924bc6a904753d39846ad235c7dab4641"
+  integrity sha512-FwFRTziWvEdMDWTzK6AvuWPSjpcgnlh+FBBzTVQlVSYf5fLYN0KdFi0bUCg+zqXU9nkcovlKOZWg3MWDPLwrDQ==
+  dependencies:
+    "@types/node" "*"
+
 "@types/cheerio@*":
   version "0.22.11"
   resolved "https://registry.yarnpkg.com/@types/cheerio/-/cheerio-0.22.11.tgz#61c0facf9636d14ba5f77fc65ed8913aa845d717"
@@ -1830,6 +1837,13 @@
   version "7.0.3"
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.3.tgz#bdfd69d61e464dcc81b25159c270d75a73c1a636"
 
+"@types/magnet-uri@*":
+  version "5.1.2"
+  resolved "https://registry.yarnpkg.com/@types/magnet-uri/-/magnet-uri-5.1.2.tgz#7860417399d52ddc0be1021d570b4ac93ffc133e"
+  integrity sha512-bXFPXskwHoEYP6t8rq4nWchOlbUzXkyhnfCVZmq+zb25R5pWkasw7BmTIqDKQ6RAQmq89jll1v23yLa/SvPfAw==
+  dependencies:
+    "@types/node" "*"
+
 "@types/node@*":
   version "12.7.5"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.7.5.tgz#e19436e7f8e9b4601005d73673b6dc4784ffcc2f"
@@ -1837,6 +1851,22 @@
 "@types/parse-json@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
+
+"@types/parse-torrent-file@*":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@types/parse-torrent-file/-/parse-torrent-file-4.0.2.tgz#40c96fc075aec256514807c6c381d11d9035bd9e"
+  integrity sha512-EzdzpcN0sStQ35sUV2SChTJErLsbotsxZ/RYeR9gf3zXKlPLKaA7aIAoS/nuLRvfxH8mbrWQmXSw76alKecSdg==
+  dependencies:
+    "@types/node" "*"
+
+"@types/parse-torrent@*":
+  version "5.8.3"
+  resolved "https://registry.yarnpkg.com/@types/parse-torrent/-/parse-torrent-5.8.3.tgz#ff4e987d09ad27ccc1c8893b3a2c6a31a3bc4042"
+  integrity sha512-c0xAjnpov+Xk/2HTtpaBm0tukNIAoZoxrqgTDwSaIu6IVCynY+2YD9zcQNk2P6H4atcXzD78/LI2CQzLlMmAJg==
+  dependencies:
+    "@types/magnet-uri" "*"
+    "@types/node" "*"
+    "@types/parse-torrent-file" "*"
 
 "@types/prop-types@*":
   version "15.7.3"
@@ -1940,6 +1970,13 @@
   dependencies:
     redux "^3.6.0"
 
+"@types/simple-peer@*":
+  version "9.6.0"
+  resolved "https://registry.yarnpkg.com/@types/simple-peer/-/simple-peer-9.6.0.tgz#b5828d835b7f42dde27db584ba127e7a9f9072f4"
+  integrity sha512-X2y6s+vE/3j03hkI90oqld2JH2J/m1L7yFCYYPyFV/whrOK1h4neYvJL3GIE+UcACJacXZqzdmDKudwec18RbA==
+  dependencies:
+    "@types/node" "*"
+
 "@types/stack-utils@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-1.0.1.tgz#0a851d3bd96498fa25c33ab7278ed3bd65f06c3e"
@@ -1947,6 +1984,16 @@
 "@types/webpack-env@^1.13.7":
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/@types/webpack-env/-/webpack-env-1.14.1.tgz#0d8a53f308f017c53a5ddc3d07f4d6fa76b790d7"
+
+"@types/webtorrent@^0.107.1":
+  version "0.107.1"
+  resolved "https://registry.yarnpkg.com/@types/webtorrent/-/webtorrent-0.107.1.tgz#1aeec48b6386b162e1a210c188fadca75f2fa0bd"
+  integrity sha512-T9ql/DvVzEl7rznKrjCIXEI69Hy8JFHh0j18HbvHNZ21YWCwhR+NL6IQiie0eGb8QtVV4Cb7kKjZWoI7O9V4tg==
+  dependencies:
+    "@types/bittorrent-protocol" "*"
+    "@types/node" "*"
+    "@types/parse-torrent" "*"
+    "@types/simple-peer" "*"
 
 "@types/yargs-parser@*":
   version "13.1.0"

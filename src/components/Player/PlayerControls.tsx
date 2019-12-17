@@ -14,7 +14,10 @@ import Cover from './Cover'
 import KeyHandlers from './KeyHandlers'
 import ProgressBar from './ProgressBar'
 import Spectrum from './../Spectrum'
+import WebtorrentPlayer from './CustomPlayers/WebtorrentPlayer'
 import * as types from '../../constants/ActionTypes'
+
+ReactPlayer.addCustomPlayer(WebtorrentPlayer)
 
 type Props = {
   app: any,
