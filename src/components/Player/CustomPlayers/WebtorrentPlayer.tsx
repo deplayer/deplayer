@@ -2,6 +2,18 @@ import React from 'react'
 import { ReactPlayerProps } from 'react-player'
 import Webtorrent from 'webtorrent'
 
+const announceList = [
+  ['udp://tracker.openbittorrent.com:80'],
+  ['udp://tracker.internetwarriors.net:1337'],
+  ['udp://tracker.leechers-paradise.org:6969'],
+  ['udp://tracker.coppersurfer.tk:6969'],
+  ['udp://exodus.desync.com:6969'],
+  ['wss://tracker.webtorrent.io'],
+  ['wss://tracker.btorrent.xyz'],
+  ['wss://tracker.openwebtorrent.com'],
+  ['wss://tracker.fastcast.nz']
+]
+
 function canPlay (url: string) {
   return typeof url === 'string' && url.startsWith('magnet:')
 }
@@ -142,7 +154,9 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
 
     const { player } = this
 
-    this.client.add(url, (torrent: any) => {
+    this.client.add(url, {
+      announce: announceList
+    }, (torrent: any) => {
       const file = torrent.files.find((file: any) => {
           return file.name.endsWith('.mp4')
       })
