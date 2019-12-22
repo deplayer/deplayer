@@ -118,24 +118,25 @@ type LayoutProps = {
 
 const Layout = (props: LayoutProps) => {
   return (
+    <>
     <div
       className='bg-handler absolute w-full h-full bg-cover bg-center bg-no-repeat bg-fixed'
-      style={{backgroundImage: `url(${ props.backgroundImage })`}}
+      style={{backgroundImage: `url(${ props.backgroundImage })`, filter: 'blur(4px)'}}
     >
-      <SidebarContainer
-      >
-        <TopbarContainer title={ props.title }>
-          <SearchButton />
-        </TopbarContainer>
-
-        <div
-          className='contents'
-        >
-          { props.children }
-        </div>
-        <Placeholder mqlMatch={props.app.mqlMatch} />
-      </SidebarContainer>
     </div>
+    <SidebarContainer>
+      <TopbarContainer title={ props.title }>
+        <SearchButton />
+      </TopbarContainer>
+
+      <div
+        className='contents'
+      >
+        { props.children }
+      </div>
+      <Placeholder mqlMatch={props.app.mqlMatch} />
+    </SidebarContainer>
+    </>
   )
 }
 
