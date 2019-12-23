@@ -35,13 +35,7 @@ class PlayerControls extends React.Component<Props> {
   playerRef: any
 
   state = {
-    buffered: 0,
-    playedSeconds: 0,
-    loadedSeconds: 0,
-    loaded: 0,
-    duration: 0,
     timeShown: 0,
-    playbackRate: 1.0,
   }
 
   componentWillMount() {
@@ -56,9 +50,6 @@ class PlayerControls extends React.Component<Props> {
     this.props.dispatch({ type: types.VOLUME_SET, value: value })
   }
 
-  setPlaybackRate = (e: any) => {
-    this.setState({ playbackRate: parseFloat(e.target.value) })
-  }
   onPlay = () => {
     this.props.dispatch({ type: types.START_PLAYING })
   }
@@ -66,7 +57,7 @@ class PlayerControls extends React.Component<Props> {
     this.props.dispatch({ type: types.STOP_PLAYING })
   }
   onSeekChange = (value: any) => {
-    this.setState({ playedSeconds: value / 1000 })
+    this.props.dispatch({ type: types.SET_PLAYER_PLAYED_SECONDS, value: value / 1000 })
     this.playerRef.current.seekTo(
       value / 1000
     )
@@ -86,10 +77,10 @@ class PlayerControls extends React.Component<Props> {
       this.props.dispatch({ type: types.CLEAR_PLAYER_ERRORS })
     }
     // We only want to update time slider if we are not currently
-    this.setState(state)
+    this.props.dispatch({ type: types.SET_PLAYER_PROGRESS, value: state })
   }
   onDuration = (duration: number) => {
-    this.setState({ duration })
+    this.props.dispatch({ type: types.SET_PLAYER_DURATION, value: duration})
   }
 
   // Play prev song of the player list
@@ -123,11 +114,12 @@ class PlayerControls extends React.Component<Props> {
 
   render () {
     const {
+      playedSeconds,
+      playing,
       duration,
       loadedSeconds,
-      playedSeconds
-    } = this.state
-    const { playing, volume } = this.props.player
+      volume
+    } = this.props.player
 
     const currentPlayingId = this.props.queue.currentPlaying
     const currentPlaying = this.props.collection.rows[currentPlayingId]
@@ -173,7 +165,6 @@ class PlayerControls extends React.Component<Props> {
           }}
           onMouseMove={this.showPlayer}
           controls={false}
-          playbackRate={1}
           volume={volume / 100}
           muted={false}
           onPlay={this.onPlay}

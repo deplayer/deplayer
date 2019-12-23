@@ -2,6 +2,10 @@ import * as types from '../constants/ActionTypes'
 
 export type State = {
   playing: boolean,
+  buffered: number,
+  duration: number,
+  loadedSeconds: number,
+  playedSeconds: number,
   showPlayer: boolean,
   fullscreen: boolean,
   currentTime: number,
@@ -14,6 +18,10 @@ export type State = {
 
 export const defaultState = {
   playing: false,
+  buffered: 0,
+  duration: 0,
+  loadedSeconds: 0,
+  playedSeconds: 0,
   showPlayer: false,
   fullscreen: false,
   currentTime: 0,
@@ -44,6 +52,15 @@ export default (state: State = defaultState, action: any): State => {
 
     case types.VOLUME_SET:
       return {...state, volume: action.value}
+
+    case types.SET_PLAYER_PROGRESS:
+      return {...state, ...action.value}
+
+    case types.SET_PLAYER_DURATION:
+      return {...state, duration: action.value}
+
+    case types.SET_PLAYER_PLAYED_SECONDS:
+      return {...state, playedSeconds: action.value}
 
     case types.SET_CURRENT_TIME:
       return {...state, currentTime: action.value}
