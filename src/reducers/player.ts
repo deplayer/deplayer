@@ -73,7 +73,12 @@ export default (state: State = defaultState, action: any): State => {
       return {...state, errorCount: 0}
 
     case types.SET_CURRENT_PLAYING_URL:
-      return {...state, streamUri: action.url}
+      return {
+      ...state,
+      playedSeconds: 0,
+      loadedSeconds: 0,
+      streamUri: action.url
+    }
 
     case types.TOGGLE_FULL_SCREEN:
       return {...state, fullscreen: !state.fullscreen}
