@@ -56,7 +56,7 @@ class MSidebar extends React.Component<Props, State> {
         overlayClassName='z-50'
         overlayId='left-sidebar-overlay'
         contentId='left-sidebar-content'
-        styles={{ overlay: { zIndex: '50' }, sidebar: { backgroundColor: '#000', opacity: '0.85' } }}
+        styles={{ overlay: { zIndex: '50' }, sidebar: { backgroundColor: 'rgba(0, 0, 0, 0.4)' } }}
         onSetOpen={this.onSetSidebarOpen}
         transitions={true}
         docked={docked}

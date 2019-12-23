@@ -26,8 +26,14 @@ export const defaultState = {
 
 export default (state: State = defaultState, action: any): State => {
   switch (action.type) {
+    case types.STOP_PLAYING:
+      return {...state, playing: false}
+
     case types.START_PLAYING:
       return {...state, playing: true, showPlayer: true}
+
+    case types.TOGGLE_PLAYING:
+      return {...state, playing: !state.playing}
 
     case types.CLEAR_QUEUE:
     case types.HIDE_PLAYER:

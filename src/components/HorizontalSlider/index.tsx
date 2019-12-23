@@ -4,10 +4,13 @@ import ScrollMenu from 'react-horizontal-scrolling-menu'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
 
+const bodyBg = 'rgba(16, 27, 38, 0)'
+const bodyBgAfter = 'rgba(16, 27, 38, 0.8)'
+
 const ArrowLeft = (
   <div
-    className='text-4xl z-10 absolute inset-y-0 flex left-0 pl-4'
-    style={{ backgroundImage: 'linear-gradient(to left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8))' }}
+    className='text-4xl z-10 absolute inset-y-0 flex left-0'
+    style={{ backgroundImage: `linear-gradient(to left, ${ bodyBg }, ${ bodyBgAfter }` }}
   >
     <Button transparent>
       <Icon icon='faArrowCircleLeft' className='arrow-prev text-blue-200 hover:text-blue-800' />
@@ -17,8 +20,8 @@ const ArrowLeft = (
 
 const ArrowRight = (
   <div
-    className='text-4xl z-10 absolute inset-y-0 flex right-0 pr-4'
-    style={{ backgroundImage: 'linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8))' }}
+    className='text-4xl z-10 absolute inset-y-0 flex right-0'
+    style={{ backgroundImage: `linear-gradient(to right, ${ bodyBg }, ${ bodyBgAfter }` }}
   >
     <Button transparent>
       <Icon icon='faArrowCircleRight' className='arrow-prev text-blue-200 hover:text-blue-800' />
@@ -34,9 +37,9 @@ type Props = {
 const HorizontalSlider = (props: Props) => {
   return (
     <div className='w-full overflow-hidden'>
-      <h2 className='my-4 px-6 text-xl'>{ props.title }</h2>
+      <h2 className='my-4 px-4 text-xl'>{ props.title }</h2>
       <ScrollMenu
-        menuClass='relative pl-6'
+        menuClass='relative'
         wrapperStyle={{overflow: 'hidden'}}
         hideArrows
         hideSingleArrow

@@ -15,7 +15,7 @@ const Dashboard = (props: Props) => {
   })
 
   return (
-    <div className='z-10 w-full flex flex-col px-4'>
+    <div className='z-10 w-full flex flex-col'>
       <MediaSlider
         title={<Translate value='titles.mostPlayedSongs'/>}
         mediaItems={mediaItems.slice(0, MAX_LIST_ITEMS)}

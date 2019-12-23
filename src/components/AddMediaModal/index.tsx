@@ -2,6 +2,7 @@ import { Dispatch, connect } from 'react-redux'
 import React from 'react'
 
 import Button from '../common/Button'
+import Input from '../common/Input'
 import Modal from '../common/Modal'
 import * as types from '../../constants/ActionTypes'
 
@@ -26,7 +27,7 @@ const AddMediaModal = (props: Props) => {
       <h2>Select media to add:</h2>
       <h3>Magnet link</h3>
 
-      <input
+      <Input
         type="text"
         value={magnetLink}
         onChange={(event) => setMagnetLink(event.target.value)}

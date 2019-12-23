@@ -119,11 +119,12 @@ type LayoutProps = {
 const Layout = (props: LayoutProps) => {
   return (
     <>
-    <div
-      className='bg-handler absolute w-full h-full bg-cover bg-center bg-no-repeat bg-fixed'
-      style={{backgroundImage: `url(${ props.backgroundImage })`, filter: 'blur(4px)'}}
-    >
-    </div>
+    {props.backgroundImage &&
+      <div
+        className='bg-handler absolute w-full h-full bg-cover bg-center bg-no-repeat bg-fixed'
+        style={{backgroundImage: `url(${ props.backgroundImage })`, filter: 'blur(10px)'}}
+      />
+    }
     <SidebarContainer>
       <TopbarContainer title={ props.title }>
         <SearchButton />

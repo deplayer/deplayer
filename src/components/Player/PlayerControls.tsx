@@ -35,10 +35,6 @@ class PlayerControls extends React.Component<Props> {
   playerRef: any
 
   state = {
-    playing: true,
-    seeking: false,
-    volume: 0.8,
-    muted: false,
     buffered: 0,
     playedSeconds: 0,
     loadedSeconds: 0,
@@ -46,51 +42,34 @@ class PlayerControls extends React.Component<Props> {
     duration: 0,
     timeShown: 0,
     playbackRate: 1.0,
-    loop: false
   }
 
   componentWillMount() {
-    if (this.props.player.playing && !this.state.playing) {
-      this.playPause()
-    }
-
     this.playerRef = React.createRef()
   }
 
   playPause = () => {
-    this.setState({ playing: !this.state.playing })
+    this.props.dispatch({ type: types.TOGGLE_PLAYING })
   }
 
-  toggleLoop = () => {
-    this.setState({ loop: !this.state.loop })
-  }
   setVolume = (value: number) => {
-    this.setState({ volume: value / 100 })
+    this.props.dispatch({ type: types.VOLUME_SET, value: value })
   }
-  toggleMuted = () => {
-    this.setState({ muted: !this.state.muted })
-  }
-  setPlaybackRate = e => {
+
+  setPlaybackRate = (e: any) => {
     this.setState({ playbackRate: parseFloat(e.target.value) })
   }
   onPlay = () => {
-    this.setState({ playing: true })
+    this.props.dispatch({ type: types.START_PLAYING })
   }
   onPause = () => {
-    this.setState({ playing: false })
+    this.props.dispatch({ type: types.STOP_PLAYING })
   }
-  onSeekMouseDown = e => {
-    this.setState({ seeking: true })
-  }
-  onSeekChange = value => {
+  onSeekChange = (value: any) => {
     this.setState({ playedSeconds: value / 1000 })
     this.playerRef.current.seekTo(
       value / 1000
     )
-  }
-
-  onSeekMouseUp = value => {
-    this.setState({ seeking: false })
   }
 
   onProgress = (state: any) => {
@@ -106,10 +85,8 @@ class PlayerControls extends React.Component<Props> {
     if (this.props.player.errorCount) {
       this.props.dispatch({ type: types.CLEAR_PLAYER_ERRORS })
     }
-    // We only want to update time slider if we are not currently seeking
-    if (!this.state.seeking) {
-      this.setState(state)
-    }
+    // We only want to update time slider if we are not currently
+    this.setState(state)
   }
   onDuration = (duration: number) => {
     this.setState({ duration })
@@ -127,7 +104,6 @@ class PlayerControls extends React.Component<Props> {
     if (this.props.queue.nextSongId) {
       // Force player playing refresh
       this.props.dispatch({type: types.PLAY_NEXT})
-      this.setState({ playing: true })
     }
   }
 
@@ -147,12 +123,11 @@ class PlayerControls extends React.Component<Props> {
 
   render () {
     const {
-      playing,
       duration,
-      volume,
       loadedSeconds,
       playedSeconds
     } = this.state
+    const { playing, volume } = this.props.player
 
     const currentPlayingId = this.props.queue.currentPlaying
     const currentPlaying = this.props.collection.rows[currentPlayingId]
@@ -198,9 +173,8 @@ class PlayerControls extends React.Component<Props> {
           }}
           onMouseMove={this.showPlayer}
           controls={false}
-          loop={false}
           playbackRate={1}
-          volume={volume}
+          volume={volume / 100}
           muted={false}
           onPlay={this.onPlay}
           onPause={this.onPause}
@@ -266,7 +240,7 @@ class PlayerControls extends React.Component<Props> {
                   <Controls
                     mqlMatch={this.props.app.mqlMatch}
                     playPrev={this.playPrev}
-                    isPlaying={this.state.playing}
+                    isPlaying={this.props.player.playing}
                     playPause={this.playPause}
                     playNext={this.playNext}
                     dispatch={this.props.dispatch}
@@ -274,7 +248,7 @@ class PlayerControls extends React.Component<Props> {
                 </div>
                 <div className='flex flex-grow-0'>
                   <ContextualMenu
-                    volume={volume * 100}
+                    volume={volume}
                     dispatch={this.props.dispatch}
                     setVolume={this.setVolume}
                   />

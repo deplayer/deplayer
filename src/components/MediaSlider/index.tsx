@@ -7,7 +7,7 @@ import Tag from '../common/Tag'
 
 const MediaCover = ({ media }) => {
   return (
-    <div className='block border rounded w-32 h-32 mx-2'>
+    <div className='block rounded w-32 h-32 mx-2'>
       <Link to={`/song/${media.id}`} className='h-32'>
         <CoverImage
           albumName={media.title}

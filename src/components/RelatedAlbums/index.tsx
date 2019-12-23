@@ -7,7 +7,7 @@ import CoverImage from '../MusicTable/CoverImage'
 
 const AlbumCover = ({ album }) => {
   return (
-    <div className='block border rounded w-32 h-32 mx-2'>
+    <div className='block rounded w-32 h-32 mx-2'>
       <Link to={`/album/${album.id}`} className='h-32'>
         <CoverImage
           albumName={album.name}

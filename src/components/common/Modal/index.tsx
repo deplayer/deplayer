@@ -8,10 +8,12 @@ ReactModal.setAppElement('#modal')
 const customStyles = {
   content: {
     zIndex: 51,
-    top: '40px',
-    bottom: '40px',
-    left: '40px',
-    right: '40px'
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)'
   },
   overlay: {
     zIndex: 100,
