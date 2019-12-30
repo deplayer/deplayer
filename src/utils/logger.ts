@@ -1,4 +1,4 @@
-import logger from 'bragi-browser'
+/* import logger from 'bragi-browser'
 
 if (process.env.NODE_ENV !== 'development') {
   logger.transports.empty()
@@ -7,4 +7,10 @@ if (process.env.NODE_ENV !== 'development') {
 logger.transports.get('console').property('showMeta', false)
 logger.transports.get('console').property('showColors', false)
 
-export default logger
+export default logger */
+
+export default {
+  log: (...args: any) => {
+    console.log(args)
+  }
+}

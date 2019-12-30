@@ -8,6 +8,7 @@ const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
+const ThreadsPlugin = require('threads-plugin');
 const { InjectManifest } = require('workbox-webpack-plugin');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
@@ -204,6 +205,7 @@ module.exports = {
       swSrc: path.join('src', 'service-worker.js'),
       swDest: path.join('service-worker.js')
     }),
+    new ThreadsPlugin(),
     // Makes some environment variables available to the JS code, for example:
     // if (process.env.NODE_ENV === 'development') { ... }. See `./env.js`.
     // This is necessary to emit hot updates (currently CSS only):

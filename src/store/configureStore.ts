@@ -23,12 +23,13 @@ import rootSaga from '../sagas/rootSaga'
 // Custom middlewares
 import alerts from './middlewares/alerts'
 import exports from './middlewares/exports'
+import workers from './middlewares/workers'
 
 const mql = window.matchMedia(`(min-width: 800px)`)
 
 type StoreState = {}
 
-export default function configureStore() {
+const configureStore = () => {
   const testingMiddlewares: Array<any> = []
 
   if (process.env.NODE_ENV === 'development') {
@@ -41,6 +42,7 @@ export default function configureStore() {
     thunk,
     alerts,
     exports,
+    workers,
     routerMiddleware(history) // for dispatching history actions
   ]
 
@@ -81,3 +83,5 @@ export default function configureStore() {
 
   return store
 }
+
+export default configureStore
