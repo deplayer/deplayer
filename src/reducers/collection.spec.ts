@@ -4,8 +4,8 @@ import Media from '../entities/Media'
 
 import MediaId from '../entities/MediaId'
 import ArtistId from '../entities/ArtistId'
-jest.mock('../entities/MediaId');
-jest.mock('../entities/ArtistId');
+jest.mock('../entities/MediaId')
+jest.mock('../entities/ArtistId')
 
 describe('collection reducer', () => {
   it('should return the initial state', () => {

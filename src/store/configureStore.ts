@@ -4,8 +4,10 @@ import createSagaMiddleware from 'redux-saga'
 import thunk from 'redux-thunk'
 import promise from 'redux-promise'
 import perflogger from 'redux-perf-middleware'
+import { Worker } from 'threads'
 
 import history from './configureHistory'
+import applyWorker from './applyWorker'
 
 import {
   loadTranslations,
@@ -23,7 +25,10 @@ import rootSaga from '../sagas/rootSaga'
 // Custom middlewares
 import alerts from './middlewares/alerts'
 import exports from './middlewares/exports'
-import workers from './middlewares/workers'
+// import workers from './middlewares/workers'
+
+
+const worker = new Worker('../reducers/index.worker')
 
 const mql = window.matchMedia(`(min-width: 800px)`)
 
@@ -42,7 +47,7 @@ const configureStore = () => {
     thunk,
     alerts,
     exports,
-    workers,
+    // workers,
     routerMiddleware(history) // for dispatching history actions
   ]
 
@@ -54,7 +59,8 @@ const configureStore = () => {
 	const store = createStore<StoreState, any, any, any>(
     rootReducer(history),
     composeEnhancers(
-      applyMiddleware(...middlewares, sagaMiddleware)
+      applyMiddleware(...middlewares, sagaMiddleware),
+      applyWorker(worker)
     )
 	)
 

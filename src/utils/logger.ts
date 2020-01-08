@@ -12,5 +12,8 @@ export default logger */
 export default {
   log: (...args: any) => {
     console.log(args)
+  },
+  warn: (...args: any) => {
+    console.log(args)
   }
 }

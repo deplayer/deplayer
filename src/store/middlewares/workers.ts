@@ -7,7 +7,7 @@ const workers = (store: any) => (next: any) => async (action: any) => {
     action
   )
 
-  console.log(newState)
+  console.log('newState: ', newState)
   return next(action)
 }
 
