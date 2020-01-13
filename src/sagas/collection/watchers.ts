@@ -5,7 +5,6 @@ import { getAdapter } from '../../services/database'
 import { initialize } from '../settings'
 import CollectionService from '../../services/CollectionService'
 import IndexService from '../../services/Search/IndexService'
-import mapToMedia from '../../mappers/mapToMedia'
 import * as types from '../../constants/ActionTypes'
 
 /**
@@ -53,7 +52,7 @@ export function* initializeWatcher() {
     yield call(initialize)
     yield call(collectionService.initialize)
     const collection = yield call(collectionService.getAll)
-    const mappedData = mapToMedia(collection)
+    const mappedData = collection.map((elem: any) => elem.toJSON())
 
     const chunks = chunkArray(mappedData, 1000)
     for (let i = 0; i < chunks.length; i++) {
