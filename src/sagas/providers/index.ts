@@ -129,14 +129,18 @@ export function* handleIPFSFolderScan(): any {
 }
 
 function* startYoutubeDlScan(action: any) {
-  const settings = yield select(getSettings)
-  const service = new YoutubeDlServerProvider(
-    settings.app['youtube-dl-server'],
-    action.key
-  )
+  try {
+    const settings = yield select(getSettings)
+    const service = new YoutubeDlServerProvider(
+      settings.app['youtube-dl-server'],
+      action.key
+    )
 
-  const result = yield service.search(action.data.url)
-  yield put({type: types.ADD_TO_COLLECTION, data: result})
+    const result = yield service.search(action.data.url)
+    yield put({type: types.ADD_TO_COLLECTION, data: result})
+  } catch (error) {
+    yield put({type: 'YOUTUBE_FETCH_ERROR', error})
+  }
 }
 
 // Binding actions to sagas
