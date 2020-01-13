@@ -7,22 +7,6 @@ import CollectionService from '../../services/CollectionService'
 import IndexService from '../../services/Search/IndexService'
 import * as types from '../../constants/ActionTypes'
 
-/**
- * Returns an array with arrays of the given size.
- *
- * @param myArray {Array} Array to split
- * @param chunkSize {Integer} Size of every group
- */
-const chunkArray = (myArray: Array<any>, chunk_size: number) => {
-    const results: Array<any> = []
-
-    while (myArray.length) {
-      results.push(myArray.splice(0, chunk_size))
-    }
-
-    return results
-}
-
 const adapter = getAdapter()
 const collectionService = new CollectionService(new adapter())
 
@@ -54,10 +38,7 @@ export function* initializeWatcher() {
     const collection = yield call(collectionService.getAll)
     const mappedData = collection.map((elem: any) => elem.toJSON())
 
-    const chunks = chunkArray(mappedData, 1000)
-    for (let i = 0; i < chunks.length; i++) {
-      yield put({type: types.RECEIVE_COLLECTION, data: chunks[i]})
-    }
+    yield put({type: types.RECEIVE_COLLECTION, data: mappedData})
 
     yield put({type: types.INITIALIZED})
     const indexService = new IndexService()
