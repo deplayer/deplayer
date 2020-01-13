@@ -80,6 +80,7 @@ export default (state: State = defaultState, action: any = {}) => {
           ...row,
           id: row.id,
           forcedId: row.id,
+          artistName: row.artist.name,
           artistId: row.artist.id,
           albumId: row.album.id
         })
@@ -96,6 +97,7 @@ export default (state: State = defaultState, action: any = {}) => {
       // https://jsperf.com/map-vs-foreach-speed-test
       for (let i = 0; i < songs.length; i++) {
         const song = songs[i]
+
         rows[song.id] = song
         artists[song.artist.id] = song.artist
         albums[song.album.id] = {
