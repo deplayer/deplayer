@@ -1,5 +1,4 @@
 import Media from '../entities/Media'
-import Song from '../entities/Song'
 import * as actions from '../constants/ActionTypes'
 import logger from '../utils/logger'
 
@@ -8,18 +7,18 @@ declare var navigator: any
 declare var window: any
 
 export default class MediaSessionService {
-  updateMetadata = (media: Song, dispatch: any) => {
-    if (this.canSetMediaSession(media)) {
+  updateMetadata = (media: Media, dispatch: any) => {
+    if (this.canSetMediaSession()) {
       navigator.mediaSession.metadata = new window.MediaMetadata({
         title: media.title,
         artist: media.artist.name,
         album: media.album.name,
         artwork: [
           {
-            src: media.cover.thumbnailUrl, type: 'image/png', sizes: '96x96'
+            src: this.getThumbnail(media), type: 'image/png', sizes: '96x96'
           },
           {
-            src: media.cover.fullUrl, type: 'image/png', sizes: '512x512'
+            src: this.getFullCover, type: 'image/png', sizes: '512x512'
           }
         ]
       })
@@ -35,14 +34,19 @@ export default class MediaSessionService {
       navigator.mediaSession.setActionHandler('nexttrack', () => {
         dispatch({type: actions.PLAY_NEXT})
       })
-
-      navigator.mediaSession.setActionHandler('seekbackward', () => { })
-      navigator.mediaSession.setActionHandler('seekforward', () => {})
     }
   }
 
-  canSetMediaSession (media: Media) {
-    return this.getMediaSession() && media.cover && media.cover.fullUrl
+  getThumbnail(media: Media) {
+    return media.cover ? media.cover.thumbnailUrl : ''
+  }
+
+  getFullCover(media: Media) {
+    return media.cover ? media.cover.fullUrl : ''
+  }
+
+  canSetMediaSession () {
+    return this.getMediaSession()
   }
 
   getMediaSession () {
