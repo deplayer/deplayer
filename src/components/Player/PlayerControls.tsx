@@ -2,6 +2,7 @@ import { Dispatch } from 'redux'
 import { Link } from 'react-router-dom'
 import KeyHandler, {KEYPRESS} from 'react-key-handler'
 import React from 'react'
+import * as ReactDOM from 'react-dom'
 import ReactPlayer from 'react-player'
 import classNames from 'classnames'
 import { CSSTransitionGroup } from 'react-transition-group'
@@ -22,6 +23,7 @@ ReactPlayer.addCustomPlayer((WebtorrentPlayer as any))
 type Props = {
   app: any,
   queue: any,
+  location: any,
   slim: boolean,
   player: PlayerState,
   settings: SettingsState,
@@ -151,43 +153,53 @@ class PlayerControls extends React.Component<Props> {
 
     const showControls = this.props.player.showPlayer
 
+    const songFinder = this.props.location.pathname.match(/\/song\/(.*)/)
+    console.log(this.props)
+
+    const playerNode = songFinder ? document.getElementById('mini-player') : document.getElementById('player')
+
+    const player = playerNode ?  ReactDOM.createPortal(
+      <ReactPlayer
+        className={playerClassnames}
+        ref={this.playerRef}
+        url={streamUri}
+        playing={playing}
+        onClick={this.playPause}
+        onDoubleClick={() => {
+          this.props.dispatch({type: types.TOGGLE_FULL_SCREEN})
+        }}
+        onMouseMove={this.showPlayer}
+        controls={false}
+        volume={volume / 100}
+        muted={false}
+        onPlay={this.onPlay}
+        onPause={this.onPause}
+        onEnded={() => {
+          this.saveTrackPlayed(currentPlayingId)
+          this.playNext()
+        }}
+        config={{
+          file: {
+            forceAudio: currentPlaying.type === 'audio',
+            attributes: {
+              className: currentPlaying.type === 'video' ? 'video-element': 'video-element'
+            }
+          }
+        }}
+        onError={this.onError}
+        onProgress={this.onProgress}
+        onDuration={this.onDuration}
+        progressInterval={1000}
+        width={'100%'}
+        height={'100%'}
+      />,
+      playerNode
+    ) : null
+
     return (
       <React.Fragment>
         { handlers }
-        <ReactPlayer
-          className={playerClassnames}
-          ref={this.playerRef}
-          url={streamUri}
-          playing={playing}
-          onClick={this.playPause}
-          onDoubleClick={() => {
-            this.props.dispatch({type: types.TOGGLE_FULL_SCREEN})
-          }}
-          onMouseMove={this.showPlayer}
-          controls={false}
-          volume={volume / 100}
-          muted={false}
-          onPlay={this.onPlay}
-          onPause={this.onPause}
-          onEnded={() => {
-            this.saveTrackPlayed(currentPlayingId)
-            this.playNext()
-          }}
-          config={{
-            file: {
-              forceAudio: currentPlaying.type === 'audio',
-              attributes: {
-                className: currentPlaying.type === 'video' ? 'video-element': 'video-element'
-              }
-            }
-          }}
-          onError={this.onError}
-          onProgress={this.onProgress}
-          onDuration={this.onDuration}
-          progressInterval={1000}
-          width={'100%'}
-          height={'100%'}
-        />
+        { player }
         { showControls &&
           <div className={ classNames({'player-container': true }) } style={{ zIndex: 102 }}>
             <CSSTransitionGroup
