@@ -154,12 +154,12 @@ class PlayerControls extends React.Component<Props> {
     const showControls = this.props.player.showPlayer
 
     const songFinder = this.props.location.pathname.match(/\/song\/(.*)/)
-    console.log(this.props)
 
     const playerNode = songFinder ? document.getElementById('mini-player') : document.getElementById('player')
 
-    const player = playerNode ?  ReactDOM.createPortal(
+    const player = (
       <ReactPlayer
+        controls={songFinder && currentPlaying.type === 'video'}
         className={playerClassnames}
         ref={this.playerRef}
         url={streamUri}
@@ -169,7 +169,6 @@ class PlayerControls extends React.Component<Props> {
           this.props.dispatch({type: types.TOGGLE_FULL_SCREEN})
         }}
         onMouseMove={this.showPlayer}
-        controls={false}
         volume={volume / 100}
         muted={false}
         onPlay={this.onPlay}
@@ -192,14 +191,15 @@ class PlayerControls extends React.Component<Props> {
         progressInterval={1000}
         width={'100%'}
         height={'100%'}
-      />,
-      playerNode
-    ) : null
+      />
+    )
 
     return (
       <React.Fragment>
         { handlers }
-        { player }
+          <div id="player">
+            { playerNode ? ReactDOM.createPortal(player, playerNode) : player  }
+          </div>
         { showControls &&
           <div className={ classNames({'player-container': true }) } style={{ zIndex: 102 }}>
             <CSSTransitionGroup
