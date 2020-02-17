@@ -34,14 +34,25 @@ type Props = {
 }
 
 class PlayerControls extends React.Component<Props> {
-  playerRef: any
+  playerRef: any = React.createRef()
 
   state = {
     timeShown: 0,
   }
 
-  componentWillMount() {
-    this.playerRef = React.createRef()
+  componentDidMount() {
+    if (this.props.player.playedSeconds > 0) {
+      this.playerRef.current.seekTo(this.props.player.playedSeconds)
+    }
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    if (
+      this.props.location.pathname !== prevProps.location.pathname
+        && this.props.player.playedSeconds > 0
+    ) {
+      this.playerRef.current.seekTo(this.props.player.playedSeconds)
+    }
   }
 
   playPause = () => {
@@ -98,6 +109,10 @@ class PlayerControls extends React.Component<Props> {
       // Force player playing refresh
       this.props.dispatch({type: types.PLAY_NEXT})
     }
+  }
+
+  resetPlayedSeconds = () => {
+    this.props.dispatch({ type: types.SET_PLAYER_PLAYED_SECONDS, value: 0 })
   }
 
   saveTrackPlayed = (songId: string) => {
@@ -159,6 +174,8 @@ class PlayerControls extends React.Component<Props> {
 
     const player = (
       <ReactPlayer
+        pip
+        preload
         controls={songFinder && currentPlaying.type === 'video'}
         className={playerClassnames}
         ref={this.playerRef}
@@ -174,6 +191,7 @@ class PlayerControls extends React.Component<Props> {
         onPlay={this.onPlay}
         onPause={this.onPause}
         onEnded={() => {
+          this.resetPlayedSeconds()
           this.saveTrackPlayed(currentPlayingId)
           this.playNext()
         }}
