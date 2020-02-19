@@ -13,8 +13,10 @@ import Spinner from '..//Spinner'
 import Tag from '../common/Tag'
 import logger from '../../utils/logger'
 import * as types from '../../constants/ActionTypes'
+import { OutPortal } from 'react-reverse-portal'
 
 type Props = {
+  playerPortal: any,
   collection: { albumsByArtist: Array<string>, albums: any },
   queue: { trackIds: any },
   song: Media,
@@ -49,7 +51,7 @@ const SongView = (props: Props) => {
       <div className="song sm:flex">
         <div className="w-full md:p-6 image md:max-w-sm lg:max-w-md xl:max-w-xl md:flex-grow-0 sticky" >
           { song.type === 'video' &&
-            <div id="mini-player" />
+            <OutPortal node={props.playerPortal} />
           }
           { song.type !== 'video' &&
             <CoverImage

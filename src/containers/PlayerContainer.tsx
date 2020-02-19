@@ -19,6 +19,6 @@ const ConnectedPlayer = connect(
   )
 })
 
-const RoutedPlayer = withRouter(props => <ConnectedPlayer {...props}/>)
+const RoutedPlayer = withRouter((props: any) => <ConnectedPlayer {...props}/>)
 
 export default RoutedPlayer

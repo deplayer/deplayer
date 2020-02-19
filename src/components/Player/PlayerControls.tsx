@@ -6,6 +6,7 @@ import * as ReactDOM from 'react-dom'
 import ReactPlayer from 'react-player'
 import classNames from 'classnames'
 import { CSSTransitionGroup } from 'react-transition-group'
+import { InPortal, OutPortal } from 'react-reverse-portal'
 
 import { State as PlayerState } from '../../reducers/player'
 import { State as SettingsState } from '../../reducers/settings'
@@ -30,6 +31,7 @@ type Props = {
   itemCount: number,
   collection: any,
   dispatch: Dispatch,
+  playerPortal: any,
   match: any
 }
 
@@ -173,50 +175,53 @@ class PlayerControls extends React.Component<Props> {
     const playerNode = songFinder ? document.getElementById('mini-player') : document.getElementById('player')
 
     const player = (
-      <ReactPlayer
-        pip
-        preload
-        controls={songFinder && currentPlaying.type === 'video'}
-        className={playerClassnames}
-        ref={this.playerRef}
-        url={streamUri}
-        playing={playing}
-        onClick={this.playPause}
-        onDoubleClick={() => {
-          this.props.dispatch({type: types.TOGGLE_FULL_SCREEN})
-        }}
-        onMouseMove={this.showPlayer}
-        volume={volume / 100}
-        muted={false}
-        onPlay={this.onPlay}
-        onPause={this.onPause}
-        onEnded={() => {
-          this.resetPlayedSeconds()
-          this.saveTrackPlayed(currentPlayingId)
-          this.playNext()
-        }}
-        config={{
-          file: {
-            forceAudio: currentPlaying.type === 'audio',
-            attributes: {
-              className: currentPlaying.type === 'video' ? 'video-element': 'video-element'
+      <InPortal node={this.props.playerPortal}>
+        <ReactPlayer
+          pip
+          preload
+          controls={songFinder && currentPlaying.type === 'video'}
+          className={playerClassnames}
+          ref={this.playerRef}
+          url={streamUri}
+          playing={playing}
+          onClick={this.playPause}
+          onDoubleClick={() => {
+            this.props.dispatch({type: types.TOGGLE_FULL_SCREEN})
+          }}
+          onMouseMove={this.showPlayer}
+          volume={volume / 100}
+          muted={false}
+          onPlay={this.onPlay}
+          onPause={this.onPause}
+          onEnded={() => {
+            this.resetPlayedSeconds()
+            this.saveTrackPlayed(currentPlayingId)
+            this.playNext()
+          }}
+          config={{
+            file: {
+              forceAudio: currentPlaying.type === 'audio',
+              attributes: {
+                className: currentPlaying.type === 'video' ? 'video-element': 'video-element'
+              }
             }
-          }
-        }}
-        onError={this.onError}
-        onProgress={this.onProgress}
-        onDuration={this.onDuration}
-        progressInterval={1000}
-        width={'100%'}
-        height={'100%'}
-      />
+          }}
+          onError={this.onError}
+          onProgress={this.onProgress}
+          onDuration={this.onDuration}
+          progressInterval={1000}
+          width={'100%'}
+          height={'100%'}
+        />
+      </InPortal>
     )
 
     return (
       <React.Fragment>
         { handlers }
           <div id="player">
-            { playerNode ? ReactDOM.createPortal(player, playerNode) : player  }
+            { player  }
+            { !songFinder && <OutPortal node={this.props.playerPortal}/> }
           </div>
         { showControls &&
           <div className={ classNames({'player-container': true }) } style={{ zIndex: 102 }}>
