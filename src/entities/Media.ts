@@ -199,6 +199,10 @@ export default class Media {
     return 'audio'
   }
 
+  get genres(): Array<string> {
+    return this.genre ? this.genre.split(',') : []
+  }
+
   toDocument(): any {
     return {
       id: this.id,

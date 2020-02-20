@@ -11,6 +11,7 @@ type State = {
   songsByAlbum: any,
   songsByNumberOfPlays: Array<string>,
   songsByArtist: any,
+  songsByGenre: any,
   searchTerm: string,
   visibleSongs: Array<string>,
   searchResults: Array<string>,
@@ -25,6 +26,7 @@ export const defaultState = {
   artists: {},
   albums: {},
   songsByArtist: {},
+  songsByGenre: {},
   songsByAlbum: {},
   albumsByArtist: {},
   songsByNumberOfPlays: [],
@@ -90,6 +92,7 @@ export default (state: State = defaultState, action: any = {}) => {
       const artists = {}
       const albums = {}
       const songsByArtist = {}
+      const songsByGenre = {}
       const albumsByArtist = {}
       const songsByAlbum = {}
       // FIXME: Convert this in a functional way
@@ -110,6 +113,14 @@ export default (state: State = defaultState, action: any = {}) => {
         }
 
         songsByArtist[song.artist.id].push(song.id)
+
+        song.genres.forEach((genre: string) => {
+          if (!songsByGenre[genre]) {
+            songsByGenre[genre] = []
+          }
+
+          songsByGenre[genre].push(song.id)
+        })
 
         if (!albumsByArtist[song.artist.id]) {
           albumsByArtist[song.artist.id] = []
@@ -137,6 +148,7 @@ export default (state: State = defaultState, action: any = {}) => {
         artists: {...state.artists, ...artists},
         albums: {...state.albums, ...albums},
         songsByArtist: {...state.songsByArtist, ...songsByArtist},
+        songsByGenre: {...state.songsByGenre, ...songsByGenre},
         songsByAlbum: {...state.songsByAlbum, ...songsByAlbum},
         albumsByArtist: {...state.albumsByArtist, ...albumsByArtist},
         visibleSongs: filterSongs(

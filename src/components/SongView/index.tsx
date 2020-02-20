@@ -14,10 +14,16 @@ import Tag from '../common/Tag'
 import logger from '../../utils/logger'
 import * as types from '../../constants/ActionTypes'
 import { OutPortal } from 'react-reverse-portal'
+import MediaSlider from '../MediaSlider'
 
 type Props = {
   playerPortal: any,
-  collection: { albumsByArtist: Array<string>, albums: any },
+  collection: {
+    albumsByArtist: Array<string>,
+    albums: any,
+    songsByGenre: any,
+    rows: any
+  },
   queue: { trackIds: any },
   song: Media,
   dispatch: Dispatch,
@@ -26,7 +32,8 @@ type Props = {
 }
 
 const SongView = (props: Props) => {
-  const { song, queue: { trackIds }, collection: { albums, albumsByArtist } } = props
+  const MAX_LIST_ITEMS = 25
+  const { song, queue: { trackIds }, collection: { rows, albums, albumsByArtist } } = props
 
   if (props.loading) {
     return (
@@ -41,6 +48,13 @@ const SongView = (props: Props) => {
   if (!song || !song.id) {
     return null
   }
+
+  const sameGenreSongs = props.collection.songsByGenre[song.genres[0]]
+    ? props.collection
+        .songsByGenre[song.genres[0]]
+        .slice(0, MAX_LIST_ITEMS)
+        .map((songId: string) => rows[songId])
+    : null
 
   const relatedAlbums = albumsByArtist && albumsByArtist[song.artist.id] && albumsByArtist[song.artist.id].map((albumId: string) => {
     return albums[albumId]
@@ -156,6 +170,14 @@ const SongView = (props: Props) => {
       <div className='py-6'>
         <RelatedAlbums albums={relatedAlbums} />
       </div>
+      { sameGenreSongs &&
+        <div className='py-6'>
+          <MediaSlider
+            title={<Translate value='titles.sameGenreSongs'/>}
+            mediaItems={sameGenreSongs}
+          />
+        </div>
+      }
     </div>
   )
 }

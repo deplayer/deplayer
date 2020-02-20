@@ -7,7 +7,8 @@
   },
   "titles": {
     "relatedAlbums": "Same artist albums",
-    "mostPlayedSongs": "Most played songs"
+    "mostPlayedSongs": "Most played songs",
+    "sameGenreSongs": "Songs of the same genre"
   },
   "labels": {
     "enableReactPlayer": "use react-player (beta)",

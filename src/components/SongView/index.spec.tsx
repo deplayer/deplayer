@@ -38,7 +38,7 @@ describe('SongView', () => {
 
   it('render song without crash', () => {
     const song = new Media()
-    const collection = { rows: {} }
+    const collection = { rows: {}, songsByGenre: [] }
     collection.rows[song.id] = song
     const { enzymeWrapper } = setup({
       song,
