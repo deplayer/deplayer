@@ -219,6 +219,6 @@ export default class Media {
   }
 
   toJSON() {
-    return {...this, genres: this.genres, type: type}
+    return {...this, genres: this.genres, type: this.type}
   }
 }
