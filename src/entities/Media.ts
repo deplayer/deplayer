@@ -217,4 +217,8 @@ export default class Media {
       duration: this.duration,
     }
   }
+
+  toJSON() {
+    return {...this, genres: this.genres, type: this.type}
+  }
 }

@@ -3,6 +3,10 @@ export const getSettings = (state: any) => {
   return state ? state.settings.settings : {providers: {}}
 }
 
+export const getState = (state: any) => {
+  return state
+}
+
 export const getQueue = (state: any): any => {
   return state ? state.queue : {}
 }

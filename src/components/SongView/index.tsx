@@ -49,7 +49,7 @@ const SongView = (props: Props) => {
     return null
   }
 
-  const sameGenreSongs = props.collection.songsByGenre[song.genres[0]]
+  const sameGenreSongs = song.genres && song.genres.length && props.collection.songsByGenre[song.genres[0]]
     ? props.collection
         .songsByGenre[song.genres[0]]
         .slice(0, MAX_LIST_ITEMS)

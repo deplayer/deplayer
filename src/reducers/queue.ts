@@ -126,6 +126,10 @@ export default (state: State = defaultState, action: any  = {}): State => {
         repeat: !state.repeat
       }
 
+    case types.SET_CACHED_DATA: {
+      return action.data.queue
+    }
+
     default:
       return state
   }

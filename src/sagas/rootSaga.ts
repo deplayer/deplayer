@@ -14,6 +14,7 @@ import searchSaga from './search'
 import settingsSaga from './settings'
 import titleSaga from './title'
 import webtorrentSaga from './webtorrent'
+import cacheSaga from './cache'
 
 function* rootSaga(store: any) {
   yield all([
@@ -28,8 +29,9 @@ function* rootSaga(store: any) {
     providersSaga(),
     queueSaga(),
     searchSaga(),
-    settingsSaga(),
+    settingsSaga(store),
     titleSaga(),
+    cacheSaga(),
     webtorrentSaga()
   ])
 }

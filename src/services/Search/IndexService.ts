@@ -7,13 +7,10 @@ export default class IndexService {
   index: any
 
   constructor() {
-    this.index = elasticlunr(function () {
-      this.addField('title')
-      this.addField('artistName')
-      this.addField('albumName')
-    }, {
-      bool: 'AND'
-    })
+    this.index = elasticlunr()
+    this.index.addField('title')
+    this.index.addField('artistName')
+    this.index.addField('albumName')
 
     this.index.saveDocument(false)
   }
