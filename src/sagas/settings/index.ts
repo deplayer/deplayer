@@ -8,21 +8,23 @@ import getReduxieState from './getReduxieState'
 // Application initialization routines
 export function* initialize(dispatch: any) {
   const cachedState = yield call(getReduxieState, 'appcache', put)
-  console.log(cachedState)
-  yield put({type: 'SET_CACHED_DATA', data: cachedState})
 
-  const adapter = getAdapter()
-  const settingsService = new SettingsService(new adapter())
-  yield call(settingsService.initialize)
-  const settings = yield call(settingsService.get)
-
-  if (!settings) {
-    yield put({type: types.GET_SETTINGS_REJECTED})
+  if (cachedState) {
+    yield put({type: 'SET_CACHED_DATA', data: cachedState})
   } else {
-    const unserialized = JSON.parse(JSON.stringify(settings))
-    yield put({type: types.RECEIVE_SETTINGS, settings: unserialized})
+    const adapter = getAdapter()
+    const settingsService = new SettingsService(new adapter())
+    yield call(settingsService.initialize)
+    const settings = yield call(settingsService.get)
+
+    if (!settings) {
+      yield put({type: types.GET_SETTINGS_REJECTED})
+    } else {
+      const unserialized = JSON.parse(JSON.stringify(settings))
+      yield put({type: types.RECEIVE_SETTINGS, settings: unserialized})
+    }
+    yield put({type: types.RECEIVE_SETTINGS_FINISHED})
   }
-  yield put({type: types.RECEIVE_SETTINGS_FINISHED})
 }
 
 function* saveSettings(action: any) {
