@@ -6,7 +6,7 @@ import { getAdapter } from '../../services/database'
 import getReduxieState from './getReduxieState'
 
 // Application initialization routines
-export function* initialize(dispatch: any) {
+export function* initialize() {
   const cachedState = yield call(getReduxieState, 'appcache', put)
 
   if (cachedState) {
@@ -55,8 +55,8 @@ export function* deleteSettings(): any {
 }
 
 // Binding actions to sagas
-function* settingsSaga(store): any {
-  yield takeLatest(types.INITIALIZE_SETTINGS, initialize, store.dispatch)
+function* settingsSaga(): any {
+  yield takeLatest(types.INITIALIZE_SETTINGS, initialize)
   yield takeLatest(types.SAVE_SETTINGS, saveSettings)
   yield takeLatest(types.DELETE_SETTINGS, deleteSettings)
 }
