@@ -39,7 +39,7 @@ export default function configureStore() {
   }
 
   const reduxieDB = 'appcache'
-  const reduxieConfig = {throttleTime: 10000, deleteCount: 1}
+  const reduxieConfig = {throttleTime: 20000, deleteCount: 1}
   const reduxie = Reduxie.Middleware(reduxieDB, reduxieConfig)
   const middlewares = [
     ...testingMiddlewares,

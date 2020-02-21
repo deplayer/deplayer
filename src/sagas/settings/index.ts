@@ -3,9 +3,14 @@ import { takeLatest, put, call } from 'redux-saga/effects'
 import * as types from '../../constants/ActionTypes'
 import SettingsService from '../../services/settings/SettingsService'
 import { getAdapter } from '../../services/database'
+import getReduxieState from './getReduxieState'
 
 // Application initialization routines
-export function* initialize() {
+export function* initialize(dispatch: any) {
+  const cachedState = yield call(getReduxieState, 'appcache', put)
+  console.log(cachedState)
+  yield put({type: 'SET_CACHED_DATA', data: cachedState})
+
   const adapter = getAdapter()
   const settingsService = new SettingsService(new adapter())
   yield call(settingsService.initialize)
@@ -48,8 +53,8 @@ export function* deleteSettings(): any {
 }
 
 // Binding actions to sagas
-function* settingsSaga(): any {
-  yield takeLatest(types.INITIALIZE_SETTINGS, initialize)
+function* settingsSaga(store): any {
+  yield takeLatest(types.INITIALIZE_SETTINGS, initialize, store.dispatch)
   yield takeLatest(types.SAVE_SETTINGS, saveSettings)
   yield takeLatest(types.DELETE_SETTINGS, deleteSettings)
 }

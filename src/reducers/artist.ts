@@ -13,6 +13,10 @@ export default (state: State = defaultState, action: any): State => {
     case types.RECEIVE_ARTIST_METADATA:
       return {...state, artistMetadata: action.data}
 
+    case types.SET_CACHED_DATA: {
+      return action.data.artist
+    }
+
     default:
       return state
   }

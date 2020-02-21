@@ -37,6 +37,10 @@ export default (state: State = defaultState, action: any = {}): State => {
     case types.RECEIVE_PLAYLISTS:
       return {...state, playlists: action.playlists}
 
+    case types.SET_CACHED_DATA: {
+      return action.data.playlist
+    }
+
     default:
       return state
   }

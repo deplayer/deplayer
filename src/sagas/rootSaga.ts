@@ -29,7 +29,7 @@ function* rootSaga(store: any) {
     providersSaga(),
     queueSaga(),
     searchSaga(),
-    settingsSaga(),
+    settingsSaga(store),
     titleSaga(),
     cacheSaga(),
     webtorrentSaga()
