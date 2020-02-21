@@ -28,6 +28,10 @@ const ContextualMenu = (props: MenuProps) => {
     props.dispatch({type: types.REMOVE_FROM_QUEUE, data: [props.song]})
   }
 
+  const removeFromDatabase = () => {
+    props.dispatch({type: types.REMOVE_FROM_COLLECTION, data: [props.song]})
+  }
+
   return (
     <React.Fragment>
       <MenuProvider event="onClick" id={`context-menu-${song.id}`}>
@@ -74,6 +78,18 @@ const ContextualMenu = (props: MenuProps) => {
               </Button>
             </Item>
         }
+
+        <Item>
+          <Button
+            fullWidth
+            transparent
+            alignLeft
+            onClick={removeFromDatabase}
+          >
+            <i className='icon remove mr-2'></i>
+            <Translate value='buttons.removeFromCollection' />
+          </Button>
+        </Item>
       </Menu>
     </React.Fragment>
   )
