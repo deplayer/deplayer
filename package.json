@@ -71,7 +71,7 @@
     "react-contexify": "^4.0.0",
     "react-dev-utils": "6.0.0-next.3e165448",
     "react-dom": "^16.3.2",
-    "react-horizontal-scrolling-menu": "^0.7.3",
+    "react-horizontal-scrolling-menu": "^0.7.6",
     "react-hot-loader": "^4.6.3",
     "react-key-handler": "^1.2.0-beta.3",
     "react-modal": "^3.11.1",

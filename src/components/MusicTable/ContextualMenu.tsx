@@ -11,6 +11,7 @@ import Media from '../../entities/Media'
 import * as types from '../../constants/ActionTypes'
 
 type MenuProps = {
+  songsLength: number, // Used to re-render
   dispatch: Dispatch,
   disableAddButton?: boolean,
   onClick: () => any,
