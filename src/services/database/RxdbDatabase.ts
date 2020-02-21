@@ -103,6 +103,19 @@ const collections: Array<any> = [
         }
       },
     }
+  },
+  {
+    name: 'appcache',
+    schema: {
+      title: 'redux store cache',
+      version: 0,
+      type: 'object',
+      properties: {
+        state: {
+          type: 'object'
+        }
+      },
+    }
   }
 ]
 

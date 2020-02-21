@@ -178,7 +178,6 @@ class PlayerControls extends React.Component<Props> {
       <InPortal node={this.props.playerPortal}>
         <ReactPlayer
           pip
-          preload
           controls={songFinder && currentPlaying.type === 'video'}
           className={playerClassnames}
           ref={this.playerRef}
