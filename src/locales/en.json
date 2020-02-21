@@ -51,6 +51,7 @@
     "clearQueue": "clear queue",
     "saveAsPlaylist": "save as playlist",
     "addToQueue": "add to queue",
+    "removeFromCollection": "remove from collection",
     "removeFromQueue": "remove from queue",
     "shuffle": "shuffle",
     "hidePlayer": "hide",
