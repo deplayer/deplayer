@@ -48,6 +48,91 @@ const getIndexService = (index: any) => {
   return indexService.loadIndex(index.index)
 }
 
+const populateFromAction = (state: State, action: {data: any}) => {
+  const songs = action.data.map((row: any) => {
+    return new Media({
+      ...row,
+      id: row.id,
+      forcedId: row.id,
+      artistName: row.artist.name,
+      artistId: row.artist.id,
+      albumId: row.album.id
+    })
+  })
+
+  const rows = {}
+  const artists = {}
+  const albums = {}
+  const songsByArtist = {}
+  const songsByGenre = {}
+  const albumsByArtist = {}
+  const songsByAlbum = {}
+  // FIXME: Convert this in a functional way
+  // using map instead of forEach for better performance
+  // https://jsperf.com/map-vs-foreach-speed-test
+  for (let i = 0; i < songs.length; i++) {
+    const song = songs[i]
+
+    rows[song.id] = song
+    artists[song.artist.id] = song.artist
+    albums[song.album.id] = {
+      ...song.album,
+      thumbnailUrl: song.cover.thumbnailUrl
+    }
+
+    if (!songsByArtist[song.artist.id]) {
+      songsByArtist[song.artist.id] = []
+    }
+
+    songsByArtist[song.artist.id].push(song.id)
+
+    song.genres.forEach((genre: string) => {
+      if (!songsByGenre[genre]) {
+        songsByGenre[genre] = []
+      }
+
+      songsByGenre[genre].push(song.id)
+    })
+
+    if (!albumsByArtist[song.artist.id]) {
+      albumsByArtist[song.artist.id] = []
+    }
+
+    if (!albumsByArtist[song.artist.id].includes(song.album.id)) {
+      albumsByArtist[song.artist.id].push(song.album.id)
+    }
+
+    if (!songsByAlbum[song.album.id]) {
+      songsByAlbum[song.album.id] = []
+    }
+
+    if (!songsByAlbum[song.album.id].includes(song.id)) {
+      songsByAlbum[song.album.id].push(song.id)
+    }
+  }
+
+  const totalRows = {...state.rows, ...rows}
+  const indexService = getIndexService(state.searchIndex)
+
+  return {
+    ...state,
+    rows: totalRows,
+    artists: {...state.artists, ...artists},
+    albums: {...state.albums, ...albums},
+    songsByArtist: {...state.songsByArtist, ...songsByArtist},
+    songsByGenre: {...state.songsByGenre, ...songsByGenre},
+    songsByAlbum: {...state.songsByAlbum, ...songsByAlbum},
+    albumsByArtist: {...state.albumsByArtist, ...albumsByArtist},
+    visibleSongs: filterSongs(
+      indexService,
+      totalRows
+    ),
+    searchResults: state.searchTerm !== '' ? filterSongs(indexService, totalRows, state.searchTerm) : [],
+    totalRows: Object.keys(totalRows).length,
+    loading: false
+  }
+}
+
 export default (state: State = defaultState, action: any = {}) => {
   switch (action.type) {
     case types.SET_SEARCH_TERM: {
@@ -77,88 +162,7 @@ export default (state: State = defaultState, action: any = {}) => {
 
     case types.RECEIVE_COLLECTION_ITEM:
     case types.RECEIVE_COLLECTION: {
-      const songs = action.data.map((row: any) => {
-        return new Media({
-          ...row,
-          id: row.id,
-          forcedId: row.id,
-          artistName: row.artist.name,
-          artistId: row.artist.id,
-          albumId: row.album.id
-        })
-      })
-
-      const rows = {}
-      const artists = {}
-      const albums = {}
-      const songsByArtist = {}
-      const songsByGenre = {}
-      const albumsByArtist = {}
-      const songsByAlbum = {}
-      // FIXME: Convert this in a functional way
-      // using map instead of forEach for better performance
-      // https://jsperf.com/map-vs-foreach-speed-test
-      for (let i = 0; i < songs.length; i++) {
-        const song = songs[i]
-
-        rows[song.id] = song
-        artists[song.artist.id] = song.artist
-        albums[song.album.id] = {
-          ...song.album,
-          thumbnailUrl: song.cover.thumbnailUrl
-        }
-
-        if (!songsByArtist[song.artist.id]) {
-          songsByArtist[song.artist.id] = []
-        }
-
-        songsByArtist[song.artist.id].push(song.id)
-
-        song.genres.forEach((genre: string) => {
-          if (!songsByGenre[genre]) {
-            songsByGenre[genre] = []
-          }
-
-          songsByGenre[genre].push(song.id)
-        })
-
-        if (!albumsByArtist[song.artist.id]) {
-          albumsByArtist[song.artist.id] = []
-        }
-
-        if (!albumsByArtist[song.artist.id].includes(song.album.id)) {
-          albumsByArtist[song.artist.id].push(song.album.id)
-        }
-
-        if (!songsByAlbum[song.album.id]) {
-          songsByAlbum[song.album.id] = []
-        }
-
-        if (!songsByAlbum[song.album.id].includes(song.id)) {
-          songsByAlbum[song.album.id].push(song.id)
-        }
-      }
-
-      const totalRows = {...state.rows, ...rows}
-      const indexService = getIndexService(state.searchIndex)
-
-      return {
-        ...state,
-        rows: totalRows,
-        artists: {...state.artists, ...artists},
-        albums: {...state.albums, ...albums},
-        songsByArtist: {...state.songsByArtist, ...songsByArtist},
-        songsByGenre: {...state.songsByGenre, ...songsByGenre},
-        songsByAlbum: {...state.songsByAlbum, ...songsByAlbum},
-        albumsByArtist: {...state.albumsByArtist, ...albumsByArtist},
-        visibleSongs: filterSongs(
-          indexService,
-          totalRows
-        ),
-        searchResults: state.searchTerm !== '' ? filterSongs(indexService, totalRows, state.searchTerm) : [],
-        totalRows: Object.keys(totalRows).length,
-        loading: false
-      }
+      return populateFromAction(state, action)
     }
 
     case types.RECEIVE_SETTINGS: {
@@ -205,6 +209,17 @@ export default (state: State = defaultState, action: any = {}) => {
         ...state,
         songsByNumberOfPlays
       }
+    }
+
+    case types.REMOVE_FROM_COLLECTION_FULFILLED: {
+      const songIds = action.data.map((media: Media) => media.id)
+
+      const newRows = state.rows
+      songIds.forEach((songId: string) => {
+        delete newRows[songId]
+      })
+
+      return populateFromAction(state, { data: Object.values(newRows) })
     }
 
     case types.UPDATE_MEDIA: {

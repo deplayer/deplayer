@@ -167,11 +167,11 @@ const SongView = (props: Props) => {
           </div>
         </div>
       </div>
-      <div className='py-6'>
+      <div>
         <RelatedAlbums albums={relatedAlbums} />
       </div>
       { sameGenreSongs &&
-        <div className='py-6'>
+        <div className='pb-4'>
           <MediaSlider
             title={<Translate value='titles.sameGenreSongs'/>}
             mediaItems={sameGenreSongs}

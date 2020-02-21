@@ -27,6 +27,7 @@ const Album = (props: AlbumProps) => {
       const songObj = new Media(songRow)
       return (
         <SongRow
+          songsLength={props.songs.length}
           mqlMatch={false}
           disableCovers
           style={ {} }

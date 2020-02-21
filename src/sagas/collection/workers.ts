@@ -27,7 +27,8 @@ export function* saveToDbWorker(data: Array<any>): any {
 export function* removeFromDbWorker(action: any): any {
   try {
     yield collectionService.bulkRemove(action.data)
-    yield put({type: types.REMOVE_FROM_COLLECTION_FULFILLED})
+    yield put({type: types.REMOVE_FROM_COLLECTION_FULFILLED, data: action.data})
+    yield put({type: types.RECREATE_INDEX})
   } catch (e) {
     yield put({type: types.REMOVE_FROM_COLLECTION_REJECTED, message: e.message})
   }
