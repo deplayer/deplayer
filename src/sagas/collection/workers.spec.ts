@@ -25,7 +25,8 @@ describe('removeFromDbWorker', () => {
   it('works', () => {
     const action = { data: [] }
     return expectSaga(removeFromDbWorker, action)
-      .put({type: types.REMOVE_FROM_COLLECTION_FULFILLED})
+      .put({type: types.REMOVE_FROM_COLLECTION_FULFILLED, data: []})
+      .put({type: types.RECREATE_INDEX})
       .run()
   })
 })
