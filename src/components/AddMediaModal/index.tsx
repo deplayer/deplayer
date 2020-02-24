@@ -13,6 +13,7 @@ type Props = {
 
 const AddMediaModal = (props: Props) => {
   const [magnetLink, setMagnetLink] = React.useState('')
+  const [youtubeLink, setYoutubeLink] = React.useState('')
 
   if (!props.showAddMediaModal) {
     return null
@@ -36,6 +37,26 @@ const AddMediaModal = (props: Props) => {
         type='submit'
         onClick={() => {
           props.dispatch({type: types.ADD_WEBTORRENT_MEDIA, magnet: magnetLink})
+          props.dispatch({type: types.HIDE_ADD_MEDIA_MODAL})
+        }}
+      >
+        Add
+      </Button>
+
+      <h3>Youtube link</h3>
+      <Input
+        type="text"
+        value={youtubeLink}
+        onChange={(event) => setYoutubeLink(event.target.value)}
+      />
+      <Button
+        type='submit'
+        onClick={() => {
+          props.dispatch({
+            type: types.START_YOUTUBE_DL_SERVER_SCAN,
+            key: 'youtube',
+            data: { url: youtubeLink }
+          })
           props.dispatch({type: types.HIDE_ADD_MEDIA_MODAL})
         }}
       >

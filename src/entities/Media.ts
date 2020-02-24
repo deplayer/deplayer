@@ -118,6 +118,9 @@ export default class Media {
       genre: {
         type: 'string'
       },
+      type: {
+        type: 'string'
+      },
       shareUrl: {
         type: 'string'
       },
@@ -192,7 +195,7 @@ export default class Media {
   }
 
   get type(): MediaType {
-    if (this.hasAnyProviderOf(['youtube'])) {
+    if (this.hasAnyProviderOf(['youtube', 'webtorrent'])) {
       return 'video'
     }
 
@@ -214,6 +217,7 @@ export default class Media {
       genre: this.genre,
       playCount: this.playCount,
       filePath: this.filePath,
+      type: this.type,
       duration: this.duration,
     }
   }

@@ -42,21 +42,6 @@ class PlayerControls extends React.Component<Props> {
     timeShown: 0,
   }
 
-  componentDidMount() {
-    if (this.props.player.playedSeconds > 0) {
-      this.playerRef.current.seekTo(this.props.player.playedSeconds)
-    }
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (
-      this.props.location.pathname !== prevProps.location.pathname
-        && this.props.player.playedSeconds > 0
-    ) {
-      this.playerRef.current.seekTo(this.props.player.playedSeconds)
-    }
-  }
-
   playPause = () => {
     this.props.dispatch({ type: types.TOGGLE_PLAYING })
   }
@@ -170,14 +155,16 @@ class PlayerControls extends React.Component<Props> {
 
     const showControls = this.props.player.showPlayer
 
-    const songFinder = this.props.location.pathname.match(/\/song\/(.*)/)
-
-    const playerNode = songFinder ? document.getElementById('mini-player') : document.getElementById('player')
+    const songFinder = this.props
+      .location
+      .pathname
+      .match(new RegExp(`/song/${currentPlayingId}`))
 
     const player = (
       <InPortal node={this.props.playerPortal}>
         <ReactPlayer
           pip
+          fullscreen={this.props.player.fullscreen}
           controls={songFinder && currentPlaying.type === 'video'}
           className={playerClassnames}
           ref={this.playerRef}

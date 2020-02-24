@@ -4,11 +4,13 @@ import classnames from 'classnames'
 type Props = {
   children: any
   transparent?: boolean
+  fullWidth?: boolean,
   type?: 'primary'
 }
 
 const Tag = (props: Props) => {
   const classes = classnames({
+    'w-full': props.fullWidth,
     'p-1': true,
     'px-2': true,
     rounded: true,

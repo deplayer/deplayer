@@ -12,6 +12,7 @@ type Props = {
   alignLeft?: boolean,
   disabled?: boolean,
   transparent?: boolean,
+  uppercase?: boolean,
   fullWidth?: boolean,
   type?: 'submit' | 'button',
   className?: string
@@ -19,6 +20,7 @@ type Props = {
 
 const Button = (props: Props) => {
   const classNames = classnames({
+    uppercase: props.uppercase,
     'text-blue-200': !props.transparent || props.inverted,
     'hover:text-blue-200': !props.transparent || props.inverted,
     'bg-blue-700': !props.transparent && !props.inverted,

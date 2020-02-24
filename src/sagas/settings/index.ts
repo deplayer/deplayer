@@ -3,28 +3,26 @@ import { takeLatest, put, call } from 'redux-saga/effects'
 import * as types from '../../constants/ActionTypes'
 import SettingsService from '../../services/settings/SettingsService'
 import { getAdapter } from '../../services/database'
-import getReduxieState from './getReduxieState'
+// import getReduxieState from './getReduxieState'
 
 // Application initialization routines
 export function* initialize() {
-  const cachedState = yield call(getReduxieState, 'appcache', put)
+  // const cachedState = yield call(getReduxieState, 'appcache', put)
 
-  if (cachedState) {
-    yield put({type: 'SET_CACHED_DATA', data: cachedState})
+  // if (cachedState) {
+  // yield put({type: 'SET_CACHED_DATA', data: cachedState})
+  const adapter = getAdapter()
+  const settingsService = new SettingsService(new adapter())
+  yield call(settingsService.initialize)
+  const settings = yield call(settingsService.get)
+
+  if (!settings) {
+    yield put({type: types.GET_SETTINGS_REJECTED})
   } else {
-    const adapter = getAdapter()
-    const settingsService = new SettingsService(new adapter())
-    yield call(settingsService.initialize)
-    const settings = yield call(settingsService.get)
-
-    if (!settings) {
-      yield put({type: types.GET_SETTINGS_REJECTED})
-    } else {
-      const unserialized = JSON.parse(JSON.stringify(settings))
-      yield put({type: types.RECEIVE_SETTINGS, settings: unserialized})
-    }
-    yield put({type: types.RECEIVE_SETTINGS_FINISHED})
+    const unserialized = JSON.parse(JSON.stringify(settings))
+    yield put({type: types.RECEIVE_SETTINGS, settings: unserialized})
   }
+  yield put({type: types.RECEIVE_SETTINGS_FINISHED})
 }
 
 function* saveSettings(action: any) {

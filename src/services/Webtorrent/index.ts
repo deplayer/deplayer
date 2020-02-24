@@ -28,10 +28,12 @@ export const magnetToMedia = async (torrentUrl: string): Promise<Array<Media>> =
       })
 
       const medias = files.map((file: any) => {
+        const type = file.name.endsWith('.mp4') ? 'video': 'audio'
         return new Media({
           title: file.name,
           artistName: 'webtorrent',
           albumName: 'webtorrent',
+          type: type,
           stream: [
             {
               service: 'webtorrent',

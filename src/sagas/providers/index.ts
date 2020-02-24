@@ -138,6 +138,7 @@ function* startYoutubeDlScan(action: any) {
 
     const result = yield service.search(action.data.url)
     yield put({type: types.ADD_TO_COLLECTION, data: result})
+    yield put({type: types.RECREATE_INDEX})
   } catch (error) {
     yield put({type: 'YOUTUBE_FETCH_ERROR', error})
   }
@@ -146,7 +147,7 @@ function* startYoutubeDlScan(action: any) {
 // Binding actions to sagas
 function* providersSaga(): any {
   yield takeLatest(types.START_SCAN_SOURCES, startProvidersScan)
-  yield takeEvery('START_YOUTUBE_DL_SERVER_SCAN', startYoutubeDlScan)
+  yield takeEvery(types.START_YOUTUBE_DL_SERVER_SCAN, startYoutubeDlScan)
   yield fork(handleIPFSFolderScan)
   yield fork(handleIPFSFileLoad)
 }

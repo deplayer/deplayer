@@ -45,7 +45,6 @@ export default function configureStore() {
     ...testingMiddlewares,
     promise,
     thunk,
-    reduxie,
     alerts,
     exports,
     routerMiddleware(history) // for dispatching history actions
