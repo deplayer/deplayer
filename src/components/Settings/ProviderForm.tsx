@@ -1,4 +1,5 @@
 import { Dispatch } from 'redux'
+import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
 
 import { State as SettingsStateType } from '../../reducers/settings'
@@ -18,6 +19,7 @@ const ProviderForm = (props: ProviderFormProps) => {
     const onClick = () => {
       props.dispatch({type: types.REMOVE_PROVIDER, providerKey: props.providerKey})
     }
+
     return (
       <Button
         transparent
@@ -28,6 +30,7 @@ const ProviderForm = (props: ProviderFormProps) => {
       </Button>
     )
   }
+
   return (
     <div key={props.providerKey} className={`${settingsCard} mr-4`}>
       <div className='top-0 right-0 absolute'>
@@ -38,6 +41,7 @@ const ProviderForm = (props: ProviderFormProps) => {
       </div>
 
       <FormSchema schema={props.settings.settingsForm.providers[props.providerKey]} />
+
     </div>
   )
 }

@@ -16,4 +16,9 @@ const getReduxieState = async (dbName: string, dispatch: Dispatch) => {
   }
 }
 
+export const invalidateReduxie = async (dbName: string) => {
+  const db = new Reduxie(dbName)
+  await db.delete()
+}
+
 export default getReduxieState;

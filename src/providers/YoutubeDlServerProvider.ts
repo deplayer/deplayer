@@ -37,6 +37,7 @@ export default class YoutubeDlServerProvider implements IMusicProvider {
       duration: 0,
       track: '',
       filePath: '',
+      type: 'video',
       stream: [
         {
           service: this.providerKey,

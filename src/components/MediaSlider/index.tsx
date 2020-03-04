@@ -3,6 +3,7 @@ import React from 'react'
 
 import CoverImage from '../MusicTable/CoverImage'
 import HorizontalSlider from '../HorizontalSlider'
+import Spinner from '../Spinner'
 import Tag from '../common/Tag'
 
 const MediaCover = ({ media }) => {
@@ -16,7 +17,7 @@ const MediaCover = ({ media }) => {
             fullUrl: media.cover.thumbnailUrl
           }}
         />
-        <Tag>{ media.playCount } times played</Tag>
+        <Tag fullWidth>{ media.playCount ? `${media.playCount} times played` : "never played" }</Tag>
         <div className='py-4 whitespace-normal text-center truncate w-32'>
           { media.title }
         </div>
@@ -40,11 +41,19 @@ export const MediaItems = (list: Array<any>) => {
 
 type Props = {
   mediaItems: Array<any>,
+  loading?: boolean,
   title: React.ReactNode
 }
 
 const SongsSlider = (props: Props) => {
   const mediaItems = MediaItems(props.mediaItems)
+
+  if (props.loading) {
+    return (
+      <Spinner />
+    )
+  }
+
   return (
     <HorizontalSlider
       title={props.title}

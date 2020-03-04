@@ -133,6 +133,17 @@ const populateFromAction = (state: State, action: {data: any}) => {
   }
 }
 
+export const sortByPlayCount = (songId1: string, songId2: string, rows: any) => {
+  const song1 = rows[songId1]
+
+  const song2 = rows[songId2]
+
+  if (song1.playCount < song2.playCount) return 1
+  if (song1.playCount > song2.playCount) return -1
+
+  return 0
+}
+
 export default (state: State = defaultState, action: any = {}) => {
   switch (action.type) {
     case types.SET_SEARCH_TERM: {
@@ -195,15 +206,7 @@ export default (state: State = defaultState, action: any = {}) => {
     case types.APPLY_MOST_PLAYED_SORT: {
       const songsByNumberOfPlays = Object.keys(state.rows).filter((songId) => {
         return state.rows[songId].playCount > 0
-      }).sort((songId1, songId2) => {
-        const song1 = state.rows[songId1]
-        const song2 = state.rows[songId2]
-
-        if (song1.playCount < song2.playCount) return 1
-        if (song1.playCount > song2.playCount) return -1
-
-        return 0
-      })
+      }).sort((songId1, songId2) => sortByPlayCount(songId1, songId2, state.rows))
 
       return {
         ...state,

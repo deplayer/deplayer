@@ -7,7 +7,6 @@ import classNames from 'classnames'
 import { State as SettingsStateType } from '../../reducers/settings'
 import Button from '../common/Button'
 import FormSchema from './FormSchema'
-import ProviderForm from './ProviderForm'
 import * as types from '../../constants/ActionTypes'
 
 type Props = {
@@ -53,7 +52,7 @@ const SettingsForm = (props: Props) => {
             </div>
 
             <div>
-              <Button long disabled={isSubmitting} type='submit'>
+              <Button long fullWidth uppercase disabled={isSubmitting} type='submit'>
                 <Translate value="buttons.save" />
               </Button>
             </div>

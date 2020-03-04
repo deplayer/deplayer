@@ -15,16 +15,18 @@ import logger from '../../utils/logger'
 import * as types from '../../constants/ActionTypes'
 import { OutPortal } from 'react-reverse-portal'
 import MediaSlider from '../MediaSlider'
+import { sortByPlayCount } from '../../reducers/collection'
 
 type Props = {
   playerPortal: any,
+  location: any,
   collection: {
     albumsByArtist: Array<string>,
     albums: any,
     songsByGenre: any,
     rows: any
   },
-  queue: { trackIds: any },
+  queue: { trackIds: any, currentPlaying: string },
   song: Media,
   dispatch: Dispatch,
   loading: boolean,
@@ -33,7 +35,17 @@ type Props = {
 
 const SongView = (props: Props) => {
   const MAX_LIST_ITEMS = 25
-  const { song, queue: { trackIds }, collection: { rows, albums, albumsByArtist } } = props
+  const {
+    song,
+    queue: {
+      trackIds,
+      currentPlaying
+    },
+    collection: {
+      rows, albums,
+      albumsByArtist
+    }
+  } = props
 
   if (props.loading) {
     return (
@@ -52,6 +64,7 @@ const SongView = (props: Props) => {
   const sameGenreSongs = song.genres && song.genres.length && props.collection.songsByGenre[song.genres[0]]
     ? props.collection
         .songsByGenre[song.genres[0]]
+        .sort((songId1: string, songId2: string) => sortByPlayCount(songId1, songId2, rows))
         .slice(0, MAX_LIST_ITEMS)
         .map((songId: string) => rows[songId])
     : null
@@ -60,14 +73,14 @@ const SongView = (props: Props) => {
     return albums[albumId]
   })
 
+  const songFinder = song.id === props.queue.currentPlaying
+
   return (
     <div className={`song-view ${props.className} w-full overflow-y-auto z-10 flex flex-col`}>
       <div className="song sm:flex">
         <div className="w-full md:p-6 image md:max-w-sm lg:max-w-md xl:max-w-xl md:flex-grow-0 sticky" >
-          { song.type === 'video' &&
-            <OutPortal node={props.playerPortal} />
-          }
-          { song.type !== 'video' &&
+          { songFinder && song.type === 'video' && <OutPortal node={props.playerPortal} /> }
+          { (song.type !== 'video' || !songFinder) &&
             <CoverImage
               useImage
               cover={song.cover}
@@ -104,6 +117,9 @@ const SongView = (props: Props) => {
             </div>
             <div className='mt-2'>
               <Tag>{ song.genre }</Tag>
+            </div>
+            <div className='mt-2'>
+              <Tag>{ song.type }</Tag>
             </div>
             <div className='mt-2'>
               <Translate value='song.label.played' /> { song.playCount || 0 } <Translate value='song.label.times' />
