@@ -19,7 +19,7 @@ describe('RxdbAdapter', () => {
     rxdbAdapter.initialize()
     const data = {
       name: "media",
-      schemaHash: "6558e1d1c742cfa4c6cef2c62df87d94",
+      schemaHash: "af900becb9d94a767b6cb138069c3edc",
       docs: []
     }
 
