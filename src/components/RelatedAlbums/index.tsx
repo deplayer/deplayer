@@ -10,6 +10,7 @@ const AlbumCover = ({ album }) => {
     <div className='block rounded w-32 h-32 mx-2'>
       <Link to={`/album/${album.id}`} className='h-32'>
         <CoverImage
+          reflect
           albumName={album.name}
           cover={{
             thumbnailUrl: album.thumbnailUrl,

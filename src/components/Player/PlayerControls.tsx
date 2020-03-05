@@ -206,7 +206,7 @@ class PlayerControls extends React.Component<Props> {
       <React.Fragment>
         { handlers }
           <div id="player">
-            { player  }
+            { player }
             { !songFinder && <OutPortal node={this.props.playerPortal}/> }
           </div>
         { showControls &&

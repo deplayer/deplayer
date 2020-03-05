@@ -3,6 +3,7 @@ import classNames from 'classnames'
 
 type Props = {
   src?: string,
+  reflect?: boolean,
   onClick?: () => void
 }
 
@@ -84,6 +85,7 @@ class LazyImage extends React.Component<Props> {
       "bg-no-repeat": true,
       "bg-center": true,
       "cursor-pointer": true,
+      "reflected-image": this.props.reflect,
       one: true
     })
 

@@ -14,7 +14,7 @@ const Cover = (props: Props) => {
   }
 
   return (
-    <div className='media-thumb hidden md:block h-full' style={{ width: '60px', height: '60px' }}>
+    <div className='show-cover relative text-lg hidden md:block h-full' style={{ width: '60px', height: '60px' }}>
       <CoverImage
         useImage
         cover={props.song.cover}

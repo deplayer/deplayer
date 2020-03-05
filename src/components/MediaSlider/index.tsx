@@ -10,14 +10,15 @@ const MediaCover = ({ media }) => {
   return (
     <div className='block rounded w-32 h-32 mx-2'>
       <Link to={`/song/${media.id}`} className='h-32'>
+        <Tag transparent fullWidth>{ media.playCount ? `${media.playCount} times played` : "never played" }</Tag>
         <CoverImage
+          reflect
           albumName={media.title}
           cover={{
             thumbnailUrl: media.cover.thumbnailUrl,
             fullUrl: media.cover.thumbnailUrl
           }}
         />
-        <Tag fullWidth>{ media.playCount ? `${media.playCount} times played` : "never played" }</Tag>
         <div className='py-4 whitespace-normal text-center truncate w-32'>
           { media.title }
         </div>

@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import LazyImage from '../LazyImage'
+import classNames from 'classnames'
 
 type cover = {
   thumbnailUrl: string,
@@ -9,6 +10,7 @@ type cover = {
 
 type Props = {
   cover: cover,
+  reflect?: boolean,
   size?: string,
   onClick?: () => void,
   useImage?: boolean,
@@ -28,9 +30,14 @@ const Content = (props: any) => {
     )
   }
 
+  const className = classNames({
+    'cover-image': true,
+    "reflected-image": props.reflect,
+  })
+
   return (
     <div
-      className='cover-image'
+      className={className}
       style={{backgroundImage: `url(${imageUrl})`}}
       data-alt={ props.alt }
     />
@@ -41,6 +48,7 @@ type ImgProps = {
   src?: string,
   alt?: string,
   noImage?: boolean,
+  reflect?: boolean,
   onClick?: () => void,
   useImage?: boolean
 }
@@ -49,6 +57,7 @@ const Img = (props: ImgProps) => {
   return (
     <LazyImage
       src={props.src}
+      reflect={props.reflect}
       onClick={props.onClick}
     >
       <Content useImage={props.useImage} src={props.src} />
@@ -60,6 +69,7 @@ const CoverImage = (props: Props) => {
   if (!props.cover) {
     return (
       <Img
+        reflect={props.reflect}
         useImage={props.useImage}
         onClick={props.onClick}
         noImage
@@ -71,6 +81,7 @@ const CoverImage = (props: Props) => {
 
   return (
     <Img
+      reflect={props.reflect}
       useImage={props.useImage}
       onClick={props.onClick}
       alt={ `${props.albumName} cover` }

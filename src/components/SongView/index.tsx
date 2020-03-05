@@ -42,7 +42,8 @@ const SongView = (props: Props) => {
       currentPlaying
     },
     collection: {
-      rows, albums,
+      rows,
+      albums,
       albumsByArtist
     }
   } = props
@@ -73,21 +74,73 @@ const SongView = (props: Props) => {
     return albums[albumId]
   })
 
-  const songFinder = song.id === props.queue.currentPlaying
+  const songFinder = song.id === currentPlaying
 
   return (
     <div className={`song-view ${props.className} w-full overflow-y-auto z-10 flex flex-col`}>
       <div className="song sm:flex">
         <div className="w-full md:p-6 image md:max-w-sm lg:max-w-md xl:max-w-xl md:flex-grow-0 sticky" >
-          { songFinder && song.type === 'video' && <OutPortal node={props.playerPortal} /> }
-          { (song.type !== 'video' || !songFinder) &&
-            <CoverImage
-              useImage
-              cover={song.cover}
-              size='thumbnail'
-              albumName={song.album ? song.album.name : 'N/A'}
-            />
-          }
+          <div>
+            { songFinder && song.type === 'video' && <OutPortal node={props.playerPortal} /> }
+            { (song.type !== 'video' || !songFinder) &&
+              <CoverImage
+                useImage
+                cover={song.cover}
+                size='thumbnail'
+                albumName={song.album ? song.album.name : 'N/A'}
+              />
+            }
+
+            <div className='btn-group mt-4 mx-4 md:mx-0'>
+              { !songFinder &&
+                <Button
+                  large
+                  onClick={() => {
+                    props.dispatch({type: types.SET_CURRENT_PLAYING, songId: song.id})
+                  }}
+                >
+                  <Icon
+                    icon='faPlay'
+                    className='mr-4'
+                  />
+                  <Translate value="common.play" />
+                </Button>
+              }
+
+              { !trackIds.includes(song.id) &&
+                <Button
+                  transparent
+                  alignLeft
+                  onClick={() => {
+                    props.dispatch({type: types.ADD_TO_QUEUE, song})
+                  }}
+                >
+                  <Icon
+                    icon='faPlusCircle'
+                    className='mx-2'
+                  />
+                  <Translate value='buttons.addToQueue' />
+                </Button>
+              }
+
+              { trackIds.includes(song.id) &&
+                <Button
+                  transparent
+                  alignLeft
+                  onClick={() => {
+                    props.dispatch({type: types.REMOVE_FROM_QUEUE, song})
+                  }}
+                >
+                  <Icon
+                    icon='faMinusCircle'
+                    className='mx-2'
+                  />
+                  <Translate value='buttons.removeFromQueue' />
+                </Button>
+              }
+            </div>
+          </div>
+
         </div>
         <div className="w-full p-6 content flex-grow">
           <div>
@@ -132,53 +185,6 @@ const SongView = (props: Props) => {
               }
             </div>
 
-            <div className='btn-group mt-10'>
-              <Button
-                large
-                onClick={() => {
-                  props.dispatch({type: types.SET_CURRENT_PLAYING, songId: song.id})
-                }}
-              >
-                <Icon
-                  icon='faPlay'
-                  className='mr-4'
-                />
-                <Translate value="common.play" />
-              </Button>
-
-              { !trackIds[song.id] &&
-                <Button
-                  transparent
-                  alignLeft
-                  onClick={() => {
-                    props.dispatch({type: types.ADD_TO_QUEUE, song})
-                  }}
-                >
-                  <Icon
-                    icon='faPlusCircle'
-                    className='mx-2'
-                  />
-                  <Translate value='buttons.addToQueue' />
-                </Button>
-              }
-
-              { trackIds[song.id] &&
-                <Button
-                  transparent
-                  alignLeft
-                  onClick={() => {
-                    props.dispatch({type: types.REMOVE_FROM_QUEUE, song})
-                  }}
-                >
-                  <Icon
-                    icon='faMinusCircle'
-                    className='mx-2'
-                  />
-                  <Translate value='buttons.removeFromQueue' />
-                </Button>
-              }
-
-            </div>
 
           </div>
         </div>
