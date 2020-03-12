@@ -20,6 +20,7 @@ import { sortByPlayCount } from '../../reducers/collection'
 type Props = {
   playerPortal: any,
   location: any,
+  player: any,
   collection: {
     albumsByArtist: Array<string>,
     albums: any,
@@ -92,7 +93,7 @@ const SongView = (props: Props) => {
             }
 
             <div className='btn-group mt-4 mx-4 md:mx-0'>
-              { !songFinder &&
+              { (!songFinder || !props.player.playing) &&
                 <Button
                   large
                   onClick={() => {

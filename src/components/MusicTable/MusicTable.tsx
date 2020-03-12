@@ -76,7 +76,7 @@ const MusicTable = (props: Props) => {
 
   return (
     <React.Fragment>
-      <div className='p-2 h-8 toolbar flex justify-between items-center'>
+      <div className='p-2 h-8 toolbar flex justify-between items-center text-base'>
         <div className='p-2'>
           Total items: <b>{ props.tableIds.length }</b>
         </div>
