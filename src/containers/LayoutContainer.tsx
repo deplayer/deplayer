@@ -70,6 +70,13 @@ const dynamicTitle = (router, collection, searchTerm: ''): string | React.ReactN
           Collection
         </>
       )
+    case '/collection/video':
+      return (
+        <>
+          <i className='fa fa-film outline outline mr-4'></i>
+          Videos
+        </>
+      )
     case '/artists':
       return (
         <>

@@ -12,6 +12,7 @@ type State = {
   songsByNumberOfPlays: Array<string>,
   songsByArtist: any,
   songsByGenre: any,
+  mediaByType: any,
   searchTerm: string,
   visibleSongs: Array<string>,
   searchResults: Array<string>,
@@ -28,6 +29,10 @@ export const defaultState = {
   songsByArtist: {},
   songsByGenre: {},
   songsByAlbum: {},
+  mediaByType: {
+    audio: [],
+    video: []
+  },
   albumsByArtist: {},
   songsByNumberOfPlays: [],
   searchTerm: '',
@@ -67,6 +72,7 @@ const populateFromAction = (state: State, action: {data: any}) => {
   const songsByGenre = {}
   const albumsByArtist = {}
   const songsByAlbum = {}
+  const mediaByType = {}
   // FIXME: Convert this in a functional way
   // using map instead of forEach for better performance
   // https://jsperf.com/map-vs-foreach-speed-test
@@ -109,6 +115,14 @@ const populateFromAction = (state: State, action: {data: any}) => {
     if (!songsByAlbum[song.album.id].includes(song.id)) {
       songsByAlbum[song.album.id].push(song.id)
     }
+
+    if (!mediaByType[song.type]) {
+      mediaByType[song.type] = []
+    }
+
+    if (!mediaByType[song.type].includes(song.id)) {
+      mediaByType[song.type].push(song.id)
+    }
   }
 
   const totalRows = {...state.rows, ...rows}
@@ -122,6 +136,7 @@ const populateFromAction = (state: State, action: {data: any}) => {
     songsByArtist: {...state.songsByArtist, ...songsByArtist},
     songsByGenre: {...state.songsByGenre, ...songsByGenre},
     songsByAlbum: {...state.songsByAlbum, ...songsByAlbum},
+    mediaByType: {...state.mediaByType, ...mediaByType},
     albumsByArtist: {...state.albumsByArtist, ...albumsByArtist},
     visibleSongs: filterSongs(
       indexService,

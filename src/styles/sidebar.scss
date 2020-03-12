@@ -3,6 +3,23 @@
   align-items: center;
 
   ul {
+    ul {
+      li {
+        &:last-child {
+          a {
+            padding-bottom: 20px;
+          }
+        }
+
+        font-size: 14px;
+
+        a {
+          padding-left: 32px;
+          padding-right: 22px;
+        }
+      }
+    }
+
     li {
       &.current {
         a {

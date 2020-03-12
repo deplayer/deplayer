@@ -43,7 +43,8 @@ const SidebarContents = (props: ContentProps) => {
         />
         <PlaylistsMenuItem current={inSection(props.location, 'playlists')} />
         <CollectionMenuItem
-          current={inSection(props.location, 'collection')}
+          collection={props.collection}
+          current={inSection(props.location, '(collection.*)')}
           totalItems={props.collection.totalRows}
         />
         <ArtistsMenuItem

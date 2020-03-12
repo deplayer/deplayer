@@ -1,6 +1,7 @@
 import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
+import { Route } from 'react-router-dom'
 
 import AddNewMediaButton from './Buttons/AddNewMediaButton'
 import BodyMessage from './BodyMessage'
@@ -43,14 +44,38 @@ const Collection = (props: Props) => {
     <div
       className='collection z-10'
     >
-      <MusicTable
-        app={props.app}
-        queue={props.queue}
-        tableIds={props.visibleSongs}
-        disableAddButton
-        disableCovers={false}
-        {...props}
-      />
+      <Route exact path="/collection" component={() =>
+        <MusicTable
+          app={props.app}
+          queue={props.queue}
+          tableIds={props.visibleSongs}
+          disableAddButton
+          disableCovers={false}
+          {...props}
+        />
+      } />
+
+      <Route path="/collection/video" component={() =>
+        <MusicTable
+          app={props.app}
+          queue={props.queue}
+          tableIds={props.collection.mediaByType['video']}
+          disableAddButton
+          disableCovers={false}
+          {...props}
+        />
+      } />
+
+      <Route path="/collection/audio" component={() =>
+        <MusicTable
+          app={props.app}
+          queue={props.queue}
+          tableIds={props.collection.mediaByType['audio']}
+          disableAddButton
+          disableCovers={false}
+          {...props}
+        />
+      } />
     </div>
   )
 }

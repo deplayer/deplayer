@@ -7,6 +7,8 @@ import Tag from '../common/Tag'
 type Props = {
   totalItems?: number,
   current?: Boolean,
+  children?: React.ReactNode,
+  onClick?: () => void,
   url: string,
   title: string,
   label: string,
@@ -16,8 +18,6 @@ type Props = {
 const MenuItem = (props: Props) => {
   const classNames = classnames({
     button: true,
-    'hover:text-blue-900': true,
-    'hover:bg-blue-400': true,
     'bg-gray-900': props.current
   })
   return (
@@ -25,6 +25,7 @@ const MenuItem = (props: Props) => {
       <Link
         className='flex justify-between items-center focus:bg-blue-400 focus:text-blue-900'
         to={ props.url }
+        onClick={ props.onClick }
         title={ props.title }
       >
         <div className='py-4'>
@@ -41,6 +42,8 @@ const MenuItem = (props: Props) => {
           </div>
         }
       </Link>
+
+      { props.children }
     </li>
   )
 }
