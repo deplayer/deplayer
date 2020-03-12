@@ -40,42 +40,27 @@ const Collection = (props: Props) => {
     )
   }
 
+  const tableFor = (tableIds: Array<string>) => {
+    return (
+      <MusicTable
+        app={props.app}
+        queue={props.queue}
+        tableIds={tableIds}
+        disableAddButton
+        disableCovers={false}
+        {...props}
+      />
+    )
+  }
+
   return (
     <div
       className='collection z-10'
     >
-      <Route exact path="/collection" component={() =>
-        <MusicTable
-          app={props.app}
-          queue={props.queue}
-          tableIds={props.visibleSongs}
-          disableAddButton
-          disableCovers={false}
-          {...props}
-        />
-      } />
-
-      <Route path="/collection/video" component={() =>
-        <MusicTable
-          app={props.app}
-          queue={props.queue}
-          tableIds={props.collection.mediaByType['video']}
-          disableAddButton
-          disableCovers={false}
-          {...props}
-        />
-      } />
-
-      <Route path="/collection/audio" component={() =>
-        <MusicTable
-          app={props.app}
-          queue={props.queue}
-          tableIds={props.collection.mediaByType['audio']}
-          disableAddButton
-          disableCovers={false}
-          {...props}
-        />
-      } />
+      <Route path="/search-results" component={() => tableFor(props.visibleSongs) } />
+      <Route exact path="/collection" component={() => tableFor(props.visibleSongs) } />
+      <Route path="/collection/video" component={() => tableFor(props.collection.mediaByType['video']) } />
+      <Route path="/collection/audio" component={() => tableFor(props.collection.mediaByType['audio']) } />
     </div>
   )
 }

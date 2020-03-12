@@ -10,6 +10,15 @@ import { initialize } from './workers'
 
 // Extract songs from collection state
 export const getSongs = (state: any, action: { path: string }): Array<string> => {
+  console.log('action.path: ', action.path)
+  if (action.path === 'collection/video') {
+    return state ? state.collection.mediaByType['video'] : []
+  }
+
+  if (action.path === 'collection/audio') {
+    return state ? state.collection.mediaByType['audio'] : []
+  }
+
   if (action.path === 'search-results') {
     return state ? state.collection.searchResults : []
   }
