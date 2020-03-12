@@ -77,6 +77,13 @@ const dynamicTitle = (router, collection, searchTerm: ''): string | React.ReactN
           Videos
         </>
       )
+    case '/collection/audio':
+      return (
+        <>
+          <i className='fa fa-file-audio-o outline outline mr-4'></i>
+          Audio
+        </>
+      )
     case '/artists':
       return (
         <>

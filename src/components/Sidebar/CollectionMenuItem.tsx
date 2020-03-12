@@ -29,7 +29,7 @@ const CollectionMenuItem = ({collection, totalItems, current = false}: Props) =>
         totalItems={collection.mediaByType['audio'].length}
         title='Audio'
         label='Audio'
-        url='/collection/video'
+        url='/collection/audio'
         iconClasses='fa fa-file-audio-o outline'
       />
     </ul>
