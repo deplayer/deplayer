@@ -1,7 +1,7 @@
 import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
-import { Route } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 
 import AddNewMediaButton from './Buttons/AddNewMediaButton'
 import BodyMessage from './BodyMessage'
@@ -10,6 +10,7 @@ import Spinner from './Spinner'
 
 type Props = {
   app: any,
+  location: any,
   playlist: any,
   queue: any,
   player: any,
@@ -18,7 +19,19 @@ type Props = {
   dispatch: Dispatch
 }
 
+const mediaForPath = (props: any) => {
+  switch (props.location.pathname) {
+    case '/collection/audio':
+      return props.collection.mediaByType['audio']
+    case '/collection/video':
+      return props.collection.mediaByType['video']
+    default:
+      return props.visibleSongs
+  }
+}
+
 const Collection = (props: Props) => {
+
   if (props.app.loading) {
     return (
       <div className={`collection z-10`}>
@@ -29,7 +42,9 @@ const Collection = (props: Props) => {
     )
   }
 
-  if (!props.visibleSongs.length) {
+  const mediaItems = mediaForPath(props)
+
+  if (!mediaItems) {
     return (
         <BodyMessage message={
           <div>
@@ -40,29 +55,20 @@ const Collection = (props: Props) => {
     )
   }
 
-  const tableFor = (tableIds: Array<string>) => {
-    return (
-      <MusicTable
-        app={props.app}
-        queue={props.queue}
-        tableIds={tableIds}
-        disableAddButton
-        disableCovers={false}
-        {...props}
-      />
-    )
-  }
-
   return (
     <div
       className='collection z-10'
     >
-      <Route path="/search-results" component={() => tableFor(props.visibleSongs) } />
-      <Route exact path="/collection" component={() => tableFor(props.visibleSongs) } />
-      <Route path="/collection/video" component={() => tableFor(props.collection.mediaByType['video']) } />
-      <Route path="/collection/audio" component={() => tableFor(props.collection.mediaByType['audio']) } />
+      <MusicTable
+        app={props.app}
+        queue={props.queue}
+        tableIds={mediaItems}
+        disableAddButton
+        disableCovers={false}
+        {...props}
+      />
     </div>
   )
 }
 
-export default Collection
+export default withRouter((props: any) => <Collection {...props} />)
