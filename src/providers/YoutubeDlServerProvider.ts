@@ -65,8 +65,5 @@ export default class YoutubeDlServerProvider implements IMusicProvider {
         const response = result.data.info
         return this.mapSongs(response)
       })
-      .catch((err) => {
-        return err
-      })
   }
 }
