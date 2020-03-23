@@ -127,6 +127,9 @@ export default class Media {
       filePath: {
         type: 'string'
       },
+      albumName: {
+        type: 'string'
+      },
       album: {
         type: 'object',
         properties: {
@@ -215,6 +218,7 @@ export default class Media {
       cover: this.cover,
       album: this.album,
       genre: this.genre,
+      albumName: this.albumName,
       playCount: this.playCount,
       filePath: this.filePath,
       type: this.type,
@@ -223,6 +227,6 @@ export default class Media {
   }
 
   toJSON() {
-    return {...this, genres: this.genres, type: this.type}
+    return {...this, type: this.type}
   }
 }

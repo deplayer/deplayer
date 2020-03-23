@@ -165,9 +165,14 @@ class AudioSpectrum extends React.Component<Props> {
   prepareElements = () => {
     // Select audioelement by provided selector
     const selection = document.querySelectorAll(this.props.audioSelector);
+
     this.audioEle = Array.from(selection)[0]
 
+    console.log('audioEle: : ', this.audioEle)
+
     this.audioCanvas = document.getElementById(this.canvasId)
+
+    console.log('audioCanvas: : ', this.audioCanvas)
   }
 
   prepareAPIs = () => {
