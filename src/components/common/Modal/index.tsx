@@ -3,8 +3,6 @@ import ReactModal from 'react-modal'
 
 import Button from '../Button'
 
-ReactModal.setAppElement('#modal')
-
 const customStyles = {
   content: {
     zIndex: 51,
@@ -38,6 +36,8 @@ const Modal = (props: Props) => {
     setIsOpen(false)
     props.onClose && props.onClose()
   }
+
+  ReactModal.setAppElement('#modal')
 
   return (
     <ReactModal
