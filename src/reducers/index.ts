@@ -8,6 +8,7 @@ import player from './player'
 import playlist from './playlist'
 import collection from './collection'
 import connection from './connection'
+import lyrics from './lyrics'
 import search from './search'
 import settings from './settings'
 import queue from './queue'
@@ -21,6 +22,7 @@ export default (history: any): State => combineReducers({
   playlist,
   collection,
   connection,
+  lyrics,
   search,
   settings,
   queue,

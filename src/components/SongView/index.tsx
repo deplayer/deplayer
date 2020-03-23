@@ -16,11 +16,16 @@ import * as types from '../../constants/ActionTypes'
 import { OutPortal } from 'react-reverse-portal'
 import MediaSlider from '../MediaSlider'
 import { sortByPlayCount } from '../../reducers/collection'
+import Modal from '../common/Modal'
+import Header from '../common/Header'
 
 type Props = {
   playerPortal: any,
   location: any,
   player: any,
+  lyrics: {
+    lyrics: string
+  },
   collection: {
     albumsByArtist: Array<string>,
     albums: any,
@@ -35,6 +40,7 @@ type Props = {
 }
 
 const SongView = (props: Props) => {
+  const [showLyrics, setShowLyrics] = React.useState(false)
   const MAX_LIST_ITEMS = 25
   const {
     song,
@@ -139,6 +145,20 @@ const SongView = (props: Props) => {
                   <Translate value='buttons.removeFromQueue' />
                 </Button>
               }
+
+              <Button
+                large
+                transparent
+                onClick={() => {
+                  setShowLyrics(true)
+                }}
+              >
+                <Icon
+                  icon='faPlay'
+                  className='mr-4'
+                />
+                <Translate value="common.lyrics" />
+              </Button>
             </div>
           </div>
 
@@ -200,6 +220,22 @@ const SongView = (props: Props) => {
             mediaItems={sameGenreSongs}
           />
         </div>
+      }
+      {
+        showLyrics && (
+          <Modal
+            onClose={() => {
+              setShowLyrics(false)
+            }}
+          >
+            <Header>Lyrics</Header>
+            <div className='my-6 overflow-y-auto'>
+              <pre>
+                { props.lyrics.lyrics }
+              </pre>
+            </div>
+          </Modal>
+        )
       }
     </div>
   )

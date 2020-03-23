@@ -42,7 +42,7 @@ const SongRow = (props: Props) => {
       <CoverImage
         cover={song.cover}
         size='thumbnail'
-        albumName={song.album ? song.album.name : 'N/A'}
+        albumName={song.albumName || song.album ? song.album.name : 'N/A'}
       />
     </div>
   )
