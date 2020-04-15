@@ -34,10 +34,19 @@ const ContextualMenu = (props: MenuProps) => {
 
   return (
     <React.Fragment>
-      <MenuProvider event="onClick" id='context-menu-player' className='w-8 m-2'>
-        <Button transparent fullWidth>
-          <i className='fa fa-ellipsis-v' />
-        </Button>
+      <MenuProvider
+        event="onClick"
+        id='context-menu-player'
+        className='m-2'
+      >
+        <button
+          className='bg-yellow-500 w-12 h-12 rounded-full'
+        >
+          <Icon
+            icon='faCompactDisc'
+            className='text-yellow-900'
+          />
+        </button>
       </MenuProvider>
       <Menu id='context-menu-player' theme={theme.dark}>
         <VolumeControl

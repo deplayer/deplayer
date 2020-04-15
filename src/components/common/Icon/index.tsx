@@ -1,5 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
+  faScroll,
+  faEllipsisV,
   faCompactDisc,
   faStopwatch,
   faMicrophoneAlt,
@@ -18,6 +20,8 @@ import {
 import React from 'react'
 
 const icons = {
+  faScroll: faScroll,
+  faEllipsisV: faEllipsisV,
   faCompactDisc: faCompactDisc,
   faStopwatch: faStopwatch,
   faMicrophoneAlt: faMicrophoneAlt,

@@ -19,6 +19,7 @@ import CollectionContainer from './containers/CollectionContainer'
 import DashboardContainer from './containers/DashboardContainer'
 import LayoutContainer from './containers/LayoutContainer'
 import PlayerContainer from './containers/PlayerContainer'
+import ContextMenuContainer from './containers/ContextMenuContainer'
 import PlaylistsContainer from './containers/PlaylistsContainer'
 import ProvidersContainer from './containers/ProvidersContainer'
 import QueueContainer from './containers/QueueContainer'
@@ -61,6 +62,7 @@ const App = () =>  {
             <Route path="/settings" component={SettingsContainer} />
           </LayoutContainer>
           <PlayerContainer playerPortal={playerPortal} />
+          <ContextMenuContainer />
           <AddMediaModal />
           <Alert stack={{limit: 3}} />
         </React.Fragment>

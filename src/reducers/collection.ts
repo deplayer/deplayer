@@ -83,6 +83,7 @@ const populateFromAction = (state: State, action: {data: any}) => {
     artists[song.artist.id] = song.artist
     albums[song.album.id] = {
       ...song.album,
+      albumName: song.albumName,
       thumbnailUrl: song.cover.thumbnailUrl
     }
 

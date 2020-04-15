@@ -15,6 +15,7 @@ type Props = {
   uppercase?: boolean,
   fullWidth?: boolean,
   type?: 'submit' | 'button',
+  roundedFull?: boolean,
   className?: string
 }
 
@@ -33,6 +34,7 @@ const Button = (props: Props) => {
     'px-2': true,
     'px-4': props.long || props.large,
     'rounded': true,
+    'rounded-full': props.roundedFull,
     'w-full': props.fullWidth,
     'border': !props.transparent || props.inverted,
     'border-blue-500': !props.inverted,

@@ -16,8 +16,7 @@ import * as types from '../../constants/ActionTypes'
 import { OutPortal } from 'react-reverse-portal'
 import MediaSlider from '../MediaSlider'
 import { sortByPlayCount } from '../../reducers/collection'
-import Modal from '../common/Modal'
-import Header from '../common/Header'
+import Lyrics from './Lyrics'
 
 type Props = {
   playerPortal: any,
@@ -154,7 +153,7 @@ const SongView = (props: Props) => {
                 }}
               >
                 <Icon
-                  icon='faPlay'
+                  icon='faScroll'
                   className='mr-4'
                 />
                 <Translate value="common.lyrics" />
@@ -223,18 +222,10 @@ const SongView = (props: Props) => {
       }
       {
         showLyrics && (
-          <Modal
-            onClose={() => {
-              setShowLyrics(false)
-            }}
-          >
-            <Header>Lyrics</Header>
-            <div className='my-6 overflow-y-auto'>
-              <pre>
-                { props.lyrics.lyrics }
-              </pre>
-            </div>
-          </Modal>
+          <Lyrics
+            lyrics={props.lyrics.lyrics}
+            onClose={() => setShowLyrics(false)}
+          />
         )
       }
     </div>

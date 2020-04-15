@@ -10,7 +10,6 @@ import { InPortal, OutPortal } from 'react-reverse-portal'
 
 import { State as PlayerState } from '../../reducers/player'
 import { State as SettingsState } from '../../reducers/settings'
-import ContextualMenu from './ContextualMenu'
 import Controls from './Controls'
 import Cover from './Cover'
 import KeyHandlers from './KeyHandlers'
@@ -56,6 +55,7 @@ class PlayerControls extends React.Component<Props> {
   onPause = () => {
     this.props.dispatch({ type: types.STOP_PLAYING })
   }
+
   onSeekChange = (value: any) => {
     this.props.dispatch({ type: types.SET_PLAYER_PLAYED_SECONDS, value: value / 1000 })
     this.playerRef.current.seekTo(
@@ -79,6 +79,7 @@ class PlayerControls extends React.Component<Props> {
     // We only want to update time slider if we are not currently
     this.props.dispatch({ type: types.SET_PLAYER_PROGRESS, value: state })
   }
+
   onDuration = (duration: number) => {
     this.props.dispatch({ type: types.SET_PLAYER_DURATION, value: duration})
   }
@@ -160,53 +161,49 @@ class PlayerControls extends React.Component<Props> {
       .pathname
       .match(new RegExp(`/song/${currentPlayingId}`))
 
-    const player = (
-      <InPortal node={this.props.playerPortal}>
-        <ReactPlayer
-          pip
-          fullscreen={this.props.player.fullscreen}
-          controls={songFinder && currentPlaying.type === 'video'}
-          className={playerClassnames}
-          ref={this.playerRef}
-          url={streamUri}
-          playing={playing}
-          onClick={this.playPause}
-          onDoubleClick={() => {
-            this.props.dispatch({type: types.TOGGLE_FULL_SCREEN})
-          }}
-          onMouseMove={this.showPlayer}
-          volume={volume / 100}
-          muted={false}
-          onPlay={this.onPlay}
-          onPause={this.onPause}
-          onEnded={() => {
-            this.resetPlayedSeconds()
-            this.saveTrackPlayed(currentPlayingId)
-            this.playNext()
-          }}
-          config={{
-            file: {
-              forceAudio: currentPlaying.type === 'audio',
-              attributes: {
-                className: currentPlaying.type === 'video' ? 'video-element': 'video-element'
-              }
-            }
-          }}
-          onError={this.onError}
-          onProgress={this.onProgress}
-          onDuration={this.onDuration}
-          progressInterval={1000}
-          width={'100%'}
-          height={'100%'}
-        />
-      </InPortal>
-    )
-
     return (
       <React.Fragment>
         { handlers }
           <div id="player">
-            { player }
+            <InPortal node={this.props.playerPortal}>
+              <ReactPlayer
+                pip
+                fullscreen={this.props.player.fullscreen}
+                controls={songFinder && currentPlaying.type === 'video'}
+                className={playerClassnames}
+                ref={this.playerRef}
+                url={streamUri}
+                playing={playing}
+                onClick={this.playPause}
+                onDoubleClick={() => {
+                  this.props.dispatch({type: types.TOGGLE_FULL_SCREEN})
+                }}
+                onMouseMove={this.showPlayer}
+                volume={volume / 100}
+                muted={false}
+                onPlay={this.onPlay}
+                onPause={this.onPause}
+                onEnded={() => {
+                  this.resetPlayedSeconds()
+                  this.saveTrackPlayed(currentPlayingId)
+                  this.playNext()
+                }}
+                config={{
+                  file: {
+                    forceAudio: currentPlaying.type === 'audio',
+                    attributes: {
+                      className: currentPlaying.type === 'video' ? 'video-element': 'video-element'
+                    }
+                  }
+                }}
+                onError={this.onError}
+                onProgress={this.onProgress}
+                onDuration={this.onDuration}
+                progressInterval={1000}
+                width={'100%'}
+                height={'100%'}
+              />
+            </InPortal>
             { !songFinder && <OutPortal node={this.props.playerPortal}/> }
           </div>
         { showControls &&
@@ -258,12 +255,7 @@ class PlayerControls extends React.Component<Props> {
                     dispatch={this.props.dispatch}
                   />
                 </div>
-                <div className='flex flex-grow-0'>
-                  <ContextualMenu
-                    volume={volume}
-                    dispatch={this.props.dispatch}
-                    setVolume={this.setVolume}
-                  />
+                <div className='flex flex-grow-0 w-16'>
                 </div>
               </div>
               {

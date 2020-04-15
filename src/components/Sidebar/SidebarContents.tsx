@@ -61,7 +61,7 @@ const SidebarContents = (props: ContentProps) => {
         <SettingsMenuItem current={inSection(props.location, 'settings')} />
       </ul>
 
-      <section className='p-6 absolute bottom-0 text-xs text-center w-full'>
+      <section className='p-6 pt-8 bottom-0 text-xs text-center w-full'>
         <a
           href={'https://gitlab.com/deplayer/deplayer'}
           title="Show me the code"

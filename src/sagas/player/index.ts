@@ -18,6 +18,12 @@ export function* setCurrentPlayingStream(songId: string, providerNum: number): a
   const collection = yield select(getCollection)
   const fullUrl = yield select(getSongBg)
   const currentPlaying = collection.rows[songId]
+
+  // The song can't be found
+  if (!currentPlaying) {
+    return yield put({type: types.PLAY_NEXT})
+  }
+
   // Getting the first stream URI, in the future will be choosen based on
   // priorities
   const streamUri = getStreamUri(currentPlaying, settings, providerNum)
