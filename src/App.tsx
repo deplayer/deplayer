@@ -61,8 +61,8 @@ const App = () =>  {
             <Route path="/providers" component={ProvidersContainer} />
             <Route path="/settings" component={SettingsContainer} />
           </LayoutContainer>
-          <PlayerContainer playerPortal={playerPortal} />
           <ContextMenuContainer />
+          <PlayerContainer playerPortal={playerPortal} />
           <AddMediaModal />
           <Alert stack={{limit: 3}} />
         </React.Fragment>

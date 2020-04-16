@@ -18,12 +18,11 @@ const ConnectedContextualMenu = connect(
   return (
     <div
       className={ classNames({
-        'player-container': true,
         'justify-end': true,
+        'items-center': true,
         flex: true
       })}
       style={{
-        zIndex: 102,
         backgroundColor: 'transparent'
       }}
     >

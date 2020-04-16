@@ -45,10 +45,6 @@ class PlayerControls extends React.Component<Props> {
     this.props.dispatch({ type: types.TOGGLE_PLAYING })
   }
 
-  setVolume = (value: number) => {
-    this.props.dispatch({ type: types.VOLUME_SET, value: value })
-  }
-
   onPlay = () => {
     this.props.dispatch({ type: types.START_PLAYING })
   }
