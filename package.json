@@ -187,6 +187,7 @@
     "@typescript-eslint/eslint-plugin": "^2.3.0",
     "@typescript-eslint/parser": "^2.3.0",
     "axios-mock-adapter": "^1.15.0",
+    "babel-preset-react-app": "^9.1.2",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.15.1",
     "eslint-plugin-jest": "^21.22.1",
