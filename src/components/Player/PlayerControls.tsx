@@ -15,6 +15,7 @@ import Cover from './Cover'
 import KeyHandlers from './KeyHandlers'
 import ProgressBar from './ProgressBar'
 import Spectrum from './../Spectrum'
+import VisualizerContainer from '../../containers/VisualizerContainer'
 import WebtorrentPlayer from './CustomPlayers/WebtorrentPlayer'
 import * as types from '../../constants/ActionTypes'
 
@@ -266,6 +267,7 @@ class PlayerControls extends React.Component<Props> {
             </CSSTransitionGroup>
           </div>
         }
+        <VisualizerContainer playerRef={this.playerRef} />
       </React.Fragment>
     )
   }
