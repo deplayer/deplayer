@@ -160,48 +160,53 @@ class PlayerControls extends React.Component<Props> {
     return (
       <React.Fragment>
         { handlers }
-          <div id="player">
-            <InPortal node={this.props.playerPortal}>
-              <ReactPlayer
-                pip
-                fullscreen={this.props.player.fullscreen}
-                controls={songFinder && currentPlaying.type === 'video'}
-                className={playerClassnames}
-                ref={this.playerRef}
-                url={streamUri}
-                playing={playing}
-                onClick={this.playPause}
-                onDoubleClick={() => {
-                  this.props.dispatch({type: types.TOGGLE_FULL_SCREEN})
-                }}
-                onMouseMove={this.showPlayer}
-                volume={volume / 100}
-                muted={false}
-                onPlay={this.onPlay}
-                onPause={this.onPause}
-                onEnded={() => {
-                  this.resetPlayedSeconds()
-                  this.saveTrackPlayed(currentPlayingId)
-                  this.playNext()
-                }}
-                config={{
-                  file: {
-                    forceAudio: currentPlaying.type === 'audio',
-                    attributes: {
-                      className: currentPlaying.type === 'video' ? 'video-element': 'video-element'
-                    }
+        <div id="player">
+          <InPortal node={this.props.playerPortal}>
+            <ReactPlayer
+              pip
+              fullscreen={this.props.player.fullscreen}
+              controls={songFinder && currentPlaying.type === 'video'}
+              className={playerClassnames}
+              ref={this.playerRef}
+              url={streamUri}
+              playing={playing}
+              onClick={this.playPause}
+              onDoubleClick={() => {
+                this.props.dispatch({type: types.TOGGLE_FULL_SCREEN})
+              }}
+              onMouseMove={this.showPlayer}
+              volume={volume / 100}
+              muted={false}
+              onPlay={this.onPlay}
+              onPause={this.onPause}
+              onEnded={() => {
+                this.resetPlayedSeconds()
+                this.saveTrackPlayed(currentPlayingId)
+                this.playNext()
+              }}
+              config={{
+                file: {
+                  forceAudio: currentPlaying.type === 'audio',
+                  attributes: {
+                    className: currentPlaying.type === 'video' ? 'video-element': 'video-element'
                   }
-                }}
-                onError={this.onError}
-                onProgress={this.onProgress}
-                onDuration={this.onDuration}
-                progressInterval={1000}
-                width={'100%'}
-                height={'100%'}
-              />
-            </InPortal>
-            { !songFinder && <OutPortal node={this.props.playerPortal}/> }
-          </div>
+                }
+              }}
+              onError={this.onError}
+              onProgress={this.onProgress}
+              onDuration={this.onDuration}
+              progressInterval={1000}
+              width={'100%'}
+              height={'100%'}
+            />
+          </InPortal>
+        </div>
+        { !songFinder && (
+          <OutPortal
+            className='left-0 right-0 top-0 botton-0 absolute bg-handler'
+            node={this.props.playerPortal}
+          />
+        )}
         { showControls &&
           <div className={ classNames({'player-container': true }) } style={{ zIndex: 102 }}>
             <CSSTransitionGroup

@@ -41,7 +41,7 @@ const Song = ({ playerPortal }) => {
 }
 
 const App = () =>  {
-  const playerPortal = React.useMemo(() => portals.createPortalNode(), [])
+  const playerPortal = React.useMemo(() => portals.createHtmlPortalNode(), [])
 
   return (
     <Provider store={appStore}>
