@@ -1,5 +1,5 @@
 import { Dispatch } from 'redux'
-import { Translate } from 'react-redux-i18n'
+import { I18n } from 'react-redux-i18n'
 import { connect } from 'react-redux'
 import * as React from 'react'
 
@@ -20,12 +20,12 @@ const ToggleMiniQueue = (props: Props) => {
     <Button
       transparent
       onClick={toggleMiniQueue}
+      title={I18n.t('buttons.toggleMiniQueue')}
     >
       <Icon
         icon='faEyeSlash'
         className='mx-2'
       />
-      <Translate value='buttons.toggleMiniQueue' />
     </Button>
   )
 }

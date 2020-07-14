@@ -39,8 +39,8 @@ const ContextualMenu = (props: MenuProps) => {
 
   const animations = !props.player.playing && 'pulse'
   const base = 'absolute right-0 bottom-0 bg-yellow-600 focus:bg-yellow-700 hover:bg-yellow-500 focus:outline-none flex justify-center'
-  const integratedClassnames = `${base} w-10 h-10 rounded-full text-2xl p-4`
-  const standaloneClassnames = `${animations} ${base} w-20 h-20 rounded-full text-4xl p-6 shadow-outline`
+  const integratedClassnames = `${base} w-10 h-10 rounded-full text-2xl m-4`
+  const standaloneClassnames = `${animations} ${base} w-20 h-20 rounded-full text-4xl m-6 shadow-outline`
 
   const showExtraPlayerOps = props.player.showPlayer
   const showFullscreen = props.player.playing
@@ -59,7 +59,7 @@ const ContextualMenu = (props: MenuProps) => {
         <button
           className={props.player.showPlayer ? integratedClassnames : standaloneClassnames}
         >
-          <div className='flex justify-center items-center w-full h-full'>
+          <div className='flex justify-center items-center w-100 h-full'>
             <Icon
               icon='faCompactDisc'
               className='text-blue-200'
