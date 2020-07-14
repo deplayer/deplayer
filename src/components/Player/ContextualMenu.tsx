@@ -59,10 +59,12 @@ const ContextualMenu = (props: MenuProps) => {
         <button
           className={props.player.showPlayer ? integratedClassnames : standaloneClassnames}
         >
-          <Icon
-            icon='faCompactDisc'
-            className='text-blue-200'
-          />
+          <div className='flex justify-center items-center w-full h-full'>
+            <Icon
+              icon='faCompactDisc'
+              className='text-blue-200'
+            />
+          </div>
         </button>
       </MenuProvider>
       <Menu

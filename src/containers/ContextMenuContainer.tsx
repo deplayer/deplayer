@@ -31,6 +31,6 @@ const ConnectedContextualMenu = connect(
   )
 })
 
-const RoutedPlayer = withRouter((props: any) => <ConnectedContextualMenu {...props}/>)
+const ConnectedContextualMenuWithRouter = withRouter((props: any) => <ConnectedContextualMenu {...props}/>)
 
-export default RoutedPlayer
+export default ConnectedContextualMenuWithRouter
