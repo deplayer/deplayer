@@ -135,7 +135,7 @@ const Layout = (props: LayoutProps) => {
     <>
     {props.backgroundImage &&
       <div
-        className='absolute w-full h-full bg-cover bg-center bg-no-repeat bg-fixed'
+        className='bg-handler absolute w-full h-full bg-cover bg-center bg-no-repeat bg-fixed'
         style={{backgroundImage: `url(${ props.backgroundImage })`, filter: 'blur(10px)'}}
       />
     }
