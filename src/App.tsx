@@ -26,6 +26,7 @@ import QueueContainer from './containers/QueueContainer'
 import SearchResultsContainer from './containers/SearchResultsContainer'
 import SettingsContainer from './containers/SettingsContainer'
 import SongContainer from './containers/SongContainer'
+import Wiki from './components/Wiki'
 import configureStore from './store/configureStore'
 import history from './store/configureHistory'
 
@@ -60,6 +61,7 @@ const App = () =>  {
             <Route path="/artists" component={ArtistsContainer} />
             <Route path="/providers" component={ProvidersContainer} />
             <Route path="/settings" component={SettingsContainer} />
+            <Route path="/wiki" component={Wiki} />
           </LayoutContainer>
           <ContextMenuContainer />
           <PlayerContainer playerPortal={playerPortal} />

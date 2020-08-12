@@ -9,6 +9,7 @@ const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 const { InjectManifest } = require('workbox-webpack-plugin');
+const Mode = require('frontmatter-markdown-loader/mode')
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // In development, we always serve from the root. This makes config easier.
@@ -165,6 +166,13 @@ module.exports = {
             }
           },
           ...cssRules,
+          {
+            test: /\.md$/,
+            loader: 'frontmatter-markdown-loader',
+            options: {
+              mode: [Mode.REACT]
+            }
+          },
           // "file" loader makes sure those assets get served by WebpackDevServer.
           // When you `import` an asset, you get its (virtual) filename.
           // In production, they would get copied to the `build` folder.

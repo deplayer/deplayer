@@ -58,6 +58,13 @@ const SidebarContents = (props: ContentProps) => {
           label='Providers'
           iconClasses='icon fa fa-plug'
         />
+        <MenuItem
+          current={inSection(props.location, 'wiki')}
+          url='/wiki'
+          title='Help'
+          label='Help'
+          iconClasses='icon fa fa-life-ring'
+        />
         <SettingsMenuItem current={inSection(props.location, 'settings')} />
       </ul>
 
