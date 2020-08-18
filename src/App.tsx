@@ -1,8 +1,8 @@
 import 'react-s-alert/dist/s-alert-css-effects/stackslide.css'
 import 'react-s-alert/dist/s-alert-default.css'
 import 'rc-slider/assets/index.css'
-import './App.css'
 import './styles/App.scss'
+import './tailwind.css'
 
 import { ConnectedRouter } from 'connected-react-router'
 import { Provider } from 'react-redux'

@@ -71,6 +71,7 @@ const SidebarContents = (props: ContentProps) => {
       <section className='p-6 pt-8 bottom-0 text-xs text-center w-full'>
         <a
           href={'https://gitlab.com/deplayer/deplayer'}
+          rel="noreferrer"
           title="Show me the code"
           target="_blank"
         >
@@ -79,6 +80,7 @@ const SidebarContents = (props: ContentProps) => {
 
         <a
           href={'https://gitlab.com/deplayer/deplayer/tags'}
+          rel="noreferrer"
           title="Show me the code"
           target="_blank"
         >
