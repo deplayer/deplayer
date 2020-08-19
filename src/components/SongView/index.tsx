@@ -117,7 +117,7 @@ const SongView = (props: Props) => {
                   transparent
                   alignLeft
                   onClick={() => {
-                    props.dispatch({type: types.ADD_TO_QUEUE, song})
+                    props.dispatch({type: types.ADD_TO_QUEUE, songs: [song]})
                   }}
                 >
                   <Icon

@@ -1,21 +1,25 @@
 import * as types from '../constants/ActionTypes'
+import Media from '../entities/Media'
 import {
-  populateTracks,
   getSiblingSong
 } from './utils/queues'
 
 type State = {
   trackIds: Array<string>,
+  randomTrackIds: Array<string>,
   currentPlaying: string|null,
   repeat: boolean,
+  shuffle: boolean,
   nextSongId: string|null,
   prevSongId: string|null
 }
 
 export const defaultState = {
   trackIds: [],
+  randomTrackIds: [],
   currentPlaying: null,
   repeat: false,
+  shuffle: false,
   nextSongId: null,
   prevSongId: null
 }
@@ -44,6 +48,14 @@ const setCurrentPlaying = (state: any, action: any) => {
   }
 }
 
+const getCurrentQueue = (state: State): Array<string> => {
+  if (state.shuffle) {
+    return state.randomTrackIds
+  }
+
+  return state.trackIds
+}
+
 export default (state: State = defaultState, action: any  = {}): State => {
   switch (action.type) {
 
@@ -51,8 +63,8 @@ export default (state: State = defaultState, action: any  = {}): State => {
       return {...state, ...action.queue}
 
     case types.ADD_TO_QUEUE:
-      const mergedTrackIds = [...state.trackIds, ...populateTracks([action.song])]
-      const filteredTracks = new Set(mergedTrackIds)
+      const trackIds = getCurrentQueue(state)
+      const filteredTracks = new Set(trackIds.concat(action.songs.map((song: Media) => song.id)))
       return {
         ...state,
         trackIds: [...filteredTracks]
@@ -88,11 +100,11 @@ export default (state: State = defaultState, action: any  = {}): State => {
       if (action.replace) {
         return {
           ...state,
-          trackIds: populateTracks(action.songs)
+          trackIds: action.songs.map((song: Media) => song.id)
         }
       }
 
-      const tracks = state.trackIds.concat(populateTracks(action.songs))
+      const tracks = state.trackIds.concat(action.songs)
       const cleanedTracks = tracks.filter((item, pos) => tracks.indexOf(item) === pos)
 
       return {
@@ -117,7 +129,8 @@ export default (state: State = defaultState, action: any  = {}): State => {
     case types.SHUFFLE:
       return {
         ...state,
-        trackIds: shuffleArray(state.trackIds)
+        shuffle: !state.shuffle,
+        randomTrackIds: shuffleArray(state.trackIds)
       }
 
     case types.REPEAT:

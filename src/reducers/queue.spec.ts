@@ -9,16 +9,8 @@ describe('queue reducer', () => {
       .toEqual(defaultState)
   })
 
-  it('should handle ADD_TO_QUEUE action', () => {
-    expect(reducer(undefined, {type: types.ADD_TO_QUEUE, song: '1234'}))
-      .toEqual({
-        ...defaultState,
-        trackIds: ['1234'],
-      })
-  })
-
   it('should handle ADD_TO_QUEUE not repeat ids', () => {
-    expect(reducer({ ...defaultState, trackIds: ['1234'] }, {type: types.ADD_TO_QUEUE, song: { id: '1234' }}))
+    expect(reducer({ ...defaultState, trackIds: ['1234'] }, {type: types.ADD_TO_QUEUE, songs: [{ id: '1234' }]}))
       .toEqual({
         ...defaultState,
         trackIds: ['1234'],
@@ -36,7 +28,7 @@ describe('queue reducer', () => {
 
     const addSongsState = reducer(undefined, {
       type: types.ADD_SONGS_TO_QUEUE,
-      songs
+      songs: songs.map((song: Media) => song.id)
     })
 
     expect(addSongsState)
@@ -77,6 +69,8 @@ describe('queue reducer', () => {
         })
       }).length !== 4
     ).toBe(false)
+
+    expect(res.shuffle).toBe(true)
   })
 
   it('should handle RECEIVE_QUEUE', () => {

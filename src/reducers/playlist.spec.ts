@@ -11,10 +11,7 @@ describe('collection reducer', () => {
   })
 
   it('should handle ADD_TO_PLAYLIST action', () => {
-    const songToAdd = new Media({forcedId: '1234'})
-    const currPlaying = {}
-    currPlaying['1234'] = songToAdd
-    expect(reducer(undefined, {type: types.ADD_TO_PLAYLIST, song: songToAdd}))
+    expect(reducer(undefined, {type: types.ADD_TO_PLAYLIST, songs: ['1234']}))
       .toEqual({
         ...defaultState,
         trackIds: ['1234'],
@@ -31,7 +28,7 @@ describe('collection reducer', () => {
       expectedObj[i] = song
     }
 
-    const addSongsState = reducer(undefined, {type: types.ADD_SONGS_TO_PLAYLIST, songs})
+    const addSongsState = reducer(undefined, {type: types.ADD_SONGS_TO_PLAYLIST, songs: songs.map((song: Media) => song.id)})
 
     expect(addSongsState)
       .toEqual({
@@ -50,7 +47,7 @@ describe('collection reducer', () => {
       expectedObj[i] = song
     }
 
-    const addSongsState = reducer(undefined, {type: types.ADD_SONGS_TO_PLAYLIST, songs})
+    const addSongsState = reducer(undefined, {type: types.ADD_SONGS_TO_PLAYLIST, songs: songs.map((song: Media) => song.id)})
 
     // It should set prev and next songs Ids
     const sortedSongsIds = sortTrackIds(expectedObj, 'price', 'ASC')

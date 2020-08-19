@@ -22,7 +22,7 @@ const ContextualMenu = (props: MenuProps) => {
   const { onClick, disableAddButton, song } = props
 
   const addToQueue = () => {
-    props.dispatch({type: types.ADD_TO_QUEUE, song: [props.song]})
+    props.dispatch({type: types.ADD_TO_QUEUE, songs: [props.song]})
   }
 
   const removeFromQueue = () => {

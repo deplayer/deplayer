@@ -42,7 +42,6 @@ const ContextualMenu = (props: MenuProps) => {
   const integratedClassnames = `${base} w-10 h-10 rounded-full text-2xl m-4`
   const standaloneClassnames = `${animations} ${base} w-20 h-20 rounded-full text-4xl m-6 shadow-outline`
 
-  const showExtraPlayerOps = props.player.showPlayer
   const showFullscreen = props.player.playing
   const showVisibilityCons = false
   const showStartPlaying = props.queue.trackIds.length && !props.player.playing
@@ -77,7 +76,7 @@ const ContextualMenu = (props: MenuProps) => {
           volume={ props.player.volume }
           onChange={setVolume}
         />
-        { showExtraPlayerOps && (
+        { props.queue.trackIds.length && (
           <>
             <Item className='flex w-full'>
               <ShuffleButton

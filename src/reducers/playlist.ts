@@ -1,7 +1,6 @@
 import * as types from '../constants/ActionTypes'
 import {
-  sortTrackIds,
-  populateTracks
+  sortTrackIds
 } from './utils/queues'
 
 type State = {
@@ -18,14 +17,14 @@ export const defaultState = {
 export default (state: State = defaultState, action: any = {}): State => {
   switch (action.type) {
     case types.ADD_TO_PLAYLIST:
-      const mergedTrackIds = [...state.trackIds, ...populateTracks([action.song])]
+      const mergedTrackIds = [...state.trackIds, ...action.songs]
       return {
         ...state,
         trackIds: mergedTrackIds
       }
 
     case types.ADD_SONGS_TO_PLAYLIST:
-      const trackIds = populateTracks(action.songs)
+      const trackIds = action.songs
       return {
         ...state,
         trackIds

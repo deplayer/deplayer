@@ -1,17 +1,3 @@
-// deprecate
-export const populateTracks = (songs: Array<any>): Array<string> => {
-  const tracks: Array<string> = []
-  songs.forEach((song: any) => {
-    if (song.id) {
-      tracks.push(song.id)
-    } else {
-      tracks.push(song)
-    }
-  })
-
-  return tracks
-}
-
 // Get sibling songs ids to know which is the next and prev song
 export const getSiblingSong = (trackIds: Array<string>, song: string, next = false) => {
   const tracksIndex = {}
