@@ -2,7 +2,6 @@
   &:hover {
     &::after {
       @extend .fa;
-      content: $fa-var-play-circle-o;
       text-align: center;
       color: #ecc94b;
       background-color: rgba(77, 148, 170, 0.5);

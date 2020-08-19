@@ -5,6 +5,7 @@ import SidebarContainer from './SidebarContainer'
 import TopbarContainer from './TopbarContainer'
 import SearchButton from '../components/Buttons/SearchButton'
 import Placeholder from '../components/Player/Placeholder'
+import Icon from '../components/common/Icon'
 
 const dynamicTitle = (router, collection, searchTerm: ''): string | React.ReactNode => {
   const songFinder = router.location.pathname.match(/\/song\/(.*)/)
@@ -47,7 +48,7 @@ const dynamicTitle = (router, collection, searchTerm: ''): string | React.ReactN
 
     return (
       <>
-        <i className='icon music outline mr-4'></i>
+        <Icon icon='faMusic' className='mr-4' />
         { album.name }
       </>
     )
@@ -57,7 +58,7 @@ const dynamicTitle = (router, collection, searchTerm: ''): string | React.ReactN
     case '/settings':
       return (
         <>
-          <i className='icon cogs outline outline mr-4'></i>
+          <Icon icon='faCogs' className='mr-4' />
           Settings
         </>
       )
@@ -66,56 +67,56 @@ const dynamicTitle = (router, collection, searchTerm: ''): string | React.ReactN
     case '/collection':
       return (
         <>
-          <i className='icon database outline outline mr-4'></i>
+          <Icon icon='faDatabase' className='mr-4' />
           Collection
         </>
       )
     case '/collection/video':
       return (
         <>
-          <i className='fa fa-film outline outline mr-4'></i>
+          <Icon icon='faFilm' className='mr-4' />
           Videos
         </>
       )
     case '/collection/audio':
       return (
         <>
-          <i className='fa fa-file-audio-o outline outline mr-4'></i>
+          <Icon icon='faFileAudio' className='mr-4' />
           Audio
         </>
       )
     case '/artists':
       return (
         <>
-          <i className='icon fa fa-microphone outline outline mr-4'></i>
+          <Icon icon='faMicrophoneAlt' className='mr-4' />
           Artists
         </>
       )
     case '/queue':
       return (
         <>
-          <i className='icon icon-music outline outline mr-4'></i>
+          <Icon icon='faMusic' className='mr-4' />
           Current playing
         </>
       )
     case '/playlists':
       return (
         <>
-          <i className='fa fa-bookmark outline outline mr-4'></i>
+          <Icon icon='faBookmark' className='mr-4' />
           Playlists
         </>
       )
     case '/providers':
       return (
         <>
-          <i className='fa fa-plug outline outline mr-4'></i>
+          <Icon icon='faPlug' className='mr-4' />
           Providers
         </>
       )
     default:
       return (
         <>
-          <i className='fa fa-globe outline outline mr-4'></i>
+          <Icon icon='faGlobe' className='mr-4' />
           Explore
         </>
       )

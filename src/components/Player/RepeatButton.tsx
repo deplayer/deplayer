@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import { REPEAT } from '../../constants/ActionTypes'
 import Button from '../common/Button'
+import Icon from '../common/Icon'
 
 type Props = {
   dispatch: Dispatch
@@ -21,7 +22,7 @@ const RepeatButton = (props: Props) => {
       alignLeft
       onClick={onClick}
     >
-      <i className='fa fa-repeat mx-2'></i>
+      <Icon icon='faRedo' className='mx-2' />
       <Translate value='buttons.repeat' />
     </Button>
   )

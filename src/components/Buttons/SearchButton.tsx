@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import Button from '../common/Button'
 import * as types from '../../constants/ActionTypes'
+import Icon from '../common/Icon'
 
 type Props = {
   dispatch: Dispatch,
@@ -24,7 +25,7 @@ const SearchButton = ({dispatch, searchToggled}: Props) => {
       transparent
       onClick={toggleSearch}
     >
-      <i className='fa fa-search'></i>
+      <Icon icon='faSearch' />
     </Button>
   )
 }

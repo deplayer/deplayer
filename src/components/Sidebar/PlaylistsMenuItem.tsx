@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import MenuItem from './MenuItem'
+import Icon from '../common/Icon'
 
 type Props = {
   current?: Boolean
@@ -13,7 +14,7 @@ const PlaylistsMenuItem = ({current = false}: Props) => {
       url='/playlists'
       title='playlists'
       label='Playlists'
-      iconClasses='fa fa-bookmark'
+      icon={<Icon icon='faBookmark' />}
     />
   )
 }

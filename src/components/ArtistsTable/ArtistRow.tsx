@@ -3,6 +3,7 @@ import * as React from 'react'
 
 import Artist from '../../entities/Artist'
 import Tag from '../common/Tag'
+import Icon from '../common/Icon'
 
 type Props = {
   artist: Artist,
@@ -18,9 +19,9 @@ const ArtistRow = (props: Props) => {
       className='artist-row w-full'
       style={props.style}
     >
-      <Link className='flex justify-between' to={`/artist/${artist.id}`}>
-        <span>
-          <i style={{marginRight: '5px'}} className='fa fa-microphone' />
+      <Link className='flex justify-between items-center' to={`/artist/${artist.id}`}>
+        <Icon icon='faMicrophoneAlt' />
+        <span className='ml-4 w-full truncate'>
           { artist.name }
         </span>
 

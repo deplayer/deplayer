@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import Button from '../common/Button'
+import Icon from '../common/Icon'
 
 type Props = {
   playing: boolean,
@@ -15,7 +16,7 @@ const PlayPauseButton = (props: Props) => {
         size='4xl'
         onClick={props.onClick}
       >
-        <i className={`icon ${props.playing ? 'pause': 'play'} circle`}></i>
+        { props.playing ? <Icon icon='faPlayCircle' /> : <Icon icon='faPauseCircle' /> }
       </Button>
     </React.Fragment>
   )

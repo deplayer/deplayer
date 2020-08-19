@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import MenuItem from './MenuItem'
+import Icon from '../common/Icon'
 
 type Props = {
   collection: any,
@@ -16,21 +17,21 @@ const CollectionMenuItem = ({collection, totalItems, current = false}: Props) =>
         title='all'
         label='All'
         url='/collection'
-        iconClasses='icon database outline'
+        icon={<Icon icon='faDatabase' />}
       />
       <MenuItem
         totalItems={collection.mediaByType['video'].length}
         title='videos'
         label='Videos'
         url='/collection/video'
-        iconClasses='fa fa-film outline'
+        icon={<Icon icon='faFilm' />}
       />
       <MenuItem
         totalItems={collection.mediaByType['audio'].length}
         title='Audio'
         label='Audio'
         url='/collection/audio'
-        iconClasses='fa fa-file-audio-o outline'
+        icon={<Icon icon='faFileAudio' />}
       />
     </ul>
   ) : null
@@ -41,7 +42,7 @@ const CollectionMenuItem = ({collection, totalItems, current = false}: Props) =>
       url='/collection'
       title='collection'
       label='Collection'
-      iconClasses='icon database outline'
+      icon={<Icon icon='faDatabase' />}
     >
       { children }
     </MenuItem>

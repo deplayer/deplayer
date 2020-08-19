@@ -2,6 +2,7 @@ import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
 import { connect } from 'react-redux'
 import * as React from 'react'
+import Icon from '../common/Icon'
 
 import { SAVE_PLAYLIST } from '../../constants/ActionTypes'
 import Button from '../common/Button'
@@ -27,7 +28,7 @@ const SaveQueueButton = (props: Props) => {
       className='clearqueue-button button'
       onClick={saveQueue}
     >
-      <i className='fa fa-save mr-2'></i>
+      <Icon icon='faSave' className='mr-2' />
       <Translate className='hidden md:inline' value='buttons.saveAsPlaylist' />
     </Button>
   )

@@ -1,6 +1,7 @@
 import { I18n } from 'react-redux-i18n'
 import * as React from 'react'
 import classNames from 'classnames'
+import Icon from '../../common/Icon'
 
 type Props = {
   loading: boolean,
@@ -45,7 +46,7 @@ const SearchInput = (props: Props) => {
         type='text'
       />
       <div className='p-2'>
-        { props.loading ? <i className='icon fa fa-spinner fa-pulse'></i> : <i className='icon search'></i> }
+        { props.loading ? <Icon icon='faSpinner' className='fa-pulse' /> : <Icon icon='faSearch' /> }
       </div>
     </div>
   )

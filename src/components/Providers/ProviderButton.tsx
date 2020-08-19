@@ -3,6 +3,7 @@ import { Translate } from 'react-redux-i18n'
 import { connect } from 'react-redux'
 import * as React from 'react'
 
+import Icon from '../common/Icon'
 import Button from '../common/Button'
 import * as types from '../../constants/ActionTypes'
 
@@ -22,7 +23,7 @@ const ProviderButton = (props: Props) => {
       onClick={onClick}
       title={ props.providerKey }
     >
-      <i className='fa fa-plus mr-2'></i>
+      <Icon icon='faPlusCircle' className='mr-2' />
       <Translate value={`buttons.addProvider.${props.providerKey}`} />
     </Button>
   )

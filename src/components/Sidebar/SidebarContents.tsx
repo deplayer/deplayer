@@ -9,6 +9,7 @@ import QueueMenuItem from './QueueMenuItem'
 import ArtistsMenuItem from './ArtistsMenuItem'
 import MenuItem from './MenuItem'
 import { inSection } from '../../utils/router'
+import Icon from '../common/Icon'
 
 type ContentProps = {
   dispatch: Dispatch,
@@ -31,7 +32,7 @@ const SidebarContents = (props: ContentProps) => {
           url='/'
           title='Explore'
           label='Explore'
-          iconClasses='icon fa fa-globe'
+          icon={<Icon icon='faGlobe' />}
         />
         <QueueMenuItem
           current={inSection(props.location, 'queue')}
@@ -56,14 +57,14 @@ const SidebarContents = (props: ContentProps) => {
           url='/providers'
           title='Providers'
           label='Providers'
-          iconClasses='icon fa fa-plug'
+          icon={<Icon icon='faPlug' />}
         />
         <MenuItem
           current={inSection(props.location, 'wiki')}
           url='/wiki'
           title='Help'
           label='Help'
-          iconClasses='icon fa fa-life-ring'
+          icon={<Icon icon='faLifeRing' />}
         />
         <SettingsMenuItem current={inSection(props.location, 'settings')} />
       </ul>
@@ -75,11 +76,12 @@ const SidebarContents = (props: ContentProps) => {
           title="Show me the code"
           target="_blank"
         >
-          <i className='fa fa-gitlab' />
+          <Icon icon='faGitlab' />
         </a>
 
         <a
           href={'https://gitlab.com/deplayer/deplayer/tags'}
+          className='ml-2'
           rel="noreferrer"
           title="Show me the code"
           target="_blank"

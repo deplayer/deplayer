@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import * as React from 'react'
 
 import Button from '../common/Button'
+import Icon from '../common/Icon'
 import * as types from '../../constants/ActionTypes'
 
 type Props = {
@@ -19,7 +20,7 @@ const SidebarButton = ({dispatch}: Props) => {
       transparent
       onClick={toggleSidebar}
     >
-      <i className="fa fa-bars"></i>
+      <Icon icon='faBars' />
     </Button>
   )
 }

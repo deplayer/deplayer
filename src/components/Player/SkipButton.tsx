@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import Button from '../common/Button'
+import Icon from '../common/Icon'
 
 type Props = {
   onClick: () => void,
@@ -15,7 +16,8 @@ const SkipButton = (props: Props) => {
         size='2xl'
         onClick={props.onClick}
       >
-        <i className={`icon step ${ props.type === 'next' ? 'forward': 'backward'}`}></i>
+
+        { props.type === 'next' ? <Icon icon='faStepForward' /> : <Icon icon='faStepBackward' /> }
       </Button>
     </React.Fragment>
   )

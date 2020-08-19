@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import MenuItem from './MenuItem'
+import Icon from '../common/Icon'
 
 type Props = {
   totalItems: number,
@@ -15,7 +16,7 @@ const ArtistsMenuItem = ({totalItems, current = false}: Props) => {
       url='/artists'
       title='artists'
       label='Artists'
-      iconClasses='icon fa fa-microphone'
+      icon={<Icon icon='faMicrophoneAlt' />}
     />
   )
 }

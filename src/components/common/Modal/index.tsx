@@ -2,6 +2,7 @@ import React from 'react'
 import ReactModal from 'react-modal'
 
 import Button from '../Button'
+import Icon from '../Icon'
 
 const customStyles = {
   content: {
@@ -53,7 +54,7 @@ const Modal = (props: Props) => {
           transparent
           onClick={() => close()}
         >
-          <i className='fa fa-remove' />
+          <Icon icon='faTimes' />
         </Button>
       </div>
       {props.children}

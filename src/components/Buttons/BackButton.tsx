@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
+import Icon fom '../common/Icon'
 
 type Props = {
   history: any
@@ -15,7 +16,7 @@ const BackButton = (props: Props) => {
       className='back-button button'
       onClick={goBack}
     >
-      <i className='fa fa-times'></i>
+      <Icon icon='faTimes' />
     </button>
   )
 }

@@ -2,6 +2,7 @@ import * as React from 'react'
 
 import { settingsCard } from '../Settings/SettingsForm'
 import Button from '../common/Button'
+import Icon from '../common/Icon'
 import * as types from '../../constants/ActionTypes'
 
 type Props = {
@@ -44,7 +45,7 @@ const Playlist = (props: Props) => {
             onClick={() => setShowSongs(!showSongs)}
           >
             Show songs
-            <i className={`fa ${showSongs ? 'fa-chevron-down' : 'fa-chevron-right' }`} />
+            { showSongs ? <Icon icon='faChevronDown'/> : <Icon icon='faChevronRight' /> }
           </Button>
 
           <Button
@@ -61,7 +62,7 @@ const Playlist = (props: Props) => {
             }}
           >
             Play
-            <i className='fa fa-play' />
+            <Icon icon='faPlayCircle' />
           </Button>
         </div>
 

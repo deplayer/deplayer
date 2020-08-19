@@ -5,6 +5,7 @@ import * as React from 'react'
 
 import { PLAY_ALL } from '../../constants/ActionTypes'
 import Button from '../common/Button'
+import Icon from '../common/Icon'
 
 type Props = {
   dispatch: Dispatch,
@@ -26,7 +27,7 @@ const PlayAllButton = (props: Props) => {
       className='playall-button button'
       onClick={playAll}
     >
-      <i className='fa fa-caret-right mr-2'></i>
+      <Icon icon='faCaretRight' className='mr-2' />
       <Translate className='hidden md:inline' value='buttons.playAll' />
     </Button>
   )

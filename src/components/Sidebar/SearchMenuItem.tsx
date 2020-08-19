@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import MenuItem from './MenuItem'
+import Icon from '../common/Icon'
 
 type Props = {
   current?: Boolean,
@@ -15,7 +16,7 @@ const SearchMenuItem = ({current = false, totalItems}: Props) => {
       url='/search-results'
       title='search'
       label='Search'
-      iconClasses='fa fa-search'
+      icon={<Icon icon='faSearch' />}
     />
   )
 }

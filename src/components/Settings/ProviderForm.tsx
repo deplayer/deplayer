@@ -5,6 +5,7 @@ import * as React from 'react'
 import { State as SettingsStateType } from '../../reducers/settings'
 import { settingsCard } from './SettingsForm'
 import Button from '../common/Button'
+import Icon from '../common/Icon'
 import FormSchema from './FormSchema'
 import * as types from '../../constants/ActionTypes'
 
@@ -26,7 +27,7 @@ const ProviderForm = (props: ProviderFormProps) => {
         onClick={onClick}
         title={ props.providerKey }
       >
-        <i className='fa fa-remove'></i>
+        <Icon icon='faTrash' />
       </Button>
     )
   }

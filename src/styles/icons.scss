@@ -1,38 +1,3 @@
-.icon {
-  @extend .fa;
-
-  &.music {
-    @extend .fa-music;
-  }
-  &.database {
-    @extend .fa-archive;
-  }
-  &.cogs {
-    @extend .fa-gears;
-  }
-  &.play {
-    @extend .fa-play-circle;
-  }
-  &.pause {
-    @extend .fa-pause-circle;
-  }
-  &.search {
-    @extend .fa-search;
-  }
-  &.step.backward {
-    @extend .fa-fast-backward;
-  }
-  &.step.forward {
-    @extend .fa-fast-forward;
-  }
-  &.add.circle {
-    @extend .fa-plus-square;
-  }
-  &.remove {
-    @extend .fa-minus-square;
-  }
-}
-
 .fa.fa-wifi.disabled {
   color: red;
 }

@@ -36,7 +36,9 @@ const ContextualMenu = (props: MenuProps) => {
   return (
     <React.Fragment>
       <MenuProvider event="onClick" id={`context-menu-${song.id}`}>
-        <i className='fa fa-ellipsis-v p-1 mx-1 text-blue-400 cursor-pointer float-right' />
+        <div className='p-1 mx-1 float-right cursor-pointer'>
+          <Icon icon='faEllipsisV' className='text-blue-400' />
+        </div>
       </MenuProvider>
       <Menu id={`context-menu-${song.id}`} className='song-menu' theme={theme.dark}>
         <Item>

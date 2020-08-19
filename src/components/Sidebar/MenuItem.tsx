@@ -12,7 +12,7 @@ type Props = {
   url: string,
   title: string,
   label: string,
-  iconClasses: string
+  icon: React.ReactNode
 }
 
 const MenuItem = (props: Props) => {
@@ -29,8 +29,8 @@ const MenuItem = (props: Props) => {
         title={ props.title }
       >
         <div className='py-4'>
-          <i className={ props.iconClasses }></i>
-          { props.label }
+          { props.icon }
+          <span className='ml-4'>{ props.label }</span>
         </div>
 
           { props.totalItems &&
