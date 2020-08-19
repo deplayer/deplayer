@@ -48,9 +48,6 @@ class PlayerControls extends React.Component<Props> {
   onPlay = () => {
     this.props.dispatch({ type: types.START_PLAYING })
   }
-  onPause = () => {
-    this.props.dispatch({ type: types.STOP_PLAYING })
-  }
 
   onSeekChange = (value: any) => {
     this.props.dispatch({ type: types.SET_PLAYER_PLAYED_SECONDS, value: value / 1000 })
@@ -157,6 +154,8 @@ class PlayerControls extends React.Component<Props> {
       .pathname
       .match(new RegExp(`/song/${currentPlayingId}`))
 
+    console.log('playing:', playing)
+
     return (
       <React.Fragment>
         { handlers }
@@ -178,7 +177,6 @@ class PlayerControls extends React.Component<Props> {
               volume={volume / 100}
               muted={false}
               onPlay={this.onPlay}
-              onPause={this.onPause}
               onEnded={() => {
                 this.resetPlayedSeconds()
                 this.saveTrackPlayed(currentPlayingId)
@@ -201,7 +199,7 @@ class PlayerControls extends React.Component<Props> {
             />
           </InPortal>
         </div>
-        { !songFinder && (
+        { !songFinder && currentPlaying.type === 'video' && (
           <OutPortal
             className={`left-0 right-0 top-0 botton-0 absolute ${currentPlaying.type === 'video' && 'bg-handler'}`}
             node={this.props.playerPortal}
