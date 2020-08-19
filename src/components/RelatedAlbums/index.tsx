@@ -28,14 +28,18 @@ const AlbumCover = ({ album }) => {
 // All items component
 // Important! add unique key
 export const Albums = (list: Array<any>) => {
-  return list.map((album) => {
-    return (
-      <AlbumCover
-        key={album.id}
-        album={album}
-      />
-    )
-  })
+  return list
+    .filter((album) => {
+      return album.name !== '' // We don't want empty titles
+    })
+    .map((album) => {
+      return (
+        <AlbumCover
+          key={album.id}
+          album={album}
+        />
+      )
+    })
 }
 
 type Props = {
