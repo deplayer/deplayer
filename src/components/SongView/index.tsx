@@ -84,8 +84,8 @@ const SongView = (props: Props) => {
   return (
     <div className={`song-view ${props.className} w-full overflow-y-auto z-10 flex flex-col`}>
       <div className="song sm:flex">
-        <div className="w-full md:p-6 image md:max-w-sm lg:max-w-md xl:max-w-xl md:flex-grow-0 sticky" >
-          <div>
+        <div className="w-full md:p-6 image md:max-w-sm lg:max-w-md xl:max-w-xl md:flex-grow-0 sticky flex" >
+          <div className='flex flex-col'>
             { songFinder && song.type === 'video' && <OutPortal node={props.playerPortal} /> }
             { (song.type !== 'video' || !songFinder) &&
               <CoverImage

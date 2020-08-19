@@ -216,7 +216,7 @@ class PlayerControls extends React.Component<Props> {
               transitionEnter={true}
               transitionLeave={true}
             >
-              <div key='player-controls' className='flex justify-between items-center'>
+              <div key='player-controls' className='flex justify-between items-center flex-col'>
                 <div className='absolute top-0 w-full'>
                   <ProgressBar
                     dispatch={this.props.dispatch}
@@ -227,34 +227,36 @@ class PlayerControls extends React.Component<Props> {
                   />
                 </div>
 
-                <div className='flex flex-initial items-center flex-grow min-w-0'>
+                <div className='flex flex-initial items-center justify-between min-w-0 max-w-full w-full'>
                   <Cover song={currentPlaying} />
-                  <div className='mx-2 pr-2 md:text-center w-full'>
-                    <Link to={`/song/${currentPlaying.id}`} className='text-lg md:text-xl text-blue-200 block'>
-                      <h5 className='truncate'>
-                        { currentPlaying.title }
-                      </h5>
-                    </Link>
-                    { currentPlaying.artist &&
-                      <Link to={`/artist/${currentPlaying.artist.id}`} className='block'>
-                        <h6 className='truncate text-blue-600'>
-                          {  currentPlaying.artist.name }
-                        </h6>
+                  <div className='flex justify-between items-center w-full'>
+                    <div className='mx-2 pr-2 md:text-center w-full truncate overflow-hidden'>
+                      <Link to={`/song/${currentPlaying.id}`} className='text-lg md:text-xl text-blue-200 block'>
+                        <h5 className='truncate'>
+                          { currentPlaying.title }
+                        </h5>
                       </Link>
-                    }
+                      { currentPlaying.artist &&
+                        <Link to={`/artist/${currentPlaying.artist.id}`} className='block'>
+                          <h6 className='truncate text-blue-600'>
+                            {  currentPlaying.artist.name }
+                          </h6>
+                        </Link>
+                      }
+                    </div>
+                    <div className='player-tools flex fustify-center items-center'>
+                      <Controls
+                        mqlMatch={this.props.app.mqlMatch}
+                        playPrev={this.playPrev}
+                        isPlaying={this.props.player.playing}
+                        playPause={this.playPause}
+                        playNext={this.playNext}
+                        dispatch={this.props.dispatch}
+                      />
+                      <div className='w-16'>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className='player-tools flex fustify-center items-center'>
-                  <Controls
-                    mqlMatch={this.props.app.mqlMatch}
-                    playPrev={this.playPrev}
-                    isPlaying={this.props.player.playing}
-                    playPause={this.playPause}
-                    playNext={this.playNext}
-                    dispatch={this.props.dispatch}
-                  />
-                </div>
-                <div className='flex flex-grow-0 w-16'>
                 </div>
               </div>
               {

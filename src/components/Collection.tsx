@@ -44,7 +44,7 @@ const Collection = (props: Props) => {
 
   const mediaItems = mediaForPath(props)
 
-  if (!mediaItems) {
+  if (!mediaItems.length) {
     return (
         <BodyMessage message={
           <div>
