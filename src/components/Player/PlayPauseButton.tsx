@@ -16,7 +16,7 @@ const PlayPauseButton = (props: Props) => {
         size='4xl'
         onClick={props.onClick}
       >
-        { props.playing ? <Icon icon='faPlayCircle' /> : <Icon icon='faPauseCircle' /> }
+        { props.playing ? <Icon icon='faPauseCircle' /> : <Icon icon='faPlayCircle' /> }
       </Button>
     </React.Fragment>
   )
