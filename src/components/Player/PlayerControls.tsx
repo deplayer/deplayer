@@ -154,8 +154,6 @@ class PlayerControls extends React.Component<Props> {
       .pathname
       .match(new RegExp(`/song/${currentPlayingId}`))
 
-    console.log('playing:', playing)
-
     return (
       <React.Fragment>
         { handlers }

@@ -17,13 +17,15 @@ export default class ItunesApiProvider implements IMusicProvider {
   }
 
   mapResponse(result: any): Array<Media> {
-    return result.data.results.map((itSong) => {
+    return result.data.results.map((itSong: Media) => {
       return this.songFromItSong(itSong)
     })
   }
 
   // Map itunes song to entity song params
   songFromItSong(itSong: any) {
+    const isAudio = itSong.kind === 'song'
+
     return new Media({
       artistName: itSong.artistName,
       title: itSong.trackName,
@@ -37,6 +39,7 @@ export default class ItunesApiProvider implements IMusicProvider {
       price: itSong.trackPrice,
       currency: itSong.currency,
       shareUrl: itSong.trackViewUrl,
+      type: isAudio ? 'audio': 'video',
       stream: [
         {service: this.providerKey, uris: [{uri: itSong.previewUrl, quality: 'demo'}]}
       ]
