@@ -1,4 +1,4 @@
-import PouchDB, { Database } from 'pouchdb'
+import PouchDB from 'pouchdb'
 
 import Media from '../../entities/Media'
 import Artist from '../../entities/Artist'
@@ -119,7 +119,7 @@ const collections: Array<any> = [
   }
 ]
 
-const createDB = (): Database<any> => {
+const createDB = (): any => {
   const dbName = 'player_data'
   if (process.env.NODE_ENV === 'test') {
     return new PouchDB(dbName)

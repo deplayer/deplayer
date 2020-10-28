@@ -86,21 +86,17 @@ export default class PouchdbAdapter implements IAdapter {
 
   getAll = (model: string, conditions: any = {}): Promise<any> => {
     return new Promise((resolve, reject) => {
-      return db.get().then((instance) => {
+      return db.get().then(async (instance) => {
 
-        const query = instance[model].find()
+        const result = await instance.query((doc: any, emit: any) => {
+          emit(doc)
+        }, {type: model})
 
-        query.exec().then((result) => {
-          if (result) {
-            resolve(Promise.all(result))
-          }
+        if (result) {
+          resolve(result.rows)
+        }
 
-          resolve(null)
-        })
-          .catch((err: Error) => {
-            logger.warn('RxdbDatabase', err)
-            reject(err)
-          })
+        resolve(null)
       })
     })
   }
