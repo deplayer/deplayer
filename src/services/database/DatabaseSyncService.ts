@@ -1,7 +1,7 @@
-import RxDB from 'rxdb'
-
 import { IAdapter } from './IAdapter'
 import  * as types from '../../constants/ActionTypes'
+import PouchDB from 'pouchdb'
+require('pouchdb-adapter-http')
 
 export default class DatabaseSyncService {
   storageAdapter: IAdapter
@@ -11,32 +11,17 @@ export default class DatabaseSyncService {
   }
 
   setupSync = async (settings: any, dispatch: any) => {
-    const db = await this.storageAdapter.getDb()
-
-    RxDB.plugin(require('pouchdb-adapter-http'))
-
-    const collection = db['media']
-
-    const replicationState = collection.sync({
-      remote: settings.app.databaseSync.remote,
-      waitForLeadership: true,
-      direction: {
-        pull: true,
-        push: true
-      },
-      options: {
-        live: true,
-        retry: true
-      }
-    })
+    // FIXME: Magic string
+    const replicationState = PouchDB.sync('player_data', settings.app.databaseSync.remote, { live: true, retry: true })
 
     const replicatedPayload: Array<any> = []
 
-    replicationState.docs$.subscribe((docData: any) => {
+    replicationState.on('change', (docData: any) => {
       replicatedPayload.push(docData)
 
       if (replicatedPayload.length >= 100) {
-        dispatch({type: types.RECEIVE_COLLECTION, data: replicatedPayload})
+        const collection = replicatedPayload.filter((elem) => elem.type === 'media')
+        dispatch({type: types.RECEIVE_COLLECTION, data: collection})
         // Emptying payload
         replicatedPayload.length = 0
       }

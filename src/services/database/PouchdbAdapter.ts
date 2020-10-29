@@ -8,13 +8,21 @@ export default class PouchdbAdapter implements IAdapter {
   }
 
   save = async (model: string, id: string, payload: any): Promise<any> => {
-    const fixedPayload = {_id: id, ...payload}
+    const fixedPayload = {_id: id, ...payload, type: model}
 
     const instance = await db.get()
-    return instance[model].atomicUpsert(fixedPayload)
+
+    try {
+      const prev = await instance.get(id)
+      await instance.put({...prev, ...fixedPayload})
+    } catch {
+      await instance.put(fixedPayload)
+    }
+
+    return fixedPayload
   }
 
-  addMany(model: string, payload: Array<any>): Promise<any> {
+  addMany = async (model: string, payload: Array<any>): Promise<any> => {
     const inserts: Array<any> = []
     payload.forEach((item) => {
       const insertPromise = this.addItem(model, item)
@@ -22,15 +30,8 @@ export default class PouchdbAdapter implements IAdapter {
       inserts.push(insertPromise)
     })
 
-    return new Promise((resolve, reject) => {
-      Promise.all(inserts).then((results) => {
-        resolve(results)
-      })
-        .catch((e) => {
-          logger.log('RxdbDatabase', e)
-          reject(e)
-        })
-    })
+    const results = await Promise.all(inserts)
+    return results
   }
 
   removeMany(model: string, payload: Array<string>): Promise<any> {
@@ -59,24 +60,13 @@ export default class PouchdbAdapter implements IAdapter {
   get = async (model: string, id: string): Promise<any> => {
     await db.get()
 
-    const result = await this.getDocObj(model, id)
-    if (!result) {
-      logger.log('RxdbAdapter', 'Result for %s with id %s not found', model, id)
-      return
-    }
-
-    return result.get()
+    return this.getDocObj(model, id)
   }
 
   getDocObj = async (model: string, id: string): Promise<any> => {
     const instance = await db.get()
 
-    if (!instance[model]) {
-      logger.log('RxdbAdapter', 'no instance model found for', model)
-      return
-    }
-
-    return instance[model].findOne({_id: id}).exec()
+    return instance.get(id)
   }
 
   removeCollection = async (model: string): Promise<any> => {
@@ -89,11 +79,14 @@ export default class PouchdbAdapter implements IAdapter {
       return db.get().then(async (instance) => {
 
         const result = await instance.query((doc: any, emit: any) => {
-          emit(doc)
+          if (doc.type === model) {
+            emit(doc)
+          }
         }, {type: model})
 
         if (result) {
-          resolve(result.rows)
+          // FIXME: This elem.key should be elem.value maybe?
+          resolve(result.rows.map((elem: any) => elem.key))
         }
 
         resolve(null)

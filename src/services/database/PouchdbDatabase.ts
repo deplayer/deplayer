@@ -6,6 +6,8 @@ import logger from '../../utils/logger'
 
 let dbPromise: Promise<any>|null = null
 
+export const dbName = 'player_data'
+
 const collections: Array<any> = [
   {
     name: 'settings',
@@ -120,7 +122,6 @@ const collections: Array<any> = [
 ]
 
 const createDB = (): any => {
-  const dbName = 'player_data'
   if (process.env.NODE_ENV === 'test') {
     return new PouchDB(dbName)
   } else {

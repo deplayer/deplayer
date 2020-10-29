@@ -11,14 +11,19 @@ const queueService = new QueueService(new adapter())
 export function* initialize() {
   yield queueService.initialize
   logger.log('queue-saga', 'initializing queue')
-  const queue = yield call(queueService.get)
-  if (!queue) {
-    logger.log('queue-saga', 'error retrieving queue', queue)
+
+  try {
+    const queue = yield call(queueService.get)
+    if (!queue) {
+      logger.log('queue-saga', 'error retrieving queue', queue)
+      yield put({type: types.GET_QUEUE_REJECTED})
+    } else {
+      const unserialized = JSON.parse(JSON.stringify(queue))
+      logger.log('queue-saga', 'queue recieved and unserialized')
+      yield put({type: types.RECEIVE_QUEUE, queue: unserialized})
+    }
+  } catch {
     yield put({type: types.GET_QUEUE_REJECTED})
-  } else {
-    const unserialized = JSON.parse(JSON.stringify(queue))
-    logger.log('queue-saga', 'queue recieved and unserialized')
-    yield put({type: types.RECEIVE_QUEUE, queue: unserialized})
   }
 }
 
