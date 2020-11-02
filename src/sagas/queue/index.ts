@@ -43,7 +43,6 @@ export function* saveQueue(): any {
   const queue = yield select(getQueue)
   logger.log('queue-saga', 'saving queue', queue)
 
-  // FIXME Fix this with rxdb pre-insert hook
   // https://redux-saga.js.org/docs/advanced/NonBlockingCalls.html
   yield call(queueService.save, 'queue', {
     trackIds: queue.trackIds,

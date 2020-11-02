@@ -27,9 +27,9 @@ It's tech stack is based in:
   API](https://developers.google.com/web/updates/2017/02/media-session)
   implemented, control your player from your keyboard media keys or show media
   controls in your mobile.
-* Import/Export your collection (thanks to [rxdb][rxdb]), allowing to share
+* Import/Export your collection (th), allowing to share
   your collection between machines.
-* Offline first, sync with your remote [pouchdb](https://pouchdb.com/) /
+* Offline first, sync with your remote  [pouchdb](https://pouchdb.com/) /
   [couchdb](https://couchdb.apache.org/) your database as a backup and share
   your collection and session between devices and browsers!
 * Multi provider, add your data sources and listen the music from there. Keep
@@ -82,5 +82,3 @@ yarn start
 ```bash
 yarn storybook
 ```
-
-[rxdb]: https://rxdb.info

@@ -1,8 +1,6 @@
-import { RxDocument } from 'rxdb'
-
 import rowToSong from './rowToSong'
 
-const mapToMedia = (collection: Array<RxDocument<any, any>>) => {
+const mapToMedia = (collection: Array<any>) => {
   if (!collection.length) {
     return []
   }

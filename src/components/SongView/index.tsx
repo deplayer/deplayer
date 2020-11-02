@@ -86,8 +86,8 @@ const SongView = (props: Props) => {
       <div className="song sm:flex">
         <div className="w-full md:p-6 image md:max-w-sm lg:max-w-md xl:max-w-xl md:flex-grow-0 sticky flex" >
           <div className='flex flex-col'>
-            { songFinder && song.type === 'video' && <OutPortal node={props.playerPortal} /> }
-            { (song.type !== 'video' || !songFinder) &&
+            { songFinder && song.media_type === 'video' && <OutPortal node={props.playerPortal} /> }
+            { (song.media_type !== 'video' || !songFinder) &&
               <CoverImage
                 useImage
                 cover={song.cover}
@@ -191,7 +191,7 @@ const SongView = (props: Props) => {
               <Tag>{ song.genre }</Tag>
             </div>
             <div className='mt-2'>
-              <Tag>{ song.type }</Tag>
+              <Tag>{ song.media_type }</Tag>
             </div>
             <div className='mt-2'>
               <Translate value='song.label.played' /> { song.playCount || 0 } <Translate value='song.label.times' />

@@ -17,9 +17,11 @@ export default class DatabaseSyncService {
     const replicatedPayload: Array<any> = []
 
     replicationState.on('change', (docData: any) => {
+      console.log(docData)
       replicatedPayload.push(docData)
 
       if (replicatedPayload.length >= 100) {
+        console.log(replicatedPayload)
         const collection = replicatedPayload.filter((elem) => elem.type === 'media')
         dispatch({type: types.RECEIVE_COLLECTION, data: collection})
         // Emptying payload

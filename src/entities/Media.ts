@@ -17,11 +17,6 @@ type stream = {
   uris: Array<streamUri>
 }
 
-type cover = {
-  thumbnailUrl: string,
-  fullUrl: string
-}
-
 type MediaType = 'video' | 'audio'
 
 export default class Media {
@@ -197,7 +192,7 @@ export default class Media {
     return result
   }
 
-  get type(): MediaType {
+  get media_type(): MediaType {
     if (this.hasAnyProviderOf(['youtube', 'webtorrent'])) {
       return 'video'
     }
@@ -221,12 +216,12 @@ export default class Media {
       albumName: this.albumName,
       playCount: this.playCount,
       filePath: this.filePath,
-      type: this.type,
+      media_type: this.media_type,
       duration: this.duration,
     }
   }
 
   toJSON() {
-    return {...this, type: this.type}
+    return {...this, media_type: this.media_type}
   }
 }
