@@ -14,15 +14,20 @@ export function* initialize() {
   const adapter = getAdapter()
   const settingsService = new SettingsService(new adapter())
   yield call(settingsService.initialize)
-  const settings = yield call(settingsService.get)
 
-  if (!settings) {
+  try {
+    const settings = yield call(settingsService.get)
+
+    if (!settings) {
+      yield put({type: types.GET_SETTINGS_REJECTED})
+    } else {
+      const unserialized = JSON.parse(JSON.stringify(settings))
+      yield put({type: types.RECEIVE_SETTINGS, settings: unserialized})
+    }
+    yield put({type: types.RECEIVE_SETTINGS_FINISHED})
+  } catch {
     yield put({type: types.GET_SETTINGS_REJECTED})
-  } else {
-    const unserialized = JSON.parse(JSON.stringify(settings))
-    yield put({type: types.RECEIVE_SETTINGS, settings: unserialized})
   }
-  yield put({type: types.RECEIVE_SETTINGS_FINISHED})
 }
 
 function* saveSettings(action: any) {

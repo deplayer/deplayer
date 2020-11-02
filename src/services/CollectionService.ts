@@ -1,5 +1,3 @@
-import { RxDocument } from 'rxdb'
-
 import { IStorageService } from './IStorageService'
 import { IAdapter } from './database/IAdapter'
 import MediaMergerService from './MediaMergerService'
@@ -63,7 +61,7 @@ export default class CollectionService implements IStorageService {
     return this.storageAdapter.get(MODEL, id)
   }
 
-  getAll = (): Promise<Array<RxDocument<any, any>>> => {
+  getAll = (): Promise<Array<any>> => {
     return this.storageAdapter.getAll(MODEL, {})
   }
 }

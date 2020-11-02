@@ -36,7 +36,7 @@ export function* initializeWatcher() {
     yield call(initialize)
     yield call(collectionService.initialize)
     const collection = yield call(collectionService.getAll)
-    const mappedData = collection.map((elem: any) => elem.toJSON())
+    const mappedData = collection.map((elem: any) => elem)
 
     yield put({type: types.RECEIVE_COLLECTION, data: mappedData})
 

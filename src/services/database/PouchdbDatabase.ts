@@ -1,10 +1,12 @@
-import RxDB from 'rxdb'
+import PouchDB from 'pouchdb'
 
 import Media from '../../entities/Media'
 import Artist from '../../entities/Artist'
 import logger from '../../utils/logger'
 
 let dbPromise: Promise<any>|null = null
+
+export const dbName = 'player_data'
 
 const collections: Array<any> = [
   {
@@ -119,11 +121,12 @@ const collections: Array<any> = [
   }
 ]
 
-const createDB = (): Promise<any> => {
+const createDB = (): any => {
   if (process.env.NODE_ENV === 'test') {
-    return RxDB.create({name: 'player_data', adapter: 'memory'})
+    return new PouchDB(dbName)
   } else {
-    return RxDB.create({name: 'player_data', adapter: 'idb'})
+    // return RxDB.create({name: 'player_data', adapter: 'idb'})
+    return new PouchDB(dbName, {adapter: 'idb'})
   }
 }
 
@@ -146,13 +149,17 @@ export const createCollections = async (db: any, filter: Array<string> = []) => 
 
 const _create = async (): Promise<any> => {
   if (process.env.NODE_ENV === 'test') {
-    RxDB.plugin(require('pouchdb-adapter-memory'))
+    require('pouchdb-adapter-memory')
   } else {
-    RxDB.plugin(require('pouchdb-adapter-idb'))
+    require('pouchdb-adapter-idb')
   }
 
   logger.log('DatabaseService', 'creating database..')
-  const db = await createDB()
+  const db = createDB()
+
+  console.log('pouch object:', db)
+
+
   logger.log('DatabaseService', 'created database')
   window['db'] = db; // write to window for debugging
 

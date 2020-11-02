@@ -66,8 +66,6 @@ export default class ArtistView extends React.Component<Props> {
       )
     }
 
-    console.log('received metadata: ', this.props.artistMetadata)
-
     const extractSummary = (): string => {
       if (this.props.artistMetadata && this.props.artistMetadata.artist) {
         return this.props.artistMetadata.artist.bio.content

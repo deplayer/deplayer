@@ -1,7 +1,6 @@
 import Media from '../entities/Media'
-import { RxDocument } from 'rxdb'
 
-const rowToSong  = (elem: RxDocument<any, any>): Media => {
+const rowToSong  = (elem: any): Media => {
   const songPayload = {
     ...elem,
     ...{

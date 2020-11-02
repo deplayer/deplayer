@@ -1,23 +1,28 @@
-import { RxDocument } from 'rxdb'
-
 import { IAdapter } from './IAdapter'
-import * as db from './RxdbDatabase'
-import { createCollections } from './RxdbDatabase'
+import * as db from './PouchdbDatabase'
 import logger from '../../utils/logger'
 
-export default class RxdbAdapter implements IAdapter {
+export default class PouchdbAdapter implements IAdapter {
   initialize = async () => {
     await db.get()
   }
 
   save = async (model: string, id: string, payload: any): Promise<any> => {
-    const fixedPayload = {_id: id, ...payload}
+    const fixedPayload = {_id: id, ...payload, type: model}
 
     const instance = await db.get()
-    return instance[model].atomicUpsert(fixedPayload)
+
+    try {
+      const prev = await instance.get(id)
+      await instance.put({...prev, ...fixedPayload})
+    } catch {
+      await instance.put(fixedPayload)
+    }
+
+    return fixedPayload
   }
 
-  addMany(model: string, payload: Array<any>): Promise<any> {
+  addMany = async (model: string, payload: Array<any>): Promise<any> => {
     const inserts: Array<any> = []
     payload.forEach((item) => {
       const insertPromise = this.addItem(model, item)
@@ -25,15 +30,8 @@ export default class RxdbAdapter implements IAdapter {
       inserts.push(insertPromise)
     })
 
-    return new Promise((resolve, reject) => {
-      Promise.all(inserts).then((results) => {
-        resolve(results)
-      })
-        .catch((e) => {
-          logger.log('RxdbDatabase', e)
-          reject(e)
-        })
-    })
+    const results = await Promise.all(inserts)
+    return results
   }
 
   removeMany(model: string, payload: Array<string>): Promise<any> {
@@ -62,24 +60,13 @@ export default class RxdbAdapter implements IAdapter {
   get = async (model: string, id: string): Promise<any> => {
     await db.get()
 
-    const result = await this.getDocObj(model, id)
-    if (!result) {
-      logger.log('RxdbAdapter', 'Result for %s with id %s not found', model, id)
-      return
-    }
-
-    return result.get()
+    return this.getDocObj(model, id)
   }
 
   getDocObj = async (model: string, id: string): Promise<any> => {
     const instance = await db.get()
 
-    if (!instance[model]) {
-      logger.log('RxdbAdapter', 'no instance model found for', model)
-      return
-    }
-
-    return instance[model].findOne({_id: id}).exec()
+    return instance.get(id)
   }
 
   removeCollection = async (model: string): Promise<any> => {
@@ -87,23 +74,22 @@ export default class RxdbAdapter implements IAdapter {
     await dbInst[model].remove()
   }
 
-  getAll = (model: string, conditions: any = {}): Promise<RxDocument<any, any>> => {
+  getAll = (model: string, conditions: any = {}): Promise<any> => {
     return new Promise((resolve, reject) => {
-      return db.get().then((instance) => {
+      return db.get().then(async (instance) => {
 
-        const query = instance[model].find()
-
-        query.exec().then((result) => {
-          if (result) {
-            resolve(Promise.all(result))
+        const result = await instance.query((doc: any, emit: any) => {
+          if (doc.type === model) {
+            emit(doc)
           }
+        }, {type: model})
 
-          resolve(null)
-        })
-          .catch((err: Error) => {
-            logger.warn('RxdbDatabase', err)
-            reject(err)
-          })
+        if (result) {
+          // FIXME: This elem.key should be elem.value maybe?
+          resolve(result.rows.map((elem: any) => elem.key))
+        }
+
+        resolve(null)
       })
     })
   }
@@ -120,7 +106,7 @@ export default class RxdbAdapter implements IAdapter {
 
   importCollection = async (model: string, data: any): Promise<any> => {
     const instance = await db.get()
-    await createCollections(instance, [model])
+    await db.createCollections(instance, [model])
     return instance[model].importDump(data)
   }
 

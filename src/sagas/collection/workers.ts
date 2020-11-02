@@ -14,8 +14,8 @@ const collectionService = new CollectionService(new adapter())
 
 export function* saveToDbWorker(data: Array<any>): any {
   const prevCollection = yield select(getCollection)
-  yield call(collectionService.bulkSave, data, prevCollection)
   try {
+    yield call(collectionService.bulkSave, data, prevCollection)
     yield put({type: types.SAVE_COLLECTION_FULLFILLED})
   } catch (e) {
     logger.log('settings-saga', 'addToCollection', e)
