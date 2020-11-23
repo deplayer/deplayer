@@ -118,11 +118,11 @@ const populateFromAction = (state: State, action: {data: any}) => {
     }
 
     if (!mediaByType[song.type]) {
-      mediaByType[song.type] = []
+      mediaByType[song.media_type] = []
     }
 
-    if (!mediaByType[song.type].includes(song.id)) {
-      mediaByType[song.type].push(song.id)
+    if (!mediaByType[song.media_type].includes(song.id)) {
+      mediaByType[song.media_type].push(song.id)
     }
   }
 

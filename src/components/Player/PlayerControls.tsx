@@ -162,7 +162,7 @@ class PlayerControls extends React.Component<Props> {
             <ReactPlayer
               pip
               fullscreen={this.props.player.fullscreen}
-              controls={songFinder && currentPlaying.type === 'video'}
+              controls={songFinder && currentPlaying.media_type === 'video'}
               className={playerClassnames}
               ref={this.playerRef}
               url={streamUri}
@@ -182,9 +182,9 @@ class PlayerControls extends React.Component<Props> {
               }}
               config={{
                 file: {
-                  forceAudio: currentPlaying.type === 'audio',
+                  forceAudio: currentPlaying.media_type === 'audio',
                   attributes: {
-                    className: currentPlaying.type === 'video' ? 'video-element': 'video-element'
+                    className: currentPlaying.media_type === 'video' ? 'video-element': 'video-element'
                   }
                 }
               }}
@@ -197,9 +197,9 @@ class PlayerControls extends React.Component<Props> {
             />
           </InPortal>
         </div>
-        { !songFinder && currentPlaying.type === 'video' && (
+        { !songFinder && currentPlaying.media_type === 'video' && (
           <OutPortal
-            className={`left-0 right-0 top-0 botton-0 absolute ${currentPlaying.type === 'video' && 'bg-handler'}`}
+            className={`left-0 right-0 top-0 botton-0 absolute ${currentPlaying.media_type === 'video' && 'bg-handler'}`}
             node={this.props.playerPortal}
           />
         )}
