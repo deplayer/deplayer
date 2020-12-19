@@ -8,11 +8,11 @@ declare var window: any
 
 export default class MediaSessionService {
   updateMetadata = (media: Media, dispatch: any) => {
-    if (this.canSetMediaSession()) {
+    if (this.canSetMediaSession() && media) {
       navigator.mediaSession.metadata = new window.MediaMetadata({
         title: media.title,
-        artist: media.artist.name,
-        album: media.album.name,
+        artist: media.artistName,
+        album: media.albumName,
         artwork: [
           {
             src: this.getThumbnail(media), type: 'image/png', sizes: '96x96'

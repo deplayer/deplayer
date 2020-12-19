@@ -1,13 +1,17 @@
 import { put, call } from 'redux-saga/effects'
 
 import { getAdapter } from '../../services/database'
-import { magnetToMedia } from '../../services/Webtorrent'
+import { magnetToMedia, torrentToMedia } from '../../services/Webtorrent'
 import CollectionService from '../../services/CollectionService'
 import Media from '../../entities/Media'
 import * as types from '../../constants/ActionTypes'
 
-export function* readWebtorrentFile(action: {magnet: string}) {
-  const medias = yield call(magnetToMedia, action.magnet)
+export function* readWebtorrentFile(action: {
+  magnet: string,
+  torrent: File
+}) {
+  const torrentSource = action.magnet || action.torrent
+  const medias = yield call(magnetToMedia, torrentSource)
   const adapter = getAdapter()
   const collectionService = new CollectionService(new adapter())
 

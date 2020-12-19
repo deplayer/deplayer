@@ -14,6 +14,7 @@ type Props = {
 
 const AddMediaModal = (props: Props) => {
   const [magnetLink, setMagnetLink] = React.useState('')
+  const [torrent, setTorrent] = React.useState<File>()
   const [youtubeLink, setYoutubeLink] = React.useState('')
   const [ipfsHash, setIpfsHash] = React.useState('')
 
@@ -36,11 +37,17 @@ const AddMediaModal = (props: Props) => {
           value={magnetLink}
           onChange={(event) => setMagnetLink(event.target.value)}
         />
+        <input type="file" name="file" onChange={(event) => event.target.files && setTorrent(event.target.files[0])}/>
         <Button
           fullWidth
           type='submit'
           onClick={() => {
-            props.dispatch({type: types.ADD_WEBTORRENT_MEDIA, magnet: magnetLink})
+            if (magnetLink !== '') {
+              props.dispatch({type: types.ADD_WEBTORRENT_MEDIA, magnet: magnetLink})
+            }
+            if (torrent) {
+              props.dispatch({type: types.ADD_WEBTORRENT_MEDIA, torrent: torrent})
+            }
             props.dispatch({type: types.HIDE_ADD_MEDIA_MODAL})
           }}
         >

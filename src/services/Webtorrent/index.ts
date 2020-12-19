@@ -14,7 +14,7 @@ const announceList = [
   ['wss://tracker.fastcast.nz']
 ]
 
-export const magnetToMedia = async (torrentUrl: string): Promise<Array<Media>> => {
+export const magnetToMedia = async (torrentUrl: string|File): Promise<Array<Media>> => {
   const client = new Webtorrent()
 
   return new Promise((resolve): any => {
@@ -24,11 +24,19 @@ export const magnetToMedia = async (torrentUrl: string): Promise<Array<Media>> =
     }, (torrent: any) => {
       console.log('files detected: ', torrent.files)
       const files = torrent.files.filter((file: any) => {
-        return file.name.endsWith('.mp4') || file.name.endsWith('.mp3')
+        console.log(`scanning ${file.name}`)
+        return file.name.endsWith('.mp4') || file.name.endsWith('.mp3') || file.name.endsWith('.mkv')
       })
 
       const medias = files.map((file: any) => {
-        const type = file.name.endsWith('.mp4') ? 'video': 'audio'
+        const type = file.name.endsWith('.mp4') || file.name.endsWith('.mkv') ? 'video': 'audio'
+        const attachments = {
+          'webtorrent': {
+            content_type: 'application/x-bittorrent',
+            data: typeof torrentUrl === 'string' ? btoa(torrentUrl): torrentUrl
+          }
+        }
+
         return new Media({
           title: file.name,
           artistName: 'webtorrent',
@@ -44,7 +52,8 @@ export const magnetToMedia = async (torrentUrl: string): Promise<Array<Media>> =
                 }
               ]
             }
-          ]
+          ],
+          _attachments: attachments
         })
       })
 

@@ -7,7 +7,21 @@ import SearchButton from '../components/Buttons/SearchButton'
 import Placeholder from '../components/Player/Placeholder'
 import Icon from '../components/common/Icon'
 
-const dynamicTitle = (router, collection, searchTerm: ''): string | React.ReactNode => {
+type TitleRouter = {
+  location: {
+    pathname: string
+  }
+}
+
+type TitleCollection = {
+  rows: any
+}
+
+const dynamicTitle = (
+  router: TitleRouter,
+  collection: TitleCollection,
+  searchTerm: ''
+): string | React.ReactNode => {
   const songFinder = router.location.pathname.match(/\/song\/(.*)/)
   const artistFinder = router.location.pathname.match(/\/artist\/(.*)/)
   const albumFinder = router.location.pathname.match(/\/album\/(.*)/)

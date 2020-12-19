@@ -14,7 +14,8 @@ const announceList = [
   ['wss://tracker.fastcast.nz']
 ]
 
-function canPlay (url: string) {
+function canPlay (url: string|File) {
+  console.log('type of url: ', typeof url)
   return typeof url === 'string' && url.startsWith('magnet:')
 }
 
@@ -76,15 +77,15 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
   }
 
   onSeek = (e: any) => {
-      if (this.props.onSeek == undefined) return;
-      this.props.onSeek(e.target.currentTime)
+    if (this.props.onSeek === undefined) return;
+    this.props.onSeek(e.target.currentTime)
   }
 
   play () {
-      const promise = this.player.play()
-      if (promise) {
-        promise.catch(this.props.onError)
-      }
+    const promise = this.player.play()
+    if (promise) {
+      promise.catch(this.props.onError)
+    }
   }
 
   pause () {
@@ -150,7 +151,7 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
   }
 
   getSource (url: any) {
-    if (typeof url !== 'string' && url.length < 10) return
+    // if (typeof url !== 'string' && url.length < 10) return
 
     const { player } = this
 
@@ -158,7 +159,8 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
       announce: announceList
     }, (torrent: any) => {
       const file = torrent.files.find((file: any) => {
-          return file.name.endsWith('.mp4')
+        // FIXME: Add other file extensions
+        return file.name.endsWith('.mp4')
       })
 
       if (file === undefined) return
