@@ -30,7 +30,6 @@ export default class Media {
   artistName: string
   duration: number
   externalId: string
-  _attachments: any
   stream: Array<stream>
   playCount: number
   genre: string
@@ -49,7 +48,6 @@ export default class Media {
       artistName,
       artistId,
       albumId,
-      _attachments,
       albumName,
       duration,
       genre,
@@ -71,7 +69,6 @@ export default class Media {
     this.forcedId = forcedId
     this.albumName = albumName
     this.filePath = filePath
-    this._attachments = _attachments
 
     this.album = new Album({
       albumId: albumId,
@@ -220,8 +217,7 @@ export default class Media {
       playCount: this.playCount,
       filePath: this.filePath,
       media_type: this.media_type,
-      duration: this.duration,
-      _attachments: this._attachments
+      duration: this.duration
     }
   }
 

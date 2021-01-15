@@ -3,19 +3,16 @@ import { ReactPlayerProps } from 'react-player'
 import Webtorrent from 'webtorrent'
 
 const announceList = [
+  ['wss://tracker.btorrent.xyz'],
   ['udp://tracker.openbittorrent.com:80'],
   ['udp://tracker.internetwarriors.net:1337'],
   ['udp://tracker.leechers-paradise.org:6969'],
   ['udp://tracker.coppersurfer.tk:6969'],
   ['udp://exodus.desync.com:6969'],
-  ['wss://tracker.webtorrent.io'],
-  ['wss://tracker.btorrent.xyz'],
   ['wss://tracker.openwebtorrent.com'],
-  ['wss://tracker.fastcast.nz']
 ]
 
-function canPlay (url: string|File) {
-  console.log('type of url: ', typeof url)
+function canPlay (url: string) {
   return typeof url === 'string' && url.startsWith('magnet:')
 }
 
@@ -89,11 +86,11 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
   }
 
   pause () {
-      this.player.pause()
+    this.player.pause()
   }
 
   stop () {
-      this.player.removeAttribute('src')
+    this.player.removeAttribute('src')
   }
 
   seekTo (seconds: any) {
@@ -151,7 +148,7 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
   }
 
   getSource (url: any) {
-    // if (typeof url !== 'string' && url.length < 10) return
+    if (typeof url !== 'string' && url.length < 10) return
 
     const { player } = this
 

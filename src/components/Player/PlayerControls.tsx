@@ -101,7 +101,7 @@ class PlayerControls extends React.Component<Props> {
   }
 
   onError = (e: Error) => {
-    logger.log(e.message)
+    console.log(e.message)
     this.props.dispatch({type: types.PLAY_ERROR, error: e})
   }
 
@@ -123,8 +123,6 @@ class PlayerControls extends React.Component<Props> {
     const currentPlayingId = this.props.queue.currentPlaying
     const currentPlaying = this.props.collection.rows[currentPlayingId]
 
-    // FIXME: Here I need to receive the torrent attachment but it's not
-    // available in redux
     const { streamUri } = this.props.player
 
     const handlers = (
@@ -158,8 +156,6 @@ class PlayerControls extends React.Component<Props> {
       .pathname
       .match(new RegExp(`/song/${currentPlayingId}`))
 
-    console.log(currentPlaying._attachments)
-
     return (
       <React.Fragment>
         { handlers }
@@ -167,7 +163,7 @@ class PlayerControls extends React.Component<Props> {
           <InPortal node={this.props.playerPortal}>
             <ReactPlayer
               pip
-              fullscreen={this.props.player.fullscreen}
+              fullscreen={this.props.player.fullscreen.toString()}
               controls={songFinder && currentPlaying.media_type === 'video'}
               className={playerClassnames}
               ref={this.playerRef}
