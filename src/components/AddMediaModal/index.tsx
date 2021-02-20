@@ -46,6 +46,7 @@ const AddMediaModal = (props: Props) => {
 
         <div className='flex justify-end'>
           <Button
+            fullWidth
             type='submit'
             onClick={() => {
               if (magnetLink !== '') {
@@ -81,6 +82,7 @@ const AddMediaModal = (props: Props) => {
         </div>
         <div className='flex justify-end'>
           <Button
+            fullWidth
             type='submit'
             onClick={() => {
               props.dispatch({
@@ -107,6 +109,7 @@ const AddMediaModal = (props: Props) => {
         </div>
         <div className='flex justify-end'>
           <Button
+            fullWidth
             type='submit'
             onClick={() => {
               props.dispatch({
