@@ -66,7 +66,7 @@ export default class PouchdbAdapter implements IAdapter {
   getDocObj = async (model: string, id: string): Promise<any> => {
     const instance = await db.get()
 
-    return instance.get(id)
+    return instance.get(id, {attachments: true})
   }
 
   removeCollection = async (model: string): Promise<any> => {
@@ -78,11 +78,12 @@ export default class PouchdbAdapter implements IAdapter {
     return new Promise((resolve, reject) => {
       return db.get().then(async (instance) => {
 
+        logger.log('RxdbDatabase', 'Querying all database')
         const result = await instance.query((doc: any, emit: any) => {
           if (doc.type === model) {
             emit(doc)
           }
-        }, {type: model})
+        }, {type: model}, {attachments: true})
 
         if (result) {
           // FIXME: This elem.key should be elem.value maybe?

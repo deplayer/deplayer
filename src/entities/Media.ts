@@ -217,7 +217,7 @@ export default class Media {
       playCount: this.playCount,
       filePath: this.filePath,
       media_type: this.media_type,
-      duration: this.duration,
+      duration: this.duration
     }
   }
 

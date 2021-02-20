@@ -3,15 +3,13 @@ import { ReactPlayerProps } from 'react-player'
 import Webtorrent from 'webtorrent'
 
 const announceList = [
+  ['wss://tracker.btorrent.xyz'],
   ['udp://tracker.openbittorrent.com:80'],
   ['udp://tracker.internetwarriors.net:1337'],
   ['udp://tracker.leechers-paradise.org:6969'],
   ['udp://tracker.coppersurfer.tk:6969'],
   ['udp://exodus.desync.com:6969'],
-  ['wss://tracker.webtorrent.io'],
-  ['wss://tracker.btorrent.xyz'],
   ['wss://tracker.openwebtorrent.com'],
-  ['wss://tracker.fastcast.nz']
 ]
 
 function canPlay (url: string) {
@@ -76,23 +74,23 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
   }
 
   onSeek = (e: any) => {
-      if (this.props.onSeek == undefined) return;
-      this.props.onSeek(e.target.currentTime)
+    if (this.props.onSeek === undefined) return;
+    this.props.onSeek(e.target.currentTime)
   }
 
   play () {
-      const promise = this.player.play()
-      if (promise) {
-        promise.catch(this.props.onError)
-      }
+    const promise = this.player.play()
+    if (promise) {
+      promise.catch(this.props.onError)
+    }
   }
 
   pause () {
-      this.player.pause()
+    this.player.pause()
   }
 
   stop () {
-      this.player.removeAttribute('src')
+    this.player.removeAttribute('src')
   }
 
   seekTo (seconds: any) {
@@ -158,7 +156,8 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
       announce: announceList
     }, (torrent: any) => {
       const file = torrent.files.find((file: any) => {
-          return file.name.endsWith('.mp4')
+        // FIXME: Add other file extensions
+        return file.name.endsWith('.mp4')
       })
 
       if (file === undefined) return

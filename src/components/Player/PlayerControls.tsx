@@ -101,6 +101,7 @@ class PlayerControls extends React.Component<Props> {
   }
 
   onError = (e: Error) => {
+    console.log(e.message)
     this.props.dispatch({type: types.PLAY_ERROR, error: e})
   }
 
@@ -121,6 +122,7 @@ class PlayerControls extends React.Component<Props> {
 
     const currentPlayingId = this.props.queue.currentPlaying
     const currentPlaying = this.props.collection.rows[currentPlayingId]
+
     const { streamUri } = this.props.player
 
     const handlers = (
@@ -161,7 +163,7 @@ class PlayerControls extends React.Component<Props> {
           <InPortal node={this.props.playerPortal}>
             <ReactPlayer
               pip
-              fullscreen={this.props.player.fullscreen}
+              fullscreen={this.props.player.fullscreen.toString()}
               controls={songFinder && currentPlaying.media_type === 'video'}
               className={playerClassnames}
               ref={this.playerRef}

@@ -62,13 +62,17 @@ export function* handleError(): any {
 export function* handlePlayNext(): any {
   const queue = yield select(getQueue)
   const songId = queue.nextSongId
-  yield put({type: types.SET_CURRENT_PLAYING, songId})
+  if (songId) {
+    yield put({type: types.SET_CURRENT_PLAYING, songId})
+  }
 }
 
 export function* handlePlayPrev(): any {
   const queue = yield select(getQueue)
   const songId = queue.prevSongId
-  yield put({type: types.SET_CURRENT_PLAYING, songId})
+  if (songId) {
+    yield put({type: types.SET_CURRENT_PLAYING, songId})
+  }
 }
 
 export function* goToViewPage(): any {
