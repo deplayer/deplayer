@@ -25,20 +25,23 @@ const AddMediaModal = (props: Props) => {
 
   return (
     <Modal
+      title='Select media to add'
       onClose={() => {
         props.dispatch({type: types.HIDE_ADD_MEDIA_MODAL})
       }}
     >
-      <Header>Select media to add:</Header>
-
       <div className='my-6'>
-        <Header>Magnet link</Header>
+        <Header>
+          Magnet link (powered by <a target="_blank" rel="noopener noreferrer" href='https://webtorrent.io/'><span>webtorrent</span></a>. check some <a target="_blank" rel="noopener noreferrer" href="https://webtorrent.io/free-torrents"><span>examples</span></a>)
+        </Header>
         <Input
           type="text"
           value={magnetLink}
           onChange={(event) => setMagnetLink(event.target.value)}
         />
-        <input type="file" name="file" onChange={(event) => event.target.files && setTorrent(event.target.files[0])}/>
+
+        <input className='my-4' type="file" name="file" onChange={(event) => event.target.files && setTorrent(event.target.files[0])}/>
+
         <Button
           fullWidth
           type='submit'

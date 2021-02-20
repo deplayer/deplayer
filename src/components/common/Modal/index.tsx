@@ -27,6 +27,7 @@ const customStyles = {
 
 type Props = {
   children: React.ReactNode,
+  title?: string,
   onClose?: () => void
 }
 
@@ -49,7 +50,8 @@ const Modal = (props: Props) => {
       onRequestClose={() => close()}
       style={customStyles}
     >
-      <div className='w-full flex justify-end'>
+      <div className='w-full flex justify-between'>
+        { props.title && <h2 className='py-4 text-2xl'>{props.title}</h2>}
         <Button
           transparent
           onClick={() => close()}

@@ -61,6 +61,8 @@
     "startPlaying": "start playing"
   },
   "message": {
-    "noCollectionItems": "No collection items found, try adding more by searching or adding them manually: "
+    "noCollectionItems": "No collection items found, try adding more by searching or adding them manually: ",
+    "noMostPlayed": "You didn't played any song yet",
+    "goToCollection": "Jump to collection to play something!"
   }
 }

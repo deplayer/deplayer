@@ -26,6 +26,7 @@ const Button = (props: Props) => {
     'hover:text-blue-200': !props.transparent || props.inverted,
     'bg-blue-700': !props.transparent && !props.inverted,
     'hover:bg-blue-500': !props.transparent && !props.inverted,
+    'text-base': props.size === 'lg',
     'text-xl': props.size === 'lg',
     'text-4xl': props.size === '4xl',
     'text-2xl': props.size === '2xl',

@@ -5,6 +5,8 @@ import CoverImage from '../MusicTable/CoverImage'
 import HorizontalSlider from '../HorizontalSlider'
 import Spinner from '../Spinner'
 import Tag from '../common/Tag'
+import BodyMessage from '../BodyMessage'
+import { Translate } from 'react-redux-i18n'
 
 const MediaCover = ({ media }) => {
   return (
@@ -52,6 +54,18 @@ const SongsSlider = (props: Props) => {
   if (props.loading) {
     return (
       <Spinner />
+    )
+  }
+
+  if (!mediaItems.length) {
+    return (
+      <BodyMessage message={
+        <div>
+          <Translate value='message.noMostPlayed' />
+          <br/>
+          <Link to={'/collection'} className='h-32 button'><Translate value='message.goToCollection' /></Link>
+        </div>
+      }/>
     )
   }
 
