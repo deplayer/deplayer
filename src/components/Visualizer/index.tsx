@@ -18,7 +18,9 @@ const enableVisualizer = (
   // initialize audioContext and get canvas
   const audioContext = new AudioContext()
   audioNode.crossOrigin = "anonymous"
+  const analyser = audioContext.createAnalyser()
   const source = audioContext.createMediaElementSource(audioNode)
+  source.connect(analyser)
   console.log('audioContext: ', audioContext)
 
   const visualizer = butterchurn.createVisualizer(audioContext, canvas, {
@@ -29,7 +31,7 @@ const enableVisualizer = (
   // get audioNode from audio source or microphone
 
   console.log('connecting audio source', source)
-  visualizer.connectAudio(source)
+  visualizer.connectAudio(analyser)
   source.connect(audioContext.destination)
 
   // load a preset

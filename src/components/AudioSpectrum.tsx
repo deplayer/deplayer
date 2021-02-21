@@ -11,7 +11,7 @@ type Props = {
   id?: string,
   width?: number,
   height?: number,
-  audioSelector: string,
+  playerRef: HTMLAudioElement,
   capColor?: string,
   capHeight: number,
   meterWidth: number,
@@ -38,7 +38,6 @@ class AudioSpectrum extends React.Component<Props> {
 
   animationId: any
   audioContext: any
-  audioEle: any
   audioCanvas: any
   playStatus: string | null
   canvasId: string
@@ -48,13 +47,12 @@ class AudioSpectrum extends React.Component<Props> {
 
     this.animationId = null
     this.audioContext = null
-    this.audioEle = null
     this.audioCanvas = null
     this.playStatus = null
     this.canvasId = this.props.id || this.getRandomId(50)
   }
 
-  getRandomId(len): string {
+  getRandomId(len: number): string {
     const str = '1234567890-qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM'
     const strLen = str.length
     let res = ''
@@ -68,21 +66,20 @@ class AudioSpectrum extends React.Component<Props> {
   componentDidMount() {
     this.prepareAPIs()
     this.prepareElements()
-    const analyser = this.setupAudioNode(this.audioEle)
+    const analyser = this.setupAudioNode(this.props.playerRef)
     this.initAudioEvents(analyser)
   }
 
   componentWillUnmount() {
-    this.audioEle = null
     this.audioCanvas = null
     this.audioContext = null
   }
 
   initAudioEvents = (analyser) => {
-    this.audioEle.onpause = (e) => {
+    this.props.playerRef.onpause = (e) => {
       this.playStatus = 'PAUSED'
     }
-    this.audioEle.onplay = (e) => {
+    this.props.playerRef.onplay = (e) => {
       this.playStatus = 'PLAYING'
       this.drawSpectrum(analyser)
     }
@@ -150,7 +147,7 @@ class AudioSpectrum extends React.Component<Props> {
     this.animationId = requestAnimationFrame(drawMeter)
   }
 
-  setupAudioNode = (audioEle) => {
+  setupAudioNode = (audioEle: HTMLMediaElement) => {
     const analyser = this.audioContext.createAnalyser()
     analyser.smoothingTimeConstant = 0.8
     analyser.fftSize = 2048
@@ -163,15 +160,7 @@ class AudioSpectrum extends React.Component<Props> {
   }
 
   prepareElements = () => {
-    // Select audioelement by provided selector
-    const selection = document.querySelectorAll(this.props.audioSelector);
-
-    this.audioEle = Array.from(selection)[0]
-
-    console.log('audioEle: : ', this.audioEle)
-
     this.audioCanvas = document.getElementById(this.canvasId)
-
     console.log('audioCanvas: : ', this.audioCanvas)
   }
 

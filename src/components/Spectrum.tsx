@@ -4,7 +4,7 @@ import AudioSpectrum from './AudioSpectrum'
 
 type Props = {
   appSettings: any,
-  audioSelector: any
+  playerRef: any
 }
 type State = {
   width: number
@@ -31,14 +31,12 @@ class Spectrum  extends React.Component<Props, State> {
   }
 
   render () {
-    if (
-      !this.props.appSettings.settings
-      || !this.props.appSettings.settings.app.spectrum.enabled
-    ) {
+    const widthFactor = 8
+
+    if (!this.props?.playerRef?.getInternalPlayer()) {
       return null
     }
 
-    const widthFactor = 8
     return (
       <AudioSpectrum
         id="audio-canvas"
@@ -47,7 +45,7 @@ class Spectrum  extends React.Component<Props, State> {
         meterWidth={this.state.width / (this.state.width / widthFactor)}
         meterCount={this.state.width}
         width={this.state.width}
-        audioSelector={this.props.audioSelector}
+        playerRef={this.props?.playerRef?.getInternalPlayer()}
         meterColor={[
           {stop: 0, color: '#f00'},
           {stop: 0.5, color: '#0CD7FD'},
