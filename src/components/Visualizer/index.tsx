@@ -14,6 +14,7 @@ const enableVisualizer = (
     console.log('No audio or canvas found!')
     return
   }
+
   // initialize audioContext and get canvas
   const audioContext = new AudioContext()
   audioNode.crossOrigin = "anonymous"
@@ -29,6 +30,7 @@ const enableVisualizer = (
 
   console.log('connecting audio source', source)
   visualizer.connectAudio(source)
+  source.connect(audioContext.destination)
 
   // load a preset
   const presets = butterchurnPresets.getPresets()
@@ -56,13 +58,14 @@ type Props = {
 }
 
 const Visualizer = (props: Props) => {
-  const audioNode: any = props.playerRef.current
+  const audioNode: any = props.playerRef
 
   // Select audioelement by provided selector
   if (!audioNode) {
     console.log('No audioNode')
     return null
   }
+
   const internalPlayer = audioNode.getInternalPlayer()
 
   const canvasRef = React.useCallback(node => {
@@ -82,7 +85,7 @@ const Visualizer = (props: Props) => {
   }, [audioNode, internalPlayer])
 
   return (
-    <canvas className='absolute w-full h-full z-50' ref={canvasRef} />
+    <canvas className='absolute left-0 right-0 top-0 bottom-0 w-full h-full z-50' ref={canvasRef} />
   )
 }
 

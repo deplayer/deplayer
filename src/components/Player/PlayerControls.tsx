@@ -267,7 +267,7 @@ class PlayerControls extends React.Component<Props> {
             </CSSTransitionGroup>
           </div>
         }
-        <VisualizerContainer playerRef={this.playerRef} />
+        <VisualizerContainer playerRef={this.playerRef.current} />
       </React.Fragment>
     )
   }
