@@ -2,7 +2,6 @@ import { Dispatch } from 'redux'
 import { Link } from 'react-router-dom'
 import KeyHandler, {KEYPRESS} from 'react-key-handler'
 import React from 'react'
-import * as ReactDOM from 'react-dom'
 import ReactPlayer from 'react-player'
 import classNames from 'classnames'
 import { CSSTransitionGroup } from 'react-transition-group'
@@ -14,8 +13,7 @@ import Controls from './Controls'
 import Cover from './Cover'
 import KeyHandlers from './KeyHandlers'
 import ProgressBar from './ProgressBar'
-import Spectrum from './../Spectrum'
-import VisualizerContainer from '../../containers/VisualizerContainer'
+import Visualizer from './../Visualizer'
 import WebtorrentPlayer from './CustomPlayers/WebtorrentPlayer'
 import * as types from '../../constants/ActionTypes'
 
@@ -233,14 +231,14 @@ class PlayerControls extends React.Component<Props> {
                   <Cover song={currentPlaying} />
                   <div className='flex justify-between items-center w-full'>
                     <div className='mx-2 pr-2 md:text-center w-full truncate overflow-hidden'>
-                      <Link to={`/song/${currentPlaying.id}`} className='text-lg md:text-xl text-blue-200 block'>
+                      <Link to={`/song/${currentPlaying.id}`} className='text-lg md:text-xl text-blue-200 block' style={{textShadow: '#000000 0px 0px 4px'}}>
                         <h5 className='truncate'>
                           { currentPlaying.title }
                         </h5>
                       </Link>
                       { currentPlaying.artist &&
-                        <Link to={`/artist/${currentPlaying.artist.id}`} className='block'>
-                          <h6 className='truncate text-blue-600'>
+                        <Link to={`/artist/${currentPlaying.artist.id}`} className='block' style={{textShadow: '#000000 0px 0px 4px'}}>
+                          <h6 className='truncate text-blue-400'>
                             {  currentPlaying.artist.name }
                           </h6>
                         </Link>
@@ -261,11 +259,10 @@ class PlayerControls extends React.Component<Props> {
                   </div>
                 </div>
               </div>
-              <Spectrum playerRef={this.playerRef.current} />
             </CSSTransitionGroup>
           </div>
         }
-        <VisualizerContainer playerRef={this.playerRef.current} />
+        <Visualizer playerRef={this.playerRef.current} />
       </React.Fragment>
     )
   }

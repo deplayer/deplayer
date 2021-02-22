@@ -135,6 +135,34 @@ const ContextualMenu = (props: MenuProps) => {
             </Button>
           </Item>
         }
+        <Item className='flex w-full'>
+          <Button
+            transparent
+            alignLeft
+            fullWidth
+            onClick={() => props.dispatch({ type: types.TOGGLE_VISUALS })}
+          >
+            <Icon
+              icon='faExpand'
+              className='mx-2'
+            />
+            <Translate value='buttons.toggleVisuals' />
+          </Button>
+        </Item>
+        <Item className='flex w-full'>
+          <Button
+            transparent
+            alignLeft
+            fullWidth
+            onClick={() => props.dispatch({ type: types.TOGGLE_SPECTRUM })}
+          >
+            <Icon
+              icon='faExpand'
+              className='mx-2'
+            />
+            <Translate value='buttons.toggleSpectrum' />
+          </Button>
+        </Item>
       </Menu>
     </React.Fragment>
   )

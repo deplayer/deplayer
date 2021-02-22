@@ -3,12 +3,16 @@
  * https://github.com/hu-ke/react-audio-spectrum
  */
 import * as React from 'react'
+import butterchurn from 'butterchurn'
+import butterchurnPresets from 'butterchurn-presets'
+
 import logger from '../utils/logger'
 
 declare var AudioContext: any;
 
 type Props = {
-  id?: string,
+  spectrumId?: string,
+  visualsId?: string,
   width?: number,
   height?: number,
   playerRef: HTMLAudioElement,
@@ -18,6 +22,8 @@ type Props = {
   meterCount: number,
   meterColor: any,
   gap: number,
+  showSpectrum?: boolean,
+  showVisuals?: boolean
 }
 
 class AudioSpectrum extends React.Component<Props> {
@@ -38,18 +44,26 @@ class AudioSpectrum extends React.Component<Props> {
 
   animationId: any
   audioContext: any
-  audioCanvas: any
+  spectrumCanvas: any
+  visualsCanvas: any
   playStatus: string | null
-  canvasId: string
+  spectrumCanvasId: string
+  visualsCanvasId: string
+  visualizer: any
+  analyser: any
 
   constructor(props: Props) {
     super(props)
 
     this.animationId = null
     this.audioContext = null
-    this.audioCanvas = null
+    this.spectrumCanvas = null
+    this.visualsCanvas = null
     this.playStatus = null
-    this.canvasId = this.props.id || this.getRandomId(50)
+    this.visualizer = null
+    this.analyser = null
+    this.spectrumCanvasId = this.props.spectrumId || this.getRandomId(50)
+    this.visualsCanvasId = this.props.visualsId || this.getRandomId(50)
   }
 
   getRandomId(len: number): string {
@@ -66,30 +80,77 @@ class AudioSpectrum extends React.Component<Props> {
   componentDidMount() {
     this.prepareAPIs()
     this.prepareElements()
-    const analyser = this.setupAudioNode(this.props.playerRef)
-    this.initAudioEvents(analyser)
+    this.analyser = this.setupAudioNode(this.props.playerRef)
+    this.initializeVisualizer()
+    this.initAudioEvents(this.analyser)
+  }
+
+  initializeVisualizer = () => {
+    if (this.props.showVisuals) {
+      this.visualizer = butterchurn.createVisualizer(this.audioContext, this.visualsCanvas, {
+        width: this.props.width,
+        height: this.props.height
+      })
+      this.visualizer.connectAudio(this.analyser)
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.showSpectrum !== this.props.showSpectrum) {
+      this.prepareElements()
+      this.initializeVisualizer()
+      this.initAudioEvents(this.analyser)
+    }
+    if (prevProps.showVisuals !== this.props.showVisuals) {
+      this.prepareElements()
+      this.initializeVisualizer()
+      this.initAudioEvents(this.analyser)
+    }
   }
 
   componentWillUnmount() {
-    this.audioCanvas = null
+    this.spectrumCanvas = null
+    this.visualsCanvas = null
     this.audioContext = null
+    this.visualizer = null
   }
 
   initAudioEvents = (analyser) => {
+    const { showSpectrum, showVisuals } = this.props
     this.props.playerRef.onpause = (e) => {
       this.playStatus = 'PAUSED'
     }
     this.props.playerRef.onplay = (e) => {
       this.playStatus = 'PLAYING'
-      this.drawSpectrum(analyser)
+      if (showSpectrum) {
+        this.drawSpectrum(analyser)
+      }
+      if (showVisuals) {
+        const startRender = () => {
+          this.visualizer.render()
+          requestAnimationFrame(() => startRender())
+        }
+
+        const presets = butterchurnPresets.getPresets()
+        const randomKey = Object.keys(presets)[Math.floor(Math.random() * Object.keys(presets).length)]
+        const preset = presets[randomKey]
+
+        if (this.visualizer) {
+          console.log('setting size of:', this.props.width, this.props.height)
+          this.visualizer.setRendererSize(this.props.width, this.props.height)
+          this.visualizer.loadPreset(preset, 0.0) // 2nd argument is the number of seconds to blend presets
+        }
+
+        startRender()
+      }
     }
   }
 
   drawSpectrum = (analyser) => {
-    const cwidth = this.audioCanvas.width
-    const cheight = this.audioCanvas.height - this.props.capHeight
+    const cwidth = this.spectrumCanvas.width
+    const cheight = this.spectrumCanvas.height - this.props.capHeight
     const capYPositionArray: Array<any> = [] // store the vertical position of hte caps for the preivous frame
-    const ctx = this.audioCanvas.getContext('2d')
+    const ctx = this.spectrumCanvas.getContext('2d')
     let gradient = ctx.createLinearGradient(0, 0, 0, 300)
 
     if (this.props.meterColor.constructor === Array) {
@@ -153,6 +214,7 @@ class AudioSpectrum extends React.Component<Props> {
     analyser.fftSize = 2048
 
     const mediaEleSource = this.audioContext.createMediaElementSource(audioEle)
+
     mediaEleSource.connect(analyser)
     mediaEleSource.connect(this.audioContext.destination);
 
@@ -160,8 +222,10 @@ class AudioSpectrum extends React.Component<Props> {
   }
 
   prepareElements = () => {
-    this.audioCanvas = document.getElementById(this.canvasId)
-    console.log('audioCanvas: : ', this.audioCanvas)
+    this.spectrumCanvas = document.getElementById(this.spectrumCanvasId)
+    console.log('spectrumCanvas', this.spectrumCanvas)
+    this.visualsCanvas = document.getElementById(this.visualsCanvasId)
+    console.log('visualsCanvas', this.visualsCanvas)
   }
 
   prepareAPIs = () => {
@@ -173,12 +237,24 @@ class AudioSpectrum extends React.Component<Props> {
   }
 
   render() {
+    const { showSpectrum, showVisuals } = this.props
+
+    console.log('showSpectrum: ', showSpectrum)
+
     return (
-      <canvas
-        id={this.canvasId}
-        width={this.props.width}
-        height={this.props.height}
-      />
+      <>
+      { showVisuals && (
+        <canvas className='fixed absolute left-0 right-0 top-0 bottom-0 w-full h-full' id={this.visualsCanvasId} />
+      )}
+      { showSpectrum && (
+        <canvas
+          className='opacity-75'
+          id={this.spectrumCanvasId}
+          width={this.props.width}
+          height={this.props.height}
+        />
+      )}
+      </>
     )
   }
 }
