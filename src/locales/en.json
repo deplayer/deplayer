@@ -58,7 +58,9 @@
     "repeat": "repeat",
     "fullScreen": "fullscreen",
     "toggleMiniQueue": "toggle queue",
-    "startPlaying": "start playing"
+    "startPlaying": "start playing",
+    "toggleSpectrum": "Toggle spectrum",
+    "toggleVisuals": "Toggle visuals"
   },
   "message": {
     "noCollectionItems": "No collection items found, try adding more by searching or adding them manually: ",

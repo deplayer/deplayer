@@ -7,7 +7,9 @@ type State = {
   mqlMatch: boolean,
   loading: boolean,
   displayMiniQueue: boolean,
-  version: string
+  version: string,
+  showSpectrum: boolean,
+  showVisuals: boolean
 }
 
 export const defaultState = {
@@ -18,6 +20,8 @@ export const defaultState = {
   loading: true,
   slimPlayer: false,
   displayMiniQueue: true,
+  showSpectrum: false,
+  showVisuals: false,
   version: process.env.REACT_APP_VERSION || 'development'
 }
 
@@ -25,6 +29,13 @@ export default (state: State = defaultState, action: any) => {
   switch (action.type) {
     case types.TOGGLE_SIDEBAR: {
       return {...state, sidebarToggled: action.value ? action.value :!state.sidebarToggled}
+    }
+
+    case types.TOGGLE_SPECTRUM: {
+      return {...state, showSpectrum: !state.showSpectrum}
+    }
+    case types.TOGGLE_VISUALS: {
+      return {...state, showVisuals: !state.showVisuals}
     }
 
     case types.SHOW_ADD_MEDIA_MODAL: {
