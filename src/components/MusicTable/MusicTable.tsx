@@ -80,7 +80,7 @@ const MusicTable = (props: Props) => {
         <div className='p-2'>
           #<b>{ props.tableIds.length }</b>
         </div>
-        <div className='actions'>
+        <div className='actions flex items-center'>
           <Route
             path="/queue"
             component={() => (

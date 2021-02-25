@@ -21,6 +21,8 @@ type Props = {
 
 const Button = (props: Props) => {
   const classNames = classnames({
+    flex: true,
+    'items-center': true,
     uppercase: props.uppercase,
     'text-blue-200': !props.transparent || props.inverted,
     'hover:text-blue-200': !props.transparent || props.inverted,

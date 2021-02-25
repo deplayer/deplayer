@@ -244,7 +244,10 @@ class AudioSpectrum extends React.Component<Props> {
     return (
       <>
       { showVisuals && (
-        <canvas className='fixed absolute left-0 right-0 top-0 bottom-0 w-full h-full' id={this.visualsCanvasId} />
+        <canvas className='fixed absolute left-0 right-0 top-0 bottom-0 w-full h-full' id={this.visualsCanvasId}
+          width={this.props.width}
+          height={this.props.height}
+        />
       )}
       { showSpectrum && (
         <canvas

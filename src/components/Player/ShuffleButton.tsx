@@ -22,7 +22,7 @@ const ShuffleButton = (props: Props) => {
       alignLeft
       onClick={onClick}
     >
-      <Icon icon='faRandom' className='mx-2' />
+      <Icon icon='faRandom' className='mr-2' />
       <Translate value='buttons.shuffle' />
     </Button>
   )

@@ -14,6 +14,7 @@ import VolumeControl from './VolumeControl'
 import * as types from '../../constants/ActionTypes'
 
 type MenuProps = {
+  app: app,
   player: any,
   queue: any,
   dispatch: any,
@@ -26,7 +27,7 @@ const ContextualMenu = (props: MenuProps) => {
       <Button alignLeft transparent fullWidth onClick={() => props.dispatch({type: types.HIDE_PLAYER})}>
         <Icon
           icon='faEyeSlash'
-          className='mx-2'
+          className='mr-2'
         />
         <Translate value='buttons.hidePlayer' />
       </Button>
@@ -76,6 +77,71 @@ const ContextualMenu = (props: MenuProps) => {
           volume={ props.player.volume }
           onChange={setVolume}
         />
+        { showVisibilityCons &&
+          <>
+            <Item className='flex w-full'>
+              <TogglePlayer />
+            </Item>
+            <Item className='flex w-full'>
+              <ToggleMiniQueueButton />
+            </Item>
+          </>
+        }
+        <Item className='flex w-full'>
+          <AddNewMediaButton />
+        </Item>
+        { showFullscreen &&
+          <Item className='flex w-full'>
+            <Button
+              transparent
+              alignLeft
+              fullWidth
+              onClick={() => props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
+            >
+              <Icon
+                icon='faExpand'
+                className='mr-2'
+              />
+              <Translate value='buttons.fullScreen' />
+            </Button>
+          </Item>
+        }
+        <Item className='flex w-full'>
+          <Button
+            transparent
+            alignLeft
+            fullWidth
+            onClick={() => props.dispatch({ type: types.TOGGLE_VISUALS })}
+          >
+            <Icon
+              icon='faBahai'
+              className='mr-2'
+            />
+            <Translate className='w-full' value='buttons.toggleVisuals' />
+            <Icon
+              icon={ props.app.showVisuals ? 'faCheckSquare': 'faSquare' }
+              className='ml-4'
+            />
+          </Button>
+        </Item>
+        <Item className='flex w-full'>
+          <Button
+            transparent
+            alignLeft
+            fullWidth
+            onClick={() => props.dispatch({ type: types.TOGGLE_SPECTRUM })}
+          >
+            <Icon
+              icon='faDeezer'
+              className='mr-2'
+            />
+            <Translate className='w-full' value='buttons.toggleSpectrum' />
+            <Icon
+              icon={ props.app.showSpectrum ? 'faCheckSquare': 'faSquare' }
+              className='ml-4'
+            />
+          </Button>
+        </Item>
         { props.queue.trackIds.length && (
           <>
             <Item className='flex w-full'>
@@ -100,69 +166,12 @@ const ContextualMenu = (props: MenuProps) => {
               >
                 <Icon
                   icon='faPlayCircle'
-                  className='mx-2'
+                  className='mr-2'
                 />
                 <Translate value='buttons.startPlaying' />
               </Button>
             </Item>
         }
-        { showVisibilityCons &&
-          <>
-            <Item className='flex w-full'>
-              <TogglePlayer />
-            </Item>
-            <Item className='flex w-full'>
-              <ToggleMiniQueueButton />
-            </Item>
-          </>
-        }
-        <Item className='flex w-full'>
-          <AddNewMediaButton />
-        </Item>
-        { showFullscreen &&
-          <Item className='flex w-full'>
-            <Button
-              transparent
-              alignLeft
-              fullWidth
-              onClick={() => props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
-            >
-              <Icon
-                icon='faExpand'
-                className='mx-2'
-              />
-              <Translate value='buttons.fullScreen' />
-            </Button>
-          </Item>
-        }
-        <Item className='flex w-full'>
-          <Button
-            transparent
-            alignLeft
-            fullWidth
-            onClick={() => props.dispatch({ type: types.TOGGLE_VISUALS })}
-          >
-            <Icon
-              icon='faExpand'
-              className='mx-2'
-            />
-            <Translate value='buttons.toggleVisuals' />
-          </Button>
-        </Item>
-        <Item className='flex w-full'>
-          <Button
-            transparent
-            alignLeft
-            fullWidth
-            onClick={() => props.dispatch({ type: types.TOGGLE_SPECTRUM })}
-          >
-            <Icon
-              icon='faExpand'
-              className='mx-2'
-            />
-            <Translate value='buttons.toggleSpectrum' />
-          </Button>
-        </Item>
       </Menu>
     </React.Fragment>
   )

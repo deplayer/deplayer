@@ -22,7 +22,7 @@ const RepeatButton = (props: Props) => {
       alignLeft
       onClick={onClick}
     >
-      <Icon icon='faRedo' className='mx-2' />
+      <Icon icon='faRedo' className='mr-2' />
       <Translate value='buttons.repeat' />
     </Button>
   )
