@@ -96,7 +96,7 @@ const SongView = (props: Props) => {
               />
             }
 
-            <div className='btn-group mt-4 mx-4 md:mx-0'>
+            <div className='btn-group mt-4 mx-4 md:mx-0 flex items-center'>
               { (!songFinder || !props.player.playing) &&
                 <Button
                   large
@@ -157,6 +157,17 @@ const SongView = (props: Props) => {
                 />
                 <Translate value="common.lyrics" />
               </Button>
+
+              <a
+                href={props.player.streamUri}
+                target="_blank"
+              >
+                <Icon
+                  icon='faDownload'
+                  className='mr-4'
+                />
+                <Translate value="common.downloadMedia" />
+              </a>
             </div>
           </div>
 

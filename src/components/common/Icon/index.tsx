@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
+  faDownload,
   faCheckSquare,
   faSquare,
   faBahai,
@@ -48,6 +49,7 @@ import { faGitlab, faDeezer } from "@fortawesome/free-brands-svg-icons"
 import React from 'react'
 
 const icons = {
+  faDownload,
   faMusic,
   faCheckSquare,
   faSquare,

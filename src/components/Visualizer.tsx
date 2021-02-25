@@ -6,7 +6,8 @@ import { AutoSizer } from 'react-virtualized'
 type Props = {
   appSettings: any,
   app: any,
-  playerRef: any
+  playerRef: any,
+  visualizerOnTop: boolean
 }
 class Visualizer extends React.Component<Props> {
   render () {
@@ -31,6 +32,7 @@ class Visualizer extends React.Component<Props> {
             playerRef={this.props?.playerRef?.getInternalPlayer()}
             showSpectrum={this.props.app.showSpectrum}
             showVisuals={this.props.app.showVisuals}
+            visualsOnTop={this.props.visualizerOnTop}
             meterColor={[
               {stop: 0, color: '#f00'},
               {stop: 0.5, color: '#0CD7FD'},

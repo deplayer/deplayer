@@ -5,6 +5,7 @@
 import * as React from 'react'
 import butterchurn from 'butterchurn'
 import butterchurnPresets from 'butterchurn-presets'
+import classnames from 'classnames'
 
 import logger from '../utils/logger'
 
@@ -23,7 +24,8 @@ type Props = {
   meterColor: any,
   gap: number,
   showSpectrum?: boolean,
-  showVisuals?: boolean
+  showVisuals?: boolean,
+  visualsOnTop: boolean
 }
 
 class AudioSpectrum extends React.Component<Props> {
@@ -239,12 +241,24 @@ class AudioSpectrum extends React.Component<Props> {
   render() {
     const { showSpectrum, showVisuals } = this.props
 
-    console.log('showSpectrum: ', showSpectrum)
+    const visualsClass = classnames({
+      fixed: true,
+      absolute: true,
+      'z-50': this.props.visualsOnTop,
+      'left-0': true,
+      'right-0': true,
+      'top-0': true,
+      'bottom-0': true,
+      'w-full': true,
+      'h-full': true
+    })
 
     return (
       <>
       { showVisuals && (
-        <canvas className='fixed absolute left-0 right-0 top-0 bottom-0 w-full h-full' id={this.visualsCanvasId}
+        <canvas
+          className={visualsClass}
+          id={this.visualsCanvasId}
           width={this.props.width}
           height={this.props.height}
         />

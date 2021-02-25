@@ -262,7 +262,7 @@ class PlayerControls extends React.Component<Props> {
             </CSSTransitionGroup>
           </div>
         }
-        <Visualizer playerRef={this.playerRef.current} />
+        <Visualizer playerRef={this.playerRef.current} visualizerOnTop={this.props.player.fullscreen}/>
       </React.Fragment>
     )
   }
