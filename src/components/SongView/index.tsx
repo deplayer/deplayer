@@ -16,11 +16,13 @@ import { OutPortal } from 'react-reverse-portal'
 import MediaSlider from '../MediaSlider'
 import { sortByPlayCount } from '../../reducers/collection'
 import Lyrics from './Lyrics'
+import { getStreamUri } from '../../services/Song/StreamUriService'
 
 type Props = {
   playerPortal: any,
   location: any,
   player: any,
+  settings: any,
   lyrics: {
     lyrics: string
   },
@@ -96,7 +98,7 @@ const SongView = (props: Props) => {
               />
             }
 
-            <div className='btn-group mt-4 mx-4 md:mx-0 flex items-center'>
+            <div className='btn-group mt-4 mx-4 md:mx-0 flex items-center flex-wrap'>
               { (!songFinder || !props.player.playing) &&
                 <Button
                   large
@@ -159,14 +161,14 @@ const SongView = (props: Props) => {
               </Button>
 
               <a
-                href={props.player.streamUri}
+                href={getStreamUri(song, props.settings.settings, 0)}
                 target="_blank"
               >
                 <Icon
                   icon='faDownload'
                   className='mr-4'
                 />
-                <Translate value="common.downloadMedia" />
+                <Translate value="buttons.downloadMedia" />
               </a>
             </div>
           </div>

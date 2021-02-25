@@ -23,7 +23,7 @@ const AddNewMediaButton = (props: Props) => {
     >
       <Icon
         icon='faPlusCircle'
-        className='mx-2'
+        className='mr-2'
       />
       <Translate value='buttons.addNewMedia' />
     </Button>

@@ -52,7 +52,7 @@
     "saveAsPlaylist": "save as playlist",
     "addToQueue": "add to queue",
     "removeFromCollection": "remove from collection",
-    "removeFromQueue": "remove from queue",
+    "removeFromQueue": "Remove from queue",
     "shuffle": "shuffle",
     "hidePlayer": "hide",
     "repeat": "repeat",
@@ -60,7 +60,8 @@
     "toggleMiniQueue": "toggle queue",
     "startPlaying": "start playing",
     "toggleSpectrum": "Toggle spectrum",
-    "toggleVisuals": "Toggle visuals"
+    "toggleVisuals": "Toggle visuals",
+    "downloadMedia": "Download media"
   },
   "message": {
     "noCollectionItems": "No collection items found, try adding more by searching or adding them manually: ",
