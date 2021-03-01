@@ -98,6 +98,7 @@ export const PLAY_PREV = 'PLAY_PREV'
 export const CLEAR_QUEUE = 'CLEAR_QUEUE'
 export const SHUFFLE = 'SHUFFLE'
 export const REPEAT = 'REPEAT'
+export const ADD_TO_QUEUE_NEXT = 'ADD_TO_QUEUE_NEXT'
 
 // Search
 export const TOGGLE_SEARCH = 'TOGGLE_SEARCH'

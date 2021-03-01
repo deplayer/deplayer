@@ -45,6 +45,7 @@
     }
   },
   "buttons": {
+    "addNext": "Enqueue next",
     "addNewMedia": "Add new media",
     "addProvider": "Set up new provider",
     "playAll": "play all",

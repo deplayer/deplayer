@@ -61,7 +61,6 @@ const Collection = (props: Props) => {
     >
       <MusicTable
         tableIds={mediaItems}
-        disableAddButton
         disableCovers={false}
         {...props}
       />

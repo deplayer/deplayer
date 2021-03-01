@@ -14,6 +14,7 @@ type MenuProps = {
   songsLength: number, // Used to re-render
   dispatch: Dispatch,
   disableAddButton?: boolean,
+  queue: any,
   onClick: () => any,
   song: Media,
 }
@@ -52,7 +53,7 @@ const ContextualMenu = (props: MenuProps) => {
             <Translate value='buttons.play' />
           </Button>
         </Item>
-        { !disableAddButton &&
+        { !disableAddButton && (
             <Item>
               <Button
                 fullWidth
@@ -67,7 +68,26 @@ const ContextualMenu = (props: MenuProps) => {
                 <Translate value='buttons.addToQueue' />
               </Button>
             </Item>
-        }
+        )}
+
+        { props.queue.currentPlaying && (
+          <Item>
+            <Button
+              fullWidth
+              transparent
+              alignLeft
+              onClick={() => {
+                props.dispatch({type: types.ADD_TO_QUEUE_NEXT, songs: [props.song]})
+              }}
+            >
+              <Icon
+                icon='faPlusCircle'
+                className='mr-2'
+              />
+              <Translate value='buttons.addNext' />
+            </Button>
+          </Item>
+        )}
         { disableAddButton &&
             <Item>
               <Button

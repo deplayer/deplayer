@@ -66,13 +66,44 @@ export default (state: State = defaultState, action: any  = {}): State => {
     case types.RECEIVE_QUEUE:
       return {...state, ...action.queue}
 
-    case types.ADD_TO_QUEUE:
+    case types.ADD_TO_QUEUE: {
       const trackIds = getCurrentQueue(state)
       const filteredTracks = new Set(trackIds.concat(action.songs.map((song: Media) => song.id)))
       return {
         ...state,
         trackIds: [...filteredTracks]
       }
+    }
+
+    case types.ADD_TO_QUEUE_NEXT: {
+      const trackIds = getCurrentQueue(state)
+
+      if (!state.currentPlaying) {
+        return state
+      }
+
+      const currPosition = trackIds.indexOf(state.currentPlaying)
+      const songs = action.songs.map((song: Media) => song.id)
+      const newIds = [...trackIds]
+
+      newIds.splice(
+        currPosition + 1,
+        0,
+        ...songs
+      )
+
+      if (state.shuffle) {
+        return setCurrentPlaying({
+          ...state,
+          randomTrackIds: newIds
+        }, { songId: state.currentPlaying})
+      } else {
+        return setCurrentPlaying({
+          ...state,
+          trackIds: newIds
+        }, { songId: state.currentPlaying})
+      }
+    }
 
     case types.REMOVE_FROM_QUEUE:
       const queueTracks = new Set([

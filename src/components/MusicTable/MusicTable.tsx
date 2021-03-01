@@ -54,6 +54,7 @@ const MusicTable = (props: Props) => {
 
     return (
       <SongRow
+        queue={props.queue}
         songsLength={props.tableIds.length}
         mqlMatch={props.app.mqlMatch}
         key={key}
