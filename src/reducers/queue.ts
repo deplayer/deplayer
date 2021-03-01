@@ -91,16 +91,15 @@ export default (state: State = defaultState, action: any  = {}): State => {
         0,
         ...songs
       )
-
       if (state.shuffle) {
         return setCurrentPlaying({
           ...state,
-          randomTrackIds: newIds
+          randomTrackIds: new Set(newIds)
         }, { songId: state.currentPlaying})
       } else {
         return setCurrentPlaying({
           ...state,
-          trackIds: newIds
+          trackIds: new Set(newIds)
         }, { songId: state.currentPlaying})
       }
     }

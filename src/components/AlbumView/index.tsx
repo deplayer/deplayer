@@ -8,6 +8,7 @@ import * as types from '../../constants/ActionTypes'
 
 type Props = {
   album: any,
+  queue: any,
   albumsByArtist: any,
   artistMetadata: any,
   className: string|null,
@@ -39,6 +40,7 @@ export default class AlbumView extends React.Component<Props> {
         <div className='main w-full z-10 md:p-4'>
           <h2 className='text-center text-3xl py-3'>{ album.name }</h2>
           <Album
+            queue={this.props.queue}
             album={this.props.album}
             dispatch={this.props.dispatch}
             collection={this.props.collection}

@@ -9,6 +9,7 @@ import CoverImage from '../MusicTable/CoverImage'
 
 type AlbumProps = {
   album: any,
+  queue: any,
   songs: Array<string>,
   collection: any,
   dispatch: any
@@ -27,6 +28,7 @@ const Album = (props: AlbumProps) => {
       const songObj = new Media(songRow)
       return (
         <SongRow
+          queue={props.queue}
           songsLength={props.songs.length}
           mqlMatch={false}
           disableCovers

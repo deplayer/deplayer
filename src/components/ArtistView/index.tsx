@@ -8,6 +8,7 @@ import Artist from '../../entities/Artist'
 import * as types from '../../constants/ActionTypes'
 
 type Props = {
+  queue: any,
   albums: any,
   albumsByArtist: any,
   artist: Artist,
@@ -77,6 +78,7 @@ export default class ArtistView extends React.Component<Props> {
     const albumRows = albumsByArtist.map((albumId: string) => {
       return (
         <Album
+          queue={this.props.queue}
           key={albumId}
           album={albums[albumId]}
           dispatch={this.props.dispatch}
