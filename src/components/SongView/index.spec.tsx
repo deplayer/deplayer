@@ -14,6 +14,13 @@ const setup = (customProps: any) => {
       params: {}
     },
     collection: collectionDefaultState,
+    settings: {
+      settings: {
+        app: {
+          ipfs: {}
+        }
+      }
+    },
     queue: {
       currentPlaying: null,
       trackIds: []
