@@ -18,13 +18,14 @@ type Props = {
 }
 
 const Queue = (props: Props) => {
+  const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
   // Is disabled for small screens
   if (props.slim && !props.app.mqlMatch) {
     return null
   }
 
   // Disabled if theres no songs on queue
-  if (props.slim && !props.queue.trackIds.length) {
+  if (props.slim && !trackIds.length) {
     return null
   }
 
@@ -42,7 +43,7 @@ const Queue = (props: Props) => {
     )
   }
 
-  if (!props.queue.trackIds.length) {
+  if (!trackIds.length) {
     return (
       <div className={`queue z-10 no-results ${props.className || ''}`}>
         <BodyMessage message={'Add songs from the collection or search for new ones'} />
@@ -61,7 +62,7 @@ const Queue = (props: Props) => {
   return (
     <div className={`queue z-10 ${props.className || ''}`}>
       <MusicTable
-        tableIds={props.queue.trackIds}
+        tableIds={trackIds}
         disableCovers={props.slim}
         slim={props.slim}
         {...props}

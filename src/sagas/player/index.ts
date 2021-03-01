@@ -61,16 +61,26 @@ export function* handleError(): any {
 
 export function* handlePlayNext(): any {
   const queue = yield select(getQueue)
+  const trackIds = queue.shuffle ? queue.randomTrackIds : queue.trackIds
   const songId = queue.nextSongId
-  if (songId) {
+
+  if (queue.repeat && !songId && trackIds[0]) {
+    yield put({type: types.SET_CURRENT_PLAYING, songId: trackIds[0]})
+  } else if (songId) {
     yield put({type: types.SET_CURRENT_PLAYING, songId})
   }
 }
 
 export function* handlePlayPrev(): any {
   const queue = yield select(getQueue)
+  const trackIds = queue.shuffle ? queue.randomTrackIds : queue.trackIds
   const songId = queue.prevSongId
-  if (songId) {
+
+  console.log('last item: ', trackIds[trackIds.length - 1])
+
+  if (queue.repeat && !songId && trackIds[trackIds.length - 1]) {
+    yield put({type: types.SET_CURRENT_PLAYING, songId: trackIds[trackIds.length - 1]})
+  } else if(songId) {
     yield put({type: types.SET_CURRENT_PLAYING, songId})
   }
 }

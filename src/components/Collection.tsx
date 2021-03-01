@@ -60,8 +60,6 @@ const Collection = (props: Props) => {
       className='collection z-10'
     >
       <MusicTable
-        app={props.app}
-        queue={props.queue}
         tableIds={mediaItems}
         disableAddButton
         disableCovers={false}

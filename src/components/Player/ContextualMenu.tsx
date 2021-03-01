@@ -7,7 +7,6 @@ import React from 'react'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
 import RepeatButton from './RepeatButton'
-import ShuffleButton from './ShuffleButton'
 import ToggleMiniQueueButton from '../Buttons/ToggleMiniQueueButton'
 import AddNewMediaButton from '../Buttons/AddNewMediaButton'
 import VolumeControl from './VolumeControl'
@@ -45,7 +44,8 @@ const ContextualMenu = (props: MenuProps) => {
 
   const showFullscreen = props.player.playing
   const showVisibilityCons = false
-  const showStartPlaying = props.queue.trackIds.length && !props.player.playing
+  const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
+  const showStartPlaying = trackIds.length && !props.player.playing
 
   return (
     <React.Fragment>
@@ -142,17 +142,41 @@ const ContextualMenu = (props: MenuProps) => {
             />
           </Button>
         </Item>
-        { props.queue.trackIds.length && (
+        { trackIds.length && (
           <>
             <Item className='flex w-full'>
-              <ShuffleButton
-                dispatch={props.dispatch}
-              />
+              <Button
+                fullWidth
+                transparent
+                alignLeft
+                onClick={() => {
+                  props.dispatch({type: types.SHUFFLE})
+                }}
+              >
+                <Icon icon='faRandom' className='mr-2' />
+                <Translate className='w-full' value='buttons.shuffle' />
+                <Icon
+                  icon={ props.queue.shuffle ? 'faCheckSquare': 'faSquare' }
+                  className='ml-4'
+                />
+              </Button>
             </Item>
             <Item className='flex w-full'>
-              <RepeatButton
-                dispatch={props.dispatch}
-              />
+              <Button
+                fullWidth
+                transparent
+                alignLeft
+                onClick={() => {
+                  props.dispatch({type: types.REPEAT})
+                }}
+              >
+                <Icon icon='faRedo' className='mr-2' />
+                <Translate className='w-full' value='buttons.repeat' />
+                <Icon
+                  icon={ props.queue.repeat ? 'faCheckSquare': 'faSquare' }
+                  className='ml-4'
+                />
+              </Button>
             </Item>
           </>
         )}
@@ -162,7 +186,7 @@ const ContextualMenu = (props: MenuProps) => {
                 transparent
                 alignLeft
                 fullWidth
-                onClick={() => props.dispatch({ type: types.SET_CURRENT_PLAYING, songId: props.queue.trackIds[0] })}
+                onClick={() => props.dispatch({ type: types.SET_CURRENT_PLAYING, songId: trackIds[0] })}
               >
                 <Icon
                   icon='faPlayCircle'

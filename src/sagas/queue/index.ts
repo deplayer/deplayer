@@ -46,7 +46,8 @@ export function* saveQueue(): any {
   // https://redux-saga.js.org/docs/advanced/NonBlockingCalls.html
   yield call(queueService.save, 'queue', {
     trackIds: queue.trackIds,
-    shuffleEnabled: false,
+    randomTrackIds: queue.randomTrackIds,
+    shuffleEnabled: queue.shuffle,
     currentPlaying: queue.currentPlaying,
     repeat: queue.repeat,
     nextSongId: queue.nextSongId,

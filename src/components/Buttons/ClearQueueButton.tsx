@@ -13,7 +13,8 @@ type Props = {
 }
 
 const ClearQueueButton = (props: Props) => {
-  if (!props.queue.trackIds.length) {
+  const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
+  if (!trackIds) {
     return null
   }
 

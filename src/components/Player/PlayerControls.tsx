@@ -78,17 +78,13 @@ class PlayerControls extends React.Component<Props> {
 
   // Play prev song of the player list
   playPrev = () => {
-    if (this.props.queue.prevSongId) {
-      this.props.dispatch({type: types.PLAY_PREV})
-    }
+    this.props.dispatch({type: types.PLAY_PREV})
   }
 
   // Play next song of the player list
   playNext = () => {
-    if (this.props.queue.nextSongId) {
-      // Force player playing refresh
-      this.props.dispatch({type: types.PLAY_NEXT})
-    }
+    // Force player playing refresh
+    this.props.dispatch({type: types.PLAY_NEXT})
   }
 
   resetPlayedSeconds = () => {

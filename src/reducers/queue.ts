@@ -25,20 +25,24 @@ export const defaultState = {
 }
 
 const shuffleArray = (array: Array<any>) => {
-  for (var i = array.length - 1; i > 0; i--) {
+  const newArray = [...array]
+
+  for (var i = newArray.length - 1; i > 0; i--) {
     var j = Math.floor(Math.random() * (i + 1));
-    var temp = array[i];
-    array[i] = array[j];
-    array[j] = temp;
+    var temp = newArray[i];
+    newArray[i] = newArray[j];
+    newArray[j] = temp;
   }
 
-  return array
+  return newArray
 }
 
 const setCurrentPlaying = (state: any, action: any) => {
-  const scTracks = state.trackIds.includes(action.songId)
-    ? state.trackIds
-    : [...state.trackIds, action.songId]
+  const sourceIds = getCurrentQueue(state)
+  const scTracks = sourceIds.includes(action.songId)
+    ? sourceIds
+    : [...sourceIds, action.songId]
+
   return {
     ...state,
     trackIds: scTracks,
@@ -114,14 +118,6 @@ export default (state: State = defaultState, action: any  = {}): State => {
 
     case types.SET_CURRENT_PLAYING:
       return setCurrentPlaying(state, action)
-
-    case types.PLAY_NEXT:
-      // Handling repeat
-      if (state.repeat && state.trackIds[0]) {
-        return setCurrentPlaying(state, {songId: state.trackIds[0]})
-      }
-
-      return state
 
     case types.CLEAR_QUEUE:
       return defaultState
