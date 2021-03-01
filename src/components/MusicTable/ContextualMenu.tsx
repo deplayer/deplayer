@@ -70,7 +70,7 @@ const ContextualMenu = (props: MenuProps) => {
             </Item>
         )}
 
-        { props.queue.currentPlaying && (
+        { !disableAddButton && props.queue.currentPlaying && (
           <Item>
             <Button
               fullWidth

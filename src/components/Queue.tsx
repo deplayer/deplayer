@@ -64,6 +64,7 @@ const Queue = (props: Props) => {
       <MusicTable
         tableIds={trackIds}
         disableCovers={props.slim}
+        disableAddButton
         slim={props.slim}
         {...props}
       />
