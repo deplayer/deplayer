@@ -102,11 +102,17 @@ class AudioSpectrum extends React.Component<Props> {
       this.prepareElements()
       this.initializeVisualizer()
       this.initAudioEvents(this.analyser)
+      if (this.props.showSpectrum) {
+        this.drawSpectrum(this.analyser)
+      }
     }
     if (prevProps.showVisuals !== this.props.showVisuals) {
       this.prepareElements()
       this.initializeVisualizer()
       this.initAudioEvents(this.analyser)
+      if (this.props.showVisuals) {
+        this.drawVisuals(this.analyser)
+      }
     }
   }
 
@@ -127,25 +133,30 @@ class AudioSpectrum extends React.Component<Props> {
       if (showSpectrum) {
         this.drawSpectrum(analyser)
       }
+
       if (showVisuals) {
-        const startRender = () => {
-          this.visualizer.render()
-          requestAnimationFrame(() => startRender())
-        }
-
-        const presets = butterchurnPresets.getPresets()
-        const randomKey = Object.keys(presets)[Math.floor(Math.random() * Object.keys(presets).length)]
-        const preset = presets[randomKey]
-
-        if (this.visualizer) {
-          console.log('setting size of:', this.props.width, this.props.height)
-          this.visualizer.setRendererSize(this.props.width, this.props.height)
-          this.visualizer.loadPreset(preset, 0.0) // 2nd argument is the number of seconds to blend presets
-        }
-
-        startRender()
+        this.drawVisuals(analyser)
       }
     }
+  }
+
+  drawVisuals = (analyser) => {
+    const startRender = () => {
+      this.visualizer.render()
+      requestAnimationFrame(() => startRender())
+    }
+
+    const presets = butterchurnPresets.getPresets()
+    const randomKey = Object.keys(presets)[Math.floor(Math.random() * Object.keys(presets).length)]
+    const preset = presets[randomKey]
+
+    if (this.visualizer) {
+      console.log('setting size of:', this.props.width, this.props.height)
+      this.visualizer.setRendererSize(this.props.width, this.props.height)
+      this.visualizer.loadPreset(preset, 0.0) // 2nd argument is the number of seconds to blend presets
+    }
+
+    startRender()
   }
 
   drawSpectrum = (analyser) => {
