@@ -181,7 +181,6 @@ class PlayerControls extends React.Component<Props> {
                 file: {
                   forceAudio: currentPlaying.media_type === 'audio',
                   attributes: {
-                    crossOrigin: 'anonymous',
                     className: currentPlaying.media_type === 'video' ? 'video-element': 'video-element'
                   }
                 }
