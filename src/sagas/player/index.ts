@@ -100,6 +100,7 @@ function* handleFullscreen(): any {
   }
 
   if (player.fullscreen) {
+    yield put({type: types.TOGGLE_SIDEBAR, value: false})
     yield screenfull.request()
   } else {
     yield screenfull.exit()

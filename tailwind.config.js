@@ -8,8 +8,7 @@ module.exports = {
     './src/*.tsx',
   ],
   theme: {
-    extend: {},
-    maxWidth: {}
+    extend: {}
   },
   variants: {},
   plugins: []

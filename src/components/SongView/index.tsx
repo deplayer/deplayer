@@ -86,9 +86,14 @@ const SongView = (props: Props) => {
   return (
     <div className={`song-view ${props.className} w-full overflow-y-auto z-10 flex flex-col`}>
       <div className="song sm:flex">
-        <div className="w-full md:p-6 image md:max-w-sm lg:max-w-md xl:max-w-xl md:flex-grow-0 sticky flex" >
-          <div className='flex flex-col w-full max-w-lg'>
-            { songFinder && song.media_type === 'video' && <OutPortal node={props.playerPortal} /> }
+        <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className="w-full md:m-6 md:rounded-b-lg image lg:max-w-md xl:max-w-xl">
+          <div className='flex flex-col w-full'>
+            { songFinder && song.media_type === 'video' && (
+              <OutPortal
+                className={`flex w-full`}
+                node={props.playerPortal}
+              />
+            )}
             { (song.media_type !== 'video' || !songFinder) &&
               <CoverImage
                 useImage
@@ -98,7 +103,7 @@ const SongView = (props: Props) => {
               />
             }
 
-            <div className='btn-group mt-4 mx-4 md:mx-0 flex items-center flex-wrap'>
+            <div className='btn-group md:mx-0 flex items-center flex-wrap p-4'>
               { (!songFinder || !props.player.playing) &&
                 <Button
                   large
@@ -108,7 +113,7 @@ const SongView = (props: Props) => {
                 >
                   <Icon
                     icon='faPlay'
-                    className='mr-4'
+                    className='mr-2'
                   />
                   <Translate value="common.play" />
                 </Button>
@@ -155,27 +160,28 @@ const SongView = (props: Props) => {
               >
                 <Icon
                   icon='faScroll'
-                  className='mr-4'
+                  className='mr-2'
                 />
                 <Translate value="common.lyrics" />
               </Button>
 
               <a
+                className='p-4'
                 href={getStreamUri(song, props.settings.settings, 0)}
                 target="_blank"
               >
                 <Icon
                   icon='faDownload'
-                  className='mr-4'
+                  className='mr-2'
                 />
                 <Translate value="buttons.downloadMedia" />
               </a>
             </div>
           </div>
-
         </div>
-        <div className="w-full p-6 content flex-grow">
-          <div>
+
+        <div className="content flex-grow pt-6 sm:pt-0 md:pt-6 md:pr-6">
+          <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className="p-6 rounded-lg">
             <h2 className='text-3xl'>{ song.title }</h2>
             <div className='text-lg mt-2'>
               <Link to={`/artist/${ song.artist.id }`}>
@@ -210,6 +216,7 @@ const SongView = (props: Props) => {
               <Translate value='song.label.played' /> { song.playCount || 0 } <Translate value='song.label.times' />
             </div>
             <div className='mt-2'>
+              <Translate value='labels.providers' />: &nbsp;
               {
                 song.stream.map((provider) => {
                   return (<Tag type='primary' key={provider.service}>{ provider.service }</Tag>)

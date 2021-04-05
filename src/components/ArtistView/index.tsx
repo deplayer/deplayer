@@ -94,14 +94,14 @@ export default class ArtistView extends React.Component<Props> {
           <h2 className='text-center text-3xl py-2'>{ artist.name }</h2>
           <p dangerouslySetInnerHTML={{__html: extractSummary()}} />
           {
-            this.props.artistMetadata['life-span'] && (
+            this.props.artistMetadata && this.props.artistMetadata['life-span'] && (
               <div className='text-center text-md'>
                 { this.props.artistMetadata['life-span'].begin } { this.props.artistMetadata['life-span'].end && '- ' + this.props.artistMetadata['life-span'].end }
               </div>
             )
           }
           {
-            this.props.artistMetadata['country'] && (
+            this.props.artistMetadata && this.props.artistMetadata['country'] && (
               <div className='text-center text-md'>
                 { this.props.artistMetadata['country'] }
               </div>
@@ -109,7 +109,7 @@ export default class ArtistView extends React.Component<Props> {
           }
           <div className='py-4 text-center'>
             {
-              this.props.artistMetadata['relations'] && this.props.artistMetadata['relations'].map((relation: any, index: number) => {
+              this.props.artistMetadata && this.props.artistMetadata['relations'] && this.props.artistMetadata['relations'].map((relation: any, index: number) => {
                 return (
                   <div className='mr-2 py-1 inline-block'>
                     <Tag key={index} transparent>

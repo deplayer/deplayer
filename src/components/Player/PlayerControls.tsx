@@ -151,6 +151,19 @@ class PlayerControls extends React.Component<Props> {
       .pathname
       .match(new RegExp(`/song/${currentPlayingId}`))
 
+      const config = {
+        file: {
+          forceAudio: currentPlaying.media_type === 'audio',
+          attributes: {
+            className: currentPlaying.media_type === 'video' ? 'video-element': 'video-element'
+          }
+        }
+      }
+
+    if (currentPlaying.media_type === 'audio') {
+      config.file.attributes['crossOrigin'] = 'anonymous'
+    }
+
     return (
       <React.Fragment>
         { handlers }
@@ -177,14 +190,7 @@ class PlayerControls extends React.Component<Props> {
                 this.saveTrackPlayed(currentPlayingId)
                 this.playNext()
               }}
-              config={{
-                file: {
-                  forceAudio: currentPlaying.media_type === 'audio',
-                  attributes: {
-                    className: currentPlaying.media_type === 'video' ? 'video-element': 'video-element'
-                  }
-                }
-              }}
+              config={config}
               onError={this.onError}
               onProgress={this.onProgress}
               onDuration={this.onDuration}
