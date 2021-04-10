@@ -3,7 +3,7 @@ import Album from './Album'
 import Artist from './Artist'
 
 type streamUri = {
-  uri: string,
+  uri: any,
   quality: string
 }
 

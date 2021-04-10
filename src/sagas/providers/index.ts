@@ -10,14 +10,14 @@ import {
 } from 'redux-saga/effects'
 
 import { getAdapter } from '../../services/database'
-import { getFileMetadata, metadataToSong } from '../../services/ID3Tag/ID3TagService'
+import { getFileMetadata, metadataToSong, readFileMetadata } from '../../services/ID3Tag/ID3TagService'
 import { getSettings } from '../selectors'
 import { scanFolder } from '../../services/Ipfs/IpfsService'
 import CollectionService from '../../services/CollectionService'
 import YoutubeDlServerProvider from '../../providers/YoutubeDlServerProvider'
 import  * as types from '../../constants/ActionTypes'
 
-export function* startFolderScan(hash: string): any {
+export function* startIpfsFolderScan(hash: string): any {
   const settings = yield select(getSettings)
 
   try {
@@ -69,6 +69,29 @@ export function* startProvidersScan(): any {
   }
 }
 
+// Handle filesystem adding
+export function* startFilesystemProcess(action: any): any {
+  for (let i = 0; i < action.files.length; i++) {
+    const file = action.files[i]
+    const metadata = yield call(readFileMetadata, file)
+    const song = yield call(metadataToSong, metadata, file, 'filesystem')
+
+    const adapter = getAdapter()
+    const collectionService = new CollectionService(new adapter())
+
+    // Save song
+    yield call(collectionService.save, song.id, song.toDocument())
+    yield put({type: types.ADD_TO_COLLECTION, data: [song]})
+
+    yield put({ type: types.FILESYSTEM_SONG_LOADED, song })
+    yield put({
+      type: types.SEND_NOTIFICATION,
+      notification: song.title + ' - ' + song.artistName + ' saved',
+      level: 'info'
+    })
+  }
+}
+
 // IPFS file scan Queue
 // Watcher
 export function* handleIPFSFileLoad(): any {
@@ -82,7 +105,7 @@ export function* handleIPFSFileLoad(): any {
       const settings = yield select(getSettings)
       const metadata = yield call(getFileMetadata, file, settings)
 
-      const song = yield call(metadataToSong, metadata, file)
+      const song = yield call(metadataToSong, metadata, file.hash, 'ipfs')
 
       const adapter = getAdapter()
       const collectionService = new CollectionService(new adapter())
@@ -112,7 +135,7 @@ export function* handleIPFSFolderScan(): any {
     const { hash } = yield take(handleChannel)
     // 3- Note that we're using a blocking call
     try {
-      const files = yield call(startFolderScan, hash)
+      const files = yield call(startIpfsFolderScan, hash)
 
       for (let file of files) {
         if (file.type === 'dir') {
@@ -148,6 +171,7 @@ function* startYoutubeDlScan(action: any) {
 function* providersSaga(): any {
   yield takeLatest(types.START_SCAN_SOURCES, startProvidersScan)
   yield takeEvery(types.START_YOUTUBE_DL_SERVER_SCAN, startYoutubeDlScan)
+  yield takeLatest(types.START_FILESYSTEM_FILES_PROCESSING, startFilesystemProcess)
   yield fork(handleIPFSFolderScan)
   yield fork(handleIPFSFileLoad)
 }

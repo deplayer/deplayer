@@ -8,6 +8,8 @@ import Modal from '../common/Modal'
 import Header from '../common/Header'
 import * as types from '../../constants/ActionTypes'
 
+import openDialog from '../../services/Filesystem/openDirectory'
+
 type Props = {
   showAddMediaModal: boolean,
   dispatch: Dispatch
@@ -67,6 +69,31 @@ const AddMediaModal = (props: Props) => {
             }}
           >
             Add and fetch
+          </Button>
+        </div>
+      </div>
+
+      { /* Filesystem */ }
+      <div className='my-6'>
+        <Header>
+          Open local filesystem directory
+        </Header>
+
+        <input multiple className='my-4 hidden' id="filePicker" type="file" name="file" />
+
+        <div className='flex justify-end'>
+          <Button
+            fullWidth
+            type='submit'
+            onClick={async () => {
+              const files = await openDialog()
+              props.dispatch({
+                type: types.START_FILESYSTEM_FILES_PROCESSING,
+                files: files
+              })
+            }}
+          >
+            Open
           </Button>
         </div>
       </div>

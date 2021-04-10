@@ -6,6 +6,7 @@ const mapToMedia = (collection: Array<any>) => {
   }
 
   return collection.map((elem) => {
+    console.log('elem', elem)
     return rowToSong(elem.get())
   })
 }
