@@ -19,10 +19,20 @@ export const getStreamUri = async (
   const directoryHandler = await get('directoryHandler')
   await verifyPermission(directoryHandler)
 
-  const handler = await get(streamUri)
-  await verifyPermission(handler)
+  if (song.stream[providerNum].service === 'filesystem') {
+    console.log('streamUri: ', streamUri)
+    const handler = await get(streamUri)
 
-  if (song.stream[providerNum].service === 'filesystem' && handler.getFile) {
+    if (handler instanceof File) {
+      return URL.createObjectURL(handler)
+    }
+
+    if (!handler.getFile) {
+      return streamUri
+    }
+
+    await verifyPermission(handler)
+
     console.log('streamUri: ', streamUri)
 
     const file = await handler.getFile()

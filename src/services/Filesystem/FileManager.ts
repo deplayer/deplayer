@@ -32,12 +32,13 @@ const FileManager = () => {
     let file: any
 
     console.log(`saving handler ${entry.name} for later use`)
-    await set(entry.name, entry)
 
     if (entry.kind === 'file') {
+      await set(entry.name, entry)
       file = await entry.getFile()
     } else {
       file = entry
+      await set(file.name, file)
     }
 
     return {
