@@ -3,7 +3,8 @@ import * as musicMetadata from 'music-metadata-browser'
 import Media from '../../entities/Media'
 
 export const readFileMetadata = async (file: any) => {
-  const metadata = await musicMetadata.parseBlob(file)
+  const normFile = file.contents ? file.contents : file
+  const metadata = await musicMetadata.parseBlob(normFile)
   console.log('metadata: ', metadata)
   return metadata
 }
@@ -17,7 +18,7 @@ export const getFileMetadata = async (file: any, settings: any) => {
 export const metadataToSong = (
   metadata: musicMetadata.IAudioMetadata,
   fileUri: any,
-  service: string
+  service: string,
 ): Media => {
   const song = new Media({
     title: metadata.common.title || fileUri?.name,

@@ -6,7 +6,7 @@ class Filesystem {
     'showDirectoryPicker' in window
 
   getFileLegacy = () => {
-    const filePicker = document.getElementById('filePicker');
+    const filePicker = document.getElementById('filePicker')
 
     if (!filePicker) {
       throw new Error('No file input#filePicker found')
@@ -20,10 +20,10 @@ class Filesystem {
           return
         }
         reject(new Error('AbortError'));
-      };
+      }
 
       filePicker.click()
-    });
+    })
   }
 
   openDialog = (): Promise<any> => {

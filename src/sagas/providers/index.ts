@@ -73,8 +73,10 @@ export function* startProvidersScan(): any {
 export function* startFilesystemProcess(action: any): any {
   for (let i = 0; i < action.files.length; i++) {
     const file = action.files[i]
-    const metadata = yield call(readFileMetadata, file)
-    const song = yield call(metadataToSong, metadata, file, 'filesystem')
+    const metadata = yield call(readFileMetadata, file.file)
+    const song = yield call(metadataToSong, metadata, file.handler, 'filesystem')
+
+    console.log('saving song: ', song)
 
     const adapter = getAdapter()
     const collectionService = new CollectionService(new adapter())
@@ -82,6 +84,7 @@ export function* startFilesystemProcess(action: any): any {
     // Save song
     yield call(collectionService.save, song.id, song.toDocument())
     yield put({type: types.ADD_TO_COLLECTION, data: [song]})
+    yield put({type: types.RECEIVE_COLLECTION, data: [song]})
 
     yield put({ type: types.FILESYSTEM_SONG_LOADED, song })
     yield put({
@@ -90,6 +93,8 @@ export function* startFilesystemProcess(action: any): any {
       level: 'info'
     })
   }
+
+  yield put({ type: types.RECREATE_INDEX })
 }
 
 // IPFS file scan Queue

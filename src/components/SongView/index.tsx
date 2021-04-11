@@ -2,6 +2,7 @@ import { Dispatch } from 'redux'
 import { Link } from 'react-router-dom'
 import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
+import { AutoSizer } from 'react-virtualized'
 
 import { getDurationStr } from '../../utils/timeFormatter'
 import Button from '../common/Button'
@@ -87,7 +88,7 @@ const SongView = (props: Props) => {
     <div className={`song-view ${props.className} w-full overflow-y-auto z-10 flex flex-col`}>
       <div className="song sm:flex">
         <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className="w-full md:m-6 md:rounded-b-lg image lg:max-w-md xl:max-w-xl">
-          <div className='flex flex-col w-full'>
+          <div className='flex flex-col w-full md:sticky md:top-0'>
             { songFinder && song.media_type === 'video' && (
               <OutPortal
                 className={`flex w-full`}
@@ -223,30 +224,31 @@ const SongView = (props: Props) => {
                 })
               }
             </div>
-
-
           </div>
+          {
+            showLyrics && (
+              <Lyrics
+                lyrics={props.lyrics.lyrics}
+                onClose={() => setShowLyrics(false)}
+              />
+            )
+          }
+
+          <AutoSizer>
+            {({ width }) => (
+              <div className='flex flex-col pt-8' style={{ width: width}}>
+                <RelatedAlbums albums={relatedAlbums} />
+                { sameGenreSongs &&
+                  <MediaSlider
+                    title={<Translate value='titles.sameGenreSongs'/>}
+                    mediaItems={sameGenreSongs}
+                  />
+                }
+              </div>
+            )}
+          </AutoSizer>
         </div>
       </div>
-      <div>
-        <RelatedAlbums albums={relatedAlbums} />
-      </div>
-      { sameGenreSongs &&
-        <div className='pb-4'>
-          <MediaSlider
-            title={<Translate value='titles.sameGenreSongs'/>}
-            mediaItems={sameGenreSongs}
-          />
-        </div>
-      }
-      {
-        showLyrics && (
-          <Lyrics
-            lyrics={props.lyrics.lyrics}
-            onClose={() => setShowLyrics(false)}
-          />
-        )
-      }
     </div>
   )
 }

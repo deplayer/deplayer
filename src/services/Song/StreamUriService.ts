@@ -1,6 +1,6 @@
 import Media from '../../entities/Media'
 
-export const getStreamUri = (
+export const getStreamUri = async (
   song: Media,
   settings: any,
   providerNum: number
@@ -19,6 +19,12 @@ export const getStreamUri = (
   console.log(streamUri)
 
   verifyPermission(streamUri)
+
+  if (streamUri?.getFile) {
+    const file = await streamUri.getFile()
+    console.log('file:', file)
+    return URL.createObjectURL(file)
+  }
 
   return streamUri ? prepend + streamUri : null
 }

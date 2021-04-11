@@ -74,6 +74,8 @@ export default class PouchdbAdapter implements IAdapter {
         }, {type: model}, {attachments: true})
 
         if (result) {
+          console.log('getAll result: ', result)
+
           // FIXME: This elem.key should be elem.value maybe?
           resolve(result.rows.map((elem: any) => elem.key))
         }
