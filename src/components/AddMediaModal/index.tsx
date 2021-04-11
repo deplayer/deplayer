@@ -8,7 +8,7 @@ import Modal from '../common/Modal'
 import Header from '../common/Header'
 import * as types from '../../constants/ActionTypes'
 
-import openDialog from '../../services/Filesystem/openDirectory'
+import fileManager from '../../services/Filesystem/FileManager'
 
 type Props = {
   showAddMediaModal: boolean,
@@ -79,14 +79,14 @@ const AddMediaModal = (props: Props) => {
           Open local filesystem directory
         </Header>
 
-        <input multiple className='my-4 hidden' id="filePicker" type="file" name="file" />
+        <input multiple className='hidden' id="filePicker" type="file" name="file" />
 
         <div className='flex justify-end'>
           <Button
             fullWidth
             type='submit'
             onClick={async () => {
-              const files = await openDialog()
+              const files = await fileManager.openDialog()
               props.dispatch({
                 type: types.START_FILESYSTEM_FILES_PROCESSING,
                 files: files

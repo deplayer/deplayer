@@ -71,10 +71,13 @@ export function* startProvidersScan(): any {
 
 // Handle filesystem adding
 export function* startFilesystemProcess(action: any): any {
+  console.log('files: ', action.files)
+
   for (let i = 0; i < action.files.length; i++) {
     const file = action.files[i]
     const metadata = yield call(readFileMetadata, file.file)
-    const song = yield call(metadataToSong, metadata, file.handler, 'filesystem')
+
+    const song = yield call(metadataToSong, metadata, file.handler.name, 'filesystem')
 
     console.log('saving song: ', song)
 

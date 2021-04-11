@@ -1,4 +1,5 @@
 import Media from '../../entities/Media'
+import { get } from 'idb-keyval'
 
 export const getStreamUri = async (
   song: Media,
@@ -11,17 +12,25 @@ export const getStreamUri = async (
     song.stream[providerNum].service === 'ipfs' ? `${proto}://${host}:${port}/ipfs/` : ''
 
   const streamUri = song &&
-      song?.stream[providerNum] &&
       song.stream.length ?
+      song?.stream[providerNum] &&
       song.stream[providerNum].uris[0].uri: null
 
-  console.log(song)
-  console.log(streamUri)
+  const directoryHandler = await get('directoryHandler')
+  await verifyPermission(directoryHandler)
 
-  verifyPermission(streamUri)
+  const handler = await get(streamUri)
+  await verifyPermission(handler)
 
-  if (streamUri?.getFile) {
-    const file = await streamUri.getFile()
+  if (song.stream[providerNum].service === 'filesystem' && handler.getFile) {
+    console.log('streamUri: ', streamUri)
+
+    const file = await handler?.getFile()
+
+    if (!file) {
+      return streamUri
+    }
+
     console.log('file:', file)
     return URL.createObjectURL(file)
   }
@@ -33,10 +42,6 @@ async function verifyPermission(fileHandle: any, readWrite = false) {
   const options = {};
   if (readWrite) {
     // options.mode = 'readwrite';
-  }
-
-  if (!fileHandle?.queryPermission) {
-    return
   }
 
   // Check if permission was already granted. If so, return true.
