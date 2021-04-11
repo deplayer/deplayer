@@ -3,7 +3,7 @@ import Album from './Album'
 import Artist from './Artist'
 
 type streamUri = {
-  uri: string,
+  uri: any,
   quality: string
 }
 
@@ -193,6 +193,13 @@ export default class Media {
   }
 
   get media_type(): MediaType {
+    const uris: Array<string> = []
+    this.stream.forEach((stream) => stream.uris.forEach((uri) => uris.push(uri.uri)))
+
+    if (uris.filter((uri) => uri.endsWith('.mp4')).length) {
+      return 'video'
+    }
+
     if (this.hasAnyProviderOf(['youtube', 'webtorrent'])) {
       return 'video'
     }

@@ -6,6 +6,8 @@ import {
 import Media from '../../entities/Media'
 import * as types from '../../constants/ActionTypes'
 
+jest.mock('idb-keyval')
+
 describe('setCurrentPlaying', () => {
   it('works', () => {
     const streamUrl = 'https://foo.bar'

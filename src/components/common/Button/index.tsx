@@ -33,6 +33,8 @@ const Button = (props: Props) => {
     'text-4xl': props.size === '4xl',
     'text-2xl': props.size === '2xl',
     'text-left': props.alignLeft,
+    'justify-center': !props.alignLeft,
+    'text-center': true,
     'p-2': true,
     'px-2': true,
     'px-4': props.long || props.large,

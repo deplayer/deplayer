@@ -34,23 +34,11 @@ export default class PouchdbAdapter implements IAdapter {
     return results
   }
 
-  removeMany(model: string, payload: Array<string>): Promise<any> {
-    const removes: Array<any> = []
-    payload.forEach((item) => {
-      const removePromise = this.getDocObj(model, item).then((doc) => doc.remove() )
-
-      removes.push(removePromise)
-    })
-
-    return new Promise((resolve, reject) => {
-      Promise.all(removes).then((results) => {
-        resolve(results)
-      })
-        .catch((e) => {
-          logger.log('RxdbDatabase', e)
-          reject(e)
-        })
-    })
+  async removeMany(model: string, payload: Array<string>): Promise<any> {
+    for (let i = 0; i < payload.length; i++) {
+      const object = await this.getDocObj(model, payload[i])
+      object.remove()
+    }
   }
 
   addItem = (model: string, item: any): Promise<any> => {
@@ -86,6 +74,8 @@ export default class PouchdbAdapter implements IAdapter {
         }, {type: model}, {attachments: true})
 
         if (result) {
+          console.log('getAll result: ', result)
+
           // FIXME: This elem.key should be elem.value maybe?
           resolve(result.rows.map((elem: any) => elem.key))
         }
