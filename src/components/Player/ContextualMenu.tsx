@@ -11,6 +11,7 @@ import ToggleMiniQueueButton from '../Buttons/ToggleMiniQueueButton'
 import AddNewMediaButton from '../Buttons/AddNewMediaButton'
 import VolumeControl from './VolumeControl'
 import * as types from '../../constants/ActionTypes'
+import Controls from './Controls'
 
 type MenuProps = {
   app: app,
@@ -196,6 +197,19 @@ const ContextualMenu = (props: MenuProps) => {
               </Button>
             </Item>
         }
+
+          <Item>
+            <div className='flex justify-center w-full my-4'>
+              <Controls
+                playPrev={() => props.dispatch({type: types.PLAY_PREV}) }
+                isPlaying={props.player.playing}
+                mqlMatch={true}
+                playPause={() => props.dispatch({ type: types.TOGGLE_PLAYING }) }
+                playNext={() => props.dispatch({type: types.PLAY_NEXT})}
+                dispatch={props.dispatch}
+              />
+            </div>
+          </Item>
       </Menu>
     </React.Fragment>
   )
