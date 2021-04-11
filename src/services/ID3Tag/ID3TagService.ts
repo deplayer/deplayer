@@ -21,11 +21,12 @@ export const metadataToSong = (
   service: string,
 ): Media => {
   const song = new Media({
-    title: metadata.common.title || fileUri?.name,
+    title: metadata.common.title || fileUri,
     artistName:  metadata.common.artist,
     // FIXME: genre is an array, we should extract only if its defined
     // genre: metadata.common.genre,
     albumName: metadata.common.album,
+    media_type: fileUri.endsWith('.mp4') ? 'video' : 'audio',
     stream: [
       {
         // FIXME: This could be anything
