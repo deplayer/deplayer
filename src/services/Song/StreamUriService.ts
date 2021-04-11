@@ -5,7 +5,7 @@ export const getStreamUri = async (
   song: Media,
   settings: any,
   providerNum: number
-): any => {
+): Promise<string> => {
   const { proto, host, port } = settings.app.ipfs
   const prepend = song.stream &&
     song.stream[providerNum] &&
@@ -13,7 +13,7 @@ export const getStreamUri = async (
 
   const streamUri = song &&
       song.stream.length ?
-      song?.stream[providerNum] &&
+      song.stream[providerNum] &&
       song.stream[providerNum].uris[0].uri: null
 
   const directoryHandler = await get('directoryHandler')
@@ -25,7 +25,7 @@ export const getStreamUri = async (
   if (song.stream[providerNum].service === 'filesystem' && handler.getFile) {
     console.log('streamUri: ', streamUri)
 
-    const file = await handler?.getFile()
+    const file = await handler.getFile()
 
     if (!file) {
       return streamUri
@@ -35,13 +35,17 @@ export const getStreamUri = async (
     return URL.createObjectURL(file)
   }
 
-  return streamUri ? prepend + streamUri : null
+  return prepend + streamUri
 }
 
 async function verifyPermission(fileHandle: any, readWrite = false) {
   const options = {};
   if (readWrite) {
     // options.mode = 'readwrite';
+  }
+
+  if (!fileHandle || !fileHandle.queryPermission) {
+    return
   }
 
   // Check if permission was already granted. If so, return true.

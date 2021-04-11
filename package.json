@@ -207,7 +207,7 @@
     "redux-thunk": "^2.3.0",
     "sass-loader": "^7.1.0",
     "surge": "^0.20.1",
-    "ts-jest": "24",
+    "ts-jest": "^26.5.4",
     "typescript": "^3.5.2",
     "webpack-bundle-analyzer": "^3.8.0",
     "workbox-webpack-plugin": "^4.2.0"

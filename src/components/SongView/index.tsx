@@ -84,6 +84,10 @@ const SongView = (props: Props) => {
 
   const songFinder = song.id === currentPlaying
 
+  const downloadUrl = async () => {
+    return await getStreamUri(song, props.settings.settings, 0)
+  }
+
   return (
     <div className={`song-view ${props.className} w-full overflow-y-auto z-10 flex flex-col`}>
       <div className="song sm:flex">
@@ -168,7 +172,6 @@ const SongView = (props: Props) => {
 
               <a
                 className='p-4'
-                href={getStreamUri(song, props.settings.settings, 0)}
                 target="_blank"
               >
                 <Icon
