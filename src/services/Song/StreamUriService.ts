@@ -7,9 +7,17 @@ export const getStreamUri = async (
   providerNum: number
 ): Promise<string> => {
   const { proto, host, port } = settings.app.ipfs
-  const prepend = song.stream &&
-    song.stream[providerNum] &&
-    song.stream[providerNum].service === 'ipfs' ? `${proto}://${host}:${port}/ipfs/` : ''
+
+  console.log('providerNum', providerNum)
+  console.log('song', song)
+
+  const service = song.stream && song.stream[providerNum] && song.stream[providerNum].service
+
+  if (!service) {
+    return null
+  }
+
+  const prepend = service === 'ipfs' ? `${proto}://${host}:${port}/ipfs/` : ''
 
   const streamUri = song &&
       song.stream.length ?
@@ -19,7 +27,7 @@ export const getStreamUri = async (
   const directoryHandler = await get('directoryHandler')
   await verifyPermission(directoryHandler)
 
-  if (song.stream[providerNum].service === 'filesystem') {
+  if (service === 'filesystem') {
     console.log('streamUri: ', streamUri)
     const handler = await get(streamUri)
 
