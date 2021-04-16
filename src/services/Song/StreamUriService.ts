@@ -14,7 +14,7 @@ export const getStreamUri = async (
   const service = song.stream && song.stream[providerNum] && song.stream[providerNum].service
 
   if (!service) {
-    return null
+    return ''
   }
 
   const prepend = service === 'ipfs' ? `${proto}://${host}:${port}/ipfs/` : ''
