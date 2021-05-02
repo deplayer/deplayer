@@ -6,6 +6,7 @@
     "collection": "Collection"
   },
   "titles": {
+    "albums": "Albums",
     "relatedAlbums": "Same artist albums",
     "mostPlayedSongs": "Most played songs",
     "sameGenreSongs": "Songs of the same genre"
@@ -19,6 +20,7 @@
     "deleteSettings": "Delete settings",
     "addProviders": "Add providers",
     "providers": "Providers",
+    "lazyProviders": "Search providers",
     "generalSettings": "General settings"
   },
   "song": {

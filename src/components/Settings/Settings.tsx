@@ -51,27 +51,27 @@ class Settings extends React.Component<Props, State> {
 
     return (
       <MainContainer centerContents>
-        <SettingsForm
-          schema={settingsForm}
-          settings={this.props.settings}
-          dispatch={this.props.dispatch}
-        />
-        <div className='my-12'>
-          <Button onClick={this.exportCollection} inverted>
-            <Translate value="labels.exportCollection" />
-          </Button>
-          <Button onClick={this.toggleImporter} inverted>
-            <Translate value="labels.importCollection" />
-          </Button>
-          <Button onClick={this.deleteCollection} inverted>
-            <Translate value="labels.deleteCollection" />
-          </Button>
-          <Button onClick={this.deleteSettings} inverted>
-            <Translate value="labels.deleteSettings" />
-          </Button>
-        </div>
-        <div className='my-4'>
-          { ImporterComp }
+        <div className='flex flex-col'>
+          <SettingsForm
+            schema={settingsForm}
+            settings={this.props.settings}
+            dispatch={this.props.dispatch}
+          />
+          <div className='my-12 flex'>
+            <Button onClick={this.exportCollection} inverted>
+              <Translate value="labels.exportCollection" />
+            </Button>
+            <Button onClick={this.toggleImporter} inverted>
+              <Translate value="labels.importCollection" />
+            </Button>
+            <Button onClick={this.deleteCollection} inverted>
+              <Translate value="labels.deleteCollection" />
+            </Button>
+            <Button onClick={this.deleteSettings} inverted>
+              <Translate value="labels.deleteSettings" />
+            </Button>
+            { ImporterComp }
+          </div>
         </div>
       </MainContainer>
     )

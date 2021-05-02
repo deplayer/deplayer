@@ -48,7 +48,7 @@ type Props = {
 
 const RelatedAlbums = (props: Props) => {
   const albums = Albums(props.albums)
-  const title = <Translate value='titles.relatedAlbums'/>
+  const title = <Translate value='titles.albums'/>
 
   return (
     <HorizontalSlider

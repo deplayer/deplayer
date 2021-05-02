@@ -23,10 +23,10 @@ const FormSchema = (props: Props) => {
         key={field.name}
         className="my-3"
       >
-        <label className='w-full block mb-2'>
-          <Translate value={field.title} />
-        </label>
-        <div className='w-full'>
+        <div className='w-full flex items-center'>
+          <label className='w-40 capitalize text-xl'>
+            <Translate value={field.title} />
+          </label>
           <FormField
             field={field}
           />

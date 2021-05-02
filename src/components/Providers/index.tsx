@@ -36,17 +36,16 @@ const Providers = (props: Props) => {
   })
 
   return (
-    <MainContainer>
+    <MainContainer centerContents>
       <div className='md:px-20'>
-        <div className='my-3'>
+        <div className='my-3 flex flex-col'>
           <h2 className='py-4'><Translate value="labels.lazyProviders" /></h2>
-          <ProviderButton providerKey='subsonic' />
-          <ProviderButton providerKey='mstream' />
-          <ProviderButton providerKey='itunes' />
 
-          <h2 className='py-4'><Translate value="labels.oneOffProviders" /></h2>
-          <ProviderButton providerKey='ipfs' />
-          <ProviderButton providerKey='youtube-dl-server' />
+          <div className='flex'>
+            <ProviderButton providerKey='subsonic' />
+            <ProviderButton providerKey='mstream' />
+            <ProviderButton providerKey='itunes' />
+          </div>
         </div>
 
         <Formik
@@ -69,9 +68,11 @@ const Providers = (props: Props) => {
                 </div>
 
                 <div>
-                  <Button long disabled={isSubmitting} type='submit'>
-                    <Translate value="buttons.save" />
-                  </Button>
+                  { !!providers.length && (
+                    <Button long uppercase disabled={isSubmitting} type='submit' size='2xl' >
+                      <Translate value="buttons.save" />
+                    </Button>
+                  )}
                 </div>
               </Form>
             )}

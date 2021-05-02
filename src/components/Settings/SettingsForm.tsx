@@ -49,12 +49,21 @@ const SettingsForm = (props: Props) => {
 
             <div className={settingsCard}>
               <FormSchema schema={props.schema} />
-            </div>
 
-            <div>
-              <Button long fullWidth uppercase disabled={isSubmitting} type='submit'>
-                <Translate value="buttons.save" />
-              </Button>
+              <div className='w-full flex justify-center mt-12'>
+                <div className='max-w-xs w-full'>
+                  <Button
+                    long
+                    fullWidth
+                    uppercase
+                    size='2xl'
+                    disabled={isSubmitting}
+                    type='submit'
+                  >
+                    <Translate value="buttons.save" />
+                  </Button>
+                </div>
+              </div>
             </div>
           </Form>
         )}
