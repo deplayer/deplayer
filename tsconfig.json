@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "strict": true,
     "sourceMap": true,
     "strictNullChecks": true,
     "module": "es6",
