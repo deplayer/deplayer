@@ -5,6 +5,7 @@ import collectionSaga from './collection'
 import connectionSaga from './connection'
 import databaseSyncSaga from './databaseSync'
 import mediaSessionSaga from './mediaSession'
+import wakeLock from './wakeLock'
 import notificationsSaga from './notifications'
 import playerSaga from './player'
 import playlistSaga from './playlist'
@@ -22,6 +23,7 @@ function* rootSaga(store: any) {
     connectionSaga(store),
     databaseSyncSaga(store),
     mediaSessionSaga(store),
+    wakeLock(store),
     notificationsSaga(store),
     playerSaga(),
     playlistSaga(),

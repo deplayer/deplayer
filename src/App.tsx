@@ -1,6 +1,7 @@
 import 'react-s-alert/dist/s-alert-css-effects/stackslide.css'
 import 'react-s-alert/dist/s-alert-default.css'
 import 'rc-slider/assets/index.css'
+
 import './styles/App.scss'
 import './tailwind.css'
 

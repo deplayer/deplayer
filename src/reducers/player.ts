@@ -34,6 +34,7 @@ export const defaultState = {
 
 export default (state: State = defaultState, action: any): State => {
   switch (action.type) {
+    case types.PAUSE_PLAYING:
     case types.STOP_PLAYING:
       return {...state, playing: false}
 
