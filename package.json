@@ -1,6 +1,6 @@
 {
   "name": "deplayer",
-  "version": "0.12.3",
+  "version": "0.12.4",
   "private": true,
   "dependencies": {
     "@babel/core": "^7.0.0",
