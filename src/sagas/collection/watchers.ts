@@ -1,5 +1,6 @@
 import { call, actionChannel, fork, take, put } from 'redux-saga/effects'
 
+import Verida from '@verida/datastore'
 import { generateIndexWorker, saveToDbWorker } from './workers'
 import { getAdapter } from '../../services/database'
 import { initialize } from '../settings'
@@ -29,11 +30,33 @@ export function* addToCollectionWatcher(): any {
   }
 }
 
+const setupVerida = async () => {
+  const web3Provider = await Verida.Helpers.wallet.connectWeb3('ethr');
+  const address = await web3Provider.getAddress('ethr');
+
+  Verida.setConfig({
+    appName: 'asdf'
+  });
+
+  let app = new Verida({
+    chain: 'ethr',
+    address: address,
+    web3Provider: web3Provider
+  });
+
+  console.log('verida app: ', app)
+
+  let connected = await app.connect(true)
+  console.log('verida connected: ', connected)
+}
+
 // Application initialization routines
 export function* initializeWatcher() {
   while (true) {
     yield take(types.INITIALIZE)
+    yield call(setupVerida)
     yield call(initialize)
+
     yield call(collectionService.initialize)
     const collection = yield call(collectionService.getAll)
     const mappedData = collection.map((elem: any) => elem)
