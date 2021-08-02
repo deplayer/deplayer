@@ -28,6 +28,7 @@ import SearchResultsContainer from './containers/SearchResultsContainer'
 import SettingsContainer from './containers/SettingsContainer'
 import SongContainer from './containers/SongContainer'
 import Wiki from './components/Wiki'
+import GlobalKeyHandlers from './components/GlobalKeyHandlers'
 import configureStore from './store/configureStore'
 import history from './store/configureHistory'
 
@@ -68,6 +69,7 @@ const App = () =>  {
           <PlayerContainer playerPortal={playerPortal} />
           <AddMediaModal />
           <Alert stack={{limit: 3}} />
+          <GlobalKeyHandlers />
         </React.Fragment>
       </ConnectedRouter>
     </Provider>

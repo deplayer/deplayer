@@ -1,8 +1,8 @@
+
 import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
 import { withRouter } from 'react-router-dom'
-
 import AddNewMediaButton from './Buttons/AddNewMediaButton'
 import BodyMessage from './BodyMessage'
 import MusicTable from './MusicTable/MusicTable'
