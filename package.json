@@ -24,7 +24,7 @@
     "@types/webtorrent": "^0.107.1",
     "autoprefixer": "7.1.6",
     "awesome-typescript-loader": "^5.2.1",
-    "axios": "^0.18.0",
+    "axios": "^0.24.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^23.4.2",
