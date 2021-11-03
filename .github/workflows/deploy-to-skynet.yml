@@ -22,6 +22,8 @@ jobs:
 
       - name: Build webapp
         run: yarn build
+        env:
+          PUBLIC_URL: 'https://cg0d9me6o1il37s37fgc7j4v8vchvo1o5k9659no3urbl784ml1mdao.siasky.net/'
 
       - name: Deploy to Skynet
         uses: SkynetLabs/deploy-to-skynet-action@v2
