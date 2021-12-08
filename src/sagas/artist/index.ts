@@ -9,10 +9,10 @@ import * as types from '../../constants/ActionTypes'
 
 type LoadArtistAction = {
   type: string,
-  artist: Artist
+  artist: typeof Artist
 }
 
-export function* fetchSongMetadata(action: LoadArtistAction): any {
+export function* fetchSongMetadata(_action: LoadArtistAction): any {
   const song = yield select(getCurrentSong)
 
   try {
