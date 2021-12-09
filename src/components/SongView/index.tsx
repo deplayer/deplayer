@@ -41,6 +41,7 @@ type Props = {
 }
 
 const SongView = (props: Props) => {
+  const [downloadUrls, setDownloadUrls] = React.useState([])
   const [showLyrics, setShowLyrics] = React.useState(false)
   const MAX_LIST_ITEMS = 25
   const {
@@ -55,6 +56,27 @@ const SongView = (props: Props) => {
       albumsByArtist
     }
   } = props
+
+  React.useMemo(() => {
+    const retrieveUrls = async () => {
+      const urls: any = []
+
+      if (!song) {
+        return
+      }
+
+      for (let i = 0; i < song.stream.length; i++) {
+        urls.push(
+          await getStreamUri(song, props.settings.settings, i)
+        )
+      }
+
+      setDownloadUrls(urls)
+    }
+
+    retrieveUrls()
+  }, [song, props.settings])
+
 
   if (props.loading) {
     return (
@@ -83,10 +105,6 @@ const SongView = (props: Props) => {
   })
 
   const songFinder = song.id === currentPlaying
-
-  const downloadUrl = async () => {
-    return await getStreamUri(song, props.settings.settings, 0)
-  }
 
   return (
     <div className={`song-view ${props.className} w-full overflow-y-auto z-10 flex flex-col`}>
@@ -170,16 +188,24 @@ const SongView = (props: Props) => {
                 <Translate value="common.lyrics" />
               </Button>
 
-              <a
-                className='p-4'
-                target="_blank"
-              >
-                <Icon
-                  icon='faDownload'
-                  className='mr-2'
-                />
-                <Translate value="buttons.downloadMedia" />
-              </a>
+              {
+                downloadUrls.map((url) => {
+                  return (
+                    <a
+                      key={url}
+                      className='p-4'
+                      target="_blank"
+                      href={url}
+                    >
+                      <Icon
+                        icon='faDownload'
+                        className='mr-2'
+                      />
+                      <Translate value="buttons.downloadMedia" />
+                    </a>
+                  )
+                })
+              }
             </div>
           </div>
         </div>

@@ -1,4 +1,3 @@
-import { Dispatch } from 'redux'
 import * as React from 'react'
 
 import PlayPauseButton from './PlayPauseButton'
@@ -10,7 +9,6 @@ type ControlProps = {
   mqlMatch: boolean,
   playPause: () => void,
   playNext: () => void,
-  dispatch: Dispatch
 }
 
 const Controls = (props: ControlProps) => {
