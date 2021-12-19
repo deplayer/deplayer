@@ -1,6 +1,8 @@
 # deplayer
 
 [![pipeline status](https://gitlab.com/deplayer/deplayer/badges/master/pipeline.svg)](https://gitlab.com/deplayer/deplayer/commits/master)
+[![Add to Homescreen](https://img.shields.io/badge/Skynet-Add%20To%20Homescreen-00c65e?logo=skynet&labelColor=0d0d0d)](https://homescreen.hns.siasky.net/#/skylink/deplayer.hns)
+
 
 [Online version](http://deplayer.surge.sh/) - [Hosted in siasky](https://deplayer.hns.siasky.net/) - [Hosted on IPFS](http://deplayer.eth.link/) - [zil domain](http://deplayer.zil/)
 
