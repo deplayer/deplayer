@@ -17,11 +17,14 @@ export default class DatabaseSyncService {
     const replicatedPayload: Array<any> = []
 
     replicationState.on('change', (docData: any) => {
-      console.log(docData)
-      replicatedPayload.push(docData)
+      console.log('docData: ', docData)
+      // FIXME: Magic string
+      if (docData.direction === 'pull') {
+        replicatedPayload.push(...docData.change.docs)
+      }
 
       if (replicatedPayload.length >= 100) {
-        console.log(replicatedPayload)
+        console.log('Got 100 items!', replicatedPayload)
         const collection = replicatedPayload.filter((elem) => elem.type === 'media')
         dispatch({type: types.RECEIVE_COLLECTION, data: collection})
         // Emptying payload
