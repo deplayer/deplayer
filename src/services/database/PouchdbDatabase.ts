@@ -130,6 +130,30 @@ const createDB = (): any => {
   }
 }
 
+declare function emit (val: any)
+
+const createIndex = async (db) => {
+  // document that tells PouchDB/CouchDB
+  // to build up an index on doc.name
+  var ddoc = {
+    _id: '_design/deplayer',
+    views: {
+      by_type: {
+        map: function (doc) {
+          emit(doc.type);
+        }.toString()
+      }
+    }
+  };
+  // save it
+  db.put(ddoc).then(function () {
+    console.log('index crated')
+  }).catch(function (err) {
+    // some error (maybe a 409, because it already exists?)
+    console.log('error creating index', err)
+  });
+}
+
 export const createCollections = async (db: any, filter: Array<string> = []) => {
   const filteredCollections = !filter.length ? collections :  collections.filter(({name}) =>
     filter.indexOf(name) >= 0
@@ -159,11 +183,11 @@ const _create = async (): Promise<any> => {
 
   console.log('pouch object:', db)
 
-
   logger.log('DatabaseService', 'created database')
   window['db'] = db; // write to window for debugging
 
-  await createCollections(db)
+  // await createCollections(db)
+  await createIndex(db)
 
   return db
 }

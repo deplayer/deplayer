@@ -4,7 +4,6 @@ import logger from '../../utils/logger'
 
 export default class PouchdbAdapter implements IAdapter {
   initialize = async () => {
-    await db.get()
   }
 
   save = async (model: string, id: string, payload: any): Promise<any> => {
@@ -62,26 +61,27 @@ export default class PouchdbAdapter implements IAdapter {
     await dbInst[model].remove()
   }
 
-  getAll = (model: string, conditions: any = {}): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      return db.get().then(async (instance) => {
+  getAll = async (model: string, conditions: any = {}): Promise<any> => {
+    return new Promise(async (resolve, reject) => {
+      const instance = await db.get()
 
-        logger.log('RxdbDatabase', 'Querying all database')
-        const result = await instance.query((doc: any, emit: any) => {
-          if (doc.type === model) {
-            emit(doc)
-          }
-        }, {type: model}, {attachments: true})
-
-        if (result) {
-          console.log('getAll result: ', result)
-
-          // FIXME: This elem.key should be elem.value maybe?
-          resolve(result.rows.map((elem: any) => elem.key))
+      logger.log('RxdbDatabase', 'Querying all database')
+      const result = await instance.query(
+        'deplayer/by_type',
+        {key: model, include_docs: true},
+        {
+          attachments: true
         }
+      )
 
-        resolve(null)
-      })
+      if (result) {
+        console.log('getAll result: ', result)
+
+        // FIXME: This elem.key should be elem.value maybe?
+        resolve(result.rows.map((elem: any) => elem.doc))
+      }
+
+      resolve(null)
     })
   }
 

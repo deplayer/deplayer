@@ -4,7 +4,6 @@ import * as React from 'react'
 
 import RelatedAlbums from '../RelatedAlbums'
 import Album from '../ArtistView/Album'
-import * as types from '../../constants/ActionTypes'
 
 type Props = {
   album: any,
