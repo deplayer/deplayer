@@ -152,6 +152,11 @@ const createIndex = async (db) => {
     // some error (maybe a 409, because it already exists?)
     console.log('error creating index', err)
   });
+
+  db.query(
+    'deplayer/by_type',
+    {limit: 0 }
+  )
 }
 
 export const createCollections = async (db: any, filter: Array<string> = []) => {

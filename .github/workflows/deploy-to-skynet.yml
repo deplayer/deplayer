@@ -23,7 +23,8 @@ jobs:
       - name: Build webapp
         run: yarn build
         env:
-          PUBLIC_URL: ''
+          REACT_APP_VERSION: ${{ env.GITHUB_REF_NAME	}}
+          PUBLIC_URL: 'https://deplayer.hns.siasky.net/'
 
       - name: Deploy to Skynet
         uses: SkynetLabs/deploy-to-skynet-action@v2
