@@ -25,6 +25,9 @@ jobs:
         env:
           REACT_APP_VERSION: ${{ env.GITHUB_REF_NAME }}
 
+      - name: Fix route resolving
+        run: cp build/index.html build/404.html
+
       - name: Deploy to Skynet
         uses: SkynetLabs/deploy-to-skynet-action@v2
 
