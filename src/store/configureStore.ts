@@ -1,5 +1,4 @@
 import { createStore, applyMiddleware, compose } from 'redux'
-import Reduxie from 'reduxie'
 import { routerMiddleware } from 'connected-react-router'
 import createSagaMiddleware from 'redux-saga'
 import thunk from 'redux-thunk'
@@ -24,7 +23,6 @@ import rootSaga from '../sagas/rootSaga'
 // Custom middlewares
 import alerts from './middlewares/alerts'
 import exports from './middlewares/exports'
-import reduxieInitializer from './middlewares/reduxie'
 import outerReducer from './outerReducer'
 
 const mql = window.matchMedia(`(min-width: 800px)`)
@@ -38,9 +36,6 @@ export default function configureStore() {
     testingMiddlewares.push(perflogger)
   }
 
-  const reduxieDB = 'appcache'
-  const reduxieConfig = {throttleTime: 20000, deleteCount: 1}
-  const reduxie = Reduxie.Middleware(reduxieDB, reduxieConfig)
   const middlewares = [
     ...testingMiddlewares,
     promise,
