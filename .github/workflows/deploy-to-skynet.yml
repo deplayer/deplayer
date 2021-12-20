@@ -35,7 +35,5 @@ jobs:
           upload-dir: build
           github-token: ${{ secrets.GITHUB_TOKEN }}
           registry-seed: ${{ secrets.REGISTRY_SECRET }}
-          try-files:
-          - 'index.html'
-          - '/index.html'
+          try-files: ['index.html', '/index.html']
 
