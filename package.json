@@ -1,6 +1,6 @@
 {
   "name": "deplayer",
-  "version": "0.12.25",
+  "version": "0.12.26",
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.25",
