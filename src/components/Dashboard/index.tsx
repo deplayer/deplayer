@@ -22,7 +22,7 @@ const Dashboard = (props: Props) => {
     .slice(0, MAX_LIST_ITEMS)
     .map((albumId) => props.collection.albums[albumId])
 
-  if (!albums.length && mediaItems.length) {
+  if (!albums.length && !mediaItems.length) {
     return (
       <BodyMessage message={
         <div>
