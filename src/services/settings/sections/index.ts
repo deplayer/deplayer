@@ -4,8 +4,8 @@ import IpfsSettings from './IpfsSettings'
 import YoutubeDlServer from './YoutubeDlServer'
 
 export default {
-  lastfm: new Lastfm(),
   databaseSync: new DatabaseSync(),
+  lastfm: new Lastfm(),
   ipfsSettings: new IpfsSettings(),
   youtubeDlServer: new YoutubeDlServer(),
 }
