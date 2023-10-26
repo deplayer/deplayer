@@ -4,6 +4,7 @@ include:
 stages:
 - test
 - deploy
+- report
 
 test:
   stage: test
@@ -27,3 +28,13 @@ deploy:
     SURGE_TOKEN: $SURGE_TOKEN
     PUBLIC_URL: https://deplayer.surge.sh
     REACT_APP_VERSION: $CI_COMMIT_TAG
+
+send-results:
+  stage: report
+  variables:
+    API_KEY: $CODE_PULSE_API_KEY
+    CODE_PULSE_API_KEY: $CODE_PULSE_API_KEY
+  image:
+    name: registry.gitlab.com/gtrias/code_pulse/project-scanner
+    entrypoint: [""]
+  script: /app/project_scanner --server-url $CODE_URL
