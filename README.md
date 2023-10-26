@@ -2,7 +2,7 @@
 
 [![pipeline status](https://gitlab.com/deplayer/deplayer/badges/master/pipeline.svg)](https://gitlab.com/deplayer/deplayer/commits/master)
 
-[Online version](http://deplayer.surge.sh/) - [Hosted on IPFS](http://deplayer.eth.link/) - [zil domain](http://deplayer.zil/)
+[Online version](http://deplayer.surge.sh/)
 
 Play your music and videos entirely from your browser.
 Connect your providers and start playing.
