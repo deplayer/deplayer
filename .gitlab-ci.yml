@@ -34,7 +34,10 @@ send-results:
   variables:
     API_KEY: $CODE_PULSE_API_KEY
     CODE_PULSE_API_KEY: $CODE_PULSE_API_KEY
+    CODE_PULSE_PROJECT_SLUG: Deplayer
   image:
     name: registry.gitlab.com/gtrias/code_pulse/project-scanner
     entrypoint: [""]
-  script: /app/project_scanner --server-url $CODE_URL
+  script:
+    - ls /builds/deplayer
+    - /app/project_scanner --server-url $CODE_URL --plugin react --directory /builds/deplayer/deplayer
