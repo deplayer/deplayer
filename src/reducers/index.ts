@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 import { i18nReducer } from 'react-redux-i18n'
-import { connectRouter } from 'connected-react-router'
+// import { connectRouter } from 'connected-react-router'
 
 import app from './app'
 import artist from './artist'
@@ -27,5 +27,5 @@ export default (history: any): State => combineReducers({
   settings,
   queue,
   i18n: i18nReducer,
-  router: connectRouter(history),
+  // router: connectRouter(history),
 })

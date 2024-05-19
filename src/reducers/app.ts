@@ -22,28 +22,28 @@ export const defaultState = {
   displayMiniQueue: true,
   showSpectrum: false,
   showVisuals: false,
-  version: process.env.REACT_APP_VERSION || 'development'
+  version: import.meta.env.REACT_APP_VERSION || 'development'
 }
 
 export default (state: State = defaultState, action: any) => {
   switch (action.type) {
     case types.TOGGLE_SIDEBAR: {
-      return {...state, sidebarToggled: action.value ? action.value :!state.sidebarToggled}
+      return { ...state, sidebarToggled: action.value ? action.value : !state.sidebarToggled }
     }
 
     case types.TOGGLE_SPECTRUM: {
-      return {...state, showSpectrum: !state.showSpectrum}
+      return { ...state, showSpectrum: !state.showSpectrum }
     }
     case types.TOGGLE_VISUALS: {
-      return {...state, showVisuals: !state.showVisuals}
+      return { ...state, showVisuals: !state.showVisuals }
     }
 
     case types.SHOW_ADD_MEDIA_MODAL: {
-      return {...state, showAddMediaModal: true}
+      return { ...state, showAddMediaModal: true }
     }
 
     case types.HIDE_ADD_MEDIA_MODAL: {
-      return {...state, showAddMediaModal: false}
+      return { ...state, showAddMediaModal: false }
     }
 
 
@@ -56,11 +56,11 @@ export default (state: State = defaultState, action: any) => {
     }
 
     case types.INITIALIZED: {
-      return {...state, loading: false}
+      return { ...state, loading: false }
     }
 
     case types.TOGGLE_MINI_QUEUE: {
-      return {...state, displayMiniQueue: !state.displayMiniQueue}
+      return { ...state, displayMiniQueue: !state.displayMiniQueue }
     }
 
     case types.SET_BACKGROUND_IMAGE: {

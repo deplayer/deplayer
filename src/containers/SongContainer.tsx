@@ -1,12 +1,9 @@
 import { connect } from 'react-redux'
-import * as React from 'react'
-import { withRouter } from 'react-router-dom'
-
 import SongView from '../components/SongView'
 
-const RoutedSongView = withRouter((props: any) => <SongView {...props}/>)
+const RoutedSongView = (props: any) => <SongView {...props} />
 
-const getSongId = (router: any) : string => {
+const getSongId = (router: any): string => {
   const songFinder = router.location.pathname.match(/\/song\/(.*)/)
 
   if (songFinder && songFinder[1]) {

@@ -46,8 +46,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 import { faGitlab, faDeezer } from "@fortawesome/free-brands-svg-icons"
 
-import React from 'react'
-
 const icons = {
   faDownload,
   faMusic,

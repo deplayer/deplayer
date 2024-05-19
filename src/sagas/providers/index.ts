@@ -12,30 +12,9 @@ import {
 import { getAdapter } from '../../services/database'
 import { getFileMetadata, metadataToSong, readFileMetadata } from '../../services/ID3Tag/ID3TagService'
 import { getSettings } from '../selectors'
-import { scanFolder } from '../../services/Ipfs/IpfsService'
 import CollectionService from '../../services/CollectionService'
 import YoutubeDlServerProvider from '../../providers/YoutubeDlServerProvider'
-import  * as types from '../../constants/ActionTypes'
-
-export function* startIpfsFolderScan(hash: string): any {
-  const settings = yield select(getSettings)
-
-  try {
-    const files = yield call(scanFolder, hash, settings)
-
-    return files
-  } catch(e) {
-    yield put({ type: types.IPFS_FOLDER_SCAN_FAILED, e })
-
-    yield put({
-      type: types.SEND_NOTIFICATION,
-      notification: `failed scanning: ${ hash }`,
-      level: 'warning'
-    })
-
-    return e
-  }
-}
+import * as types from '../../constants/ActionTypes'
 
 // Watcher should enque tasks to avoid concurrency
 export function* startProvidersScan(): any {
@@ -58,13 +37,13 @@ export function* startProvidersScan(): any {
 
       yield put({
         type: types.SEND_NOTIFICATION,
-        notification: `starting to scan hash: ${ hash }`,
+        notification: `starting to scan hash: ${hash}`,
         level: 'info'
       })
 
       // Dispatching an event with configured ipfs hash
-      yield put({type: types.IPFS_FOLDER_FOUND, hash })
-      yield put({ type: 'PROVIDER_SCAN_FINISHED',  key })
+      yield put({ type: types.IPFS_FOLDER_FOUND, hash })
+      yield put({ type: 'PROVIDER_SCAN_FINISHED', key })
     }
   }
 }
@@ -86,8 +65,8 @@ export function* startFilesystemProcess(action: any): any {
 
     // Save song
     yield call(collectionService.save, song.id, song.toDocument())
-    yield put({type: types.ADD_TO_COLLECTION, data: [song]})
-    yield put({type: types.RECEIVE_COLLECTION, data: [song]})
+    yield put({ type: types.ADD_TO_COLLECTION, data: [song] })
+    yield put({ type: types.RECEIVE_COLLECTION, data: [song] })
 
     yield put({ type: types.FILESYSTEM_SONG_LOADED, song })
     yield put({
@@ -127,34 +106,8 @@ export function* handleIPFSFileLoad(): any {
         notification: song.title + ' - ' + song.artistName + ' saved',
         level: 'info'
       })
-    } catch(e) {
+    } catch (e) {
       yield put({ type: types.IPFS_NON_SUPPORTED_ITEM, e })
-    }
-  }
-}
-
-// IPFS Folder scan Queue
-// Watcher
-export function* handleIPFSFolderScan(): any {
-  const handleChannel = yield actionChannel(types.IPFS_FOLDER_FOUND)
-
-  while (true) {
-    // 2- take from the channel
-    const { hash } = yield take(handleChannel)
-    // 3- Note that we're using a blocking call
-    try {
-      const files = yield call(startIpfsFolderScan, hash)
-
-      for (let file of files) {
-        if (file.type === 'dir') {
-          // Recursive execution
-          yield put({ type: types.IPFS_FOLDER_FOUND, hash: file.hash })
-        } else {
-          yield put({ type: types.IPFS_FILE_FOUND, file })
-        }
-      }
-    } catch(e) {
-      yield put({ type: types.IPFS_FOLDER_SCAN_FAILED, e })
     }
   }
 }
@@ -168,10 +121,10 @@ function* startYoutubeDlScan(action: any) {
     )
 
     const result = yield service.search(action.data.url)
-    yield put({type: types.ADD_TO_COLLECTION, data: result})
-    yield put({type: types.RECREATE_INDEX})
+    yield put({ type: types.ADD_TO_COLLECTION, data: result })
+    yield put({ type: types.RECREATE_INDEX })
   } catch (error) {
-    yield put({type: 'YOUTUBE_FETCH_ERROR', error})
+    yield put({ type: 'YOUTUBE_FETCH_ERROR', error })
   }
 }
 
@@ -180,7 +133,6 @@ function* providersSaga(): any {
   yield takeLatest(types.START_SCAN_SOURCES, startProvidersScan)
   yield takeEvery(types.START_YOUTUBE_DL_SERVER_SCAN, startYoutubeDlScan)
   yield takeLatest(types.START_FILESYSTEM_FILES_PROCESSING, startFilesystemProcess)
-  yield fork(handleIPFSFolderScan)
   yield fork(handleIPFSFileLoad)
 }
 

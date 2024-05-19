@@ -37,9 +37,9 @@ export default class IndexService {
   search(searchTerm: string) {
     const results = this.index.search(searchTerm, {
       fields: {
-        albumName: {boost: 3},
-        artistName: {boost: 2},
-        title: {boost: 1}
+        albumName: { boost: 3 },
+        artistName: { boost: 2 },
+        title: { boost: 1 }
       },
       bool: 'AND',
       expand: true

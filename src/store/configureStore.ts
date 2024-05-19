@@ -1,7 +1,8 @@
-import { createStore, applyMiddleware, compose } from 'redux'
-import { routerMiddleware } from 'connected-react-router'
+import { applyMiddleware, compose } from 'redux'
+import { configureStore as confStore } from '@reduxjs/toolkit'
+
 import createSagaMiddleware from 'redux-saga'
-import thunk from 'redux-thunk'
+import { thunk } from 'redux-thunk'
 import promise from 'redux-promise'
 import perflogger from 'redux-perf-middleware'
 
@@ -21,13 +22,11 @@ import rootReducer from '../reducers'
 import rootSaga from '../sagas/rootSaga'
 
 // Custom middlewares
-import alerts from './middlewares/alerts'
+// import alerts from './middlewares/alerts'
 import exports from './middlewares/exports'
 import outerReducer from './outerReducer'
 
 const mql = window.matchMedia(`(min-width: 800px)`)
-
-type StoreState = {}
 
 export default function configureStore() {
   const testingMiddlewares: Array<any> = []
@@ -36,43 +35,32 @@ export default function configureStore() {
     testingMiddlewares.push(perflogger)
   }
 
+  const sagaMiddleware = createSagaMiddleware()
+
   const middlewares = [
     ...testingMiddlewares,
     promise,
     thunk,
-    alerts,
     exports,
-    routerMiddleware(history) // for dispatching history actions
+    sagaMiddleware
   ]
 
-  const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
-
   // Instantiate sagaMiddleware
-  const sagaMiddleware = createSagaMiddleware()
   // Prepare store with all the middlewares
-	const store = createStore<StoreState, any, any, any>(
-    outerReducer(rootReducer(history)),
-    composeEnhancers(
-      applyMiddleware(...middlewares, sagaMiddleware)
-    )
-	)
-
-  if ((module as any).hot) {
-    // Enable Webpack hot module replacement for reducers
-    (module as any).hot.accept('../reducers', () => {
-      const nextReducer = require('../reducers')
-      store.replaceReducer(nextReducer)
-    })
-  }
+  const store = confStore({
+    reducer: outerReducer(rootReducer(history)),
+    devTools: process.env.NODE_ENV !== 'production',
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(...middlewares),
+  })
 
   // Running sagas
   sagaMiddleware.run(rootSaga, store)
 
-  store.dispatch({type: types.INITIALIZE})
+  store.dispatch({ type: types.INITIALIZE })
   // Set breakpoint matching for responsive utilities
-  store.dispatch({type: types.SET_MQL, value: mql.matches})
+  store.dispatch({ type: types.SET_MQL, value: mql.matches })
   mql.addListener(() => {
-    store.dispatch({type: types.SET_MQL, value: mql.matches})
+    store.dispatch({ type: types.SET_MQL, value: mql.matches })
   })
 
   // Setting up locales

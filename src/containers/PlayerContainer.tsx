@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 import PlayerControls from '../components/Player/PlayerControls'
 
 const ConnectedPlayer = connect(
@@ -19,6 +18,6 @@ const ConnectedPlayer = connect(
   )
 })
 
-const RoutedPlayer = withRouter((props: any) => <ConnectedPlayer {...props}/>)
+const RoutedPlayer = (props: any) => <ConnectedPlayer {...props} />
 
 export default RoutedPlayer

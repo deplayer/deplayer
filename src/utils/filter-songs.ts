@@ -1,14 +1,16 @@
-import IndexService from '../services/Search/IndexService'
-
 const filterSongs = (
-  indexService: IndexService,
   songs: any,
   term: string = ''
 ) => {
+  if (!songs) {
+    []
+  }
+
   if (term === '') {
     return Object.keys(songs)
   }
 
+  /* 
   const results = indexService.search(term)
 
   const mappedResults = results.map((result: any) => {
@@ -16,6 +18,7 @@ const filterSongs = (
   })
 
   return mappedResults
+    */
 }
 
 export default filterSongs

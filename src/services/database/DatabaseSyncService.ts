@@ -1,7 +1,7 @@
 import { IAdapter } from './IAdapter'
-import  * as types from '../../constants/ActionTypes'
+import * as types from '../../constants/ActionTypes'
 import PouchDB from 'pouchdb'
-require('pouchdb-adapter-http')
+// import 'pouchdb-adapter-http'
 
 export default class DatabaseSyncService {
   storageAdapter: IAdapter
@@ -26,7 +26,7 @@ export default class DatabaseSyncService {
       if (replicatedPayload.length >= 100) {
         console.log('Got 100 items!', replicatedPayload)
         const collection = replicatedPayload.filter((elem) => elem.type === 'media')
-        dispatch({type: types.RECEIVE_COLLECTION, data: collection})
+        dispatch({ type: types.RECEIVE_COLLECTION, data: collection })
         // Emptying payload
         replicatedPayload.length = 0
       }

@@ -1,7 +1,6 @@
 import Media from '../entities/Media'
 import filterSongs from '../utils/filter-songs'
 import * as types from '../constants/ActionTypes'
-import IndexService from '../services/Search/IndexService'
 
 type State = {
   rows: { [key: string]: Media },
@@ -44,16 +43,7 @@ export const defaultState = {
   totalRows: 0
 }
 
-const getIndexService = (index: any) => {
-  const indexService = new IndexService()
-  if (!index) {
-    return indexService
-  }
-
-  return indexService.loadIndex(index.index)
-}
-
-const populateFromAction = (state: State, action: {data: any}) => {
+const populateFromAction = (state: State, action: { data: any }) => {
   const songs = action.data.map((row: any) => {
     return new Media({
       ...row,
@@ -126,24 +116,22 @@ const populateFromAction = (state: State, action: {data: any}) => {
     }
   }
 
-  const totalRows = {...state.rows, ...rows}
-  const indexService = getIndexService(state.searchIndex)
+  const totalRows = { ...state.rows, ...rows }
 
   return {
     ...state,
     rows: totalRows,
-    artists: {...state.artists, ...artists},
-    albums: {...state.albums, ...albums},
-    songsByArtist: {...state.songsByArtist, ...songsByArtist},
-    songsByGenre: {...state.songsByGenre, ...songsByGenre},
-    songsByAlbum: {...state.songsByAlbum, ...songsByAlbum},
-    mediaByType: {...state.mediaByType, ...mediaByType},
-    albumsByArtist: {...state.albumsByArtist, ...albumsByArtist},
+    artists: { ...state.artists, ...artists },
+    albums: { ...state.albums, ...albums },
+    songsByArtist: { ...state.songsByArtist, ...songsByArtist },
+    songsByGenre: { ...state.songsByGenre, ...songsByGenre },
+    songsByAlbum: { ...state.songsByAlbum, ...songsByAlbum },
+    mediaByType: { ...state.mediaByType, ...mediaByType },
+    albumsByArtist: { ...state.albumsByArtist, ...albumsByArtist },
     visibleSongs: filterSongs(
-      indexService,
       totalRows
     ),
-    searchResults: state.searchTerm !== '' ? filterSongs(indexService, totalRows, state.searchTerm) : [],
+    searchResults: state.searchTerm !== '' ? filterSongs(totalRows, state.searchTerm) : [],
     totalRows: Object.keys(totalRows).length,
     loading: false
   }
@@ -170,20 +158,18 @@ export default (state: State = defaultState, action: any = {}) => {
     }
 
     case types.START_SEARCH:
-    case types.SEARCH_FINISHED:  {
-      const indexService = getIndexService(state.searchIndex)
+    case types.SEARCH_FINISHED: {
       return {
         ...state,
-        searchResults: state.searchTerm !== '' ? filterSongs(indexService, state.rows, state.searchTerm) : []
+        searchResults: state.searchTerm !== '' ? filterSongs(state.rows, state.searchTerm) : []
       }
     }
 
     case types.RECEIVE_SEARCH_INDEX: {
-      const indexService = getIndexService(action.data)
       return {
         ...state,
         searchIndex: action.data,
-        searchResults: state.searchTerm !== '' ? filterSongs(indexService, state.rows, state.searchTerm) : []
+        searchResults: state.searchTerm !== '' ? filterSongs(state.rows, state.searchTerm) : []
       }
     }
 

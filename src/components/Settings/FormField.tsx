@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Field } from 'formik'
 import Toggle from 'react-toggle'
 
-require("react-toggle/style.css")
+import 'react-toggle/style.css'
 
 type Props = {
   field: any
@@ -15,7 +15,7 @@ export const TYPES = {
 
 const FormikToggle = ({
   field,
-  form: {touched, errors},
+  form: { touched, errors },
   ...props
 }) => {
   return (
@@ -46,7 +46,7 @@ const FormField = (props: Props) => {
   return (
     <Field
       className={`
-        ${ field.type === TYPES.checkbox ? 'form-check': 'form-control'}
+        ${field.type === TYPES.checkbox ? 'form-check' : 'form-control'}
         p-3
         w-24
         w-full

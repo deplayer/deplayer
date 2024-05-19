@@ -1,4 +1,3 @@
-import React from 'react'
 import classnames from 'classnames'
 
 type Props = {
@@ -58,7 +57,7 @@ const Button = (props: Props) => {
       title={props.title}
       onClick={props.onClick}
     >
-      { props.children }
+      {props.children}
     </button>
   )
 }

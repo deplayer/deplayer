@@ -1,10 +1,11 @@
 import PouchDB from 'pouchdb'
+import 'pouchdb-adapter-idb'
 
 import Media from '../../entities/Media'
 import Artist from '../../entities/Artist'
 import logger from '../../utils/logger'
 
-let dbPromise: Promise<any>|null = null
+let dbPromise: Promise<any> | null = null
 
 export const dbName = 'player_data'
 
@@ -126,11 +127,11 @@ const createDB = (): any => {
     return new PouchDB(dbName)
   } else {
     // return RxDB.create({name: 'player_data', adapter: 'idb'})
-    return new PouchDB(dbName, {adapter: 'idb'})
+    return new PouchDB(dbName, { adapter: 'idb' })
   }
 }
 
-declare function emit (val: any)
+declare function emit(val: any)
 
 const createIndex = async (db) => {
   // document that tells PouchDB/CouchDB
@@ -139,28 +140,28 @@ const createIndex = async (db) => {
     _id: '_design/deplayer',
     views: {
       by_type: {
-        map: function (doc) {
+        map: function(doc) {
           emit(doc.type);
         }.toString()
       }
     }
   };
   // save it
-  db.put(ddoc).then(function () {
+  db.put(ddoc).then(function() {
     console.log('index crated')
-  }).catch(function (err) {
+  }).catch(function(err) {
     // some error (maybe a 409, because it already exists?)
     console.log('error creating index', err)
   });
 
   db.query(
     'deplayer/by_type',
-    {limit: 0 }
+    { limit: 0 }
   )
 }
 
 export const createCollections = async (db: any, filter: Array<string> = []) => {
-  const filteredCollections = !filter.length ? collections :  collections.filter(({name}) =>
+  const filteredCollections = !filter.length ? collections : collections.filter(({ name }) =>
     filter.indexOf(name) >= 0
   )
 
@@ -170,18 +171,13 @@ export const createCollections = async (db: any, filter: Array<string> = []) => 
     await Promise.all(filteredCollections.map(async (colData) =>
       await db.collection(colData)
     ))
-  } catch(e) {
+  } catch (e) {
     logger.log('DatabaseService', 'Error creating collections', e.message)
   }
   logger.log('DatabaseService', 'database collections created')
 }
 
 const _create = async (): Promise<any> => {
-  if (process.env.NODE_ENV === 'test') {
-    require('pouchdb-adapter-memory')
-  } else {
-    require('pouchdb-adapter-idb')
-  }
 
   logger.log('DatabaseService', 'creating database..')
   const db = createDB()
@@ -198,9 +194,9 @@ const _create = async (): Promise<any> => {
 }
 
 export const get = () => {
-    if (!dbPromise) {
-      dbPromise = _create()
-    }
+  if (!dbPromise) {
+    dbPromise = _create()
+  }
 
-    return dbPromise
+  return dbPromise
 }

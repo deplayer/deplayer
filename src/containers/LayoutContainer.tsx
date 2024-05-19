@@ -22,9 +22,9 @@ const dynamicTitle = (
   collection: TitleCollection,
   searchTerm: ''
 ): string | React.ReactNode => {
-  const songFinder = router.location.pathname.match(/\/song\/(.*)/)
-  const artistFinder = router.location.pathname.match(/\/artist\/(.*)/)
-  const albumFinder = router.location.pathname.match(/\/album\/(.*)/)
+  const songFinder = router?.location.pathname.match(/\/song\/(.*)/)
+  const artistFinder = router?.location.pathname.match(/\/artist\/(.*)/)
+  const albumFinder = router?.location.pathname.match(/\/album\/(.*)/)
 
   if (songFinder && songFinder[1]) {
     const song = collection.rows[songFinder[1]]
@@ -36,7 +36,7 @@ const dynamicTitle = (
     return (
       <>
         <i className='icon music outline mr-4'></i>
-        { song.title }
+        {song.title}
       </>
     )
   }
@@ -63,12 +63,12 @@ const dynamicTitle = (
     return (
       <>
         <Icon icon='faMusic' className='mr-4' />
-        { album.name }
+        {album.name}
       </>
     )
   }
 
-  switch (router.location.pathname) {
+  switch (router?.location.pathname) {
     case '/settings':
       return (
         <>
@@ -153,23 +153,23 @@ const Layout = (props: LayoutProps) => {
           <div className='bg-handler'></div>
           <div
             className='absolute w-full h-full bg-cover bg-center bg-no-repeat bg-fixed'
-            style={{backgroundImage: `url(${ props.backgroundImage })`, filter: 'blur(10px)'}}
+            style={{ backgroundImage: `url(${props.backgroundImage})`, filter: 'blur(10px)' }}
           />
         </>
       )
-    }
-    <SidebarContainer>
-      <TopbarContainer title={ props.title }>
-        <SearchButton />
-      </TopbarContainer>
+      }
+      <SidebarContainer>
+        <TopbarContainer title={props.title}>
+          <SearchButton />
+        </TopbarContainer>
 
-      <div
-        className='contents'
-      >
-        { props.children }
-      </div>
-      <Placeholder mqlMatch={props.app.mqlMatch} />
-    </SidebarContainer>
+        <div
+          className='contents'
+        >
+          {props.children}
+        </div>
+        <Placeholder mqlMatch={props.app.mqlMatch} />
+      </SidebarContainer>
     </>
   )
 }

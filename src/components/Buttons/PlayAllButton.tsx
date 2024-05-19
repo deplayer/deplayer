@@ -1,7 +1,5 @@
 import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
-import { withRouter } from 'react-router-dom'
-import * as React from 'react'
 
 import { PLAY_ALL } from '../../constants/ActionTypes'
 import Button from '../common/Button'
@@ -14,7 +12,7 @@ type Props = {
 
 const PlayAllButton = (props: Props) => {
   const playAll = () => {
-    props.dispatch({type: PLAY_ALL, path: props.location.pathname.replace(/\//, '')})
+    props.dispatch({ type: PLAY_ALL, path: props.location.pathname.replace(/\//, '') })
   }
 
   if (props.location.pathname.match(/^\/settings?$/)) {
@@ -33,6 +31,6 @@ const PlayAllButton = (props: Props) => {
   )
 }
 
-const RoutedButton = withRouter((props: any) => <PlayAllButton {...props}/>)
+const RoutedButton = (props: any) => <PlayAllButton {...props} />
 
 export default RoutedButton
