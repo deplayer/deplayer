@@ -1,5 +1,5 @@
-import * as React from 'react'
 import classNames from 'classnames'
+import * as React from 'react'
 
 type Props = {
   src?: string,
@@ -25,7 +25,7 @@ class LazyImage extends React.Component<Props> {
   }
 
   componentDidMount() {
-    this.setState({isMounted: true})
+    this.setState({ isMounted: true })
     this.initializeLoading(this.props.src)
   }
 
@@ -51,7 +51,7 @@ class LazyImage extends React.Component<Props> {
 
   // Reset the loading parameters
   destroyLoading() {
-   this.image = null
+    this.image = null
   }
 
   handleLoad(_e: any) {
@@ -94,7 +94,7 @@ class LazyImage extends React.Component<Props> {
         className={className}
         onClick={this.props.onClick}
       >
-        { childrenWithProps }
+        {childrenWithProps}
       </div>
     )
   }

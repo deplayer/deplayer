@@ -1,9 +1,8 @@
-import { storiesOf } from '@storybook/react'
 import { withKnobs } from '@storybook/addon-knobs'
-import * as React from 'react'
-
-import LazyImage from './'
+import { storiesOf } from '@storybook/react'
 import withProvider from '../../utils/withProvider'
+import LazyImage from './'
+
 
 const stories = storiesOf('LazyImage', module)
 

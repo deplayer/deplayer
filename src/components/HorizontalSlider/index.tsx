@@ -1,6 +1,5 @@
 import React from 'react'
 import { ScrollMenu } from 'react-horizontal-scrolling-menu'
-
 import Button from '../common/Button'
 import Icon from '../common/Icon'
 
@@ -10,7 +9,7 @@ const bodyBgAfter = 'rgba(16, 27, 38, 0.8)'
 const ArrowLeft = (
   <div
     className='text-4xl z-10 absolute inset-y-0 flex left-0'
-    style={{ backgroundImage: `linear-gradient(to left, ${bodyBg}, ${bodyBgAfter}` }}
+    style={{ backgroundImage: `linear-gradient(to left, ${bodyBg}, ${bodyBgAfter})` }}
   >
     <Button transparent>
       <Icon icon='faArrowCircleLeft' className='arrow-prev text-blue-200 hover:text-blue-800' />
@@ -21,7 +20,7 @@ const ArrowLeft = (
 const ArrowRight = (
   <div
     className='text-4xl z-10 absolute inset-y-0 flex right-0'
-    style={{ backgroundImage: `linear-gradient(to right, ${bodyBg}, ${bodyBgAfter}` }}
+    style={{ backgroundImage: `linear-gradient(to right, ${bodyBg}, ${bodyBgAfter})` }}
   >
     <Button transparent>
       <Icon icon='faArrowCircleRight' className='arrow-prev text-blue-200 hover:text-blue-800' />

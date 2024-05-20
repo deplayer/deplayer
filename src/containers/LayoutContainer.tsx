@@ -1,4 +1,4 @@
-import { connect } from 'react-redux'
+import { connect, ConnectedProps } from 'react-redux'
 import * as React from 'react'
 import { Dispatch } from 'redux'
 import SidebarContainer from './SidebarContainer'
@@ -15,6 +15,8 @@ type TitleRouter = {
 
 type TitleCollection = {
   rows: any
+  artists: any
+  albums: any
 }
 
 const dynamicTitle = (
@@ -137,7 +139,9 @@ const dynamicTitle = (
   }
 }
 
-type LayoutProps = {
+type PropsFromRedux = ConnectedProps<typeof connector>
+
+interface LayoutProps extends PropsFromRedux {
   backgroundImage: string,
   dispatch: Dispatch,
   app: any,
@@ -145,7 +149,7 @@ type LayoutProps = {
   children: any
 }
 
-const Layout = (props: LayoutProps) => {
+function Layout(props: LayoutProps) {
   return (
     <>
       {props.backgroundImage && (
@@ -174,7 +178,7 @@ const Layout = (props: LayoutProps) => {
   )
 }
 
-export default connect(
+const connector = connect(
   (state: any) => ({
     title: dynamicTitle(state.router, state.collection, state.search.searchTerm),
     backgroundImage: state.app.backgroundImage,
@@ -185,4 +189,6 @@ export default connect(
     tableIds: Object.keys(state.collection.artists),
     visibleSongs: state.collection.visibleSongs
   })
-)(Layout)
+)
+
+export default connector(Layout)
