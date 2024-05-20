@@ -1,7 +1,6 @@
 import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
 import { connect } from 'react-redux'
-import * as React from 'react'
 import Icon from '../common/Icon'
 
 import { SAVE_PLAYLIST } from '../../constants/ActionTypes'
@@ -20,7 +19,7 @@ const SaveQueueButton = (props: Props) => {
 
   const saveQueue = () => {
     const playlistName = window.prompt('Set playlist name')
-    props.dispatch({type: SAVE_PLAYLIST, name: playlistName})
+    props.dispatch({ type: SAVE_PLAYLIST, name: playlistName })
   }
 
   return (

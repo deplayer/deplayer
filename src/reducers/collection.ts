@@ -1,10 +1,11 @@
 import Media from '../entities/Media'
+import Artist from '../entities/Artist'
 import filterSongs from '../utils/filter-songs'
 import * as types from '../constants/ActionTypes'
 
-type State = {
+export type State = {
   rows: { [key: string]: Media },
-  artists: any,
+  artists: { [key: string]: Artist },
   albums: any,
   albumsByArtist: any,
   songsByAlbum: any,

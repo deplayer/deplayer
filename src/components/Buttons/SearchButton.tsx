@@ -1,6 +1,5 @@
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
-import * as React from 'react'
 
 import Button from '../common/Button'
 import * as types from '../../constants/ActionTypes'
@@ -11,9 +10,9 @@ type Props = {
   searchToggled: boolean
 }
 
-const SearchButton = ({dispatch, searchToggled}: Props) => {
+const SearchButton = ({ dispatch, searchToggled }: Props) => {
   const toggleSearch = () => {
-    dispatch({type: types.TOGGLE_SEARCH})
+    dispatch({ type: types.TOGGLE_SEARCH })
   }
 
   if (searchToggled) {

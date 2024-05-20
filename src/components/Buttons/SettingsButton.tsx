@@ -1,4 +1,3 @@
-import * as React from 'react'
 import classnames from 'classnames'
 
 import { Link } from 'react-router-dom'
@@ -7,7 +6,7 @@ type Props = {
   current?: Boolean
 }
 
-const SettingsButton = ({current = false}: Props) => {
+const SettingsButton = ({ current = false }: Props) => {
   const classNames = classnames({
     button: true,
     'settings-button': true,

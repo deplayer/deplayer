@@ -4,12 +4,12 @@ import { Dispatch } from 'redux'
 import * as types from '../../constants/ActionTypes'
 import SidebarContents from './SidebarContents'
 import Sidebar from 'react-sidebar'
-
+import { State as CollectionState } from '../../reducers/collection'
 
 type Props = {
   sidebarToggled: boolean,
   mqlMatch: boolean,
-  collection: any,
+  collection: CollectionState,
   queue: any,
   app: any,
   location: any,
@@ -27,7 +27,7 @@ class MSidebar extends React.Component<Props, State> {
     const docked = mqlMatch && sidebarToggled
 
     if (!docked) {
-      this.props.dispatch({type: types.TOGGLE_SIDEBAR, value: open})
+      this.props.dispatch({ type: types.TOGGLE_SIDEBAR, value: open })
     }
   }
 
@@ -61,7 +61,7 @@ class MSidebar extends React.Component<Props, State> {
         transitions={true}
         docked={docked}
       >
-        { children }
+        {children}
       </Sidebar>
     )
   }

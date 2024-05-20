@@ -1,7 +1,6 @@
 import { Dispatch } from 'redux'
 import { I18n } from 'react-redux-i18n'
 import { connect } from 'react-redux'
-import * as React from 'react'
 
 import { TOGGLE_MINI_QUEUE } from '../../constants/ActionTypes'
 import Button from '../common/Button'
@@ -13,7 +12,7 @@ type Props = {
 
 const ToggleMiniQueue = (props: Props) => {
   const toggleMiniQueue = () => {
-    props.dispatch({type: TOGGLE_MINI_QUEUE})
+    props.dispatch({ type: TOGGLE_MINI_QUEUE })
   }
 
   return (

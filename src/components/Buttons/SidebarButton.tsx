@@ -1,6 +1,5 @@
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
-import * as React from 'react'
 
 import Button from '../common/Button'
 import Icon from '../common/Icon'
@@ -10,9 +9,9 @@ type Props = {
   dispatch: Dispatch
 }
 
-const SidebarButton = ({dispatch}: Props) => {
+const SidebarButton = ({ dispatch }: Props) => {
   const toggleSidebar = () => {
-    dispatch({type: types.TOGGLE_SIDEBAR})
+    dispatch({ type: types.TOGGLE_SIDEBAR })
   }
 
   return (

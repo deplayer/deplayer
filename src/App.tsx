@@ -1,5 +1,8 @@
 import React from 'react'
+
 import './styles/App.scss'
+import './tailwind.css'
+
 import * as portals from 'react-reverse-portal'
 import { Provider } from 'react-redux'
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
@@ -43,7 +46,7 @@ const router = createBrowserRouter(
       <Route path="/index.html" element={<DashboardContainer />} />
       <Route path="/queue" element={<QueueContainer />} />
       <Route path="/playlists" element={<PlaylistsContainer />} />
-      <Route path="/collection" element={<CollectionContainer />} disableCurrent />
+      <Route path="/collection" element={<CollectionContainer />} />
       <Route path="/search-results" element={<SearchResultsContainer />} />
       <Route path="/song/:id" element={<Song />} />
       <Route path="/album/:id" element={<AlbumContainer />} />

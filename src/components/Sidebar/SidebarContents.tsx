@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Dispatch } from 'redux'
 
 import CollectionMenuItem from './CollectionMenuItem'
@@ -10,10 +9,11 @@ import ArtistsMenuItem from './ArtistsMenuItem'
 import MenuItem from './MenuItem'
 import { inSection } from '../../utils/router'
 import Icon from '../common/Icon'
+import { State as CollectionState } from '../../reducers/collection'
 
 type ContentProps = {
   dispatch: Dispatch,
-  collection: any,
+  collection: CollectionState,
   queue: any,
   app: any,
   location: any,
@@ -87,7 +87,7 @@ const SidebarContents = (props: ContentProps) => {
           title="Show me the code"
           target="_blank"
         >
-          { props.app.version }
+          {props.app.version}
         </a>
       </section>
     </div>
