@@ -5,7 +5,7 @@ import './tailwind.css'
 
 import * as portals from 'react-reverse-portal'
 import { Provider } from 'react-redux'
-import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 import LayoutContainer from './containers/LayoutContainer'
 import AddMediaModal from './components/AddMediaModal'
@@ -39,33 +39,29 @@ const Song = () => {
   )
 }
 
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route path="/" element={<LayoutContainer />}>
-      <Route path="/" element={<DashboardContainer />} />
-      <Route path="/index.html" element={<DashboardContainer />} />
-      <Route path="/queue" element={<QueueContainer />} />
-      <Route path="/playlists" element={<PlaylistsContainer />} />
-      <Route path="/collection" element={<CollectionContainer />} />
-      <Route path="/search-results" element={<SearchResultsContainer />} />
-      <Route path="/song/:id" element={<Song />} />
-      <Route path="/album/:id" element={<AlbumContainer />} />
-      <Route path="/artist/:id" element={<ArtistContainer />} />
-      <Route path="/artists" element={<ArtistsContainer />} />
-      <Route path="/providers" element={<ProvidersContainer />} />
-      <Route path="/settings" element={<SettingsContainer />} />
-      <Route path="/wiki" element={<Wiki />} />
-    </Route>
-  )
-)
-
-
 const App = () => {
   const playerPortal = React.useMemo(() => portals.createHtmlPortalNode(), [])
 
   return (
     <Provider store={appStore}>
-      <RouterProvider router={router} />
+      <BrowserRouter>
+        <LayoutContainer>
+          <Routes>
+            <Route path="/index.html" element={<DashboardContainer />} />
+            <Route path="/queue" element={<QueueContainer />} />
+            <Route path="/playlists" element={<PlaylistsContainer />} />
+            <Route path="/collection" element={<CollectionContainer />} />
+            <Route path="/search-results" element={<SearchResultsContainer />} />
+            <Route path="/song/:id" element={<Song />} />
+            <Route path="/album/:id" element={<AlbumContainer />} />
+            <Route path="/artist/:id" element={<ArtistContainer />} />
+            <Route path="/artists" element={<ArtistsContainer />} />
+            <Route path="/providers" element={<ProvidersContainer />} />
+            <Route path="/settings" element={<SettingsContainer />} />
+            <Route path="/wiki" element={<Wiki />} />
+          </Routes>
+        </LayoutContainer>
+      </BrowserRouter>
       <ContextMenuContainer />
       <PlayerContainer playerPortal={playerPortal} />
       <AddMediaModal />

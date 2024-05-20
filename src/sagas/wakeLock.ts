@@ -4,14 +4,15 @@ import { requestWakeLock, releaseWakeLock } from '../services/wakeLock'
 import logger from '../utils/logger'
 import * as types from '../constants/ActionTypes'
 import { getPlayer } from './selectors'
+import { Dispatch } from 'redux'
 
 // Handling START_PLAYING saga
-export function* startWakeLock (dispatch: any): any {
+export function* startWakeLock(_dispatch: Dispatch): any {
   const player = yield select(getPlayer)
 
   if (player.playing) {
     try {
-        yield call(requestWakeLock)
+      yield call(requestWakeLock)
     } catch (e) {
       logger.log('error setting WakeLock', e)
     }
@@ -19,12 +20,12 @@ export function* startWakeLock (dispatch: any): any {
 }
 
 // Handling START_PLAYING saga
-export function* stopWakeLock (dispatch: any): any {
+export function* stopWakeLock(_dispatch: Dispatch): any {
   const player = yield select(getPlayer)
 
   if (!player.playing) {
     try {
-        yield call(releaseWakeLock)
+      yield call(releaseWakeLock)
     } catch (e) {
       logger.log('error disabling WakeLock', e)
     }

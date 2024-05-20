@@ -1,6 +1,6 @@
 import * as types from '../constants/ActionTypes'
 
-type State = {
+export type State = {
   backgroundImage: string,
   sidebarToggled: boolean,
   showAddMediaModal: boolean,
