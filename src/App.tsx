@@ -18,28 +18,40 @@ import ProvidersContainer from './containers/ProvidersContainer'
 import QueueContainer from './containers/QueueContainer'
 import SearchResultsContainer from './containers/SearchResultsContainer'
 import SettingsContainer from './containers/SettingsContainer'
+import SongContainer from './containers/SongContainer'
 import Wiki from './components/Wiki'
 import GlobalKeyHandlers from './components/GlobalKeyHandlers'
 import configureStore from './store/configureStore'
 
 const appStore = configureStore()
 
+const Song = () => {
+  const playerPortal = React.useMemo(() => portals.createHtmlPortalNode(), [])
+
+  return (
+    <React.Fragment>
+      <QueueContainer slim className='slim' />
+      <SongContainer playerPortal={playerPortal} />
+    </React.Fragment>
+  )
+}
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<LayoutContainer />}>
-      <Route exact path="/" component={DashboardContainer} />
-      <Route path="/index.html" component={DashboardContainer} />
-      <Route path="/queue" component={QueueContainer} />
-      <Route path="/playlists" component={PlaylistsContainer} />
-      <Route path="/collection" component={CollectionContainer} disableCurrent />
-      <Route path="/search-results" component={SearchResultsContainer} />
-      <Route path="/song/:id" component={() => <Song playerPortal={playerPortal} />} />
-      <Route path="/album/:id" component={AlbumContainer} />
-      <Route path="/artist/:id" component={ArtistContainer} />
-      <Route path="/artists" component={ArtistsContainer} />
-      <Route path="/providers" component={ProvidersContainer} />
-      <Route path="/settings" component={SettingsContainer} />
-      <Route path="/wiki" component={Wiki} />
+      <Route path="/" element={<DashboardContainer />} />
+      <Route path="/index.html" element={<DashboardContainer />} />
+      <Route path="/queue" element={<QueueContainer />} />
+      <Route path="/playlists" element={<PlaylistsContainer />} />
+      <Route path="/collection" element={<CollectionContainer />} disableCurrent />
+      <Route path="/search-results" element={<SearchResultsContainer />} />
+      <Route path="/song/:id" element={<Song />} />
+      <Route path="/album/:id" element={<AlbumContainer />} />
+      <Route path="/artist/:id" element={<ArtistContainer />} />
+      <Route path="/artists" element={<ArtistsContainer />} />
+      <Route path="/providers" element={<ProvidersContainer />} />
+      <Route path="/settings" element={<SettingsContainer />} />
+      <Route path="/wiki" element={<Wiki />} />
     </Route>
   )
 )
@@ -50,13 +62,11 @@ const App = () => {
 
   return (
     <Provider store={appStore}>
-      <React.Fragment>
-        <RouterProvider router={router} />
-        <ContextMenuContainer />
-        <PlayerContainer playerPortal={playerPortal} />
-        <AddMediaModal />
-        <GlobalKeyHandlers />
-      </React.Fragment>
+      <RouterProvider router={router} />
+      <ContextMenuContainer />
+      <PlayerContainer playerPortal={playerPortal} />
+      <AddMediaModal />
+      <GlobalKeyHandlers />
     </Provider>
   )
 }

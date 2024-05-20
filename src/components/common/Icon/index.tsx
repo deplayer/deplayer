@@ -103,7 +103,7 @@ type Props = {
 const Icon = (props: Props) => {
   return (
     <FontAwesomeIcon
-      className={props.className}
+      className={props.className || ''}
       icon={icons[props.icon]}
       fixedWidth={props.fixedWidth}
     />
