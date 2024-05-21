@@ -45,7 +45,7 @@ export const defaultState = {
 }
 
 const populateFromAction = (state: State, action: { data: any }) => {
-  const songs = action.data.map((row: any) => {
+  const songs: [Media] = action.data.map((row: any) => {
     return new Media({
       ...row,
       id: row.id,
@@ -70,8 +70,8 @@ const populateFromAction = (state: State, action: { data: any }) => {
   for (let i = 0; i < songs.length; i++) {
     const song = songs[i]
 
-    rows[song.id] = song
-    artists[song.artist.id] = song.artist
+    rows[song.id] = song.toDocument()
+    artists[song.artist.id] = song.artist.toDocument()
     albums[song.album.id] = {
       ...song.album,
       albumName: song.albumName,
