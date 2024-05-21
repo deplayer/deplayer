@@ -1,4 +1,5 @@
 import reducer, { defaultState } from './collection'
+import { describe, it, expect } from 'vitest'
 import * as types from '../constants/ActionTypes'
 import Media from '../entities/Media'
 
@@ -14,13 +15,13 @@ describe('collection reducer', () => {
   })
 
   xit('should handle RECEIVE_COLLECTION', () => {
-    const initialState = {...defaultState, enabledProviders: ['itunes']}
+    const initialState = { ...defaultState, enabledProviders: ['itunes'] }
     const fixtureSong = new Media({
       forcedId: 'the-doors',
       artistName: 'The Doors',
       artistId: 'the-doors',
       albumName: 'LIght my fire',
-      stream: [{uris: [{uri: 'http://some-songs-api/song.mp4'}], service: 'itunes'}]
+      stream: [{ uris: [{ uri: 'http://some-songs-api/song.mp4' }], service: 'itunes' }]
     })
     const rows = {}
     rows[fixtureSong.id] = fixtureSong
@@ -50,7 +51,7 @@ describe('collection reducer', () => {
       albums,
       rows,
       loading: false,
-      mediaByType: {audio: ['the-doors']},
+      mediaByType: { audio: ['the-doors'] },
       visibleSongs: [fixtureSong.id]
     }
 
@@ -58,12 +59,12 @@ describe('collection reducer', () => {
     expect(MediaId).not.toHaveBeenCalled()
     expect(ArtistId).not.toHaveBeenCalled()
 
-    expect(reducer(initialState, {type: types.RECEIVE_COLLECTION, data: [fixtureSong]}))
+    expect(reducer(initialState, { type: types.RECEIVE_COLLECTION, data: [fixtureSong] }))
       .toEqual(expected)
   })
 
   it('should handle RECEIVE_SETTINGS to filter by provider', () => {
-    const expected = {...defaultState, enabledProviders: ['mstream']}
+    const expected = { ...defaultState, enabledProviders: ['mstream'] }
     const action = {
       type: types.RECEIVE_SETTINGS,
       settings: {

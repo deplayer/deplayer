@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import MediaMergerService from './MediaMergerService'
 import Media from '../entities/Media'
 

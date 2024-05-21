@@ -1,4 +1,5 @@
 import reducer, { defaultState } from './playlist'
+import { describe, it, expect } from 'vitest'
 import Media from '../entities/Media'
 import { sortTrackIds } from './utils/queues'
 
@@ -11,7 +12,7 @@ describe('collection reducer', () => {
   })
 
   it('should handle ADD_TO_PLAYLIST action', () => {
-    expect(reducer(undefined, {type: types.ADD_TO_PLAYLIST, songs: ['1234']}))
+    expect(reducer(undefined, { type: types.ADD_TO_PLAYLIST, songs: ['1234'] }))
       .toEqual({
         ...defaultState,
         trackIds: ['1234'],
@@ -23,12 +24,12 @@ describe('collection reducer', () => {
     const songs: Array<Media> = []
     const expectedObj = {}
     for (let i = 1; i <= 20; i++) {
-      const song = new Media({forcedId: i.toString()})
+      const song = new Media({ forcedId: i.toString() })
       songs.push(song)
       expectedObj[i] = song
     }
 
-    const addSongsState = reducer(undefined, {type: types.ADD_SONGS_TO_PLAYLIST, songs: songs.map((song: Media) => song.id)})
+    const addSongsState = reducer(undefined, { type: types.ADD_SONGS_TO_PLAYLIST, songs: songs.map((song: Media) => song.id) })
 
     expect(addSongsState)
       .toEqual({
@@ -42,17 +43,17 @@ describe('collection reducer', () => {
     const songs: Array<Media> = []
     const expectedObj = {}
     for (let i = 1; i <= 20; i++) {
-      const song = new Media({forcedId: i.toString(), price: {price: i%2}})
+      const song = new Media({ forcedId: i.toString(), price: { price: i % 2 } })
       songs.push(song)
       expectedObj[i] = song
     }
 
-    const addSongsState = reducer(undefined, {type: types.ADD_SONGS_TO_PLAYLIST, songs: songs.map((song: Media) => song.id)})
+    const addSongsState = reducer(undefined, { type: types.ADD_SONGS_TO_PLAYLIST, songs: songs.map((song: Media) => song.id) })
 
     // It should set prev and next songs Ids
     const sortedSongsIds = sortTrackIds(expectedObj, 'price', 'ASC')
 
-    expect(reducer(addSongsState, {type: types.SET_COLUMN_SORT, column: 'price', direction: 'ASC', songs: expectedObj}))
+    expect(reducer(addSongsState, { type: types.SET_COLUMN_SORT, column: 'price', direction: 'ASC', songs: expectedObj }))
       .toEqual({
         ...defaultState,
         currentPlaying: {},
@@ -63,9 +64,9 @@ describe('collection reducer', () => {
   })
 
   it('should handle RECEIVE_PLAYLISTS action', () => {
-    const playlist = {foo: 'bar'}
+    const playlist = { foo: 'bar' }
 
-    expect(reducer(defaultState, {type: types.RECEIVE_PLAYLISTS, playlists: [playlist] }).playlists.length)
+    expect(reducer(defaultState, { type: types.RECEIVE_PLAYLISTS, playlists: [playlist] }).playlists.length)
       .toBe(1)
   })
 })

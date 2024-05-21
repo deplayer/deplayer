@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import CollectionService from './CollectionService'
 import DummyAdapter from './database/DummyAdapter'
 import Media from '../entities/Media'
@@ -8,7 +9,7 @@ describe('CollectionService', () => {
 
     expect.assertions(1)
 
-    collectionService.save('123', {mySetting: 'value'})
+    collectionService.save('123', { mySetting: 'value' })
       .then((result) => {
         expect(result).toBeDefined()
       })
@@ -17,9 +18,9 @@ describe('CollectionService', () => {
   it('should handle bulkSave', async () => {
     const collectionService = new CollectionService(new DummyAdapter())
 
-    const song = new Media({forceId: 'test', thumbnailUrl: 'test.png'})
+    const song = new Media({ forceId: 'test', thumbnailUrl: 'test.png' })
 
-    const result = await collectionService.bulkSave([song], {rows: []})
+    const result = await collectionService.bulkSave([song], { rows: [] })
 
     expect(result).toBeDefined()
   })

@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { describe, it, expect } from 'vitest'
 import MockAdapter from 'axios-mock-adapter'
 
 import exampleSongs from './mstreamExampleSongs.json'
@@ -9,14 +10,17 @@ const mock = new MockAdapter(axios)
 
 // Mock any GET request to /db/album-songs
 // arguments for reply are (status, data, headers)
-mock.onGet(/rest\/search/).reply(200, { 'subsonic-response': {
-  searchResult3: {
-    song: exampleSongs
-  }}}
+mock.onGet(/rest\/search/).reply(200, {
+  'subsonic-response': {
+    searchResult3: {
+      song: exampleSongs
+    }
+  }
+}
 )
 
 describe('SubsonicApiProvider', () => {
-  const mstreamRepo = new SubsonicApiProvider({baseUrl: ''}, 'subsonic')
+  const mstreamRepo = new SubsonicApiProvider({ baseUrl: '' }, 'subsonic')
 
   it('should handle song search', () => {
     expect.assertions(3)

@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import IndexService from './IndexService'
 import Media from '../../entities/Media'
 

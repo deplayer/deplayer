@@ -1,4 +1,5 @@
-import reducer, {defaultState} from './queue'
+import reducer, { defaultState } from './queue'
+import { describe, it, expect } from 'vitest'
 import Media from '../entities/Media'
 
 import * as types from '../constants/ActionTypes'
@@ -10,7 +11,7 @@ describe('queue reducer', () => {
   })
 
   it('should handle ADD_TO_QUEUE not repeat ids', () => {
-    expect(reducer({ ...defaultState, trackIds: ['1234'] }, {type: types.ADD_TO_QUEUE, songs: [{ id: '1234' }]}))
+    expect(reducer({ ...defaultState, trackIds: ['1234'] }, { type: types.ADD_TO_QUEUE, songs: [{ id: '1234' }] }))
       .toEqual({
         ...defaultState,
         trackIds: ['1234'],
@@ -21,7 +22,7 @@ describe('queue reducer', () => {
     const songs: any = []
     const expectedObj = {}
     for (let i = 1; i <= 20; i++) {
-      const song = new Media({forcedId: i.toString()})
+      const song = new Media({ forcedId: i.toString() })
       songs.push(song)
       expectedObj[i] = song
     }
@@ -40,8 +41,8 @@ describe('queue reducer', () => {
 
   it('should handle SET_CURRENT_PLAYING action', () => {
     const trackIds = ['1234', '4321']
-    const props = {...defaultState, trackIds}
-    expect(reducer(props, {type: types.SET_CURRENT_PLAYING, songId: '1234'}))
+    const props = { ...defaultState, trackIds }
+    expect(reducer(props, { type: types.SET_CURRENT_PLAYING, songId: '1234' }))
       .toEqual({
         ...props,
         trackIds,
@@ -53,15 +54,15 @@ describe('queue reducer', () => {
 
   it('should handle CLEAR_QUEUE action', () => {
     const trackIds = ['1234', '4321']
-    const props = {...defaultState, trackIds}
-    expect(reducer(props, {type: types.CLEAR_QUEUE, song: '1234'}))
+    const props = { ...defaultState, trackIds }
+    expect(reducer(props, { type: types.CLEAR_QUEUE, song: '1234' }))
       .toEqual(defaultState)
   })
 
   it('should handle SHUFFLE action', () => {
     const trackIds = ['1234', '4321', '3456', '2323']
-    const props = {...defaultState, trackIds}
-    const res = reducer(props, {type: types.SHUFFLE})
+    const props = { ...defaultState, trackIds }
+    const res = reducer(props, { type: types.SHUFFLE })
     expect(
       res.trackIds.map((id) => {
         return trackIds.map((sid) => {
@@ -81,7 +82,7 @@ describe('queue reducer', () => {
       currentPlaying: '1234',
       prevSongId: '4321'
     }
-    expect(reducer(props, {type: types.RECEIVE_QUEUE}))
-    .toEqual(props)
+    expect(reducer(props, { type: types.RECEIVE_QUEUE }))
+      .toEqual(props)
   })
 })

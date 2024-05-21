@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { describe, it, expect } from 'vitest'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../../tests/configureEnzyme'
 import SongView from './index'
@@ -27,9 +27,9 @@ const setup = (customProps: any) => {
     }
   }
 
-  const props = {...defaultProps, ...customProps}
+  const props = { ...defaultProps, ...customProps }
 
-  const enzymeWrapper = shallow(<SongView {...props}/>)
+  const enzymeWrapper = shallow(<SongView {...props} />)
 
   return {
     props,

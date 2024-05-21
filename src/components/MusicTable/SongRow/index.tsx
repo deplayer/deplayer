@@ -9,16 +9,16 @@ import CoverImage from './../CoverImage'
 import Media from '../../../entities/Media'
 import Tag from '../../common/Tag'
 
-type Props = {
+export type Props = {
   songsLength: number, // Listening this in order to recreate context menu
   song: Media,
   queue: any,
-  isCurrent: boolean|null,
+  isCurrent?: boolean | null,
   onClick: () => any,
   dispatch: Dispatch,
   disableAddButton?: boolean,
   disableCovers?: boolean,
-  mqlMatch: boolean,
+  mqlMatch?: boolean,
   slim?: boolean,
   style: any
 }
@@ -36,6 +36,7 @@ const SongRow = (props: Props) => {
 
   const cover = (
     <div
+      role='row'
       className='media-thumb hidden md:block relative mr-3'
       style={{ minWidth: '80px', height: '80px' }}
       onClick={props.onClick}
@@ -50,25 +51,25 @@ const SongRow = (props: Props) => {
 
   return (
     <div
-      className={`song-row ${ props.isCurrent && 'current' } p-2 flex justify-between`}
+      className={`song-row ${props.isCurrent && 'current'} p-2 flex justify-between`}
       style={props.style}
       onClick={onClick}
     >
-      { disableCovers || cover }
+      {disableCovers || cover}
       <div className='media-info truncate w-full whitespace-no-wrap'>
         <h4 className='text-blue-400 text-lg -mt-1'>
           <Link to={`/song/${song.id}`}>
-            { song.title }
+            {song.title}
           </Link>
         </h4>
         <h5 className='text-yellow-600 text-sm'>
-          { song.album ? song.album.name: nonAvailable }
+          {song.album ? song.album.name : nonAvailable}
         </h5>
         <h6 className='text-yellow-600 text-sm'>
-          <Link to={`/artist/${song.artist.id}`}>{ song.artist ? song.artist.name: nonAvailable }</Link>
+          <Link to={`/artist/${song.artist.id}`}>{song.artist ? song.artist.name : nonAvailable}</Link>
         </h6>
-        { props.slim || (
-          <div className='inline-block text-yellow-400 text-sm'>{ getDurationStr(song.duration) }</div>
+        {props.slim || (
+          <div className='inline-block text-yellow-400 text-sm'>{getDurationStr(song.duration)}</div>
         )}
       </div>
       <div className='relative'>
@@ -76,13 +77,13 @@ const SongRow = (props: Props) => {
         <div>
           {
             !props.slim && props.mqlMatch &&
-              song.stream.map((provider) => {
-                return (<Tag transparent key={provider.service}>{ provider.service }</Tag>)
-              })
+            song.stream.map((provider) => {
+              return (<Tag transparent key={provider.service}>{provider.service}</Tag>)
+            })
           }
-          { props.slim && (
-              <span className='text-yellow-400'>{ getDurationStr(song.duration) }</span>
-            )
+          {props.slim && (
+            <span className='text-yellow-400'>{getDurationStr(song.duration)}</span>
+          )
           }
         </div>
       </div>

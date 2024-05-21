@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { describe, it, expect } from 'vitest'
 import { shallow } from 'enzyme'
 
 import configureEnzyme from '../../tests/configureEnzyme'
@@ -12,9 +12,9 @@ const setup = (customProps: any) => {
     field: {}
   }
 
-  const props = {...defaultProps, ...customProps}
+  const props = { ...defaultProps, ...customProps }
 
-  const enzymeWrapper = shallow(<FormField {...props}/>)
+  const enzymeWrapper = shallow(<FormField {...props} />)
 
   return {
     props,

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { describe, it, expect } from 'vitest'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../../tests/configureEnzyme'
 
