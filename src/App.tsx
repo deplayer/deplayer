@@ -50,7 +50,7 @@ const App = () => {
             <Route path="/index.html" element={<DashboardContainer />} />
             <Route path="/queue" element={<QueueContainer />} />
             <Route path="/playlists" element={<PlaylistsContainer />} />
-            <Route path="/collection" element={<CollectionContainer />} />
+            <Route path="/collection/*" element={<CollectionContainer />} />
             <Route path="/search-results" element={<SearchResultsContainer />} />
             <Route path="/song/:id" element={<Song />} />
             <Route path="/album/:id" element={<AlbumContainer />} />

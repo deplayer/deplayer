@@ -5,10 +5,11 @@ import AddNewMediaButton from './Buttons/AddNewMediaButton'
 import BodyMessage from './BodyMessage'
 import MusicTable from './MusicTable/MusicTable'
 import Spinner from './Spinner'
+import { useLocation } from 'react-router'
+import { Location } from 'react-router'
 
 type Props = {
   app: any,
-  location: any,
   playlist: any,
   queue: any,
   player: any,
@@ -17,8 +18,8 @@ type Props = {
   dispatch: Dispatch
 }
 
-const mediaForPath = (props: any) => {
-  switch (props.location.pathname) {
+const mediaForPath = (location: Location, props: Props) => {
+  switch (location.pathname) {
     case '/collection/audio':
       return props.collection.mediaByType['audio']
     case '/collection/video':
@@ -40,7 +41,8 @@ const Collection = (props: Props) => {
     )
   }
 
-  const mediaItems = mediaForPath(props)
+  const location = useLocation()
+  const mediaItems = mediaForPath(location, props)
 
   if (!mediaItems.length) {
     return (
