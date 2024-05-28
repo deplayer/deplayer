@@ -4,9 +4,10 @@ import filterSongs from '../utils/filter-songs'
 import * as types from '../constants/ActionTypes'
 
 export type State = {
+  // FIXME: There should not be objects serialized here
   rows: { [key: string]: Media },
   artists: { [key: string]: Artist },
-  albums: any,
+  albums: { [key: string]: any },
   albumsByArtist: any,
   songsByAlbum: any,
   songsByNumberOfPlays: Array<string>,
@@ -72,11 +73,7 @@ const populateFromAction = (state: State, action: { data: any }) => {
 
     rows[song.id] = song.toDocument()
     artists[song.artist.id] = song.artist.toDocument()
-    albums[song.album.id] = {
-      ...song.album,
-      albumName: song.albumName,
-      thumbnailUrl: song.cover.thumbnailUrl
-    }
+    albums[song.album.id] = song.album.toDocument()
 
     if (!songsByArtist[song.artist.id]) {
       songsByArtist[song.artist.id] = []

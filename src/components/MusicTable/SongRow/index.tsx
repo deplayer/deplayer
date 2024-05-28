@@ -1,7 +1,6 @@
 import { Dispatch } from 'redux'
 import { Link } from 'react-router-dom'
 import { Translate } from 'react-redux-i18n'
-import * as React from 'react'
 
 import { getDurationStr } from '../../../utils/timeFormatter'
 import ContextualMenu from './../ContextualMenu'

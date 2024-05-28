@@ -1,7 +1,7 @@
 // import 'react-contexify/dist/ReactContexify.min.css'
 
-import { Dispatch } from 'redux'
-import { Menu, Item, useContextMenu } from 'react-contexify'
+import type { Dispatch } from 'redux'
+import { Menu, Item, useContextMenu, TriggerEvent } from 'react-contexify'
 import { Translate } from 'react-redux-i18n'
 import React from 'react'
 
@@ -9,7 +9,6 @@ import Button from '../common/Button'
 import Icon from '../common/Icon'
 import Media from '../../entities/Media'
 import * as types from '../../constants/ActionTypes'
-import { handleError } from '../../sagas/player'
 
 type MenuProps = {
   songsLength: number, // Used to re-render
@@ -38,7 +37,7 @@ const ContextualMenu = (props: MenuProps) => {
   const { show } = useContextMenu({
     id: `context-menu-${song.id}`,
   })
-  function handleContextMenu(event) {
+  function handleContextMenu(event: TriggerEvent) {
     show({
       event,
       props: {
