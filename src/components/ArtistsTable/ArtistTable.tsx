@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { AutoSizer, List } from 'react-virtualized'
 
 import ArtistRow from './ArtistRow'
@@ -13,7 +12,7 @@ export type Props = {
 
 const ArtistTable = (props: Props) => {
   const errors = props.error ?
-    <div><div>{ props.error }</div></div>
+    <div><div>{props.error}</div></div>
     : null
 
   const rowRenderer = ({
@@ -58,7 +57,7 @@ const ArtistTable = (props: Props) => {
         )}
       </AutoSizer>
       <div className="table-status">
-        Total items: <b>{ props.tableIds.length }</b>
+        Total items: <b>{props.tableIds.length}</b>
       </div>
       {errors}
     </div>

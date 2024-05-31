@@ -170,7 +170,7 @@ function Layout(props: LayoutProps) {
         </TopbarContainer>
 
         <div
-          className='contents'
+          className='layout-contents'
         >
           {props.children}
         </div>
