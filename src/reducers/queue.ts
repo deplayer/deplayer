@@ -4,14 +4,14 @@ import {
   getSiblingSong
 } from './utils/queues'
 
-type State = {
+export type State = {
   trackIds: Array<string>,
   randomTrackIds: Array<string>,
-  currentPlaying: string|null,
+  currentPlaying: string | null,
   repeat: boolean,
   shuffle: boolean,
-  nextSongId: string|null,
-  prevSongId: string|null
+  nextSongId: string | null,
+  prevSongId: string | null
 }
 
 export const defaultState = {
@@ -60,11 +60,11 @@ const getCurrentQueue = (state: State): Array<string> => {
   return state.trackIds
 }
 
-export default (state: State = defaultState, action: any  = {}): State => {
+export default (state: State = defaultState, action: any = {}): State => {
   switch (action.type) {
 
     case types.RECEIVE_QUEUE:
-      return {...state, ...action.queue}
+      return { ...state, ...action.queue }
 
     case types.ADD_TO_QUEUE: {
       const trackIds = getCurrentQueue(state)
@@ -95,12 +95,12 @@ export default (state: State = defaultState, action: any  = {}): State => {
         return setCurrentPlaying({
           ...state,
           randomTrackIds: new Set(newIds)
-        }, { songId: state.currentPlaying})
+        }, { songId: state.currentPlaying })
       } else {
         return setCurrentPlaying({
           ...state,
           trackIds: new Set(newIds)
-        }, { songId: state.currentPlaying})
+        }, { songId: state.currentPlaying })
       }
     }
 

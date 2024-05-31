@@ -1,10 +1,9 @@
 import { combineReducers } from 'redux'
 import { i18nReducer } from 'react-redux-i18n'
 import { State as PlayerState } from './player'
-import { State as AppState } from './app'
 // import { connectRouter } from 'connected-react-router'
 
-import app from './app'
+import app, { State as AppState } from './app'
 import artist from './artist'
 import player from './player'
 import playlist from './playlist'
@@ -13,11 +12,12 @@ import connection from './connection'
 import lyrics from './lyrics'
 import search from './search'
 import settings from './settings'
-import queue from './queue'
+import queue, { State as QueueState } from './queue'
 
 export type State = {
   app: AppState
-  player: PlayerState
+  player: PlayerState,
+  queue: QueueState
 }
 
 export default (_history: any): State => combineReducers({

@@ -11,9 +11,10 @@ import AddNewMediaButton from '../Buttons/AddNewMediaButton'
 import VolumeControl from './VolumeControl'
 import * as types from '../../constants/ActionTypes'
 import Controls from './Controls'
+import { State as AppState } from '../../reducers/app'
 
 type MenuProps = {
-  app: app,
+  app: AppState,
   player: any,
   queue: any,
   dispatch: any,
@@ -50,14 +51,6 @@ const ContextualMenu = (props: MenuProps) => {
   const { show } = useContextMenu({
     id: 'context-menu-player',
   })
-  function handleContextMenu(event) {
-    show({
-      event,
-      props: {
-        key: 'value'
-      }
-    })
-  }
 
   return (
     <React.Fragment>
@@ -67,7 +60,9 @@ const ContextualMenu = (props: MenuProps) => {
         style={{
           zIndex: 103,
         }}
-        onContextMenu={handleContextMenu}
+        onContextMenu={() => {
+          show()
+        }
       >
         <div className='flex justify-center items-center w-100 h-full'>
           <Icon
@@ -217,7 +212,7 @@ const ContextualMenu = (props: MenuProps) => {
           </div>
         </Item>
       </Menu>
-    </React.Fragment>
+    </React.Fragment >
   )
 }
 

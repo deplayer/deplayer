@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { shallow } from 'enzyme'
 import configureEnzyme from '../../tests/configureEnzyme'
 
@@ -20,7 +19,7 @@ const setup = () => {
     collection: {}
   }
 
-  const enzymeWrapper = shallow(<MusicTable {...props}/>)
+  const enzymeWrapper = shallow(<MusicTable {...props} />)
 
   return {
     props,

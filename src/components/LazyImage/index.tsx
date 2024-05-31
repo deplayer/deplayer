@@ -2,9 +2,10 @@ import classNames from 'classnames'
 import * as React from 'react'
 
 type Props = {
-  src?: string,
-  reflect?: boolean,
+  src?: string
+  reflect?: boolean
   onClick?: () => void
+  children: React.Component
 }
 
 class LazyImage extends React.Component<Props> {
@@ -74,7 +75,7 @@ class LazyImage extends React.Component<Props> {
   render() {
     const childrenWithProps = React.Children.map(this.props.children, (child: any) =>
       React.cloneElement(child, {
-        noImage: this.state.loading || this.state.error
+        noImage: this.state.error || this.state.loading
       })
     )
 
