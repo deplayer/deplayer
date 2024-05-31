@@ -1,6 +1,6 @@
-import * as React from 'react'
 import { connect } from 'react-redux'
 import PlayerControls from '../components/Player/PlayerControls'
+import { useLocation } from 'react-router'
 
 const ConnectedPlayer = connect(
   (state: any) => ({
@@ -13,11 +13,11 @@ const ConnectedPlayer = connect(
     itemCount: state.queue.trackIds ? state.queue.trackIds.length : 0
   })
 )((props: any) => {
+  const location = useLocation()
+
   return (
-    <PlayerControls {...props} />
+    <PlayerControls {...props} location={location} />
   )
 })
 
-const RoutedPlayer = (props: any) => <ConnectedPlayer {...props} />
-
-export default RoutedPlayer
+export default ConnectedPlayer

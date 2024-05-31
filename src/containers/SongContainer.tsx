@@ -16,6 +16,7 @@ const RoutedSongView = (props: any) => {
   const location = useLocation()
   const songId = getSongId(location)
 
+
   return (<SongView songId={songId} {...props} />)
 }
 
@@ -28,7 +29,6 @@ export default connect(
       lyrics: state.lyrics,
       player: state.player,
       loading: state.collection.loading,
-      song: state.collection.rows[state.songId] || state.collection.rows[state.queue.currentPlaying]
     }
   }
 )(RoutedSongView)

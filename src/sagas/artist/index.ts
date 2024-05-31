@@ -18,8 +18,8 @@ export function* fetchSongMetadata(_action: LoadArtistAction): any {
     const lyrics = yield call(mbProvider.searchLyrics, song)
     yield put({ type: types.LYRICS_FOUND, data: lyrics.data.lyrics })
 
-  } catch (e) {
-    yield put({ type: types.NO_LYRICS_FOUND, error: e })
+  } catch (e: any) {
+    yield put({ type: types.NO_LYRICS_FOUND, error: e.message })
   }
 }
 

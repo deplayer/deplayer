@@ -61,12 +61,12 @@ const App = () => {
             <Route path="/wiki" element={<Wiki />} />
           </Routes>
         </LayoutContainer>
+        <ContextMenuContainer />
+        <PlayerContainer playerPortal={playerPortal} />
+        <AddMediaModal />
+        <GlobalKeyHandlers />
       </BrowserRouter>
-      <ContextMenuContainer />
-      <PlayerContainer playerPortal={playerPortal} />
-      <AddMediaModal />
-      <GlobalKeyHandlers />
-    </Provider>
+    </Provider >
   )
 }
 

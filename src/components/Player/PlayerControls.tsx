@@ -94,8 +94,8 @@ class PlayerControls extends React.Component<Props> {
   }
 
   onError = (e: Error) => {
-    console.log(e.message)
-    this.props.dispatch({ type: types.PLAY_ERROR, error: e })
+    console.error(e.message)
+    this.props.dispatch({ type: types.PLAY_ERROR, error: e.message })
   }
 
   showPlayer = () => {
@@ -149,7 +149,6 @@ class PlayerControls extends React.Component<Props> {
 
     return (
       <React.Fragment>
-        {handlers}
         <div id="player">
           <InPortal node={this.props.playerPortal}>
             <ReactPlayer
@@ -192,6 +191,7 @@ class PlayerControls extends React.Component<Props> {
         {showControls &&
           <div className={classNames({ 'player-container': true })} style={{ zIndex: 102 }}>
             <CSSTransition
+              timeout={500}
               transitionName="player"
               transitionAppear={true}
               transitionAppearTimeout={500}

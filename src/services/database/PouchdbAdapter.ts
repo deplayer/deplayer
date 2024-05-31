@@ -7,13 +7,13 @@ export default class PouchdbAdapter implements IAdapter {
   }
 
   save = async (model: string, id: string, payload: any): Promise<any> => {
-    const fixedPayload = {_id: id, ...payload, type: model}
+    const fixedPayload = { _id: id, ...payload, type: model }
 
     const instance = await db.get()
 
     try {
       const prev = await instance.get(id)
-      await instance.put({...prev, ...fixedPayload})
+      await instance.put({ ...prev, ...fixedPayload })
     } catch {
       await instance.put(fixedPayload)
     }
@@ -53,11 +53,11 @@ export default class PouchdbAdapter implements IAdapter {
   getDocObj = async (model: string, id: string): Promise<any> => {
     const instance = await db.get()
 
-    return instance.get(id, {attachments: true})
+    return instance.get(id, { attachments: true })
   }
 
   removeCollection = async (model: string): Promise<any> => {
-    const dbInst  = await db.get()
+    const dbInst = await db.get()
     await dbInst[model].remove()
   }
 
@@ -65,10 +65,10 @@ export default class PouchdbAdapter implements IAdapter {
     return new Promise(async (resolve, reject) => {
       const instance = await db.get()
 
-      logger.log('RxdbDatabase', 'Querying all database')
+      logger.log('PouchDB', 'Querying all database')
       const result = await instance.query(
         'deplayer/by_type',
-        {key: model, include_docs: true},
+        { key: model, include_docs: true },
         {
           attachments: true
         }
