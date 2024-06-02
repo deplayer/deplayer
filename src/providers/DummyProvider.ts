@@ -12,7 +12,7 @@ export default class DummyProvider implements IMusicProvider {
   search(searchTerm: string): Promise<any> {
     return new Promise((resolve) => {
       resolve([
-        {title: 'Highway to hell'}
+        { title: 'Highway to hell' }
       ])
     })
   }

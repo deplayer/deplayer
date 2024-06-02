@@ -20,9 +20,7 @@ const setup = () => {
 
   const containedComponent = connect((state: any) => ({ ...state, ...props }))(SongRow)
 
-  render(
-    containedComponent
-  )
+  render(containedComponent)
 }
 
 describe('SongRow', () => {

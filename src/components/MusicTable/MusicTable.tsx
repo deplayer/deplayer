@@ -101,7 +101,7 @@ const MusicTable = (props: Props) => {
         </div>
       </div>
       <AutoSizer className='music-table'>
-        {({ height, width }: { heigh: Number, width: Number }) => (
+        {({ height, width }) => (
           <List
             height={height}
             rowCount={props.tableIds.length}

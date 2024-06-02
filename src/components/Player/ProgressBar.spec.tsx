@@ -1,15 +1,12 @@
-import * as React from 'react'
-import { shallow } from 'enzyme'
-import configureEnzyme from '../../tests/configureEnzyme'
+import { it, expect } from 'vitest'
+import { render, screen } from '@testing-library/react'
 import ProgressBar from './ProgressBar'
-
-configureEnzyme()
 
 const setup = (customProps) => {
   const defaultProps = {}
-  const props = {...defaultProps, ...customProps}
+  const props = { ...defaultProps, ...customProps }
 
-  const enzymeWrapper = shallow(<ProgressBar {...props}/>)
+  const enzymeWrapper = render(<ProgressBar {...props} />)
 
   return {
     props,
@@ -18,7 +15,7 @@ const setup = (customProps) => {
 }
 
 it('renders without crashing', () => {
-  const { enzymeWrapper } = setup({total: 60, current: 30})
+  const { enzymeWrapper } = setup({ total: 60, current: 30 })
   expect(enzymeWrapper.find('.progress').exists())
     .toBe(true)
 

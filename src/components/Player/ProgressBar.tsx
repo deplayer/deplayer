@@ -6,8 +6,8 @@ import { getDurationStr } from '../../utils/timeFormatter'
 type Props = {
   total: number, // Milliseconds
   dispatch: Dispatch,
-  onChange: (value: number) => any,
-  onAfterChange: (value: number) => any,
+  onChange: (value: number) => void,
+  onAfterChange: (value: number) => void,
   current: number // Milliseconds,
   buffered: number
 }
