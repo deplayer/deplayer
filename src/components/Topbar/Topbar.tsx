@@ -11,10 +11,10 @@ type State = {
 
 type Props = {
   title?: string,
-  dispatch: any,
+  dispatch: (params: any) => void,
   loading: boolean,
   showInCenter: boolean,
-  children: any,
+  children: React.ReactNode
   searchTerm: string,
   searchToggled: boolean,
   error: string

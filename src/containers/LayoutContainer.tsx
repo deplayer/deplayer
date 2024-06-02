@@ -6,7 +6,7 @@ import TopbarContainer from './TopbarContainer'
 import SearchButton from '../components/Buttons/SearchButton'
 import Placeholder from '../components/Player/Placeholder'
 import Icon from '../components/common/Icon'
-import type { State as AppState } from '../reducers/app'
+import type { State } from '../reducers'
 
 type TitleRouter = {
   location: {
@@ -145,7 +145,7 @@ type PropsFromRedux = ConnectedProps<typeof connector>
 interface LayoutProps extends PropsFromRedux {
   backgroundImage: string,
   dispatch: Dispatch,
-  app: AppState,
+  app: State,
   title: string,
   children: React.ReactNode
 }
@@ -180,7 +180,7 @@ function Layout(props: LayoutProps) {
 }
 
 const connector = connect(
-  (state: AppState) => ({
+  (state: State) => ({
     title: dynamicTitle(state.router, state.collection, state.search.searchTerm),
     backgroundImage: state.app.backgroundImage,
     queue: state.queue,

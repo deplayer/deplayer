@@ -6,7 +6,7 @@ import app, { State as AppState } from './app'
 import artist from './artist'
 import player from './player'
 import playlist from './playlist'
-import collection from './collection'
+import collection, { State as CollectionState } from './collection'
 import connection from './connection'
 import lyrics from './lyrics'
 import search from './search'
@@ -15,8 +15,9 @@ import queue, { State as QueueState } from './queue'
 
 export type State = {
   app: AppState
-  player: PlayerState,
+  player: PlayerState
   queue: QueueState
+  collection: CollectionState
 }
 
 export default (_history: any): State => combineReducers({
