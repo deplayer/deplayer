@@ -1,4 +1,4 @@
-// import 'react-contexify/dist/ReactContexify.min.css'
+import 'react-contexify/ReactContexify.css';
 
 import { Menu, useContextMenu, Item } from 'react-contexify'
 import { Translate } from 'react-redux-i18n'
@@ -12,6 +12,8 @@ import VolumeControl from './VolumeControl'
 import * as types from '../../constants/ActionTypes'
 import Controls from './Controls'
 import { State as AppState } from '../../reducers/app'
+
+const MENU_ID = 'context-menu-player'
 
 type MenuProps = {
   app: AppState,
@@ -49,20 +51,27 @@ const ContextualMenu = (props: MenuProps) => {
   const showStartPlaying = trackIds.length && !props.player.playing
 
   const { show } = useContextMenu({
-    id: 'context-menu-player',
+    id: MENU_ID,
   })
+
+  function handleContextMenu(event) {
+    show({
+      event,
+      props: {
+        key: 'value'
+      }
+    })
+  }
 
   return (
     <React.Fragment>
       <button
         className={props.player.showPlayer ? integratedClassnames : standaloneClassnames}
-        id='context-menu-player'
+        id={MENU_ID}
         style={{
           zIndex: 103,
         }}
-        onContextMenu={() => {
-          show()
-        }
+        onClick={handleContextMenu}
       >
         <div className='flex justify-center items-center w-100 h-full'>
           <Icon
@@ -72,7 +81,7 @@ const ContextualMenu = (props: MenuProps) => {
         </div>
       </button>
       <Menu
-        id='context-menu-player'
+        id={MENU_ID}
         style={{ marginTop: props.player.showPlayer ? '-68px' : '-124px' }}
       >
         <VolumeControl

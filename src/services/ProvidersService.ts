@@ -2,7 +2,7 @@ import { ISearchService } from './ISearchService'
 import { ISettings } from '../interfaces/ISettings'
 import providersIndex from '../providers'
 
-export default class ProvidersService  implements ISearchService {
+export default class ProvidersService implements ISearchService {
   providers: any = {}
 
   constructor(config: ISettings) {

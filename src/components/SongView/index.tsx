@@ -9,7 +9,6 @@ import Button from '../common/Button'
 import CoverImage from '../MusicTable/CoverImage'
 import RelatedAlbums from '../RelatedAlbums'
 import Icon from '../common/Icon'
-import Media from '../../entities/Media'
 import Spinner from '..//Spinner'
 import Tag from '../common/Tag'
 import * as types from '../../constants/ActionTypes'
@@ -77,9 +76,6 @@ const SongView = (props: Props) => {
 
     retrieveUrls()
   }, [song, props.settings])
-
-  console.log('song view', song)
-
 
   if (props.loading) {
     return (
