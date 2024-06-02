@@ -1,4 +1,3 @@
-import { applyMiddleware, compose } from 'redux'
 import { configureStore as confStore } from '@reduxjs/toolkit'
 
 import createSagaMiddleware from 'redux-saga'

@@ -6,8 +6,8 @@ import { getDurationStr } from '../../utils/timeFormatter'
 type Props = {
   total: number, // Milliseconds
   dispatch: Dispatch,
-  onChange: (value: number) => void,
-  onAfterChange: (value: number) => void,
+  onChange?: (value: string) => any,
+  onAfterChange?: (value: string) => any,
   current: number // Milliseconds,
   buffered: number
 }
@@ -31,7 +31,7 @@ const ProgressBar = (props: Props) => {
         value={props.buffered}
       />
       <Range
-        className='bar'
+        className='bar absolute top-0'
         min={0}
         max={props.total}
         step={step}

@@ -19,7 +19,7 @@ import { getSettings } from './../selectors'
 function* performSingleSearch(
   searchTerm: string,
   provider: string
-) {
+): Generator<any> {
   try {
     const settings = yield select(getSettings)
     const providerService = new ProvidersService(settings)
@@ -28,7 +28,7 @@ function* performSingleSearch(
     yield put({ type: types.RECEIVE_COLLECTION, data: serializedResults })
     yield put({ type: types.RECREATE_INDEX })
     yield put({ type: types.ADD_TO_COLLECTION, data: serializedResults })
-  } catch (e) {
+  } catch (e: any) {
     yield put({ type: types.SEARCH_REJECTED, message: e.message })
     yield put({ type: types.SEND_NOTIFICATION, notification: 'notifications.search.failed' })
   }

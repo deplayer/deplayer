@@ -19,7 +19,7 @@ type MenuProps = {
   app: AppState,
   player: any,
   queue: any,
-  dispatch: any,
+  dispatch: (action: any) => void,
   volume: number,
 }
 
@@ -216,7 +216,6 @@ const ContextualMenu = (props: MenuProps) => {
               mqlMatch={true}
               playPause={() => props.dispatch({ type: types.TOGGLE_PLAYING })}
               playNext={() => props.dispatch({ type: types.PLAY_NEXT })}
-              dispatch={props.dispatch}
             />
           </div>
         </Item>

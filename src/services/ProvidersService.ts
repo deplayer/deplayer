@@ -1,11 +1,11 @@
 import { ISearchService } from './ISearchService'
-import { ISettings } from '../interfaces/ISettings'
 import providersIndex from '../providers'
+import Media from '../entities/Media'
 
 export default class ProvidersService implements ISearchService {
   providers: any = {}
 
-  constructor(config: ISettings) {
+  constructor(config: any) {
     Object.keys(config.providers).forEach((provider) => {
 
       const providerType = provider.replace(/[0-9]/g, '')
@@ -26,7 +26,7 @@ export default class ProvidersService implements ISearchService {
     })
   }
 
-  searchForProvider = (searchTerm: string, provider: string): Promise<any> => {
+  searchForProvider = (searchTerm: string, provider: string): Promise<Array<Media>> => {
     if (!this.providers[provider]) {
       throw Error(`Provider ${provider} not found`)
     }

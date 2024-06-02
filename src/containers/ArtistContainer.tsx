@@ -1,9 +1,11 @@
 import { connect } from 'react-redux'
+import { useParams, Params } from 'react-router-dom'
+import { State as CollectionState } from '../reducers/collection'
 
 import ArtistView from '../components/ArtistView'
 
-const getArtist = (match, collection) => {
-  const artistId = match.params.id
+const getArtist = (params: Params, collection: CollectionState) => {
+  const artistId = params.id || ''
   if (collection.artists[artistId]) {
     return collection.artists[artistId]
   }
@@ -11,8 +13,8 @@ const getArtist = (match, collection) => {
   return null
 }
 
-const getSongsByArtist = (match, collection) => {
-  const artistId = match.params.id
+const getSongsByArtist = (params: Params, collection: CollectionState) => {
+  const artistId = params.id || ''
   if (collection.songsByArtist[artistId]) {
     return collection.songsByArtist[artistId]
   }
@@ -20,8 +22,8 @@ const getSongsByArtist = (match, collection) => {
   return null
 }
 
-const getAlbumsByArtist = (match, collection) => {
-  const artistId = match.params.id
+const getAlbumsByArtist = (params: Params, collection: CollectionState) => {
+  const artistId = params.id || ''
   if (collection.albumsByArtist[artistId]) {
     return collection.albumsByArtist[artistId]
   }
@@ -29,16 +31,26 @@ const getAlbumsByArtist = (match, collection) => {
   return null
 }
 
+const ArtistsContainer = (props: any) => {
+  const params = useParams()
+  const artist = getArtist(params, props.collection)
+  const songs = getSongsByArtist(params, props.collection)
+  const albumsByArtist = getAlbumsByArtist(params, props.collection)
+
+  return (
+    <ArtistView {...props} artist={artist} songs={songs} albumsByArtist={albumsByArtist} />
+  )
+}
+
 export default connect(
-  (state: any, ownProps: any) => ({
-    artistMetadata: state.artist.artistMetadata,
-    artist: getArtist(ownProps.match, state.collection),
-    songs: getSongsByArtist(ownProps.match, state.collection),
-    songsByAlbum: state.collection.songsByAlbum,
-    albumsByArtist: getAlbumsByArtist(ownProps.match, state.collection),
-    backgroundImage: state.app.backgroundImage,
-    albums: state.collection.albums,
-    collection: state.collection,
-    queue: state.queue,
-  })
-)(ArtistView)
+  (state: any) => {
+    return {
+      artistMetadata: state.artist.artistMetadata,
+      songsByAlbum: state.collection.songsByAlbum,
+      backgroundImage: state.app.backgroundImage,
+      albums: state.collection.albums,
+      collection: state.collection,
+      queue: state.queue,
+    }
+  }
+)(ArtistsContainer)

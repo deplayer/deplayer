@@ -1,6 +1,7 @@
 import React from 'react'
 
 import './styles/App.scss'
+import 'rc-slider/assets/index.css';
 import './tailwind.css'
 
 import * as portals from 'react-reverse-portal'
