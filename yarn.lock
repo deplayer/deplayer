@@ -1147,6 +1147,11 @@
   resolved "https://registry.npmjs.org/@types/doctrine/-/doctrine-0.0.3.tgz"
   integrity sha512-w5jZ0ee+HaPOaX25X2/2oGR/7rgAQSYII7X7pp0m9KgBfMP7uKfMfTvcpl5Dj+eDBbpxKGiqE+flqDr6XTd2RA==
 
+"@types/elasticlunr@^0.9.9":
+  version "0.9.9"
+  resolved "https://registry.npmjs.org/@types/elasticlunr/-/elasticlunr-0.9.9.tgz"
+  integrity sha512-59TMY+u8jKLqSg0AZStCz4n8A7l/nVenmum6fFQa9bUOH26GNMEgDseiN813IxXmTQ0AivefnMlbileBggCf5g==
+
 "@types/emscripten@^1.39.6":
   version "1.39.12"
   resolved "https://registry.npmjs.org/@types/emscripten/-/emscripten-1.39.12.tgz"

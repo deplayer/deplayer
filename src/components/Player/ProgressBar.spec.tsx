@@ -2,22 +2,9 @@ import { it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import ProgressBar from './ProgressBar'
 
-const setup = (customProps) => {
-  const defaultProps = {}
-  const props = { ...defaultProps, ...customProps }
+it('renders without crashing', async () => {
+  const props = { total: 60, current: 30 }
+  render(<ProgressBar {...props} />)
 
-  const enzymeWrapper = render(<ProgressBar {...props} />)
-
-  return {
-    props,
-    enzymeWrapper,
-  }
-}
-
-it('renders without crashing', () => {
-  const { enzymeWrapper } = setup({ total: 60, current: 30 })
-  expect(enzymeWrapper.find('.progress').exists())
-    .toBe(true)
-
-  expect(enzymeWrapper.find('.bar').prop('value')).toEqual(30)
+  expect(screen.getByRole('slider', { value: { now: 30 } })).toBeTruthy()
 })

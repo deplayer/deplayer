@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
-import { connect } from 'react-redux'
+import { BrowserRouter } from 'react-router-dom'
 
 import Media from '../../../entities/Media'
 import SongRow from './index'
@@ -18,15 +18,13 @@ const setup = () => {
     disableAddButton: false
   }
 
-  const containedComponent = connect((state: any) => ({ ...state, ...props }))(SongRow)
-
-  render(containedComponent)
+  render(<SongRow {...props} />, { wrapper: BrowserRouter })
 }
 
 describe('SongRow', () => {
   it('should show render without errors', () => {
     setup()
 
-    expect(screen.getByRole('row')).toBe(true)
+    expect(screen.getByRole('row')).toBeTruthy()
   })
 })

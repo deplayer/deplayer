@@ -1,4 +1,7 @@
+import IndexService from '../services/Search/IndexService'
+
 const filterSongs = (
+  indexService: IndexService,
   songs: any,
   term: string = ''
 ) => {
@@ -6,13 +9,13 @@ const filterSongs = (
     []
   }
 
-  if (term === '') {
+  if (term === '' && songs) {
     return Object.keys(songs)
   }
 
-  // FIXME: Recover this
-  // const results = indexService.search(term)
-  const results = []
+  console.log('indexService', indexService)
+
+  const results = indexService.search(term)
 
   const mappedResults = results.map((result: any) => {
     return result.ref

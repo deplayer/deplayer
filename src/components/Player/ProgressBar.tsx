@@ -31,6 +31,7 @@ const ProgressBar = (props: Props) => {
         value={props.buffered}
       />
       <Range
+        data-testid='slider'
         className='bar absolute top-0'
         min={0}
         max={props.total}
