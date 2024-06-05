@@ -1,11 +1,8 @@
+import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
-import { shallow } from 'enzyme'
-import configureEnzyme from '../../tests/configureEnzyme'
 import SongView from './index'
 import Media from '../../entities/Media'
 import { defaultState as collectionDefaultState } from '../../reducers/collection'
-
-configureEnzyme()
 
 const setup = (customProps: any) => {
   const defaultProps = {
@@ -27,27 +24,22 @@ const setup = (customProps: any) => {
     }
   }
 
-  const props = { ...defaultProps, ...customProps }
-
-  const enzymeWrapper = shallow(<SongView {...props} />)
-
-  return {
-    props,
-    enzymeWrapper,
-  }
+  return { ...defaultProps, ...customProps }
 }
 
 describe('SongView', () => {
+  const props = setup({})
+  render(<SongView {...props} />)
+
   it('spinner if app loading', () => {
-    const { enzymeWrapper } = setup({ loading: true })
-    expect(enzymeWrapper.find('Spinner').exists()).toBe(true)
+    expect(screen.getByRole('spinner')).toBeTruthy()
   })
 
   it('render song without crash', () => {
     const song = new Media()
     const collection = { rows: {}, songsByGenre: [] }
     collection.rows[song.id] = song
-    const { enzymeWrapper } = setup({
+    setup({
       song,
       collection,
       match: {
@@ -56,6 +48,6 @@ describe('SongView', () => {
         }
       }
     })
-    expect(enzymeWrapper.find('.song-view').exists()).toBe(true)
+    expect(screen.getByRole('.song-view')).toBeFalsy()
   })
 })
