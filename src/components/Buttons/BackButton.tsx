@@ -1,7 +1,5 @@
-import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
-import Icon fom '../common/Icon'
+import Icon from '../common/Icon'
 
 type Props = {
   history: any
@@ -21,6 +19,6 @@ const BackButton = (props: Props) => {
   )
 }
 
-const RoutedButton = withRouter(props => <BackButton {...props}/>)
+const RoutedButton = (props: Props) => <BackButton {...props} />
 
 export default connect()(RoutedButton)

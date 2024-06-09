@@ -1,30 +1,32 @@
-import 'react-contexify/dist/ReactContexify.min.css'
+import 'react-contexify/ReactContexify.css';
 
-import { Menu, MenuProvider, Item, theme, animation } from 'react-contexify'
+import { Menu, useContextMenu, Item } from 'react-contexify'
 import { Translate } from 'react-redux-i18n'
 import React from 'react'
 
 import Button from '../common/Button'
 import Icon from '../common/Icon'
-import RepeatButton from './RepeatButton'
 import ToggleMiniQueueButton from '../Buttons/ToggleMiniQueueButton'
 import AddNewMediaButton from '../Buttons/AddNewMediaButton'
 import VolumeControl from './VolumeControl'
 import * as types from '../../constants/ActionTypes'
 import Controls from './Controls'
+import { State as AppState } from '../../reducers/app'
+
+const MENU_ID = 'context-menu-player'
 
 type MenuProps = {
-  app: app,
+  app: AppState,
   player: any,
   queue: any,
-  dispatch: any,
+  dispatch: (action: any) => void,
   volume: number,
 }
 
 const ContextualMenu = (props: MenuProps) => {
   const TogglePlayer = () => {
     return (
-      <Button alignLeft transparent fullWidth onClick={() => props.dispatch({type: types.HIDE_PLAYER})}>
+      <Button alignLeft transparent fullWidth onClick={() => props.dispatch({ type: types.HIDE_PLAYER })}>
         <Icon
           icon='faEyeSlash'
           className='mr-2'
@@ -48,37 +50,45 @@ const ContextualMenu = (props: MenuProps) => {
   const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
   const showStartPlaying = trackIds.length && !props.player.playing
 
+  const { show } = useContextMenu({
+    id: MENU_ID,
+  })
+
+  function handleContextMenu(event) {
+    show({
+      event,
+      props: {
+        key: 'value'
+      }
+    })
+  }
+
   return (
     <React.Fragment>
-      <MenuProvider
-        event="onClick"
-        id='context-menu-player'
+      <button
+        className={props.player.showPlayer ? integratedClassnames : standaloneClassnames}
+        id={MENU_ID}
         style={{
           zIndex: 103,
         }}
+        onClick={handleContextMenu}
       >
-        <button
-          className={props.player.showPlayer ? integratedClassnames : standaloneClassnames}
-        >
-          <div className='flex justify-center items-center w-100 h-full'>
-            <Icon
-              icon='faCompactDisc'
-              className='text-blue-200'
-            />
-          </div>
-        </button>
-      </MenuProvider>
+        <div className='flex justify-center items-center w-100 h-full'>
+          <Icon
+            icon='faCompactDisc'
+            className='text-blue-200'
+          />
+        </div>
+      </button>
       <Menu
-        id='context-menu-player'
-        style={{ marginTop: props.player.showPlayer ? '-68px' : '-124px'}}
-        theme={theme.dark}
-        animation={animation.fade}
+        id={MENU_ID}
+        style={{ marginTop: props.player.showPlayer ? '-68px' : '-124px' }}
       >
         <VolumeControl
-          volume={ props.player.volume }
+          volume={props.player.volume}
           onChange={setVolume}
         />
-        { showVisibilityCons &&
+        {showVisibilityCons &&
           <>
             <Item className='flex w-full'>
               <TogglePlayer />
@@ -91,7 +101,7 @@ const ContextualMenu = (props: MenuProps) => {
         <Item className='flex w-full'>
           <AddNewMediaButton />
         </Item>
-        { showFullscreen &&
+        {showFullscreen &&
           <Item className='flex w-full'>
             <Button
               transparent
@@ -120,7 +130,7 @@ const ContextualMenu = (props: MenuProps) => {
             />
             <Translate className='w-full' value='buttons.toggleVisuals' />
             <Icon
-              icon={ props.app.showVisuals ? 'faCheckSquare': 'faSquare' }
+              icon={props.app.showVisuals ? 'faCheckSquare' : 'faSquare'}
               className='ml-4'
             />
           </Button>
@@ -138,12 +148,12 @@ const ContextualMenu = (props: MenuProps) => {
             />
             <Translate className='w-full' value='buttons.toggleSpectrum' />
             <Icon
-              icon={ props.app.showSpectrum ? 'faCheckSquare': 'faSquare' }
+              icon={props.app.showSpectrum ? 'faCheckSquare' : 'faSquare'}
               className='ml-4'
             />
           </Button>
         </Item>
-        { trackIds.length && (
+        {trackIds.length && (
           <>
             <Item className='flex w-full'>
               <Button
@@ -151,13 +161,13 @@ const ContextualMenu = (props: MenuProps) => {
                 transparent
                 alignLeft
                 onClick={() => {
-                  props.dispatch({type: types.SHUFFLE})
+                  props.dispatch({ type: types.SHUFFLE })
                 }}
               >
                 <Icon icon='faRandom' className='mr-2' />
                 <Translate className='w-full' value='buttons.shuffle' />
                 <Icon
-                  icon={ props.queue.shuffle ? 'faCheckSquare': 'faSquare' }
+                  icon={props.queue.shuffle ? 'faCheckSquare' : 'faSquare'}
                   className='ml-4'
                 />
               </Button>
@@ -168,50 +178,49 @@ const ContextualMenu = (props: MenuProps) => {
                 transparent
                 alignLeft
                 onClick={() => {
-                  props.dispatch({type: types.REPEAT})
+                  props.dispatch({ type: types.REPEAT })
                 }}
               >
                 <Icon icon='faRedo' className='mr-2' />
                 <Translate className='w-full' value='buttons.repeat' />
                 <Icon
-                  icon={ props.queue.repeat ? 'faCheckSquare': 'faSquare' }
+                  icon={props.queue.repeat ? 'faCheckSquare' : 'faSquare'}
                   className='ml-4'
                 />
               </Button>
             </Item>
           </>
         )}
-        { showStartPlaying &&
-            <Item className='flex w-full'>
-              <Button
-                transparent
-                alignLeft
-                fullWidth
-                onClick={() => props.dispatch({ type: types.SET_CURRENT_PLAYING, songId: trackIds[0] })}
-              >
-                <Icon
-                  icon='faPlayCircle'
-                  className='mr-2'
-                />
-                <Translate value='buttons.startPlaying' />
-              </Button>
-            </Item>
+        {showStartPlaying &&
+          <Item className='flex w-full'>
+            <Button
+              transparent
+              alignLeft
+              fullWidth
+              onClick={() => props.dispatch({ type: types.SET_CURRENT_PLAYING, songId: trackIds[0] })}
+            >
+              <Icon
+                icon='faPlayCircle'
+                className='mr-2'
+              />
+              <Translate value='buttons.startPlaying' />
+            </Button>
+          </Item>
         }
 
-          <Item>
-            <div className='flex justify-center w-full my-4'>
-              <Controls
-                playPrev={() => props.dispatch({type: types.PLAY_PREV}) }
-                isPlaying={props.player.playing}
-                mqlMatch={true}
-                playPause={() => props.dispatch({ type: types.TOGGLE_PLAYING }) }
-                playNext={() => props.dispatch({type: types.PLAY_NEXT})}
-                dispatch={props.dispatch}
-              />
-            </div>
-          </Item>
+        <Item>
+          <div className='flex justify-center w-full my-4'>
+            <Controls
+              playPrev={() => props.dispatch({ type: types.PLAY_PREV })}
+              isPlaying={props.player.playing}
+              mqlMatch={true}
+              playPause={() => props.dispatch({ type: types.TOGGLE_PLAYING })}
+              playNext={() => props.dispatch({ type: types.PLAY_NEXT })}
+            />
+          </div>
+        </Item>
       </Menu>
-    </React.Fragment>
+    </React.Fragment >
   )
 }
 

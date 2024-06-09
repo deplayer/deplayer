@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import IndexService from '../services/Search/IndexService'
 import Media from '../entities/Media'
 import filterSongs from './filter-songs'
@@ -7,7 +8,7 @@ describe('filterSongs', () => {
     forcedId: 'test',
     title: 'test'
   })
-  const songs = {test: fixtureSong}
+  const songs = { test: fixtureSong }
 
   it('should filter songs', () => {
     const indexService = new IndexService()

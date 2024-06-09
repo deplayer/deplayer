@@ -1,33 +1,13 @@
-<!DOCTYPE html>
-
-<!--
-  Want to customize this website? Learn more about how HTML works:
-  https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML
--->
-
-<html>
+<!doctype html>
+<html lang="en">
   <head>
-    <title>deplayer</title>
-    <link rel="stylesheet" href="/static/js/main.css">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#0e1b1e">
-    <meta charset="utf-8">
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React + TS</title>
   </head>
-
   <body>
-      <div id="root" />
-      <div id="player" />
-      <script type="application/javascript" src="/static/js/main.js"></script>
-
-      <script>
-        // Check that service workers are registered
-        if ('serviceWorker' in navigator) {
-          // Use the window load event to keep the page load performant
-          window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/service-worker.js');
-          });
-        }
-      </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

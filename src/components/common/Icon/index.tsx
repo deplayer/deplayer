@@ -46,8 +46,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 import { faGitlab, faDeezer } from "@fortawesome/free-brands-svg-icons"
 
-import React from 'react'
-
 const icons = {
   faDownload,
   faMusic,
@@ -105,7 +103,7 @@ type Props = {
 const Icon = (props: Props) => {
   return (
     <FontAwesomeIcon
-      className={props.className}
+      className={props.className || ''}
       icon={icons[props.icon]}
       fixedWidth={props.fixedWidth}
     />

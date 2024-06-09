@@ -1,6 +1,4 @@
-import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 import classNames from 'classnames'
 import ContextualMenu from '../components/Player/ContextualMenu'
 
@@ -17,7 +15,7 @@ const ConnectedContextualMenu = connect(
 )((props: any) => {
   return (
     <div
-      className={ classNames({
+      className={classNames({
         'justify-end': true,
         'items-center': true,
         flex: true
@@ -31,6 +29,6 @@ const ConnectedContextualMenu = connect(
   )
 })
 
-const ConnectedContextualMenuWithRouter = withRouter((props: any) => <ConnectedContextualMenu {...props}/>)
+const ConnectedContextualMenuWithRouter = (props: any) => <ConnectedContextualMenu {...props} />
 
 export default ConnectedContextualMenuWithRouter

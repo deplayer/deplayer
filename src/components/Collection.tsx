@@ -1,16 +1,15 @@
 
 import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
-import * as React from 'react'
-import { withRouter } from 'react-router-dom'
 import AddNewMediaButton from './Buttons/AddNewMediaButton'
 import BodyMessage from './BodyMessage'
 import MusicTable from './MusicTable/MusicTable'
 import Spinner from './Spinner'
+import { useLocation } from 'react-router'
+import { Location } from 'react-router'
 
 type Props = {
   app: any,
-  location: any,
   playlist: any,
   queue: any,
   player: any,
@@ -19,8 +18,8 @@ type Props = {
   dispatch: Dispatch
 }
 
-const mediaForPath = (props: any) => {
-  switch (props.location.pathname) {
+const mediaForPath = (location: Location, props: Props) => {
+  switch (location.pathname) {
     case '/collection/audio':
       return props.collection.mediaByType['audio']
     case '/collection/video':
@@ -42,16 +41,17 @@ const Collection = (props: Props) => {
     )
   }
 
-  const mediaItems = mediaForPath(props)
+  const location = useLocation()
+  const mediaItems = mediaForPath(location, props)
 
   if (!mediaItems.length) {
     return (
-        <BodyMessage message={
-          <div>
-            <Translate value='message.noCollectionItems' />
-            <AddNewMediaButton />
-          </div>
-        }/>
+      <BodyMessage message={
+        <div>
+          <Translate value='message.noCollectionItems' />
+          <AddNewMediaButton />
+        </div>
+      } />
     )
   }
 
@@ -68,4 +68,4 @@ const Collection = (props: Props) => {
   )
 }
 
-export default withRouter((props: any) => <Collection {...props} />)
+export default (props: any) => <Collection {...props} />

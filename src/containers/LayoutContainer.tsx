@@ -1,4 +1,4 @@
-import { connect } from 'react-redux'
+import { connect, ConnectedProps } from 'react-redux'
 import * as React from 'react'
 import { Dispatch } from 'redux'
 import SidebarContainer from './SidebarContainer'
@@ -6,6 +6,7 @@ import TopbarContainer from './TopbarContainer'
 import SearchButton from '../components/Buttons/SearchButton'
 import Placeholder from '../components/Player/Placeholder'
 import Icon from '../components/common/Icon'
+import type { State } from '../reducers'
 
 type TitleRouter = {
   location: {
@@ -15,6 +16,8 @@ type TitleRouter = {
 
 type TitleCollection = {
   rows: any
+  artists: any
+  albums: any
 }
 
 const dynamicTitle = (
@@ -22,9 +25,9 @@ const dynamicTitle = (
   collection: TitleCollection,
   searchTerm: ''
 ): string | React.ReactNode => {
-  const songFinder = router.location.pathname.match(/\/song\/(.*)/)
-  const artistFinder = router.location.pathname.match(/\/artist\/(.*)/)
-  const albumFinder = router.location.pathname.match(/\/album\/(.*)/)
+  const songFinder = router?.location.pathname.match(/\/song\/(.*)/)
+  const artistFinder = router?.location.pathname.match(/\/artist\/(.*)/)
+  const albumFinder = router?.location.pathname.match(/\/album\/(.*)/)
 
   if (songFinder && songFinder[1]) {
     const song = collection.rows[songFinder[1]]
@@ -36,7 +39,7 @@ const dynamicTitle = (
     return (
       <>
         <i className='icon music outline mr-4'></i>
-        { song.title }
+        {song.title}
       </>
     )
   }
@@ -63,12 +66,12 @@ const dynamicTitle = (
     return (
       <>
         <Icon icon='faMusic' className='mr-4' />
-        { album.name }
+        {album.name}
       </>
     )
   }
 
-  switch (router.location.pathname) {
+  switch (router?.location.pathname) {
     case '/settings':
       return (
         <>
@@ -137,15 +140,17 @@ const dynamicTitle = (
   }
 }
 
-type LayoutProps = {
+type PropsFromRedux = ConnectedProps<typeof connector>
+
+interface LayoutProps extends PropsFromRedux {
   backgroundImage: string,
   dispatch: Dispatch,
-  app: any,
+  app: State,
   title: string,
-  children: any
+  children: React.ReactNode
 }
 
-const Layout = (props: LayoutProps) => {
+function Layout(props: LayoutProps) {
   return (
     <>
       {props.backgroundImage && (
@@ -153,29 +158,29 @@ const Layout = (props: LayoutProps) => {
           <div className='bg-handler'></div>
           <div
             className='absolute w-full h-full bg-cover bg-center bg-no-repeat bg-fixed'
-            style={{backgroundImage: `url(${ props.backgroundImage })`, filter: 'blur(10px)'}}
+            style={{ backgroundImage: `url(${props.backgroundImage})`, filter: 'blur(10px)' }}
           />
         </>
       )
-    }
-    <SidebarContainer>
-      <TopbarContainer title={ props.title }>
-        <SearchButton />
-      </TopbarContainer>
+      }
+      <SidebarContainer>
+        <TopbarContainer title={props.title}>
+          <SearchButton />
+        </TopbarContainer>
 
-      <div
-        className='contents'
-      >
-        { props.children }
-      </div>
-      <Placeholder mqlMatch={props.app.mqlMatch} />
-    </SidebarContainer>
+        <div
+          className='layout-contents'
+        >
+          {props.children}
+        </div>
+        <Placeholder mqlMatch={props.app.mqlMatch} />
+      </SidebarContainer>
     </>
   )
 }
 
-export default connect(
-  (state: any) => ({
+const connector = connect(
+  (state: State) => ({
     title: dynamicTitle(state.router, state.collection, state.search.searchTerm),
     backgroundImage: state.app.backgroundImage,
     queue: state.queue,
@@ -185,4 +190,6 @@ export default connect(
     tableIds: Object.keys(state.collection.artists),
     visibleSongs: state.collection.visibleSongs
   })
-)(Layout)
+)
+
+export default connector(Layout)

@@ -10,8 +10,11 @@ type Props = {
   visualizerOnTop: boolean
 }
 class Visualizer extends React.Component<Props> {
-  render () {
+  render() {
     const widthFactor = 8
+
+    // FIXME: Temporary disable this component
+    return null
 
     if (!this.props?.playerRef?.getInternalPlayer()) {
       return null
@@ -34,9 +37,9 @@ class Visualizer extends React.Component<Props> {
             showVisuals={this.props.app.showVisuals}
             visualsOnTop={this.props.visualizerOnTop}
             meterColor={[
-              {stop: 0, color: '#f00'},
-              {stop: 0.5, color: '#0CD7FD'},
-              {stop: 1, color: '#ecc94b'}
+              { stop: 0, color: '#f00' },
+              { stop: 0.5, color: '#0CD7FD' },
+              { stop: 1, color: '#ecc94b' }
             ]}
             gap={0.5}
           />

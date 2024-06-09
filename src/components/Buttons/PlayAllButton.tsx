@@ -1,7 +1,6 @@
 import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
-import { withRouter } from 'react-router-dom'
-import * as React from 'react'
+import { useLocation } from 'react-router-dom'
 
 import { PLAY_ALL } from '../../constants/ActionTypes'
 import Button from '../common/Button'
@@ -9,15 +8,15 @@ import Icon from '../common/Icon'
 
 type Props = {
   dispatch: Dispatch,
-  location: any
 }
 
 const PlayAllButton = (props: Props) => {
+  const location = useLocation()
   const playAll = () => {
-    props.dispatch({type: PLAY_ALL, path: props.location.pathname.replace(/\//, '')})
+    props.dispatch({ type: PLAY_ALL, path: location.pathname.replace(/\//, '') })
   }
 
-  if (props.location.pathname.match(/^\/settings?$/)) {
+  if (location.pathname.match(/^\/settings?$/)) {
     return null
   }
 
@@ -33,6 +32,6 @@ const PlayAllButton = (props: Props) => {
   )
 }
 
-const RoutedButton = withRouter((props: any) => <PlayAllButton {...props}/>)
+const RoutedButton = (props: any) => <PlayAllButton {...props} />
 
 export default RoutedButton

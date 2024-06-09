@@ -1,4 +1,4 @@
-// @flow
+import { describe, it, expect } from 'vitest'
 
 import Artist from './Artist'
 

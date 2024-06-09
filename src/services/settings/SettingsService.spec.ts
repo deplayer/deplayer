@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import SettingsService from './SettingsService'
 import DummyAdapter from '../database/DummyAdapter'
 
@@ -7,7 +9,7 @@ describe('SettingsService', () => {
 
     expect.assertions(1)
 
-    settingsService.save('123', {mySetting: 'value'})
+    settingsService.save('123', { mySetting: 'value' })
       .then((result) => {
         expect(result).toBeDefined()
       })

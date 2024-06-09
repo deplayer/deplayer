@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import QueueService from './QueueService'
 import DummyAdapter from './database/DummyAdapter'
 import { defaultState } from '../reducers/queue'

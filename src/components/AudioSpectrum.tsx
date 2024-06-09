@@ -37,9 +37,9 @@ class AudioSpectrum extends React.Component<Props> {
     meterWidth: 2,
     meterCount: 40 * (2 + 2),
     meterColor: [
-      {stop: 0, color: '#f00'},
-      {stop: 0.5, color: '#0CD7FD'},
-      {stop: 1, color: 'red'}
+      { stop: 0, color: '#f00' },
+      { stop: 0.5, color: '#0CD7FD' },
+      { stop: 1, color: 'red' }
     ],
     gap: 10, // gap between meters
   }
@@ -97,7 +97,7 @@ class AudioSpectrum extends React.Component<Props> {
     }
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Props) {
     if (prevProps.showSpectrum !== this.props.showSpectrum) {
       this.prepareElements()
       this.initializeVisualizer()
@@ -266,22 +266,22 @@ class AudioSpectrum extends React.Component<Props> {
 
     return (
       <>
-      { showVisuals && (
-        <canvas
-          className={visualsClass}
-          id={this.visualsCanvasId}
-          width={this.props.width}
-          height={this.props.height}
-        />
-      )}
-      { showSpectrum && (
-        <canvas
-          className='opacity-75'
-          id={this.spectrumCanvasId}
-          width={this.props.width}
-          height={this.props.height}
-        />
-      )}
+        {showVisuals && (
+          <canvas
+            className={visualsClass}
+            id={this.visualsCanvasId}
+            width={this.props.width}
+            height={this.props.height}
+          />
+        )}
+        {showSpectrum && (
+          <canvas
+            className='opacity-75'
+            id={this.spectrumCanvasId}
+            width={this.props.width}
+            height={this.props.height}
+          />
+        )}
       </>
     )
   }

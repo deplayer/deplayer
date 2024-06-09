@@ -1,13 +1,13 @@
 import { Translate } from 'react-redux-i18n'
-import React from 'react'
 
 import BodyMessage from '../BodyMessage'
 import MediaSlider from '../MediaSlider'
 import RelatedAlbums from '../RelatedAlbums'
 import { Link } from 'react-router-dom'
+import { State as CollectionState } from '../../reducers/collection'
 
 type Props = {
-  collection: any
+  collection: CollectionState
 }
 
 const Dashboard = (props: Props) => {
@@ -27,10 +27,10 @@ const Dashboard = (props: Props) => {
       <BodyMessage message={
         <div>
           <Translate value='message.noMostPlayed' />
-          <br/>
+          <br />
           <Link to={'/collection'} className='h-32 button'><Translate value='message.goToCollection' /></Link>
         </div>
-      }/>
+      } />
     )
   }
 
@@ -38,7 +38,7 @@ const Dashboard = (props: Props) => {
     <div className='z-10 w-full flex flex-col'>
       <MediaSlider
         loading={props.collection.loading}
-        title={<Translate value='titles.mostPlayedSongs'/>}
+        title={<Translate value='titles.mostPlayedSongs' />}
         mediaItems={mediaItems.slice(0, MAX_LIST_ITEMS)}
       />
       <RelatedAlbums albums={albums} />

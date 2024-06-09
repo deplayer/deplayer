@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import PlaylistService from './PlaylistService'
 import DummyAdapter from './database/DummyAdapter'
 import { defaultState } from '../reducers/playlist'

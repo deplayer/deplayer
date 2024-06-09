@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import MenuItem from './MenuItem'
 import Icon from '../common/Icon'
 
@@ -9,7 +7,7 @@ type Props = {
   current?: Boolean
 }
 
-const CollectionMenuItem = ({collection, totalItems, current = false}: Props) => {
+const CollectionMenuItem = ({ collection, totalItems, current = false }: Props) => {
   const children = current ? (
     <ul>
       <MenuItem
@@ -44,7 +42,7 @@ const CollectionMenuItem = ({collection, totalItems, current = false}: Props) =>
       label='Collection'
       icon={<Icon icon='faDatabase' />}
     >
-      { children }
+      {children}
     </MenuItem>
   )
 }

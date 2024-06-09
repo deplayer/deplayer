@@ -1,3 +1,4 @@
+import { describe, it } from 'vitest'
 import { expectSaga } from 'redux-saga-test-plan'
 
 import { search } from './index'
@@ -12,8 +13,8 @@ describe('search', () => {
       noRedirect: false
     }
     return expectSaga(search, action)
-      .put({type: types.ADD_TO_COLLECTION, data: []})
-      .put({type: types.SEARCH_FINISHED, searchTerm})
+      .put({ type: types.ADD_TO_COLLECTION, data: [] })
+      .put({ type: types.SEARCH_FINISHED, searchTerm })
       .run()
   })
 })

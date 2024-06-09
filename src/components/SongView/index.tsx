@@ -9,8 +9,7 @@ import Button from '../common/Button'
 import CoverImage from '../MusicTable/CoverImage'
 import RelatedAlbums from '../RelatedAlbums'
 import Icon from '../common/Icon'
-import Media from '../../entities/Media'
-import Spinner from '..//Spinner'
+import Spinner from '../Spinner'
 import Tag from '../common/Tag'
 import * as types from '../../constants/ActionTypes'
 import { OutPortal } from 'react-reverse-portal'
@@ -34,18 +33,19 @@ type Props = {
     rows: any
   },
   queue: { trackIds: any, currentPlaying: string },
-  song: Media,
+  songId: string,
   dispatch: Dispatch,
   loading: boolean,
-  className?: string|null
+  className?: string | null
 }
 
 const SongView = (props: Props) => {
+  const song = props.collection.rows[props.songId] || props.collection.rows[props.queue.currentPlaying]
+
   const [downloadUrls, setDownloadUrls] = React.useState([])
   const [showLyrics, setShowLyrics] = React.useState(false)
   const MAX_LIST_ITEMS = 25
   const {
-    song,
     queue: {
       trackIds,
       currentPlaying
@@ -77,7 +77,6 @@ const SongView = (props: Props) => {
     retrieveUrls()
   }, [song, props.settings])
 
-
   if (props.loading) {
     return (
       <div className={`collection`}>
@@ -94,30 +93,30 @@ const SongView = (props: Props) => {
 
   const sameGenreSongs = song.genres && song.genres.length && props.collection.songsByGenre[song.genres[0]]
     ? props.collection
-        .songsByGenre[song.genres[0]]
-        .sort((songId1: string, songId2: string) => sortByPlayCount(songId1, songId2, rows))
-        .slice(0, MAX_LIST_ITEMS)
-        .map((songId: string) => rows[songId])
+      .songsByGenre[song.genres[0]]
+      .sort((songId1: string, songId2: string) => sortByPlayCount(songId1, songId2, rows))
+      .slice(0, MAX_LIST_ITEMS)
+      .map((songId: string) => rows[songId])
     : null
 
-  const relatedAlbums = albumsByArtist && albumsByArtist[song.artist.id] && albumsByArtist[song.artist.id].map((albumId: string) => {
+  const relatedAlbums = albumsByArtist?.[song.artist.id].map((albumId: string) => {
     return albums[albumId]
-  })
+  }) || []
 
   const songFinder = song.id === currentPlaying
 
   return (
-    <div className={`song-view ${props.className} w-full overflow-y-auto z-10 flex flex-col`}>
+    <div data-testid="song-view" className={`song-view ${props.className} w-full overflow-y-auto z-10 flex flex-col`}>
       <div className="song sm:flex">
         <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className="w-full md:m-6 md:rounded-b-lg image lg:max-w-md xl:max-w-xl">
           <div className='flex flex-col w-full md:sticky md:top-0'>
-            { songFinder && song.media_type === 'video' && (
+            {songFinder && song.media_type === 'video' && (
               <OutPortal
                 className={`flex w-full`}
                 node={props.playerPortal}
               />
             )}
-            { (song.media_type !== 'video' || !songFinder) &&
+            {(song.media_type !== 'video' || !songFinder) &&
               <CoverImage
                 useImage
                 cover={song.cover}
@@ -127,11 +126,11 @@ const SongView = (props: Props) => {
             }
 
             <div className='btn-group md:mx-0 flex items-center flex-wrap p-4'>
-              { (!songFinder || !props.player.playing) &&
+              {(!songFinder || !props.player.playing) &&
                 <Button
                   large
                   onClick={() => {
-                    props.dispatch({type: types.SET_CURRENT_PLAYING, songId: song.id})
+                    props.dispatch({ type: types.SET_CURRENT_PLAYING, songId: song.id })
                   }}
                 >
                   <Icon
@@ -142,12 +141,12 @@ const SongView = (props: Props) => {
                 </Button>
               }
 
-              { !trackIds.includes(song.id) &&
+              {!trackIds.includes(song.id) &&
                 <Button
                   transparent
                   alignLeft
                   onClick={() => {
-                    props.dispatch({type: types.ADD_TO_QUEUE, songs: [song]})
+                    props.dispatch({ type: types.ADD_TO_QUEUE, songs: [song] })
                   }}
                 >
                   <Icon
@@ -158,12 +157,12 @@ const SongView = (props: Props) => {
                 </Button>
               }
 
-              { trackIds.includes(song.id) &&
+              {trackIds.includes(song.id) &&
                 <Button
                   transparent
                   alignLeft
                   onClick={() => {
-                    props.dispatch({type: types.REMOVE_FROM_QUEUE, song})
+                    props.dispatch({ type: types.REMOVE_FROM_QUEUE, song })
                   }}
                 >
                   <Icon
@@ -212,44 +211,44 @@ const SongView = (props: Props) => {
 
         <div className="content flex-grow pt-6 sm:pt-0 md:pt-6 md:pr-6">
           <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className="p-6 rounded-lg">
-            <h2 className='text-3xl'>{ song.title }</h2>
+            <h2 className='text-3xl'>{song.title}</h2>
             <div className='text-lg mt-2'>
-              <Link to={`/artist/${ song.artist.id }`}>
+              <Link to={`/artist/${song.artist.id}`}>
                 <h3>
                   <Icon
                     icon='faMicrophoneAlt'
                     className='mr-1 w-8'
                   />
-                  <span>{ song.artist.name }</span>
+                  <span>{song.artist.name}</span>
                 </h3>
               </Link>
             </div>
             <div className='color-white text-lg mt-2'>
-              <Link to={`/album/${ song.album.id }`}>
+              <Link to={`/album/${song.album.id}`}>
                 <Icon
                   className='mr-1 w-8'
                   icon='faCompactDisc'
                 />
-                { song.albumName || 'N/A' }
+                {song.albumName || 'N/A'}
               </Link>
             </div>
             <div className='mt-4'>
-              <Icon icon='faStopwatch' /> { getDurationStr(song.duration) }
+              <Icon icon='faStopwatch' /> {getDurationStr(song.duration)}
             </div>
             <div className='mt-2'>
-              <Tag>{ song.genre }</Tag>
+              <Tag>{song.genre}</Tag>
             </div>
             <div className='mt-2'>
-              <Tag>{ song.media_type }</Tag>
+              <Tag>{song.media_type}</Tag>
             </div>
             <div className='mt-2'>
-              <Translate value='song.label.played' /> { song.playCount || 0 } <Translate value='song.label.times' />
+              <Translate value='song.label.played' /> {song.playCount || 0} <Translate value='song.label.times' />
             </div>
             <div className='mt-2'>
               <Translate value='labels.providers' />: &nbsp;
               {
                 song.stream.map((provider) => {
-                  return (<Tag type='primary' key={provider.service}>{ provider.service }</Tag>)
+                  return (<Tag type='primary' key={provider.service}>{provider.service}</Tag>)
                 })
               }
             </div>
@@ -265,11 +264,11 @@ const SongView = (props: Props) => {
 
           <AutoSizer>
             {({ width }) => (
-              <div className='flex flex-col pt-8' style={{ width: width}}>
+              <div className='flex flex-col pt-8' style={{ width: width }}>
                 <RelatedAlbums albums={relatedAlbums} />
-                { sameGenreSongs &&
+                {sameGenreSongs &&
                   <MediaSlider
-                    title={<Translate value='titles.sameGenreSongs'/>}
+                    title={<Translate value='titles.sameGenreSongs' />}
                     mediaItems={sameGenreSongs}
                   />
                 }

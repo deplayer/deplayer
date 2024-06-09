@@ -1,5 +1,3 @@
-import { I18n } from 'react-redux-i18n'
-import KeyHandler, { KEYUP } from 'react-key-handler'
 import * as React from 'react'
 
 import SearchInput from './SearchInput'
@@ -13,10 +11,10 @@ type State = {
 
 type Props = {
   title?: string,
-  dispatch: any,
+  dispatch: (params: any) => void,
   loading: boolean,
   showInCenter: boolean,
-  children: any,
+  children: React.ReactNode
   searchTerm: string,
   searchToggled: boolean,
   error: string
@@ -32,7 +30,7 @@ class Topbar extends React.Component<Props, State> {
   timer: any
   props: Props
 
-  constructor(props: Props){
+  constructor(props: Props) {
     super(props);
 
     this.props = props
@@ -40,7 +38,7 @@ class Topbar extends React.Component<Props, State> {
   }
 
   // Handling searchTerm text change
-  onSearchChange = (event:  React.FormEvent<HTMLInputElement>) => {
+  onSearchChange = (event: React.FormEvent<HTMLInputElement>) => {
     clearTimeout(this.timer)
     this.props.dispatch({
       type: types.SET_SEARCH_TERM,
@@ -59,25 +57,25 @@ class Topbar extends React.Component<Props, State> {
   // Starting to search when the user press enter key or stops to writte in the interval
   triggerChange = () => {
     if (this.props.searchTerm) {
-      this.props.dispatch( {
+      this.props.dispatch({
         type: types.START_SEARCH, searchTerm: this.props.searchTerm
       })
     }
   }
 
   onFocusOut = () => {
-    this.setState({focus: false})
-    this.props.dispatch( { type: types.TOGGLE_SEARCH })
+    this.setState({ focus: false })
+    this.props.dispatch({ type: types.TOGGLE_SEARCH })
   }
 
   setSearchOn = () => {
-    this.props.dispatch( { type: types.TOGGLE_SEARCH })
-    this.setState({focus: true})
+    this.props.dispatch({ type: types.TOGGLE_SEARCH })
+    this.setState({ focus: true })
   }
 
   setSearchOff = () => {
-    this.props.dispatch( { type: types.TOGGLE_SEARCH_OFF })
-    this.setState({focus: false})
+    this.props.dispatch({ type: types.TOGGLE_SEARCH_OFF })
+    this.setState({ focus: false })
   }
 
   render() {
@@ -94,13 +92,8 @@ class Topbar extends React.Component<Props, State> {
     )
 
     return (
-      <div className='topbar flex justify-between overflow-hidden z-10 items-center px-2' style={{gridArea: 'topbar'}}>
+      <div className='topbar flex justify-between overflow-hidden z-10 items-center px-2' style={{ gridArea: 'topbar' }}>
         <SidebarButton />
-        <KeyHandler
-          keyEventName={KEYUP}
-          keyValue='/'
-          onKeyHandle={this.setSearchOn}
-        />
         <SearchInput
           setSearchOff={this.setSearchOff}
           searchToggled={searchToggled}
@@ -109,9 +102,9 @@ class Topbar extends React.Component<Props, State> {
           onBlur={this.onFocusOut}
           value={searchTerm}
         />
-        {  !this.state.focus && !this.props.searchToggled  ? <Title title={title} onClick={this.setSearchOn} /> : null }
+        {!this.state.focus && !this.props.searchToggled ? <Title title={title} onClick={this.setSearchOn} /> : null}
         <div className='flex justify-end'>
-          {  !this.state.focus && childrenWithProps }
+          {!this.state.focus && childrenWithProps}
         </div>
       </div>
     )

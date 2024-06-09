@@ -16,14 +16,14 @@ export function* initialize() {
     const queue = yield call(queueService.get)
     if (!queue) {
       logger.log('queue-saga', 'error retrieving queue', queue)
-      yield put({type: types.GET_QUEUE_REJECTED})
+      yield put({ type: types.GET_QUEUE_REJECTED })
     } else {
       const unserialized = JSON.parse(JSON.stringify(queue))
       logger.log('queue-saga', 'queue recieved and unserialized')
-      yield put({type: types.RECEIVE_QUEUE, queue: unserialized})
+      yield put({ type: types.RECEIVE_QUEUE, queue: unserialized })
     }
-  } catch {
-    yield put({type: types.GET_QUEUE_REJECTED})
+  } catch (e: any) {
+    yield put({ type: types.GET_QUEUE_REJECTED, error: e.message })
   }
 }
 

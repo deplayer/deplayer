@@ -1,11 +1,8 @@
-import * as React from 'react'
-import { shallow } from 'enzyme'
-import configureEnzyme from '../../tests/configureEnzyme'
+import { render, screen } from '@testing-library/react'
+import { describe, it, expect } from 'vitest'
 
 import Media from '../../entities/Media'
 import CoverImage from './CoverImage'
-
-configureEnzyme()
 
 const setup = () => {
   const props = {
@@ -19,18 +16,12 @@ const setup = () => {
     isCurrent: false
   }
 
-  const enzymeWrapper = shallow(<CoverImage {...props}/>)
-
-  return {
-    props,
-    enzymeWrapper,
-  }
+  render(<CoverImage {...props} />)
 }
 
 describe('CoverImage', () => {
   it('should show render without errors', () => {
-    const { enzymeWrapper } = setup()
-    expect(enzymeWrapper.find('Img').exists())
-      .toBe(true)
+    setup()
+    expect(screen.getByTestId('cover-image')).toBeTruthy()
   })
 })

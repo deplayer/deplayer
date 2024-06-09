@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import Media from './Media'
 
 describe('entities/Media', () => {
@@ -7,24 +9,24 @@ describe('entities/Media', () => {
   })
 
   it('should create a Media with stream information', () => {
-    const song = new Media({stream: [{uris: [{uri: 'http://some-songs-api/song.mp4'}], service: 'itunes'}]})
+    const song = new Media({ stream: [{ uris: [{ uri: 'http://some-songs-api/song.mp4' }], service: 'itunes' }] })
     expect(song.stream[0].service).toEqual('itunes')
     expect(song.stream[0].uris[0].uri).toEqual('http://some-songs-api/song.mp4')
   })
 
   it('should create s Media with thumbnail and full size covers', () => {
-    const song = new Media({cover: { thumbnailUrl: 'http://some-songs-api/song.mp4'}})
+    const song = new Media({ cover: { thumbnailUrl: 'http://some-songs-api/song.mp4' } })
     expect(song.cover.thumbnailUrl).toEqual('http://some-songs-api/song.mp4')
   })
 
   it('should create s Media with shareUrl', () => {
-    const song = new Media({shareUrl: 'http://some-songs-api/song.mp4'})
+    const song = new Media({ shareUrl: 'http://some-songs-api/song.mp4' })
     expect(song.shareUrl).toEqual('http://some-songs-api/song.mp4')
   })
 
   it('should answer hasAnyProviderOf', () => {
     const song = new Media({
-      stream: [{uris: [{uri: 'http://some-songs-api/song.mp4'}], service: 'itunes'}]
+      stream: [{ uris: [{ uri: 'http://some-songs-api/song.mp4' }], service: 'itunes' }]
     })
 
     expect(song.hasAnyProviderOf(['itunes'])).toEqual(true)

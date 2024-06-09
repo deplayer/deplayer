@@ -1,7 +1,6 @@
 import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
 import { connect } from 'react-redux'
-import * as React from 'react'
 import Icon from '../common/Icon'
 
 import { CLEAR_QUEUE } from '../../constants/ActionTypes'
@@ -19,7 +18,7 @@ const ClearQueueButton = (props: Props) => {
   }
 
   const clearQueue = () => {
-    props.dispatch({type: CLEAR_QUEUE})
+    props.dispatch({ type: CLEAR_QUEUE })
   }
 
   return (
@@ -35,7 +34,7 @@ const ClearQueueButton = (props: Props) => {
 }
 
 export default connect(
-  (state: {queue: any}) => ({
+  (state: { queue: any }) => ({
     queue: state.queue
   })
 )(ClearQueueButton)

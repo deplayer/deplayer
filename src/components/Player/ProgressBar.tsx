@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Dispatch } from 'redux'
 import Range from 'rc-slider'
 
@@ -29,22 +28,23 @@ const ProgressBar = (props: Props) => {
         handleStyle={{ display: 'none' }}
         trackStyle={{ backgroundColor: '#2c5282' }}
         count={1}
-        value={ props.buffered }
+        value={props.buffered}
       />
       <Range
-        className='bar'
+        data-testid='slider'
+        className='bar absolute top-0'
         min={0}
         max={props.total}
         step={step}
         count={1}
-        value={ props.current }
-        onChange={ props.onChange }
+        value={props.current}
+        onChange={props.onChange}
         trackStyle={{ zIndex: 11, backgroundColor: '#4299e1' }}
         handleStyle={{ zIndex: 11 }}
-        onAfterChange={ props.onAfterChange }
+        onAfterChange={props.onAfterChange}
       />
       <span className='absolute bg-black px-2 right-0 mr-0 -mt-8 text-xs text-yellow-400'>
-        { getDurationStr(props.current)} - { getDurationStr(props.total) }
+        {getDurationStr(props.current)} - {getDurationStr(props.total)}
       </span>
     </div>
   )

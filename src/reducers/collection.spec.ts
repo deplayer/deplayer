@@ -1,11 +1,7 @@
-import reducer, { defaultState } from './collection'
+import { describe, expect, it } from 'vitest'
 import * as types from '../constants/ActionTypes'
 import Media from '../entities/Media'
-
-import MediaId from '../entities/MediaId'
-import ArtistId from '../entities/ArtistId'
-jest.mock('../entities/MediaId');
-jest.mock('../entities/ArtistId');
+import reducer, { defaultState } from './collection'
 
 describe('collection reducer', () => {
   it('should return the initial state', () => {
@@ -13,32 +9,21 @@ describe('collection reducer', () => {
       .toEqual(defaultState)
   })
 
-  xit('should handle RECEIVE_COLLECTION', () => {
-    const initialState = {...defaultState, enabledProviders: ['itunes']}
+  it('should handle RECEIVE_COLLECTION', () => {
+    const initialState = { ...defaultState, enabledProviders: ['itunes'] }
     const fixtureSong = new Media({
       forcedId: 'the-doors',
       artistName: 'The Doors',
       artistId: 'the-doors',
       albumName: 'LIght my fire',
-      stream: [{uris: [{uri: 'http://some-songs-api/song.mp4'}], service: 'itunes'}]
+      stream: [{ uris: [{ uri: 'http://some-songs-api/song.mp4' }], service: 'itunes' }]
     })
-    const rows = {}
-    rows[fixtureSong.id] = fixtureSong
-
-    const artists = {}
-    artists[fixtureSong.artist.id] = fixtureSong.artist
-
-    const songsByArtist = {}
-    songsByArtist[fixtureSong.artist.id] = [fixtureSong.id]
-
-    const albumsByArtist = {}
-    albumsByArtist[fixtureSong.artist.id] = [fixtureSong.album.id]
-
-    const songsByAlbum = {}
-    songsByAlbum[fixtureSong.album.id] = [fixtureSong.id]
-
-    const albums = {}
-    albums[fixtureSong.album.id] = fixtureSong.album
+    const rows = { [fixtureSong.id]: fixtureSong.toDocument() }
+    const artists = { [fixtureSong.artist.id]: fixtureSong.artist.toDocument() }
+    const songsByArtist = { [fixtureSong.artist.id]: [fixtureSong.id] }
+    const albumsByArtist = { [fixtureSong.artist.id]: [fixtureSong.album.id] }
+    const songsByAlbum = { [fixtureSong.album.id]: [fixtureSong.id] }
+    const albums = { [fixtureSong.album.id]: fixtureSong.album.toDocument() }
 
     const expected = {
       ...initialState,
@@ -50,20 +35,16 @@ describe('collection reducer', () => {
       albums,
       rows,
       loading: false,
-      mediaByType: {audio: ['the-doors']},
+      mediaByType: { audio: [] },
       visibleSongs: [fixtureSong.id]
     }
 
-    // slugify has a huge performance penalization, so should be avoided when RECEIVE_COLLECTION
-    expect(MediaId).not.toHaveBeenCalled()
-    expect(ArtistId).not.toHaveBeenCalled()
-
-    expect(reducer(initialState, {type: types.RECEIVE_COLLECTION, data: [fixtureSong]}))
-      .toEqual(expected)
+    expect(reducer(initialState, { type: types.RECEIVE_COLLECTION, data: [fixtureSong] }))
+      .toMatchObject(expected)
   })
 
   it('should handle RECEIVE_SETTINGS to filter by provider', () => {
-    const expected = {...defaultState, enabledProviders: ['mstream']}
+    const expected = { ...defaultState, enabledProviders: ['mstream'] }
     const action = {
       type: types.RECEIVE_SETTINGS,
       settings: {

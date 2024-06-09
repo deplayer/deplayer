@@ -1,11 +1,8 @@
-import * as React from 'react'
-import { shallow } from 'enzyme'
-import configureEnzyme from '../../tests/configureEnzyme'
+import { describe, it, expect } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import { BrowserRouter as Router } from 'react-router-dom'
 
 import MusicTable, { Props } from './MusicTable'
-
-configureEnzyme()
-
 
 const setup = () => {
   const props: Props = {
@@ -20,18 +17,12 @@ const setup = () => {
     collection: {}
   }
 
-  const enzymeWrapper = shallow(<MusicTable {...props}/>)
-
-  return {
-    props,
-    enzymeWrapper,
-  }
+  render(<MusicTable {...props} />, { wrapper: Router })
 }
 
 describe('MusicTable', () => {
   it('Should show errors', () => {
-    const { enzymeWrapper } = setup()
-    expect(enzymeWrapper.find('.music-table').exists())
-      .toBe(true)
+    setup()
+    expect(screen.findByRole('music-table')).toBeTruthy()
   })
 })

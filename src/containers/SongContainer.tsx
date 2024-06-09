@@ -1,19 +1,23 @@
 import { connect } from 'react-redux'
-import * as React from 'react'
-import { withRouter } from 'react-router-dom'
-
 import SongView from '../components/SongView'
+import { useLocation, Location } from 'react-router'
 
-const RoutedSongView = withRouter((props: any) => <SongView {...props}/>)
-
-const getSongId = (router: any) : string => {
-  const songFinder = router.location.pathname.match(/\/song\/(.*)/)
+const getSongId = (location: Location): string => {
+  const songFinder = location.pathname.match(/\/song\/(.*)/)
 
   if (songFinder && songFinder[1]) {
     return songFinder[1]
   }
 
   return '0'
+}
+
+const RoutedSongView = (props: any) => {
+  const location = useLocation()
+  const songId = getSongId(location)
+
+
+  return (<SongView songId={songId} {...props} />)
 }
 
 export default connect(
@@ -25,7 +29,6 @@ export default connect(
       lyrics: state.lyrics,
       player: state.player,
       loading: state.collection.loading,
-      song: state.collection.rows[getSongId(state.router)] || state.collection.rows[state.queue.currentPlaying]
     }
   }
 )(RoutedSongView)

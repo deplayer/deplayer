@@ -1,4 +1,4 @@
-import { Reducer, AnyAction, Action } from "redux";
+import { Reducer } from "redux";
 
 export default function outerReducer(appReducer: Reducer) {
   return function(state: any, action: any) {

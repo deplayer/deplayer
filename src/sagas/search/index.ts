@@ -10,25 +10,27 @@ import {
 
 import history from '../../store/configureHistory'
 
-import  * as types from '../../constants/ActionTypes'
+import * as types from '../../constants/ActionTypes'
 import ProvidersService from '../../services/ProvidersService'
+import Media from '../../entities/Media'
 import { getSettings } from './../selectors'
 
 // Handle every provider as independent thread
 function* performSingleSearch(
   searchTerm: string,
   provider: string
-) {
+): Generator<any> {
   try {
     const settings = yield select(getSettings)
     const providerService = new ProvidersService(settings)
     const searchResults = yield call(providerService.searchForProvider, searchTerm, provider)
-    yield put({type: types.RECEIVE_COLLECTION, data: searchResults})
-    yield put({type: types.RECREATE_INDEX})
-    yield put({type: types.ADD_TO_COLLECTION, data: searchResults})
-  } catch (e) {
-    yield put({type: types.SEARCH_REJECTED, message: e.message})
-    yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.search.failed'})
+    const serializedResults = searchResults.map((r: Media) => r.toDocument())
+    yield put({ type: types.RECEIVE_COLLECTION, data: serializedResults })
+    yield put({ type: types.RECREATE_INDEX })
+    yield put({ type: types.ADD_TO_COLLECTION, data: serializedResults })
+  } catch (e: any) {
+    yield put({ type: types.SEARCH_REJECTED, message: e.message })
+    yield put({ type: types.SEND_NOTIFICATION, notification: 'notifications.search.failed' })
   }
 }
 
@@ -60,8 +62,8 @@ export function* search(action: SearchAction): any {
   if (redirect) {
     yield call(goToSearchResults)
   }
-  yield put({type: types.SEARCH_FINISHED, searchTerm: action.searchTerm})
-  yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.search.finished'})
+  yield put({ type: types.SEARCH_FINISHED, searchTerm: action.searchTerm })
+  yield put({ type: types.SEND_NOTIFICATION, notification: 'notifications.search.finished' })
 }
 
 // Going to home page

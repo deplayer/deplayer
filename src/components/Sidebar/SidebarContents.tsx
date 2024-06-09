@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Dispatch } from 'redux'
 
 import CollectionMenuItem from './CollectionMenuItem'
@@ -10,18 +9,20 @@ import ArtistsMenuItem from './ArtistsMenuItem'
 import MenuItem from './MenuItem'
 import { inSection } from '../../utils/router'
 import Icon from '../common/Icon'
+import { State as CollectionState } from '../../reducers/collection'
+import { useLocation } from 'react-router'
 
 type ContentProps = {
   dispatch: Dispatch,
-  collection: any,
+  collection: CollectionState,
   queue: any,
   app: any,
-  location: any,
   onSetSidebarOpen: Function
 }
 
 const SidebarContents = (props: ContentProps) => {
   const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
+  const location = useLocation()
   return (
     <div className='flex flex-col' onClick={() => props.onSetSidebarOpen()}>
       <h4 className="text-xl text-center py-4 bg-gray-900 text-blue-500 tracking-wider">
@@ -29,45 +30,45 @@ const SidebarContents = (props: ContentProps) => {
       </h4>
       <ul className='flex flex-col'>
         <MenuItem
-          current={inSection(props.location, '$')}
+          current={inSection(location, '$')}
           url='/'
           title='Explore'
           label='Explore'
           icon={<Icon icon='faGlobe' />}
         />
         <QueueMenuItem
-          current={inSection(props.location, 'queue')}
+          current={inSection(location, 'queue')}
           totalItems={trackIds.length}
         />
         <SearchMenuItem
-          current={inSection(props.location, 'search-results')}
+          current={inSection(location, 'search-results')}
           totalItems={props.collection.searchResults.length}
         />
-        <PlaylistsMenuItem current={inSection(props.location, 'playlists')} />
+        <PlaylistsMenuItem current={inSection(location, 'playlists')} />
         <CollectionMenuItem
           collection={props.collection}
-          current={inSection(props.location, '(collection.*)')}
+          current={inSection(location, '(collection.*)')}
           totalItems={props.collection.totalRows}
         />
         <ArtistsMenuItem
-          current={inSection(props.location, 'artists')}
+          current={inSection(location, 'artists')}
           totalItems={Object.keys(props.collection.artists).length}
         />
         <MenuItem
-          current={inSection(props.location, 'providers')}
+          current={inSection(location, 'providers')}
           url='/providers'
           title='Providers'
           label='Providers'
           icon={<Icon icon='faPlug' />}
         />
         <MenuItem
-          current={inSection(props.location, 'wiki')}
+          current={inSection(location, 'wiki')}
           url='/wiki'
           title='Help'
           label='Help'
           icon={<Icon icon='faLifeRing' />}
         />
-        <SettingsMenuItem current={inSection(props.location, 'settings')} />
+        <SettingsMenuItem current={inSection(location, 'settings')} />
       </ul>
 
       <section className='p-6 pt-8 bottom-0 text-xs text-center w-full'>
@@ -87,7 +88,7 @@ const SidebarContents = (props: ContentProps) => {
           title="Show me the code"
           target="_blank"
         >
-          { props.app.version }
+          {props.app.version}
         </a>
       </section>
     </div>

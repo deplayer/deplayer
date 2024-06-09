@@ -1,37 +1,30 @@
-import * as React from 'react'
-import { shallow } from 'enzyme'
-import configureEnzyme from '../../../tests/configureEnzyme'
+import { render, screen } from '@testing-library/react'
+import { describe, it, expect } from 'vitest'
+import { BrowserRouter } from 'react-router-dom'
 
 import Media from '../../../entities/Media'
 import SongRow from './index'
+import type { Props } from './index'
 
-configureEnzyme()
 
-
-const setup = (customProps) => {
-  const props = {
+const setup = () => {
+  const props: Props = {
     song: new Media(),
-    onClick: () => {},
+    songsLength: 1,
+    queue: {},
+    onClick: () => { },
     isCurrent: false,
     style: {},
-    dispatch: jest.fn(),
     disableAddButton: false
   }
 
-  const finalProps = {...props, ...customProps}
-
-  const enzymeWrapper = shallow(<SongRow {...finalProps}/>)
-
-  return {
-    props,
-    enzymeWrapper,
-  }
+  render(<SongRow {...props} />, { wrapper: BrowserRouter })
 }
 
 describe('SongRow', () => {
   it('should show render without errors', () => {
-    const { enzymeWrapper } = setup({})
-    expect(enzymeWrapper.find('.song-row').exists())
-      .toBe(true)
+    setup()
+
+    expect(screen.getByRole('row')).toBeTruthy()
   })
 })

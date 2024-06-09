@@ -1,19 +1,19 @@
-import * as React from 'react'
 import { Dispatch } from 'redux'
 
+import { Translate } from 'react-redux-i18n'
+import { Link } from 'react-router-dom'
+import { State as CollectionState } from '../reducers/collection'
+import BodyMessage from './BodyMessage'
 import MusicTable from './MusicTable/MusicTable'
 import Spinner from './Spinner'
-import BodyMessage from './BodyMessage'
-import { Link } from 'react-router-dom'
-import { Translate } from 'react-redux-i18n'
 
 type Props = {
   queue: any,
   player: any,
-  collection: any,
+  collection: CollectionState,
   dispatch: Dispatch,
   slim?: boolean,
-  className: string|null,
+  className?: string,
   app: any,
 }
 
@@ -52,7 +52,7 @@ const Queue = (props: Props) => {
           to="/collection"
           title="collection"
         >
-          <Translate value="application.title"/>
+          <Translate value="application.title" />
           <i className='icon database outline'></i>
         </Link>
       </div>
@@ -72,4 +72,4 @@ const Queue = (props: Props) => {
   )
 }
 
-export default  Queue
+export default Queue

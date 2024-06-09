@@ -1,17 +1,15 @@
 import { Dispatch } from 'redux'
 import { Link } from 'react-router-dom'
-import KeyHandler, {KEYPRESS} from 'react-key-handler'
 import React from 'react'
 import ReactPlayer from 'react-player'
 import classNames from 'classnames'
-import { CSSTransitionGroup } from 'react-transition-group'
+import { CSSTransition } from 'react-transition-group'
 import { InPortal, OutPortal } from 'react-reverse-portal'
 
 import { State as PlayerState } from '../../reducers/player'
 import { State as SettingsState } from '../../reducers/settings'
 import Controls from './Controls'
 import Cover from './Cover'
-import KeyHandlers from './KeyHandlers'
 import ProgressBar from './ProgressBar'
 import Visualizer from './../Visualizer'
 import WebtorrentPlayer from './CustomPlayers/WebtorrentPlayer'
@@ -58,9 +56,9 @@ class PlayerControls extends React.Component<Props> {
   onProgress = (state: any) => {
     if (this.props.player.fullscreen && this.state.timeShown > 2) {
       this.props.player.showPlayer && this.props.dispatch({ type: types.HIDE_PLAYER })
-      this.setState({ timeShown: 0})
+      this.setState({ timeShown: 0 })
     } else if (this.props.player.fullscreen) {
-      this.setState({ timeShown: this.state.timeShown + 1})
+      this.setState({ timeShown: this.state.timeShown + 1 })
     } else {
       !this.props.player.showPlayer && this.props.dispatch({ type: types.SHOW_PLAYER })
     }
@@ -73,18 +71,18 @@ class PlayerControls extends React.Component<Props> {
   }
 
   onDuration = (duration: number) => {
-    this.props.dispatch({ type: types.SET_PLAYER_DURATION, value: duration})
+    this.props.dispatch({ type: types.SET_PLAYER_DURATION, value: duration })
   }
 
   // Play prev song of the player list
   playPrev = () => {
-    this.props.dispatch({type: types.PLAY_PREV})
+    this.props.dispatch({ type: types.PLAY_PREV })
   }
 
   // Play next song of the player list
   playNext = () => {
     // Force player playing refresh
-    this.props.dispatch({type: types.PLAY_NEXT})
+    this.props.dispatch({ type: types.PLAY_NEXT })
   }
 
   resetPlayedSeconds = () => {
@@ -92,12 +90,12 @@ class PlayerControls extends React.Component<Props> {
   }
 
   saveTrackPlayed = (songId: string) => {
-    this.props.dispatch({type: types.SONG_PLAYED, songId})
+    this.props.dispatch({ type: types.SONG_PLAYED, songId })
   }
 
   onError = (e: Error) => {
-    console.log(e.message)
-    this.props.dispatch({type: types.PLAY_ERROR, error: e})
+    console.error(e.message)
+    this.props.dispatch({ type: types.PLAY_ERROR, error: e.message })
   }
 
   showPlayer = () => {
@@ -106,7 +104,7 @@ class PlayerControls extends React.Component<Props> {
     }
   }
 
-  render () {
+  render() {
     const {
       playedSeconds,
       playing,
@@ -120,23 +118,8 @@ class PlayerControls extends React.Component<Props> {
 
     const { streamUri } = this.props.player
 
-    const handlers = (
-      <>
-        <KeyHandler
-          keyEventName={KEYPRESS}
-          keyValue="f"
-          onKeyHandle={() => this.props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
-        />
-        <KeyHandlers
-          playPrev={this.playPrev}
-          playPause={this.playPause}
-          playNext={this.playNext}
-        />
-      </>
-    )
-
     if (!this.props.itemCount || !currentPlaying || !streamUri) {
-      return handlers
+      return
     }
 
     const playerClassnames = classNames({
@@ -151,14 +134,14 @@ class PlayerControls extends React.Component<Props> {
       .pathname
       .match(new RegExp(`/song/${currentPlayingId}`))
 
-      const config = {
-        file: {
-          forceAudio: currentPlaying.media_type === 'audio',
-          attributes: {
-            className: currentPlaying.media_type === 'video' ? 'video-element': 'video-element'
-          }
+    const config = {
+      file: {
+        forceAudio: currentPlaying.media_type === 'audio',
+        attributes: {
+          className: currentPlaying.media_type === 'video' ? 'video-element' : 'video-element'
         }
       }
+    }
 
     if (currentPlaying.media_type === 'audio') {
       config.file.attributes['crossOrigin'] = 'anonymous'
@@ -166,7 +149,6 @@ class PlayerControls extends React.Component<Props> {
 
     return (
       <React.Fragment>
-        { handlers }
         <div id="player">
           <InPortal node={this.props.playerPortal}>
             <ReactPlayer
@@ -179,7 +161,7 @@ class PlayerControls extends React.Component<Props> {
               playing={playing}
               onClick={this.playPause}
               onDoubleClick={() => {
-                this.props.dispatch({type: types.TOGGLE_FULL_SCREEN})
+                this.props.dispatch({ type: types.TOGGLE_FULL_SCREEN })
               }}
               onMouseMove={this.showPlayer}
               volume={volume / 100}
@@ -200,15 +182,16 @@ class PlayerControls extends React.Component<Props> {
             />
           </InPortal>
         </div>
-        { !songFinder && currentPlaying.media_type === 'video' && (
+        {!songFinder && currentPlaying.media_type === 'video' && (
           <OutPortal
             className={`left-0 right-0 top-0 botton-0 absolute ${currentPlaying.media_type === 'video' && 'bg-handler'}`}
             node={this.props.playerPortal}
           />
         )}
-        { showControls &&
-          <div className={ classNames({'player-container': true }) } style={{ zIndex: 102 }}>
-            <CSSTransitionGroup
+        {showControls &&
+          <div className={classNames({ 'player-container': true })} style={{ zIndex: 102 }}>
+            <CSSTransition
+              timeout={500}
               transitionName="player"
               transitionAppear={true}
               transitionAppearTimeout={500}
@@ -232,15 +215,15 @@ class PlayerControls extends React.Component<Props> {
                   <Cover song={currentPlaying} />
                   <div className='flex justify-between items-center w-full'>
                     <div className='mx-2 pr-2 md:text-center w-full truncate overflow-hidden'>
-                      <Link to={`/song/${currentPlaying.id}`} className='text-lg md:text-xl text-blue-200 block' style={{textShadow: '#000000 0px 0px 4px'}}>
+                      <Link to={`/song/${currentPlaying.id}`} className='text-lg md:text-xl text-blue-200 block' style={{ textShadow: '#000000 0px 0px 4px' }}>
                         <h5 className='truncate'>
-                          { currentPlaying.title }
+                          {currentPlaying.title}
                         </h5>
                       </Link>
-                      { currentPlaying.artist &&
-                        <Link to={`/artist/${currentPlaying.artist.id}`} className='block' style={{textShadow: '#000000 0px 0px 4px'}}>
+                      {currentPlaying.artist &&
+                        <Link to={`/artist/${currentPlaying.artist.id}`} className='block' style={{ textShadow: '#000000 0px 0px 4px' }}>
                           <h6 className='truncate text-blue-400'>
-                            {  currentPlaying.artist.name }
+                            {currentPlaying.artist.name}
                           </h6>
                         </Link>
                       }
@@ -260,10 +243,10 @@ class PlayerControls extends React.Component<Props> {
                   </div>
                 </div>
               </div>
-            </CSSTransitionGroup>
+            </CSSTransition>
           </div>
         }
-        <Visualizer playerRef={this.playerRef.current} visualizerOnTop={this.props.player.fullscreen}/>
+        <Visualizer playerRef={this.playerRef.current} visualizerOnTop={this.props.player.fullscreen} />
       </React.Fragment>
     )
   }

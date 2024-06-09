@@ -1,4 +1,5 @@
 import reducer from './settings'
+import { describe, it, expect } from 'vitest'
 
 import * as types from '../constants/ActionTypes'
 
@@ -16,7 +17,7 @@ describe('settings reducer', () => {
         baseUrl: 'http://localhost'
       }
     }
-    expect(reducer(undefined, {type: types.RECEIVE_SETTINGS, settings}))
+    expect(reducer(undefined, { type: types.RECEIVE_SETTINGS, settings }))
       .toEqual(
         {
           ...defaultState,
@@ -45,8 +46,8 @@ describe('settings reducer', () => {
         }
       }
     }
-    expect(reducer(undefined, {type: types.SETTINGS_SAVED_SUCCESSFULLY, settings}))
-      .toEqual(expect.objectContaining({settings}))
+    expect(reducer(undefined, { type: types.SETTINGS_SAVED_SUCCESSFULLY, settings }))
+      .toEqual(expect.objectContaining({ settings }))
   })
 
   it('should handle ADD_PROVIDER', () => {

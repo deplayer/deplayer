@@ -1,5 +1,5 @@
 import { AutoSizer, List } from 'react-virtualized'
-import { Route } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import * as React from 'react'
 
 import AddNewMediaButton from '../Buttons/AddNewMediaButton'
@@ -25,7 +25,8 @@ export type Props = {
 }
 
 const MusicTable = (props: Props) => {
-  const errors = props.error && <div>{ props.error }</div>
+  const errors = props.error && <div>{props.error}</div>
+  const location = useLocation()
 
   if (props.app.loading) {
     return (
@@ -62,7 +63,7 @@ const MusicTable = (props: Props) => {
         isCurrent={id === song.id}
         style={style}
         onClick={() => {
-          props.dispatch({type: types.SET_CURRENT_PLAYING, songId: song.id})
+          props.dispatch({ type: types.SET_CURRENT_PLAYING, songId: song.id })
         }}
         disableAddButton={props.disableAddButton}
         disableCovers={props.disableCovers}
@@ -75,27 +76,35 @@ const MusicTable = (props: Props) => {
   // Track the position of current playing to jump there
   const currentIndex = !props.disableCurrent ? props.tableIds.indexOf(props.queue.currentPlaying) : null
 
+  const getActions = () => {
+    switch (location.pathname) {
+      case '/queue':
+        return (
+          <>
+            <ClearQueueButton />
+            <SaveQueueButton />
+            <PlayAllButton dispatch={props.dispatch} />
+          </>
+        )
+      case '/collection':
+        return (<><AddNewMediaButton /><PlayAllButton dispatch={props.dispatch} /></>)
+      case '/song/:id':
+        return (<ToggleMiniQueueButton />)
+      case '/search-results':
+        return <PlayAllButton dispatch={props.dispatch} />
+      default:
+        return null
+    }
+  }
+
   return (
     <React.Fragment>
       <div className='p-2 h-8 toolbar flex justify-between items-center text-base'>
         <div className='p-2'>
-          #<b>{ props.tableIds.length }</b>
+          #<b>{props.tableIds.length}</b>
         </div>
         <div className='actions flex items-center'>
-          <Route
-            path="/queue"
-            component={() => (
-              <>
-                <ClearQueueButton />
-                <SaveQueueButton />
-                <PlayAllButton dispatch={props.dispatch} />
-              </>
-            )}
-          />
-          <Route path="/collection" component={() => <AddNewMediaButton /> } />
-          <Route path="/song/:id" component={() => <ToggleMiniQueueButton /> } />
-          <Route path="/collection" component={() => <PlayAllButton dispatch={props.dispatch} /> } />
-          <Route path="/search-results" component={() => <PlayAllButton dispatch={props.dispatch} /> } />
+          {getActions()}
         </div>
       </div>
       <AutoSizer className='music-table'>

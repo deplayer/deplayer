@@ -1,13 +1,14 @@
+import { describe, it, expect } from 'vitest'
 import MediaMergerService from './MediaMergerService'
 import Media from '../entities/Media'
 
 describe('MediaMergerService', () => {
   it('should merge two media objects with its streams', () => {
     const song1 = new Media({
-      stream: [{service: 'itunes', urls: []}]
+      stream: [{ service: 'itunes', urls: [] }]
     })
     const song2 = new Media({
-      stream: [{service: 'itunes', urls: []}]
+      stream: [{ service: 'itunes', urls: [] }]
     })
     const mediaMergerService = new MediaMergerService(song1, song2)
     const merged = mediaMergerService.getMerged()
@@ -18,12 +19,12 @@ describe('MediaMergerService', () => {
 
   it('should combine two different streams', () => {
     const song1 = new Media({
-      stream: [{service: 'itunes', urls: []}]
+      stream: [{ service: 'itunes', urls: [] }]
     })
     const song2 = new Media({
       stream: [
-        {service: 'itunes', urls: []},
-        {service: 'subsonic', urls: []}
+        { service: 'itunes', urls: [] },
+        { service: 'subsonic', urls: [] }
       ]
     })
     const mediaMergerService = new MediaMergerService(song1, song2)

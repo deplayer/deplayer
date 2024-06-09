@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom'
 import { Translate } from 'react-redux-i18n'
-import React from 'react'
 
 import HorizontalSlider from '../HorizontalSlider'
 import CoverImage from '../MusicTable/CoverImage'
+import type Album from '../../entities/Album'
 
-const AlbumCover = ({ album }) => {
+const AlbumCover = ({ album }: { album: Album }) => {
   return (
     <div className='block rounded w-32 h-32 mx-2'>
       <Link to={`/album/${album.id}`} className='h-32'>
@@ -18,7 +18,7 @@ const AlbumCover = ({ album }) => {
           }}
         />
         <p className='py-4 whitespace-normal text-center truncate w-32'>
-          { album.name }
+          {album.name}
         </p>
       </Link>
     </div>
@@ -27,7 +27,7 @@ const AlbumCover = ({ album }) => {
 
 // All items component
 // Important! add unique key
-export const Albums = (list: Array<any>) => {
+export const Albums = (list: Array<Album>) => {
   return list
     .filter((album) => {
       return album.name !== '' // We don't want empty titles
@@ -43,12 +43,12 @@ export const Albums = (list: Array<any>) => {
 }
 
 type Props = {
-  albums: Array<any>
+  albums: Array<Album>
 }
 
 const RelatedAlbums = (props: Props) => {
   const albums = Albums(props.albums)
-  const title = <Translate value='titles.albums'/>
+  const title = <Translate value='titles.albums' />
 
   return (
     <HorizontalSlider

@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import KeyHandler, {KEYPRESS, KEYUP} from 'react-key-handler'
 import * as types from '../constants/ActionTypes'
 
 type Props = {
@@ -11,11 +10,6 @@ type Props = {
 const GlobalKeyHandlers = (props: Props) => {
   return (
     <>
-      <KeyHandler
-        keyEventName={KEYUP}
-        keyValue="m"
-        onKeyHandle={() => props.dispatch({ type: types.VOLUME_SET, value: 0 })}
-      />
     </>
   )
 }

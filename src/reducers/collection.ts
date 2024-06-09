@@ -1,12 +1,14 @@
 import Media from '../entities/Media'
+import Artist from '../entities/Artist'
 import filterSongs from '../utils/filter-songs'
 import * as types from '../constants/ActionTypes'
 import IndexService from '../services/Search/IndexService'
+const indexService = new IndexService()
 
-type State = {
+export type State = {
   rows: { [key: string]: Media },
-  artists: any,
-  albums: any,
+  artists: { [key: string]: Artist },
+  albums: { [key: string]: any },
   albumsByArtist: any,
   songsByAlbum: any,
   songsByNumberOfPlays: Array<string>,
@@ -44,17 +46,8 @@ export const defaultState = {
   totalRows: 0
 }
 
-const getIndexService = (index: any) => {
-  const indexService = new IndexService()
-  if (!index) {
-    return indexService
-  }
-
-  return indexService.loadIndex(index.index)
-}
-
-const populateFromAction = (state: State, action: {data: any}) => {
-  const songs = action.data.map((row: any) => {
+const populateFromAction = (state: State, action: { data: any }) => {
+  const songs: [Media] = action.data.map((row: any) => {
     return new Media({
       ...row,
       id: row.id,
@@ -79,13 +72,9 @@ const populateFromAction = (state: State, action: {data: any}) => {
   for (let i = 0; i < songs.length; i++) {
     const song = songs[i]
 
-    rows[song.id] = song
-    artists[song.artist.id] = song.artist
-    albums[song.album.id] = {
-      ...song.album,
-      albumName: song.albumName,
-      thumbnailUrl: song.cover.thumbnailUrl
-    }
+    rows[song.id] = song.toDocument()
+    artists[song.artist.id] = song.artist.toDocument()
+    albums[song.album.id] = song.album.toDocument()
 
     if (!songsByArtist[song.artist.id]) {
       songsByArtist[song.artist.id] = []
@@ -117,28 +106,28 @@ const populateFromAction = (state: State, action: {data: any}) => {
       songsByAlbum[song.album.id].push(song.id)
     }
 
-    if (!mediaByType[song.type]) {
-      mediaByType[song.media_type] = []
+    const songType = song.media_type
+    if (!mediaByType[songType]) {
+      mediaByType[songType] = []
     }
 
-    if (!mediaByType[song.media_type].includes(song.id)) {
-      mediaByType[song.media_type].push(song.id)
+    if (!mediaByType[songType].includes(song.id)) {
+      mediaByType[songType].push(song.id)
     }
   }
 
-  const totalRows = {...state.rows, ...rows}
-  const indexService = getIndexService(state.searchIndex)
+  const totalRows = { ...state.rows, ...rows }
 
   return {
     ...state,
     rows: totalRows,
-    artists: {...state.artists, ...artists},
-    albums: {...state.albums, ...albums},
-    songsByArtist: {...state.songsByArtist, ...songsByArtist},
-    songsByGenre: {...state.songsByGenre, ...songsByGenre},
-    songsByAlbum: {...state.songsByAlbum, ...songsByAlbum},
-    mediaByType: {...state.mediaByType, ...mediaByType},
-    albumsByArtist: {...state.albumsByArtist, ...albumsByArtist},
+    artists: { ...state.artists, ...artists },
+    albums: { ...state.albums, ...albums },
+    songsByArtist: { ...state.songsByArtist, ...songsByArtist },
+    songsByGenre: { ...state.songsByGenre, ...songsByGenre },
+    songsByAlbum: { ...state.songsByAlbum, ...songsByAlbum },
+    mediaByType: { ...state.mediaByType, ...mediaByType },
+    albumsByArtist: { ...state.albumsByArtist, ...albumsByArtist },
     visibleSongs: filterSongs(
       indexService,
       totalRows
@@ -170,8 +159,7 @@ export default (state: State = defaultState, action: any = {}) => {
     }
 
     case types.START_SEARCH:
-    case types.SEARCH_FINISHED:  {
-      const indexService = getIndexService(state.searchIndex)
+    case types.SEARCH_FINISHED: {
       return {
         ...state,
         searchResults: state.searchTerm !== '' ? filterSongs(indexService, state.rows, state.searchTerm) : []
@@ -179,7 +167,6 @@ export default (state: State = defaultState, action: any = {}) => {
     }
 
     case types.RECEIVE_SEARCH_INDEX: {
-      const indexService = getIndexService(action.data)
       return {
         ...state,
         searchIndex: action.data,

@@ -5,9 +5,15 @@ const filterSongs = (
   songs: any,
   term: string = ''
 ) => {
-  if (term === '') {
+  if (!songs) {
+    []
+  }
+
+  if (term === '' && songs) {
     return Object.keys(songs)
   }
+
+  console.log('indexService', indexService)
 
   const results = indexService.search(term)
 

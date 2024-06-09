@@ -10,16 +10,16 @@ test:
   stage: test
   image: node:20
   script:
-  - yarn
-  - yarn test
+  - npm install
+  - npm run test
 
 deploy:
   stage: deploy
   image: node:20
   script:
-  - yarn
-  - yarn build
-  - cp build/index.html build/200.html # Creating fallback page
+  - npm install
+  - npm run build
+    # - cp build/index.html build/200.html # Creating fallback page
   - node_modules/.bin/surge --project ./build --domain deplayer.surge.sh
   only:
   - tags

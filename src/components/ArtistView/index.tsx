@@ -1,5 +1,4 @@
 import { Dispatch } from 'redux'
-import { Redirect } from 'react-router-dom'
 import * as React from 'react'
 
 import Tag from '../common/Tag'
@@ -13,7 +12,7 @@ type Props = {
   albumsByArtist: any,
   artist: Artist,
   artistMetadata: any,
-  className: string|null,
+  className: string | null,
   collection: any,
   dispatch: Dispatch,
   songs: any,
@@ -26,7 +25,7 @@ const extractBackground = (collection, songsByAlbum, albumsByArtist = []): strin
     return collection.rows[songsByAlbum[albumId][0]].cover.fullUrl
   }
 
-    return ''
+  return ''
 }
 
 
@@ -59,14 +58,6 @@ export default class ArtistView extends React.Component<Props> {
       songsByAlbum
     } = this.props
 
-    if (!artist) {
-      return (
-        <div>
-          <Redirect to='/' />
-        </div>
-      )
-    }
-
     const extractSummary = (): string => {
       if (this.props.artistMetadata && this.props.artistMetadata.artist) {
         return this.props.artistMetadata.artist.bio.content
@@ -89,21 +80,21 @@ export default class ArtistView extends React.Component<Props> {
     })
 
     return (
-      <div className={`artist-view ${this.props.className} z-50`}>
+      <div data-testid="artist-view" className={`artist-view ${this.props.className} z-50`}>
         <div className='main w-full z-10 md:p-4'>
-          <h2 className='text-center text-3xl py-2'>{ artist.name }</h2>
-          <p dangerouslySetInnerHTML={{__html: extractSummary()}} />
+          <h2 className='text-center text-3xl py-2'>{artist.name}</h2>
+          <p dangerouslySetInnerHTML={{ __html: extractSummary() }} />
           {
             this.props.artistMetadata && this.props.artistMetadata['life-span'] && (
               <div className='text-center text-md'>
-                { this.props.artistMetadata['life-span'].begin } { this.props.artistMetadata['life-span'].end && '- ' + this.props.artistMetadata['life-span'].end }
+                {this.props.artistMetadata['life-span'].begin} {this.props.artistMetadata['life-span'].end && '- ' + this.props.artistMetadata['life-span'].end}
               </div>
             )
           }
           {
             this.props.artistMetadata && this.props.artistMetadata['country'] && (
               <div className='text-center text-md'>
-                { this.props.artistMetadata['country'] }
+                {this.props.artistMetadata['country']}
               </div>
             )
           }
@@ -113,7 +104,7 @@ export default class ArtistView extends React.Component<Props> {
                 return (
                   <div className='mr-2 py-1 inline-block'>
                     <Tag key={index} transparent>
-                      <a target="_blank" href={ relation.url.resource }>{ relation.type }</a>
+                      <a target="_blank" href={relation.url.resource}>{relation.type}</a>
                     </Tag>
                   </div>
                 )
@@ -122,7 +113,7 @@ export default class ArtistView extends React.Component<Props> {
           </div>
 
           <div className='yt-4'>
-            { albumRows }
+            {albumRows}
           </div>
           <div className='placeholder'></div>
         </div>

@@ -1,5 +1,4 @@
 import { Dispatch } from 'redux'
-import { Redirect } from 'react-router-dom'
 import * as React from 'react'
 
 import RelatedAlbums from '../RelatedAlbums'
@@ -10,7 +9,7 @@ type Props = {
   queue: any,
   albumsByArtist: any,
   artistMetadata: any,
-  className: string|null,
+  className: string | null,
   collection: any,
   dispatch: Dispatch,
   songs: any,
@@ -22,14 +21,6 @@ export default class AlbumView extends React.Component<Props> {
   render() {
     const { album, collection: { albums, albumsByArtist } } = this.props
 
-    if (!album) {
-      return (
-        <div>
-          <Redirect to='/' />
-        </div>
-      )
-    }
-
     const relatedAlbums = albumsByArtist && albumsByArtist[album.artist.id] && albumsByArtist[album.artist.id].map((albumId: string) => {
       return albums[albumId]
     })
@@ -37,7 +28,7 @@ export default class AlbumView extends React.Component<Props> {
     return (
       <div className={`artist-view ${this.props.className} z-50`}>
         <div className='main w-full z-10 md:p-4'>
-          <h2 className='text-center text-3xl py-3'>{ album.name }</h2>
+          <h2 className='text-center text-3xl py-3'>{album.name}</h2>
           <Album
             queue={this.props.queue}
             album={this.props.album}

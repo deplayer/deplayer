@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import PlayPauseButton from './PlayPauseButton'
 import SkipButton from './SkipButton'
 
@@ -14,7 +12,7 @@ type ControlProps = {
 const Controls = (props: ControlProps) => {
   return (
     <>
-      { props.mqlMatch &&
+      {props.mqlMatch &&
         <SkipButton
           onClick={props.playPrev}
           type="prev"
