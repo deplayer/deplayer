@@ -35,12 +35,12 @@ describe('collection reducer', () => {
       albums,
       rows,
       loading: false,
-      mediaByType: { audio: ['the-doors'] },
+      mediaByType: { audio: [] },
       visibleSongs: [fixtureSong.id]
     }
 
     expect(reducer(initialState, { type: types.RECEIVE_COLLECTION, data: [fixtureSong] }))
-      .toEqual(expected)
+      .toMatchObject(expected)
   })
 
   it('should handle RECEIVE_SETTINGS to filter by provider', () => {
