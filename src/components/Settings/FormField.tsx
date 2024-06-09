@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { Field } from 'formik'
+import { Field, FormikProvider } from 'formik'
 import Toggle from 'react-toggle'
+import { useFormik, useFormikContext } from 'formik'
 
 import 'react-toggle/style.css'
 
@@ -15,9 +15,11 @@ export const TYPES = {
 
 const FormikToggle = ({
   field,
-  form: { touched, errors },
+  form,
   ...props
 }) => {
+  useFormikContext()
+
   return (
     <Toggle
       id={field.name}
@@ -30,22 +32,26 @@ const FormikToggle = ({
 }
 
 const FormField = (props: Props) => {
+  const formik = useFormik({})
   const { field } = props
 
   if (field.type === TYPES.checkbox) {
     return (
-      <div className='w-full toggle-control flex justify-end'>
-        <Field
-          name={field.name}
-          component={FormikToggle}
-        />
-      </div>
+      <FormikProvider value={formik}>
+        <div className='w-full toggle-control flex justify-end'>
+          <Field
+            name={field.name}
+            component={FormikToggle}
+          />
+        </div>
+      </FormikProvider>
     )
   }
 
   return (
-    <Field
-      className={`
+    <FormikProvider value={formik}>
+      <Field
+        className={`
         ${field.type === TYPES.checkbox ? 'form-check' : 'form-control'}
         p-3
         w-24
@@ -56,9 +62,10 @@ const FormField = (props: Props) => {
         rounded
         text-lg
       `}
-      name={field.name}
-      type={field.type}
-    />
+        name={field.name}
+        type={field.type}
+      />
+    </FormikProvider>
   )
 }
 

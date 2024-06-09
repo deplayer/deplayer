@@ -1287,6 +1287,13 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-toggle@^4.0.5":
+  version "4.0.5"
+  resolved "https://registry.npmjs.org/@types/react-toggle/-/react-toggle-4.0.5.tgz"
+  integrity sha512-MHHEDe7GnF/EhLtI5sT70Dqab8rwlgjRZtu/u6gmfbYd+HeYxWiUSRog16+1BCfkz7Wy2VU6+TPU2oCsDtqDzA==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-virtualized@^9.21.30":
   version "9.21.30"
   resolved "https://registry.npmjs.org/@types/react-virtualized/-/react-virtualized-9.21.30.tgz"

@@ -1,10 +1,9 @@
-import * as React from 'react'
 import { Translate } from 'react-redux-i18n'
 
 import FormField, { TYPES } from './FormField'
 
 type Props = {
-  schema: any
+  schema: { fields: any[] }
 }
 
 // Convert schema object to form elements

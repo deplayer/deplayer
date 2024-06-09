@@ -1,23 +1,20 @@
 import { describe, it, expect } from 'vitest'
-import { shallow } from 'enzyme'
-import { Translate } from 'react-redux-i18n'
-import configureEnzyme from '../../tests/configureEnzyme'
+import { render, screen } from '@testing-library/react'
 
 import SettingsForm from './SettingsForm'
-
-configureEnzyme()
 
 const setup = (customProps: any) => {
   const schema = {
     providers: {},
     fields: [
-      { title: <Translate value="labels.mstream" />, type: 'title' },
-      { title: <Translate value="labels.enabled" />, name: 'providers.mstream.enabled', type: 'checkbox' },
-      { title: <Translate value="labels.mstream.baseUrl" />, name: 'providers.mstream.baseUrl', type: 'url' }
+      { title: "labels.mstream", type: 'title' },
+      { title: "labels.enabled", name: 'providers.mstream.enabled', type: 'checkbox' },
+      { title: "labels.mstream.baseUrl", name: 'providers.mstream.baseUrl', type: 'url' }
     ]
   }
 
   const defaultProps = {
+    schema: schema,
     settings: {
       settingsForm: schema,
       settings: {
@@ -29,17 +26,12 @@ const setup = (customProps: any) => {
 
   const props = { ...defaultProps, ...customProps }
 
-  const enzymeWrapper = shallow(<SettingsForm {...props} />)
-
-  return {
-    props,
-    enzymeWrapper,
-  }
+  render(<SettingsForm {...props} schema={schema} />)
 }
 
 describe('SettingsForm', () => {
   it('renders without crashing', () => {
-    const { enzymeWrapper } = setup({})
-    expect(enzymeWrapper.find('Formik').exists()).toBe(true)
+    setup({})
+    expect(screen.getByRole('button')).toBeTruthy()
   })
 })

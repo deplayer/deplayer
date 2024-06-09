@@ -25,7 +25,7 @@ const Content = (props: any) => {
     return (
       <img
         src={imageUrl}
-        alt={ props.alt }
+        alt={props.alt}
       />
     )
   }
@@ -37,9 +37,10 @@ const Content = (props: any) => {
 
   return (
     <div
+      data-testid='cover-image'
       className={className}
-      style={{backgroundImage: `url(${imageUrl})`}}
-      data-alt={ props.alt }
+      style={{ backgroundImage: `url(${imageUrl})` }}
+      data-alt={props.alt}
     />
   )
 }
@@ -84,8 +85,8 @@ const CoverImage = (props: Props) => {
       reflect={props.reflect}
       useImage={props.useImage}
       onClick={props.onClick}
-      alt={ `${props.albumName} cover` }
-      src={ src }
+      alt={`${props.albumName} cover`}
+      src={src}
     />
   )
 }

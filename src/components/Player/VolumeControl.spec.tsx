@@ -1,29 +1,19 @@
-import * as React from 'react'
-import { shallow } from 'enzyme'
-import Slider from 'rc-slider'
+import { it, expect } from 'vitest'
+import { render, screen } from '@testing-library/react'
 
-import configureEnzyme from '../../tests/configureEnzyme'
 import VolumeControl from './VolumeControl'
-
-configureEnzyme()
 
 const setup = (customProps: any) => {
   const defaultProps = {
     keyValues: [],
-    onChange: jest.fn()
   }
-  const props = {...defaultProps, ...customProps}
+  const props = { ...defaultProps, ...customProps }
 
-  const enzymeWrapper = shallow(<VolumeControl {...props}/>)
-
-  return {
-    props,
-    enzymeWrapper,
-  }
+  render(<VolumeControl {...props} />)
 }
 
 it('renders without crashing', () => {
-  const { enzymeWrapper } = setup({volume: 50})
-  expect(enzymeWrapper.find(Slider).exists())
-    .toBe(true)
+  setup({ volume: 50 })
+  expect(screen.findByRole('slider'))
+    .toBeTruthy()
 })

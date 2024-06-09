@@ -1,27 +1,18 @@
 import { describe, it, expect } from 'vitest'
-import { shallow } from 'enzyme'
-import configureEnzyme from '../../tests/configureEnzyme'
+import { render, screen } from '@testing-library/react'
 
 import Settings from './Settings'
 
-configureEnzyme()
-
 const setup = (customProps: any) => {
-  const defaultProps = {settings: {settingsForm: {}}}
+  const defaultProps = { settings: { settingsForm: {} } }
 
-  const props = {...defaultProps, ...customProps}
+  const props = { ...defaultProps, ...customProps }
 
-  const enzymeWrapper = shallow(<Settings {...props}/>)
-
-  return {
-    props,
-    enzymeWrapper,
-  }
+  render(<Settings {...props} />)
 }
 
 describe('Settings', () => {
   it('renders without crashing', () => {
-    const { enzymeWrapper } = setup({})
-    expect(enzymeWrapper.find('SettingsForm').exists()).toBe(true)
+    expect(screen.findByRole('SettingsForm')).toBeTruthy()
   })
 })

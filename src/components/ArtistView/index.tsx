@@ -80,7 +80,7 @@ export default class ArtistView extends React.Component<Props> {
     })
 
     return (
-      <div className={`artist-view ${this.props.className} z-50`}>
+      <div data-testid="artist-view" className={`artist-view ${this.props.className} z-50`}>
         <div className='main w-full z-10 md:p-4'>
           <h2 className='text-center text-3xl py-2'>{artist.name}</h2>
           <p dangerouslySetInnerHTML={{ __html: extractSummary() }} />
