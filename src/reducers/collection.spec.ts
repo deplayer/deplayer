@@ -9,7 +9,7 @@ describe('collection reducer', () => {
       .toEqual(defaultState)
   })
 
-  it.only('should handle RECEIVE_COLLECTION', () => {
+  it('should handle RECEIVE_COLLECTION', () => {
     const initialState = { ...defaultState, enabledProviders: ['itunes'] }
     const fixtureSong = new Media({
       forcedId: 'the-doors',
