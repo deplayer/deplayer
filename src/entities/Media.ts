@@ -87,83 +87,15 @@ export default class Media {
     }
 
     this.stream = stream || []
-    this.cover = cover ? {
-      thumbnailUrl: cover.thumbnailUrl,
-      fullUrl: cover.fullUrl
-    } : {}
+    this.cover = {
+      thumbnailUrl: cover?.thumbnailUrl,
+      fullUrl: cover?.fullUrl
+    }
 
     // this must be the last assignment
     const id = forcedId ? forcedId : new MediaId(this).value
     this.id = id
     this.externalId = id
-  }
-
-  static toSchema(): any {
-    return {
-      id: {
-        type: 'string'
-      },
-      title: {
-        type: 'string'
-      },
-      duration: {
-        type: 'number'
-      },
-      playCount: {
-        type: 'number'
-      },
-      genre: {
-        type: 'string'
-      },
-      type: {
-        type: 'string'
-      },
-      shareUrl: {
-        type: 'string'
-      },
-      filePath: {
-        type: 'string'
-      },
-      albumName: {
-        type: 'string'
-      },
-      album: {
-        type: 'object',
-        properties: {
-          id: {
-            type: 'string'
-          },
-          name: {
-            type: 'string'
-          },
-        }
-      },
-      cover: {
-        type: 'object',
-        properties: {
-          thumbnailUrl: {
-            type: 'string'
-          },
-          fullUrl: {
-            type: 'string'
-          },
-        }
-      },
-      artist: {
-        type: 'object',
-        properties: {
-          id: {
-            type: 'string'
-          },
-          name: {
-            type: 'string'
-          },
-        }
-      },
-      stream: {
-        type: 'array'
-      },
-    }
   }
 
   generateArtist(artistName: string, artistId: string): Artist {

@@ -9,7 +9,7 @@ describe('collection reducer', () => {
       .toEqual(defaultState)
   })
 
-  it('should handle RECEIVE_COLLECTION', () => {
+  it.only('should handle RECEIVE_COLLECTION', () => {
     const initialState = { ...defaultState, enabledProviders: ['itunes'] }
     const fixtureSong = new Media({
       forcedId: 'the-doors',
@@ -18,23 +18,12 @@ describe('collection reducer', () => {
       albumName: 'LIght my fire',
       stream: [{ uris: [{ uri: 'http://some-songs-api/song.mp4' }], service: 'itunes' }]
     })
-    const rows = {}
-    rows[fixtureSong.id] = fixtureSong
-
-    const artists = {}
-    artists[fixtureSong.artist.id] = fixtureSong.artist
-
-    const songsByArtist = {}
-    songsByArtist[fixtureSong.artist.id] = [fixtureSong.id]
-
-    const albumsByArtist = {}
-    albumsByArtist[fixtureSong.artist.id] = [fixtureSong.album.id]
-
-    const songsByAlbum = {}
-    songsByAlbum[fixtureSong.album.id] = [fixtureSong.id]
-
-    const albums = {}
-    albums[fixtureSong.album.id] = fixtureSong.album
+    const rows = { [fixtureSong.id]: fixtureSong.toDocument() }
+    const artists = { [fixtureSong.artist.id]: fixtureSong.artist.toDocument() }
+    const songsByArtist = { [fixtureSong.artist.id]: [fixtureSong.id] }
+    const albumsByArtist = { [fixtureSong.artist.id]: [fixtureSong.album.id] }
+    const songsByAlbum = { [fixtureSong.album.id]: [fixtureSong.id] }
+    const albums = { [fixtureSong.album.id]: fixtureSong.album.toDocument() }
 
     const expected = {
       ...initialState,

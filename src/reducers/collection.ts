@@ -2,9 +2,10 @@ import Media from '../entities/Media'
 import Artist from '../entities/Artist'
 import filterSongs from '../utils/filter-songs'
 import * as types from '../constants/ActionTypes'
+import IndexService from '../services/Search/IndexService'
+const indexService = new IndexService()
 
 export type State = {
-  // FIXME: There should not be objects serialized here
   rows: { [key: string]: Media },
   artists: { [key: string]: Artist },
   albums: { [key: string]: any },
@@ -105,12 +106,13 @@ const populateFromAction = (state: State, action: { data: any }) => {
       songsByAlbum[song.album.id].push(song.id)
     }
 
-    if (!mediaByType[song.type]) {
-      mediaByType[song.media_type] = []
+    const songType = song.media_type
+    if (!mediaByType[songType]) {
+      mediaByType[songType] = []
     }
 
-    if (!mediaByType[song.media_type].includes(song.id)) {
-      mediaByType[song.media_type].push(song.id)
+    if (!mediaByType[songType].includes(song.id)) {
+      mediaByType[songType].push(song.id)
     }
   }
 
@@ -127,9 +129,10 @@ const populateFromAction = (state: State, action: { data: any }) => {
     mediaByType: { ...state.mediaByType, ...mediaByType },
     albumsByArtist: { ...state.albumsByArtist, ...albumsByArtist },
     visibleSongs: filterSongs(
+      indexService,
       totalRows
     ),
-    searchResults: state.searchTerm !== '' ? filterSongs(totalRows, state.searchTerm) : [],
+    searchResults: state.searchTerm !== '' ? filterSongs(indexService, totalRows, state.searchTerm) : [],
     totalRows: Object.keys(totalRows).length,
     loading: false
   }
@@ -159,7 +162,7 @@ export default (state: State = defaultState, action: any = {}) => {
     case types.SEARCH_FINISHED: {
       return {
         ...state,
-        searchResults: state.searchTerm !== '' ? filterSongs(state.rows, state.searchTerm) : []
+        searchResults: state.searchTerm !== '' ? filterSongs(indexService, state.rows, state.searchTerm) : []
       }
     }
 
@@ -167,7 +170,7 @@ export default (state: State = defaultState, action: any = {}) => {
       return {
         ...state,
         searchIndex: action.data,
-        searchResults: state.searchTerm !== '' ? filterSongs(state.rows, state.searchTerm) : []
+        searchResults: state.searchTerm !== '' ? filterSongs(indexService, state.rows, state.searchTerm) : []
       }
     }
 

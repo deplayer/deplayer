@@ -1,12 +1,18 @@
 import AlbumId from './AlbumId'
 import Artist from './Artist'
 
+interface AlbumParams {
+  name: string
+  artist: Artist
+  albumId?: string
+}
+
 export default class Album {
   id: string
   name: string
   artist: Artist
 
-  constructor(albumParams: any = {}) {
+  constructor(albumParams: AlbumParams) {
     const { name, artist, albumId } = albumParams
     this.name = name
     this.artist = artist
@@ -17,6 +23,11 @@ export default class Album {
     }).value
 
     this.id = compAlbumId
+  }
+
+  // FIXME: Implement
+  thumbnailUrl(): string {
+    return ""
   }
 
   static toSchema(): any {

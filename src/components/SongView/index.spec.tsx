@@ -2,7 +2,9 @@ import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import SongView from './index'
 import Media from '../../entities/Media'
+import Artist from '../../entities/Artist'
 import { defaultState as collectionDefaultState } from '../../reducers/collection'
+import { BrowserRouter } from 'react-router-dom'
 
 const setup = (customProps: any) => {
   const defaultProps = {
@@ -28,19 +30,20 @@ const setup = (customProps: any) => {
 }
 
 describe('SongView', () => {
-  const props = setup({})
-  render(<SongView {...props} />)
-
   it('spinner if app loading', () => {
-    expect(screen.getByRole('spinner')).toBeTruthy()
+    const props = setup({ loading: true })
+
+    render(<SongView {...props} />)
+    expect(screen.getByTestId('spinner')).toBeTruthy()
   })
 
   it('render song without crash', () => {
-    const song = new Media()
-    const collection = { rows: {}, songsByGenre: [] }
-    collection.rows[song.id] = song
-    setup({
+    const song = new Media({ artist: new Artist({ name: "Pink Floyd" }) })
+    const rows = { [song.id]: song }
+    const collection = { rows: rows, songsByGenre: [] }
+    const props = setup({
       song,
+      songId: song.id,
       collection,
       match: {
         params: {
@@ -48,6 +51,8 @@ describe('SongView', () => {
         }
       }
     })
-    expect(screen.getByRole('.song-view')).toBeFalsy()
+
+    render(<SongView {...props} />, { wrapper: BrowserRouter })
+    expect(screen.getByTestId('song-view')).toBeTruthy()
   })
 })

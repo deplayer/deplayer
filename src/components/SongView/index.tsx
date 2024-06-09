@@ -9,7 +9,7 @@ import Button from '../common/Button'
 import CoverImage from '../MusicTable/CoverImage'
 import RelatedAlbums from '../RelatedAlbums'
 import Icon from '../common/Icon'
-import Spinner from '..//Spinner'
+import Spinner from '../Spinner'
 import Tag from '../common/Tag'
 import * as types from '../../constants/ActionTypes'
 import { OutPortal } from 'react-reverse-portal'
@@ -99,14 +99,14 @@ const SongView = (props: Props) => {
       .map((songId: string) => rows[songId])
     : null
 
-  const relatedAlbums = albumsByArtist && albumsByArtist[song.artist.id] && albumsByArtist[song.artist.id].map((albumId: string) => {
+  const relatedAlbums = albumsByArtist?.[song.artist.id].map((albumId: string) => {
     return albums[albumId]
-  })
+  }) || []
 
   const songFinder = song.id === currentPlaying
 
   return (
-    <div className={`song-view ${props.className} w-full overflow-y-auto z-10 flex flex-col`}>
+    <div data-testid="song-view" className={`song-view ${props.className} w-full overflow-y-auto z-10 flex flex-col`}>
       <div className="song sm:flex">
         <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className="w-full md:m-6 md:rounded-b-lg image lg:max-w-md xl:max-w-xl">
           <div className='flex flex-col w-full md:sticky md:top-0'>
