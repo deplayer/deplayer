@@ -23,7 +23,6 @@ export default class Media {
   id: string
   title: string
   author: any
-  authorName: string
   cover: any
   artist: Artist
   album: Album
@@ -37,7 +36,6 @@ export default class Media {
   shareUrl: string
   albumName: string
   price: money
-  dateAdded: Date
   filePath: string
 
   constructor(songParams: any = {}) {

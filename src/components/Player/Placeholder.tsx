@@ -1,5 +1,4 @@
 import { connect } from 'react-redux'
-import * as React from 'react'
 import classNames from 'classnames'
 
 import { State } from '../../reducers/player'

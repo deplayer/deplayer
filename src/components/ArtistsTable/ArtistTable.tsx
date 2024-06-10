@@ -1,4 +1,4 @@
-import { AutoSizer, List } from 'react-virtualized'
+import { AutoSizer, List, ListRowRenderer } from 'react-virtualized'
 
 import ArtistRow from './ArtistRow'
 
@@ -15,16 +15,8 @@ const ArtistTable = (props: Props) => {
     <div><div>{props.error}</div></div>
     : null
 
-  const rowRenderer = ({
-    index,       // Index of row
-    isScrolling, // The List is currently being scrolled
-    isVisible,   // This row is visible within the List (eg it is not an overscanned row)
-    key,         // Unique key within array of rendered rows
-    parent,      // Reference to the parent List (instance)
-    style        // Style object to be applied to row (to position it);
-    // This must be passed through to the rendered row element.
-  }) => {
-    const artistId = props.tableIds[index]
+  const rowRenderer = (props: any): any => {
+    const artistId = props.tableIds[props.index]
     const artist = props.collection.artists[artistId]
 
     if (!artist || !artist.id) {
@@ -33,10 +25,10 @@ const ArtistTable = (props: Props) => {
 
     return (
       <ArtistRow
-        key={key}
+        key={props.key}
         artist={artist}
         songs={props.collection.songsByArtist[artist.id]}
-        style={style}
+        style={props.style}
       />
     )
   }
@@ -49,7 +41,7 @@ const ArtistTable = (props: Props) => {
             height={height}
             rowCount={props.tableIds.length}
             rowHeight={50}
-            rowRenderer={rowRenderer}
+            rowRenderer={rowRenderer as ListRowRenderer}
             width={width}
             overscanRowCount={6}
             recomputeRowHeights

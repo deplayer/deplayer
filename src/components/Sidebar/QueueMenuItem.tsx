@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import MenuItem from './MenuItem'
 import Icon from '../common/Icon'
 
@@ -8,7 +6,7 @@ type Props = {
   current?: Boolean
 }
 
-const QueueMenuItem = ({current = false, totalItems}: Props) => {
+const QueueMenuItem = ({ current = false, totalItems }: Props) => {
   return (
     <MenuItem
       totalItems={totalItems}
@@ -16,7 +14,7 @@ const QueueMenuItem = ({current = false, totalItems}: Props) => {
       url='/queue'
       title='now playing'
       label='Now playing'
-      icon={ <Icon icon='faMusic' /> }
+      icon={<Icon icon='faMusic' />}
     />
   )
 }

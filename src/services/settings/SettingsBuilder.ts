@@ -1,8 +1,7 @@
-import { ISettingsBuilder } from '../../interfaces/ISettingsBuilder'
 import sections from './sections'
 import providerBuilders from './providers'
 
-export default class SettingsBuilder implements ISettingsBuilder {
+export default class SettingsBuilder {
   getFormSchema(providers: any = {}) {
     const totalFields = Object.keys(sections).reduce((accumulator, sectionId: string) => {
       if (sections[sectionId].isRepeatable) {

@@ -23,26 +23,26 @@ class Settings extends React.Component<Props, State> {
   }
 
   deleteCollection = () => {
-    this.props.dispatch({type: types.DELETE_COLLECTION})
+    this.props.dispatch({ type: types.DELETE_COLLECTION })
   }
 
   exportCollection = () => {
-    this.props.dispatch({type: types.EXPORT_COLLECTION})
+    this.props.dispatch({ type: types.EXPORT_COLLECTION })
   }
 
   importCollection = (data: any) => {
     try {
       const collectionImport = JSON.parse(data)
-      this.props.dispatch({type: types.IMPORT_COLLECTION, data: collectionImport})
-    } catch(e) {
-      this.props.dispatch({type: types.IMPORT_COLLECTION_REJECTED, error: e.message})
+      this.props.dispatch({ type: types.IMPORT_COLLECTION, data: collectionImport })
+    } catch (e: any) {
+      this.props.dispatch({ type: types.IMPORT_COLLECTION_REJECTED, error: e.message })
     }
   }
 
-  toggleImporter = () => this.setState({showImporter: true})
+  toggleImporter = () => this.setState({ showImporter: true })
 
   deleteSettings = () => {
-    this.props.dispatch({type: types.DELETE_SETTINGS})
+    this.props.dispatch({ type: types.DELETE_SETTINGS })
   }
 
   render() {
@@ -70,7 +70,7 @@ class Settings extends React.Component<Props, State> {
             <Button onClick={this.deleteSettings} inverted>
               <Translate value="labels.deleteSettings" />
             </Button>
-            { ImporterComp }
+            {ImporterComp}
           </div>
         </div>
       </MainContainer>

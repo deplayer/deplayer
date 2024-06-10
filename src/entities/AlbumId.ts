@@ -5,9 +5,11 @@ export default class AlbumId {
   name: string
   artistName: string
 
-  constructor(props: {albumName: string, artistName: string}) {
+  constructor(props: { albumName: string, artistName: string }) {
     this.name = props.albumName ? props.albumName : 'undefined-album'
     this.artistName = props.artistName ? props.artistName : 'undefined-artist'
+
+    this.id = this.value
   }
 
   get value(): string {

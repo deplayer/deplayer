@@ -50,7 +50,7 @@ export default class PouchdbAdapter implements IAdapter {
     return this.getDocObj(model, id)
   }
 
-  getDocObj = async (model: string, id: string): Promise<any> => {
+  getDocObj = async (_model: string, id: string): Promise<any> => {
     const instance = await db.get()
 
     return instance.get(id, { attachments: true })
@@ -61,8 +61,8 @@ export default class PouchdbAdapter implements IAdapter {
     await dbInst[model].remove()
   }
 
-  getAll = async (model: string, conditions: any = {}): Promise<any> => {
-    return new Promise(async (resolve, reject) => {
+  getAll = async (model: string, _conditions: any = {}): Promise<any> => {
+    return new Promise(async (resolve, _reject) => {
       const instance = await db.get()
 
       logger.log('PouchDB', 'Querying all database')
@@ -101,7 +101,7 @@ export default class PouchdbAdapter implements IAdapter {
     return instance[model].importDump(data)
   }
 
-  getDb = (): Promise<any> => {
+  getDb = (): Promise<PouchDB.Database> => {
     return db.get()
   }
 }

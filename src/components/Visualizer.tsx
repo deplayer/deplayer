@@ -13,9 +13,6 @@ class Visualizer extends React.Component<Props> {
   render() {
     const widthFactor = 8
 
-    // FIXME: Temporary disable this component
-    return null
-
     if (!this.props?.playerRef?.getInternalPlayer()) {
       return null
     }

@@ -1,7 +1,6 @@
 import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
 import { connect } from 'react-redux'
-import * as React from 'react'
 
 import Icon from '../common/Icon'
 import Button from '../common/Button'
@@ -14,14 +13,14 @@ type Props = {
 
 const ProviderButton = (props: Props) => {
   const onClick = () => {
-    props.dispatch({type: types.ADD_PROVIDER, providerKey: props.providerKey})
+    props.dispatch({ type: types.ADD_PROVIDER, providerKey: props.providerKey })
   }
 
   return (
     <Button
       inverted
       onClick={onClick}
-      title={ props.providerKey }
+      title={props.providerKey}
     >
       <Icon icon='faPlusCircle' className='mr-2' />
       <Translate value={`buttons.addProvider.${props.providerKey}`} />

@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 
 import Sidebar from '../components/Sidebar/Sidebar'
 
-export default connect((state: any, ownProps: any) => {
+export default connect((state: any) => {
   return {
     mqlMatch: state.app.mqlMatch,
     loading: state.search.loading,

@@ -1,4 +1,3 @@
-import React from 'react'
 import classnames from 'classnames'
 
 type Props = {
@@ -28,7 +27,7 @@ const Tag = (props: Props) => {
 
   return (
     <div className={classes}>
-      { props.children }
+      {props.children}
     </div>
   )
 }

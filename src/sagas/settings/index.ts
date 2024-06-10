@@ -19,14 +19,14 @@ export function* initialize() {
     const settings = yield call(settingsService.get)
 
     if (!settings) {
-      yield put({type: types.GET_SETTINGS_REJECTED})
+      yield put({ type: types.GET_SETTINGS_REJECTED })
     } else {
       const unserialized = JSON.parse(JSON.stringify(settings))
-      yield put({type: types.RECEIVE_SETTINGS, settings: unserialized})
+      yield put({ type: types.RECEIVE_SETTINGS, settings: unserialized })
     }
-    yield put({type: types.RECEIVE_SETTINGS_FINISHED})
+    yield put({ type: types.RECEIVE_SETTINGS_FINISHED })
   } catch {
-    yield put({type: types.GET_SETTINGS_REJECTED})
+    yield put({ type: types.GET_SETTINGS_REJECTED })
   }
 }
 
@@ -36,24 +36,24 @@ function* saveSettings(action: any) {
   try {
     const settings = yield call(settingsService.save, 'settings', action.settingsPayload)
 
-    yield put({type: types.SETTINGS_SAVED_SUCCESSFULLY, settings})
-    yield put({type: types.INITIALIZE, settings})
-    yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.settings.saved'})
-  } catch (e) {
-    yield put({type: types.SETTINGS_SAVED_REJECTED, error: e.message})
-    yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.settings.error_saving', error: e.message})
+    yield put({ type: types.SETTINGS_SAVED_SUCCESSFULLY, settings })
+    yield put({ type: types.INITIALIZE, settings })
+    yield put({ type: types.SEND_NOTIFICATION, notification: 'notifications.settings.saved' })
+  } catch (e: any) {
+    yield put({ type: types.SETTINGS_SAVED_REJECTED, error: e.message })
+    yield put({ type: types.SEND_NOTIFICATION, notification: 'notifications.settings.error_saving', error: e.message })
   }
 }
 
 export function* deleteSettings(): any {
   try {
     const adapter = getAdapter()
-    const settingsService  = new SettingsService(new adapter())
+    const settingsService = new SettingsService(new adapter())
     yield call(settingsService.removeAll)
-    yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.settings.deleted'})
-  } catch (e) {
-    yield put({type: types.SEND_NOTIFICATION, notification: 'notifications.settings.deleted_failed'})
-    yield put({type: types.REMOVE_FROM_SETTINGS_REJECTED, message: e.message})
+    yield put({ type: types.SEND_NOTIFICATION, notification: 'notifications.settings.deleted' })
+  } catch (e: any) {
+    yield put({ type: types.SEND_NOTIFICATION, notification: 'notifications.settings.deleted_failed' })
+    yield put({ type: types.REMOVE_FROM_SETTINGS_REJECTED, message: e.message })
   }
 }
 

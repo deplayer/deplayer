@@ -8,12 +8,7 @@ import { IMusicProvider } from './IMusicProvider'
  */
 export default class YoutubeDlServerProvider implements IMusicProvider {
   baseUrl: string
-  user: string
-  password: string
-  albumSongsUrl: string
   searchUrl: string
-  streamBase: string
-  coverBase: string
   providerKey: string
   playUrl: string
 
@@ -41,7 +36,7 @@ export default class YoutubeDlServerProvider implements IMusicProvider {
       stream: [
         {
           service: this.providerKey,
-          uris: [{uri: `${this.playUrl}?url=${escape(songInfo.webpage_url)}`}]
+          uris: [{ uri: `${this.playUrl}?url=${escape(songInfo.webpage_url)}` }]
         }
       ]
     })

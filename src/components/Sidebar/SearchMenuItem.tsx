@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import MenuItem from './MenuItem'
 import Icon from '../common/Icon'
 
@@ -8,7 +6,7 @@ type Props = {
   totalItems: number
 }
 
-const SearchMenuItem = ({current = false, totalItems}: Props) => {
+const SearchMenuItem = ({ current = false, totalItems }: Props) => {
   return (
     <MenuItem
       current={current}

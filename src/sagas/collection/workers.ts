@@ -16,7 +16,7 @@ export function* saveToDbWorker(data: Array<any>): any {
   try {
     yield call(collectionService.bulkSave, data, prevCollection)
     yield put({ type: types.SAVE_COLLECTION_FULLFILLED })
-  } catch (e) {
+  } catch (e: any) {
     logger.log('settings-saga', 'addToCollection', e)
     yield put({ type: types.SAVE_COLLECTION_FAILED, error: e.message })
   }
@@ -28,7 +28,7 @@ export function* removeFromDbWorker(action: any): any {
     yield collectionService.bulkRemove(action.data)
     yield put({ type: types.REMOVE_FROM_COLLECTION_FULFILLED, data: action.data })
     yield put({ type: types.RECREATE_INDEX })
-  } catch (e) {
+  } catch (e: any) {
     yield put({ type: types.REMOVE_FROM_COLLECTION_REJECTED, message: e.message })
   }
 }
@@ -40,7 +40,7 @@ export function* deleteCollectionWorker(): any {
     yield put({ type: types.CLEAR_COLLECTION })
     yield put({ type: types.CLEAR_QUEUE })
     yield put({ type: types.SEND_NOTIFICATION, notification: 'notifications.collection_deleted' })
-  } catch (e) {
+  } catch (e: any) {
     yield put({ type: types.REMOVE_FROM_COLLECTION_REJECTED, message: e.message })
   }
 }
@@ -49,7 +49,7 @@ export function* exportCollectionWorker(): any {
   try {
     const exported = yield collectionService.exportCollection()
     yield put({ type: types.EXPORT_COLLECTION_FINISHED, exported })
-  } catch (e) {
+  } catch (e: any) {
     yield put({ type: types.EXPORT_COLLECTION_REJECTED, message: e.message })
   }
 }

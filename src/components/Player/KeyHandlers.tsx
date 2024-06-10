@@ -1,5 +1,4 @@
-import * as React from 'react'
-import KeyHandler, {KEYPRESS, KEYUP} from 'react-key-handler'
+import KeyHandler, { KEYPRESS, KEYUP } from 'react-key-handler'
 
 type Props = {
   playPrev: () => void,

@@ -13,8 +13,8 @@ const AlbumCover = ({ album }: { album: Album }) => {
           reflect
           albumName={album.name}
           cover={{
-            thumbnailUrl: album.thumbnailUrl,
-            fullUrl: album.thumbnailUrl
+            thumbnailUrl: album.thumbnailUrl(),
+            fullUrl: album.thumbnailUrl()
           }}
         />
         <p className='py-4 whitespace-normal text-center truncate w-32'>

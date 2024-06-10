@@ -25,7 +25,7 @@ export default class MstreamApiProvider implements IMusicProvider {
       || re.test(song.metadata.title)
   }
 
-  filterSongs = (result: any, searchTerm: string): Array<any> => {
+  filterSongs = (result: Array<any>, searchTerm: string): Array<any> => {
     return result.filter((resultSong) => {
       return this.matchSearch(resultSong, searchTerm)
     })
@@ -38,12 +38,12 @@ export default class MstreamApiProvider implements IMusicProvider {
         title: song.metadata.title ? song.metadata.title : song.filepath,
         artistName: song.metadata.artist,
         albumName: song.metadata.album,
-        thumbnailUrl: song.metadata['album-art'] ? this.baseUrl + '/album-art/' + song.metadata['album-art']: undefined,
-        fullUrl: song.metadata['album-art'] ? this.baseUrl + '/album-art/' + song.metadata['album-art']: undefined,
+        thumbnailUrl: song.metadata['album-art'] ? this.baseUrl + '/album-art/' + song.metadata['album-art'] : undefined,
+        fullUrl: song.metadata['album-art'] ? this.baseUrl + '/album-art/' + song.metadata['album-art'] : undefined,
         stream: [
           {
             service: this.providerKey,
-            uris: [{uri: this.baseUrl + '/media/' + decodeURIComponent(song.filepath)}]
+            uris: [{ uri: this.baseUrl + '/media/' + decodeURIComponent(song.filepath) }]
           }
         ]
       })

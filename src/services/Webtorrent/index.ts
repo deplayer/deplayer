@@ -3,13 +3,13 @@ import Webtorrent from 'webtorrent'
 import Media from '../../entities/Media'
 
 const announceList = [
-  ['wss://tracker.btorrent.xyz'],
-  ['udp://tracker.openbittorrent.com:80'],
-  ['udp://tracker.internetwarriors.net:1337'],
-  ['udp://tracker.leechers-paradise.org:6969'],
-  ['udp://tracker.coppersurfer.tk:6969'],
-  ['udp://exodus.desync.com:6969'],
-  ['wss://tracker.openwebtorrent.com'],
+  'wss://tracker.btorrent.xyz',
+  'udp://tracker.openbittorrent.com:80',
+  'udp://tracker.internetwarriors.net:1337',
+  'udp://tracker.leechers-paradise.org:6969',
+  'udp://tracker.coppersurfer.tk:6969',
+  'udp://exodus.desync.com:6969',
+  'wss://tracker.openwebtorrent.com',
 ]
 
 export const magnetToMedia = async (torrentUrl: string): Promise<Array<Media>> => {
@@ -27,7 +27,7 @@ export const magnetToMedia = async (torrentUrl: string): Promise<Array<Media>> =
       })
 
       const medias = files.map((file: any) => {
-        const type = file.name.endsWith('.mp4') ? 'video': 'audio'
+        const type = file.name.endsWith('.mp4') ? 'video' : 'audio'
         return new Media({
           title: file.name,
           artistName: 'webtorrent',

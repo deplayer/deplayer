@@ -1,4 +1,3 @@
-import * as React from 'react'
 import Modal from '../common/Modal'
 import Header from '../common/Header'
 
@@ -17,7 +16,7 @@ const Lyrics = (props: Props) => {
       <Header>Lyrics</Header>
       <div className='p-4 my-6'>
         <pre className='overflow-y-auto'>
-          { props.lyrics }
+          {props.lyrics}
         </pre>
       </div>
     </Modal>

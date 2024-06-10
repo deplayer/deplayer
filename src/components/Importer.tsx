@@ -13,40 +13,40 @@ export default class Importer extends React.Component<Props> {
     status: ''
   }
 
-  constructor (props: Props) {
+  constructor(props: Props) {
     super(props)
     // create a ref to store the textInput DOM element
     this.fileInput = React.createRef()
   }
 
-  loaded (evt) {
+  loaded(evt): void {
     // Obtain the read file data
     const fileString = evt.target.result
-    this.setState({status: 'File loaded!'})
+    this.setState({ status: 'File loaded!' })
     this.props.onLoaded(fileString)
   }
 
-  errorHandler (evt) {
-    if(evt.target.error.name === "NotReadableError") {
+  errorHandler(evt) {
+    if (evt.target.error.name === "NotReadableError") {
       // The file could not be read
     }
 
-    this.setState({status: evt.target.error.name})
+    this.setState({ status: evt.target.error.name })
   }
 
-  updateProgress (evt) {
+  updateProgress(evt: ProgressEvent): void {
     if (evt.lengthComputable) {
       // evt.loaded and evt.total are ProgressEvent properties
       var loaded = (evt.loaded / evt.total);
       if (loaded < 1) {
         // Increase the prog bar length
         // style.width = (loaded * 200) + "px";
-        this.setState({status: 'Loading ' + loaded + '%'})
+        this.setState({ status: 'Loading ' + loaded + '%' })
       }
     }
   }
 
-  getAsText (readFile) {
+  getAsText(readFile: File) {
     var reader = new FileReader()
 
     // Read file into memory as UTF-16
@@ -56,7 +56,7 @@ export default class Importer extends React.Component<Props> {
     reader.onprogress = this.updateProgress.bind(this)
     reader.onload = this.loaded.bind(this)
     reader.onerror = this.errorHandler.bind(this)
-    this.setState({status: 'Loading'})
+    this.setState({ status: 'Loading' })
   }
 
   startImport() {
@@ -80,8 +80,8 @@ export default class Importer extends React.Component<Props> {
           ref={this.fileInput}
         />
         <Button onClick={this.startImport.bind(this)}>Start import</Button>
-        { message }
+        {message}
       </React.Fragment>
     )
   }
-  }
+}

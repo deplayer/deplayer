@@ -1,10 +1,9 @@
 import { Translate } from 'react-redux-i18n'
-import * as React from 'react'
 import Slider from 'rc-slider'
 
 type Props = {
   volume: number,
-  onChange: (volume: number) => void
+  onChange: (volume: number | number[]) => void
 }
 
 const VolumeControl = (props: Props) => {
@@ -17,10 +16,10 @@ const VolumeControl = (props: Props) => {
         className='bar'
         min={0}
         max={100}
-        step={ 1 }
+        step={1}
         type='range'
-        value={ props.volume }
-        onChange={ props.onChange }
+        value={props.volume}
+        onChange={props.onChange}
       />
     </div>
   )

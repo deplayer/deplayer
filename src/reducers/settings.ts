@@ -1,11 +1,10 @@
 import * as types from '../constants/ActionTypes'
-import { ISettings } from '../interfaces/ISettings'
 import SettingsBuilder from '../services/settings/SettingsBuilder'
 
 export type State = {
   error: string,
   saving: boolean,
-  settings: ISettings,
+  settings: any,
   settingsForm: {
     providers: any,
     fields: any

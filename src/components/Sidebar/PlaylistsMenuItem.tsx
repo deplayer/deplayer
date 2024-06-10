@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import MenuItem from './MenuItem'
 import Icon from '../common/Icon'
 
@@ -7,7 +5,7 @@ type Props = {
   current?: Boolean
 }
 
-const PlaylistsMenuItem = ({current = false}: Props) => {
+const PlaylistsMenuItem = ({ current = false }: Props) => {
   return (
     <MenuItem
       current={current}

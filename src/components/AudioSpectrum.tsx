@@ -111,7 +111,7 @@ class AudioSpectrum extends React.Component<Props> {
       this.initializeVisualizer()
       this.initAudioEvents(this.analyser)
       if (this.props.showVisuals) {
-        this.drawVisuals(this.analyser)
+        this.drawVisuals()
       }
     }
   }
@@ -123,24 +123,24 @@ class AudioSpectrum extends React.Component<Props> {
     this.visualizer = null
   }
 
-  initAudioEvents = (analyser) => {
+  initAudioEvents = (analyser: AnalyserNode) => {
     const { showSpectrum, showVisuals } = this.props
-    this.props.playerRef.onpause = (e) => {
+    this.props.playerRef.onpause = () => {
       this.playStatus = 'PAUSED'
     }
-    this.props.playerRef.onplay = (e) => {
+    this.props.playerRef.onplay = () => {
       this.playStatus = 'PLAYING'
       if (showSpectrum) {
         this.drawSpectrum(analyser)
       }
 
       if (showVisuals) {
-        this.drawVisuals(analyser)
+        this.drawVisuals()
       }
     }
   }
 
-  drawVisuals = (analyser) => {
+  drawVisuals = () => {
     const startRender = () => {
       this.visualizer.render()
       requestAnimationFrame(() => startRender())
@@ -159,7 +159,7 @@ class AudioSpectrum extends React.Component<Props> {
     startRender()
   }
 
-  drawSpectrum = (analyser) => {
+  drawSpectrum = (analyser: AnalyserNode) => {
     const cwidth = this.spectrumCanvas.width
     const cheight = this.spectrumCanvas.height - this.props.capHeight
     const capYPositionArray: Array<any> = [] // store the vertical position of hte caps for the preivous frame

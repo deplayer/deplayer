@@ -6,13 +6,9 @@ import TopbarContainer from './TopbarContainer'
 import SearchButton from '../components/Buttons/SearchButton'
 import Placeholder from '../components/Player/Placeholder'
 import Icon from '../components/common/Icon'
+import type { State as AppState } from '../reducers/app'
 import type { State } from '../reducers'
-
-type TitleRouter = {
-  location: {
-    pathname: string
-  }
-}
+import { useLocation } from 'react-router-dom'
 
 type TitleCollection = {
   rows: any
@@ -21,13 +17,14 @@ type TitleCollection = {
 }
 
 const dynamicTitle = (
-  router: TitleRouter,
   collection: TitleCollection,
   searchTerm: ''
 ): string | React.ReactNode => {
-  const songFinder = router?.location.pathname.match(/\/song\/(.*)/)
-  const artistFinder = router?.location.pathname.match(/\/artist\/(.*)/)
-  const albumFinder = router?.location.pathname.match(/\/album\/(.*)/)
+  const location = useLocation()
+
+  const songFinder = location.pathname.match(/\/song\/(.*)/)
+  const artistFinder = location.pathname.match(/\/artist\/(.*)/)
+  const albumFinder = location.pathname.match(/\/album\/(.*)/)
 
   if (songFinder && songFinder[1]) {
     const song = collection.rows[songFinder[1]]
@@ -71,7 +68,7 @@ const dynamicTitle = (
     )
   }
 
-  switch (router?.location.pathname) {
+  switch (location.pathname) {
     case '/settings':
       return (
         <>
@@ -140,12 +137,10 @@ const dynamicTitle = (
   }
 }
 
-type PropsFromRedux = ConnectedProps<typeof connector>
-
-interface LayoutProps extends PropsFromRedux {
+interface LayoutProps {
   backgroundImage: string,
   dispatch: Dispatch,
-  app: State,
+  app: AppState,
   title: string,
   children: React.ReactNode
 }
@@ -181,7 +176,7 @@ function Layout(props: LayoutProps) {
 
 const connector = connect(
   (state: State) => ({
-    title: dynamicTitle(state.router, state.collection, state.search.searchTerm),
+    title: dynamicTitle(state.collection, state.search.searchTerm),
     backgroundImage: state.app.backgroundImage,
     queue: state.queue,
     app: state.app,

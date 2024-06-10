@@ -1,7 +1,6 @@
 import { Dispatch } from 'redux'
 import { Formik, Form } from 'formik'
 import { Translate } from 'react-redux-i18n'
-import React from 'react'
 
 import * as types from '../../constants/ActionTypes'
 import { State as SettingsStateType } from '../../reducers/settings'
@@ -17,11 +16,11 @@ type Props = {
 
 const Providers = (props: Props) => {
   const saveSettings = (form: any): any => {
-    props.dispatch({type: types.SAVE_SETTINGS, settingsPayload: form})
+    props.dispatch({ type: types.SAVE_SETTINGS, settingsPayload: form })
   }
 
   const scanSources = () => {
-    props.dispatch({type: types.START_SCAN_SOURCES})
+    props.dispatch({ type: types.START_SCAN_SOURCES })
   }
 
   const providers = Object.keys(props.settings.settingsForm.providers).map((providerKey) => {
@@ -56,26 +55,26 @@ const Providers = (props: Props) => {
           }}
           enableReinitialize
           render=
-            {({
-              isSubmitting
-            }) => (
-              <Form
-                className='settings-form'
-              >
+          {({
+            isSubmitting
+          }) => (
+            <Form
+              className='settings-form'
+            >
 
-                <div className='flex flex-wrap'>
-                  { providers }
-                </div>
+              <div className='flex flex-wrap'>
+                {providers}
+              </div>
 
-                <div>
-                  { !!providers.length && (
-                    <Button long uppercase disabled={isSubmitting} type='submit' size='2xl' >
-                      <Translate value="buttons.save" />
-                    </Button>
-                  )}
-                </div>
-              </Form>
-            )}
+              <div>
+                {!!providers.length && (
+                  <Button long uppercase disabled={isSubmitting} type='submit' size='2xl' >
+                    <Translate value="buttons.save" />
+                  </Button>
+                )}
+              </div>
+            </Form>
+          )}
         />
         <div className='my-12'>
           <Button onClick={scanSources} inverted>

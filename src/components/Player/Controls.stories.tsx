@@ -1,6 +1,5 @@
 import { storiesOf } from '@storybook/react'
 import { withKnobs, boolean, number } from '@storybook/addon-knobs'
-import * as React from 'react'
 import withProvider from '../../utils/withProvider'
 
 import Controls from './Controls'
