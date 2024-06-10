@@ -1,13 +1,12 @@
 import Media from '../entities/Media'
-import Artist from '../entities/Artist'
 import filterSongs from '../utils/filter-songs'
 import * as types from '../constants/ActionTypes'
 import IndexService from '../services/Search/IndexService'
 const indexService = new IndexService()
 
 export type State = {
-  rows: { [key: string]: Media },
-  artists: { [key: string]: Artist },
+  rows: { [key: string]: any },
+  artists: { [key: string]: any },
   albums: { [key: string]: any },
   albumsByArtist: any,
   songsByAlbum: any,
@@ -46,97 +45,97 @@ export const defaultState = {
   totalRows: 0
 }
 
-const populateFromAction = (state: State, action: { data: any }) => {
-  const songs: [Media] = action.data.map((row: any) => {
-    return new Media({
-      ...row,
-      id: row.id,
-      forcedId: row.id,
-      artistName: row.artist.name,
-      artistId: row.artist.id,
-      albumId: row.album.id
-    })
-  })
+interface Artist {
+  id: string;
+  name: string;
+}
 
-  const rows = {}
-  const artists = {}
-  const albums = {}
-  const songsByArtist = {}
-  const songsByGenre = {}
-  const albumsByArtist = {}
-  const songsByAlbum = {}
-  const mediaByType = {}
-  // FIXME: Convert this in a functional way
-  // using map instead of forEach for better performance
-  // https://jsperf.com/map-vs-foreach-speed-test
-  for (let i = 0; i < songs.length; i++) {
-    const song = songs[i]
+interface Album {
+  id: string;
+  name: string;
+}
 
-    rows[song.id] = song.toDocument()
-    artists[song.artist.id] = song.artist.toDocument()
-    albums[song.album.id] = song.album.toDocument()
+interface Song {
+  id: string;
+  artist: Artist;
+  album: Album;
+  genres: string[];
+  media_type: string;
+}
 
-    if (!songsByArtist[song.artist.id]) {
-      songsByArtist[song.artist.id] = []
-    }
-
-    songsByArtist[song.artist.id].push(song.id)
-
-    song.genres.forEach((genre: string) => {
-      if (!songsByGenre[genre]) {
-        songsByGenre[genre] = []
-      }
-
-      songsByGenre[genre].push(song.id)
+const populateFromAction = (state: State, action: { data: any }): State => {
+  const aggregation = action.data.reduce((acc: any, row: any) => {
+    const song = new Media({
+       ...row,
+       id: row.id,
+       forcedId: row.id,
+       artistName: row.artist.name,
+       artistId: row.artist.id,
+       albumId: row.album.id
     })
 
-    if (!albumsByArtist[song.artist.id]) {
-      albumsByArtist[song.artist.id] = []
+    acc.rows[song.id] = song.toDocument()
+    acc.albums[song.album.id] = song.album.toDocument()
+    acc.artists[song.artist.id] = song.artist.toDocument()
+
+    // Ensure initialization of arrays/maps
+    acc.songsByArtist[song.artist.id] = acc.songsByArtist[song.artist.id] || [];
+    acc.songsByGenre = song.genres.reduce((genresAcc, genre) => {
+      genresAcc[genre] = genresAcc[genre] || [];
+      genresAcc[genre].push(song.id);
+      return genresAcc;
+    }, acc.songsByGenre);
+    acc.albumsByArtist[song.artist.id] = acc.albumsByArtist[song.artist.id] || [];
+    acc.songsByAlbum[song.album.id] = acc.songsByAlbum[song.album.id] || [];
+    acc.mediaByType[song.media_type] = acc.mediaByType[song.media_type] || [];
+
+    // Add song ID to relevant arrays if not already present
+    if (!acc.songsByArtist[song.artist.id].includes(song.id)) {
+      acc.songsByArtist[song.artist.id].push(song.id);
+    }
+    if (!acc.albumsByArtist[song.artist.id].includes(song.album.id)) {
+      acc.albumsByArtist[song.artist.id].push(song.album.id);
+    }
+    if (!acc.songsByAlbum[song.album.id].includes(song.id)) {
+      acc.songsByAlbum[song.album.id].push(song.id);
+    }
+    if (!acc.mediaByType[song.media_type].includes(song.id)) {
+      acc.mediaByType[song.media_type].push(song.id);
     }
 
-    if (!albumsByArtist[song.artist.id].includes(song.album.id)) {
-      albumsByArtist[song.artist.id].push(song.album.id)
-    }
+    return acc;
+  }, {
+    rows: {},
+    albums: {},
+    artists: {},
+    songsByArtist: {},
+    songsByGenre: {},
+    albumsByArtist: {},
+    songsByAlbum: {},
+    mediaByType: {},
+  });
 
-    if (!songsByAlbum[song.album.id]) {
-      songsByAlbum[song.album.id] = []
-    }
+  const rows = {...state.rows, ...aggregation.rows}
 
-    if (!songsByAlbum[song.album.id].includes(song.id)) {
-      songsByAlbum[song.album.id].push(song.id)
-    }
-
-    const songType = song.media_type
-    if (!mediaByType[songType]) {
-      mediaByType[songType] = []
-    }
-
-    if (!mediaByType[songType].includes(song.id)) {
-      mediaByType[songType].push(song.id)
-    }
-  }
-
-  const totalRows = { ...state.rows, ...rows }
-
+  // Merge the aggregated data with the existing state
   return {
     ...state,
-    rows: totalRows,
-    artists: { ...state.artists, ...artists },
-    albums: { ...state.albums, ...albums },
-    songsByArtist: { ...state.songsByArtist, ...songsByArtist },
-    songsByGenre: { ...state.songsByGenre, ...songsByGenre },
-    songsByAlbum: { ...state.songsByAlbum, ...songsByAlbum },
-    mediaByType: { ...state.mediaByType, ...mediaByType },
-    albumsByArtist: { ...state.albumsByArtist, ...albumsByArtist },
+    rows: rows,
+    artists: { ...state.artists, ...aggregation.artists },
+    albums: { ...state.albums, ...aggregation.albums },
+    songsByArtist: { ...state.songsByArtist, ...aggregation.songsByArtist },
+    songsByGenre: { ...state.songsByGenre, ...aggregation.songsByGenre },
+    albumsByArtist: { ...state.albumsByArtist, ...aggregation.albumsByArtist },
+    songsByAlbum: { ...state.songsByAlbum, ...aggregation.songsByAlbum },
+    mediaByType: { ...state.mediaByType, ...aggregation.mediaByType },
     visibleSongs: filterSongs(
-      indexService,
-      totalRows
+       indexService,
+       rows
     ),
-    searchResults: state.searchTerm !== '' ? filterSongs(indexService, totalRows, state.searchTerm) : [],
-    totalRows: Object.keys(totalRows).length,
-    loading: false
-  }
-}
+    loading: false,
+    totalRows: Object.keys(rows).length,
+  };
+};
 
 export const sortByPlayCount = (songId1: string, songId2: string, rows: any) => {
   const song1 = rows[songId1]

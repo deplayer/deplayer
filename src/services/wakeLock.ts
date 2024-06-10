@@ -3,9 +3,9 @@ let wakeLock = null
 export const requestWakeLock = async () => {
   if ('WakeLock' in window && 'request' in window.WakeLock) {
 
-      const controller = new AbortController()
-      const signal = controller.signal
-      window.WakeLock.request('screen', {signal})
+    const controller = new AbortController()
+    const signal = controller.signal
+    window.WakeLock.request('screen', { signal })
       .catch((e) => {
         if (e.name === 'AbortError') {
           console.log('Wake Lock was aborted')
@@ -13,8 +13,8 @@ export const requestWakeLock = async () => {
           console.error(`${e.name}, ${e.message}`)
         }
       })
-      console.log('Wake Lock is active')
-      wakeLock = controller
+    console.log('Wake Lock is active')
+    wakeLock = controller
 
   } else if ('wakeLock' in navigator && 'request' in navigator.wakeLock) {
     let wakeLock = null
@@ -26,7 +26,7 @@ export const requestWakeLock = async () => {
         console.log('Wake Lock was released')
       })
       console.log('Wake Lock is active')
-    } catch (e) {
+    } catch (e: any) {
       console.error(`${e.name}, ${e.message}`)
     }
   } else {

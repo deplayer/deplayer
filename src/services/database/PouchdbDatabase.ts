@@ -16,25 +16,25 @@ const createDB = (): any => {
   }
 }
 
-declare function emit(val: any)
+declare function emit(val: any): void
 
-const createIndex = async (db) => {
+const createIndex = async (db: PouchDB.Database) => {
   // document that tells PouchDB/CouchDB
   // to build up an index on doc.name
   var ddoc = {
     _id: '_design/deplayer',
     views: {
       by_type: {
-        map: function(doc: { type: String }) {
+        map: function (doc: { type: String }) {
           emit(doc.type);
         }.toString()
       }
     }
   };
   // save it
-  db.put(ddoc).then(function() {
+  db.put(ddoc).then(function () {
     console.log('index crated')
-  }).catch(function(err: Error) {
+  }).catch(function (err: Error) {
     // some error (maybe a 409, because it already exists?)
     console.log('error creating index', err)
   });

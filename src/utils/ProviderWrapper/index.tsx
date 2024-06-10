@@ -1,13 +1,9 @@
-import React from 'react'
-import { ConnectedRouter } from 'connected-react-router'
 import { Provider } from 'react-redux'
-import history from '../../store/configureHistory'
+import { Store } from 'redux'
 
-const ProviderWrapper = ({ children, store }) => (
+const ProviderWrapper = ({ children, store }: { children: React.ReactNode, store: Store }) => (
   <Provider store={store}>
-    <ConnectedRouter history={history} >
-      { children }
-    </ConnectedRouter>
+    {children}
   </Provider>
 )
 

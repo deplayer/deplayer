@@ -4,49 +4,49 @@ export default class DummyAdapter implements IAdapter {
   async initialize() {
   }
 
-  save(model: string, id: string, payload: any): Promise<any> {
+  save(_model: string, _id: string, _payload: any): Promise<any> {
     return new Promise((resolve) => {
       resolve({})
     })
   }
 
-  addMany(model: string, payload: any): Promise<any> {
+  addMany(_model: string, _payload: any): Promise<any> {
     return new Promise((resolve) => {
       resolve({})
     })
   }
 
-  removeMany(model: string, payload: any): Promise<any> {
+  removeMany(_model: string, _payload: any): Promise<any> {
     return new Promise((resolve) => {
       resolve({})
     })
   }
 
-  removeCollection(model: string): Promise<any> {
+  removeCollection(_model: string): Promise<any> {
     return new Promise((resolve) => {
       resolve({})
     })
   }
 
-  exportCollection(model: string): Promise<any> {
+  exportCollection(_model: string): Promise<any> {
     return new Promise((resolve) => {
       resolve({})
     })
   }
 
-  importCollection(model: string, data: any): Promise<any> {
+  importCollection(_model: string, _data: any): Promise<any> {
     return new Promise((resolve) => {
       resolve({})
     })
   }
 
-  get(model: string, id: string): Promise<any> {
+  get(_model: string, _id: string): Promise<any> {
     return new Promise((resolve) => {
       resolve({})
     })
   }
 
-  getAll(model: string): Promise<any> {
+  getAll(_model: string): Promise<any> {
     return new Promise((resolve) => {
       resolve([])
     })
