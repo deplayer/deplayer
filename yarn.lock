@@ -1182,11 +1182,6 @@
   resolved "https://registry.npmjs.org/@types/doctrine/-/doctrine-0.0.3.tgz"
   integrity sha512-w5jZ0ee+HaPOaX25X2/2oGR/7rgAQSYII7X7pp0m9KgBfMP7uKfMfTvcpl5Dj+eDBbpxKGiqE+flqDr6XTd2RA==
 
-"@types/elasticlunr@^0.9.9":
-  version "0.9.9"
-  resolved "https://registry.npmjs.org/@types/elasticlunr/-/elasticlunr-0.9.9.tgz"
-  integrity sha512-59TMY+u8jKLqSg0AZStCz4n8A7l/nVenmum6fFQa9bUOH26GNMEgDseiN813IxXmTQ0AivefnMlbileBggCf5g==
-
 "@types/emscripten@^1.39.6":
   version "1.39.12"
   resolved "https://registry.npmjs.org/@types/emscripten/-/emscripten-1.39.12.tgz"
@@ -1270,6 +1265,11 @@
   integrity sha512-pk2B1NWalF9toCRu6gjBzR69syFjP4Od8WRAX+0mmf9lAjCRicLOWc+ZrxZHx/0XRjotgkF9t6iaMJ+aXcOdZQ==
   dependencies:
     "@types/istanbul-lib-report" "*"
+
+"@types/lunr@^2.3.7":
+  version "2.3.7"
+  resolved "https://registry.npmjs.org/@types/lunr/-/lunr-2.3.7.tgz"
+  integrity sha512-Tb/kUm38e8gmjahQzdCKhbdsvQ9/ppzHFfsJ0dMs3ckqQsRj+P5IkSAwFTBrBxdyr3E/LoMUUrZngjDYAjiE3A==
 
 "@types/magnet-uri@*":
   version "5.1.5"
@@ -1507,6 +1507,13 @@
   dependencies:
     "@types/react" "*"
     redux "^3.7.2"
+
+"@types/react-s-alert@^1.3.6":
+  version "1.3.6"
+  resolved "https://registry.npmjs.org/@types/react-s-alert/-/react-s-alert-1.3.6.tgz"
+  integrity sha512-zeWmTqgzWLS2jtzPBxXiOJlmvQsBae5uMfQNXm0vPp84kyduQODcvMWggb+J4DyxD/CtY6OWNKHgKV2uVGnh8g==
+  dependencies:
+    "@types/react" "*"
 
 "@types/react-sidebar@^3.0.4":
   version "3.0.4"
@@ -3095,11 +3102,6 @@ ecma-proposal-math-extensions@0.0.2:
   version "0.0.2"
   resolved "https://registry.npmjs.org/ecma-proposal-math-extensions/-/ecma-proposal-math-extensions-0.0.2.tgz"
   integrity sha512-80BnDp2Fn7RxXlEr5HHZblniY4aQ97MOAicdWWpSo0vkQiISSE9wLR4SqxKsu4gCtXFBIPPzy8JMhay4NWRg/Q==
-
-elasticlunr@^0.9.5:
-  version "0.9.5"
-  resolved "https://registry.npmjs.org/elasticlunr/-/elasticlunr-0.9.5.tgz"
-  integrity sha512-5YM9LFQgVYfuLNEoqMqVWIBuF2UNCA+xu/jz1TyryLN/wmBcQSb+GNAwvLKvEpGESwgGN8XA1nbLAt6rKlyHYQ==
 
 electron-to-chromium@^1.4.668:
   version "1.4.774"
@@ -5183,6 +5185,11 @@ ltgt@^2.1.2, ltgt@~2.2.0, ltgt@2.2.1:
   version "2.2.1"
   resolved "https://registry.npmjs.org/ltgt/-/ltgt-2.2.1.tgz"
   integrity sha512-AI2r85+4MquTw9ZYqabu4nMwy9Oftlfa/e/52t9IjtfG+mGBbTNdAoZ3RQKLHR6r0wQnwZnPIEh/Ya6XTWAKNA==
+
+lunr@^2.3.9:
+  version "2.3.9"
+  resolved "https://registry.npmjs.org/lunr/-/lunr-2.3.9.tgz"
+  integrity sha512-zTU3DaZaF3Rt9rhN3uBMGQD3dD2/vFQqnvZCDv4dl5iOzq2IZQqTxu90r4E5J+nP70J3ilqVCrbho2eWaeW8Ow==
 
 lz-string@^1.5.0:
   version "1.5.0"

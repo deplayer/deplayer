@@ -5,7 +5,6 @@ import { addToCollectionWatcher, initializeWatcher } from './watchers'
 import {
   deleteCollectionWorker,
   exportCollectionWorker,
-  generateIndexWorker,
   importCollectionWorker,
   removeFromDbWorker,
   trackSongPlayed,

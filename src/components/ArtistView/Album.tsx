@@ -1,4 +1,3 @@
-import * as React from 'react'
 import * as types from '../../constants/ActionTypes'
 import Button from '../common/Button'
 import { Translate } from 'react-redux-i18n'
@@ -32,13 +31,13 @@ const Album = (props: AlbumProps) => {
           songsLength={props.songs.length}
           mqlMatch={false}
           disableCovers
-          style={ {} }
-          key={ songId }
+          style={{}}
+          key={songId}
           dispatch={props.dispatch}
-          isCurrent={ false }
-          slim={ true }
+          isCurrent={false}
+          slim={true}
           onClick={() => {
-            props.dispatch({type: types.SET_CURRENT_PLAYING, songId: songObj.id})
+            props.dispatch({ type: types.SET_CURRENT_PLAYING, songId: songObj.id })
           }}
           song={songObj}
         />
@@ -49,11 +48,11 @@ const Album = (props: AlbumProps) => {
   return (
     <div className='mx-0 z-4 flex flex-col md:flex-row items-center md:items-start md:items-start mb-16' key={albumId}>
       <div style={{ top: 50 }} className='md:sticky flex flex-col items-center md:mr-8'>
-        <h3 className='text-lg mb-2'>{ props.album.name }</h3>
+        <h3 className='text-lg mb-2'>{props.album.name}</h3>
         <div
           className='h-56 w-56 mb-2 md:h-56 md:w-56 cursor-pointer md:mr-4'
           onClick={() => {
-            props.dispatch({type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
+            props.dispatch({ type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
           }}
         >
           <CoverImage
@@ -68,7 +67,7 @@ const Album = (props: AlbumProps) => {
         <Button
           transparent
           onClick={() => {
-            props.dispatch({type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
+            props.dispatch({ type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
           }}
         >
           <Icon
@@ -79,7 +78,7 @@ const Album = (props: AlbumProps) => {
         </Button>
       </div>
       <div className='w-full m-2'>
-        { extractSongs() }
+        {extractSongs()}
       </div>
     </div>
   )

@@ -7,7 +7,7 @@ export default class ItunesApiProvider implements IMusicProvider {
   baseUrl: string
   providerKey: string
 
-  constructor(settings, providerKey = 'itunes') {
+  constructor(_settings: any, providerKey = 'itunes') {
     this.baseUrl = 'https://itunes.apple.com'
     this.providerKey = providerKey
   }
@@ -39,9 +39,9 @@ export default class ItunesApiProvider implements IMusicProvider {
       price: itSong.trackPrice,
       currency: itSong.currency,
       shareUrl: itSong.trackViewUrl,
-      type: isAudio ? 'audio': 'video',
+      type: isAudio ? 'audio' : 'video',
       stream: [
-        {service: this.providerKey, uris: [{uri: itSong.previewUrl, quality: 'demo'}]}
+        { service: this.providerKey, uris: [{ uri: itSong.previewUrl, quality: 'demo' }] }
       ]
     })
   }

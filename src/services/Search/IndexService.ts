@@ -1,24 +1,26 @@
-import elasticlunr from 'elasticlunr'
+import lunr from 'lunr'
 
 import Media from '../../entities/Media'
 import logger from '../../utils/logger'
 
 export default class IndexService {
-  index: any
+  indexBuilder: lunr.Builder
+  index: lunr.Index
 
   constructor() {
-    this.index = elasticlunr()
-    this.index.addField('title')
-    this.index.addField('artistName')
-    this.index.addField('albumName')
+    this.indexBuilder = new lunr.Builder
+    this.indexBuilder.field('title')
+    this.indexBuilder.field('artistName')
+    this.indexBuilder.field('albumName')
 
-    this.index.saveDocument(false)
+    this.index = this.indexBuilder.build()
   }
 
   generateIndexFrom = (collection: Array<Media>) => {
     collection.forEach((doc) => {
-      this.index.addDoc(doc)
+      this.indexBuilder.add(doc)
     })
+    this.index = this.indexBuilder.build()
 
     return this
   }
@@ -29,21 +31,13 @@ export default class IndexService {
       return this
     }
     logger.log('indexDump', indexDump)
-    this.index = elasticlunr.Index.load(indexDump)
+    this.index = lunr.Index.load(indexDump)
 
     return this
   }
 
   search(searchTerm: string) {
-    const results = this.index.search(searchTerm, {
-      fields: {
-        albumName: { boost: 3 },
-        artistName: { boost: 2 },
-        title: { boost: 1 }
-      },
-      bool: 'AND',
-      expand: true
-    })
+    const results = this.index.search(searchTerm)
     return results
   }
 }

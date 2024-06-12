@@ -21,7 +21,6 @@ import rootReducer from '../reducers'
 import rootSaga from '../sagas/rootSaga'
 
 // Custom middlewares
-// import alerts from './middlewares/alerts'
 import exports from './middlewares/exports'
 import outerReducer from './outerReducer'
 

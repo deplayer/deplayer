@@ -1,4 +1,5 @@
-import { Dispatch, connect } from 'react-redux'
+import { connect } from 'react-redux'
+import { Dispatch } from 'redux'
 import React from 'react'
 import parseTorrent from 'parse-torrent'
 
@@ -29,7 +30,7 @@ const AddMediaModal = (props: Props) => {
     <Modal
       title='Select media to add'
       onClose={() => {
-        props.dispatch({type: types.HIDE_ADD_MEDIA_MODAL})
+        props.dispatch({ type: types.HIDE_ADD_MEDIA_MODAL })
       }}
     >
       <div className='my-6'>
@@ -44,7 +45,7 @@ const AddMediaModal = (props: Props) => {
           />
         </div>
 
-        <input className='my-4' type="file" name="file" onChange={(event) => event.target.files && setTorrent(event.target.files[0])}/>
+        <input className='my-4' type="file" name="file" onChange={(event) => event.target.files && setTorrent(event.target.files[0])} />
 
         <div className='flex justify-end'>
           <Button
@@ -52,7 +53,7 @@ const AddMediaModal = (props: Props) => {
             type='submit'
             onClick={() => {
               if (magnetLink !== '') {
-                props.dispatch({type: types.ADD_WEBTORRENT_MEDIA, magnet: magnetLink})
+                props.dispatch({ type: types.ADD_WEBTORRENT_MEDIA, magnet: magnetLink })
               }
               if (torrent) {
                 console.log('torrent: ', torrent)
@@ -62,10 +63,10 @@ const AddMediaModal = (props: Props) => {
                   if (!parsedTorrent) return
 
                   const magnet = parseTorrent.toMagnetURI(parsedTorrent)
-                  props.dispatch({type: types.ADD_WEBTORRENT_MEDIA, magnet: magnet})
+                  props.dispatch({ type: types.ADD_WEBTORRENT_MEDIA, magnet: magnet })
                 })
               }
-              props.dispatch({type: types.HIDE_ADD_MEDIA_MODAL})
+              props.dispatch({ type: types.HIDE_ADD_MEDIA_MODAL })
             }}
           >
             Add and fetch
@@ -73,7 +74,7 @@ const AddMediaModal = (props: Props) => {
         </div>
       </div>
 
-      { /* Filesystem */ }
+      { /* Filesystem */}
       <div className='my-6'>
         <Header>
           Open local filesystem directory
@@ -117,7 +118,7 @@ const AddMediaModal = (props: Props) => {
                 key: 'youtube',
                 data: { url: youtubeLink }
               })
-              props.dispatch({type: types.HIDE_ADD_MEDIA_MODAL})
+              props.dispatch({ type: types.HIDE_ADD_MEDIA_MODAL })
             }}
           >
             Add and fetch
@@ -141,10 +142,10 @@ const AddMediaModal = (props: Props) => {
             onClick={() => {
               props.dispatch({
                 type: types.SEND_NOTIFICATION,
-                notification: `starting to scan hash: ${ ipfsHash }`,
+                notification: `starting to scan hash: ${ipfsHash}`,
                 level: 'info'
               })
-              props.dispatch({type: types.IPFS_FOLDER_FOUND, hash: ipfsHash })
+              props.dispatch({ type: types.IPFS_FOLDER_FOUND, hash: ipfsHash })
             }}
           >
             Add and fetch

@@ -2,6 +2,12 @@ import { IAdapter } from './IAdapter'
 import * as db from './PouchdbDatabase'
 import logger from '../../utils/logger'
 
+const cb = (err: any) => {
+  if (err) {
+    console.log('get err:', err)
+  }
+}
+
 export default class PouchdbAdapter implements IAdapter {
   initialize = async () => {
   }
@@ -12,7 +18,7 @@ export default class PouchdbAdapter implements IAdapter {
     const instance = await db.get()
 
     try {
-      const prev = await instance.get(id)
+      const prev = await instance.get(id, {}, cb)
       await instance.put({ ...prev, ...fixedPayload })
     } catch {
       await instance.put(fixedPayload)
@@ -53,7 +59,7 @@ export default class PouchdbAdapter implements IAdapter {
   getDocObj = async (_model: string, id: string): Promise<any> => {
     const instance = await db.get()
 
-    return instance.get(id, { attachments: true })
+    return instance.get(id, { attachments: true }, cb)
   }
 
   removeCollection = async (model: string): Promise<any> => {

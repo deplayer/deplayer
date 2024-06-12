@@ -22,7 +22,7 @@ export type State = {
   search: SearchState
 }
 
-export default (_history: any): State => combineReducers({
+export default (): State => combineReducers({
   app,
   artist,
   player,

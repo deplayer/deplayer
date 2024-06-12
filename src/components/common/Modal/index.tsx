@@ -39,8 +39,6 @@ const Modal = (props: Props) => {
     props.onClose && props.onClose()
   }
 
-  ReactModal.setAppElement('#modal')
-
   return (
     <ReactModal
       shouldCloseOnOverlayClick
@@ -51,7 +49,7 @@ const Modal = (props: Props) => {
       style={customStyles}
     >
       <div className='w-full flex justify-between'>
-        { props.title && <h2 className='py-4 text-2xl'>{props.title}</h2>}
+        {props.title && <h2 className='py-4 text-2xl'>{props.title}</h2>}
         <Button
           transparent
           onClick={() => close()}

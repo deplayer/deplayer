@@ -1,7 +1,6 @@
 # deplayer
 
 [![pipeline status](https://gitlab.com/deplayer/deplayer/badges/master/pipeline.svg)](https://gitlab.com/deplayer/deplayer/commits/master)
-
 [Online version](http://deplayer.surge.sh/)
 
 Play your music and videos entirely from your browser.
@@ -24,7 +23,7 @@ collection as you wish and play it from any device.
 ## Features
 
 * Progressive Web App, you can install it in your phone or as a desktop app.
-* Fulltext search support thanks to [elasticlunr](https://elasticlunr.com/).
+* Fulltext search support thanks to [lunr](https://lunrjs.com/).
 * Desktop and mobile notifications thanks to [Notification Web
   API](https://developer.mozilla.org/en-US/docs/Web/API/notification)
 * [Media Session

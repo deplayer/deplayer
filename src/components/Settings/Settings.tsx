@@ -7,10 +7,11 @@ import Importer from '../Importer'
 import MainContainer from '../common/MainContainer'
 import SettingsForm from './SettingsForm'
 import * as types from '../../constants/ActionTypes'
+import { State as SettingsState } from '../../reducers/settings'
 
 type Props = {
   dispatch: Dispatch,
-  settings: any
+  settings: SettingsState
 }
 
 type State = {

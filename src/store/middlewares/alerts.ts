@@ -1,7 +1,6 @@
 import { I18n } from 'react-redux-i18n'
 import Alert from 'react-s-alert'
 
-import AlertContentTemplate from './AlertContentTemplate'
 import * as types from '../../constants/ActionTypes'
 
 type Action = {
@@ -9,7 +8,7 @@ type Action = {
   notification: string
 }
 
-const alerts = () => next => (action: Action) => {
+const alerts = () => (next) => (action: Action) => {
   if (action.type === types.SEND_NOTIFICATION) {
     const options = {
       effect: 'stackslide',
