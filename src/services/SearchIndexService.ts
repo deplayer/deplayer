@@ -13,7 +13,7 @@ export default class SearchIndexService implements IStorageService {
     this.storageAdapter.initialize(model)
   }
 
-  save = (id: string, payload: any): Promise<any> => {
+  save = (_id: string, payload: any): Promise<any> => {
     logger.log('search index saving: ', payload)
     return this.storageAdapter.save('search_index', 'search_index', payload)
       .catch((e) => {

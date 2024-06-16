@@ -13,7 +13,7 @@ export default class QueueService implements IStorageService {
     this.storageAdapter.initialize(model)
   }
 
-  save = (id: string, payload: any): Promise<any> => {
+  save = (_id: string, payload: any): Promise<any> => {
     return this.storageAdapter.save('queue', 'queue', payload)
       .catch((e) => {
         logger.log('Error saving queue', e.message)

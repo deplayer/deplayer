@@ -1,6 +1,6 @@
 import * as types from '../constants/ActionTypes'
 
-type State = {
+export type State = {
   artistMetadata: any
 }
 
@@ -11,7 +11,7 @@ export const defaultState = {
 export default (state: State = defaultState, action: any): State => {
   switch (action.type) {
     case types.RECEIVE_ARTIST_METADATA:
-      return {...state, artistMetadata: action.data}
+      return { ...state, artistMetadata: action.data }
 
     case types.SET_CACHED_DATA: {
       return action.data.artist

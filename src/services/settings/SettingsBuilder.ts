@@ -3,7 +3,7 @@ import providerBuilders from './providers'
 
 export default class SettingsBuilder {
   getFormSchema(providers: any = {}) {
-    const totalFields = Object.keys(sections).reduce((accumulator, sectionId: string) => {
+    const totalFields = Object.keys(sections).reduce((accumulator: any, sectionId: string) => {
       if (sections[sectionId].isRepeatable) {
         return accumulator
       }

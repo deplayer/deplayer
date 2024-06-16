@@ -1,11 +1,11 @@
 import * as types from '../constants/ActionTypes'
 
-type State = {
+export type State = {
   lyrics?: string
 }
 
 export const defaultState = {
-  lyrics: null
+  lyrics: ''
 }
 
 export default (state: State = defaultState, action: any): State => {

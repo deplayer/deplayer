@@ -5,8 +5,6 @@ import { thunk } from 'redux-thunk'
 import promise from 'redux-promise'
 import perflogger from 'redux-perf-middleware'
 
-import history from './configureHistory'
-
 import {
   loadTranslations,
   setLocale,
@@ -45,8 +43,9 @@ export default function configureStore() {
 
   // Instantiate sagaMiddleware
   // Prepare store with all the middlewares
+  const reducer = outerReducer(rootReducer)
   const store = confStore({
-    reducer: outerReducer(rootReducer(history)),
+    reducer: reducer,
     devTools: process.env.NODE_ENV !== 'production',
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(...middlewares),
   })

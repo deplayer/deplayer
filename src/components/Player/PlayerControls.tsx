@@ -143,6 +143,9 @@ class PlayerControls extends React.Component<Props> {
       }
     }
 
+    // const visualizer = <Visualizer playerRef={this.playerRef.current} visualizerOnTop={this.props.player.fullscreen} /> 
+    const visualizer = null
+
     if (currentPlaying.media_type === 'audio') {
       config.file.attributes['crossOrigin'] = 'anonymous'
     }
@@ -246,7 +249,7 @@ class PlayerControls extends React.Component<Props> {
             </CSSTransition>
           </div>
         }
-        <Visualizer playerRef={this.playerRef.current} visualizerOnTop={this.props.player.fullscreen} />
+        {visualizer}
       </React.Fragment>
     )
   }

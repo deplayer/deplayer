@@ -13,7 +13,7 @@ export default class PlaylistService implements IStorageService {
     this.storageAdapter.initialize(model)
   }
 
-  save = (id: string, payload: any): Promise<any> => {
+  save = (_id: string, payload: any): Promise<any> => {
     return this.storageAdapter.save('playlist', 'playlist', payload)
       .catch((e) => {
         logger.log('Error saving playlist', e.message)

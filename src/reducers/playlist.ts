@@ -3,7 +3,7 @@ import {
   sortTrackIds
 } from './utils/queues'
 
-type State = {
+export type State = {
   trackIds: Array<string>,
   playlists: Array<any>
 }
@@ -31,10 +31,10 @@ export default (state: State = defaultState, action: any = {}): State => {
       }
 
     case types.SET_COLUMN_SORT:
-      return {...state, trackIds: sortTrackIds(action.songs, action.column)}
+      return { ...state, trackIds: sortTrackIds(action.songs, action.column) }
 
     case types.RECEIVE_PLAYLISTS:
-      return {...state, playlists: action.playlists}
+      return { ...state, playlists: action.playlists }
 
     case types.SET_CACHED_DATA: {
       return action.data.playlist
