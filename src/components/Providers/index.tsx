@@ -54,28 +54,24 @@ const Providers = (props: Props) => {
             actions.setSubmitting(false)
           }}
           enableReinitialize
-          render=
-          {({
-            isSubmitting
-          }) => (
-            <Form
-              className='settings-form'
-            >
+        >{({ isSubmitting }) => (
+          <Form
+            className='settings-form'
+          >
 
-              <div className='flex flex-wrap'>
-                {providers}
-              </div>
+            <div className='flex flex-wrap'>
+              {providers}
+            </div>
 
-              <div>
-                {!!providers.length && (
-                  <Button long uppercase disabled={isSubmitting} type='submit' size='2xl' >
-                    <Translate value="buttons.save" />
-                  </Button>
-                )}
-              </div>
-            </Form>
-          )}
-        />
+            <div>
+              {!!providers.length && (
+                <Button long uppercase disabled={isSubmitting} type='submit' size='2xl' >
+                  <Translate value="buttons.save" />
+                </Button>
+              )}
+            </div>
+          </Form>)}
+        </Formik>
         <div className='my-12'>
           <Button onClick={scanSources} inverted>
             <Translate value="labels.scanSources" />

@@ -2,15 +2,20 @@ import { Translate } from 'react-redux-i18n'
 
 import FormField, { TYPES } from './FormField'
 
+interface Field {
+  title: string
+  name: string
+  type: string
+}
 type Props = {
-  schema: { fields: any[] }
+  schema: { fields: Field[] }
 }
 
 // Convert schema object to form elements
 const FormSchema = (props: Props) => {
   const { fields } = props.schema
 
-  const populatedFields = fields.map((field: any, index: number) => {
+  const populatedFields = fields.map((field: Field, index: number) => {
     if (field.type === TYPES.title) {
       return (
         <h3 className='text-2xl leading-loose py-2 uppercase tracking-wide pt-4 pb-2' key={index}><Translate value={field.title} /></h3>

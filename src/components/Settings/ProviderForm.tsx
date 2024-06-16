@@ -40,7 +40,6 @@ const ProviderForm = (props: ProviderFormProps) => {
       </div>
 
       <FormSchema schema={props.settings.settingsForm.providers[props.providerKey]} />
-
     </div>
   )
 }
