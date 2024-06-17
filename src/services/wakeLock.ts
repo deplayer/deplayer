@@ -1,4 +1,4 @@
-let wakeLock = null
+let wakeLockController: AbortController | null = null
 
 export const requestWakeLock = async () => {
   if ('WakeLock' in window && 'request' in window.WakeLock) {
@@ -14,7 +14,7 @@ export const requestWakeLock = async () => {
         }
       })
     console.log('Wake Lock is active')
-    wakeLock = controller
+    wakeLockController = controller
 
   } else if ('wakeLock' in navigator && 'request' in navigator.wakeLock) {
     let wakeLock = null
@@ -35,15 +35,15 @@ export const requestWakeLock = async () => {
 }
 
 export const releaseWakeLock = () => {
-  if (wakeLock) {
-    if (wakeLock.abort) {
-      wakeLock.abort()
+  if (wakeLockController) {
+    if (wakeLockController.abort) {
+      wakeLockController.abort()
     }
 
-    if (wakeLock.release) {
-      wakeLock.release()
+    if (wakeLockController.release) {
+      wakeLockController.release()
     }
 
-    wakeLock = null
+    wakeLockController = null
   }
 }

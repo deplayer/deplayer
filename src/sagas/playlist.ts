@@ -10,7 +10,7 @@ const adapter = getAdapter()
 const playlistService = new PlaylistService(new adapter())
 
 // Application initialization routines
-function* initialize() {
+function* initialize(): Generator<any, void, any> {
   yield playlistService.initialize
   logger.log('playlist-saga', 'initializing playlists')
   const playlists = yield call(playlistService.get)

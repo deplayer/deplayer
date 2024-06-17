@@ -19,19 +19,19 @@ export default class Importer extends React.Component<Props> {
     this.fileInput = React.createRef()
   }
 
-  loaded(evt): void {
+  loaded(evt: ProgressEvent<FileReader>): void {
     // Obtain the read file data
-    const fileString = evt.target.result
+    const fileString = (evt.target as FileReader).result
     this.setState({ status: 'File loaded!' })
     this.props.onLoaded(fileString)
   }
 
-  errorHandler(evt) {
-    if (evt.target.error.name === "NotReadableError") {
+  errorHandler(evt: ProgressEvent<FileReader>) {
+    if (evt.target?.error?.name === "NotReadableError") {
       // The file could not be read
     }
-
-    this.setState({ status: evt.target.error.name })
+  
+    this.setState({ status: evt.target?.error?.name })
   }
 
   updateProgress(evt: ProgressEvent): void {

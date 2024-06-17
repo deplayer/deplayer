@@ -5,22 +5,13 @@ import SidebarContainer from './SidebarContainer'
 import TopbarContainer from './TopbarContainer'
 import SearchButton from '../components/Buttons/SearchButton'
 import Placeholder from '../components/Player/Placeholder'
-import Icon from '../components/common/Icon'
 import type { State as AppState } from '../reducers/app'
 import type { State } from '../reducers'
-import { useLocation, Location } from 'react-router-dom'
-
-type TitleCollection = {
-  rows: any
-  artists: any
-  albums: any
-}
 
 interface LayoutProps {
   backgroundImage: string,
   dispatch: Dispatch,
   app: AppState,
-  title: string,
   children: React.ReactNode
 }
 
@@ -38,7 +29,7 @@ function Layout(props: LayoutProps) {
       )
       }
       <SidebarContainer>
-        <TopbarContainer title={props.title}>
+        <TopbarContainer>
           <SearchButton />
         </TopbarContainer>
 

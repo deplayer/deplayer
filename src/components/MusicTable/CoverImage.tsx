@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import LazyImage from '../LazyImage'
 import classNames from 'classnames'
 

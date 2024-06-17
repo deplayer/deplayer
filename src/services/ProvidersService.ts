@@ -1,20 +1,20 @@
 import { ISearchService } from './ISearchService'
-import providersIndex from '../providers'
+import providersIndex, { ProviderType } from '../providers'
 import Media from '../entities/Media'
 
 export default class ProvidersService implements ISearchService {
-  providers: any = {}
+  providers: { [key: string]: ProviderType } = {}
 
   constructor(config: any) {
     Object.keys(config.providers).forEach((provider) => {
 
       const providerType = provider.replace(/[0-9]/g, '')
 
-      if (providersIndex[providerType]) {
+      if (providersIndex[providerType as keyof typeof providersIndex]) {
         const parameters = config.providers[provider]
 
         if (parameters.enabled) {
-          this.providers[provider] = new providersIndex[providerType](parameters, providerType)
+          this.providers[provider] = new providersIndex[providerType as keyof typeof providersIndex](parameters, providerType)
         }
       }
     })
@@ -33,4 +33,8 @@ export default class ProvidersService implements ISearchService {
 
     return this.providers[provider].search(searchTerm)
   }
+}
+
+interface ProviderType {
+  search: (searchTerm: string) => Promise<any>
 }

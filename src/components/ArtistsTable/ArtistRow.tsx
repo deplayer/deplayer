@@ -1,6 +1,4 @@
 import { Link } from 'react-router-dom'
-import * as React from 'react'
-
 import Artist from '../../entities/Artist'
 import Tag from '../common/Tag'
 import Icon from '../common/Icon'

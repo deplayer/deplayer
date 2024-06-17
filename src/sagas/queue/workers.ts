@@ -8,7 +8,7 @@ const adapter = getAdapter()
 const queueService = new QueueService(new adapter())
 
 // Application initialization routines
-export function* initialize() {
+export function* initialize(): Generator<any, void, unknown> {
   yield queueService.initialize
   logger.log('queue-saga', 'initializing queue')
 

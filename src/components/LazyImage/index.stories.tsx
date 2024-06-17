@@ -1,4 +1,3 @@
-import { withKnobs } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 import withProvider from '../../utils/withProvider'
 import LazyImage from './'
@@ -7,7 +6,6 @@ import LazyImage from './'
 const stories = storiesOf('LazyImage', module)
 
 stories
-  .addDecorator(withKnobs)
   .addDecorator(withProvider)
   .add(
     'default',

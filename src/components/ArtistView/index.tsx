@@ -5,6 +5,8 @@ import Tag from '../common/Tag'
 import Album from './Album'
 import Artist from '../../entities/Artist'
 import * as types from '../../constants/ActionTypes'
+import { State as CollectionState } from '../../reducers/collection'
+import Media from '../../entities/Media'
 
 type Props = {
   queue: any,
@@ -19,7 +21,7 @@ type Props = {
   songsByAlbum: any
 }
 
-const extractBackground = (collection, songsByAlbum, albumsByArtist = []): string => {
+const extractBackground = (collection: CollectionState, songsByAlbum: {string: Media}, albumsByArtist = []): string => {
   const albumId = albumsByArtist && albumsByArtist.length && albumsByArtist[0]
   if (albumId && songsByAlbum[albumId]) {
     return collection.rows[songsByAlbum[albumId][0]].cover.fullUrl

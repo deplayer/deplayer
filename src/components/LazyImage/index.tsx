@@ -5,7 +5,7 @@ type Props = {
   src?: string
   reflect?: boolean
   onClick?: () => void
-  children: React.Component
+  children: React.ReactNode
 }
 
 class LazyImage extends React.Component<Props> {

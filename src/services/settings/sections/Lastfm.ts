@@ -7,7 +7,7 @@ export default class Lastfm implements ISettingsSection {
     this.isRepeatable = false
   }
 
-  getFormSchema(index: string = '') {
+  getFormSchema(_index: string = '') {
     return [
       { title: "labels.lastfm", type: 'title' },
       { title: "labels.enabled", name: `app.lastfm.enabled`, type: 'checkbox' },

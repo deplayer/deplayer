@@ -20,7 +20,7 @@ describe('queue reducer', () => {
 
   it('should handle ADD_SONGS_TO_QUEUE action', () => {
     const songs: any = []
-    const expectedObj = {}
+    const expectedObj: { [key: number]: Media } = {}
     for (let i = 1; i <= 20; i++) {
       const song = new Media({ forcedId: i.toString() })
       songs.push(song)
