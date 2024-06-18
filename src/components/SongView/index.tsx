@@ -17,6 +17,7 @@ import MediaSlider from '../MediaSlider'
 import { sortByPlayCount } from '../../reducers/collection'
 import Lyrics from './Lyrics'
 import { getStreamUri } from '../../services/Song/StreamUriService'
+import Album from '../../entities/Album'
 
 type Props = {
   playerPortal: any,
@@ -27,7 +28,7 @@ type Props = {
     lyrics: string
   },
   collection: {
-    albumsByArtist: Array<string>,
+    albumsByArtist: {[key: string]: string[]},
     albums: any,
     songsByGenre: any,
     rows: any
@@ -247,7 +248,7 @@ const SongView = (props: Props) => {
             <div className='mt-2'>
               <Translate value='labels.providers' />: &nbsp;
               {
-                song.stream.map((provider) => {
+                song.stream.map((provider: any) => {
                   return (<Tag type='primary' key={provider.service}>{provider.service}</Tag>)
                 })
               }
