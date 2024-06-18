@@ -5,9 +5,9 @@ import CoverImage from '../MusicTable/CoverImage'
 import HorizontalSlider from '../HorizontalSlider'
 import Spinner from '../Spinner'
 import Tag from '../common/Tag'
-import Media from '../../entities/Media'
+import type Media from '../../entities/Media'
 
-const MediaCover = ({ media }: { media: Media ) => {
+const MediaCover = ({ media }: { media: Media }) => {
   return (
     <div className='block rounded w-32 h-32 mx-2'>
       <Link to={`/song/${media.id}`} className='h-32'>

@@ -17,7 +17,6 @@ const VolumeControl = (props: Props) => {
         min={0}
         max={100}
         step={1}
-        type='range'
         value={props.volume}
         onChange={props.onChange}
       />

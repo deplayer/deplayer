@@ -239,7 +239,6 @@ class PlayerControls extends React.Component<Props> {
                         isPlaying={this.props.player.playing}
                         playPause={this.playPause}
                         playNext={this.playNext}
-                        dispatch={this.props.dispatch}
                       />
                       <div className='w-16'>
                       </div>

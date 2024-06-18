@@ -6,8 +6,8 @@ import { getDurationStr } from '../../utils/timeFormatter'
 type Props = {
   total: number, // Milliseconds
   dispatch: Dispatch,
-  onChange?: (value: string) => any,
-  onAfterChange?: (value: string) => any,
+  onChange?: (value: number | number[]) => void,
+  onAfterChange?: (value: number | number[]) => void,
   current: number // Milliseconds,
   buffered: number
 }
@@ -24,7 +24,6 @@ const ProgressBar = (props: Props) => {
         min={0}
         max={props.total}
         step={step}
-        handle={() => null}
         handleStyle={{ display: 'none' }}
         trackStyle={{ backgroundColor: '#2c5282' }}
         count={1}
