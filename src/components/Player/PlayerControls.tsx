@@ -11,7 +11,7 @@ import { State as SettingsState } from '../../reducers/settings'
 import Controls from './Controls'
 import Cover from './Cover'
 import ProgressBar from './ProgressBar'
-import Visualizer from './../Visualizer'
+// import Visualizer from './../Visualizer'
 import WebtorrentPlayer from './CustomPlayers/WebtorrentPlayer'
 import * as types from '../../constants/ActionTypes'
 
@@ -138,7 +138,8 @@ class PlayerControls extends React.Component<Props> {
       file: {
         forceAudio: currentPlaying.media_type === 'audio',
         attributes: {
-          className: currentPlaying.media_type === 'video' ? 'video-element' : 'video-element'
+          className: currentPlaying.media_type === 'video' ? 'video-element' : 'video-element',
+          crossOrigin: 'anonymous'
         }
       }
     }

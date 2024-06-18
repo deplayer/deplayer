@@ -15,7 +15,7 @@ const setup = () => {
     onClick: () => { },
     isCurrent: false,
     style: {},
-    disableAddButton: false
+    disableAddButton: false,
   }
 
   render(<SongRow {...props} />, { wrapper: BrowserRouter })
