@@ -11,7 +11,7 @@ export default class SettingsBuilder {
       return [...accumulator, ...sections[sectionId].getFormSchema()]
     }, [])
 
-    const providerFields = Object.keys(providers).reduce((accumulator, providerId: string) => {
+    const providerFields = Object.keys(providers).reduce((accumulator: any, providerId: string) => {
       const providerType = providerId.replace(/[0-9]/g, '')
       const providerNum = Object.keys(providers).indexOf(providerId) || 0
 

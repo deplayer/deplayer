@@ -9,7 +9,7 @@ export default class DummyProvider implements IMusicProvider {
     this.enabled = settings.enabled
   }
 
-  search(searchTerm: string): Promise<any> {
+  search(_searchTerm: string): Promise<any> {
     return new Promise((resolve) => {
       resolve([
         { title: 'Highway to hell' }
