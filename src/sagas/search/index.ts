@@ -19,7 +19,7 @@ import { getSettings } from './../selectors'
 function* performSingleSearch(
   searchTerm: string,
   provider: string
-): Generator<any> {
+): Generator<any, void, any>{
   try {
     const settings = yield select(getSettings)
     const providerService = new ProvidersService(settings)

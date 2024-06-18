@@ -11,7 +11,7 @@ const mbApi = new MusicBrainzApi({
 export default class MusicbrainzProvider implements IMusicMetadataProvider {
   providerKey: string
 
-  constructor(settings: any, providerKey: string) {
+  constructor(_settings: any, providerKey: string) {
     this.providerKey = providerKey
   }
 

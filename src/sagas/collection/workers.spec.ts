@@ -12,7 +12,7 @@ import * as types from '../../constants/ActionTypes'
 
 describe('saveToDbWorker', () => {
   it('works', () => {
-    const data = []
+    const data: any[] = []
     return expectSaga(saveToDbWorker, data)
       .put({ type: types.SAVE_COLLECTION_FULLFILLED })
       .run()

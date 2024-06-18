@@ -1,6 +1,6 @@
 // Get sibling songs ids to know which is the next and prev song
 export const getSiblingSong = (trackIds: Array<string>, song: string, next = false) => {
-  const tracksIndex = {}
+  const tracksIndex: { [key: number]: string } = {}
   const position = trackIds.indexOf(song) ? trackIds.indexOf(song) : 0
   trackIds.forEach((trackId, index) => {
     tracksIndex[index] = trackId

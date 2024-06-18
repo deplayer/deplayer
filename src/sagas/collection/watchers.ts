@@ -29,7 +29,7 @@ export function* addToCollectionWatcher(): any {
 }
 
 // Application initialization routines
-export function* initializeWatcher() {
+export function* initializeWatcher(): Generator<any, void, any>{
   while (true) {
     yield take(types.INITIALIZE)
     yield call(initialize)

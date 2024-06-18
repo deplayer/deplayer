@@ -1,6 +1,5 @@
 import { storiesOf } from '@storybook/react'
 import { withKnobs, boolean } from '@storybook/addon-knobs';
-import * as React from 'react'
 
 import Media from '../../entities/Media'
 import SongView from './index'

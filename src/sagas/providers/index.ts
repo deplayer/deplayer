@@ -15,6 +15,7 @@ import { getSettings } from '../selectors'
 import CollectionService from '../../services/CollectionService'
 import YoutubeDlServerProvider from '../../providers/YoutubeDlServerProvider'
 import * as types from '../../constants/ActionTypes'
+import { G } from 'vitest/dist/reporters-yx5ZTtEV.js'
 
 // Watcher should enque tasks to avoid concurrency
 export function* startProvidersScan(): any {
@@ -112,7 +113,7 @@ export function* handleIPFSFileLoad(): any {
   }
 }
 
-function* startYoutubeDlScan(action: any) {
+function* startYoutubeDlScan(action: any): Generator<any, void, any>{
   try {
     const settings = yield select(getSettings)
     const service = new YoutubeDlServerProvider(

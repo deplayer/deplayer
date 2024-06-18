@@ -22,7 +22,7 @@ describe('collection reducer', () => {
 
   it('should handle ADD_SONGS_TO_PLAYLIST action', () => {
     const songs: Array<Media> = []
-    const expectedObj = {}
+    const expectedObj: { [key: number]: Media } = {}
     for (let i = 1; i <= 20; i++) {
       const song = new Media({ forcedId: i.toString() })
       songs.push(song)
@@ -41,7 +41,7 @@ describe('collection reducer', () => {
 
   it('should handle SET_COLUMN_SORT action', () => {
     const songs: Array<Media> = []
-    const expectedObj = {}
+    const expectedObj: { [key: number]: Media } = {}
     for (let i = 1; i <= 20; i++) {
       const song = new Media({ forcedId: i.toString(), price: { price: i % 2 } })
       songs.push(song)
