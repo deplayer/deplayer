@@ -50,7 +50,7 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
   }
 
   addListeners () {
-      const { onReady, onPlay, onBuffer, onBufferEnd, onPause, onEnded, onError, playsinline, onEnablePIP } = this.props
+      const { onReady, onPlay, onBuffer, onBufferEnd, onPause, onEnded, onError } = this.props
       this.player.addEventListener('canplay', onReady)
       this.player.addEventListener('play', onPlay)
       this.player.addEventListener('waiting', onBuffer)
@@ -62,7 +62,7 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
   }
 
   removeListeners () {
-    const { onReady, onPlay, onBuffer, onBufferEnd, onPause, onEnded, onError, onEnablePIP } = this.props
+    const { onReady, onPlay, onBuffer, onBufferEnd, onPause, onEnded, onError } = this.props
     this.player.removeEventListener('canplay', onReady)
     this.player.removeEventListener('play', onPlay)
     this.player.removeEventListener('waiting', onBuffer)

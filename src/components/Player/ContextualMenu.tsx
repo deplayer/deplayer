@@ -36,7 +36,7 @@ const ContextualMenu = (props: MenuProps) => {
     )
   }
 
-  const setVolume = (value: number) => {
+  const setVolume = (value: number | number[]) => {
     props.dispatch({ type: types.VOLUME_SET, value: value })
   }
 
@@ -54,7 +54,7 @@ const ContextualMenu = (props: MenuProps) => {
     id: MENU_ID,
   })
 
-  function handleContextMenu(event) {
+  function handleContextMenu(event: any) {
     show({
       event,
       props: {

@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import CoverImage from '../MusicTable/CoverImage'
 import Media from '../../entities/Media'
 
