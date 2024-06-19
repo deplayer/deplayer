@@ -13,6 +13,7 @@ const setup = (customProps: any) => {
 
 describe('Settings', () => {
   it('renders without crashing', () => {
+    setup({})
     expect(screen.findByRole('SettingsForm')).toBeTruthy()
   })
 })

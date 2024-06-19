@@ -17,7 +17,6 @@ import MediaSlider from '../MediaSlider'
 import { sortByPlayCount } from '../../reducers/collection'
 import Lyrics from './Lyrics'
 import { getStreamUri } from '../../services/Song/StreamUriService'
-import Album from '../../entities/Album'
 
 type Props = {
   playerPortal: any,
@@ -28,7 +27,7 @@ type Props = {
     lyrics: string
   },
   collection: {
-    albumsByArtist: {[key: string]: string[]},
+    albumsByArtist: { [key: string]: string[] },
     albums: any,
     songsByGenre: any,
     rows: any

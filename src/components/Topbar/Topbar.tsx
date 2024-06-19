@@ -10,7 +10,7 @@ type State = {
 }
 
 type Props = {
-  title?: string,
+  title?: string | React.ReactNode,
   dispatch: (params: any) => void,
   loading: boolean,
   showInCenter: boolean,
@@ -87,7 +87,7 @@ class Topbar extends React.Component<Props, State> {
       loading
     } = this.props
 
-    const childrenWithProps = React.Children.map(children, child =>
+    const childrenWithProps = React.Children.map(children, (child: any) =>
       React.cloneElement(child, { dispatch: this.props.dispatch })
     )
 

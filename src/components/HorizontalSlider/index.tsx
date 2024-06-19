@@ -29,7 +29,7 @@ const ArrowRight = (
 )
 
 type Props = {
-  items: Array<any>,
+  items: React.ReactNode[],
   title: React.ReactNode
 }
 
@@ -38,17 +38,18 @@ const HorizontalSlider = (props: Props) => {
     <div className='w-full overflow-hidden'>
       <h2 className='my-4 px-4 text-xl'>{props.title}</h2>
       <ScrollMenu
-        wheel={false}
-        menuClass='relative'
+        onWheel={() => null}
+        wrapperClassName='overflow-hidden'
         wrapperStyle={{ overflow: 'hidden' }}
         innerWrapperStyle={{ paddingLeft: '10px' }}
         hideArrows
         hideSingleArrow
         alignCenter={false}
-        data={props.items}
         arrowLeft={ArrowLeft}
         arrowRight={ArrowRight}
-      />
+      >
+        {props.items}
+      </ScrollMenu>
     </div>
   )
 }

@@ -98,11 +98,8 @@ export default class Media {
 
   generateArtist(artistName: string, artistId: string): Artist {
     const artistPayload = {
-      name: artistName ? artistName : ''
-    }
-
-    if (artistId) {
-      artistPayload['artistId'] = artistId
+      name: artistName ? artistName : '',
+      artistId: artistId
     }
 
     return new Artist(artistPayload)

@@ -16,10 +16,10 @@ export default class MusicbrainzProvider implements IMusicMetadataProvider {
   }
 
   async searchArtistInfo(searchTerm: string): Promise<any> {
-    const artistResults = await mbApi.searchArtist(searchTerm)
+    const artistResults = await mbApi.search('artist', { query: searchTerm })
     if (artistResults.artists[0]) {
       const id = artistResults.artists[0].id
-      return mbApi.getArtist(id, ['recordings', 'releases', 'release-groups', 'works', 'url-rels'])
+      return mbApi.lookup('artist', id)
     }
 
     return Promise.resolve()

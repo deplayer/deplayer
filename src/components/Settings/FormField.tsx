@@ -20,7 +20,7 @@ export const TYPES = {
 
 const FormikToggle = ({
   field,
-}) => {
+}: { field: any }) => {
   useFormikContext()
 
   return (
