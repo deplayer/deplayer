@@ -45,7 +45,7 @@ const MusicTable = (props: Props) => {
     key,         // Unique key within array of rendered rows
     style        // Style object to be applied to row (to position it);
     // This must be passed through to the rendered row element.
-  }: { index: number, key: number, style: any }) => {
+  }: { index: number, key: number, style: any }): React.ReactNode | null => {
     const songId = props.tableIds[index]
     const song = props.collection.rows[songId]
 
@@ -108,7 +108,7 @@ const MusicTable = (props: Props) => {
         </div>
       </div>
       <AutoSizer className='music-table'>
-        {({ height, width }: {height: number, width: number}) => (
+        {({ height, width }: { height: number, width: number }) => (
           <List
             height={height}
             rowCount={props.tableIds.length}

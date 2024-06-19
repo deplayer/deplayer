@@ -9,6 +9,7 @@ import type { Props } from './index'
 
 const setup = () => {
   const props: Props = {
+    dispatch: (_action: any) => _action,
     song: new Media(),
     songsLength: 1,
     queue: {},

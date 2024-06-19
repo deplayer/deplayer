@@ -29,7 +29,7 @@ const ArrowRight = (
 )
 
 type Props = {
-  items: React.ReactNode[],
+  items: any,
   title: React.ReactNode
 }
 

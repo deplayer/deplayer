@@ -11,7 +11,7 @@ const MediaCover = ({ media }: { media: Media }) => {
   return (
     <div className='block rounded w-32 h-32 mx-2'>
       <Link to={`/song/${media.id}`} className='h-32'>
-        <Tag transparent fullWidth>{ media.playCount ? `${media.playCount} times played` : "never played" }</Tag>
+        <Tag transparent fullWidth>{media.playCount ? `${media.playCount} times played` : "never played"}</Tag>
         <CoverImage
           reflect
           albumName={media.title}
@@ -21,7 +21,7 @@ const MediaCover = ({ media }: { media: Media }) => {
           }}
         />
         <div className='py-4 whitespace-normal text-center truncate w-32'>
-          { media.title }
+          {media.title}
         </div>
       </Link>
     </div>
@@ -62,7 +62,6 @@ const SongsSlider = (props: Props) => {
 
   return (
     <HorizontalSlider
-      wheel={false}
       title={props.title}
       items={mediaItems}
     />
