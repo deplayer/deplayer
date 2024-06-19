@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { Formik } from 'formik'
 
 import FormField from './FormField'
 
@@ -10,7 +11,7 @@ const setup = (customProps: any) => {
 
   const props = { ...defaultProps, ...customProps }
 
-  render(<FormField {...props} />)
+  render(<Formik initialValues={{}} onSubmit={(foo: any) => foo}>{() => (<FormField {...props} />)}</Formik>)
 }
 
 describe('FormField', () => {
