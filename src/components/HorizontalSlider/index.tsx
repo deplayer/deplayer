@@ -40,13 +40,8 @@ const HorizontalSlider = (props: Props) => {
       <ScrollMenu
         onWheel={() => null}
         wrapperClassName='overflow-hidden'
-        wrapperStyle={{ overflow: 'hidden' }}
-        innerWrapperStyle={{ paddingLeft: '10px' }}
-        hideArrows
-        hideSingleArrow
-        alignCenter={false}
-        arrowLeft={ArrowLeft}
-        arrowRight={ArrowRight}
+        LeftArrow={ArrowLeft}
+        RightArrow={ArrowRight}
       >
         {props.items}
       </ScrollMenu>
