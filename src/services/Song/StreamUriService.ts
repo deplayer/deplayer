@@ -5,9 +5,7 @@ export const getStreamUri = async (
   song: Media,
   settings: any,
   providerNum: number
-): Promise<string> => {
-  const { proto, host, port } = settings.app.ipfs
-
+): Promise<string | Blob> => {
   console.log('providerNum', providerNum)
   console.log('song', song)
 
@@ -17,18 +15,18 @@ export const getStreamUri = async (
     return ''
   }
 
+  const { proto, host, port } = settings.app.ipfs
   const prepend = service === 'ipfs' ? `${proto}://${host}:${port}/ipfs/` : ''
 
   const streamUri = song &&
-      song.stream.length ?
-      song.stream[providerNum] &&
-      song.stream[providerNum].uris[0].uri: null
-
-  const directoryHandler = await get('directoryHandler')
-  await verifyPermission(directoryHandler)
+    song.stream.length ?
+    song.stream[providerNum] &&
+    song.stream[providerNum].uris[0].uri : null
 
   if (service === 'filesystem') {
-    console.log('streamUri: ', streamUri)
+    const directoryHandler = await get('directoryHandler')
+    await verifyPermission(directoryHandler)
+
     const handler = await get(streamUri)
 
     if (handler instanceof File) {
@@ -41,15 +39,12 @@ export const getStreamUri = async (
 
     await verifyPermission(handler)
 
-    console.log('streamUri: ', streamUri)
-
     const file = await handler.getFile()
 
     if (!file) {
       return streamUri
     }
 
-    console.log('file:', file)
     return URL.createObjectURL(file)
   }
 

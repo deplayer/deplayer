@@ -30,17 +30,6 @@ export default class Album {
     return ""
   }
 
-  static toSchema(): any {
-    return {
-      id: {
-        type: 'string'
-      },
-      name: {
-        type: 'string'
-      }
-    }
-  }
-
   toDocument(): any {
     return {
       id: '' + this.id,
