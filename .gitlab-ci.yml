@@ -11,7 +11,7 @@ test:
   image: node:20
   script:
   - npm install
-  - npm run test
+  - npm run coverage
 
 deploy:
   stage: deploy
@@ -40,4 +40,4 @@ send-results:
     entrypoint: [""]
   script:
     - ls /builds/deplayer
-    - /app/project_scanner --server-url $CODE_URL --plugin react --directory /builds/deplayer/deplayer
+    - /app/project_scanner --server-url $CODE_URL --plugin v8 --directory /builds/deplayer/deplayer
