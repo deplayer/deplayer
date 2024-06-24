@@ -6,7 +6,6 @@ export default connect(
     queue: state.queue,
     player: state.player,
     collection: state.collection,
-    tableIds: Object.keys(state.collection.artists),
     visibleSongs: state.collection.visibleSongs
   })
 )(ArtistsTable)

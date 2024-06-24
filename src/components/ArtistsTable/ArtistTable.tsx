@@ -1,25 +1,27 @@
 import { AutoSizer, List, ListRowRenderer } from 'react-virtualized'
 
+import { State as CollectionState } from '../../reducers/collection'
 import ArtistRow from './ArtistRow'
 
 export type Props = {
   error?: string,
   queue: any,
-  tableIds: Array<string>,
-  collection: any,
+  collection: CollectionState,
   dispatch: (action: any) => any
 }
 
 const ArtistTable = (props: Props) => {
+  const tableIds = props.collection.artists || []
+
   const errors = props.error ?
     <div><div>{props.error}</div></div>
     : null
 
   const rowRenderer = (props: any): any => {
-    const artistId = props.tableIds[props.index]
+    const artistId = tableIds[props.index]
     const artist = props.collection.artists[artistId]
 
-    if (!artist || !artist.id) {
+    if (!artistId || !artist || !artist.id) {
       return null
     }
 
@@ -39,7 +41,7 @@ const ArtistTable = (props: Props) => {
         {({ height, width }) => (
           <List
             height={height}
-            rowCount={props.tableIds.length}
+            rowCount={tableIds.length || 0}
             rowHeight={50}
             rowRenderer={rowRenderer as ListRowRenderer}
             width={width}
@@ -49,7 +51,7 @@ const ArtistTable = (props: Props) => {
         )}
       </AutoSizer>
       <div className="table-status">
-        Total items: <b>{props.tableIds.length}</b>
+        Total items: <b>{tableIds.length}</b>
       </div>
       {errors}
     </div>

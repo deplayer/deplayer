@@ -19,7 +19,7 @@ deploy:
   script:
   - npm install
   - npm run build
-    # - cp build/index.html build/200.html # Creating fallback page
+  - cp dist/index.html dist/200.html # Creating fallback page
   - node_modules/.bin/surge --project ./dist --domain deplayer.surge.sh
   only:
   - tags
