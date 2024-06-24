@@ -19,11 +19,16 @@ type stream = {
 
 type MediaType = 'video' | 'audio'
 
+type Cover = {
+  thumbnailUrl: string,
+  fullUrl: string
+}
+
 export default class Media {
   id: string
   title: string
   author: any
-  cover: any
+  cover: Cover
   artist: Artist
   album: Album
   artistName: string

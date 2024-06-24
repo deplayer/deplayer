@@ -101,7 +101,7 @@ const SongView = (props: Props) => {
     : null
 
   const relatedAlbums = albumsByArtist?.[song.artist.id].map((albumId: string) => {
-    return albums[albumId]
+    return new Album({ ...albums[albumId], artist: song.artist })
   }) || []
 
   const songFinder = song.id === currentPlaying
