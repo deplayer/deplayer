@@ -28,6 +28,7 @@ type Props = {
     lyrics: string
   },
   collection: {
+    albums: { [key: string]: Album },
     albumsByArtist: { [key: string]: string[] },
     songsByGenre: any,
     rows: any
