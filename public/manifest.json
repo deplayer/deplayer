@@ -1,0 +1,21 @@
+{
+  "short_name": "deplayer",
+  "name": "deplayer",
+  "skylink": "https://040d300m7gcffnmbargkvs2enj40tmppftpfil56lrid8n8jo0hovbg.siasky.net/",
+  "icons": [
+    {
+      "src": "logo-small.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme_color": "#0e1b1e",
+  "background_color": "#0e1b1e"
+}
