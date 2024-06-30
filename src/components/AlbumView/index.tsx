@@ -1,11 +1,12 @@
 import { Dispatch } from 'redux'
-import * as React from 'react'
 
 import RelatedAlbums from '../RelatedAlbums'
 import Album from '../ArtistView/Album'
+import { useMatch } from 'react-router'
+import { redirect } from 'react-router-dom'
+import { getAlbum } from '../../containers/RouteSelectors'
 
 type Props = {
-  album: any,
   queue: any,
   albumsByArtist: any,
   artistMetadata: any,
@@ -17,31 +18,42 @@ type Props = {
 }
 
 
-export default class AlbumView extends React.Component<Props> {
-  render() {
-    const { album, collection: { albums, albumsByArtist } } = this.props
+export default function AlbumView(props: Props) {
+  const match = useMatch('/album/:id')
 
-    const relatedAlbums = albumsByArtist && albumsByArtist[album.artist.id] && albumsByArtist[album.artist.id].map((albumId: string) => {
-      return albums[albumId]
-    })
-
-    return (
-      <div className={`artist-view ${this.props.className} z-50`}>
-        <div className='main w-full z-10 md:p-4'>
-          <h2 className='text-center text-3xl py-3'>{album.name}</h2>
-          <Album
-            queue={this.props.queue}
-            album={this.props.album}
-            dispatch={this.props.dispatch}
-            collection={this.props.collection}
-            songs={this.props.songsByAlbum[album.id]}
-          />
-          <div className='w-full'>
-            <RelatedAlbums albums={relatedAlbums} />
-          </div>
-          <div className='placeholder'></div>
-        </div>
-      </div>
-    )
+  if (!match) {
+    return null
   }
+
+  const { collection } = props
+
+  const album = getAlbum(match, collection)
+
+  if (!album) {
+    redirect('/')
+    return null
+  }
+
+  const relatedAlbums = collection.albumsByArtist && collection.albumsByArtist[album.artist.id] && collection.albumsByArtist[album.artist.id].map((albumId: string) => {
+    return collection.albums[albumId]
+  })
+
+  return (
+    <div className={`artist-view ${props.className} z-50`}>
+      <div className='main w-full z-10 md:p-4'>
+        <h2 className='text-center text-3xl py-3'>{album.name}</h2>
+        <Album
+          queue={props.queue}
+          album={album}
+          dispatch={props.dispatch}
+          collection={props.collection}
+          songs={props.songsByAlbum[album.id]}
+        />
+        <div className='w-full'>
+          <RelatedAlbums albums={relatedAlbums} />
+        </div>
+        <div className='placeholder'></div>
+      </div>
+    </div>
+  )
 }

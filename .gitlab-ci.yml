@@ -22,7 +22,7 @@ deploy:
   - cp dist/index.html dist/200.html # Creating fallback page
   - node_modules/.bin/surge --project ./dist --domain deplayer.surge.sh
   - npm install -g wrangler --unsafe-perm=true
-  - wrangler pages publish ./dist --project-name=deplayer --branch=main
+  - wrangler pages deploy ./dist --project-name=deplayer --branch=main
   only:
   - tags
   variables:

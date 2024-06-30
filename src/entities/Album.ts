@@ -33,7 +33,8 @@ export default class Album {
   toDocument(): any {
     return {
       id: '' + this.id,
-      name: this.name
+      name: this.name,
+      artist: this.artist.toDocument()
     }
   }
 }

@@ -7,7 +7,7 @@ import Spinner from '../Spinner'
 import Tag from '../common/Tag'
 import type Media from '../../entities/Media'
 
-const MediaCover = ({ media }: { media: Media }) => {
+const MediaCover = ({ media }: { media: Media, itemId: string }) => {
   return (
     <div className='block rounded w-32 h-32 mx-2'>
       <Link to={`/song/${media.id}`} className='h-32'>
@@ -34,6 +34,7 @@ export const MediaItems = (list: Array<any>) => {
   return list.map((media) => {
     return (
       <MediaCover
+        itemId={media.id}
         key={media.id}
         media={media}
       />
