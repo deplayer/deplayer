@@ -21,9 +21,13 @@ deploy:
   - npm run build
   - cp dist/index.html dist/200.html # Creating fallback page
   - node_modules/.bin/surge --project ./dist --domain deplayer.surge.sh
+  - npm install -g wrangler --unsafe-perm=true
+  - wrangler pages publish ./dist --project-name=deplayer --branch=main
   only:
   - tags
   variables:
+    CLOUDFLARE_API_TOKEN: $CLOUDFLARE_API_TOKEN
+    CLOUDFLARE_ACCOUNT_ID: $CLOUDFLARE_ACCOUNT_ID
     SURGE_LOGIN: $SURGE_LOGIN
     SURGE_TOKEN: $SURGE_TOKEN
     PUBLIC_URL: https://deplayer.surge.sh
