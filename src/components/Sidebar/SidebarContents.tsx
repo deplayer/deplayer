@@ -22,8 +22,8 @@ type ContentProps = {
 
 const SidebarContents = (props: ContentProps) => {
   const location = useLocation()
-
   const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
+
   return (
     <div className='flex flex-col' onClick={() => props.onSetSidebarOpen()}>
       <h4 className="text-xl text-center py-4 bg-gray-900 text-blue-500 tracking-wider">

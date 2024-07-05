@@ -5,6 +5,7 @@ import SidebarContainer from './SidebarContainer'
 import TopbarContainer from './TopbarContainer'
 import SearchButton from '../components/Buttons/SearchButton'
 import Placeholder from '../components/Player/Placeholder'
+import ReloadPrompt from '../components/ReloadPrompt'
 import type { State as AppState } from '../reducers/app'
 import type { State } from '../reducers'
 
@@ -29,6 +30,7 @@ function Layout(props: LayoutProps) {
       )
       }
       <SidebarContainer>
+        <ReloadPrompt />
         <TopbarContainer>
           <SearchButton />
         </TopbarContainer>
