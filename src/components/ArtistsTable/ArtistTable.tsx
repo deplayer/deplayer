@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { AutoSizer, List, ListRowRenderer } from 'react-virtualized'
 
 import { State as CollectionState } from '../../reducers/collection'
@@ -13,12 +14,8 @@ export type Props = {
 const ArtistTable = (props: Props) => {
   const tableIds = props.collection.artists || []
 
-  const errors = props.error ?
-    <div><div>{props.error}</div></div>
-    : null
-
   const rowRenderer = (props: any): any => {
-    const artistId = tableIds[props.index]
+    const artistId = props.tableIds[props.index]
     const artist = props.collection.artists[artistId]
 
     if (!artistId || !artist || !artist.id) {
@@ -53,7 +50,6 @@ const ArtistTable = (props: Props) => {
       <div className="table-status">
         Total items: <b>{tableIds.length}</b>
       </div>
-      {errors}
     </div>
   )
 }

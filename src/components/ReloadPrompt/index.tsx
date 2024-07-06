@@ -1,4 +1,4 @@
-import React from 'react'
+import './index.css'
 import { useRegisterSW } from 'virtual:pwa-register/react'
 
 function ReloadPrompt() {

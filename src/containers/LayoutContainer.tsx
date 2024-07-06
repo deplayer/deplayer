@@ -17,18 +17,19 @@ interface LayoutProps {
 }
 
 function Layout(props: LayoutProps) {
+  const background = props.backgroundImage && (
+    <>
+      <div className='bg-handler'></div>
+      <div
+        className='absolute w-full h-full bg-cover bg-center bg-no-repeat bg-fixed'
+        style={{ backgroundImage: `url(${props.backgroundImage})`, filter: 'blur(10px)' }}
+      />
+    </>
+  )
+
   return (
     <>
-      {props.backgroundImage && (
-        <>
-          <div className='bg-handler'></div>
-          <div
-            className='absolute w-full h-full bg-cover bg-center bg-no-repeat bg-fixed'
-            style={{ backgroundImage: `url(${props.backgroundImage})`, filter: 'blur(10px)' }}
-          />
-        </>
-      )
-      }
+      {background}
       <SidebarContainer>
         <ReloadPrompt />
         <TopbarContainer>
@@ -48,7 +49,6 @@ function Layout(props: LayoutProps) {
 
 const connector = connect(
   (state: State) => {
-    // const location = useLocation()
     return {
       backgroundImage: state.app.backgroundImage,
       queue: state.queue,
