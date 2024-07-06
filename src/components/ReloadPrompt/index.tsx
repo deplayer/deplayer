@@ -22,7 +22,7 @@ function ReloadPrompt() {
   }
 
   return (
-    <div className="ReloadPrompt-container">
+    <div className="ReloadPrompt-container p-0 m-0 w-0 h-0">
       {(offlineReady || needRefresh)
         && <div className="ReloadPrompt-toast">
           <div className="ReloadPrompt-message">
