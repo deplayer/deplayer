@@ -2,11 +2,13 @@ import Media from "../entities/Media";
 import filterSongs from "../utils/filter-songs";
 import * as types from "../constants/ActionTypes";
 import IndexService from "../services/Search/IndexService";
+import Artist from "../entities/Artist"
+
 const indexService = new IndexService();
 
 export type State = {
   rows: { [key: string]: any };
-  artists: { [key: string]: any };
+  artists: { [key: string]: Artist };
   albums: { [key: string]: any };
   albumsByArtist: any;
   songsByAlbum: any;

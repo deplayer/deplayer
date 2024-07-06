@@ -10,22 +10,19 @@ export type Props = {
   dispatch: (action: any) => any
 }
 
-const ArtistTable = (props: Props) => {
-  const tableIds = props.collection.artists || []
+const ArtistTable = ({ collection: { artists, songsByArtist } }: Props) => {
+  const tableIds = Object.keys(artists)
+  console.log('tableIds', tableIds)
 
   const rowRenderer = (props: any): any => {
-    const artistId = props.tableIds[props.index]
-    const artist = props.collection.artists[artistId]
-
-    if (!artistId || !artist || !artist.id) {
-      return null
-    }
+    const artistId = tableIds[props.index]
+    const artist = artists[artistId]
 
     return (
       <ArtistRow
         key={props.key}
         artist={artist}
-        songs={props.collection.songsByArtist[artist.id]}
+        songs={songsByArtist[artist.id]}
         style={props.style}
       />
     )
@@ -34,12 +31,12 @@ const ArtistTable = (props: Props) => {
   return (
     <div className='collection z-10'>
       <AutoSizer className='artists-table'>
-        {({ height, width }) => (
+        {({ height, width }: { height: number, width: number }) => (
           <List
             height={height}
             rowCount={tableIds.length || 0}
             rowHeight={50}
-            rowRenderer={rowRenderer as ListRowRenderer}
+            rowRenderer={rowRenderer}
             width={width}
             overscanRowCount={6}
             recomputeRowHeights
@@ -47,7 +44,7 @@ const ArtistTable = (props: Props) => {
         )}
       </AutoSizer>
       <div className="table-status">
-        Total items: <b>{tableIds.length}</b>
+        Total items: <b>{artists.length}</b>
       </div>
     </div>
   )
