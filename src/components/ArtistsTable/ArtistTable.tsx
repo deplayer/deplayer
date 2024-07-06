@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { AutoSizer, List, ListRowRenderer } from 'react-virtualized'
 
 import { State as CollectionState } from '../../reducers/collection'
