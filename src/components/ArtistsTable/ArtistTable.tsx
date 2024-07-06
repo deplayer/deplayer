@@ -1,4 +1,4 @@
-import { AutoSizer, List, ListRowRenderer } from 'react-virtualized'
+import { AutoSizer, List } from 'react-virtualized'
 
 import { State as CollectionState } from '../../reducers/collection'
 import ArtistRow from './ArtistRow'
@@ -12,7 +12,6 @@ export type Props = {
 
 const ArtistTable = ({ collection: { artists, songsByArtist } }: Props) => {
   const tableIds = Object.keys(artists)
-  console.log('tableIds', tableIds)
 
   const rowRenderer = (props: any): any => {
     const artistId = tableIds[props.index]
@@ -44,7 +43,7 @@ const ArtistTable = ({ collection: { artists, songsByArtist } }: Props) => {
         )}
       </AutoSizer>
       <div className="table-status">
-        Total items: <b>{artists.length}</b>
+        Total items: <b>{tableIds.length}</b>
       </div>
     </div>
   )
