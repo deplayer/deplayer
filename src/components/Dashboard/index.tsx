@@ -10,22 +10,23 @@ type Props = {
   collection: CollectionState
 }
 
-const Dashboard = (props: Props) => {
+const Dashboard = ({ collection: { loading, rows, songsByNumberOfPlays, albums } }: Props) => {
   const MAX_LIST_ITEMS = 25
 
-  const mediaItems = props.collection.songsByNumberOfPlays.map((songId: string) => {
-    return props.collection.rows[songId]
+  const mediaItems = songsByNumberOfPlays.map((songId: string) => {
+    return rows[songId]
   })
 
-  const albums = Object
-    .keys(props.collection.albums)
+  const slicedAlbums = Object
+    .keys(albums)
     .slice(0, MAX_LIST_ITEMS)
-    .map((albumId) => props.collection.albums[albumId])
+    .map((albumId) => albums[albumId])
 
-  if (!albums.length && !mediaItems.length) {
+  if (!slicedAlbums.length && !mediaItems.length) {
     return (
       <BodyMessage message={
         <div>
+          Welcome to Deplayer!
           <Translate value='message.noMostPlayed' />
           <br />
           <Link to={'/collection'} className='h-32 button'><Translate value='message.goToCollection' /></Link>
@@ -37,11 +38,11 @@ const Dashboard = (props: Props) => {
   return (
     <div className='z-10 w-full flex flex-col'>
       <MediaSlider
-        loading={props.collection.loading}
+        loading={loading}
         title={<Translate value='titles.mostPlayedSongs' />}
         mediaItems={mediaItems.slice(0, MAX_LIST_ITEMS)}
       />
-      <RelatedAlbums albums={albums} />
+      <RelatedAlbums albums={slicedAlbums} />
     </div>
   )
 }

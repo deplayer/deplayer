@@ -78,7 +78,8 @@ export default class Media {
     this.album = new Album({
       albumId: albumId,
       name: albumName ? albumName : '',
-      artist: artist
+      artist: artist,
+      thumbnailUrl: cover?.thumbnail
     })
     if (typeof price === 'number') {
       this.price = {

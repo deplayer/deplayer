@@ -48,6 +48,7 @@ const App = () => {
       <BrowserRouter>
         <LayoutContainer>
           <Routes>
+            <Route path="/" element={<DashboardContainer />} />
             <Route path="/index.html" element={<DashboardContainer />} />
             <Route path="/queue" element={<QueueContainer />} />
             <Route path="/playlists" element={<PlaylistsContainer />} />

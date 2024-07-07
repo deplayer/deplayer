@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import Playlists from '../components/Playlists/index'
+import Playlists from '../components/Playlists'
 
 export default connect(
   (state: any) => ({

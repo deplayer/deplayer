@@ -6,8 +6,13 @@ import Media from '../../entities/Media'
 import SongRow from '../MusicTable/SongRow'
 import CoverImage from '../MusicTable/CoverImage'
 
+interface Album {
+  id: string
+  name: string
+}
+
 type AlbumProps = {
-  album: any,
+  album: Album,
   queue: any,
   songs: Array<string>,
   collection: any,

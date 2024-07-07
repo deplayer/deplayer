@@ -5,17 +5,20 @@ interface AlbumParams {
   name: string
   artist: Artist
   albumId?: string
+  thumbnailUrl?: string
 }
 
 export default class Album {
   id: string
   name: string
   artist: Artist
+  thumbnailUrl: string
 
   constructor(albumParams: AlbumParams) {
-    const { name, artist, albumId } = albumParams
+    const { name, artist, albumId, thumbnailUrl } = albumParams
     this.name = name
     this.artist = artist
+    this.thumbnailUrl = thumbnailUrl || ''
 
     const compAlbumId = albumId ? albumId : new AlbumId({
       albumName: name,
@@ -25,16 +28,12 @@ export default class Album {
     this.id = compAlbumId
   }
 
-  // FIXME: Implement
-  thumbnailUrl(): string {
-    return ""
-  }
-
   toDocument(): any {
     return {
       id: '' + this.id,
       name: this.name,
-      artist: this.artist.toDocument()
+      artist: this.artist.toDocument(),
+      thumbnailUrl: this.thumbnailUrl
     }
   }
 }
