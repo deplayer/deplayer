@@ -16,7 +16,7 @@ type Props = {
 }
 
 const Content = (props: any) => {
-  const placeholderUrl = '/logo.png'
+  const placeholderUrl = '/disc.svg'
   const imageUrl = props.noImage ? placeholderUrl : props.src
 
   if (props.useImage) {
