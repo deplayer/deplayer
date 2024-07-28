@@ -9,13 +9,18 @@ const bodyBgAfter = 'rgba(16, 27, 38, 0.8)'
 
 const ArrowLeft = () => {
   const visibility = React.useContext<publicApiType>(VisibilityContext);
+  const isFirstItemVisible = visibility.useIsVisible('first', true);
+
+  if (isFirstItemVisible) {
+    return null
+  }
 
   return (
     <div
       className='text-4xl z-10 absolute inset-y-0 flex left-0'
       style={{ backgroundImage: `linear-gradient(to left, ${bodyBg}, ${bodyBgAfter})` }}
     >
-      <Button onClick={visibility.scrollPrev} transparent>
+      <Button onClick={() => visibility.scrollPrev()} transparent>
         <Icon icon='faArrowCircleLeft' className='arrow-prev text-blue-200 hover:text-blue-800' />
       </Button>
     </div>
@@ -24,13 +29,18 @@ const ArrowLeft = () => {
 
 const ArrowRight = () => {
   const visibility = React.useContext<publicApiType>(VisibilityContext);
+  const isLastItemVisible = visibility.useIsVisible('last', false);
+
+  if (isLastItemVisible) {
+    return null;
+  }
 
   return (
     <div
       className='text-4xl z-10 absolute inset-y-0 flex right-0'
       style={{ backgroundImage: `linear-gradient(to right, ${bodyBg}, ${bodyBgAfter})` }}
     >
-      <Button onClick={visibility.scrollNext} transparent>
+      <Button onClick={() => visibility.scrollNext()} transparent>
         <Icon icon='faArrowCircleRight' className='arrow-prev text-blue-200 hover:text-blue-800' />
       </Button>
     </div>
@@ -38,7 +48,7 @@ const ArrowRight = () => {
 }
 
 type Props = {
-  items: any,
+  items: React.ReactNode[],
   title: React.ReactNode
 }
 
@@ -47,12 +57,13 @@ const HorizontalSlider = (props: Props) => {
     <div className='w-full overflow-hidden relative'>
       <h2 className='my-4 px-4 text-xl'>{props.title}</h2>
       <ScrollMenu
-        onWheel={() => null}
-        wrapperClassName='overflow-hidden'
         LeftArrow={ArrowLeft}
         RightArrow={ArrowRight}
+        transitionBehavior="smooth"
       >
-        {props.items}
+        {props.items.map((item: React.ReactNode, index: number) => {
+          return <div key={index} itemID={`${index}`}>{item}</div>
+        })}
       </ScrollMenu>
     </div>
   )
