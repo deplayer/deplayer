@@ -54,12 +54,13 @@ type Props = {
 
 const HorizontalSlider = (props: Props) => {
   return (
-    <div className='w-full overflow-hidden relative'>
+    <div className='w-full overflow-hidden'>
       <h2 className='my-4 px-4 text-xl'>{props.title}</h2>
       <ScrollMenu
         LeftArrow={ArrowLeft}
         RightArrow={ArrowRight}
         transitionBehavior="smooth"
+        wrapperClassName='relative'
       >
         {props.items.map((item: React.ReactNode, index: number) => {
           return <div key={index} itemID={`${index}`}>{item}</div>

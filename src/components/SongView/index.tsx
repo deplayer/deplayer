@@ -4,6 +4,7 @@ import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
 import { AutoSizer } from 'react-virtualized'
 
+import NotFound from '../NotFound'
 import { getDurationStr } from '../../utils/timeFormatter'
 import Button from '../common/Button'
 import CoverImage from '../MusicTable/CoverImage'
@@ -89,7 +90,7 @@ const SongView = (props: Props) => {
   }
 
   if (!song || !song.id) {
-    return null
+    return <NotFound>The requested song can not be found</NotFound>
   }
 
   const sameGenreSongs = song.genres && song.genres.length && props.collection.songsByGenre[song.genres[0]]

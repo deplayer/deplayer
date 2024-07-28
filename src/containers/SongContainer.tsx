@@ -9,6 +9,8 @@ const getSongId = (location: Location): string => {
     return songFinder[1]
   }
 
+  console.log('No song id found in location', location)
+
   return '0'
 }
 

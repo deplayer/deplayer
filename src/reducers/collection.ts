@@ -3,6 +3,7 @@ import filterSongs from "../utils/filter-songs";
 import * as types from "../constants/ActionTypes";
 import IndexService from "../services/Search/IndexService";
 import Artist from "../entities/Artist"
+import merge from "deepmerge"
 
 const indexService = new IndexService();
 
@@ -59,7 +60,10 @@ const populateFromAction = (state: State, action: { data: any }): State => {
         albumId: row.album.id,
       });
 
-      acc.rows[song.id] = song.toDocument();
+      const songDocument = song.toDocument();
+      console.log('songDocument: ', songDocument)
+
+      acc.rows[song.id] = songDocument
       acc.albums[song.album.id] = song.album.toDocument();
       acc.artists[song.artist.id] = song.artist.toDocument();
 
@@ -104,7 +108,7 @@ const populateFromAction = (state: State, action: { data: any }): State => {
     }
   );
 
-  const rows = { ...state.rows, ...aggregation.rows };
+  const rows = merge(state.rows, aggregation.rows)
 
   // Merge the aggregated data with the existing state
   return {

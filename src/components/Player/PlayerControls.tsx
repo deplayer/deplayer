@@ -193,7 +193,7 @@ class PlayerControls extends React.Component<Props> {
           />
         )}
         {showControls &&
-          <div className={classNames({ 'player-container': true })} style={{ zIndex: 102 }}>
+          <div className={'player-container'} style={{ zIndex: 102 }}>
             <CSSTransition
               timeout={500}
               transitionName="player"
@@ -205,7 +205,7 @@ class PlayerControls extends React.Component<Props> {
               transitionLeave={true}
             >
               <div key='player-controls' className='flex justify-between items-center flex-col'>
-                <div className='absolute top-0 w-full'>
+                <div className='absolute w-full md:top-0'>
                   <ProgressBar
                     dispatch={this.props.dispatch}
                     total={duration * 1000}

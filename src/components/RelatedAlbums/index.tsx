@@ -5,20 +5,20 @@ import HorizontalSlider from '../HorizontalSlider'
 import CoverImage from '../MusicTable/CoverImage'
 import type Album from '../../entities/Album'
 
-const AlbumCover = ({ album }: { album: Album }) => {
+const AlbumCover = ({ albumName, albumId, thumbnailUrl }: { albumName: string, albumId: string, thumbnailUrl: string }) => {
   return (
     <div className='block rounded w-32 h-32 mx-2'>
-      <Link to={`/album/${album.id}`} className='h-32'>
+      <Link to={`/album/${albumId}`} className='h-32'>
         <CoverImage
           reflect
-          albumName={album.name}
+          albumName={albumName}
           cover={{
-            thumbnailUrl: album.thumbnailUrl,
-            fullUrl: album.thumbnailUrl
+            thumbnailUrl: thumbnailUrl,
+            fullUrl: thumbnailUrl
           }}
         />
         <p className='py-4 whitespace-normal text-center truncate w-32'>
-          {album.name}
+          {albumName}
         </p>
       </Link>
     </div>
@@ -36,7 +36,9 @@ export const Albums = (list: Array<Album>) => {
       return (
         <AlbumCover
           key={album.id}
-          album={album}
+          albumName={album.name}
+          albumId={album.id}
+          thumbnailUrl={album.thumbnailUrl}
         />
       )
     })

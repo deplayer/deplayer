@@ -29,10 +29,11 @@ export const getSongs = (state: any, action: { path: string }): Array<string> =>
 // Handling playAll saga
 export function* playAll(action: any): any {
   const songs = yield select(getSongs, action)
+
   if (songs.length) {
-    yield put({type: types.ADD_SONGS_TO_QUEUE, songs: Object.values(songs)})
-    yield put({type: types.SET_CURRENT_PLAYING, songId: songs[0]})
-    yield put({type: types.START_PLAYING})
+    yield put({ type: types.ADD_SONGS_TO_QUEUE, songs: Object.values(songs) })
+    yield put({ type: types.SET_CURRENT_PLAYING, songId: songs[0] })
+    yield put({ type: types.START_PLAYING })
   }
 }
 
@@ -63,9 +64,9 @@ export function* clearQueue(): any {
 export function* addAlbumToPlaylist(action: any): any {
   const songsByAlbum = yield select(getAlbumSongs)
   logger.log('queue-saga', songsByAlbum)
-  yield put({type: types.ADD_SONGS_TO_QUEUE, songs: songsByAlbum[action.albumId], replace: false })
-  yield put({type: types.SET_CURRENT_PLAYING, songId: songsByAlbum[action.albumId][0]})
-  yield put({type: types.START_PLAYING})
+  yield put({ type: types.ADD_SONGS_TO_QUEUE, songs: songsByAlbum[action.albumId], replace: false })
+  yield put({ type: types.SET_CURRENT_PLAYING, songId: songsByAlbum[action.albumId][0] })
+  yield put({ type: types.START_PLAYING })
 }
 
 // Binding actions to sagas
