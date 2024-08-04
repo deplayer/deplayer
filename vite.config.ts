@@ -9,7 +9,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig({
   plugins: [react(), nodePolyfills(), VitePWA({
     registerType: 'autoUpdate',
-    injectRegister: 'auto'
+    injectRegister: 'auto',
     includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
     manifest: {
       name: 'deplayer',

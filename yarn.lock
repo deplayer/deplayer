@@ -1826,42 +1826,34 @@
     "@testing-library/dom" "^10.0.0"
     "@types/react-dom" "^18.0.0"
 
-"@thaunknown/idb-chunk-store@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.npmjs.org/@thaunknown/idb-chunk-store/-/idb-chunk-store-1.0.2.tgz"
-  integrity sha512-UdKshbKdHDP+p0XPdv55QiU/scdB9TzvovGFSgXThf+7Yd3noLeYp6KpkYyc1jzUXvI3/8+TemPeASOimrOXvw==
+"@thaunknown/simple-peer@^10.0.10", "@thaunknown/simple-peer@^10.0.8":
+  version "10.0.10"
+  resolved "https://registry.npmjs.org/@thaunknown/simple-peer/-/simple-peer-10.0.10.tgz"
+  integrity sha512-RtoYQChP5clkbh+crUhv0LD/fdzgNO/Ah/SBdcSqla6xY6GK50ukNhq39H4vzAKoYqvDu01Hc+JSD9DxCdoBOw==
   dependencies:
-    idb "^6.1.2"
-    queue-microtask "^1.2.3"
-
-"@thaunknown/simple-peer@^10.0.6", "@thaunknown/simple-peer@^10.0.7":
-  version "10.0.7"
-  resolved "https://registry.npmjs.org/@thaunknown/simple-peer/-/simple-peer-10.0.7.tgz"
-  integrity sha512-b4oPNaJEWk9UT/ADV8IFWcAyow+gOPLa73SptuOqm6IdMDr4zlsqGsdl4LQmvgMKMgWAOHdVViw/RYF5qYvkCg==
-  dependencies:
-    debug "^4.3.4"
+    debug "^4.3.5"
     err-code "^3.0.1"
-    streamx "^2.16.1"
+    streamx "^2.17.0"
     uint8-util "^2.2.5"
-    webrtc-polyfill "^1.1.6"
+    webrtc-polyfill "^1.1.8"
 
-"@thaunknown/simple-websocket@^9.1.1":
-  version "9.1.1"
-  resolved "https://registry.npmjs.org/@thaunknown/simple-websocket/-/simple-websocket-9.1.1.tgz"
-  integrity sha512-vzQloFWRodRZqZhpxMpBljFtISesY8TihA8T5uKwCYdj2I1ImMhE/gAeTCPsCGOtxJfGKu3hw/is6MXauWLjOg==
+"@thaunknown/simple-websocket@^9.1.3":
+  version "9.1.3"
+  resolved "https://registry.npmjs.org/@thaunknown/simple-websocket/-/simple-websocket-9.1.3.tgz"
+  integrity sha512-pf/FCJsgWtLJiJmIpiSI7acOZVq3bIQCpnNo222UFc8Ph1lOUOTpe6LoYhhiOSKB9GUaWJEVUtZ+sK1/aBgU5Q==
   dependencies:
-    debug "^4.3.4"
+    debug "^4.3.5"
     queue-microtask "^1.2.3"
-    streamx "^2.13.2"
-    uint8-util "^2.1.9"
-    ws "^8.12.0"
+    streamx "^2.17.0"
+    uint8-util "^2.2.5"
+    ws "^8.17.1"
 
 "@thaunknown/thirty-two@^1.0.3":
-  version "1.0.3"
-  resolved "https://registry.npmjs.org/@thaunknown/thirty-two/-/thirty-two-1.0.3.tgz"
-  integrity sha512-bD6PvWbaf53JC04O7WnGDjqZBDgja/KT2Jd/6I2vJBIy+DLmQfQJZZ/G+16nAkVq1yGTIkO4rfc4RlH0DmEEqA==
+  version "1.0.5"
+  resolved "https://registry.npmjs.org/@thaunknown/thirty-two/-/thirty-two-1.0.5.tgz"
+  integrity sha512-Q53KyCXweV1CS62EfqtPDqfpksn5keQ59PGqzzkK+g8Vif1jB4inoBCcs/BUSdsqddhE3G+2Fn+4RX3S6RqT0A==
   dependencies:
-    uint8-util "^2.1.9"
+    uint8-util "^2.2.5"
 
 "@tokenizer/token@^0.3.0":
   version "0.3.0"
@@ -3097,13 +3089,13 @@ bitfield@^4.0.0, bitfield@^4.1.0, bitfield@^4.2.0:
   resolved "https://registry.npmjs.org/bitfield/-/bitfield-4.2.0.tgz"
   integrity sha512-kUTatQb/mBd8uhvdLrUkouGDBUQiJaIOvPlptUwOWp6MFqih4d1MiVf0m3ATxfZSzu+LjW/awFeABltYa62uIA==
 
-bittorrent-dht@^11.0.6:
-  version "11.0.6"
-  resolved "https://registry.npmjs.org/bittorrent-dht/-/bittorrent-dht-11.0.6.tgz"
-  integrity sha512-iDScIyLDKuuXOSIlPIxnvzH3llqatVkugjn3CSPPpjcHO+4dyahHiiPRpzR39k4l9qW79YAbI/AzSjNWoLchHQ==
+bittorrent-dht@^11.0.7:
+  version "11.0.7"
+  resolved "https://registry.npmjs.org/bittorrent-dht/-/bittorrent-dht-11.0.7.tgz"
+  integrity sha512-jDlEtF+KSObXvvwhrTHE1mxX+aIrsiRRfYyEAdjYa+FqnxwUIYBbw/CnCfNMu5kWlfu/sQ2qK8+CuBjMSM6z3g==
   dependencies:
     bencode "^4.0.0"
-    debug "^4.3.5"
+    debug "^4.3.6"
     k-bucket "^5.1.0"
     k-rpc "^5.1.0"
     last-one-wins "^1.0.4"
@@ -3124,31 +3116,30 @@ bittorrent-peerid@^1.3.6:
   resolved "https://registry.npmjs.org/bittorrent-peerid/-/bittorrent-peerid-1.3.6.tgz"
   integrity sha512-VyLcUjVMEOdSpHaCG/7odvCdLbAB1y3l9A2V6WIje24uV7FkJPrQrH/RrlFmKxP89pFVDEnE+YlHaFujlFIZsg==
 
-bittorrent-protocol@^4.1.12:
-  version "4.1.12"
-  resolved "https://registry.npmjs.org/bittorrent-protocol/-/bittorrent-protocol-4.1.12.tgz"
-  integrity sha512-peyUDP5NQaiPSau24jCpPhLfDFCCK1DUE0N5xlJSPVIkgQmsVLi62N/Lm++pUNrBenfnhf6WKQo0nyN6x5dufQ==
+bittorrent-protocol@^4.1.14:
+  version "4.1.14"
+  resolved "https://registry.npmjs.org/bittorrent-protocol/-/bittorrent-protocol-4.1.14.tgz"
+  integrity sha512-vChtr7L/cG5b2TQgdDMzJ79TjSX+whuC8NfgoLcjXKINJVXECWkqVaRveAo50Oa+53Mo4Nw54IlTnhOZFwlVEg==
   dependencies:
     bencode "^4.0.0"
     bitfield "^4.1.0"
-    debug "^4.3.5"
+    debug "^4.3.6"
     rc4 "^0.1.5"
     streamx "^2.15.1"
     throughput "^1.0.1"
-    uint8-util "^2.2.2"
+    uint8-util "^2.2.5"
     unordered-array-remove "^1.0.2"
 
-bittorrent-tracker@^11.1.0:
-  version "11.1.0"
-  resolved "https://registry.npmjs.org/bittorrent-tracker/-/bittorrent-tracker-11.1.0.tgz"
-  integrity sha512-WKIIy1wVxFiKro5noDldW8W4C4xCjl8gHvZcG0LWM40J6VZOf7gXdrdB2/GI55+JAgrph8NGsZUeusbyzlbiQQ==
+bittorrent-tracker@^11.1.1:
+  version "11.1.1"
+  resolved "https://registry.npmjs.org/bittorrent-tracker/-/bittorrent-tracker-11.1.1.tgz"
+  integrity sha512-j5IMK80wWB44S/3TE+HwIRLYBmY00KvIoI/s7e37mVe5raBNPVTxXgXlOcvECMJvjhk1igta31d+JHTbM8c51A==
   dependencies:
-    "@thaunknown/simple-peer" "^10.0.6"
-    "@thaunknown/simple-websocket" "^9.1.1"
+    "@thaunknown/simple-peer" "^10.0.8"
+    "@thaunknown/simple-websocket" "^9.1.3"
     bencode "^4.0.0"
     bittorrent-peerid "^1.3.6"
     chrome-dgram "^3.0.6"
-    clone "^2.1.2"
     compact2string "^1.4.1"
     cross-fetch-ponyfill "^1.0.3"
     debug "^4.3.4"
@@ -3615,11 +3606,6 @@ clone-buffer@1.0.0:
   resolved "https://registry.npmjs.org/clone-buffer/-/clone-buffer-1.0.0.tgz"
   integrity sha512-KLLTJWrvwIP+OPfMn0x2PheDEP20RPUcGXj/ERegTgdmPEZylALQldygiqrPPu8P45uNuPs7ckmReLY6v/iA5g==
 
-clone@^2.1.2:
-  version "2.1.2"
-  resolved "https://registry.npmjs.org/clone/-/clone-2.1.2.tgz"
-  integrity sha512-3Pe/CF1Nn94hyhIYpjtiLhdCoEoz0DqQ+988E9gmeEdQZlojxnOb74wctFyuwWQHzqyf9X7C7MG8juUpqBJT8w==
-
 clsx@^1.0.4, clsx@^1.2.1:
   version "1.2.1"
   resolved "https://registry.npmjs.org/clsx/-/clsx-1.2.1.tgz"
@@ -3835,10 +3821,10 @@ create-require@^1.1.1:
   resolved "https://registry.npmjs.org/create-require/-/create-require-1.1.1.tgz"
   integrity sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==
 
-create-torrent@^6.0.17:
-  version "6.0.17"
-  resolved "https://registry.npmjs.org/create-torrent/-/create-torrent-6.0.17.tgz"
-  integrity sha512-GGrNP1mu3WSyJHyo+x6AnJlQWW7bbyUfoEDFfo/U2kpeTVYRCgWdQC4/sq4oreltpMTEP8UUB3U3niHIgLU/gQ==
+create-torrent@^6.0.18:
+  version "6.0.18"
+  resolved "https://registry.npmjs.org/create-torrent/-/create-torrent-6.0.18.tgz"
+  integrity sha512-rN1y6A0pnM/ijMcUfbcmAGFGjegtc76TpVsleOWLxxm6hkjbx2q2F0zN4u3LDweAzd6hM6sQySNgFEGZA1geCQ==
   dependencies:
     bencode "^4.0.0"
     block-iterator "^1.1.1"
@@ -3851,7 +3837,7 @@ create-torrent@^6.0.17:
     piece-length "^2.0.1"
     queue-microtask "^1.2.3"
     run-parallel "^1.2.0"
-    uint8-util "^2.2.4"
+    uint8-util "^2.2.5"
 
 cross-fetch-ponyfill@^1.0.1, cross-fetch-ponyfill@^1.0.3:
   version "1.0.3"
@@ -3941,10 +3927,10 @@ data-view-byte-offset@^1.0.0:
     es-errors "^1.3.0"
     is-data-view "^1.0.1"
 
-debug@^4.1.0, debug@^4.1.1, debug@^4.2.0, debug@^4.3.1, debug@^4.3.2, debug@^4.3.4, debug@^4.3.5:
-  version "4.3.5"
-  resolved "https://registry.npmjs.org/debug/-/debug-4.3.5.tgz"
-  integrity sha512-pt0bNEmneDIvdL1Xsd9oDQ/wrQRkXDT4AUWlNZNPKvW5x/jyO9VFXkJUP07vQ2upmw5PlaITaPKc31jK13V+jg==
+debug@^4.1.0, debug@^4.1.1, debug@^4.2.0, debug@^4.3.1, debug@^4.3.2, debug@^4.3.4, debug@^4.3.5, debug@^4.3.6:
+  version "4.3.6"
+  resolved "https://registry.npmjs.org/debug/-/debug-4.3.6.tgz"
+  integrity sha512-O/09Bd4Z1fBrU4VzkhFqVgpPzaGbw6Sm9FEkBT1A/YBXQFGuuSxa1dN2nxgxS34JmKXqYx8CZAwEVoJFImUXIg==
   dependencies:
     ms "2.1.2"
 
@@ -4973,10 +4959,10 @@ fs.realpath@^1.0.0:
   resolved "https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz"
   integrity sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==
 
-fsa-chunk-store@^1.1.5:
-  version "1.1.5"
-  resolved "https://registry.npmjs.org/fsa-chunk-store/-/fsa-chunk-store-1.1.5.tgz"
-  integrity sha512-+3G6d/syYrw4tGJCivHWjtTKNeP7rOXfX1wgnwzsu81CVHKVOah74XxGdlRHRrMTN5dU15lWbnhgtRsBop3V5A==
+fsa-chunk-store@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.npmjs.org/fsa-chunk-store/-/fsa-chunk-store-1.3.0.tgz"
+  integrity sha512-0WCfuxqqSB6Tz/g7Ar/nwAxMoigXaIXuvfrnLIEFYIA9uc6w9eNaHuBGzU1X3lyM4cpLKCOTUmKAA/gCiTvzMQ==
   dependencies:
     filename-reserved-regex "^3.0.0"
 
@@ -5398,16 +5384,6 @@ human-signals@^5.0.0:
   resolved "https://registry.npmjs.org/human-signals/-/human-signals-5.0.0.tgz"
   integrity sha512-AXcZb6vzzrFAUE61HnN4mpLqd/cSIwNQjtNWR0euPm6y0iqx3G4gOXaIDdtdDwZmhwe82LA6+zinmW4UBWVePQ==
 
-hybrid-chunk-store@^1.2.4:
-  version "1.2.4"
-  resolved "https://registry.npmjs.org/hybrid-chunk-store/-/hybrid-chunk-store-1.2.4.tgz"
-  integrity sha512-wLVIU7rDAz0bQ9sOVwqNWV44A+yAitm+yw66vilkIhZ7V1lVQtiZBQ98YF4vr8rmbqnysgW+pW/PZ1UQtnQCCA==
-  dependencies:
-    "@thaunknown/idb-chunk-store" "^1.0.2"
-    cache-chunk-store "^3.2.2"
-    fsa-chunk-store "^1.1.5"
-    memory-chunk-store "^1.3.5"
-
 ico-endec@*:
   version "0.1.6"
   resolved "https://registry.npmjs.org/ico-endec/-/ico-endec-0.1.6.tgz"
@@ -5424,11 +5400,6 @@ idb-keyval@^6.2.1:
   version "6.2.1"
   resolved "https://registry.npmjs.org/idb-keyval/-/idb-keyval-6.2.1.tgz"
   integrity sha512-8Sb3veuYCyrZL+VBt9LJfZjLUPWVvqn8tG28VqYNFCo43KHcKuq+b4EiXGeuaLAQWL2YmyDgMp2aSpH9JHsEQg==
-
-idb@^6.1.2:
-  version "6.1.5"
-  resolved "https://registry.npmjs.org/idb/-/idb-6.1.5.tgz"
-  integrity sha512-IJtugpKkiVXQn5Y+LteyBCNk1N8xpGV3wWZk9EVtZWH8DYkjBn0bX1XnGP9RkyZF0sAcywa6unHqSWKe7q4LGw==
 
 idb@^7.0.1:
   version "7.1.1"
@@ -6721,10 +6692,10 @@ lru@^3.1.0:
   dependencies:
     inherits "^2.0.1"
 
-lt_donthave@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.npmjs.org/lt_donthave/-/lt_donthave-2.0.1.tgz"
-  integrity sha512-GhiKG7CGTXzOQq56tIx40Ae26EbrgBq1owuuPqgCTaJDQYO1qW5G+YGaurOLx7s+Aaeta8MputrVFDr0kuiogg==
+lt_donthave@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.npmjs.org/lt_donthave/-/lt_donthave-2.0.2.tgz"
+  integrity sha512-rSEms3KNO7PnAbPwj+vWK6tg/ZafQE7yYJ9Gr9IyjaCJsopa6PYPspnhlmEFLlRwSd1wfZ1jLCR6Km3lThVLIg==
   dependencies:
     debug "^4.2.0"
     unordered-array-remove "^1.0.2"
@@ -7116,10 +7087,10 @@ node-addon-api@^6.1.0:
   resolved "https://registry.npmjs.org/node-addon-api/-/node-addon-api-6.1.0.tgz"
   integrity sha512-+eawOlIgy680F0kBzPUNFhMZGtJ1YmqM6l4+Crf4IkImjYrO/mqPwRMh352g23uIaQKFItcQ64I7KMaJxHgAVA==
 
-node-datachannel@0.9.1:
-  version "0.9.1"
-  resolved "https://registry.npmjs.org/node-datachannel/-/node-datachannel-0.9.1.tgz"
-  integrity sha512-b6Uc6YN5We2/aZA6QGicxSdWUDSwlR+vcO/Dn44BY5gieF3AOwsL/zPD+Ril+1KvYDwVJkVbRIovbG76E4PpwA==
+node-datachannel@^0.10.1:
+  version "0.10.1"
+  resolved "https://registry.npmjs.org/node-datachannel/-/node-datachannel-0.10.1.tgz"
+  integrity sha512-rhxb1iQgbFLY6HMt3W6Xcs8Q1k4jIMgI7KduXcYvIn2UMKYK6e/eegya2caF/+XYAqTeo1743gOr11CXvJ/DJA==
   dependencies:
     node-domexception "^2.0.1"
     prebuild-install "^7.0.1"
@@ -7421,17 +7392,17 @@ parse-json@^5.2.0:
     json-parse-even-better-errors "^2.3.0"
     lines-and-columns "^1.1.6"
 
-parse-torrent@^11.0.16:
-  version "11.0.16"
-  resolved "https://registry.npmjs.org/parse-torrent/-/parse-torrent-11.0.16.tgz"
-  integrity sha512-5GoOdmW0HpiB78aQpBz8/5V3V1LjBRDNiL7DOs33pKeCLOzFnfMrsRD6CYmaUBT5Vi/dXE0hfePsjDGJSMF48w==
+parse-torrent@^11.0.17:
+  version "11.0.17"
+  resolved "https://registry.npmjs.org/parse-torrent/-/parse-torrent-11.0.17.tgz"
+  integrity sha512-bkfEtrqIMT4+bSWs+m7+Ktd7LSJsDefA9qfJQ3UFwOeBqipiQ+347guu79zX++nRwMnrdvRecLmgaRcdiYjE4w==
   dependencies:
     bencode "^4.0.0"
     cross-fetch-ponyfill "^1.0.3"
     get-stdin "^9.0.0"
     magnet-uri "^7.0.5"
     queue-microtask "^1.2.3"
-    uint8-util "^2.2.4"
+    uint8-util "^2.2.5"
 
 path-browserify@^1.0.1:
   version "1.0.1"
@@ -9071,10 +9042,10 @@ stream-http@^3.2.0:
     readable-stream "^3.6.0"
     xtend "^4.0.2"
 
-streamx@^2.10.3, streamx@^2.13.2, streamx@^2.15.0, streamx@^2.15.1, streamx@^2.16.1:
-  version "2.16.1"
-  resolved "https://registry.npmjs.org/streamx/-/streamx-2.16.1.tgz"
-  integrity sha512-m9QYj6WygWyWa3H1YY69amr4nVgy61xfjys7xO7kviL5rfIEc2naf+ewFiOA+aEJD7y0JO3h2GoiUv4TDwEGzQ==
+streamx@^2.10.3, streamx@^2.15.0, streamx@^2.15.1, streamx@^2.16.1, streamx@^2.17.0, streamx@2.17.0:
+  version "2.17.0"
+  resolved "https://registry.npmjs.org/streamx/-/streamx-2.17.0.tgz"
+  integrity sha512-mzRXEeafEA0skX5XLiDht/zdIqEVs4kgayUTFHDoMjiaZ2kC7DoFsQDJVXRILI2Qme/kWXxLpuU6P0B+xcXpFA==
   dependencies:
     fast-fifo "^1.1.0"
     queue-tick "^1.0.1"
@@ -9635,15 +9606,15 @@ token-types@^4.1.1, token-types@^4.2.1:
     "@tokenizer/token" "^0.3.0"
     ieee754 "^1.2.1"
 
-torrent-discovery@^11.0.6:
-  version "11.0.6"
-  resolved "https://registry.npmjs.org/torrent-discovery/-/torrent-discovery-11.0.6.tgz"
-  integrity sha512-9gnsBZLuOzbWlTIv0lx3pjmZ2Bj4WZfY06iO9AXKiNxA7/k508CWIE80PojYsgsR9SyjDkIVfnHLyJOgnDycvQ==
+torrent-discovery@^11.0.8:
+  version "11.0.8"
+  resolved "https://registry.npmjs.org/torrent-discovery/-/torrent-discovery-11.0.8.tgz"
+  integrity sha512-T4Mve8DG+9umQRqJ4VDW3de+l7J93pJUzJY/+ANUz1JaA8gIavxIOC5xv7ydoOcgCGVzoB7FUVA5rLfCOzi+Vg==
   dependencies:
-    bittorrent-dht "^11.0.6"
+    bittorrent-dht "^11.0.7"
     bittorrent-lsd "^2.0.0"
-    bittorrent-tracker "^11.1.0"
-    debug "^4.3.5"
+    bittorrent-tracker "^11.1.1"
+    debug "^4.3.6"
     run-parallel "^1.2.0"
 
 torrent-piece@^3.0.0:
@@ -9850,7 +9821,7 @@ uglify-js@^3.1.4:
   resolved "https://registry.npmjs.org/uglify-js/-/uglify-js-3.17.4.tgz"
   integrity sha512-T9q82TJI9e/C1TAxYvfb16xO120tMVFZrGA3f9/P4424DNu6ypK103y0GPFVa17yotwSyZW5iYXgjYHkGrJW/g==
 
-uint8-util@^2.1.3, uint8-util@^2.1.9, uint8-util@^2.2.2, uint8-util@^2.2.4, uint8-util@^2.2.5:
+uint8-util@^2.1.3, uint8-util@^2.1.9, uint8-util@^2.2.2, uint8-util@^2.2.5:
   version "2.2.5"
   resolved "https://registry.npmjs.org/uint8-util/-/uint8-util-2.2.5.tgz"
   integrity sha512-/QxVQD7CttWpVUKVPz9znO+3Dd4BdTSnFQ7pv/4drVhC9m4BaL2LFHTkJn6EsYoxT79VDq/2Gg8L0H22PrzyMw==
@@ -10174,43 +10145,43 @@ webidl-conversions@^7.0.0:
   resolved "https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-7.0.0.tgz"
   integrity sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g==
 
-webrtc-polyfill@^1.1.6:
-  version "1.1.6"
-  resolved "https://registry.npmjs.org/webrtc-polyfill/-/webrtc-polyfill-1.1.6.tgz"
-  integrity sha512-sB9m4P5ZF6Af1zNiMc/jW+PMVtvPSRuE3f0FNhje5iplljZ5mAUTUtZTdaoi+l5Z17/ePQinJbNDfT+YzB6fdQ==
+webrtc-polyfill@^1.1.8:
+  version "1.1.8"
+  resolved "https://registry.npmjs.org/webrtc-polyfill/-/webrtc-polyfill-1.1.8.tgz"
+  integrity sha512-ms2rE5MEg1KXQX45sjl2QaIIevhpPogqoFz7Z1MAJYxWUuxFfI3L0SoiifrTNrWJiJiuFn/Dsf5OIGUWJFdU5g==
   dependencies:
-    node-datachannel "0.9.1"
+    node-datachannel "^0.10.1"
     node-domexception "^1.0.0"
 
 webtorrent@^2.2.1:
-  version "2.4.2"
-  resolved "https://registry.npmjs.org/webtorrent/-/webtorrent-2.4.2.tgz"
-  integrity sha512-+ToXNpDVgynwoR1W2WzNEFfctga79+nQCTCn2NVJTySIuTWcty6OpY93V8FQ/ytCScXUu57ZZhnm+n3NniXYjQ==
+  version "2.5.0"
+  resolved "https://registry.npmjs.org/webtorrent/-/webtorrent-2.5.0.tgz"
+  integrity sha512-7ijwyHeQSQB4C9f7FV1K9hbNnxPcjKYES/7zz6GDeHXL9qJyR3ceb7/ZRH1QhrnOPhTspmS0HXOh6El7tQBJFg==
   dependencies:
     "@silentbot1/nat-api" "^0.4.7"
-    "@thaunknown/simple-peer" "^10.0.7"
+    "@thaunknown/simple-peer" "^10.0.10"
     "@webtorrent/http-node" "^1.3.0"
     addr-to-ip-port "^2.0.0"
     bitfield "^4.2.0"
-    bittorrent-dht "^11.0.6"
-    bittorrent-protocol "^4.1.12"
+    bittorrent-dht "^11.0.7"
+    bittorrent-protocol "^4.1.14"
     cache-chunk-store "^3.2.2"
     chunk-store-iterator "^1.0.3"
     cpus "^1.0.3"
-    create-torrent "^6.0.17"
+    create-torrent "^6.0.18"
     cross-fetch-ponyfill "^1.0.3"
-    debug "^4.3.5"
+    debug "^4.3.6"
     escape-html "^1.0.3"
     fs-chunk-store "^4.1.0"
-    hybrid-chunk-store "^1.2.4"
+    fsa-chunk-store "^1.3.0"
     immediate-chunk-store "^2.2.0"
     join-async-iterator "^1.1.1"
     load-ip-set "^3.0.1"
-    lt_donthave "^2.0.1"
+    lt_donthave "^2.0.2"
     memory-chunk-store "^1.3.5"
     mime "^3.0.0"
     once "^1.4.0"
-    parse-torrent "^11.0.16"
+    parse-torrent "^11.0.17"
     pump "^3.0.0"
     queue-microtask "^1.2.3"
     random-iterate "^1.0.1"
@@ -10218,9 +10189,9 @@ webtorrent@^2.2.1:
     run-parallel "^1.2.0"
     run-parallel-limit "^1.1.0"
     speed-limiter "^1.0.2"
-    streamx "^2.16.1"
+    streamx "2.17.0"
     throughput "^1.0.1"
-    torrent-discovery "^11.0.6"
+    torrent-discovery "^11.0.8"
     torrent-piece "^3.0.0"
     uint8-util "^2.2.5"
     unordered-array-remove "^1.0.2"
@@ -10503,10 +10474,10 @@ write-stream@~0.4.3:
   dependencies:
     readable-stream "~0.0.2"
 
-ws@^8.12.0, ws@^8.17.0:
-  version "8.17.1"
-  resolved "https://registry.npmjs.org/ws/-/ws-8.17.1.tgz"
-  integrity sha512-6XQFvXTkbfUOZOKKILFG1PDK2NDQs4azKQl26T0YS5CxqWLgXajbPZ+h4gZekJyRqFU8pvnbAbbs/3TgRPy+GQ==
+ws@^8.17.0, ws@^8.17.1:
+  version "8.18.0"
+  resolved "https://registry.npmjs.org/ws/-/ws-8.18.0.tgz"
+  integrity sha512-8VbfWfHLbbwu3+N6OKsOMpBdT4kXPDDB9cJk2bJ6mh9ucxdlnNvH1e+roYkKmN9Nxw2yjz7VzeO9oOz2zJ04Pw==
 
 xml2js@^0.6.0:
   version "0.6.2"
