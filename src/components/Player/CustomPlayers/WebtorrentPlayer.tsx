@@ -164,7 +164,7 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
       console.log('error: ', error)
     }
 
-    this.client.on('torrent', (torrent: Torrent) => {
+    this.client.on('torrent', (torrent: any) => {
       const file = torrent.files.find((file: any) => {
         return file.type.startsWith('video/')
       })
