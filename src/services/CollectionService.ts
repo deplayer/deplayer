@@ -29,10 +29,10 @@ export default class CollectionService implements IStorageService {
 
         const mergedMedia = mediaMergerService.getMerged()
 
-        return mergedMedia.toDocument()
+        return mergedMedia
       }
 
-      return elem.toDocument()
+      return elem
     })
 
     return this.storageAdapter.addMany(MODEL, collectionItems)

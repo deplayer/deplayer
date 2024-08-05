@@ -34,6 +34,6 @@ export default class MediaMergerService {
     }
 
     const merged = merge(this.mediaA, this.mediaB, options)
-    return new Media(merged)
+    return merged
   }
 }
