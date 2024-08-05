@@ -63,6 +63,8 @@ const ContextualMenu = (props: MenuProps) => {
     })
   }
 
+  const itemClasses = 'flex flex-col w-full justify-stretch'
+
   return (
     <React.Fragment>
       <button
@@ -82,6 +84,8 @@ const ContextualMenu = (props: MenuProps) => {
       </button>
       <Menu
         id={MENU_ID}
+        theme='dark'
+        className='flex flex-col justify-items-stretch'
         style={{ marginTop: props.player.showPlayer ? '-68px' : '-124px' }}
       >
         <VolumeControl
@@ -90,19 +94,19 @@ const ContextualMenu = (props: MenuProps) => {
         />
         {showVisibilityCons &&
           <>
-            <Item className='flex w-full'>
+            <Item className={itemClasses}>
               <TogglePlayer />
             </Item>
-            <Item className='flex w-full'>
+            <Item className={itemClasses}>
               <ToggleMiniQueueButton />
             </Item>
           </>
         }
-        <Item className='flex w-full'>
+        <Item className={itemClasses}>
           <AddNewMediaButton />
         </Item>
         {showFullscreen &&
-          <Item className='flex w-full'>
+          <Item className={itemClasses}>
             <Button
               transparent
               alignLeft
@@ -117,7 +121,7 @@ const ContextualMenu = (props: MenuProps) => {
             </Button>
           </Item>
         }
-        <Item className='flex w-full'>
+        <Item className={itemClasses}>
           <Button
             transparent
             alignLeft
@@ -135,7 +139,7 @@ const ContextualMenu = (props: MenuProps) => {
             />
           </Button>
         </Item>
-        <Item className='flex w-full'>
+        <Item className={itemClasses}>
           <Button
             transparent
             alignLeft
@@ -155,7 +159,7 @@ const ContextualMenu = (props: MenuProps) => {
         </Item>
         {trackIds.length && (
           <>
-            <Item className='flex w-full'>
+            <Item className={itemClasses}>
               <Button
                 fullWidth
                 transparent
@@ -172,7 +176,7 @@ const ContextualMenu = (props: MenuProps) => {
                 />
               </Button>
             </Item>
-            <Item className='flex w-full'>
+            <Item className={itemClasses}>
               <Button
                 fullWidth
                 transparent
@@ -192,7 +196,7 @@ const ContextualMenu = (props: MenuProps) => {
           </>
         )}
         {showStartPlaying &&
-          <Item className='flex w-full'>
+          <Item className={itemClasses}>
             <Button
               transparent
               alignLeft
