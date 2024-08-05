@@ -195,14 +195,11 @@ class PlayerControls extends React.Component<Props> {
         {showControls &&
           <div className={'player-container'} style={{ zIndex: 102 }}>
             <CSSTransition
-              timeout={500}
-              transitionName="player"
-              transitionAppear={true}
-              transitionAppearTimeout={500}
-              transitionEnterTimeout={500}
-              transitionLeaveTimeout={500}
-              transitionEnter={true}
-              transitionLeave={true}
+              classNames="player"
+              appear={true}
+              timeout={{ enter: 500, exit: 500, appear: 500 }}
+              enter={true}
+              exit={true}
             >
               <div key='player-controls' className='flex justify-between items-center flex-col'>
                 <div className='absolute w-full md:top-0'>

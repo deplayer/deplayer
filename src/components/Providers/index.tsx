@@ -19,10 +19,6 @@ const Providers = (props: Props) => {
     props.dispatch({ type: types.SAVE_SETTINGS, settingsPayload: form })
   }
 
-  const scanSources = () => {
-    props.dispatch({ type: types.START_SCAN_SOURCES })
-  }
-
   const providers = Object.keys(props.settings.settingsForm.providers).map((providerKey) => {
     return (
       <ProviderForm
@@ -72,11 +68,6 @@ const Providers = (props: Props) => {
             </div>
           </Form>)}
         </Formik>
-        <div className='my-12'>
-          <Button onClick={scanSources} inverted>
-            <Translate value="labels.scanSources" />
-          </Button>
-        </div>
       </div>
     </MainContainer>
   )

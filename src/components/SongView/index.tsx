@@ -258,6 +258,8 @@ const SongView = (props: Props) => {
           {
             showLyrics && (
               <Lyrics
+                dispatch={props.dispatch}
+                songId={song.id}
                 lyrics={props.lyrics.lyrics}
                 onClose={() => setShowLyrics(false)}
               />

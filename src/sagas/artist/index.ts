@@ -35,7 +35,7 @@ export function* loadMoreArtistSongsFromProvider(
 // Binding actions to sagas
 function* artistSaga(): any {
   yield takeLatest(types.LOAD_ARTIST, loadMoreArtistSongsFromProvider);
-  yield takeLatest(types.START_PLAYING, fetchSongMetadata);
+  yield takeLatest(types.FETCH_LYRICS, fetchSongMetadata);
 }
 
 export default artistSaga;

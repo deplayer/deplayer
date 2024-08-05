@@ -27,6 +27,7 @@ const Dashboard = ({ collection: { loading, rows, songsByNumberOfPlays, albums }
       <BodyMessage message={
         <div>
           Welcome to Deplayer!
+          <br />
           <Translate value='message.noMostPlayed' />
           <br />
           <Link to={'/collection'} className='h-32 button'><Translate value='message.goToCollection' /></Link>

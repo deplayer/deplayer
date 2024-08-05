@@ -33,6 +33,7 @@ const AddMediaModal = (props: Props) => {
         props.dispatch({ type: types.HIDE_ADD_MEDIA_MODAL })
       }}
     >
+      <Header>Deplayer supports several ways to access your media! If you have a provider such as Subsonic compatible API visit Providers section!</Header>
       <div className='my-6'>
         <Header>
           Magnet link (powered by <a target="_blank" rel="noopener noreferrer" href='https://webtorrent.io/'><span>webtorrent</span></a>. check some <a target="_blank" rel="noopener noreferrer" href="https://webtorrent.io/free-torrents"><span>examples</span></a>)

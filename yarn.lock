@@ -10153,7 +10153,7 @@ webrtc-polyfill@^1.1.8:
     node-datachannel "^0.10.1"
     node-domexception "^1.0.0"
 
-webtorrent@^2.2.1:
+webtorrent@^2.5.0:
   version "2.5.0"
   resolved "https://registry.npmjs.org/webtorrent/-/webtorrent-2.5.0.tgz"
   integrity sha512-7ijwyHeQSQB4C9f7FV1K9hbNnxPcjKYES/7zz6GDeHXL9qJyR3ceb7/ZRH1QhrnOPhTspmS0HXOh6El7tQBJFg==

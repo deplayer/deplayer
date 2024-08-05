@@ -31,12 +31,14 @@ type Props = {
   onClose?: () => void
 }
 
+// ReactModal.setAppElement('#modal');
+
 const Modal = (props: Props) => {
   const [modalIsOpen, setIsOpen] = React.useState(true)
 
   const close = () => {
-    setIsOpen(false)
     props.onClose && props.onClose()
+    setIsOpen(false)
   }
 
   return (

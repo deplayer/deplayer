@@ -1,6 +1,6 @@
 import React from 'react'
 import { ReactPlayerProps } from 'react-player'
-import Webtorrent from 'webtorrent'
+import Webtorrent, { Torrent } from 'webtorrent'
 
 const announceList = [
   ['wss://tracker.btorrent.xyz'],
@@ -12,11 +12,11 @@ const announceList = [
   ['wss://tracker.openwebtorrent.com'],
 ]
 
-function canPlay (url: string) {
+function canPlay(url: string) {
   return typeof url === 'string' && url.startsWith('magnet:')
 }
 
-function canEnablePIP () {
+function canEnablePIP() {
   return false
 }
 
@@ -41,27 +41,31 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
     this.player = player
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.addListeners()
   }
 
-  componentWillUnmount () {
+  componentDidUpdate() {
+    this.getSource(this.props.url)
+  }
+
+  componentWillUnmount() {
     this.removeListeners()
   }
 
-  addListeners () {
-      const { onReady, onPlay, onBuffer, onBufferEnd, onPause, onEnded, onError } = this.props
-      this.player.addEventListener('canplay', onReady)
-      this.player.addEventListener('play', onPlay)
-      this.player.addEventListener('waiting', onBuffer)
-      this.player.addEventListener('playing', onBufferEnd)
-      this.player.addEventListener('pause', onPause)
-      this.player.addEventListener('seeked', this.onSeek)
-      this.player.addEventListener('ended', onEnded)
-      this.player.addEventListener('error', onError)
+  addListeners() {
+    const { onReady, onPlay, onBuffer, onBufferEnd, onPause, onEnded, onError } = this.props
+    this.player.addEventListener('canplay', onReady)
+    this.player.addEventListener('play', onPlay)
+    this.player.addEventListener('waiting', onBuffer)
+    this.player.addEventListener('playing', onBufferEnd)
+    this.player.addEventListener('pause', onPause)
+    this.player.addEventListener('seeked', this.onSeek)
+    this.player.addEventListener('ended', onEnded)
+    this.player.addEventListener('error', onError)
   }
 
-  removeListeners () {
+  removeListeners() {
     const { onReady, onPlay, onBuffer, onBufferEnd, onPause, onEnded, onError } = this.props
     this.player.removeEventListener('canplay', onReady)
     this.player.removeEventListener('play', onPlay)
@@ -78,26 +82,26 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
     this.props.onSeek(e.target.currentTime)
   }
 
-  play () {
+  play() {
     const promise = this.player.play()
     if (promise) {
       promise.catch(this.props.onError)
     }
   }
 
-  pause () {
+  pause() {
     this.player.pause()
   }
 
-  stop () {
+  stop() {
     this.player.removeAttribute('src')
   }
 
-  seekTo (seconds: any) {
+  seekTo(seconds: any) {
     this.player.currentTime = seconds
   }
 
-  setVolume (fraction: any) {
+  setVolume(fraction: any) {
     this.player.volume = fraction
   }
 
@@ -109,15 +113,15 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
     this.player.muted = false
   }
 
-  setPlaybackRate (rate: any) {
+  setPlaybackRate(rate: any) {
     this.player.playbackRate = rate
   }
 
-  load (url: any) {
+  load(url: any) {
     this.getSource(url)
   }
 
-  getDuration () {
+  getDuration() {
     if (!this.player) return null
     const { duration, seekable } = this.player
     // on iOS, live streams return Infinity for the duration
@@ -128,12 +132,12 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
     return duration
   }
 
-  getCurrentTime () {
+  getCurrentTime() {
     if (!this.player) return null
     return this.player.currentTime
   }
 
-  getSecondsLoaded () {
+  getSecondsLoaded() {
     if (!this.player) return null
     const { buffered } = this.player
     if (buffered.length === 0) {
@@ -147,22 +151,29 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
     return end
   }
 
-  getSource (url: any) {
+  async getSource(url: any) {
+    console.log('loading webtorrent url: ', url)
+
     if (typeof url !== 'string' && url.length < 10) return
 
-    const { player } = this
+    try {
+      this.client.add(url, {
+        announce: announceList
+      })
+    } catch (error) {
+      console.log('error: ', error)
+    }
 
-    this.client.add(url, {
-      announce: announceList
-    }, (torrent: any) => {
+    this.client.on('torrent', (torrent: Torrent) => {
       const file = torrent.files.find((file: any) => {
-        // FIXME: Add other file extensions
-        return file.name.endsWith('.mp4')
+        return file.type.startsWith('video/')
       })
 
       if (file === undefined) return
 
-      file.renderTo(player, {
+      console.log('file: ', file)
+
+      file.streamTo('#torrent-video-player', {
         autoplay: this.props.playing,
         muted: this.props.muted,
         controls: this.props.controls
@@ -170,11 +181,12 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
     })
   }
 
-  render () {
+
+  render() {
     const { playing, loop, muted, width, height } = this.props
     const style = {
-        width: width === 'auto' ? width : '100%',
-        height: height === 'auto' ? height : '100%'
+      width: width === 'auto' ? width : '100%',
+      height: height === 'auto' ? height : '100%'
     };
 
     return (
@@ -183,8 +195,8 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
         style={style}
         autoPlay={playing}
         controls={false}
-        muted={muted}
         loop={loop}
+        muted={muted}
         id='torrent-video-player'
       />
     )

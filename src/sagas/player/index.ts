@@ -21,7 +21,7 @@ export function* setCurrentPlayingStream(songId: string, providerNum: number): a
 
   // The song can't be found
   if (!currentPlaying) {
-    return yield put({type: types.PLAY_NEXT})
+    return yield put({ type: types.PLAY_NEXT })
   }
 
   // Getting the first stream URI, in the future will be choosen based on
@@ -29,29 +29,31 @@ export function* setCurrentPlayingStream(songId: string, providerNum: number): a
   const streamUri = yield getStreamUri(currentPlaying, settings, providerNum)
 
   if (!streamUri) {
-    return yield put({type: types.PLAY_NEXT})
+    return yield put({ type: types.PLAY_NEXT })
   }
 
-  yield put({type: types.SET_CURRENT_PLAYING_URL, url: streamUri})
-  yield put({type: types.SET_CURRENT_PLAYING_STREAMS, streams: currentPlaying.stream})
-  yield put({type: types.START_PLAYING})
+  yield put({ type: types.SET_CURRENT_PLAYING_URL, url: streamUri })
+  yield put({ type: types.SET_CURRENT_PLAYING_STREAMS, streams: currentPlaying.stream })
+  yield put({ type: types.START_PLAYING })
 
-  yield put({
-    type: types.SET_BACKGROUND_IMAGE,
-    backgroundImage: fullUrl
-  })
+  if (fullUrl) {
+    yield put({
+      type: types.SET_BACKGROUND_IMAGE,
+      backgroundImage: fullUrl
+    })
+  }
 }
 
 // Handling setCurrentPlaying saga
 export function* setCurrentPlaying(action: any): any {
   // Redirect to song view page
-  yield put({type: types.PUSH_TO_VIEW, song: action.songId})
+  yield put({ type: types.PUSH_TO_VIEW, song: action.songId })
 
   yield call(setCurrentPlayingStream, action.songId, 0)
 }
 
 export function* handleError(): any {
-  yield put({type: types.REGISTER_PLAYER_ERROR})
+  yield put({ type: types.REGISTER_PLAYER_ERROR })
 
   const queue = yield select(getQueue)
   const player = yield select(getPlayer)
@@ -65,9 +67,9 @@ export function* handlePlayNext(): any {
   const songId = queue.nextSongId
 
   if (queue.repeat && !songId && trackIds[0]) {
-    yield put({type: types.SET_CURRENT_PLAYING, songId: trackIds[0]})
+    yield put({ type: types.SET_CURRENT_PLAYING, songId: trackIds[0] })
   } else if (songId) {
-    yield put({type: types.SET_CURRENT_PLAYING, songId})
+    yield put({ type: types.SET_CURRENT_PLAYING, songId })
   }
 }
 
@@ -79,9 +81,9 @@ export function* handlePlayPrev(): any {
   console.log('last item: ', trackIds[trackIds.length - 1])
 
   if (queue.repeat && !songId && trackIds[trackIds.length - 1]) {
-    yield put({type: types.SET_CURRENT_PLAYING, songId: trackIds[trackIds.length - 1]})
-  } else if(songId) {
-    yield put({type: types.SET_CURRENT_PLAYING, songId})
+    yield put({ type: types.SET_CURRENT_PLAYING, songId: trackIds[trackIds.length - 1] })
+  } else if (songId) {
+    yield put({ type: types.SET_CURRENT_PLAYING, songId })
   }
 }
 
@@ -100,7 +102,7 @@ function* handleFullscreen(): any {
   }
 
   if (player.fullscreen) {
-    yield put({type: types.TOGGLE_SIDEBAR, value: false})
+    yield put({ type: types.TOGGLE_SIDEBAR, value: false })
     yield screenfull.request()
   } else {
     yield screenfull.exit()
