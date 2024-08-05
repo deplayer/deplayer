@@ -1,6 +1,6 @@
 import React from 'react'
 import { ReactPlayerProps } from 'react-player'
-import Webtorrent, { Torrent } from 'webtorrent'
+import Webtorrent from 'webtorrent'
 
 const announceList = [
   ['wss://tracker.btorrent.xyz'],
