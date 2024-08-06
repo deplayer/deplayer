@@ -236,12 +236,7 @@ export default (state: State = defaultState, action: any = {}) => {
     case types.UPDATE_MEDIA: {
       const media = action.media;
 
-      state.rows[media.id] = media;
-
-      return {
-        ...state,
-        rows: state.rows,
-      };
+      return { ...state, [media.id]: media }
     }
 
     case types.SET_CACHED_DATA: {

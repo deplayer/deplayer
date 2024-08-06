@@ -28,10 +28,14 @@ const AlbumCover = ({ albumName, albumId, thumbnailUrl }: { albumName: string, a
   )
 }
 
-// All items component
-// Important! add unique key
-export const Albums = (list: Array<Album>) => {
-  return list
+type Props = {
+  albums: Array<Album>
+}
+
+const RelatedAlbums = (props: Props) => {
+  const title = <Translate value='titles.albums' />
+
+  const Albums = props.albums
     .filter((album) => {
       return album.name !== '' // We don't want empty titles
     })
@@ -45,21 +49,11 @@ export const Albums = (list: Array<Album>) => {
         />
       )
     })
-}
-
-type Props = {
-  albums: Array<Album>
-}
-
-const RelatedAlbums = (props: Props) => {
-  const albums = Albums(props.albums)
-  const title = <Translate value='titles.albums' />
-
 
   return (
     <HorizontalSlider
       title={title}
-      items={albums}
+      items={Albums}
     />
   )
 }
