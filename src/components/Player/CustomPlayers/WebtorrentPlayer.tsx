@@ -1,16 +1,6 @@
 import React from 'react'
 import { ReactPlayerProps } from 'react-player'
-import Webtorrent from 'webtorrent'
-
-const announceList = [
-  ['wss://tracker.btorrent.xyz'],
-  ['udp://tracker.openbittorrent.com:80'],
-  ['udp://tracker.internetwarriors.net:1337'],
-  ['udp://tracker.leechers-paradise.org:6969'],
-  ['udp://tracker.coppersurfer.tk:6969'],
-  ['udp://exodus.desync.com:6969'],
-  ['wss://tracker.openwebtorrent.com'],
-]
+import WebtorrentServer from '../../WebtorrentServer'
 
 function canPlay(url: string) {
   return typeof url === 'string' && url.startsWith('magnet:')
@@ -30,7 +20,6 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
 
   constructor(props: any) {
     super(props)
-    this.client = new Webtorrent()
   }
 
   ref = (player: any) => {
@@ -43,10 +32,6 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
 
   componentDidMount() {
     this.addListeners()
-  }
-
-  componentDidUpdate() {
-    this.getSource(this.props.url)
   }
 
   componentWillUnmount() {
@@ -117,10 +102,6 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
     this.player.playbackRate = rate
   }
 
-  load(url: any) {
-    this.getSource(url)
-  }
-
   getDuration() {
     if (!this.player) return null
     const { duration, seekable } = this.player
@@ -151,53 +132,26 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
     return end
   }
 
-  async getSource(url: any) {
-    console.log('loading webtorrent url: ', url)
-
-    if (typeof url !== 'string' && url.length < 10) return
-
-    try {
-      this.client.add(url, {
-        announce: announceList
-      })
-    } catch (error) {
-      console.log('error: ', error)
-    }
-
-    this.client.on('torrent', (torrent: any) => {
-      const file = torrent.files.find((file: any) => {
-        return file.type.startsWith('video/')
-      })
-
-      if (file === undefined) return
-
-      console.log('file: ', file)
-
-      file.streamTo('#torrent-video-player', {
-        autoplay: this.props.playing,
-        muted: this.props.muted,
-        controls: this.props.controls
-      })
-    })
-  }
-
-
   render() {
-    const { playing, loop, muted, width, height } = this.props
+    const { playing, loop, muted, width, height, url } = this.props
     const style = {
       width: width === 'auto' ? width : '100%',
       height: height === 'auto' ? height : '100%'
     };
 
+    if (!url) {
+      return null
+    }
+
     return (
-      <video
-        ref={this.ref}
+      <WebtorrentServer
+        player={this.ref}
+        loop={!!loop}
         style={style}
-        autoPlay={playing}
+        muted={!!muted}
+        playing={!!playing}
         controls={false}
-        loop={loop}
-        muted={muted}
-        id='torrent-video-player'
+        url={url?.toString()}
       />
     )
   }
