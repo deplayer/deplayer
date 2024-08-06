@@ -1,9 +1,12 @@
 import { configureStore as confStore } from '@reduxjs/toolkit'
 
+import { combineReducers } from 'redux'
 import createSagaMiddleware from 'redux-saga'
+import { createBrowserHistory } from 'history';
 import { thunk } from 'redux-thunk'
 import promise from 'redux-promise'
 import perflogger from 'redux-perf-middleware'
+import { createReduxHistoryContext } from "redux-first-history";
 
 import {
   loadTranslations,
@@ -20,11 +23,15 @@ import rootSaga from '../sagas/rootSaga'
 
 // Custom middlewares
 import exports from './middlewares/exports'
-import outerReducer from './outerReducer'
 
 const mql = window.matchMedia(`(min-width: 800px)`)
 
-export default function configureStore() {
+const { createReduxHistory, routerMiddleware, routerReducer } = createReduxHistoryContext({
+  history: createBrowserHistory(),
+  //other options if needed 
+});
+
+function configureStore() {
   const testingMiddlewares: Array<any> = []
 
   if (process.env.NODE_ENV === 'development') {
@@ -38,14 +45,14 @@ export default function configureStore() {
     promise,
     thunk,
     exports,
-    sagaMiddleware
+    sagaMiddleware,
+    routerMiddleware
   ]
 
   // Instantiate sagaMiddleware
   // Prepare store with all the middlewares
-  const reducer = outerReducer(rootReducer)
   const store = confStore({
-    reducer: reducer,
+    reducer: combineReducers({ router: routerReducer, ...rootReducer }),
     devTools: process.env.NODE_ENV !== 'production',
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(...middlewares),
   })
@@ -67,3 +74,6 @@ export default function configureStore() {
 
   return store
 }
+
+export const store = configureStore()
+export const history = createReduxHistory(store);

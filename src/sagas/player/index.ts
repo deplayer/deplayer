@@ -1,5 +1,6 @@
 import { call, takeLatest, takeEvery, put, select } from 'redux-saga/effects'
 import screenfull from 'screenfull'
+import { push } from "redux-first-history"
 
 import {
   getCollection,
@@ -86,11 +87,10 @@ export function* handlePlayPrev(): any {
     yield put({ type: types.SET_CURRENT_PLAYING, songId })
   }
 }
-
 export function* goToViewPage(): any {
   const queue = yield select(getQueue)
   if (history.location.pathname.match(/^\/song.*?$/)) {
-    yield history.push(routes.songView(queue.currentPlaying))
+    yield put(push(routes.songView(queue.currentPlaying)))
   }
 }
 

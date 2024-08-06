@@ -6,7 +6,8 @@ import './tailwind.css'
 
 import * as portals from 'react-reverse-portal'
 import { Provider } from 'react-redux'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
+import { HistoryRouter as Router } from "redux-first-history/rr6";
 
 import LayoutContainer from './containers/LayoutContainer'
 import AddMediaModal from './components/AddMediaModal'
@@ -25,9 +26,7 @@ import SettingsContainer from './containers/SettingsContainer'
 import SongContainer from './containers/SongContainer'
 import Wiki from './components/Wiki'
 import GlobalKeyHandlers from './components/GlobalKeyHandlers'
-import configureStore from './store/configureStore'
-
-const appStore = configureStore()
+import { store, history } from './store/configureStore'
 
 const Song = () => {
   const playerPortal = React.useMemo(() => portals.createHtmlPortalNode(), [])
@@ -44,8 +43,8 @@ const App = () => {
   const playerPortal = React.useMemo(() => portals.createHtmlPortalNode(), [])
 
   return (
-    <Provider store={appStore}>
-      <BrowserRouter>
+    <Provider store={store}>
+      <Router history={history}>
         <LayoutContainer>
           <Routes>
             <Route path="/" element={<DashboardContainer />} />
@@ -67,7 +66,7 @@ const App = () => {
         <PlayerContainer playerPortal={playerPortal} />
         <AddMediaModal />
         <GlobalKeyHandlers />
-      </BrowserRouter>
+      </Router>
     </Provider >
   )
 }

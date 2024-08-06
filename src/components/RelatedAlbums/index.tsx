@@ -7,17 +7,20 @@ import type Album from '../../entities/Album'
 
 const AlbumCover = ({ albumName, albumId, thumbnailUrl }: { albumName: string, albumId: string, thumbnailUrl: string }) => {
   return (
-    <div className='block rounded w-32 h-32 mx-2'>
-      <Link to={`/album/${albumId}`} className='h-32'>
-        <CoverImage
-          reflect
-          albumName={albumName}
-          cover={{
-            thumbnailUrl: thumbnailUrl,
-            fullUrl: thumbnailUrl
-          }}
-        />
-        <p className='py-4 whitespace-normal text-center truncate w-32'>
+    <div className='block rounded w-32 h-48 mx-2'>
+      <Link to={`/album/${albumId}`} className='flex flex-col items-start'>
+        <div className='h-32 w-32'>
+          <CoverImage
+            reflect
+            albumName={albumName}
+            useImage
+            cover={{
+              thumbnailUrl: thumbnailUrl,
+              fullUrl: thumbnailUrl
+            }}
+          />
+        </div>
+        <p className='py-4 whitespace-normal text-center truncate inline'>
           {albumName}
         </p>
       </Link>
@@ -51,6 +54,7 @@ type Props = {
 const RelatedAlbums = (props: Props) => {
   const albums = Albums(props.albums)
   const title = <Translate value='titles.albums' />
+
 
   return (
     <HorizontalSlider

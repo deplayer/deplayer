@@ -64,11 +64,12 @@ export function* startFilesystemProcess(action: any): any {
     const collectionService = new CollectionService(new adapter())
 
     // Save song
-    yield call(collectionService.save, song.id, song.toDocument())
-    yield put({ type: types.ADD_TO_COLLECTION, data: [song] })
-    yield put({ type: types.RECEIVE_COLLECTION, data: [song] })
+    const songDocument = song.toDocument()
+    yield call(collectionService.save, song.id, songDocument)
+    yield put({ type: types.ADD_TO_COLLECTION, data: [songDocument] })
+    yield put({ type: types.RECEIVE_COLLECTION, data: [songDocument] })
 
-    yield put({ type: types.FILESYSTEM_SONG_LOADED, song })
+    yield put({ type: types.FILESYSTEM_SONG_LOADED, songDocument })
     yield put({
       type: types.SEND_NOTIFICATION,
       notification: song.title + ' - ' + song.artistName + ' saved',
@@ -112,7 +113,7 @@ export function* handleIPFSFileLoad(): any {
   }
 }
 
-function* startYoutubeDlScan(action: any): Generator<any, void, any>{
+function* startYoutubeDlScan(action: any): Generator<any, void, any> {
   try {
     const settings = yield select(getSettings)
     const service = new YoutubeDlServerProvider(

@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import * as React from 'react'
+import React, { useEffect, useState } from 'react'
 
 type Props = {
   src?: string
@@ -8,97 +8,64 @@ type Props = {
   children: React.ReactNode
 }
 
-class LazyImage extends React.Component<Props> {
-  state = {
-    error: null,
-    isMounted: false,
-    loading: false
-  }
+const LazyImage: React.FC<Props> = ({ src, reflect, onClick, children }) => {
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
-  // The Image object to check the loading will be stored here
-  image: HTMLImageElement | null = null
+  useEffect(() => {
+    let isMounted = true
 
-  constructor(props: Props) {
-    super(props)
+    const image = new Image()
 
-    this.handleLoad = this.handleLoad.bind(this)
-    this.handleError = this.handleError.bind(this)
-  }
+    const handleLoad = () => {
+      if (isMounted) {
+        setLoading(false)
+      }
+    }
 
-  componentDidMount() {
-    this.setState({ isMounted: true })
-    this.initializeLoading(this.props.src)
-  }
+    const handleError = () => {
+      if (isMounted) {
+        setError(`Failed to load ${src}`)
+        setLoading(false)
+      }
+    }
 
-  componentWillUnmount() {
-    /* eslint react/no-direct-mutation-state: 0 */
-    this.state.isMounted = false
-    this.destroyLoading()
-  }
-
-  // Initialize the loading parameters
-  initializeLoading(src: string | undefined) {
-    this.image = new Image()
+    image.onload = handleLoad
+    image.onerror = handleError
 
     if (src) {
-      this.image.src = src
+      image.src = src
     }
 
-    /* eslint react/no-direct-mutation-state: 0 */
-    this.state.loading = true
-    this.image.onload = this.handleLoad
-    this.image.onerror = this.handleError
-  }
+    setLoading(true)
 
-  // Reset the loading parameters
-  destroyLoading() {
-    this.image = null
-  }
-
-  handleLoad(_e: any) {
-    if (this.state.isMounted && this.image) {
-      this.setState({
-        loading: false
-      })
+    return () => {
+      isMounted = false
     }
-  }
+  }, [src, setError, setLoading ])
 
-  handleError() {
-    if (this.state.isMounted) {
-      this.setState({
-        error: `Failed to load ${this.props.src}`,
-        loading: false
-      })
-    }
-  }
-
-  render() {
-    const childrenWithProps = React.Children.map(this.props.children, (child: any) =>
-      React.cloneElement(child, {
-        noImage: this.state.error || this.state.loading
-      })
-    )
-
-    const className = classNames({
-      "lazy-image": true,
-      "fade-in": true,
-      "w-full": true,
-      "bg-no-repeat": true,
-      "bg-center": true,
-      "cursor-pointer": true,
-      "reflected-image": this.props.reflect,
-      one: true
+  const childrenWithProps = React.Children.map(children, (child: any) =>
+    React.cloneElement(child, {
+      noImage: error || loading
     })
+  )
 
-    return (
-      <div
-        className={className}
-        onClick={this.props.onClick}
-      >
-        {childrenWithProps}
-      </div>
-    )
-  }
+  const className = classNames({
+    "lazy-image": true,
+    "fade-in": true,
+    "w-full": true,
+    "bg-no-repeat": true,
+    "bg-center": true,
+    "cursor-pointer": true,
+    "reflected-image": reflect,
+    one: true
+  })
+
+  return (
+    <div className={className} onClick={onClick}>
+      {childrenWithProps}
+    </div>
+  )
 }
 
 export default LazyImage

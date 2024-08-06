@@ -1,4 +1,3 @@
-import { combineReducers } from 'redux'
 import { i18nReducer } from 'react-redux-i18n'
 import { State as PlayerState } from './player'
 
@@ -26,7 +25,7 @@ export type State = {
   settings: SettingsState
 }
 
-const reducers = combineReducers({
+const reducers = {
   app,
   artist,
   collection,
@@ -38,6 +37,6 @@ const reducers = combineReducers({
   search,
   settings,
   i18n: i18nReducer
-})
+}
 
 export default reducers
