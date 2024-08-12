@@ -3,8 +3,11 @@ import IndexService from '../services/Search/IndexService'
 import Media from '../entities/Media'
 import filterSongs from './filter-songs'
 
+import { mediaParams } from '../entities/Media.spec'
+
 describe('filterSongs', () => {
   const fixtureSong = new Media({
+    ...mediaParams,
     forcedId: 'test',
     title: 'test'
   })

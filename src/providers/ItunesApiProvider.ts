@@ -36,12 +36,10 @@ export default class ItunesApiProvider implements IMusicProvider {
       },
       duration: itSong.trackTimeMillis,
       genre: itSong.primaryGenreName,
-      price: itSong.trackPrice,
-      currency: itSong.currency,
       shareUrl: itSong.trackViewUrl,
       type: isAudio ? 'audio' : 'video',
       stream: [
-        { service: this.providerKey, uris: [{ uri: itSong.previewUrl, quality: 'demo' }] }
+        { service: this.providerKey, uris: [{ uri: itSong.previewUrl }] }
       ]
     })
   }

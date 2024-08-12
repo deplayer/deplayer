@@ -3,13 +3,7 @@ import Album from './Album'
 import Artist from './Artist'
 
 type streamUri = {
-  uri: any,
-  quality: string
-}
-
-type money = {
-  price: number,
-  currency: string
+  uri: string
 }
 
 type stream = {
@@ -19,93 +13,91 @@ type stream = {
 
 type MediaType = 'video' | 'audio'
 
-type Cover = {
+export type Cover = {
   thumbnailUrl: string,
   fullUrl: string
+}
+
+interface MediaParams {
+  title: string
+  artistName: string
+  artistId?: string
+  albumId?: string
+  albumName: string
+  duration: number
+  genre: string
+  cover?: Cover
+  stream: Array<stream>
+  playCount?: number
+  shareUrl: string
+  filePath: string
+  forcedId: string | null
+  type?: string
+  track?: number
 }
 
 export default class Media {
   id: string
   title: string
   author: any
-  cover: Cover
+  cover?: Cover
   artist: Artist
   album: Album
   artistName: string
+  type?: string
   duration: number
   externalId: string
   stream: Array<stream>
   playCount: number
   genre: string
-  forcedId: string
   shareUrl: string
   albumName: string
-  price: money
-  filePath: string
+  filePath?: string
+  forcedId?: string | null
+  track?: number
 
-  constructor(songParams: any = {}) {
-    const {
-      cover,
-      title,
-      forcedId,
-      artistName,
-      artistId,
-      albumId,
-      albumName,
-      duration,
-      genre,
-      price,
-      currency,
-      stream,
-      playCount,
-      shareUrl,
-      filePath
-    } = songParams
+  constructor(songParams: MediaParams) {
+    this.title = songParams.title
+    this.playCount = songParams.playCount || 0
+    this.duration = songParams.duration
+    this.genre = songParams.genre
+    this.shareUrl = songParams.shareUrl
+    this.albumName = songParams.albumName
+    this.filePath = songParams.filePath
+    this.forcedId = songParams.forcedId
 
-    this.title = title
-    this.playCount = playCount
-    this.duration = duration
-    this.genre = genre
-    this.shareUrl = shareUrl
-    this.forcedId = forcedId
-    this.albumName = albumName
-    this.filePath = filePath
-
-    const artist = this.generateArtist(artistName, artistId)
+    const artist = this.generateArtist(songParams.artistName, songParams.artistId)
     this.artist = artist
 
     this.artistName = artist.name
     this.album = new Album({
-      albumId: albumId,
-      name: albumName ? albumName : '',
+      albumId: songParams.albumId,
+      name: songParams.albumName || '',
       artist: artist,
-      thumbnailUrl: cover?.thumbnail
+      thumbnailUrl: songParams.cover?.thumbnailUrl
     })
-    if (typeof price === 'number') {
-      this.price = {
-        price: price || 0,
-        currency: currency || 'USD'
-      }
-    } else {
-      this.price = price
-    }
 
-    this.stream = stream || []
-    this.cover = {
-      thumbnailUrl: cover?.thumbnailUrl,
-      fullUrl: cover?.fullUrl
+    this.stream = songParams.stream || []
+
+    if (songParams.cover) {
+      this.cover = {
+        thumbnailUrl: songParams.cover?.thumbnailUrl,
+        fullUrl: songParams.cover?.fullUrl
+      }
     }
 
     // this must be the last assignment
-    const id = forcedId ? forcedId : new MediaId(this).value
+    const id = songParams.forcedId ? songParams.forcedId : new MediaId(this).value
     this.id = id
     this.externalId = id
+
+    this.track = songParams.track
   }
 
-  generateArtist(artistName: string, artistId: string): Artist {
+  generateArtist(artistName: string, artistId?: string): Artist {
     const artistPayload = {
-      name: artistName ? artistName : '',
-      artistId: artistId
+      name: artistName || '',
+      artistId: artistId || ''
     }
 
     return new Artist(artistPayload)
@@ -153,7 +145,7 @@ export default class Media {
       stream: this.stream,
       artist: this.artist.toDocument(),
       cover: this.cover,
-      album: this.album.toDocument(),
+      album: this.album,
       genre: this.genre,
       albumName: this.albumName,
       playCount: this.playCount,

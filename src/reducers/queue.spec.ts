@@ -1,6 +1,7 @@
 import reducer, { defaultState } from './queue'
 import { describe, it, expect } from 'vitest'
 import Media from '../entities/Media'
+import { mediaParams } from '../entities/Media.spec'
 
 import * as types from '../constants/ActionTypes'
 
@@ -22,7 +23,7 @@ describe('queue reducer', () => {
     const songs: any = []
     const expectedObj: { [key: number]: Media } = {}
     for (let i = 1; i <= 20; i++) {
-      const song = new Media({ forcedId: i.toString() })
+      const song = new Media({ ...mediaParams, forcedId: i.toString() })
       songs.push(song)
       expectedObj[i] = song
     }

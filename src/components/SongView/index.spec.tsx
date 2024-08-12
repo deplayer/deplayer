@@ -2,13 +2,14 @@ import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import SongView from './index'
 import Media from '../../entities/Media'
-import Artist from '../../entities/Artist'
 import { defaultState as collectionDefaultState } from '../../reducers/collection'
 import { BrowserRouter } from 'react-router-dom'
 
+import { mediaParams } from '../../entities/Media.spec'
+
 const setup = (customProps: any) => {
   const defaultProps = {
-    song: new Media(),
+    song: new Media(mediaParams),
     match: {
       params: {}
     },
@@ -38,7 +39,7 @@ describe('SongView', () => {
   })
 
   it('render song without crash', () => {
-    const song = new Media({ artist: new Artist({ name: "Pink Floyd" }) })
+    const song = new Media({ ...mediaParams, artistName: "Pink Floyd" })
     const rows = { [song.id]: song }
     const collection = { rows: rows, songsByGenre: [] }
     const props = setup({

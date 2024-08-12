@@ -38,8 +38,7 @@ export const magnetToMedia = async (torrentUrl: string): Promise<Array<Media>> =
               service: 'webtorrent',
               uris: [
                 {
-                  uri: torrentUrl,
-                  quality: 'unknown'
+                  uri: torrentUrl
                 }
               ]
             }

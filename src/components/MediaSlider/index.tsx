@@ -8,6 +8,10 @@ import Tag from '../common/Tag'
 import type Media from '../../entities/Media'
 
 const MediaCover = ({ media }: { media: Media, itemId: string }) => {
+  if (!media.cover) {
+    return null
+  }
+
   return (
     <div className='block rounded w-32 h-32 mx-2'>
       <Link to={`/song/${media.id}`} className='h-32'>

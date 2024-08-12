@@ -1,6 +1,7 @@
 import reducer, { defaultState } from './playlist'
 import { describe, it, expect } from 'vitest'
 import Media from '../entities/Media'
+import { mediaParams } from '../entities/Media.spec'
 import { sortTrackIds } from './utils/queues'
 
 import * as types from '../constants/ActionTypes'
@@ -24,7 +25,7 @@ describe('collection reducer', () => {
     const songs: Array<Media> = []
     const expectedObj: { [key: number]: Media } = {}
     for (let i = 1; i <= 20; i++) {
-      const song = new Media({ forcedId: i.toString() })
+      const song = new Media({ ...mediaParams, forcedId: i.toString() })
       songs.push(song)
       expectedObj[i] = song
     }
@@ -43,7 +44,7 @@ describe('collection reducer', () => {
     const songs: Array<Media> = []
     const expectedObj: { [key: number]: Media } = {}
     for (let i = 1; i <= 20; i++) {
-      const song = new Media({ forcedId: i.toString(), price: { price: i % 2 } })
+      const song = new Media({ ...mediaParams, forcedId: i.toString() })
       songs.push(song)
       expectedObj[i] = song
     }

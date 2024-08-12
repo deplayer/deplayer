@@ -36,63 +36,59 @@ export default (state: State = defaultState, action: any): State => {
   switch (action.type) {
     case types.PAUSE_PLAYING:
     case types.STOP_PLAYING:
-      return {...state, playing: false}
+      return { ...state, playing: false }
 
     case types.START_PLAYING:
-      return {...state, playing: true, showPlayer: true}
+      return { ...state, playing: true, showPlayer: true }
 
     case types.TOGGLE_PLAYING:
-      return {...state, playing: !state.playing}
+      return { ...state, playing: !state.playing }
 
     case types.CLEAR_QUEUE:
     case types.HIDE_PLAYER:
-      return {...state, showPlayer: false}
+      return { ...state, showPlayer: false }
 
     case types.SHOW_PLAYER:
-      return {...state, showPlayer: true}
+      return { ...state, showPlayer: true }
 
     case types.VOLUME_SET:
-      return {...state, volume: action.value}
+      return { ...state, volume: action.value }
 
     case types.SET_PLAYER_PROGRESS:
-      return {...state, ...action.value}
+      return { ...state, ...action.value }
 
     case types.SET_PLAYER_DURATION:
-      return {...state, duration: action.value}
+      return { ...state, duration: action.value }
 
     case types.SET_PLAYER_PLAYED_SECONDS:
-      return {...state, playedSeconds: action.value}
+      return { ...state, playedSeconds: action.value }
 
     case types.SET_CURRENT_TIME:
-      return {...state, currentTime: action.value}
+      return { ...state, currentTime: action.value }
 
     case types.REGISTER_PLAYER_ERROR:
-      return {...state, errorCount: state.errorCount + 1}
+      return { ...state, errorCount: state.errorCount + 1 }
 
     case types.CLEAR_PLAYER_ERRORS:
     case types.SONG_PLAYED:
-      return {...state, errorCount: 0}
+      return { ...state, errorCount: 0 }
 
     case types.SET_CURRENT_PLAYING_URL:
       return {
-      ...state,
-      playedSeconds: 0,
-      loadedSeconds: 0,
-      streamUri: action.url
-    }
+        ...state,
+        playedSeconds: 0,
+        loadedSeconds: 0,
+        streamUri: action.url
+      }
 
     case types.TOGGLE_FULL_SCREEN:
-      return {...state, fullscreen: !state.fullscreen}
+      return { ...state, fullscreen: !state.fullscreen }
 
     case types.SET_FULL_SCREEN:
-      return {...state, fullscreen: true}
+      return { ...state, fullscreen: true }
 
     case types.SET_CURRENT_PLAYING_STREAMS:
-      return {...state, streams: action.streams}
-
-    case types.SET_CACHED_DATA: {
-      return action.data.player
-    }
+      return { ...state, streams: action.streams }
 
     default:
       return state

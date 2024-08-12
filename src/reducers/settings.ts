@@ -85,10 +85,6 @@ export default (state: State = defaultState, action: any = {}) => {
       }
     }
 
-    case types.SET_CACHED_DATA: {
-      return action.data.settings
-    }
-
     default:
       return state
   }

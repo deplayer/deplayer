@@ -27,6 +27,10 @@ export const getStreamUri = async (
     const directoryHandler = await get('directoryHandler')
     await verifyPermission(directoryHandler)
 
+    if (!streamUri) {
+      return ''
+    }
+
     const handler = await get(streamUri)
 
     if (handler instanceof File) {

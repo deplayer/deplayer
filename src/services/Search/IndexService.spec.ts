@@ -1,16 +1,19 @@
 import { describe, it, expect } from 'vitest'
 import IndexService from './IndexService'
 import Media from '../../entities/Media'
+import { mediaParams } from '../../entities/Media.spec'
 
 describe('IndexService', () => {
   it('should handle generateIndex and search', () => {
     const indexService = new IndexService()
 
     const song1 = new Media({
+      ...mediaParams,
       title: 'California Uber alles',
       artistName: 'Dead Kennedys test'
     })
     const song2 = new Media({
+      ...mediaParams,
       title: 'Uber',
       artistName: 'dead kennedys',
       albumName: 'best'

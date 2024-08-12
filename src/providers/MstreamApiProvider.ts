@@ -31,15 +31,17 @@ export default class MstreamApiProvider implements IMusicProvider {
     })
   }
 
+
   mapSongs = (songs: Array<any>): Array<any> => {
     return songs.map((song: any) => {
       return new Media({
-        id: song.metadata.hash,
         title: song.metadata.title ? song.metadata.title : song.filepath,
         artistName: song.metadata.artist,
         albumName: song.metadata.album,
-        thumbnailUrl: song.metadata['album-art'] ? this.baseUrl + '/album-art/' + song.metadata['album-art'] : undefined,
-        fullUrl: song.metadata['album-art'] ? this.baseUrl + '/album-art/' + song.metadata['album-art'] : undefined,
+        cover: {
+          thumbnailUrl: song.metadata['album-art'] ? this.baseUrl + '/album-art/' + song.metadata['album-art'] : '',
+          fullUrl: song.metadata['album-art'] ? this.baseUrl + '/album-art/' + song.metadata['album-art'] : ''
+        },
         stream: [
           {
             service: this.providerKey,

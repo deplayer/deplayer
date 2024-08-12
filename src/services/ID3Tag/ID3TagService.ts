@@ -17,25 +17,23 @@ export const getFileMetadata = async (file: any, settings: any) => {
 
 export const metadataToSong = (
   metadata: musicMetadata.IAudioMetadata,
-  fileUri: any,
+  fileUri: string,
   service: string,
 ): Media => {
+  const genre = metadata.common.genre ? metadata.common.genre.map((genre: any) => genre).join(', ') : ''
   const song = new Media({
     title: metadata.common.title || fileUri,
-    artistName:  metadata.common.artist,
-    // FIXME: genre is an array, we should extract only if its defined
-    // genre: metadata.common.genre,
-    albumName: metadata.common.album,
-    media_type: fileUri.endsWith('.mp4') ? 'video' : 'audio',
+    artistName: metadata.common.artist || '',
+    albumName: metadata.common.album || '',
+    type: fileUri.endsWith('.mp4') ? 'video' : 'audio',
+    duration: metadata.format.duration || 0,
+    genre: genre,
     stream: [
       {
-        // FIXME: This could be anything
         service: service,
         uris: [
           {
-            // FIXME: Make it configurable
-            uri: fileUri,
-            quality: 'unknown'
+            uri: fileUri
           }
         ]
       }

@@ -1,6 +1,8 @@
 import Media from '../entities/Media'
+import { mediaParams } from '../entities/Media.spec'
 
 const exampleSong = new Media({
+  ...mediaParams,
   title: 'Whiplash',
   artistName: 'Metallica',
   albumName: 'Kill\'em all',

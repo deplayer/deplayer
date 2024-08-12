@@ -1,14 +1,17 @@
 import { describe, it, expect } from 'vitest'
 import MediaMergerService from './MediaMergerService'
 import Media from '../entities/Media'
+import { mediaParams } from '../entities/Media.spec'
 
 describe('MediaMergerService', () => {
   it('should merge two media objects with its streams', () => {
     const song1 = new Media({
-      stream: [{ service: 'itunes', urls: [] }]
+      ...mediaParams,
+      stream: [{ service: 'itunes', uris: [] }]
     })
     const song2 = new Media({
-      stream: [{ service: 'itunes', urls: [] }]
+      ...mediaParams,
+      stream: [{ service: 'itunes', uris: [] }]
     })
     const mediaMergerService = new MediaMergerService(song1, song2)
     const merged = mediaMergerService.getMerged()
@@ -19,12 +22,14 @@ describe('MediaMergerService', () => {
 
   it('should combine two different streams', () => {
     const song1 = new Media({
-      stream: [{ service: 'itunes', urls: [] }]
+      ...mediaParams,
+      stream: [{ service: 'itunes', uris: [] }]
     })
     const song2 = new Media({
+      ...mediaParams,
       stream: [
-        { service: 'itunes', urls: [] },
-        { service: 'subsonic', urls: [] }
+        { service: 'itunes', uris: [] },
+        { service: 'subsonic', uris: [] }
       ]
     })
     const mediaMergerService = new MediaMergerService(song1, song2)
@@ -37,9 +42,11 @@ describe('MediaMergerService', () => {
 
   it('should combine cover object', () => {
     const song1 = new Media({
-      cover: { thumbnailUrl: 'test.png' }
+      ...mediaParams,
+      cover: { thumbnailUrl: 'test.png', fullUrl: 'test-full.png' }
     })
     const song2 = new Media({
+      ...mediaParams,
       cover: {
         thumbnailUrl: 'test.png',
         fullUrl: 'test-full.png'
@@ -49,7 +56,7 @@ describe('MediaMergerService', () => {
     const merged = mediaMergerService.getMerged()
 
     expect(merged.cover).toBeDefined()
-    expect(merged.cover.thumbnailUrl).toBe('test.png')
-    expect(merged.cover.fullUrl).toBe('test-full.png')
+    expect(merged.cover?.thumbnailUrl).toBe('test.png')
+    expect(merged.cover?.fullUrl).toBe('test-full.png')
   })
 })

@@ -239,10 +239,6 @@ export default (state: State = defaultState, action: any = {}) => {
       return { ...state, [media.id]: media }
     }
 
-    case types.SET_CACHED_DATA: {
-      return action.data.collection;
-    }
-
     default:
       return state;
   }

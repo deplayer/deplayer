@@ -3,10 +3,11 @@ import { describe, it, expect } from 'vitest'
 
 import Media from '../../entities/Media'
 import CoverImage from './CoverImage'
+import { mediaParams } from '../../entities/Media.spec'
 
 const setup = () => {
   const props = {
-    song: new Media(),
+    song: new Media(mediaParams),
     size: 'thumbnail',
     albumName: 'My album',
     cover: {

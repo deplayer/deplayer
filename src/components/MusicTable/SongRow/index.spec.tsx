@@ -5,12 +5,12 @@ import { BrowserRouter } from 'react-router-dom'
 import Media from '../../../entities/Media'
 import SongRow from './index'
 import type { Props } from './index'
-
+import { mediaParams } from '../../../entities/Media.spec'
 
 const setup = () => {
   const props: Props = {
     dispatch: (_action: any) => _action,
-    song: new Media(),
+    song: new Media(mediaParams),
     songsLength: 1,
     queue: {},
     onClick: () => { },
