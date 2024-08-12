@@ -24,14 +24,14 @@ interface MediaParams {
   artistId?: string
   albumId?: string
   albumName: string
-  duration: number
-  genre: string
+  duration?: number
+  genre?: string
   cover?: Cover
   stream: Array<stream>
   playCount?: number
-  shareUrl: string
-  filePath: string
-  forcedId: string | null
+  shareUrl?: string
+  filePath?: string
+  forcedId?: string | null
   type?: string
   track?: number
 }
@@ -49,8 +49,8 @@ export default class Media {
   externalId: string
   stream: Array<stream>
   playCount: number
-  genre: string
-  shareUrl: string
+  genre?: string
+  shareUrl?: string
   albumName: string
   filePath?: string
   forcedId?: string | null
@@ -58,8 +58,8 @@ export default class Media {
 
   constructor(songParams: MediaParams) {
     this.title = songParams.title
-    this.playCount = songParams.playCount || 0
-    this.duration = songParams.duration
+    this.playCount = songParams.playCount ?? 0
+    this.duration = songParams.duration ?? 0
     this.genre = songParams.genre
     this.shareUrl = songParams.shareUrl
     this.albumName = songParams.albumName
@@ -97,7 +97,7 @@ export default class Media {
   generateArtist(artistName: string, artistId?: string): Artist {
     const artistPayload = {
       name: artistName || '',
-      artistId: artistId || ''
+      artistId: artistId ?? ''
     }
 
     return new Artist(artistPayload)

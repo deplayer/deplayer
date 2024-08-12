@@ -7,7 +7,7 @@ type cover = {
 }
 
 type Props = {
-  cover: cover,
+  cover?: cover,
   reflect?: boolean,
   size?: string,
   onClick?: () => void,

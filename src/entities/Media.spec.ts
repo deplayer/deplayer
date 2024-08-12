@@ -39,7 +39,7 @@ describe('entities/Media', () => {
       ...mediaParams,
       cover: { thumbnailUrl: 'http://some-songs-api/song.mp4', fullUrl: '' }
     })
-    expect(song.cover.thumbnailUrl).toEqual('http://some-songs-api/song.mp4')
+    expect(song?.cover?.thumbnailUrl).toEqual('http://some-songs-api/song.mp4')
   })
 
   it('should create s Media with shareUrl', () => {

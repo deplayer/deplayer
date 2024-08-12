@@ -39,6 +39,7 @@ const SongRow = (props: Props) => {
       className='media-thumb hidden md:block relative mr-3'
       style={{ minWidth: '80px', height: '80px' }}
       onClick={props.onClick}
+      tabIndex={0}
     >
       <CoverImage
         cover={song.cover}

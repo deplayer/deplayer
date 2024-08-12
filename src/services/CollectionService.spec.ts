@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import CollectionService from './CollectionService'
 import DummyAdapter from './database/DummyAdapter'
 import Media from '../entities/Media'
+import { mediaParams } from '../entities/Media.spec'
 
 describe('CollectionService', () => {
   it('should handle save', () => {
@@ -18,7 +19,7 @@ describe('CollectionService', () => {
   it('should handle bulkSave', async () => {
     const collectionService = new CollectionService(new DummyAdapter())
 
-    const song = new Media({ forceId: 'test', thumbnailUrl: 'test.png' })
+    const song = new Media({ ...mediaParams, forcedId: 'test', cover: { thumbnailUrl: 'test.png', fullUrl: '' } })
 
     const result = await collectionService.bulkSave([song], { rows: [] })
 

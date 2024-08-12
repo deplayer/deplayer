@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import * as types from '../constants/ActionTypes'
 import Media from '../entities/Media'
 import reducer, { defaultState } from './collection'
+import { mediaParams } from '../entities/Media.spec'
 
 describe('collection reducer', () => {
   it('should return the initial state', () => {
@@ -12,6 +13,7 @@ describe('collection reducer', () => {
   it('should handle RECEIVE_COLLECTION', () => {
     const initialState = { ...defaultState, enabledProviders: ['itunes'] }
     const fixtureSong = new Media({
+      ...mediaParams,
       forcedId: 'the-doors',
       artistName: 'The Doors',
       artistId: 'the-doors',
