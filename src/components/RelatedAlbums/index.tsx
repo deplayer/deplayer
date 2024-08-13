@@ -7,7 +7,7 @@ import type Album from '../../entities/Album'
 
 const AlbumCover = ({ albumName, albumId, thumbnailUrl }: { albumName: string, albumId: string, thumbnailUrl: string }) => {
   return (
-    <div className='flex rounded w-32 h-48 mx-4'>
+    <div className='flex items-start rounded justify-center w-32 h-60 mx-4'>
       <Link to={`/album/${albumId}`} className='flex flex-col items-start justify-center'>
         <div className='h-32 w-32'>
           <CoverImage

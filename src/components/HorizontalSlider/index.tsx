@@ -131,7 +131,7 @@ const HorizontalSlider = (props: Props) => {
   )
 
   return (
-    <div className='w-full h-full overflow-hidden' onMouseLeave={dragState.current.dragStop}>
+    <div className='w-full overflow-hidden' onMouseLeave={dragState.current.dragStop}>
       <h2 className='my-4 px-4 text-xl'>{props.title}</h2>
       <ScrollMenu
         LeftArrow={ArrowLeft}

@@ -37,7 +37,22 @@ const Dashboard = ({ collection: { loading, rows, songsByNumberOfPlays, albums }
   }
 
   return (
-    <div className='z-10 w-full flex flex-col'>
+    <div className='z-10 w-full block px-12 mb-12'>
+      <div className='flex w-full content-start items-start'>
+        <img
+          className='w-60'
+          src={`/cassete.svg`}
+          alt={'Listen you good old music collection with deplayer'}
+
+        />
+        <div className='px-6 py-14'>
+          <h2 className='text-4xl'>Hi Stranger! Welcome to deplayer</h2>
+          <p className='py-4'>
+            Access to you good old music library and enjoy it whenever you need it. <br />
+          </p>
+        </div>
+      </div>
+
       <MediaSlider
         loading={loading}
         title={<Translate value='titles.mostPlayedSongs' />}
