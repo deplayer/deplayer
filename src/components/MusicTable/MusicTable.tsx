@@ -45,7 +45,7 @@ const MusicTable = (props: Props) => {
     key,         // Unique key within array of rendered rows
     style        // Style object to be applied to row (to position it);
     // This must be passed through to the rendered row element.
-  }: { index: number, key: number, style: any }): React.ReactNode => {
+  }: { index: number, key: string, style: any }): any => {
     const songId = props.tableIds[index]
     const song = props.collection.rows[songId]
 
@@ -74,7 +74,7 @@ const MusicTable = (props: Props) => {
   }
 
   // Track the position of current playing to jump there
-  const currentIndex = !props.disableCurrent ? props.tableIds.indexOf(props.queue.currentPlaying) : null
+  const currentIndex = !props.disableCurrent ? props.tableIds.indexOf(props.queue.currentPlaying) : 0
 
   const getActions = () => {
     switch (location.pathname) {
@@ -113,7 +113,7 @@ const MusicTable = (props: Props) => {
             height={height}
             rowCount={props.tableIds.length}
             rowHeight={props.slim ? 80 : 100}
-            rowRenderer={rowRenderer}
+            rowRenderer={({ index, key, style }) => rowRenderer({ index, key, style })}
             width={width}
             overscanRowCount={6}
             scrollToIndex={currentIndex}
