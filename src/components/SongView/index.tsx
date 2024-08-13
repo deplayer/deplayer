@@ -19,6 +19,7 @@ import { sortByPlayCount } from '../../reducers/collection'
 import Lyrics from './Lyrics'
 import { getStreamUri } from '../../services/Song/StreamUriService'
 import Album from '../../entities/Album'
+import ServiceIcon from '../ServiceIcon'
 
 type Props = {
   playerPortal: any,
@@ -238,10 +239,10 @@ const SongView = (props: Props) => {
               <Icon icon='faStopwatch' /> {getDurationStr(song.duration)}
             </div>
             <div className='mt-2'>
-              <Tag>{song.genre}</Tag>
+              <Tag transparent>{song.genre}</Tag>
             </div>
             <div className='mt-2'>
-              <Tag>{song.media_type}</Tag>
+              <Tag transparent>{song.media_type}</Tag>
             </div>
             <div className='mt-2'>
               <Translate value='song.label.played' /> {song.playCount || 0} <Translate value='song.label.times' />
@@ -250,7 +251,7 @@ const SongView = (props: Props) => {
               <Translate value='labels.providers' />: &nbsp;
               {
                 song.stream.map((provider: any) => {
-                  return (<Tag type='primary' key={provider.service}>{provider.service}</Tag>)
+                  return <Tag transparent key={provider.service}><ServiceIcon service={provider.service} /><p className='capitalize'>{provider.service}</p></Tag>
                 })
               }
             </div>

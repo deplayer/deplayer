@@ -13,20 +13,25 @@ const MediaCover = ({ media }: { media: Media, itemId: string }) => {
   }
 
   return (
-    <div className='block rounded w-32 h-32 mx-2'>
-      <Link to={`/song/${media.id}`} className='h-32'>
-        <Tag transparent fullWidth>{media.playCount ? `${media.playCount} times played` : "never played"}</Tag>
-        <CoverImage
-          reflect
-          albumName={media.title}
-          cover={{
-            thumbnailUrl: media.cover.thumbnailUrl,
-            fullUrl: media.cover.thumbnailUrl
-          }}
-        />
-        <div className='py-4 whitespace-normal text-center truncate w-32'>
-          {media.title}
+    <div className='flex items-start rounded justify-center w-32 h-60 mx-4'>
+      <Link to={`/song/${media.id}`} className='flex flex-col items-start justify-center'>
+        <div className='pb-2'>
+          <Tag transparent fullWidth><span className=''>{media.playCount ? `${media.playCount} times played` : "never played"}</span></Tag>
         </div>
+        <div className='h-32 w-32'>
+          <CoverImage
+            reflect
+            albumName={media.title}
+            useImage
+            cover={{
+              thumbnailUrl: media.cover.thumbnailUrl,
+              fullUrl: media.cover.thumbnailUrl
+            }}
+          />
+        </div>
+        <p className='py-4 whitespace-normal text-center truncate inline w-full'>
+          {media.title}
+        </p>
       </Link>
     </div>
   )

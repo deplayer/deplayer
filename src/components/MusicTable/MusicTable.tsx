@@ -40,7 +40,7 @@ const MusicTable = (props: Props) => {
 
   const id = props.queue.currentPlaying
 
-  const rowRenderer: any = ({
+  const rowRenderer = ({
     index,       // Index of row
     key,         // Unique key within array of rendered rows
     style        // Style object to be applied to row (to position it);
@@ -74,7 +74,7 @@ const MusicTable = (props: Props) => {
   }
 
   // Track the position of current playing to jump there
-  const currentIndex = !props.disableCurrent ? props.tableIds.indexOf(props.queue.currentPlaying) : 0
+  const currentIndex = !props.disableCurrent ? props.tableIds.indexOf(props.queue.currentPlaying) : null
 
   const getActions = () => {
     switch (location.pathname) {

@@ -7,6 +7,7 @@ import ContextualMenu from './../ContextualMenu'
 import CoverImage from './../CoverImage'
 import Media from '../../../entities/Media'
 import Tag from '../../common/Tag'
+import ServiceIcon from '../../ServiceIcon'
 
 export type Props = {
   songsLength: number, // Listening this in order to recreate context menu
@@ -72,22 +73,21 @@ const SongRow = (props: Props) => {
           <div className='inline-block text-yellow-400 text-sm'>{getDurationStr(song.duration)}</div>
         )}
       </div>
-      <div className='relative'>
-        <ContextualMenu {...props} />
+      <div className='flex'>
         <div>
           {
             !props.slim && props.mqlMatch &&
             song.stream.map((provider) => {
-              return (<Tag transparent key={provider.service}>{provider.service}</Tag>)
+              return <Tag transparent key={provider.service}><ServiceIcon service={provider.service} /><p className='capitalize'>{provider.service}</p></Tag>
             })
           }
           {props.slim && (
             <span className='text-yellow-400'>{getDurationStr(song.duration)}</span>
-          )
-          }
+          )}
         </div>
+        <ContextualMenu {...props} />
       </div>
-    </div>
+    </div >
   )
 }
 

@@ -20,9 +20,9 @@ const Tag = (props: Props) => {
     'text-blue-300': props.transparent,
     'border-blue-800': props.transparent,
     'text-sm': true,
-    'w-auto': true,
-    'inline-block': true,
-    'pw-2': true
+    'pw-2': true,
+    'flex': true,
+    'items-center': true
   })
 
   return (

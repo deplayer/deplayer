@@ -16,9 +16,9 @@ function onWheel(apiObj: publicApiType, ev: React.WheelEvent): void {
   }
 
   if (ev.deltaY < 0) {
-    apiObj.scrollNext();
-  } else {
     apiObj.scrollPrev();
+  } else {
+    apiObj.scrollNext();
   }
 }
 
@@ -137,7 +137,7 @@ const HorizontalSlider = (props: Props) => {
         LeftArrow={ArrowLeft}
         RightArrow={ArrowRight}
         transitionBehavior="smooth"
-        wrapperClassName='relative'
+        wrapperClassName='relative overflow-y-hidden'
         onMouseDown={onMouseDown}
         onMouseUp={onMouseUp}
         onMouseMove={handleDrag}
