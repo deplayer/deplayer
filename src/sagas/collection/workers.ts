@@ -7,6 +7,7 @@ import CollectionService from '../../services/CollectionService'
 import logger from '../../utils/logger'
 import rowToSong from '../../mappers/rowToSong'
 import * as types from '../../constants/ActionTypes'
+import IndexService from '../../services/Search/IndexService'
 
 const adapter = getAdapter()
 const collectionService = new CollectionService(new adapter())
@@ -61,6 +62,21 @@ export function* importCollectionWorker(action: { type: string, data: any }): an
 }
 
 // generate fulltext index
+//
+export function* generateIndexWorker(service: IndexService): any {
+  const collection = yield select(getCollection)
+  const index = yield call(service.generateIndexFrom, Object.values(collection.rows))
+
+  try {
+    const data = JSON.parse(
+      JSON.stringify(index)
+    )
+    yield put({ type: types.RECEIVE_SEARCH_INDEX, data })
+  } catch (e) {
+    yield put({ type: types.RECEIVE_SEARCH_INDEX_REJECTED, message: e.message })
+  }
+}
+
 export function* trackSongPlayed(action: { type: string, songId: string }): any {
   yield call(collectionService.initialize)
   const songRow = yield call(collectionService.get, action.songId)

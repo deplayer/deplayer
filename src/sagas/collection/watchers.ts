@@ -5,6 +5,8 @@ import { getAdapter } from '../../services/database'
 import { initialize } from '../settings'
 import CollectionService from '../../services/CollectionService'
 import * as types from '../../constants/ActionTypes'
+import { generateIndexWorker } from './workers'
+import IndexService from '../../services/Search/IndexService'
 
 const adapter = getAdapter()
 const collectionService = new CollectionService(new adapter())
@@ -29,7 +31,7 @@ export function* addToCollectionWatcher(): any {
 }
 
 // Application initialization routines
-export function* initializeWatcher(): Generator<any, void, any>{
+export function* initializeWatcher(): Generator<any, void, any> {
   while (true) {
     yield take(types.INITIALIZE)
     yield call(initialize)
@@ -38,6 +40,9 @@ export function* initializeWatcher(): Generator<any, void, any>{
     const mappedData = collection.map((elem: any) => elem)
 
     yield put({ type: types.RECEIVE_COLLECTION, data: mappedData })
+
+    const indexService = new IndexService()
+    yield fork(generateIndexWorker, indexService)
 
     yield put({ type: types.INITIALIZED })
     yield put({ type: types.APPLY_MOST_PLAYED_SORT })

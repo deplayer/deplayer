@@ -8,8 +8,7 @@ import {
   take
 } from 'redux-saga/effects'
 
-import history from '../../store/configureHistory'
-
+import { push } from "redux-first-history"
 import * as types from '../../constants/ActionTypes'
 import ProvidersService from '../../services/ProvidersService'
 import Media from '../../entities/Media'
@@ -19,7 +18,7 @@ import { getSettings } from './../selectors'
 function* performSingleSearch(
   searchTerm: string,
   provider: string
-): Generator<any, void, any>{
+): Generator<any, void, any> {
   try {
     const settings = yield select(getSettings)
     const providerService = new ProvidersService(settings)
@@ -68,7 +67,7 @@ export function* search(action: SearchAction): any {
 
 // Going to home page
 export function* goToSearchResults(): any {
-  yield history.push('/search-results')
+  yield put(push('/search-results'))
 }
 
 // Binding actions to sagas
