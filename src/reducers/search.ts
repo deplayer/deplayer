@@ -5,7 +5,8 @@ export type State = {
   searchTerm: string,
   loading: boolean,
   searchIndex: object,
-  searchToggled: boolean
+  searchToggled: boolean,
+  searchResults: string[]
 }
 
 export const defaultState = {
@@ -13,7 +14,8 @@ export const defaultState = {
   searchTerm: '',
   loading: false,
   searchIndex: {},
-  searchToggled: false
+  searchToggled: false,
+  searchResults: []
 }
 
 export default (state: State = defaultState, action: any = {}) => {
@@ -29,6 +31,13 @@ export default (state: State = defaultState, action: any = {}) => {
       return {
         ...state,
         searchIndex: action.data
+      }
+    }
+
+    case types.SET_SEARCH_RESULTS: {
+      return {
+        ...state,
+        searchResults: action.searchResults
       }
     }
 
