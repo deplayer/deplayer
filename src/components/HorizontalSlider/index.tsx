@@ -137,7 +137,7 @@ const HorizontalSlider = (props: Props) => {
         LeftArrow={ArrowLeft}
         RightArrow={ArrowRight}
         transitionBehavior="smooth"
-        wrapperClassName='relative overflow-y-hidden'
+        wrapperClassName='relative'
         scrollContainerClassName='overflow-x-hidden'
         onMouseDown={onMouseDown}
         onMouseUp={onMouseUp}
