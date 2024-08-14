@@ -8,6 +8,7 @@ import * as types from '../../constants/ActionTypes'
 
 type Props = {
   dispatch: Dispatch
+  label?: string
 }
 
 const AddNewMediaButton = (props: Props) => {
@@ -24,7 +25,7 @@ const AddNewMediaButton = (props: Props) => {
         icon='faPlusCircle'
         className='mr-2'
       />
-      <Translate value='buttons.addNewMedia' />
+      {props.label || <Translate value='buttons.addNewMedia' />}
     </Button>
   )
 }
