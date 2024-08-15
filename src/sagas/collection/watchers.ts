@@ -41,7 +41,7 @@ export function* initializeWatcher(): Generator<any, void, any> {
 
     yield put({ type: types.RECEIVE_COLLECTION, data: mappedData })
 
-    const indexService = new IndexService()
+    const indexService = IndexService()
     yield fork(generateIndexWorker, indexService)
 
     yield put({ type: types.INITIALIZED })

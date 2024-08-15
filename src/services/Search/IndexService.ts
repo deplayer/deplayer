@@ -3,7 +3,9 @@ import lunr from 'lunr'
 import Media from '../../entities/Media'
 import logger from '../../utils/logger'
 
-export default class IndexService {
+let singleton: IndexService
+
+export class IndexService {
   indexBuilder: lunr.Builder
   index: lunr.Index
 
@@ -40,4 +42,11 @@ export default class IndexService {
     const results = this.index.search(searchTerm)
     return results
   }
+}
+
+export default () => {
+  if (!singleton) {
+    singleton = new IndexService()
+  }
+  return singleton
 }

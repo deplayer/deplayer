@@ -13,7 +13,7 @@ import {
   generateIndexWorker
 } from './workers'
 
-const indexService = new IndexService()
+const indexService = IndexService()
 
 function* collectionSaga(): any {
   yield fork(initializeWatcher)

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import IndexService from '../services/Search/IndexService'
+import { IndexService } from '../services/Search/IndexService'
 import Media from '../entities/Media'
 import filterSongs from './filter-songs'
 

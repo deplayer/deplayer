@@ -1,7 +1,7 @@
-import IndexService from '../services/Search/IndexService'
+import indexSingleton, { IndexService } from '../services/Search/IndexService'
 
 const filterSongs = (
-  indexService: IndexService,
+  indexService: IndexService = indexSingleton(),
   songs: any,
   term: string = ''
 ) => {

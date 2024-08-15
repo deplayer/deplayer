@@ -5,7 +5,7 @@ import IndexService from "../services/Search/IndexService";
 import Artist from "../entities/Artist"
 import merge from "deepmerge"
 
-const indexService = new IndexService();
+const indexService = IndexService();
 
 export type State = {
   rows: { [key: string]: any };
