@@ -34,6 +34,8 @@ function ReloadPrompt() {
       autoClose: false,
     })
   }, [offlineReady, needRefresh])
+
+  return <></>
 }
 
 export default ReloadPrompt

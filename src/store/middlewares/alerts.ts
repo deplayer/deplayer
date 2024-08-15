@@ -1,5 +1,5 @@
 import { I18n } from "react-redux-i18n";
-import { toast } from 'react-toastify';
+import { toast, ToastOptions } from 'react-toastify';
 
 
 import * as types from "../../constants/ActionTypes";
@@ -15,7 +15,7 @@ const alerts = () => (next: any) => (action: Action) => {
       effect: "stackslide",
       position: "top-right",
       offset: 50,
-    };
+    } as ToastOptions;
     toast.info(I18n.t(action.notification), options);
   }
   return next(action);
