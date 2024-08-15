@@ -1,5 +1,6 @@
 import { I18n } from "react-redux-i18n";
-import Alert from "react-s-alert";
+import { toast } from 'react-toastify';
+
 
 import * as types from "../../constants/ActionTypes";
 
@@ -15,7 +16,7 @@ const alerts = () => (next: any) => (action: Action) => {
       position: "top-right",
       offset: 50,
     };
-    Alert.info(I18n.t(action.notification), options);
+    toast.info(I18n.t(action.notification), options);
   }
   return next(action);
 };

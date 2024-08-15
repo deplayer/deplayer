@@ -8,6 +8,9 @@ import Placeholder from '../components/Player/Placeholder'
 import ReloadPrompt from '../components/ReloadPrompt'
 import type { State as AppState } from '../reducers/app'
 import type { State } from '../reducers'
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'
+
 
 interface LayoutProps {
   backgroundImage: string,
@@ -30,6 +33,7 @@ function Layout(props: LayoutProps) {
   return (
     <>
       {background}
+      <ToastContainer theme='dark' />
       <SidebarContainer>
         <ReloadPrompt />
         <TopbarContainer>

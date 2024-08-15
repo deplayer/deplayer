@@ -23,6 +23,7 @@ import rootSaga from '../sagas/rootSaga'
 
 // Custom middlewares
 // import exports from './middlewares/exports'
+import alerts from './middlewares/alerts'
 
 const mql = window.matchMedia(`(min-width: 800px)`)
 
@@ -42,6 +43,7 @@ function configureStore() {
 
   const middlewares = [
     ...testingMiddlewares,
+    alerts,
     promise,
     thunk,
     sagaMiddleware,
