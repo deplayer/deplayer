@@ -61,6 +61,7 @@ const populateFromAction = (state: State, action: { data: any }): State => {
       });
 
       const songDocument = song.toDocument();
+      console.log('songDocument: ', songDocument)
 
       acc.rows[song.id] = songDocument
       acc.albums[song.album.id] = song.album.toDocument();
@@ -120,6 +121,7 @@ const populateFromAction = (state: State, action: { data: any }): State => {
     albumsByArtist: { ...state.albumsByArtist, ...aggregation.albumsByArtist },
     songsByAlbum: { ...state.songsByAlbum, ...aggregation.songsByAlbum },
     mediaByType: { ...state.mediaByType, ...aggregation.mediaByType },
+    visibleSongs: filterSongs(indexService, rows),
     loading: false,
     totalRows: Object.keys(rows).length,
   };

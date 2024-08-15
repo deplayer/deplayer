@@ -1,5 +1,4 @@
 import { Translate } from 'react-redux-i18n'
-import React from 'react'
 
 import MediaSlider from '../MediaSlider'
 import RelatedAlbums from '../RelatedAlbums'
@@ -20,7 +19,7 @@ const WelcomeMessage = () => {
     'headset.svg'
   ]
   const pickImage = () => images[Math.floor(Math.random() * images.length)]
-  const randomImage = React.useMemo(pickImage, [])
+  const randomImage = pickImage()
 
   return (
     <div className='flex flex-col md:flex-row w-full content-start items-center md:items-start'>

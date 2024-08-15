@@ -2,10 +2,7 @@ import { IAdapter } from './IAdapter'
 import * as db from './PouchdbDatabase'
 import logger from '../../utils/logger'
 
-const cb = (err: any) => {
-  if (err) {
-    console.log('get err:', err)
-  }
+const cb = (_err: any) => {
 }
 
 export default class PouchdbAdapter implements IAdapter {

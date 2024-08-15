@@ -22,7 +22,7 @@ import rootReducer from '../reducers'
 import rootSaga from '../sagas/rootSaga'
 
 // Custom middlewares
-import exports from './middlewares/exports'
+// import exports from './middlewares/exports'
 
 const mql = window.matchMedia(`(min-width: 800px)`)
 
@@ -44,7 +44,6 @@ function configureStore() {
     ...testingMiddlewares,
     promise,
     thunk,
-    exports,
     sagaMiddleware,
     routerMiddleware
   ]
@@ -60,13 +59,13 @@ function configureStore() {
   // Running sagas
   sagaMiddleware.run(rootSaga, store)
 
-  store.dispatch({ type: types.INITIALIZE })
   // Set breakpoint matching for responsive utilities
   store.dispatch({ type: types.SET_MQL, value: mql.matches })
   mql.addListener(() => {
     store.dispatch({ type: types.SET_MQL, value: mql.matches })
   })
 
+  store.dispatch({ type: types.INITIALIZE })
   // Setting up locales
   syncTranslationWithStore(store)
   store.dispatch(loadTranslations(translationsObject))

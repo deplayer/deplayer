@@ -72,7 +72,7 @@ export function* generateIndexWorker(service: IndexService): any {
       JSON.stringify(index)
     )
     yield put({ type: types.RECEIVE_SEARCH_INDEX, data })
-  } catch (e) {
+  } catch (e: any) {
     yield put({ type: types.RECEIVE_SEARCH_INDEX_REJECTED, message: e.message })
   }
 }
