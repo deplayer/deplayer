@@ -61,11 +61,10 @@ const populateFromAction = (state: State, action: { data: any }): State => {
       });
 
       const songDocument = song.toDocument();
-      console.log('songDocument: ', songDocument)
 
       acc.rows[song.id] = songDocument
-      acc.albums[song.album.id] = song.album.toDocument();
-      acc.artists[song.artist.id] = song.artist.toDocument();
+      acc.albums[song.album.id] = songDocument.album
+      acc.artists[song.artist.id] = songDocument.artist
 
       // Ensure initialization of arrays/maps
       acc.songsByArtist[song.artist.id] =
@@ -121,7 +120,7 @@ const populateFromAction = (state: State, action: { data: any }): State => {
     albumsByArtist: { ...state.albumsByArtist, ...aggregation.albumsByArtist },
     songsByAlbum: { ...state.songsByAlbum, ...aggregation.songsByAlbum },
     mediaByType: { ...state.mediaByType, ...aggregation.mediaByType },
-    visibleSongs: filterSongs(indexService, rows),
+    visibleSongs: filterSongs(indexService, rows, state.searchTerm),
     loading: false,
     totalRows: Object.keys(rows).length,
   };

@@ -23,7 +23,7 @@ function ReloadPrompt() {
   }
 
   return (
-    <div className="ReloadPrompt-container bg-gray-900 p-0 m-0 w-0 h-0">
+    <div className="ReloadPrompt-container bg-blue-900 p-0 m-0 w-0 h-0 z-50">
       {(offlineReady || needRefresh)
         && <div className="ReloadPrompt-toast p-10">
           <div className="ReloadPrompt-message py-4">

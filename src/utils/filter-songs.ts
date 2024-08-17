@@ -13,8 +13,6 @@ const filterSongs = (
     return Object.keys(songs)
   }
 
-  console.log('indexService', indexService)
-
   const results = indexService.search(term)
 
   const mappedResults = results.map((result: any) => {

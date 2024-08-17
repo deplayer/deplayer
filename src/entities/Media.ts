@@ -145,7 +145,7 @@ export default class Media {
       stream: this.stream,
       artist: this.artist.toDocument(),
       cover: this.cover,
-      album: this.album,
+      album: this.album.toDocument(),
       genre: this.genre,
       albumName: this.albumName,
       playCount: this.playCount,
