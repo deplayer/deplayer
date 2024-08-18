@@ -6,6 +6,7 @@ import Sidebar from 'react-sidebar'
 import { State as CollectionState } from '../../reducers/collection'
 import { State as QueueState } from '../../reducers/queue'
 import { State as AppState } from '../../reducers/app'
+import { State as PlaylistState } from '../../reducers/playlist'
 
 type Props = {
   sidebarToggled: boolean,
@@ -13,6 +14,7 @@ type Props = {
   collection: CollectionState,
   queue: QueueState,
   app: AppState,
+  playlist: PlaylistState,
   children: React.ReactNode,
   dispatch: Dispatch
 }
@@ -21,6 +23,7 @@ function MSidebar({
   app,
   collection,
   queue,
+  playlist,
   sidebarToggled,
   mqlMatch,
   children,
@@ -39,6 +42,7 @@ function MSidebar({
       app={app}
       collection={collection}
       queue={queue}
+      playlist={playlist}
       onSetSidebarOpen={onSetSidebarOpen}
       dispatch={dispatch}
     />

@@ -71,8 +71,7 @@ export function* startFilesystemProcess(action: any): any {
 
     yield put({ type: types.FILESYSTEM_SONG_LOADED, songDocument })
     yield put({
-      type: types.SEND_NOTIFICATION,
-      notification: song.title + ' - ' + song.artistName + ' saved',
+      type: types.SEND_NOTIFICATION, notification: song.title + ' - ' + song.artistName + ' saved',
       level: 'info'
     })
   }

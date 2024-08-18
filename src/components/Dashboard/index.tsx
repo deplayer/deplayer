@@ -17,7 +17,8 @@ const WelcomeMessage = () => {
     'cassete.svg',
     'walkman.svg',
     'discman.svg',
-    'headset.svg'
+    'headset.svg',
+    'phonophone.svg',
   ]
   const pickImage = () => images[Math.floor(Math.random() * images.length)]
   const randomImage = React.useMemo(pickImage, [])

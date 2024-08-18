@@ -10,13 +10,17 @@ import MenuItem from './MenuItem'
 import { inSection } from '../../utils/router'
 import Icon from '../common/Icon'
 import { State as CollectionState } from '../../reducers/collection'
+import { State as QueueState } from '../../reducers/queue'
+import { State as AppState } from '../../reducers/app'
+import { State as PlaylistsState } from '../../reducers/playlist'
 import { useLocation } from 'react-router'
 
 type ContentProps = {
   dispatch: Dispatch,
   collection: CollectionState,
-  queue: any,
-  app: any,
+  queue: QueueState,
+  app: AppState,
+  playlist: PlaylistsState,
   onSetSidebarOpen: Function
 }
 
@@ -45,7 +49,7 @@ const SidebarContents = (props: ContentProps) => {
           current={inSection(location, 'search-results')}
           totalItems={props.collection.searchResults.length}
         />
-        <PlaylistsMenuItem current={inSection(location, 'playlists')} />
+        <PlaylistsMenuItem current={inSection(location, 'playlists')} totalItems={props.playlist.playlists.length} />
         <CollectionMenuItem
           collection={props.collection}
           current={inSection(location, '(collection.*)')}
