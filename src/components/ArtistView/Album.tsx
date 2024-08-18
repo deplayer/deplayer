@@ -30,7 +30,6 @@ const Album = (props: AlbumProps) => {
       const songRow = props.collection.rows[songId]
       return (
         <SongRow
-          queue={props.queue}
           songsLength={props.songs.length}
           mqlMatch={false}
           disableCovers

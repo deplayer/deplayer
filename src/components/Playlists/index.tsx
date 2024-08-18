@@ -2,10 +2,12 @@ import * as React from 'react'
 
 import Playlist from './Playlist'
 import BodyMessage from '../BodyMessage'
+import { State as CollectionState } from '../../reducers/collection'
+import { State as PlaylistState } from '../../reducers/playlist'
 
 type Props = {
-  playlist: any,
-  collection: any,
+  playlist: PlaylistState,
+  collection: CollectionState,
   dispatch: any
 }
 
@@ -35,8 +37,8 @@ const Playlists = (props: Props) => {
 
 
   return (
-    <div className='playlists z-10'>
-      { playlistsComps }
+    <div className='playlists z-10 flex flex-col w-full'>
+      {playlistsComps}
     </div>
   )
 }

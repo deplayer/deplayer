@@ -1,8 +1,9 @@
 import { connect } from 'react-redux'
 import Collection from '../components/Collection'
+import { State } from '../reducers'
 
 export default connect(
-  (state: any, ownProps: any) => ({
+  (state: State, ownProps: any) => ({
     app: state.app,
     queue: state.queue,
     player: state.player,

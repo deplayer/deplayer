@@ -35,7 +35,7 @@ type Props = {
     songsByGenre: any,
     rows: any
   },
-  queue: { trackIds: any, currentPlaying: string },
+  queue: { trackIds: any, currentPlaying?: string },
   songId: string,
   dispatch: Dispatch,
   loading: boolean,
@@ -43,7 +43,7 @@ type Props = {
 }
 
 const SongView = (props: Props) => {
-  const song = props.collection.rows[props.songId] || props.collection.rows[props.queue.currentPlaying]
+  const song = props.collection.rows[props.songId]
 
   const [downloadUrls, setDownloadUrls] = React.useState([])
   const [showLyrics, setShowLyrics] = React.useState(false)

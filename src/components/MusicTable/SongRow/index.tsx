@@ -12,7 +12,7 @@ import ServiceIcon from '../../ServiceIcon'
 export type Props = {
   songsLength: number, // Listening this in order to recreate context menu
   song: Media,
-  queue: any,
+  queue?: any,
   isCurrent?: boolean | null,
   onClick: () => any,
   dispatch: Dispatch,

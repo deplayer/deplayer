@@ -14,7 +14,7 @@ type MenuProps = {
   songsLength: number, // Used to re-render
   dispatch: Dispatch,
   disableAddButton?: boolean,
-  queue: any,
+  queue?: any,
   onClick: () => any,
   song: Media,
 }
@@ -80,7 +80,7 @@ const ContextualMenu = (props: MenuProps) => {
           </Item>
         )}
 
-        {!disableAddButton && props.queue.currentPlaying && (
+        {!disableAddButton && props.queue?.currentPlaying && (
           <Item>
             <Button
               fullWidth
