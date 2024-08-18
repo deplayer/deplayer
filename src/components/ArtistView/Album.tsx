@@ -2,7 +2,6 @@ import * as types from '../../constants/ActionTypes'
 import Button from '../common/Button'
 import { Translate } from 'react-redux-i18n'
 import Icon from '../common/Icon'
-import Media from '../../entities/Media'
 import SongRow from '../MusicTable/SongRow'
 import CoverImage from '../MusicTable/CoverImage'
 
@@ -29,7 +28,6 @@ const Album = (props: AlbumProps) => {
 
     return props.songs.map((songId) => {
       const songRow = props.collection.rows[songId]
-      const songObj = new Media(songRow)
       return (
         <SongRow
           queue={props.queue}
@@ -42,9 +40,9 @@ const Album = (props: AlbumProps) => {
           isCurrent={false}
           slim={true}
           onClick={() => {
-            props.dispatch({ type: types.SET_CURRENT_PLAYING, songId: songObj.id })
+            props.dispatch({ type: types.SET_CURRENT_PLAYING, songId: songRow.id })
           }}
-          song={songObj}
+          song={songRow}
         />
       )
     })

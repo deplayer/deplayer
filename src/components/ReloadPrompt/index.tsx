@@ -1,11 +1,12 @@
-import './index.css'
+import React from 'react'
 import { useRegisterSW } from 'virtual:pwa-register/react'
 import Button from '../common/Button'
+import { toast } from 'react-toastify'
 
 function ReloadPrompt() {
   const {
-    offlineReady: [offlineReady, setOfflineReady],
-    needRefresh: [needRefresh, setNeedRefresh],
+    offlineReady: [offlineReady],
+    needRefresh: [needRefresh],
     updateServiceWorker,
   } = useRegisterSW({
     onRegistered(r) {
@@ -17,27 +18,24 @@ function ReloadPrompt() {
     },
   })
 
-  const close = () => {
-    setOfflineReady(false)
-    setNeedRefresh(false)
-  }
-
-  return (
-    <div className="ReloadPrompt-container bg-blue-900 p-0 m-0 w-0 h-0 z-50">
-      {(offlineReady || needRefresh)
-        && <div className="ReloadPrompt-toast p-10">
-          <div className="ReloadPrompt-message py-4">
-            {offlineReady
-              ? <span>App ready to work offline</span>
-              : <span>New content available, click on reload button to update.</span>
-            }
-          </div>
+  React.useEffect(() => {
+    const msg =
+      <>
+        <div className="py-4">
+          {offlineReady && <span>App ready to work offline</span>}
+          {needRefresh && <span>New content available, click on reload button to update.</span>}
           {needRefresh && <Button className="ReloadPrompt-toast-button" onClick={() => updateServiceWorker(true)}>Reload</Button>}
-          <Button large onClick={() => close()}>Close</Button>
         </div>
-      }
-    </div>
-  )
+      </>
+
+    if (!offlineReady && !needRefresh) return
+
+    toast.info(msg, {
+      autoClose: false,
+    })
+  }, [offlineReady, needRefresh])
+
+  return <></>
 }
 
 export default ReloadPrompt

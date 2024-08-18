@@ -20,9 +20,12 @@ export default defineConfig({
     },
     manifest: {
       name: 'deplayer',
+      id: 'deplayer',
       short_name: 'deplayer',
       description: 'Decentralized mediaplayer which runs entirely in the browser',
       theme_color: '#0e1b1e',
+      display: 'standalone',
+      display_override: ['window-controls-overlay'],
       icons: [
         {
           src: "pwa-64x64.png",

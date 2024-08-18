@@ -5,7 +5,7 @@ import { mediaParams } from '../../entities/Media.spec'
 
 describe('IndexService', () => {
   it('should handle generateIndex and search', () => {
-    const indexService = new IndexService()
+    const indexService = IndexService()
 
     const song1 = new Media({
       ...mediaParams,

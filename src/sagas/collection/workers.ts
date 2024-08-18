@@ -7,7 +7,7 @@ import CollectionService from '../../services/CollectionService'
 import logger from '../../utils/logger'
 import rowToSong from '../../mappers/rowToSong'
 import * as types from '../../constants/ActionTypes'
-import IndexService from '../../services/Search/IndexService'
+import { IndexService } from '../../services/Search/IndexService'
 
 const adapter = getAdapter()
 const collectionService = new CollectionService(new adapter())
