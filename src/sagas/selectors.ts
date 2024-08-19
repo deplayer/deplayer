@@ -1,6 +1,6 @@
 // Extract settings from state
 export const getSettings = (state: any) => {
-  return state ? state.settings.settings : {providers: {}}
+  return state ? state.settings.settings : { providers: {} }
 }
 
 export const getState = (state: any) => {
@@ -31,8 +31,7 @@ export const getSongBg = (state: any): any => {
   const { collection: { rows }, queue: { currentPlaying } } = state
   if (rows[currentPlaying]) {
     const song = rows[currentPlaying]
-    const { cover: { fullUrl } } = song
-    return fullUrl
+    return song.cover?.fullUrl
   }
   return ''
 }

@@ -21,10 +21,10 @@ type Props = {
   songsByAlbum: any
 }
 
-const extractBackground = (collection: CollectionState, songsByAlbum: {string: Media}, albumsByArtist = []): string => {
+const extractBackground = (collection: CollectionState, songsByAlbum: { string: Media }, albumsByArtist = []): string => {
   const albumId = albumsByArtist && albumsByArtist.length && albumsByArtist[0]
   if (albumId && songsByAlbum[albumId]) {
-    return collection.rows[songsByAlbum[albumId][0]].cover.fullUrl
+    return collection.rows[songsByAlbum[albumId][0]]?.cover?.fullUrl
   }
 
   return ''

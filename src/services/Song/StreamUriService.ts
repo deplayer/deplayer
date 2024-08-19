@@ -24,8 +24,11 @@ export const getStreamUri = async (
     song.stream[providerNum].uris[0].uri : null
 
   if (service === 'filesystem') {
+    console.log('Processing filesystem streamUri')
     const directoryHandler = await get('directoryHandler')
     await verifyPermission(directoryHandler)
+
+    console.log('directoryHandler', directoryHandler)
 
     if (!streamUri) {
       return ''
@@ -34,6 +37,8 @@ export const getStreamUri = async (
     const handler = await get(streamUri)
 
     if (handler instanceof File) {
+      console.log('handler is a File', handler)
+
       return URL.createObjectURL(handler)
     }
 
@@ -41,10 +46,13 @@ export const getStreamUri = async (
       return streamUri
     }
 
+    console.log('Verifying file permission')
     await verifyPermission(handler)
 
+    console.log('Getting file from handler', handler)
     const file = await handler.getFile()
 
+    console.log('file', file)
     if (!file) {
       return streamUri
     }
@@ -55,7 +63,7 @@ export const getStreamUri = async (
   return prepend + streamUri
 }
 
-async function verifyPermission(fileHandle: any, readWrite = false) {
+async function verifyPermission(fileHandle: FileSystemHandle, readWrite = false) {
   const options = {};
   if (readWrite) {
     // options.mode = 'readwrite';

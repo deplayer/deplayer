@@ -13,13 +13,13 @@ type Props = {
 }
 
 const IMAGES = [
-    'record-player.svg',
-    'cassete.svg',
-    'walkman.svg',
-    'discman.svg',
-    'headset.svg',
-    'phonophone.svg',
-  ]
+  'record-player.svg',
+  'cassete.svg',
+  'walkman.svg',
+  'discman.svg',
+  'headset.svg',
+  'phonophone.svg',
+]
 
 const pickImage = () => IMAGES[Math.floor(Math.random() * IMAGES.length)]
 
@@ -44,9 +44,9 @@ const WelcomeMessage = ({ dispatch }: { dispatch: Function }) => {
         </p>
         <ul>
           <li><Link to='/providers' className='text-blue-500'>Setup your media providers</Link></li>
-            <li>
-            <a onClick={() => dispatch({ type: types.SHOW_ADD_MEDIA_MODAL })} className='text-blue-500'>Add new media to your collection</a>
-            </li>
+          <li>
+            <a onClick={() => dispatch({ type: types.SHOW_ADD_MEDIA_MODAL })} className='text-blue-500 cursor-pointer'>Add new media to your collection</a>
+          </li>
           <li><Link to='/collection' className='text-blue-500'>Or go to your collection</Link></li>
         </ul>
       </div>
@@ -55,9 +55,9 @@ const WelcomeMessage = ({ dispatch }: { dispatch: Function }) => {
 }
 
 
-const Dashboard = ({ 
-  collection: { loading, rows, songsByNumberOfPlays, albums }, 
-  dispatch 
+const Dashboard = ({
+  collection: { loading, rows, songsByNumberOfPlays, albums },
+  dispatch
 }: Props) => {
   const MAX_LIST_ITEMS = 25
 
