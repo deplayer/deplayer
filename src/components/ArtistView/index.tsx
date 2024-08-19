@@ -31,95 +31,88 @@ const extractBackground = (collection: CollectionState, songsByAlbum: { string: 
 }
 
 
-export default class ArtistView extends React.Component<Props> {
-  componentDidMount() {
-    if (this.props.artist && this.props.artist.name) {
-      this.props.dispatch({
+export default function ArtistView(props: Props) {
+  const {
+    artist,
+    albums,
+    albumsByArtist,
+    songsByAlbum,
+    collection
+  } = props
+
+  React.useEffect(() => {
+    if (props.artist && props.artist.name) {
+      props.dispatch({
         type: types.LOAD_ARTIST,
-        artist: this.props.artist
+        artist: props.artist
       })
     }
 
-    const {
-      albumsByArtist,
-      songsByAlbum,
-      collection
-    } = this.props
-
-    this.props.dispatch({
+    props.dispatch({
       type: types.SET_BACKGROUND_IMAGE,
       backgroundImage: extractBackground(collection, songsByAlbum, albumsByArtist)
     })
-  }
+  }, [])
 
-  render() {
-    const {
-      artist,
-      albumsByArtist,
-      albums,
-      songsByAlbum
-    } = this.props
-
-    const extractSummary = (): string => {
-      if (this.props.artistMetadata && this.props.artistMetadata.artist) {
-        return this.props.artistMetadata.artist.bio.content
-      }
-
-      return ''
+  const extractSummary = (): string => {
+    if (props.artistMetadata && props.artistMetadata.artist) {
+      return props.artistMetadata.artist.bio.content
     }
 
-    const albumRows = albumsByArtist.map((albumId: string) => {
-      return (
-        <Album
-          queue={this.props.queue}
-          key={albumId}
-          album={albums[albumId]}
-          dispatch={this.props.dispatch}
-          collection={this.props.collection}
-          songs={songsByAlbum[albumId]}
-        />
-      )
-    })
-
-    return (
-      <div data-testid="artist-view" className={`artist-view ${this.props.className} z-50`}>
-        <div className='main w-full z-10 md:p-4'>
-          <h2 className='text-center text-3xl py-2'>{artist.name}</h2>
-          <p dangerouslySetInnerHTML={{ __html: extractSummary() }} />
-          {
-            this.props.artistMetadata && this.props.artistMetadata['life-span'] && (
-              <div className='text-center text-md'>
-                {this.props.artistMetadata['life-span'].begin} {this.props.artistMetadata['life-span'].end && '- ' + this.props.artistMetadata['life-span'].end}
-              </div>
-            )
-          }
-          {
-            this.props.artistMetadata && this.props.artistMetadata['country'] && (
-              <div className='text-center text-md'>
-                {this.props.artistMetadata['country']}
-              </div>
-            )
-          }
-          <div className='py-4 text-center'>
-            {
-              this.props.artistMetadata && this.props.artistMetadata['relations'] && this.props.artistMetadata['relations'].map((relation: any, index: number) => {
-                return (
-                  <div className='mr-2 py-1 inline-block'>
-                    <Tag key={index} transparent>
-                      <a target="_blank" href={relation.url.resource}>{relation.type}</a>
-                    </Tag>
-                  </div>
-                )
-              })
-            }
-          </div>
-
-          <div className='yt-4'>
-            {albumRows}
-          </div>
-          <div className='placeholder'></div>
-        </div>
-      </div>
-    )
+    return ''
   }
+
+  const albumRows = albumsByArtist.map((albumId: string) => {
+    return (
+      <Album
+        queue={props.queue}
+        key={albumId}
+        album={albums[albumId]}
+        dispatch={props.dispatch}
+        collection={props.collection}
+        songs={songsByAlbum[albumId]}
+      />
+    )
+  })
+
+  return (
+    <div data-testid="artist-view" className={`artist-view ${props.className} z-50`}>
+      <div className='main w-full z-10 md:p-4'>
+        <h2 className='text-center text-3xl py-2'>{artist.name}</h2>
+        <p dangerouslySetInnerHTML={{ __html: extractSummary() }} />
+        {
+          props.artistMetadata && props.artistMetadata['life-span'] && (
+            <div className='text-center text-md'>
+              {props.artistMetadata['life-span'].begin} {props.artistMetadata['life-span'].end && '- ' + props.artistMetadata['life-span'].end}
+            </div>
+          )
+        }
+        {
+          props.artistMetadata && props.artistMetadata['country'] && (
+            <div className='text-center text-md'>
+              {props.artistMetadata['country']}
+            </div>
+          )
+        }
+        <div className='py-4 text-center'>
+          {
+            props.artistMetadata && props.artistMetadata['relations'] && props.artistMetadata['relations'].map((relation: any, index: number) => {
+              return (
+                <div className='mr-2 py-1 inline-block'>
+                  <Tag key={index} transparent>
+                    <a target="_blank" href={relation.url.resource}>{relation.type}</a>
+                  </Tag>
+                </div>
+              )
+            })
+          }
+        </div>
+
+        <div className='yt-4'>
+          {albumRows}
+        </div>
+        <div className='placeholder'></div>
+      </div>
+    </div>
+  )
 }
