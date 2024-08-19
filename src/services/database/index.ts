@@ -1,4 +1,3 @@
-// import RxdbAdapter from './RxdbAdapter'
 import PouchdbAdapter from './PouchdbAdapter'
 import DummyAdapter from './DummyAdapter'
 

@@ -45,6 +45,7 @@ type Props = {
 const SongView = (props: Props) => {
   const song = props.collection.rows[props.songId]
 
+  const [pinned, setPinnedSong] = React.useState(false)
   const [downloadUrls, setDownloadUrls] = React.useState([])
   const [showLyrics, setShowLyrics] = React.useState(false)
   const MAX_LIST_ITEMS = 25
@@ -124,7 +125,7 @@ const SongView = (props: Props) => {
                 useImage
                 cover={song.cover}
                 size='thumbnail'
-                albumName={song.album ? song.album.name : 'N/A'}
+                albumName={song.albumName || 'N/A'}
               />
             }
 
@@ -188,6 +189,21 @@ const SongView = (props: Props) => {
                   className='mr-2'
                 />
                 <Translate value="common.lyrics" />
+              </Button>
+
+              <Button
+                large
+                transparent
+                onClick={() => {
+                  props.dispatch({ type: types.PIN_SONG, songId: song.id })
+                  setPinnedSong(song)
+                }}
+              >
+                <Icon
+                  icon={ pinned ? 'faMinusCircle' : 'faPlusCircle' }
+                  className='mr-2'
+                />
+                <Translate value="media.pin" />
               </Button>
 
               {

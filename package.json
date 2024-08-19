@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
+    "@happy-js/happy-opfs": "npm:@jsr/happy-js__happy-opfs@^1.8.4",
     "@types/lunr": "^2.3.7",
     "@types/pouchdb": "^6.4.2",
     "@types/react-redux-i18n": "^0.0.16",
@@ -21,7 +22,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-toastify": "^10.0.5",
-    "redux-first-history": "^5.2.0"
+    "redux-first-history": "^5.2.0",
+    "rxdb": "^15.31.0"
   },
   "devDependencies": {
     "@fortawesome/free-brands-svg-icons": "^6.5.2",

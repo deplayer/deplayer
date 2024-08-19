@@ -43,19 +43,25 @@ function configureStore() {
 
   const middlewares = [
     ...testingMiddlewares,
-    alerts,
     promise,
     thunk,
+    alerts,
     sagaMiddleware,
     routerMiddleware
   ]
+
+  // These two middlewares cause slow performance in development
+  const disabledMiddlewares = { 
+    immutableCheck: false, 
+    serializableCheck: false
+  }
 
   // Instantiate sagaMiddleware
   // Prepare store with all the middlewares
   const store = confStore({
     reducer: combineReducers({ router: routerReducer, ...rootReducer }),
     devTools: process.env.NODE_ENV !== 'production',
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(...middlewares),
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware(disabledMiddlewares).concat(...middlewares),
   })
 
   // Running sagas
