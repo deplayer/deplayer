@@ -1,7 +1,11 @@
 import { clientsClaim } from 'workbox-core'
-import { precacheAndRoute } from 'workbox-precaching'
+import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching'
 
 declare let self: ServiceWorkerGlobalScope
+
+cleanupOutdatedCaches()
+
+self.skipWaiting()
 
 clientsClaim()
 
