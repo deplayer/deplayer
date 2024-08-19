@@ -22,8 +22,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-toastify": "^10.0.5",
-    "redux-first-history": "^5.2.0",
-    "rxdb": "^15.31.0"
+    "redux-first-history": "^5.2.0"
   },
   "devDependencies": {
     "@fortawesome/free-brands-svg-icons": "^6.5.2",
