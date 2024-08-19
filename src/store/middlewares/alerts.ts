@@ -17,12 +17,28 @@ const alerts = () => (next: any) => (action: Action) => {
       position: "top-right",
       offset: 50,
     } as ToastOptions
-    if (action.level === "success") toast.success(I18n.t(action.notification), options);
-    if (action.level === "error") toast.error(I18n.t(action.notification), options);
-    if (action.level === "warn") toast.warn(I18n.t(action.notification), options);
-    if (action.level === "info") toast.info(I18n.t(action.notification), options);
+
+    switch (action.level) {
+      case "success":
+        options.autoClose = 5000
+        toast.success(I18n.t(action.notification), options)
+        break;
+      case "error":
+        options.autoClose = false
+        toast.error(I18n.t(action.notification), options)
+        break;
+      case "warn":
+        options.autoClose = 5000
+        toast.warn(I18n.t(action.notification), options)
+        break;
+      case "info":
+      default:
+        options.autoClose = 5000
+        toast.info(I18n.t(action.notification), options)
+        break;
+    }
   }
-  return next(action);
+  return next(action)
 };
 
 export default alerts;
