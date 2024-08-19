@@ -1,7 +1,8 @@
-// import 'react-contexify/dist/ReactContexify.min.css'
+import 'react-contexify/ReactContexify.css'
 
 import type { Dispatch } from 'redux'
 import { Menu, Item, useContextMenu, TriggerEvent } from 'react-contexify'
+
 import { Translate } from 'react-redux-i18n'
 import React from 'react'
 
@@ -39,19 +40,16 @@ const ContextualMenu = (props: MenuProps) => {
   })
   function handleContextMenu(event: TriggerEvent) {
     show({
-      event,
-      props: {
-        key: 'value'
-      }
+      event
     })
   }
 
   return (
     <React.Fragment>
-      <div onContextMenu={handleContextMenu} className='p-1 mx-1 float-right cursor-pointer'>
+      <div onClick={handleContextMenu} onContextMenu={handleContextMenu} className='p-1 mx-1 float-right cursor-pointer'>
         <Icon icon='faEllipsisV' className='text-blue-400' />
       </div>
-      <Menu id={`context-menu-${song.id}`} className='song-menu'>
+      <Menu id={`context-menu-${song.id}`} className='song-menu' theme='dark'>
         <Item>
           <Button
             fullWidth

@@ -73,8 +73,8 @@ const SongRow = (props: Props) => {
           <div className='inline-block text-yellow-400 text-sm'>{getDurationStr(song.duration)}</div>
         )}
       </div>
-      <div className='flex'>
-        <div>
+      <div className='flex' tabIndex={0}>
+        <div className='mr-4'>
           {
             !props.slim && props.mqlMatch &&
             song.stream.map((provider) => {
@@ -85,7 +85,9 @@ const SongRow = (props: Props) => {
             <span className='text-yellow-400'>{getDurationStr(song.duration)}</span>
           )}
         </div>
-        <ContextualMenu {...props} />
+        <div className='h-10 relative'>
+          <ContextualMenu {...props} />
+        </div>
       </div>
     </div >
   )

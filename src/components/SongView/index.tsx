@@ -254,17 +254,19 @@ const SongView = (props: Props) => {
             <div className='mt-4'>
               <Icon icon='faStopwatch' /> {getDurationStr(song.duration)}
             </div>
-            <div className='mt-2'>
+            <div className='mt-2 flex items-center'>
+              <Translate className='mr-2' value='labels.genres' />
               <Tag transparent>{song.genre}</Tag>
             </div>
-            <div className='mt-2'>
+            <div className='mt-2 flex items-center'>
+              <Translate className='mr-2' value='labels.mediaType' />
               <Tag transparent>{song.media_type}</Tag>
             </div>
             <div className='mt-2'>
               <Translate value='song.label.played' /> {song.playCount || 0} <Translate value='song.label.times' />
             </div>
-            <div className='mt-2'>
-              <Translate value='labels.providers' />: &nbsp;
+            <div className='mt-2 flex items-center'>
+              <Translate className='mr-2' value='labels.providers' />
               {
                 song.stream.map((provider: any) => {
                   return <Tag transparent key={provider.service}><ServiceIcon service={provider.service} /><p className='capitalize'>{provider.service}</p></Tag>
