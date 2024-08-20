@@ -63,7 +63,7 @@ export const getStreamUri = async (
   return prepend + streamUri
 }
 
-async function verifyPermission(fileHandle: FileSystemHandle, readWrite = false) {
+async function verifyPermission(fileHandle: any, readWrite = false) {
   const options = {};
   if (readWrite) {
     // options.mode = 'readwrite';
