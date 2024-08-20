@@ -26,12 +26,9 @@ const dynamicTitle = (
       return 'Song'
     }
 
-    return (
-      <>
-        <i className='icon music outline mr-4'></i>
-        {song.title}
-      </>
-    )
+    const title = song.title + ' - ' + song.artist.name
+
+    return <><Icon icon='faMusic' /> {title}</>
   }
 
   if (artistFinder && artistFinder[1]) {
@@ -42,7 +39,7 @@ const dynamicTitle = (
       return 'Artist'
     }
 
-    return artist.name
+    return <><Icon icon='faMicrophoneAlt' /> {artist.name}</>
   }
 
   if (albumFinder && albumFinder[1]) {
