@@ -42,12 +42,12 @@ export default class MstreamApiProvider implements IMusicProvider {
           thumbnailUrl: song.metadata['album-art'] ? this.baseUrl + '/album-art/' + song.metadata['album-art'] : '',
           fullUrl: song.metadata['album-art'] ? this.baseUrl + '/album-art/' + song.metadata['album-art'] : ''
         },
-        stream: [
-          {
+        stream: {
+          mstreamer: {
             service: this.providerKey,
             uris: [{ uri: this.baseUrl + '/media/' + decodeURIComponent(song.filepath) }]
           }
-        ]
+        }
       })
     })
   }

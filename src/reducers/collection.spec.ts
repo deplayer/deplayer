@@ -18,7 +18,7 @@ describe('collection reducer', () => {
       artistName: 'The Doors',
       artistId: 'the-doors',
       albumName: 'LIght my fire',
-      stream: [{ uris: [{ uri: 'http://some-songs-api/song.mp4' }], service: 'itunes' }]
+      stream: { itunes: { uris: [{ uri: 'http://some-songs-api/song.mp4' }], service: 'itunes' }}
     })
     const rows = { [fixtureSong.id]: fixtureSong.toDocument() }
     const artists = { [fixtureSong.artist.id]: fixtureSong.artist.toDocument() }

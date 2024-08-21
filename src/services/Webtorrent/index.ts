@@ -33,8 +33,8 @@ export const magnetToMedia = async (torrentUrl: string): Promise<Array<Media>> =
           artistName: 'webtorrent',
           albumName: 'webtorrent',
           type: type,
-          stream: [
-            {
+          stream: {
+            webtorrent: {
               service: 'webtorrent',
               uris: [
                 {
@@ -42,7 +42,7 @@ export const magnetToMedia = async (torrentUrl: string): Promise<Array<Media>> =
                 }
               ]
             }
-          ]
+          }
         })
       })
 

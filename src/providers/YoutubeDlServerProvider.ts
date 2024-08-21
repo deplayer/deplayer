@@ -33,12 +33,12 @@ export default class YoutubeDlServerProvider implements IMusicProvider {
       track: 0,
       filePath: '',
       type: 'video',
-      stream: [
-        {
+      stream: {
+        youtubedl: {
           service: this.providerKey,
           uris: [{ uri: `${this.playUrl}?url=${escape(songInfo.webpage_url)}` }]
         }
-      ]
+      }
     })
   }
 

@@ -77,7 +77,7 @@ const SongRow = (props: Props) => {
         <div className='mr-4'>
           {
             !props.slim && props.mqlMatch &&
-            song.stream.map((provider) => {
+            Object.values(song.stream).map((provider) => {
               return <Tag transparent key={provider.service}><ServiceIcon service={provider.service} /><p className='capitalize'>{provider.service}</p></Tag>
             })
           }

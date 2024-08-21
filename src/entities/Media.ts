@@ -27,7 +27,7 @@ interface MediaParams {
   duration?: number
   genre?: string
   cover?: Cover
-  stream: Array<Stream>
+  stream: { [key: string]: Stream }
   playCount?: number
   shareUrl?: string
   filePath?: string
@@ -47,7 +47,7 @@ export default class Media {
   type?: string
   duration: number
   externalId: string
-  stream: Array<Stream>
+  stream: { [key: string]: Stream }
   playCount: number
   genre?: string
   shareUrl?: string
@@ -105,7 +105,7 @@ export default class Media {
   }
 
   hasAnyProviderOf(checkProviders: Array<string>): boolean {
-    const providers = this.stream.map((stream) => stream.service)
+    const providers = Object.values(this.stream).map((stream) => stream.service)
 
     let result = false
 
@@ -122,7 +122,7 @@ export default class Media {
 
   get media_type(): MediaType {
     const uris: Array<string> = []
-    this.stream.forEach((stream) => stream.uris.forEach((uri) => uris.push(uri.uri)))
+    Object.values(this.stream).forEach((stream) => stream.uris.forEach((uri) => uris.push(uri.uri)))
 
     if (uris.filter((uri) => uri.endsWith('.mp4')).length) {
       return 'video'

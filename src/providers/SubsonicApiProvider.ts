@@ -54,12 +54,12 @@ export default class SubsonicApiProvider implements IMusicProvider {
         track: song.track,
         filePath: song.path,
         type: 'audio',
-        stream: [
-          {
+        stream: {
+          subsonic: {
             service: this.providerKey,
             uris: [{uri: this.streamBase + '&id=' + song.id}]
           }
-        ],
+        },
       })
     })
   }

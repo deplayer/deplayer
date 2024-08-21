@@ -28,8 +28,8 @@ export const metadataToSong = (
     type: fileUri.endsWith('.mp4') ? 'video' : 'audio',
     duration: metadata.format.duration || 0,
     genre: genre,
-    stream: [
-      {
+    stream: {
+      filesystem: {
         service: service,
         uris: [
           {
@@ -37,7 +37,7 @@ export const metadataToSong = (
           }
         ]
       }
-    ]
+    }
   })
 
   return song

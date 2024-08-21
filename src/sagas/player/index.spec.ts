@@ -18,12 +18,12 @@ vi.stubGlobal('idb-keyval', IdbKevalMock)
 describe('setCurrentPlaying', () => {
   it('works', () => {
     const streamUrl = 'https://foo.bar'
-    const streams = [
-      {
+    const streams = {
+      subsonic: {
         service: 'subsonic',
         uris: [{ uri: streamUrl }]
       }
-    ]
+    }
 
     const song = new Media({
       ...mediaParams,
