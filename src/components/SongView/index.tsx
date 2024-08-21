@@ -21,6 +21,7 @@ import { getStreamUri } from '../../services/Song/StreamUriService'
 import Album from '../../entities/Album'
 import ServiceIcon from '../ServiceIcon'
 import { Stream } from '../../entities/Media'
+import Media from '../../entities/Media'
 
 type Props = {
   playerPortal: any,
@@ -46,7 +47,14 @@ type Props = {
 const SongView = (props: Props) => {
   const song = props.collection.rows[props.songId]
 
-  const [pinned, setPinnedSong] = React.useState(false)
+  if (!song) {
+    return <NotFound>The requested song can not be found</NotFound>
+  }
+
+  const songObj = new Media(song)
+  const isSongPinned = songObj.hasAnyProviderOf(['opfs'])
+
+  const [pinned, setPinnedSong] = React.useState(isSongPinned)
   const [downloadUrls, setDownloadUrls] = React.useState([])
   const [showLyrics, setShowLyrics] = React.useState(false)
   const MAX_LIST_ITEMS = 25
@@ -201,15 +209,20 @@ const SongView = (props: Props) => {
                 large
                 transparent
                 onClick={() => {
-                  props.dispatch({ type: types.PIN_SONG, songId: song.id })
-                  setPinnedSong(song)
+                  if (!pinned) {
+                    props.dispatch({ type: types.PIN_SONG, songId: song.id })
+                    setPinnedSong(true)
+                  } else {
+                    props.dispatch({ type: types.UNPIN_SONG, songId: song.id })
+                    setPinnedSong(false)
+                  }
                 }}
               >
                 <Icon
                   icon={ pinned ? 'faMinusCircle' : 'faPlusCircle' }
                   className='mr-2'
                 />
-                <Translate value="media.pin" />
+                { pinned ? <Translate value="media.unpin" /> : <Translate value="media.pin" /> }
               </Button>
 
               {

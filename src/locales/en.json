@@ -39,6 +39,8 @@
     "search": "Type some artist, song or album..."
   },
   "notifications": {
+    "songPinned": "Song pinned",
+    "songUnpinned": "Song unpinned",
     "search": {
       "finished": "Search finished!"
     },

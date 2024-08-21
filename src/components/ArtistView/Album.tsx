@@ -83,6 +83,19 @@ const Album = (props: AlbumProps) => {
             />
             <Translate value='buttons.addToQueue' />
           </Button>
+
+          <Button
+            transparent
+            onClick={() => {
+              props.dispatch({ type: types.PIN_ALBUM, albumId })
+            }}
+          >
+            <Icon
+              icon='faFolderPlus'
+              className='mx-2'
+            />
+            <Translate value='buttons.pinAlbum' />
+          </Button>
         </div>
       </div>
       <div className='w-full m-2'>

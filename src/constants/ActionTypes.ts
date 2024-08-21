@@ -139,6 +139,9 @@ export const NO_ARTIST_NAME = 'NO_ARTIST_NAME'
 
 // Store songs in the browser
 export const PIN_SONG = 'PIN_SONG'
+export const UNPIN_SONG = 'UNPIN_SONG'
+export const PIN_ALBUM = 'PIN_ALBUM'
+export const UNPIN_ALBUM = 'UNPIN_ALBUM'
 
 // Sync
 export const SETUP_DATABASE_SYNC_FINISHED = 'SETUP_DATABASE_SYNC_FINISHED'
