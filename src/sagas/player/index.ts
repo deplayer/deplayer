@@ -7,10 +7,10 @@ import {
   getPlayer,
   getQueue,
   getSettings,
-  getSongBg
+  getSongBg,
+  getState
 } from '../selectors'
 import { getStreamUri } from '../../services/Song/StreamUriService'
-import history from '../../store/configureHistory'
 import * as routes from '../../routes'
 import * as types from '../../constants/ActionTypes'
 
@@ -89,7 +89,8 @@ export function* handlePlayPrev(): any {
 }
 export function* goToViewPage(): any {
   const queue = yield select(getQueue)
-  if (history.location.pathname.match(/^\/song.*?$/)) {
+  const state = yield select(getState)
+  if (state.router.location.pathname.match(/^\/song.*?$/)) {
     yield put(push(routes.songView(queue.currentPlaying)))
   }
 }

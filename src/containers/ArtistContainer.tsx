@@ -1,6 +1,7 @@
 import { connect } from 'react-redux'
 import { useParams, Params } from 'react-router-dom'
 import { State as CollectionState } from '../reducers/collection'
+import { State } from '../reducers'
 
 import ArtistView from '../components/ArtistView'
 
@@ -37,13 +38,18 @@ const ArtistsContainer = (props: any) => {
   const songs = getSongsByArtist(params, props.collection)
   const albumsByArtist = getAlbumsByArtist(params, props.collection)
 
+  if (!artist) {
+    // FIXME: Set loading if application is loadin
+    return null
+  }
+
   return (
     <ArtistView {...props} artist={artist} songs={songs} albumsByArtist={albumsByArtist} />
   )
 }
 
 export default connect(
-  (state: any) => {
+  (state: State) => {
     return {
       artistMetadata: state.artist.artistMetadata,
       songsByAlbum: state.collection.songsByAlbum,

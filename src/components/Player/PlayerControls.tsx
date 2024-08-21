@@ -1,5 +1,5 @@
 import { Dispatch } from 'redux'
-import { Link } from 'react-router-dom'
+import { Link, Location } from 'react-router-dom'
 import React from 'react'
 import ReactPlayer from 'react-player'
 import classNames from 'classnames'
@@ -8,6 +8,9 @@ import { InPortal, OutPortal } from 'react-reverse-portal'
 
 import { State as PlayerState } from '../../reducers/player'
 import { State as SettingsState } from '../../reducers/settings'
+import { State as CollectionState } from '../../reducers/collection'
+import { State as QueueState } from '../../reducers/queue'
+import { State as AppState } from '../../reducers/app'
 import Controls from './Controls'
 import Cover from './Cover'
 import ProgressBar from './ProgressBar'
@@ -18,14 +21,14 @@ import * as types from '../../constants/ActionTypes'
 ReactPlayer.addCustomPlayer((WebtorrentPlayer as any))
 
 type Props = {
-  app: any,
-  queue: any,
-  location: any,
+  app: AppState,
+  queue: QueueState,
+  location: Location,
   slim: boolean,
   player: PlayerState,
   settings: SettingsState,
   itemCount: number,
-  collection: any,
+  collection: CollectionState,
   dispatch: Dispatch,
   playerPortal: any,
   match: any
@@ -94,7 +97,7 @@ class PlayerControls extends React.Component<Props> {
   }
 
   onError = (e: Error) => {
-    console.error(e.message)
+    console.error(e)
     this.props.dispatch({ type: types.PLAY_ERROR, error: e.message })
   }
 
@@ -114,6 +117,10 @@ class PlayerControls extends React.Component<Props> {
     } = this.props.player
 
     const currentPlayingId = this.props.queue.currentPlaying
+    if (!currentPlayingId) {
+      return null
+    }
+
     const currentPlaying = this.props.collection.rows[currentPlayingId]
 
     const { streamUri } = this.props.player
@@ -158,7 +165,6 @@ class PlayerControls extends React.Component<Props> {
             <ReactPlayer
               pip
               fullscreen={this.props.player.fullscreen.toString()}
-              controls={songFinder && currentPlaying.media_type === 'video'}
               className={playerClassnames}
               ref={this.playerRef}
               url={streamUri}

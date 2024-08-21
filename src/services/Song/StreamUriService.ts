@@ -1,14 +1,67 @@
 import Media from '../../entities/Media'
 import { get } from 'idb-keyval'
+import { readFile } from '@happy-js/happy-opfs'
+
+async function handleOpfs(streamUri: string | null) {
+  if (!streamUri) {
+    return ''
+  }
+
+  console.log('Starting OPFS reading')
+
+  const fixedStreamUri = streamUri?.replace('opfs://', '/')
+
+  const file = await readFile(fixedStreamUri)
+  const fileArrayBuffer = file.unwrap()
+
+  const blob = new Blob([fileArrayBuffer], { type: "audio/mpeg" })
+
+  return URL.createObjectURL(blob)
+}
+
+async function handleFilesystem(streamUri: string | null) {
+  console.log('Processing filesystem streamUri')
+  const directoryHandler = await get('directoryHandler')
+  await verifyPermission(directoryHandler)
+
+  console.log('directoryHandler', directoryHandler)
+
+  if (!streamUri) {
+    return ''
+  }
+
+  const handler = await get(streamUri)
+
+  if (handler instanceof File) {
+    console.log('handler is a File', handler)
+
+    return URL.createObjectURL(handler)
+  }
+
+  if (!handler.getFile) {
+    return streamUri
+  }
+
+  console.log('Verifying file permission')
+  await verifyPermission(handler)
+
+  console.log('Getting file from handler', handler)
+  const file = await handler.getFile()
+
+  console.log('file', file)
+  if (!file) {
+    return streamUri
+  }
+
+  return URL.createObjectURL(file)
+}
+
 
 export const getStreamUri = async (
   song: Media,
   settings: any,
   providerNum: number
 ): Promise<string | Blob> => {
-  console.log('providerNum', providerNum)
-  console.log('song', song)
-
   const service = song.stream && song.stream[providerNum] && song.stream[providerNum].service
 
   if (!service) {
@@ -24,40 +77,11 @@ export const getStreamUri = async (
     song.stream[providerNum].uris[0].uri : null
 
   if (service === 'filesystem') {
-    console.log('Processing filesystem streamUri')
-    const directoryHandler = await get('directoryHandler')
-    await verifyPermission(directoryHandler)
+    return await handleFilesystem(streamUri)
+  }
 
-    console.log('directoryHandler', directoryHandler)
-
-    if (!streamUri) {
-      return ''
-    }
-
-    const handler = await get(streamUri)
-
-    if (handler instanceof File) {
-      console.log('handler is a File', handler)
-
-      return URL.createObjectURL(handler)
-    }
-
-    if (!handler.getFile) {
-      return streamUri
-    }
-
-    console.log('Verifying file permission')
-    await verifyPermission(handler)
-
-    console.log('Getting file from handler', handler)
-    const file = await handler.getFile()
-
-    console.log('file', file)
-    if (!file) {
-      return streamUri
-    }
-
-    return URL.createObjectURL(file)
+  if (service === 'opfs') {
+    return await handleOpfs(streamUri)
   }
 
   return prepend + streamUri

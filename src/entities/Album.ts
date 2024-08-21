@@ -6,6 +6,7 @@ interface AlbumParams {
   artist: Artist
   albumId?: string
   thumbnailUrl?: string
+  year?: number
 }
 
 export default class Album {
@@ -13,12 +14,14 @@ export default class Album {
   name: string
   artist: Artist
   thumbnailUrl: string
+  year?: number
 
   constructor(albumParams: AlbumParams) {
-    const { name, artist, albumId, thumbnailUrl } = albumParams
+    const { name, artist, albumId, thumbnailUrl, year } = albumParams
     this.name = name
     this.artist = artist
     this.thumbnailUrl = thumbnailUrl || ''
+    this.year = year
 
     const compAlbumId = albumId ? albumId : new AlbumId({
       albumName: name,
@@ -33,7 +36,8 @@ export default class Album {
       id: '' + this.id,
       name: this.name,
       artist: this.artist.toDocument(),
-      thumbnailUrl: this.thumbnailUrl
+      thumbnailUrl: this.thumbnailUrl,
+      year: this.year
     }
   }
 }

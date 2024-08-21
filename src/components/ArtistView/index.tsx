@@ -6,12 +6,11 @@ import Album from './Album'
 import Artist from '../../entities/Artist'
 import * as types from '../../constants/ActionTypes'
 import { State as CollectionState } from '../../reducers/collection'
-import Media from '../../entities/Media'
 
 type Props = {
   queue: any,
   albums: any,
-  albumsByArtist: any,
+  albumsByArtist: any[],
   artist: Artist,
   artistMetadata: any,
   className: string | null,
@@ -21,7 +20,11 @@ type Props = {
   songsByAlbum: any
 }
 
-const extractBackground = (collection: CollectionState, songsByAlbum: { string: Media }, albumsByArtist = []): string => {
+function extractBackground(
+  collection: CollectionState,
+  songsByAlbum: any[],
+  albumsByArtist: any[]
+): string {
   const albumId = albumsByArtist && albumsByArtist.length && albumsByArtist[0]
   if (albumId && songsByAlbum[albumId]) {
     return collection.rows[songsByAlbum[albumId][0]]?.cover?.fullUrl
@@ -62,7 +65,7 @@ export default function ArtistView(props: Props) {
     return ''
   }
 
-  const albumRows = albumsByArtist.map((albumId: string) => {
+  const albumRows = albumsByArtist?.map((albumId: string) => {
     return (
       <Album
         queue={props.queue}

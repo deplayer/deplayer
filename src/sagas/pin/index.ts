@@ -4,26 +4,59 @@ import {
   select,
   put
 } from 'redux-saga/effects'
-import { readTextFile, writeFile } from '@happy-js/happy-opfs'
+import { writeFile } from '@happy-js/happy-opfs'
+import axios from 'axios'
 
+import { getCollection } from '../selectors'
 import * as types from '../../constants/ActionTypes'
+import Media from '../../entities/Media'
+
+import { getAdapter } from '../../services/database'
+import CollectionService from '../../services/CollectionService'
 
 type PinAction = {
   type: string,
   songId: string,
 }
 
-async function storeSongData(song: any) {
+async function storeSongData(song: Media) {
   const songFsUri = `/${song.id}`
-  await writeFile(songFsUri, song)
-  const fileContents = await readTextFile(songFsUri)
-  console.log(fileContents.unwrap())
+  console.log('Storing song data', songFsUri, song)
+  const streamUrl = song.stream[0].uris[0].uri
+
+  if (!streamUrl) {
+    console.error('No stream url found for song', song)
+    return
+  }
+
+  const streamData = await axios.get(streamUrl)
+  await writeFile(songFsUri, streamData.data)
+  // const fileContents = await readTextFile(songFsUri)
 }
 
 function* pinSong(action: PinAction): any {
-  const song = select(getState => getState().songs[action.songId])
-  yield put({ type: types.SEND_NOTIFICATION, notification: 'notifications.pining_song' })
+  const adapter = getAdapter()
+  const collectionService = new CollectionService(new adapter())
+
+  const collection = yield select(getCollection)
+  const song = collection.rows[action.songId]
   yield call(storeSongData, song)
+  // FIXME: Review duplicated streams
+  const modifiedSong = {
+    ...song,
+    stream: [
+      ...song.stream,
+      { 
+        service: 'opfs', 
+        uris: [
+          {uri: `opfs:///${song.id}`}
+        ] 
+      }
+    ]
+  }
+  yield call(collectionService.save, modifiedSong.id, modifiedSong)
+  yield put({ type: types.ADD_TO_COLLECTION, data: [modifiedSong] })
+  yield put({ type: types.SEND_NOTIFICATION, notification: 'notifications.songPinned' })
 }
 
 // Binding actions to sagas

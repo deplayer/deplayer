@@ -30,7 +30,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
     this.coverBase = `${settings.baseUrl}/rest/getCoverArt.view?u=${settings.user}&p=${settings.password}&c=${appName}&v=1.11.0&f=json`
   }
 
-  mapSongs = (songs: Array<any>): Array<any> => {
+  mapSongs = (songs: any[], albums: any[]): Array<any> => {
     // Protect against empty responses
     if (!songs) {
       return []
@@ -38,9 +38,12 @@ export default class SubsonicApiProvider implements IMusicProvider {
 
     const secureSongs = songs instanceof Array ? songs : [songs]
     return secureSongs.map((song: any) => {
+      const album = albums.find((album) => album.id === song.albumId)
+
       return new Media({
         title: song.title ? song.title : song.path,
         artistName: song.artist,
+        year: album?.year,
         albumName: song.album,
         cover: {
           thumbnailUrl: this.coverBase + '&id=' + song.coverArt,
@@ -56,7 +59,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
             service: this.providerKey,
             uris: [{uri: this.streamBase + '&id=' + song.id}]
           }
-        ]
+        ],
       })
     })
   }
@@ -65,9 +68,10 @@ export default class SubsonicApiProvider implements IMusicProvider {
     return new Promise((resolve, reject) => {
       axios.get(`${this.searchUrl}&query=${searchTerm}`)
         .then((result) => {
-          const response = result.data['subsonic-response'].searchResult3 ? result.data['subsonic-response'].searchResult3.song : []
+          const songs = result.data['subsonic-response'].searchResult3 ? result.data['subsonic-response'].searchResult3.song : []
+          const albums = result.data['subsonic-response'].searchResult3 ? result.data['subsonic-response'].searchResult3.album : []
           resolve(
-            this.mapSongs(response)
+            this.mapSongs(songs, albums)
           )
         })
         .catch((err) => {

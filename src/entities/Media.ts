@@ -6,7 +6,7 @@ type streamUri = {
   uri: string
 }
 
-type stream = {
+export type Stream = {
   service: string,
   uris: Array<streamUri>
 }
@@ -27,19 +27,19 @@ interface MediaParams {
   duration?: number
   genre?: string
   cover?: Cover
-  stream: Array<stream>
+  stream: Array<Stream>
   playCount?: number
   shareUrl?: string
   filePath?: string
   forcedId?: string | null
   type?: string
   track?: number
+  year?: number
 }
 
 export default class Media {
   id: string
   title: string
-  author: any
   cover?: Cover
   artist: Artist
   album: Album
@@ -47,7 +47,7 @@ export default class Media {
   type?: string
   duration: number
   externalId: string
-  stream: Array<stream>
+  stream: Array<Stream>
   playCount: number
   genre?: string
   shareUrl?: string
@@ -74,7 +74,8 @@ export default class Media {
       albumId: songParams.albumId,
       name: songParams.albumName || '',
       artist: artist,
-      thumbnailUrl: songParams.cover?.thumbnailUrl
+      thumbnailUrl: songParams.cover?.thumbnailUrl,
+      year: songParams.year
     })
 
     this.stream = songParams.stream || []

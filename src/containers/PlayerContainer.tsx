@@ -1,12 +1,13 @@
 import { connect } from 'react-redux'
 import PlayerControls from '../components/Player/PlayerControls'
 import { useLocation } from 'react-router'
+import { State } from '../reducers'
 
 const ConnectedPlayer = connect(
-  (state: any) => ({
+  (state: State) => ({
     app: state.app,
     settings: state.settings,
-    slim: state.app.slimPlayer,
+    slim: false,
     player: state.player,
     queue: state.queue,
     collection: state.collection,

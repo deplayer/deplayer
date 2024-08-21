@@ -20,6 +20,7 @@ import Lyrics from './Lyrics'
 import { getStreamUri } from '../../services/Song/StreamUriService'
 import Album from '../../entities/Album'
 import ServiceIcon from '../ServiceIcon'
+import { Stream } from '../../entities/Media'
 
 type Props = {
   playerPortal: any,
@@ -108,6 +109,11 @@ const SongView = (props: Props) => {
   }) || []
 
   const songFinder = song.id === currentPlaying
+
+  async function changeCurrentPlaying(song: any, index: number) {
+    const streamUri = await getStreamUri(song, props.settings.settings, index)
+    props.dispatch({ type: types.SET_CURRENT_PLAYING_URL, url: streamUri })
+  }
 
   return (
     <div data-testid="song-view" className={`song-view ${props.className} w-full overflow-y-auto z-10 flex flex-col`}>
@@ -248,7 +254,7 @@ const SongView = (props: Props) => {
                   className='mr-1 w-8'
                   icon='faCompactDisc'
                 />
-                {song.albumName || 'N/A'}
+                {song.albumName || 'N/A'} {song.album.year && `(${song.album.year})`}
               </Link>
             </div>
             <div className='mt-4'>
@@ -268,8 +274,17 @@ const SongView = (props: Props) => {
             <div className='mt-2 flex items-center'>
               <Translate className='mr-2' value='labels.providers' />
               {
-                song.stream.map((provider: any) => {
-                  return <Tag transparent key={provider.service}><ServiceIcon service={provider.service} /><p className='capitalize'>{provider.service}</p></Tag>
+                song.stream.map((provider: Stream, index: number) => {
+                  return (
+                    <Button 
+                      onClick={() => changeCurrentPlaying(song, index)} 
+                      key={`${provider.service}_${index}`} 
+                      inverted
+                    >
+                      <ServiceIcon service={provider.service} />
+                      <p className='capitalize'>{provider.service}</p>
+                    </Button>
+                  )
                 })
               }
             </div>
