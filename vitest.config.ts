@@ -8,6 +8,11 @@ export default defineConfig({
       provider: 'v8'
     },
     setupFiles: ['vitest-setup.ts'],
-    environment: 'happy-dom'
+    environment: 'happy-dom',
+    deps: {
+      inline: [
+        '@happy-js/happy-opfs'
+      ]
+    }
   },
 });

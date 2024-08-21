@@ -72,6 +72,16 @@ const SongView = ({
     songsByGenre
   }
 }: Props) => {
+  if (loading) {
+    return (
+      <div className={`collection`}>
+        <blockquote className='blockquote'>
+          <Spinner />
+        </blockquote>
+      </div>
+    )
+  }
+
   const song = rows[songId]
 
   if (!song) {
@@ -104,16 +114,6 @@ const SongView = ({
 
     retrieveUrls()
   }, [song, settings])
-
-  if (loading) {
-    return (
-      <div className={`collection`}>
-        <blockquote className='blockquote'>
-          <Spinner />
-        </blockquote>
-      </div>
-    )
-  }
 
   if (!song || !song.id) {
     return <NotFound>The requested song can not be found</NotFound>

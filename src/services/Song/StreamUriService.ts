@@ -62,7 +62,7 @@ export const getStreamUri = async (
   settings: any,
   providerNum: number
 ): Promise<string | Blob> => {
-  const service = song.stream && song.stream[providerNum] && song.stream[providerNum].service
+  const service = song.stream && Object.values(song.stream)[providerNum] && Object.values(song.stream)[providerNum].service
 
   if (!service) {
     return ''
@@ -72,9 +72,9 @@ export const getStreamUri = async (
   const prepend = service === 'ipfs' ? `${proto}://${host}:${port}/ipfs/` : ''
 
   const streamUri = song &&
-    song.stream.length ?
-    song.stream[providerNum] &&
-    song.stream[providerNum].uris[0].uri : null
+    Object.values(song.stream).length ?
+    Object.values(song.stream)[providerNum] &&
+    Object.values(song.stream)[providerNum].uris[0].uri : null
 
   if (service === 'filesystem') {
     return await handleFilesystem(streamUri)
