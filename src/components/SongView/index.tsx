@@ -20,8 +20,10 @@ import Lyrics from './Lyrics'
 import { getStreamUri } from '../../services/Song/StreamUriService'
 import Album from '../../entities/Album'
 import ServiceIcon from '../ServiceIcon'
-import { Stream } from '../../entities/Media'
 import Media from '../../entities/Media'
+import { State as SettingsState } from '../../reducers/settings'
+
+const MAX_LIST_ITEMS = 25
 
 type Props = {
   playerPortal: any,
@@ -44,8 +46,33 @@ type Props = {
   className?: string | null
 }
 
-const SongView = (props: Props) => {
-  const song = props.collection.rows[props.songId]
+async function changeCurrentPlaying(song: any, index: number, dispatch: Dispatch, settings: SettingsState) {
+  const streamUri = await getStreamUri(song, settings.settings, index)
+  dispatch({ type: types.SET_CURRENT_PLAYING_URL, url: streamUri })
+}
+
+
+const SongView = ({
+  songId,
+  loading,
+  className = '',
+  dispatch,
+  playerPortal,
+  player,
+  lyrics,
+  queue: {
+    trackIds,
+    currentPlaying
+  },
+  settings,
+  collection: {
+    rows,
+    albums,
+    albumsByArtist,
+    songsByGenre
+  }
+}: Props) => {
+  const song = rows[songId]
 
   if (!song) {
     return <NotFound>The requested song can not be found</NotFound>
@@ -57,18 +84,6 @@ const SongView = (props: Props) => {
   const [pinned, setPinnedSong] = React.useState(isSongPinned)
   const [downloadUrls, setDownloadUrls] = React.useState([])
   const [showLyrics, setShowLyrics] = React.useState(false)
-  const MAX_LIST_ITEMS = 25
-  const {
-    queue: {
-      trackIds,
-      currentPlaying
-    },
-    collection: {
-      rows,
-      albums,
-      albumsByArtist
-    }
-  } = props
 
   React.useMemo(() => {
     const retrieveUrls = async () => {
@@ -78,9 +93,9 @@ const SongView = (props: Props) => {
         return
       }
 
-      for (let i = 0; i < song.stream.length; i++) {
+      for (let i = 0; i < Object.values(song.stream).length; i++) {
         urls.push(
-          await getStreamUri(song, props.settings.settings, i)
+          await getStreamUri(song, settings.settings, i)
         )
       }
 
@@ -88,9 +103,9 @@ const SongView = (props: Props) => {
     }
 
     retrieveUrls()
-  }, [song, props.settings])
+  }, [song, settings])
 
-  if (props.loading) {
+  if (loading) {
     return (
       <div className={`collection`}>
         <blockquote className='blockquote'>
@@ -104,9 +119,8 @@ const SongView = (props: Props) => {
     return <NotFound>The requested song can not be found</NotFound>
   }
 
-  const sameGenreSongs = song.genres && song.genres.length && props.collection.songsByGenre[song.genres[0]]
-    ? props.collection
-      .songsByGenre[song.genres[0]]
+  const sameGenreSongs = song.genres && song.genres.length && songsByGenre[song.genres[0]]
+    ? songsByGenre[song.genres[0]]
       .sort((songId1: string, songId2: string) => sortByPlayCount(songId1, songId2, rows))
       .slice(0, MAX_LIST_ITEMS)
       .map((songId: string) => rows[songId])
@@ -118,20 +132,15 @@ const SongView = (props: Props) => {
 
   const songFinder = song.id === currentPlaying
 
-  async function changeCurrentPlaying(song: any, index: number) {
-    const streamUri = await getStreamUri(song, props.settings.settings, index)
-    props.dispatch({ type: types.SET_CURRENT_PLAYING_URL, url: streamUri })
-  }
-
   return (
-    <div data-testid="song-view" className={`song-view ${props.className} w-full overflow-y-auto z-10 flex flex-col`}>
+    <div data-testid="song-view" className={`song-view ${className} w-full overflow-y-auto z-10 flex flex-col`}>
       <div className="song sm:flex">
         <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className="w-full md:m-6 md:rounded-b-lg image lg:max-w-md xl:max-w-xl">
           <div className='flex flex-col w-full md:sticky md:top-0'>
             {songFinder && song.media_type === 'video' && (
               <OutPortal
                 className={`flex w-full`}
-                node={props.playerPortal}
+                node={playerPortal}
               />
             )}
             {(song.media_type !== 'video' || !songFinder) &&
@@ -144,11 +153,11 @@ const SongView = (props: Props) => {
             }
 
             <div className='btn-group md:mx-0 flex items-center flex-wrap p-4'>
-              {(!songFinder || !props.player.playing) &&
+              {(!songFinder || !player.playing) &&
                 <Button
                   large
                   onClick={() => {
-                    props.dispatch({ type: types.SET_CURRENT_PLAYING, songId: song.id })
+                    dispatch({ type: types.SET_CURRENT_PLAYING, songId: song.id })
                   }}
                 >
                   <Icon
@@ -164,7 +173,7 @@ const SongView = (props: Props) => {
                   transparent
                   alignLeft
                   onClick={() => {
-                    props.dispatch({ type: types.ADD_TO_QUEUE, songs: [song] })
+                    dispatch({ type: types.ADD_TO_QUEUE, songs: [song] })
                   }}
                 >
                   <Icon
@@ -180,7 +189,7 @@ const SongView = (props: Props) => {
                   transparent
                   alignLeft
                   onClick={() => {
-                    props.dispatch({ type: types.REMOVE_FROM_QUEUE, song })
+                    dispatch({ type: types.REMOVE_FROM_QUEUE, song })
                   }}
                 >
                   <Icon
@@ -210,19 +219,19 @@ const SongView = (props: Props) => {
                 transparent
                 onClick={() => {
                   if (!pinned) {
-                    props.dispatch({ type: types.PIN_SONG, songId: song.id })
+                    dispatch({ type: types.PIN_SONG, songId: song.id })
                     setPinnedSong(true)
                   } else {
-                    props.dispatch({ type: types.UNPIN_SONG, songId: song.id })
+                    dispatch({ type: types.UNPIN_SONG, songId: song.id })
                     setPinnedSong(false)
                   }
                 }}
               >
                 <Icon
-                  icon={ pinned ? 'faMinusCircle' : 'faPlusCircle' }
+                  icon={pinned ? 'faMinusCircle' : 'faPlusCircle'}
                   className='mr-2'
                 />
-                { pinned ? <Translate value="media.unpin" /> : <Translate value="media.pin" /> }
+                {pinned ? <Translate value="media.unpin" /> : <Translate value="media.pin" />}
               </Button>
 
               {
@@ -287,15 +296,15 @@ const SongView = (props: Props) => {
             <div className='mt-2 flex items-center'>
               <Translate className='mr-2' value='labels.providers' />
               {
-                song.stream.map((provider: Stream, index: number) => {
+                Object.values(song.stream).map((value: any, index: number) => {
                   return (
-                    <Button 
-                      onClick={() => changeCurrentPlaying(song, index)} 
-                      key={`${provider.service}_${index}`} 
+                    <Button
+                      onClick={() => changeCurrentPlaying(song, index, dispatch, settings)}
+                      key={`${value.service}_${index}`}
                       inverted
                     >
-                      <ServiceIcon service={provider.service} />
-                      <p className='capitalize'>{provider.service}</p>
+                      <ServiceIcon service={value.service} />
+                      <p className='capitalize'>{value.service}</p>
                     </Button>
                   )
                 })
@@ -305,9 +314,9 @@ const SongView = (props: Props) => {
           {
             showLyrics && (
               <Lyrics
-                dispatch={props.dispatch}
+                dispatch={dispatch}
                 songId={song.id}
-                lyrics={props.lyrics.lyrics}
+                lyrics={lyrics.lyrics}
                 onClose={() => setShowLyrics(false)}
               />
             )

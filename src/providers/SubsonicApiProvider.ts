@@ -30,7 +30,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
     this.coverBase = `${settings.baseUrl}/rest/getCoverArt.view?u=${settings.user}&p=${settings.password}&c=${appName}&v=1.11.0&f=json`
   }
 
-  mapSongs = (songs: any[], albums: any[]): Array<any> => {
+  mapSongs = (songs: Media[], albums: any[]): Array<any> => {
     // Protect against empty responses
     if (!songs) {
       return []
@@ -57,14 +57,14 @@ export default class SubsonicApiProvider implements IMusicProvider {
         stream: {
           subsonic: {
             service: this.providerKey,
-            uris: [{uri: this.streamBase + '&id=' + song.id}]
+            uris: [{ uri: this.streamBase + '&id=' + song.id }]
           }
         },
       })
     })
   }
 
-  search(searchTerm: string): Promise<Array<any>> {
+  search(searchTerm: string): Promise<Array<Media>> {
     return new Promise((resolve, reject) => {
       axios.get(`${this.searchUrl}&query=${searchTerm}`)
         .then((result) => {

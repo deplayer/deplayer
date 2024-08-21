@@ -37,7 +37,27 @@ interface MediaParams {
   year?: number
 }
 
-export default class Media {
+export interface IMedia {
+  id: string
+  title: string
+  cover?: Cover
+  artist: Artist
+  album: Album
+  artistName: string
+  type?: string
+  duration: number
+  externalId: string
+  stream: { [key: string]: Stream }
+  playCount: number
+  genre?: string
+  shareUrl?: string
+  albumName: string
+  filePath?: string
+  forcedId?: string | null
+  track?: number
+}
+
+export default class Media implements IMedia {
   id: string
   title: string
   cover?: Cover
@@ -78,7 +98,7 @@ export default class Media {
       year: songParams.year
     })
 
-    this.stream = songParams.stream || []
+    this.stream = songParams.stream || {}
 
     if (songParams.cover) {
       this.cover = {

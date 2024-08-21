@@ -21,7 +21,6 @@ export const mediaParams = {
   forcedId: null
 }
 
-
 describe('entities/Media', () => {
   it('should have id property', () => {
     const song = new Media(mediaParams)
@@ -29,9 +28,9 @@ describe('entities/Media', () => {
   })
 
   it('should create a Media with stream information', () => {
-    const song = new Media({ ...mediaParams, stream: { itunes: { uris: [{ uri: 'http://some-songs-api/song.mp4' }], service: 'itunes' }} })
-    expect(song.stream[0].service).toEqual('itunes')
-    expect(song.stream[0].uris[0].uri).toEqual('http://some-songs-api/song.mp4')
+    const song = new Media({ ...mediaParams, stream: { itunes: { uris: [{ uri: 'http://some-songs-api/song.mp4' }], service: 'itunes' } } })
+    expect(song.stream.itunes.service).toEqual('itunes')
+    expect(song.stream.itunes.uris[0].uri).toEqual('http://some-songs-api/song.mp4')
   })
 
   it('should create s Media with thumbnail and full size covers', () => {
@@ -50,7 +49,7 @@ describe('entities/Media', () => {
   it('should answer hasAnyProviderOf', () => {
     const song = new Media({
       ...mediaParams,
-      stream: { itunes: { uris: [{ uri: 'http://some-songs-api/song.mp4' }], service: 'itunes' }}
+      stream: { itunes: { uris: [{ uri: 'http://some-songs-api/song.mp4' }], service: 'itunes' } }
     })
 
     expect(song.hasAnyProviderOf(['itunes'])).toEqual(true)

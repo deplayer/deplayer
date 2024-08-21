@@ -13,7 +13,8 @@ const mock = new MockAdapter(axios)
 mock.onGet(/rest\/search/).reply(200, {
   'subsonic-response': {
     searchResult3: {
-      song: exampleSongs
+      song: exampleSongs,
+      album: []
     }
   }
 }
@@ -22,7 +23,7 @@ mock.onGet(/rest\/search/).reply(200, {
 describe('SubsonicApiProvider', () => {
   const mstreamRepo = new SubsonicApiProvider({ baseUrl: '' }, 'subsonic')
 
-  it('should handle song search', () => {
+  it('should handle song search', async () => {
     expect.assertions(3)
 
     expect(mstreamRepo.search('Bad brains')).toBeInstanceOf(Promise)

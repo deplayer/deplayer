@@ -2,6 +2,7 @@ import merge from 'deepmerge'
 
 import Media from '../entities/Media'
 
+// TODO: Review the need of this util
 export default class MediaMergerService {
   mediaA: Media
   mediaB: Media
@@ -13,8 +14,8 @@ export default class MediaMergerService {
 
   getMerged(): Media {
     const mergeStream = (streamA: any, streamB: any) => {
-      const concatStreams = [...streamA, ...streamB]
-      return concatStreams.filter((elem, index) => {
+      const concatStreams = { ...streamA, ...streamB }
+      return Object.values(concatStreams).filter((elem: any, index: number) => {
         const prev = concatStreams[index - 1]
 
         if (!prev) {

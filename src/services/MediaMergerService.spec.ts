@@ -7,11 +7,11 @@ describe('MediaMergerService', () => {
   it('should merge two media objects with its streams', () => {
     const song1 = new Media({
       ...mediaParams,
-      stream: {itunes: { service: 'itunes', uris: [] }}
+      stream: { itunes: { service: 'itunes', uris: [] } }
     })
     const song2 = new Media({
       ...mediaParams,
-      stream: {itunes: { service: 'itunes', uris: [] }}
+      stream: { itunes: { service: 'itunes', uris: [] } }
     })
     const mediaMergerService = new MediaMergerService(song1, song2)
     const merged = mediaMergerService.getMerged()
@@ -23,7 +23,7 @@ describe('MediaMergerService', () => {
   it('should combine two different streams', () => {
     const song1 = new Media({
       ...mediaParams,
-      stream: {itunes: { service: 'itunes', uris: [] }}
+      stream: { itunes: { service: 'itunes', uris: [] } }
     })
     const song2 = new Media({
       ...mediaParams,
