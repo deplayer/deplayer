@@ -20,6 +20,11 @@ type PinAction = {
 }
 
 async function storeSongData(song: Media) {
+  const songMedia = new Media(song)
+  if (songMedia.hasAnyProviderOf(['opfs'])) {
+    return
+  }
+
   const songFsUri = `/${song.id}`
   console.log('Storing song data', songFsUri, song)
   const streamUrl = song.stream[0].uris[0].uri
@@ -29,7 +34,7 @@ async function storeSongData(song: Media) {
     return
   }
 
-  const streamData = await axios.get(streamUrl)
+  const streamData = await axios.get(streamUrl, { responseType: 'blob' })
   await writeFile(songFsUri, streamData.data)
   // const fileContents = await readTextFile(songFsUri)
 }
