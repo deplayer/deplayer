@@ -6,14 +6,14 @@ type streamUri = {
   uri: string
 }
 
-export type Stream = {
+export interface Stream {
   service: string,
   uris: Array<streamUri>
 }
 
 type MediaType = 'video' | 'audio'
 
-export type Cover = {
+export interface Cover {
   thumbnailUrl: string,
   fullUrl: string
 }

@@ -38,7 +38,7 @@ async function storeSongData(song: Media) {
 
   const songFsUri = `/${song.id}`
   console.log('Storing song data', songFsUri, song)
-  const streamUrl = song.stream[0].uris[0].uri
+  const streamUrl = Object.values(song.stream)[0].uris[0].uri
 
   if (!streamUrl) {
     console.error('No stream url found for song', song)
@@ -76,15 +76,15 @@ function* pinSong(action: PinAction): any {
   // FIXME: Review duplicated streams
   const modifiedSong = {
     ...song,
-    stream: [
+    stream: {
       ...song.stream,
-      { 
-        service: 'opfs', 
+      opfs: {
+        service: 'opfs',
         uris: [
-          {uri: `opfs:///${song.id}`}
-        ] 
+          { uri: `opfs:///${song.id}` }
+        ]
       }
-    ]
+    }
   }
   yield call(collectionService.save, modifiedSong.id, modifiedSong)
   yield put({ type: types.ADD_TO_COLLECTION, data: [modifiedSong] })
@@ -99,7 +99,7 @@ function* unpinSong(action: PinAction): any {
   const collection = yield select(getCollection)
   const song = collection.rows[action.songId]
   yield call(removeSongData, song)
-  const streams = song.stream.filter((s: any) => s.service !== 'opfs')
+  const streams = delete song.stream
   // FIXME: Review duplicated streams
   const modifiedSong = {
     ...song,

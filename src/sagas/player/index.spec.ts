@@ -15,7 +15,7 @@ const IdbKevalMock = vi.fn(() => ({
 vi.stubGlobal('idb-keyval', IdbKevalMock)
 
 
-describe('setCurrentPlaying', () => {
+describe('setCurrentPlaying', async () => {
   it('works', () => {
     const streamUrl = 'https://foo.bar'
     const streams = {
