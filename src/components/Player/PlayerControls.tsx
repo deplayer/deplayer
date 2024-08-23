@@ -207,7 +207,7 @@ class PlayerControls extends React.Component<Props> {
               enter={true}
               exit={true}
             >
-              <div key='player-controls' className='flex justify-between items-center flex-col'>
+              <div key='player-controls' className='flex justify-between items-center flex-col  bg-gray-100/70 dark:bg-black/90'>
                 <div className='absolute w-full md:top-0'>
                   <ProgressBar
                     dispatch={this.props.dispatch}
@@ -222,13 +222,13 @@ class PlayerControls extends React.Component<Props> {
                   <Cover song={currentPlaying} />
                   <div className='flex justify-between items-center w-full'>
                     <div className='mx-2 pr-2 md:text-center w-full truncate overflow-hidden'>
-                      <Link to={`/song/${currentPlaying.id}`} className='text-lg md:text-xl text-blue-200 block' style={{ textShadow: '#000000 0px 0px 4px' }}>
+                      <Link to={`/song/${currentPlaying.id}`} className='text-lg md:text-xl text-sky-900 dark:text-sky-200 block'>
                         <h5 className='truncate'>
                           {currentPlaying.title}
                         </h5>
                       </Link>
                       {currentPlaying.artist &&
-                        <Link to={`/artist/${currentPlaying.artist.id}`} className='block' style={{ textShadow: '#000000 0px 0px 4px' }}>
+                        <Link to={`/artist/${currentPlaying.artist.id}`} className='block'>
                           <h6 className='truncate text-blue-400'>
                             {currentPlaying.artist.name}
                           </h6>
