@@ -45,12 +45,12 @@ const Modal = (props: Props) => {
     <ReactModal
       shouldCloseOnOverlayClick
       isOpen={modalIsOpen}
-      className='absolute overflow-auto bg-gray-900 p-4 rounded-sm max-w-md mx-auto'
+      className='absolute bg-gray-200 dark:bg-gray-900 rounded-sm max-w-md mx-auto flex flex-col'
       overlayClassName='fixed'
       onRequestClose={() => close()}
       style={customStyles}
     >
-      <div className='w-full flex justify-between'>
+      <div className='w-full flex justify-between p-4'>
         {props.title && <h2 className='py-4 text-2xl'>{props.title}</h2>}
         <Button
           transparent
@@ -59,7 +59,9 @@ const Modal = (props: Props) => {
           <Icon icon='faTimes' />
         </Button>
       </div>
-      {props.children}
+      <div className='overflow-auto h-full p-4'>
+        {props.children}
+      </div>
     </ReactModal>
   )
 }

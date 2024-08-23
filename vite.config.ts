@@ -4,10 +4,11 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import fixReactVirtualized from 'esbuild-plugin-react-virtualized'
 import { fileURLToPath } from 'url'
 import { VitePWA } from 'vite-plugin-pwa'
+import svgr from 'vite-plugin-svgr'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), nodePolyfills(), VitePWA({
+  plugins: [react(), svgr(), nodePolyfills(), VitePWA({
     strategies: 'injectManifest',
     registerType: 'autoUpdate',
     injectRegister: 'auto',

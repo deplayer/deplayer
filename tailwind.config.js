@@ -7,6 +7,9 @@ export default {
       colors: {
         'deplayer-dark': '#101b26',
       },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+      }
     },
   },
   plugins: [],

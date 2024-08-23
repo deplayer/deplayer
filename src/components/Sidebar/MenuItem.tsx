@@ -18,6 +18,7 @@ type Props = {
 const MenuItem = (props: Props) => {
   const classNames = classnames({
     button: true,
+    'select-none': true,
     'bg-gray-200': props.current,
     'dark:bg-gray-900': props.current,
     'font-semibold': props.current,

@@ -52,10 +52,11 @@ const Playlist = (props: Props) => {
     return song.album.thumbnailUrl && song.album.thumbnailUrl !== '/disc.svg'
   })
   const randomSongCovers = songsWithCovers.slice(0, 3)
-  const covers = randomSongCovers.map((song: any) => {
+  const covers = randomSongCovers.map((song: any, index: number) => {
     const rotation = Math.random()
+    const zIndex = 20 - index
     return (
-      <div key={song.id} className='w-32 h-32' style={{ marginRight: '-50px', transform: `rotate(${rotation})deg` }}>
+      <div key={song.id} className={`w-32 h-32`} style={{ marginRight: '-50px', transform: `rotate(${rotation})deg`, zIndex }}>
         <CoverImage
           cover={song.cover}
           size='thumbnail'
@@ -107,6 +108,7 @@ const Playlist = (props: Props) => {
 
       {
         showSongs && <Modal
+          title={playlist._id}
           onClose={() => {
             setShowSongs(false)
           }}

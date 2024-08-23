@@ -1,5 +1,5 @@
 import { Translate } from 'react-redux-i18n'
-import React from 'react'
+import { FunctionComponent, SVGProps } from 'react'
 import { Link } from 'react-router-dom'
 
 import MediaSlider from '../MediaSlider'
@@ -7,21 +7,28 @@ import RelatedAlbums from '../RelatedAlbums'
 import { State as CollectionState } from '../../reducers/collection'
 import * as types from '../../constants/ActionTypes'
 
+import RecordPlayerSvg from './record-player.svg?react'
+import CasseteSvg from './cassete.svg?react'
+import WalkmanSvg from './walkman.svg?react'
+import DiscmanSvg from './discman.svg?react'
+import HeadsetSvg from './headset.svg?react'
+import PhonophoneSvg from './phonophone.svg?react'
+
 type Props = {
   collection: CollectionState
   dispatch: Function
 }
 
-const IMAGES = [
-  'record-player.svg',
-  'cassete.svg',
-  'walkman.svg',
-  'discman.svg',
-  'headset.svg',
-  'phonophone.svg',
+const IMAGE_COMPONENTS: FunctionComponent<SVGProps<SVGSVGElement>>[] = [
+  RecordPlayerSvg,
+  CasseteSvg,
+  WalkmanSvg,
+  DiscmanSvg,
+  HeadsetSvg,
+  PhonophoneSvg
 ]
 
-const pickImage = () => IMAGES[Math.floor(Math.random() * IMAGES.length)]
+const pickImage = () => IMAGE_COMPONENTS[Math.floor(Math.random() * IMAGE_COMPONENTS.length)]
 
 function DeplayerTitle(): JSX.Element {
   return (
@@ -32,25 +39,26 @@ function DeplayerTitle(): JSX.Element {
   )
 }
 
-const WelcomeMessage = ({ dispatch }: { dispatch: Function }) => {
-  const [image, setImage] = React.useState(pickImage())
+const Image = () => {
+  const ImageComponent = pickImage()
 
   return (
-    <div className='flex flex-col md:flex-row w-full content-start items-center'>
+    <ImageComponent
+      className='w-60 cursor-pointer fill-sky-700 dark:fill-sky-500 h-auto'
+    />
+  )
+}
 
-      <h4 className="text-xl text-center py-4 text-blue-300">
-        Hi audiophile! Welcome to <DeplayerTitle />
+const WelcomeMessage = ({ dispatch }: { dispatch: Function }) => {
+  return (
+    <div className='flex flex-col lg:flex-row w-full content-start items-center'>
+      <h4 className="text-xl text-center py-4 text-sky-900 dark:text-sky-300 p-4">
+        Hi <i>audiophile</i>! Welcome to <DeplayerTitle />
       </h4>
-      <img
-        onClick={() => setImage(pickImage())}
-        className='w-60 cursor-pointer'
-        src={image}
-        alt={'Listen you good old music collection with deplayer'}
-
-      />
+      <Image />
       <div className='px-6 py-8'>
         <p className='py-4'>
-          Access to you good old music library and enjoy it whenever you need it. <br />
+          Access to you good ol' music library and enjoy it whenever you need it. <br />
           To start playing some content follow one of the steps below:
         </p>
         <ul>

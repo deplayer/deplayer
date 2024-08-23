@@ -61,9 +61,6 @@ class DragDealer {
   };
 }
 
-const bodyBg = 'rgba(16, 27, 38, 0)'
-const bodyBgAfter = 'rgba(16, 27, 38, 0.8)'
-
 const ArrowLeft = () => {
   const visibility = React.useContext<publicApiType>(VisibilityContext);
   const isFirstItemVisible = visibility.useIsVisible('first', true);
@@ -74,11 +71,10 @@ const ArrowLeft = () => {
 
   return (
     <div
-      className='text-4xl z-10 absolute inset-y-0 flex left-0'
-      style={{ backgroundImage: `linear-gradient(to left, ${bodyBg}, ${bodyBgAfter})` }}
+      className='text-4xl z-10 absolute inset-y-0 flex left-0 bg-gradient-to-l from-transparent to-gray-800/20 dark:to-gray-400/20'
     >
       <Button onClick={() => visibility.scrollPrev()} transparent>
-        <Icon icon='faArrowCircleLeft' className='arrow-prev text-blue-200 hover:text-blue-800' />
+        <Icon icon='faArrowCircleLeft' className='arrow-prev text-sky-500 dark:text-sky-200 hover:text-blue-800' />
       </Button>
     </div>
   )
@@ -94,11 +90,10 @@ const ArrowRight = () => {
 
   return (
     <div
-      className='text-4xl z-10 absolute inset-y-0 flex right-0'
-      style={{ backgroundImage: `linear-gradient(to right, ${bodyBg}, ${bodyBgAfter})` }}
+      className='text-4xl z-10 absolute inset-y-0 flex right-0 bg-gradient-to-r from-transparent to-gray-800/20 dark:to-gray-400/20'
     >
       <Button onClick={() => visibility.scrollNext()} transparent>
-        <Icon icon='faArrowCircleRight' className='arrow-prev text-blue-200 hover:text-blue-800' />
+        <Icon icon='faArrowCircleRight' className='arrow-prev text-sky-500 dark:text-sky-200 hover:text-blue-800' />
       </Button>
     </div>
   )

@@ -7,7 +7,7 @@ type Props = {
   loading: boolean,
   searchToggled: boolean,
   setSearchOff: () => void,
-  onSearchChange: (event:  React.FormEvent<HTMLInputElement>) => void,
+  onSearchChange: (event: React.FormEvent<HTMLInputElement>) => void,
   onFocus?: () => void,
   onBlur: () => void,
   value: string,
@@ -22,7 +22,8 @@ const SearchInput = (props: Props) => {
     'w-full': true,
     'p-3': true,
     'bg-transparent': true,
-    'text-blue-100': true,
+    'dark:text-sky-100': true,
+    'text-sky-900': true,
     'text-xl': true,
     'font-sans': true,
     'focus:outline-none': true,
@@ -40,13 +41,13 @@ const SearchInput = (props: Props) => {
         onChange={props.onSearchChange}
         onFocus={props.onFocus}
         onBlur={props.onBlur}
-        onKeyUp={(e) => e.key === 'Escape' && props.setSearchOff() }
+        onKeyUp={(e) => e.key === 'Escape' && props.setSearchOff()}
         value={props.value}
-        placeholder={ I18n.t('placeholder.search') }
+        placeholder={I18n.t('placeholder.search')}
         type='text'
       />
       <div className='p-2'>
-        { props.loading ? <Icon icon='faSpinner' className='fa-pulse' /> : <Icon icon='faSearch' /> }
+        {props.loading ? <Icon icon='faSpinner' className='fa-pulse' /> : <Icon icon='faSearch' />}
       </div>
     </div>
   )
