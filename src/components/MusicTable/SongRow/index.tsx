@@ -58,19 +58,19 @@ const SongRow = (props: Props) => {
     >
       {disableCovers || cover}
       <div className='media-info truncate w-full whitespace-no-wrap'>
-        <h4 className='text-blue-400 text-lg -mt-1'>
+        <h4 className='text-sky-900 dark:text-sky-400 text-lg -mt-1'>
           <Link to={`/song/${song.id}`}>
             {song.title}
           </Link>
         </h4>
-        <h5 className='text-yellow-600 text-sm'>
+        <h5 className='text-yellow-900 dark:text-yellow-600 text-sm'>
           {song.album ? song.album.name : nonAvailable}
         </h5>
-        <h6 className='text-yellow-600 text-sm'>
+        <h6 className='text-yellow-900 dark:text-yellow-600 text-sm'>
           <Link to={`/artist/${song.artist.id}`}>{song.artist ? song.artist.name : nonAvailable}</Link>
         </h6>
         {props.slim || (
-          <div className='inline-block text-yellow-400 text-sm'>{getDurationStr(song.duration)}</div>
+          <div className='inline-block text-yellow-900 dark:text-yellow-400 text-sm'>{getDurationStr(song.duration)}</div>
         )}
       </div>
       <div className='flex' tabIndex={0}>

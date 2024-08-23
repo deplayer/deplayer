@@ -92,7 +92,7 @@ class Topbar extends React.Component<Props, State> {
     )
 
     return (
-      <div className='topbar flex justify-between overflow-hidden z-10 items-center px-2' style={{ gridArea: 'topbar' }}>
+      <div className='topbar bg-gray-200/70 dark:bg-black/70 flex justify-between overflow-hidden z-10 items-center px-2' style={{ gridArea: 'topbar' }}>
         <SidebarButton />
         <SearchInput
           setSearchOff={this.setSearchOff}

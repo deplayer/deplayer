@@ -39,9 +39,9 @@ const SwitchThemeButton = () => {
     }
 
   if (theme === 'light') {
-    return <Icon onClick={toggleTheme} icon='faSun' className='text-center text-sky-900 hover:text-sky-600 text-xl absolute right-4 top-6' />
+    return <Icon onClick={toggleTheme} icon='faMoon' className='cursor-pointer text-center text-sky-900 hover:text-sky-600 text-xl absolute right-4 top-5' />
   } else {
-    return <Icon onClick={toggleTheme} icon='faMoon' className='text-center text-sky-900 hover:text-sky-600 text-xl absolute right-4 top-6' />
+    return <Icon onClick={toggleTheme} icon='faSun' className='cursor-pointer text-center text-sky-900 hover:text-sky-600 text-xl absolute right-4 top-5' />
   }
 }
 
