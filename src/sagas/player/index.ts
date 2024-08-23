@@ -14,7 +14,7 @@ import { getStreamUri } from '../../services/Song/StreamUriService'
 import * as routes from '../../routes'
 import * as types from '../../constants/ActionTypes'
 
-export function* setCurrentPlayingStream(songId: string, providerNum: number): any {
+function* setCurrentPlayingStream(songId: string, providerNum: number): any {
   const settings = yield select(getSettings)
   const collection = yield select(getCollection)
   const fullUrl = yield select(getSongBg)
@@ -87,7 +87,7 @@ export function* handlePlayPrev(): any {
     yield put({ type: types.SET_CURRENT_PLAYING, songId })
   }
 }
-export function* goToViewPage(): any {
+function* goToViewPage(): any {
   const queue = yield select(getQueue)
   const state = yield select(getState)
   if (state.router.location.pathname.match(/^\/song.*?$/)) {

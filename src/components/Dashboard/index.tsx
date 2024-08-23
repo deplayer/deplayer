@@ -23,29 +23,40 @@ const IMAGES = [
 
 const pickImage = () => IMAGES[Math.floor(Math.random() * IMAGES.length)]
 
+function DeplayerTitle(): JSX.Element {
+  return (
+    <>
+      <span className='text-blue-200'>d</span>
+      <span className='text-blue-500 '>eplayer</span>
+    </>
+  )
+}
+
 const WelcomeMessage = ({ dispatch }: { dispatch: Function }) => {
   const [image, setImage] = React.useState(pickImage())
 
   return (
-    <div className='flex flex-col md:flex-row w-full content-start items-center md:items-start'>
+    <div className='flex flex-col md:flex-row w-full content-start items-center'>
+
+      <h4 className="text-xl text-center py-4 text-blue-300">
+        Hi audiophile! Welcome to <DeplayerTitle />
+      </h4>
       <img
         onClick={() => setImage(pickImage())}
-        className='w-60'
+        className='w-60 cursor-pointer'
         src={image}
         alt={'Listen you good old music collection with deplayer'}
 
       />
       <div className='px-6 py-8'>
-        <h2 className='text-4xl'>Hi Stranger! Welcome to deplayer</h2>
         <p className='py-4'>
           Access to you good old music library and enjoy it whenever you need it. <br />
-          To start using deplayer add some music to your collection, either by
-          adding a provider (Subsonic the most tested one)
+          To start playing some content follow one of the steps below:
         </p>
         <ul>
-          <li><Link to='/providers' className='text-blue-500'>Setup your media providers</Link></li>
+          <li><Link to='/providers' className='text-blue-500'>Setup your media providers</Link>, (Subsonic API, mstream or ITunes)</li>
           <li>
-            <a onClick={() => dispatch({ type: types.SHOW_ADD_MEDIA_MODAL })} className='text-blue-500 cursor-pointer'>Add new media to your collection</a>
+            <a onClick={() => dispatch({ type: types.SHOW_ADD_MEDIA_MODAL })} className='text-blue-500 cursor-pointer'>Add new media to your collection</a> Webtorrent, Filesystem, IPFS or youtube-dl-server
           </li>
           <li><Link to='/collection' className='text-blue-500'>Or go to your collection</Link></li>
         </ul>

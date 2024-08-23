@@ -13,8 +13,8 @@ const Tag = (props: Props) => {
     'p-1': true,
     'px-2': true,
     rounded: true,
-    'text-white': !props.transparent,
-    'bg-blue-800': !props.transparent,
+    'text-sky-300': !props.transparent,
+    'bg-sky-950': !props.transparent,
     'border-none': !props.transparent,
     border: props.transparent,
     'text-blue-300': props.transparent,
@@ -22,7 +22,8 @@ const Tag = (props: Props) => {
     'text-sm': true,
     'pw-2': true,
     'flex': true,
-    'items-center': true
+    'items-center': true,
+    'opacity-90': true
   })
 
   return (

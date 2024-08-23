@@ -1,4 +1,5 @@
 import { Dispatch } from 'redux'
+import React from 'react'
 
 import CollectionMenuItem from './CollectionMenuItem'
 import SettingsMenuItem from './SettingsMenuItem'
@@ -24,12 +25,33 @@ type ContentProps = {
   onSetSidebarOpen: Function
 }
 
+const SwitchThemeButton = () => {
+  const [theme, setTheme] = React.useState('light')
+
+  const toggleTheme = () => {
+  if (theme === 'light') {
+    setTheme('dark')
+    document.documentElement.classList.add('dark')
+  } else {
+    setTheme('light')
+    document.documentElement.classList.remove('dark')
+  }
+    }
+
+  if (theme === 'light') {
+    return <Icon onClick={toggleTheme} icon='faSun' className='text-center text-sky-900 hover:text-sky-600 text-xl absolute right-4 top-6' />
+  } else {
+    return <Icon onClick={toggleTheme} icon='faMoon' className='text-center text-sky-900 hover:text-sky-600 text-xl absolute right-4 top-6' />
+  }
+}
+
 const SidebarContents = (props: ContentProps) => {
   const location = useLocation()
   const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
 
   return (
     <div className='flex flex-col' onClick={() => props.onSetSidebarOpen()}>
+      <SwitchThemeButton />
       <h4 className="text-xl text-center py-4 bg-gray-900 text-blue-500 tracking-wider">
         <span className='text-blue-200'>d</span>eplayer
       </h4>

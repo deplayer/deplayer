@@ -43,24 +43,30 @@ const Queue = (props: Props) => {
     )
   }
 
-  if (!trackIds.length) {
-    return (
-      <div className={`queue z-10 no-results ${props.className || ''}`}>
-        <BodyMessage message={'Add songs from the collection or search for new ones'} />
+    if (!trackIds.length) {
+      const message = (
+      <div className='flex flex-col'>
+        Add songs from the collection or search for new ones
 
         <Link
           to="/collection"
           title="collection"
         >
-          <Translate value="application.title" />
+          Jump to collection <br/>
           <i className='icon database outline'></i>
         </Link>
+      </div>
+    )
+
+    return (
+      <div className={`queue z-10 no-results ${props.className || ''}`}>
+        <BodyMessage message={message} />
       </div>
     )
   }
 
   return (
-    <div className={`queue z-10 ${props.className || ''}`}>
+    <div className={`queue z-10 resize-x ${props.className || ''}`}>
       <MusicTable
         tableIds={trackIds}
         disableCovers={props.slim}

@@ -8,6 +8,7 @@ import {
   faStepForward,
   faStepBackward,
   faMusic,
+  faMoon,
   faSpinner,
   faCaretRight,
   faCogs,
@@ -17,6 +18,7 @@ import {
   faFileAudio,
   faHardDrive,
   faBookmark,
+  faSun,
   faDatabase,
   faFilm,
   faScroll,
@@ -55,6 +57,7 @@ const icons = {
   faPauseCircle,
   faStepBackward,
   faStepForward,
+  faMoon,
   faSpinner,
   faCaretRight,
   faGlobe,
@@ -67,6 +70,7 @@ const icons = {
   faHardDrive,
   faDatabase,
   faBookmark,
+  faSun,
   faFilm,
   faEllipsisV,
   faChevronDown,
@@ -100,11 +104,13 @@ type Props = {
   icon: keyof typeof icons,
   className?: string,
   fixedWidth?: boolean
+  onClick?: () => void
 }
 
 const Icon = (props: Props) => {
   return (
     <FontAwesomeIcon
+      onClick={props.onClick}
       className={props.className || ''}
       icon={icons[props.icon]}
       fixedWidth={props.fixedWidth}

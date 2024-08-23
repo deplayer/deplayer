@@ -34,9 +34,11 @@ const Providers = (props: Props) => {
     <MainContainer centerContents>
       <div className='md:px-20'>
         <div className='my-3 flex flex-col'>
-          <h2 className='py-4'><Translate value="labels.lazyProviders" /></h2>
+          <h2 className='py-4 text-xl'><Translate value="labels.lazyProviders" /></h2>
 
-          <div className='flex'>
+          Select one of the providers below to configure it.
+
+          <div className='flex pt-2'>
             <ProviderButton providerKey='subsonic' />
             <ProviderButton providerKey='mstream' />
             <ProviderButton providerKey='itunes' />
@@ -59,7 +61,7 @@ const Providers = (props: Props) => {
               {providers}
             </div>
 
-            <div>
+            <div className='right-0 pb-20 pr-10 flex justify-end'>
               {!!providers.length && (
                 <Button long uppercase disabled={isSubmitting} type='submit' size='2xl' >
                   <Translate value="buttons.save" />
