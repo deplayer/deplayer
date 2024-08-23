@@ -1,6 +1,5 @@
 import { Dispatch } from 'redux'
 
-import { Translate } from 'react-redux-i18n'
 import { Link } from 'react-router-dom'
 import { State as CollectionState } from '../reducers/collection'
 import BodyMessage from './BodyMessage'
@@ -43,8 +42,8 @@ const Queue = (props: Props) => {
     )
   }
 
-    if (!trackIds.length) {
-      const message = (
+  if (!trackIds.length) {
+    const message = (
       <div className='flex flex-col'>
         Add songs from the collection or search for new ones
 
@@ -52,7 +51,7 @@ const Queue = (props: Props) => {
           to="/collection"
           title="collection"
         >
-          Jump to collection <br/>
+          Jump to collection <br />
           <i className='icon database outline'></i>
         </Link>
       </div>
