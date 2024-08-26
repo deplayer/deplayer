@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import React from 'react'
-import parseTorrent from 'parse-torrent'
+import { toMagnetURI, remote } from 'parse-torrent'
 
 import Button from '../common/Button'
 import Input from '../common/Input'
@@ -57,14 +57,21 @@ const AddMediaModal = (props: Props) => {
                 props.dispatch({ type: types.ADD_WEBTORRENT_MEDIA, magnet: magnetLink })
               }
               if (torrent) {
-                console.log('torrent: ', torrent)
-                // console.log('parsed torrent: ', parseTorrent.remote(torrent))
-                parseTorrent.remote(torrent, (err, parsedTorrent) => {
-                  if (err) throw err
-                  if (!parsedTorrent) return
+                remote(torrent, (err, parsedTorrent: any) => {
 
-                  const magnet = parseTorrent.toMagnetURI(parsedTorrent)
+                  if (err) {
+                    props.dispatch({
+                      type: types.SEND_NOTIFICATION,
+                      notification: 'Error parsing torrent file',
+                      level: 'error'
+                    })
+                    return
+                  }
+
+                  console.log('parsedTorrent', parsedTorrent)
+                  const magnet = toMagnetURI(parsedTorrent)
                   props.dispatch({ type: types.ADD_WEBTORRENT_MEDIA, magnet: magnet })
+
                 })
               }
               props.dispatch({ type: types.HIDE_ADD_MEDIA_MODAL })
