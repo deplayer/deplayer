@@ -5,10 +5,11 @@ import fixReactVirtualized from 'esbuild-plugin-react-virtualized'
 import { fileURLToPath } from 'url'
 import { VitePWA } from 'vite-plugin-pwa'
 import svgr from 'vite-plugin-svgr'
+import WALC from "@lo-fi/webauthn-local-client/bundlers/vite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), svgr(), nodePolyfills(), VitePWA({
+  plugins: [WALC(), svgr(), react(), nodePolyfills(), VitePWA({
     strategies: 'injectManifest',
     registerType: 'autoUpdate',
     injectRegister: 'auto',
@@ -53,9 +54,16 @@ export default defineConfig({
     }
   })],
   optimizeDeps: {
+    exclude: [ "@lo-fi/webauthn-local-client" ],
     esbuildOptions: {
-      plugins: [fixReactVirtualized]
+      plugins: [fixReactVirtualized],
+      // WALC uses "top-level await", which is ES2022+
+      target: "es2022"
     },
+  },
+  build: {
+    // WALC uses "top-level await", which is ES2022+
+    target: "es2022",
   },
   resolve: {
     alias: {

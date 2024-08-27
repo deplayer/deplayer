@@ -1388,6 +1388,16 @@
   resolved "https://npm.jsr.io/~/11/@jsr/std__path/1.0.2.tgz"
   integrity sha512-VadQVUlJZhIjRi8RcDQcNzqKcowfEdqntIXhphae0MeHaC1y60OiFealO25WTzBTHqBC58KFNlM7KWH+tepgOg==
 
+"@lo-fi/webauthn-local-client@^0.999.7":
+  version "0.999.7"
+  resolved "https://registry.npmjs.org/@lo-fi/webauthn-local-client/-/webauthn-local-client-0.999.7.tgz"
+  integrity sha512-aAGHdbYT3PuJnuHzKJwoNjWIf+h8GS8lTavMvTHlmQl6XNjXW51oxNsoJPcXxmbW5Mh8+RG5g0mgmoukRXQy+A==
+  dependencies:
+    "@yoursunny/asn1" "~0.0.20200718"
+    cbor-js "~0.1.0"
+    libsodium "~0.7.13"
+    libsodium-wrappers "~0.7.13"
+
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.npmjs.org/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz"
@@ -1545,6 +1555,11 @@
   version "4.17.2"
   resolved "https://registry.npmjs.org/@rollup/rollup-linux-x64-musl/-/rollup-linux-x64-musl-4.17.2.tgz"
   integrity sha512-h1+yTWeYbRdAyJ/jMiVw0l6fOOm/0D1vNLui9iPuqgRGnXA0u21gAqOyB5iHjlM9MMfNOm9RHCQ7zLIzT0x11Q==
+
+"@root/encoding@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.npmjs.org/@root/encoding/-/encoding-1.0.1.tgz"
+  integrity sha512-OaEub02ufoU038gy6bsNHQOjIn8nUjGiLcaRmJ40IUykneJkIW5fxDqKxQx48cszuNflYldsJLPPXCrGfHs8yQ==
 
 "@sec-ant/readable-stream@^0.4.1":
   version "0.4.1"
@@ -2442,6 +2457,11 @@
   resolved "https://registry.npmjs.org/@types/resolve/-/resolve-1.20.2.tgz"
   integrity sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==
 
+"@types/root__asn1@^1.0.0":
+  version "1.0.5"
+  resolved "https://registry.npmjs.org/@types/root__asn1/-/root__asn1-1.0.5.tgz"
+  integrity sha512-halz3HrALf1N4pUJrtQrH6mdWPczXwshoWjuxmx49riKMJv2MZGKXnauk0RjlnRzM0rlwiAJRlMT9FtSjnF2kw==
+
 "@types/send@*":
   version "0.17.4"
   resolved "https://registry.npmjs.org/@types/send/-/send-0.17.4.tgz"
@@ -2704,6 +2724,14 @@
   dependencies:
     "@types/emscripten" "^1.39.6"
     tslib "^1.13.0"
+
+"@yoursunny/asn1@~0.0.20200718":
+  version "0.0.20200718"
+  resolved "https://registry.npmjs.org/@yoursunny/asn1/-/asn1-0.0.20200718.tgz"
+  integrity sha512-PFM+/rP/GHm1i37NlbZp8+piK2WVzEbq8rai71dlNN+njF3gaUVKDPgmTRIs18j99XeM/n71NFiaGr4QPbHF3g==
+  dependencies:
+    "@root/encoding" "^1.0.1"
+    "@types/root__asn1" "^1.0.0"
 
 abort-controller@^3.0.0, abort-controller@3.0.0:
   version "3.0.0"
@@ -3553,6 +3581,11 @@ caseless@^0.12.0, caseless@~0.12.0:
   version "0.12.0"
   resolved "https://registry.npmjs.org/caseless/-/caseless-0.12.0.tgz"
   integrity sha512-4tYFyifaFfGacoiObjJegolkwSU4xQNGbVgUiNYVUxbQ2x2lUsFvY4hVgVzGiIe6WLOPqycWXA40l+PWsxthUw==
+
+cbor-js@~0.1.0:
+  version "0.1.0"
+  resolved "https://registry.npmjs.org/cbor-js/-/cbor-js-0.1.0.tgz"
+  integrity sha512-7sQ/TvDZPl7csT1Sif9G0+MA0I0JOVah8+wWlJVQdVEgIbCzlN/ab3x+uvMNsc34TUvO6osQTAmB2ls80JX6tw==
 
 chai@^4.3.10:
   version "4.4.1"
@@ -6690,6 +6723,18 @@ levn@^0.4.1:
   dependencies:
     prelude-ls "^1.2.1"
     type-check "~0.4.0"
+
+libsodium-wrappers@~0.7.13:
+  version "0.7.15"
+  resolved "https://registry.npmjs.org/libsodium-wrappers/-/libsodium-wrappers-0.7.15.tgz"
+  integrity sha512-E4anqJQwcfiC6+Yrl01C1m8p99wEhLmJSs0VQqST66SbQXXBoaJY0pF4BNjRYa/sOQAxx6lXAaAFIlx+15tXJQ==
+  dependencies:
+    libsodium "^0.7.15"
+
+libsodium@^0.7.15, libsodium@~0.7.13:
+  version "0.7.15"
+  resolved "https://registry.npmjs.org/libsodium/-/libsodium-0.7.15.tgz"
+  integrity sha512-sZwRknt/tUpE2AwzHq3jEyUU5uvIZHtSssktXq7owd++3CSgn8RGrv6UZJJBpP7+iBghBqe7Z06/2M31rI2NKw==
 
 lilconfig@^2.1.0:
   version "2.1.0"

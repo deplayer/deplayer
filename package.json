@@ -15,6 +15,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@happy-js/happy-opfs": "npm:@jsr/happy-js__happy-opfs@^1.8.4",
+    "@lo-fi/webauthn-local-client": "^0.999.7",
     "@types/lunr": "^2.3.7",
     "@types/pouchdb": "^6.4.2",
     "@types/react-redux-i18n": "^0.0.16",

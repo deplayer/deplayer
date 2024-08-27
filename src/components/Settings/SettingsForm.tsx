@@ -16,7 +16,8 @@ type Props = {
 
 export const settingsCard = classNames({
   'relative': true,
-  'bg-gray-900': true,
+  'dark:bg-gray-900': true,
+  'bg-gray-200': true,
   'p-10': true,
   'mb-4': true,
   'rounded-lg': true

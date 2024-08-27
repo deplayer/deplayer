@@ -33,8 +33,8 @@ const pickImage = () => IMAGE_COMPONENTS[Math.floor(Math.random() * IMAGE_COMPON
 function DeplayerTitle(): JSX.Element {
   return (
     <>
-      <span className='text-blue-200'>d</span>
-      <span className='text-blue-500 '>eplayer</span>
+      <span className='text-blue-500'>d</span>
+      <span className='text-blue-900 '>eplayer</span>
     </>
   )
 }
@@ -51,7 +51,7 @@ const Image = () => {
 
 const WelcomeMessage = ({ dispatch }: { dispatch: Function }) => {
   return (
-    <div className='flex flex-col lg:flex-row w-full content-start items-center'>
+    <div className='flex flex-col md:flex-row w-full content-start items-center'>
       <h4 className="text-xl text-center py-4 text-sky-900 dark:text-sky-300 p-4">
         Hi <i>audiophile</i>! Welcome to <DeplayerTitle />
       </h4>
