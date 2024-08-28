@@ -9,20 +9,6 @@ import { Provider } from 'react-redux'
 import { Route, Routes } from 'react-router-dom'
 import { HistoryRouter as Router } from "redux-first-history/rr6";
 
-import { register, auth, supportsWebAuthn } from "@lo-fi/webauthn-local-client";
-
-function AuthProvider({ children }: { children: React.ReactNode }) {
-  console.log('supportsWebAuthn', supportsWebAuthn)
-  React.useEffect(() => {
-    var regResult = register({});
-
-    console.log('regResult', regResult)
-  }, []);
-
-
-  return (children)
-}
-
 import LayoutContainer from './containers/LayoutContainer'
 import AddMediaModal from './components/AddMediaModal'
 import AlbumContainer from './containers/AlbumContainer'
@@ -59,25 +45,23 @@ const App = () => {
   return (
     <Provider store={store}>
       <Router history={history}>
-        <AuthProvider>
-          <LayoutContainer>
-            <Routes>
-              <Route path="/" element={<DashboardContainer />} />
-              <Route path="/index.html" element={<DashboardContainer />} />
-              <Route path="/queue" element={<QueueContainer />} />
-              <Route path="/playlists" element={<PlaylistsContainer />} />
-              <Route path="/collection/*" element={<CollectionContainer />} />
-              <Route path="/search-results" element={<SearchResultsContainer />} />
-              <Route path="/song/:id" element={<Song />} />
-              <Route path="/album/:id" element={<AlbumContainer />} />
-              <Route path="/artist/:id" element={<ArtistContainer />} />
-              <Route path="/artists" element={<ArtistsContainer />} />
-              <Route path="/providers" element={<ProvidersContainer />} />
-              <Route path="/settings" element={<SettingsContainer />} />
-              <Route path="/wiki" element={<Wiki />} />
-            </Routes>
-          </LayoutContainer>
-        </AuthProvider>
+        <LayoutContainer>
+          <Routes>
+            <Route path="/" element={<DashboardContainer />} />
+            <Route path="/index.html" element={<DashboardContainer />} />
+            <Route path="/queue" element={<QueueContainer />} />
+            <Route path="/playlists" element={<PlaylistsContainer />} />
+            <Route path="/collection/*" element={<CollectionContainer />} />
+            <Route path="/search-results" element={<SearchResultsContainer />} />
+            <Route path="/song/:id" element={<Song />} />
+            <Route path="/album/:id" element={<AlbumContainer />} />
+            <Route path="/artist/:id" element={<ArtistContainer />} />
+            <Route path="/artists" element={<ArtistsContainer />} />
+            <Route path="/providers" element={<ProvidersContainer />} />
+            <Route path="/settings" element={<SettingsContainer />} />
+            <Route path="/wiki" element={<Wiki />} />
+          </Routes>
+        </LayoutContainer>
         <ContextMenuContainer />
         <PlayerContainer playerPortal={playerPortal} />
         <AddMediaModal />

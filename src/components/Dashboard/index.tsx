@@ -1,6 +1,7 @@
 import { Translate } from 'react-redux-i18n'
 import { FunctionComponent, SVGProps } from 'react'
 import { Link } from 'react-router-dom'
+import React from 'react'
 
 import MediaSlider from '../MediaSlider'
 import RelatedAlbums from '../RelatedAlbums'
@@ -13,6 +14,8 @@ import WalkmanSvg from './walkman.svg?react'
 import DiscmanSvg from './discman.svg?react'
 import HeadsetSvg from './headset.svg?react'
 import PhonophoneSvg from './phonophone.svg?react'
+import Auth from '../Auth'
+import Button from '../common/Button'
 
 type Props = {
   collection: CollectionState
@@ -50,8 +53,10 @@ const Image = () => {
 }
 
 const WelcomeMessage = ({ dispatch }: { dispatch: Function }) => {
+  const [showAuthModal, setShowAuthModal] = React.useState(false)
   return (
     <div className='flex flex-col md:flex-row w-full content-start items-center'>
+      { showAuthModal && <Auth onClose={() => setShowAuthModal(false)} /> }
       <h4 className="text-xl text-center py-4 text-sky-900 dark:text-sky-300 p-4">
         Hi <i>audiophile</i>! Welcome to <DeplayerTitle />
       </h4>
@@ -67,6 +72,7 @@ const WelcomeMessage = ({ dispatch }: { dispatch: Function }) => {
             <a onClick={() => dispatch({ type: types.SHOW_ADD_MEDIA_MODAL })} className='text-blue-500 cursor-pointer'>Add new media to your collection</a> Webtorrent, Filesystem, IPFS or youtube-dl-server
           </li>
           <li><Link to='/collection' className='text-blue-500'>Or go to your collection</Link></li>
+          <li><Button transparent inverse onClick={setShowAuthModal} className='text-blue-500'>Auth</Button></li>
         </ul>
       </div>
     </div>
