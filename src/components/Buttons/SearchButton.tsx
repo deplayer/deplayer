@@ -21,6 +21,7 @@ const SearchButton = ({ dispatch, searchToggled }: Props) => {
 
   return (
     <Button
+      inverted
       transparent
       onClick={toggleSearch}
     >

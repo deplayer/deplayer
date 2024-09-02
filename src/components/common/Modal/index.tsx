@@ -31,7 +31,9 @@ type Props = {
   onClose?: () => void
 }
 
-// ReactModal.setAppElement('#modal');
+if (process.env.NODE_ENV !== 'test') {
+  ReactModal.setAppElement('#modal')
+}
 
 const Modal = (props: Props) => {
   const [modalIsOpen, setIsOpen] = React.useState(true)

@@ -7,7 +7,7 @@ type Props = {
 const Input = (props: Props) => {
   return (
     <input
-      className='p-3 w-full bg-blue-900 text-blue-100 font-sans rounded'
+      className='p-3 w-full bg-sky-900 text-sky-100 font-sans rounded'
       type={props.type}
       value={props.value}
       onChange={props.onChange}
