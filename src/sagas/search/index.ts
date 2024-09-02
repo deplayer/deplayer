@@ -28,6 +28,8 @@ function* performSingleSearch(
     yield put({ type: types.RECREATE_INDEX })
     yield put({ type: types.ADD_TO_COLLECTION, data: serializedResults })
   } catch (e: any) {
+    console.log(e)
+
     yield put({ type: types.SEARCH_REJECTED, message: e.message })
     yield put({ type: types.SEND_NOTIFICATION, notification: 'notifications.search.failed' })
   }
