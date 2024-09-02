@@ -13,10 +13,11 @@ const PlayPauseButton = (props: Props) => {
     <React.Fragment>
       <Button
         transparent
+        inverted
         size='4xl'
         onClick={props.onClick}
       >
-        { props.playing ? <Icon icon='faPauseCircle' /> : <Icon icon='faPlayCircle' /> }
+        {props.playing ? <Icon icon='faPauseCircle' /> : <Icon icon='faPlayCircle' />}
       </Button>
     </React.Fragment>
   )

@@ -12,12 +12,13 @@ const SkipButton = (props: Props) => {
   return (
     <React.Fragment>
       <Button
+        inverted
         transparent
         size='2xl'
         onClick={props.onClick}
       >
 
-        { props.type === 'next' ? <Icon icon='faStepForward' /> : <Icon icon='faStepBackward' /> }
+        {props.type === 'next' ? <Icon icon='faStepForward' /> : <Icon icon='faStepBackward' />}
       </Button>
     </React.Fragment>
   )
