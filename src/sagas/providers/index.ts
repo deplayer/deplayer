@@ -48,27 +48,62 @@ export function* startProvidersScan(): any {
   }
 }
 
+function* getFilesRecursively(entry: any): Generator<any, void, any> {
+  if (entry.kind === "file") {
+    const file = yield call([entry, entry.getFile]);
+    if (file !== null) {
+      return yield file;
+    }
+  } else if (entry.kind === "directory") {
+    const asyncIterator = entry.values();
+
+    const results = [];
+    while (true) {
+      const fileResult = yield call([asyncIterator, asyncIterator.next]);
+      if (fileResult.done || !fileResult.value) {
+        break;
+      }
+
+      const handle = fileResult.value;
+      if (handle !== null) {
+        const result = yield* getFilesRecursively(handle);
+        results.push({ file: result, handler: handle });
+      }
+    }
+
+    return results
+  }
+}
+
 // Handle filesystem adding
 export function* startFilesystemProcess(action: any): any {
-  console.log('files: ', action.files)
+  console.log('processing filesystem files: ', action.files)
 
-  for (let i = 0; i < action.files.length; i++) {
-    const file = action.files[i]
+  for (const file of action.files) {
+    // Recursive call for directories
+    if (file.file.kind === 'directory') {
+      const files = yield* getFilesRecursively(file.file)
+
+      yield put({ type: types.START_FILESYSTEM_FILES_PROCESSING, files: files })
+
+      break
+    }
+  
     const metadata = yield call(readFileMetadata, file.file)
-
+  
     const song = yield call(metadataToSong, metadata, file.handler.name, 'filesystem')
-
+  
     console.log('saving song: ', song)
-
+  
     const adapter = getAdapter()
     const collectionService = new CollectionService(new adapter())
-
+  
     // Save song
     const songDocument = song.toDocument()
     yield call(collectionService.save, song.id, songDocument)
     yield put({ type: types.ADD_TO_COLLECTION, data: [songDocument] })
     yield put({ type: types.RECEIVE_COLLECTION, data: [songDocument] })
-
+  
     yield put({ type: types.FILESYSTEM_SONG_LOADED, songDocument })
     yield put({
       type: types.SEND_NOTIFICATION, notification: song.title + ' - ' + song.artistName + ' saved',
