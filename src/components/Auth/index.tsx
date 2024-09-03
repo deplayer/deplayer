@@ -36,6 +36,7 @@ async function startRegister(username: string, displayName: string, dispatch: Fu
   console.log('credential', credential)
 
   localStorage.setItem('credential', JSON.stringify(credential))
+  window['credential_id'] = credential.rawId;
 
   dispatch({ type: 'SET_CREDENTIAL', payload: credential })
 }
@@ -48,7 +49,8 @@ const toUTF8String = (buf: Uint8Array) => {
 
 const startAuth = async ({ transports, id }: { transports: TransportTypes[], id: string }) => {
   const publicKeyCredentialRequestOptions = {
-    challenge: Uint8Array.from(randomStringFromServer, c => c.charCodeAt(0))
+    challenge: Uint8Array.from(randomStringFromServer, c => c.charCodeAt(0)),
+    allowCredentials: [{type: 'public-key', id: window['credential_id']}],
   }
 
   const assertion = await navigator.credentials.get({
@@ -62,6 +64,8 @@ const startAuth = async ({ transports, id }: { transports: TransportTypes[], id:
 
   const authClientDataRaw = new Uint8Array(assertion.response.clientDataJSON);
   const authClientData = JSON.parse(toUTF8String(authClientDataRaw));
+
+  window['credential_id'] = assertion.rawId;
 
   console.log('authClientData', authClientData)
 }
@@ -86,7 +90,8 @@ export default function Auth({ onClose, dispatch }: Props) {
               <Form className='flex flex-col'>
                 <Field className='px-4 py-2 my-2' type='text' name='username' placeholder='Username' />
                 <Field className='px-4 py-2 my-2' type='text' name='displayName' placeholder='Display name' />
-                <button type='submit' disabled={isSubmitting}>Register with your passkey</button>
+                <Button type='submit' disabled={isSubmitting}>Register with your passkey</Button>
+                <p className='py-2 text-sm'>This passkey will be only stored in this device</p>
               </Form>
             )}
           </Formik>
