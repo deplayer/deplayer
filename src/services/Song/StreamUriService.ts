@@ -20,7 +20,7 @@ async function handleOpfs(streamUri: string | null) {
 }
 
 async function handleFilesystem(streamUri: string | null) {
-  console.log('Processing filesystem streamUri')
+  console.log('Processing filesystem streamUri', streamUri)
   const directoryHandler = await get('directoryHandler')
   await verifyPermission(directoryHandler)
 

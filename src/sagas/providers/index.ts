@@ -15,6 +15,7 @@ import { getSettings } from '../selectors'
 import CollectionService from '../../services/CollectionService'
 import YoutubeDlServerProvider from '../../providers/YoutubeDlServerProvider'
 import * as types from '../../constants/ActionTypes'
+import FileManager from '../../services/Filesystem/FileManager'
 
 // Watcher should enque tasks to avoid concurrency
 export function* startProvidersScan(): any {
@@ -48,13 +49,23 @@ export function* startProvidersScan(): any {
   }
 }
 
-function* getFilesRecursively(entry: any): Generator<any, void, any> {
-  if (entry.kind === "file") {
+function getRelativePath(entry: FileSystemHandle, parent: FileSystemDirectoryHandle): string {
+  let path = entry.name
+  path = parent.name + '/' + path
+  return path
+}
+
+function* getFilesRecursively(entry: FileSystemHandle): Generator<any, void, any> {
+  if (entry instanceof FileSystemFileHandle) {
     const file = yield call([entry, entry.getFile]);
     if (file !== null) {
+      file.relativePath = getRelativePath(file, entry);
+
+      yield call(FileManager.processSelectedFile, entry)
+
       return yield file;
     }
-  } else if (entry.kind === "directory") {
+  } else if (entry instanceof FileSystemDirectoryHandle) {
     const asyncIterator = entry.values();
 
     const results = [];
@@ -88,22 +99,21 @@ export function* startFilesystemProcess(action: any): any {
 
       break
     }
-  
+
     const metadata = yield call(readFileMetadata, file.file)
-  
     const song = yield call(metadataToSong, metadata, file.handler.name, 'filesystem')
-  
+
     console.log('saving song: ', song)
-  
+
     const adapter = getAdapter()
     const collectionService = new CollectionService(new adapter())
-  
+
     // Save song
     const songDocument = song.toDocument()
     yield call(collectionService.save, song.id, songDocument)
     yield put({ type: types.ADD_TO_COLLECTION, data: [songDocument] })
     yield put({ type: types.RECEIVE_COLLECTION, data: [songDocument] })
-  
+
     yield put({ type: types.FILESYSTEM_SONG_LOADED, songDocument })
     yield put({
       type: types.SEND_NOTIFICATION, notification: song.title + ' - ' + song.artistName + ' saved',

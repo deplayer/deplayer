@@ -5,7 +5,7 @@ import Media from '../../entities/Media'
 export const readFileMetadata = async (file: any) => {
   const normFile = file.contents ? file.contents : file
   const metadata = await musicMetadata.parseBlob(normFile)
-  console.log('metadata: ', metadata)
+  console.log('file metadata: ', metadata)
   return metadata
 }
 

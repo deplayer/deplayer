@@ -21,7 +21,7 @@ async function startRegister(username: string, displayName: string, dispatch: Fu
       name: username,
       displayName: displayName,
     },
-    pubKeyCredParams: [{alg: -7, type: "public-key"}],
+    pubKeyCredParams: [{ alg: -7, type: "public-key" }],
     authenticatorSelection: {
       authenticatorAttachment: "cross-platform", // Review this
     },
@@ -48,7 +48,7 @@ const toUTF8String = (buf: Uint8Array) => {
 
 const startAuth = async ({ transports, id }: { transports: TransportTypes[], id: string }) => {
   const publicKeyCredentialRequestOptions = {
-      challenge: Uint8Array.from(randomStringFromServer, c => c.charCodeAt(0))
+    challenge: Uint8Array.from(randomStringFromServer, c => c.charCodeAt(0))
   }
 
   const assertion = await navigator.credentials.get({
@@ -71,7 +71,7 @@ interface Props {
   dispatch: Function
 }
 
-export default function Auth ({ onClose, dispatch }: Props ) {
+export default function Auth({ onClose, dispatch }: Props) {
   return (
     <Modal title='Authentication' onClose={() => onClose()}>
       <div className='flex'>
@@ -92,7 +92,7 @@ export default function Auth ({ onClose, dispatch }: Props ) {
           </Formik>
         </div>
         <div className='p-4 flex flex-col items-center justify-center'>
-          <Button inverted onClick={() => startAuth({transports: ['usb', 'ble', 'nfc'], id: 'gtrias'})}>Authenticate!</Button>
+          <Button inverted onClick={() => startAuth({ transports: ['usb', 'ble', 'nfc'], id: 'gtrias' })}>Authenticate!</Button>
         </div>
       </div>
     </Modal>

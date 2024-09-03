@@ -25,7 +25,7 @@ const FileManager = () => {
     return files
   }
 
-  const processSelectedFile = async (entry: any): Promise<{
+  const processSelectedFile = async (entry: FileSystemHandle): Promise<{
     file: any,
     handler: any
   }> => {
@@ -48,7 +48,8 @@ const FileManager = () => {
   }
 
   return {
-    openDialog
+    openDialog,
+    processSelectedFile
   }
 }
 
