@@ -1,6 +1,8 @@
 import Media from './Media'
 import slugify from '@sindresorhus/slugify'
 
+const zeroPad = (num: number | undefined, places: number) => String(num).padStart(places, '0')
+
 export default class MediaId {
   id: string
 
@@ -8,7 +10,7 @@ export default class MediaId {
     if (media.forcedId) {
       this.id = media.forcedId
     } else {
-      this.id = media.artistName + '_' + media.albumName + '_' + media.title
+      this.id = media.artistName + '_' + media.albumName + '_' + zeroPad(media.track, 4) + '_' + media.title
     }
   }
 

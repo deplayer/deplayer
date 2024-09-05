@@ -15,10 +15,33 @@
 }
 
 .placeholder {
-  overflow: hidden;
   grid-area: placeholder;
   position: relative;
-  min-height: 70px;
+  min-height: 66px;
+
+  &.small {
+    min-height: 58px;
+
+    &:before {
+      bottom: 58px;
+    }
+  }
+
+  &:before {
+    filter: blur(8px);
+    content: "";
+    position: absolute;
+    height: 50px;
+    top: -50px;
+    left: 0;
+    right: 0;
+    bottom: 66px;
+    background-image: linear-gradient(to top, var(--tw-gradient-stops));
+    --tw-gradient-from: rgba(0, 0, 0, 0.2) var(--tw-gradient-from-position);
+    --tw-gradient-to: transparent var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+    z-index: 10;
+  }
 }
 
 .layout-contents {

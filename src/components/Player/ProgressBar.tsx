@@ -42,7 +42,7 @@ const ProgressBar = (props: Props) => {
         handleStyle={{ zIndex: 11 }}
         onAfterChange={props.onAfterChange}
       />
-      <span className='absolute bg-black px-2 right-0 mr-0 -mt-8 text-xs text-yellow-400'>
+      <span className='absolute bg-black px-2 right-0 mr-0 -mt-4 text-xs text-yellow-400'>
         {getDurationStr(props.current)} - {getDurationStr(props.total)}
       </span>
     </div>

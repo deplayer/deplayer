@@ -8,6 +8,8 @@ import SearchMenuItem from './SearchMenuItem'
 import QueueMenuItem from './QueueMenuItem'
 import ArtistsMenuItem from './ArtistsMenuItem'
 import MenuItem from './MenuItem'
+import ExploreMenuItem from './ExploreMenuItem'
+
 import { inSection } from '../../utils/router'
 import Icon from '../common/Icon'
 import { State as CollectionState } from '../../reducers/collection'
@@ -61,13 +63,7 @@ const SidebarContents = (props: ContentProps) => {
         <span className='text-blue-200'>d</span>eplayer
       </h4>
       <ul className='flex flex-col'>
-        <MenuItem
-          current={inSection(location, '$')}
-          url='/'
-          title='Explore'
-          label='Explore'
-          icon={<Icon icon='faGlobe' />}
-        />
+        <ExploreMenuItem current={inSection(location, '$')} />
         <QueueMenuItem
           current={inSection(location, 'queue')}
           totalItems={trackIds.length}
@@ -92,13 +88,6 @@ const SidebarContents = (props: ContentProps) => {
           title='Providers'
           label='Providers'
           icon={<Icon icon='faPlug' />}
-        />
-        <MenuItem
-          current={inSection(location, 'wiki')}
-          url='/wiki'
-          title='Help'
-          label='Help'
-          icon={<Icon icon='faLifeRing' />}
         />
         <SettingsMenuItem current={inSection(location, 'settings')} />
       </ul>

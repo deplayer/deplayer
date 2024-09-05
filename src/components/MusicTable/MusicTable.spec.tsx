@@ -6,7 +6,18 @@ import MusicTable, { Props } from './MusicTable'
 
 const setup = () => {
   const props: Props = {
-    app: {},
+    app: {
+      backgroundImage: '',
+      loading: false,
+      sidebarToggled: false,
+      showVisuals: false,
+      showSpectrum: false,
+      mqlMatch: false,
+      heightMqlMatch: false,
+      displayMiniQueue: false,
+      version: '',
+      showAddMediaModal: false
+    },
     error: 'test',
     dispatch: (value) => value,
     tableIds: [],

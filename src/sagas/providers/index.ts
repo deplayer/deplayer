@@ -15,6 +15,7 @@ import { getSettings } from '../selectors'
 import CollectionService from '../../services/CollectionService'
 import YoutubeDlServerProvider from '../../providers/YoutubeDlServerProvider'
 import * as types from '../../constants/ActionTypes'
+import FileManager from '../../services/Filesystem/FileManager'
 
 // Watcher should enque tasks to avoid concurrency
 export function* startProvidersScan(): any {
@@ -48,14 +49,63 @@ export function* startProvidersScan(): any {
   }
 }
 
+function getRelativePath(entry: FileSystemHandle, parent: FileSystemHandle): string {
+  let path = entry.name
+  path = parent.name + '/' + path
+  return path
+}
+
+interface FileHandleTuple {
+  file: any,
+  handler: any
+}
+
+function* getFilesRecursively(entry: FileSystemHandle): Generator<any, FileHandleTuple[] | undefined, any> {
+  if (entry instanceof FileSystemFileHandle) {
+    const file = yield call([entry, entry.getFile]);
+    if (file !== null) {
+      file.relativePath = getRelativePath(file, entry);
+
+      yield call(FileManager.processSelectedFile, entry)
+
+      return yield file;
+    }
+  } else if (entry instanceof FileSystemDirectoryHandle) {
+    const asyncIterator = entry.values();
+
+    const results = [];
+    while (true) {
+      const fileResult = yield call([asyncIterator, asyncIterator.next]);
+      if (fileResult.done || !fileResult.value) {
+        break;
+      }
+
+      const handle = fileResult.value;
+      if (handle !== null) {
+        const result = yield* getFilesRecursively(handle);
+        results.push({ file: result, handler: handle });
+      }
+    }
+
+    return results
+  }
+}
+
 // Handle filesystem adding
 export function* startFilesystemProcess(action: any): any {
-  console.log('files: ', action.files)
+  console.log('processing filesystem files: ', action.files)
 
-  for (let i = 0; i < action.files.length; i++) {
-    const file = action.files[i]
+  for (const file of action.files) {
+    // Recursive call for directories
+    if (file.file.kind === 'directory') {
+      const files = yield* getFilesRecursively(file.file)
+
+      yield put({ type: types.START_FILESYSTEM_FILES_PROCESSING, files: files })
+
+      break
+    }
+
     const metadata = yield call(readFileMetadata, file.file)
-
     const song = yield call(metadataToSong, metadata, file.handler.name, 'filesystem')
 
     console.log('saving song: ', song)

@@ -15,7 +15,7 @@ const Placeholder = (props: Props) => {
 
   const classes = classNames({
     placeholder: true,
-    small: !props.mqlMatch
+    small: !props.mqlMatch,
   })
 
   return (

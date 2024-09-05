@@ -25,7 +25,7 @@ const FileManager = () => {
     return files
   }
 
-  const processSelectedFile = async (entry: any): Promise<{
+  const processSelectedFile = async (entry: FileSystemHandle): Promise<{
     file: any,
     handler: any
   }> => {
@@ -33,7 +33,7 @@ const FileManager = () => {
 
     console.log(`saving handler ${entry.name} for later use`)
 
-    if (entry.kind === 'file') {
+    if (entry.kind === 'file' && entry instanceof FileSystemFileHandle) {
       await set(entry.name, entry)
       file = await entry.getFile()
     } else {
@@ -48,7 +48,8 @@ const FileManager = () => {
   }
 
   return {
-    openDialog
+    openDialog,
+    processSelectedFile
   }
 }
 

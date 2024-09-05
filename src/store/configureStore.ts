@@ -26,6 +26,7 @@ import rootSaga from '../sagas/rootSaga'
 import alerts from './middlewares/alerts'
 
 const mql = window.matchMedia(`(min-width: 800px)`)
+const heightMql = window.matchMedia(`(min-height: 300px)`)
 
 const { createReduxHistory, routerMiddleware, routerReducer } = createReduxHistoryContext({
   history: createBrowserHistory(),
@@ -51,8 +52,8 @@ function configureStore() {
   ]
 
   // These two middlewares cause slow performance in development
-  const disabledMiddlewares = { 
-    immutableCheck: false, 
+  const disabledMiddlewares = {
+    immutableCheck: false,
     serializableCheck: false
   }
 
@@ -69,9 +70,14 @@ function configureStore() {
 
   // Set breakpoint matching for responsive utilities
   store.dispatch({ type: types.SET_MQL, value: mql.matches })
+  store.dispatch({ type: types.SET_HEIGHT_MQL, value: heightMql.matches })
   mql.addListener(() => {
     store.dispatch({ type: types.SET_MQL, value: mql.matches })
   })
+  heightMql.addListener(() => {
+    store.dispatch({ type: types.SET_HEIGHT_MQL, value: heightMql.matches })
+  })
+
 
   store.dispatch({ type: types.INITIALIZE })
   // Setting up locales

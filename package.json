@@ -15,6 +15,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@happy-js/happy-opfs": "npm:@jsr/happy-js__happy-opfs@^1.8.4",
+    "@lo-fi/webauthn-local-client": "^0.999.7",
     "@types/lunr": "^2.3.7",
     "@types/pouchdb": "^6.4.2",
     "@types/react-redux-i18n": "^0.0.16",
@@ -95,7 +96,7 @@
     "screenfull": "^6.0.2",
     "surge": "^0.23.1",
     "tailwindcss": "^3.4.3",
-    "typescript": "^5.2.2",
+    "typescript": "^5.5.4",
     "vite": "^5.2.0",
     "vite-plugin-node-polyfills": "^0.21.0",
     "vite-plugin-pwa": "^0.20.0",

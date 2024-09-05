@@ -1,6 +1,7 @@
 import { Translate } from 'react-redux-i18n'
 import { FunctionComponent, SVGProps } from 'react'
 import { Link } from 'react-router-dom'
+import React from 'react'
 
 import MediaSlider from '../MediaSlider'
 import RelatedAlbums from '../RelatedAlbums'
@@ -13,6 +14,8 @@ import WalkmanSvg from './walkman.svg?react'
 import DiscmanSvg from './discman.svg?react'
 import HeadsetSvg from './headset.svg?react'
 import PhonophoneSvg from './phonophone.svg?react'
+import Auth from '../Auth'
+import Button from '../common/Button'
 
 type Props = {
   collection: CollectionState
@@ -33,8 +36,8 @@ const pickImage = () => IMAGE_COMPONENTS[Math.floor(Math.random() * IMAGE_COMPON
 function DeplayerTitle(): JSX.Element {
   return (
     <>
-      <span className='text-blue-200'>d</span>
-      <span className='text-blue-500 '>eplayer</span>
+      <span className='text-blue-500'>d</span>
+      <span className='text-blue-900 '>eplayer</span>
     </>
   )
 }
@@ -50,8 +53,12 @@ const Image = () => {
 }
 
 const WelcomeMessage = ({ dispatch }: { dispatch: Function }) => {
+  const [showAuthModal, setShowAuthModal] = React.useState(false)
+  const credentials = localStorage.getItem('credentials')
+
   return (
-    <div className='flex flex-col lg:flex-row w-full content-start items-center'>
+    <div className='flex flex-col md:flex-row w-full content-start items-center'>
+      {showAuthModal && <Auth dispatch={dispatch} onClose={() => setShowAuthModal(false)} />}
       <h4 className="text-xl text-center py-4 text-sky-900 dark:text-sky-300 p-4">
         Hi <i>audiophile</i>! Welcome to <DeplayerTitle />
       </h4>
@@ -68,6 +75,16 @@ const WelcomeMessage = ({ dispatch }: { dispatch: Function }) => {
           </li>
           <li><Link to='/collection' className='text-blue-500'>Or go to your collection</Link></li>
         </ul>
+        <div className='pt-6 flex flex-col items-center md:justify-start'>
+          {credentials && <p className='py-2'>You are authenticated with your passkey</p>}
+          {!credentials && (
+            <>
+              <p className='py-2'>Access social capabilities by authenticating with your passkey</p>
+              <Button long onClick={() => setShowAuthModal(true)}>🔒 Auth</Button>
+            </>
+          )
+          }
+        </div>
       </div>
     </div>
   )

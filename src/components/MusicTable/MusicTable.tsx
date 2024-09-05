@@ -10,11 +10,12 @@ import SongRow from './SongRow'
 import Spinner from '../Spinner'
 import ToggleMiniQueueButton from '../Buttons/ToggleMiniQueueButton'
 import * as types from '../../constants/ActionTypes'
+import { State as AppState } from '../../reducers/app'
 
 export type Props = {
   error?: string,
   queue: any,
-  app: any,
+  app: AppState,
   tableIds: Array<string>,
   collection: any,
   dispatch: (action: any) => any,
@@ -43,9 +44,10 @@ const MusicTable = (props: Props) => {
   const rowRenderer = ({
     index,       // Index of row
     key,         // Unique key within array of rendered rows
-    style        // Style object to be applied to row (to position it);
+    style,        // Style object to be applied to row (to position it);
+    slim
     // This must be passed through to the rendered row element.
-  }: { index: number, key: string, style: any }): any => {
+  }: { index: number, key: string, style: any, slim: boolean }): any => {
     const songId = props.tableIds[index]
     const song = props.collection.rows[songId]
 
@@ -67,7 +69,7 @@ const MusicTable = (props: Props) => {
         }}
         disableAddButton={props.disableAddButton}
         disableCovers={props.disableCovers}
-        slim={props.slim}
+        slim={slim}
         dispatch={props.dispatch}
       />
     )
@@ -113,7 +115,7 @@ const MusicTable = (props: Props) => {
             height={height}
             rowCount={props.tableIds.length}
             rowHeight={props.slim ? 80 : 100}
-            rowRenderer={({ index, key, style }) => rowRenderer({ index, key, style })}
+            rowRenderer={({ index, key, style }) => rowRenderer({ index, key, style, slim: !!props.slim })}
             width={width}
             overscanRowCount={6}
             scrollToIndex={currentIndex}
