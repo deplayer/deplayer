@@ -47,7 +47,7 @@ const Modal = (props: Props) => {
     <ReactModal
       shouldCloseOnOverlayClick
       isOpen={modalIsOpen}
-      className='absolute bg-gray-200 dark:bg-gray-900 rounded-sm max-w-md mx-auto flex flex-col'
+      className='absolute bg-gray-200 dark:bg-gray-900 rounded-sm max-w-md md:max-w-lg lg:max-w-xl mx-auto flex flex-col'
       overlayClassName='fixed'
       onRequestClose={() => close()}
       style={customStyles}
