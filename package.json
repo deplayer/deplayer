@@ -1,7 +1,7 @@
 {
   "name": "deplayer",
   "private": true,
-  "version": "2.2.43",
+  "version": "2.2.44",
   "type": "module",
   "scripts": {
     "dev": "vite",
