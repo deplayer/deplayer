@@ -49,13 +49,18 @@ export function* startProvidersScan(): any {
   }
 }
 
-function getRelativePath(entry: FileSystemHandle, parent: FileSystemDirectoryHandle): string {
+function getRelativePath(entry: FileSystemHandle, parent: FileSystemHandle): string {
   let path = entry.name
   path = parent.name + '/' + path
   return path
 }
 
-function* getFilesRecursively(entry: FileSystemHandle): Generator<any, void, any> {
+interface FileHandleTuple {
+  file: any,
+  handler: any
+}
+
+function* getFilesRecursively(entry: FileSystemHandle): Generator<any, FileHandleTuple[] | undefined, any> {
   if (entry instanceof FileSystemFileHandle) {
     const file = yield call([entry, entry.getFile]);
     if (file !== null) {

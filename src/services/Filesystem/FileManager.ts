@@ -33,7 +33,7 @@ const FileManager = () => {
 
     console.log(`saving handler ${entry.name} for later use`)
 
-    if (entry.kind === 'file') {
+    if (entry.kind === 'file' && entry instanceof FileSystemFileHandle) {
       await set(entry.name, entry)
       file = await entry.getFile()
     } else {

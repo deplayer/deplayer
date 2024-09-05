@@ -5,6 +5,7 @@ export type State = {
   sidebarToggled: boolean,
   showAddMediaModal: boolean,
   mqlMatch: boolean,
+  heightMqlMatch: boolean,
   loading: boolean,
   displayMiniQueue: boolean,
   version: string,
@@ -17,6 +18,7 @@ export const defaultState = {
   sidebarToggled: false,
   showAddMediaModal: false,
   mqlMatch: false,
+  heightMqlMatch: false,
   loading: true,
   slimPlayer: false,
   displayMiniQueue: true,
@@ -46,6 +48,13 @@ export default (state: State = defaultState, action: any) => {
       return { ...state, showAddMediaModal: false }
     }
 
+    case types.SET_HEIGHT_MQL: {
+      return {
+        ...state,
+        heightMqlMatch: action.value,
+        slimRows: !action.value
+      }
+    }
 
     case types.SET_MQL: {
       return {

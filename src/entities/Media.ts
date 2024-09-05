@@ -107,12 +107,12 @@ export default class Media implements IMedia {
       }
     }
 
+    this.track = songParams.track
+
     // this must be the last assignment
     const id = songParams.forcedId ? songParams.forcedId : new MediaId(this).value
     this.id = id
     this.externalId = id
-
-    this.track = songParams.track
   }
 
   generateArtist(artistName: string, artistId?: string): Artist {
@@ -171,12 +171,13 @@ export default class Media implements IMedia {
       albumName: this.albumName,
       playCount: this.playCount,
       filePath: this.filePath,
-      media_type: this.media_type,
+      type: this.media_type,
+      track: this.track,
       duration: this.duration
     }
   }
 
   toJSON() {
-    return { ...this, media_type: this.media_type }
+    return { ...this, type: this.media_type }
   }
 }

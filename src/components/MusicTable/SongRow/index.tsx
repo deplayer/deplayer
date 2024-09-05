@@ -60,6 +60,7 @@ const SongRow = (props: Props) => {
       <div className='media-info truncate w-full whitespace-no-wrap'>
         <h4 className='text-sky-900 dark:text-sky-400 text-lg -mt-1'>
           <Link to={`/song/${song.id}`}>
+            {song.track && <span className='mr-1 text-yellow-900 dark:text-yellow-500 hover:dark:text-yellow-200 text-xl font-bold inline-block'>{song.track}</span>}
             {song.title}
           </Link>
         </h4>
@@ -74,7 +75,7 @@ const SongRow = (props: Props) => {
         )}
       </div>
       <div className='flex' tabIndex={0}>
-        <div className='mr-4'>
+        <div className='mx-4'>
           {
             !props.slim && props.mqlMatch &&
             Object.values(song.stream).map((provider) => {

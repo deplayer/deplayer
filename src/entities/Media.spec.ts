@@ -61,9 +61,10 @@ describe('entities/Media', () => {
       forcedId: null,
       artistName: 'artist',
       albumName: 'album',
-      title: 'title'
+      title: 'title',
+      track: 23
     })
 
-    expect(song.id).toEqual('artist-album-title')
+    expect(song.id).toEqual('artist-album-0023-title')
   })
 })

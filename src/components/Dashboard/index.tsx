@@ -58,7 +58,7 @@ const WelcomeMessage = ({ dispatch }: { dispatch: Function }) => {
 
   return (
     <div className='flex flex-col md:flex-row w-full content-start items-center'>
-      { showAuthModal && <Auth dispatch={dispatch} onClose={() => setShowAuthModal(false)} /> }
+      {showAuthModal && <Auth dispatch={dispatch} onClose={() => setShowAuthModal(false)} />}
       <h4 className="text-xl text-center py-4 text-sky-900 dark:text-sky-300 p-4">
         Hi <i>audiophile</i>! Welcome to <DeplayerTitle />
       </h4>
@@ -76,13 +76,13 @@ const WelcomeMessage = ({ dispatch }: { dispatch: Function }) => {
           <li><Link to='/collection' className='text-blue-500'>Or go to your collection</Link></li>
         </ul>
         <div className='pt-6 flex flex-col items-center md:justify-start'>
-          { credentials && <p className='py-2'>You are authenticated with your passkey</p> }
-          { !credentials && (
-              <>
-                <p className='py-2'>Access social capabilities by authenticating with your passkey</p>
-                <Button long onClick={setShowAuthModal}>🔒 Auth</Button>
-              </>
-            )
+          {credentials && <p className='py-2'>You are authenticated with your passkey</p>}
+          {!credentials && (
+            <>
+              <p className='py-2'>Access social capabilities by authenticating with your passkey</p>
+              <Button long onClick={() => setShowAuthModal(true)}>🔒 Auth</Button>
+            </>
+          )
           }
         </div>
       </div>

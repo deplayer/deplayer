@@ -9,8 +9,7 @@ const randomStringFromServer = "randomStringFromServer"
 const host = process.env.NODE_ENV === 'development' ? 'localhost' : window.location.origin
 
 async function startRegister(username: string, displayName: string, dispatch: Function) {
-  const publicKeyCredentialCreationOptions = {
-    credentialType: "publicKey",
+  const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
     challenge: Uint8Array.from(randomStringFromServer, c => c.charCodeAt(0)),
     rp: {
       name: "deplayer",
@@ -28,10 +27,10 @@ async function startRegister(username: string, displayName: string, dispatch: Fu
     timeout: REGISTER_TIMEOUT,
     // attestation: "direct"
     attestation: "none"
-  };
+  }
 
   const credential = await navigator.credentials.create({
-    publicKey: publicKeyCredentialCreationOptions,
+    publicKey: publicKeyCredentialCreationOptions
   })
   console.log('credential', credential)
 
@@ -41,21 +40,20 @@ async function startRegister(username: string, displayName: string, dispatch: Fu
   dispatch({ type: 'SET_CREDENTIAL', payload: credential })
 }
 
-type TransportTypes = 'usb' | 'ble' | 'nfc'
-
 const toUTF8String = (buf: Uint8Array) => {
   return String.fromCharCode.apply(null, Array.from(buf))
 }
 
-const startAuth = async ({ transports, id }: { transports: TransportTypes[], id: string }) => {
+const startAuth = async () => {
   const publicKeyCredentialRequestOptions = {
     challenge: Uint8Array.from(randomStringFromServer, c => c.charCodeAt(0)),
     allowCredentials: [{type: 'public-key', id: window['credential_id']}],
+    pubKeyCredParams: [{ alg: -7, type: "public-key" }],
   }
 
   const assertion = await navigator.credentials.get({
     publicKey: publicKeyCredentialRequestOptions
-  })
+  }) as PublicKeyCredential // Review this as
 
   console.log('assertion', assertion)
   if (!assertion) {
@@ -97,7 +95,7 @@ export default function Auth({ onClose, dispatch }: Props) {
           </Formik>
         </div>
         <div className='p-4 flex flex-col items-center justify-center'>
-          <Button inverted onClick={() => startAuth({ transports: ['usb', 'ble', 'nfc'], id: 'gtrias' })}>Authenticate!</Button>
+          <Button inverted onClick={() => startAuth()}>Authenticate!</Button>
         </div>
       </div>
     </Modal>
