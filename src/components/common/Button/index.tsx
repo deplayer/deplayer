@@ -20,9 +20,11 @@ type Props = {
 
 const Button = (props: Props) => {
   const classNames = classnames({
+    btn: true,
     flex: true,
     'items-center': true,
     uppercase: props.uppercase,
+    'btn-outline': props.inverted,
     'text-sky-200': !props.transparent || !props.inverted,
     'text-sky-800': props.inverted || props.transparent,
     'dark:text-sky-200': props.transparent || props.inverted,
