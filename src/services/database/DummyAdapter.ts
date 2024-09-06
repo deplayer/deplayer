@@ -34,7 +34,7 @@ export default class DummyAdapter implements IAdapter {
   }
 
   getAll(_model: string): Promise<any> {
-    return Promise.resolve({})
+    return Promise.resolve([])
   }
 
   getDb() {
