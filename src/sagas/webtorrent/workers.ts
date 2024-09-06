@@ -10,7 +10,7 @@ export function* readWebtorrentFile(action: any): Generator<any, void, any> {
   console.log("getting media objects from magnet: ", action.magnet);
   const medias = yield call(magnetToMedia, action.magnet);
   const adapter = getAdapter();
-  const collectionService = new CollectionService(new adapter());
+  const collectionService = new CollectionService(adapter);
 
   console.log("medias: ", medias);
 

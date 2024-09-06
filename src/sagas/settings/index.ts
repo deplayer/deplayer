@@ -7,7 +7,7 @@ import { getAdapter } from '../../services/database'
 // Application initialization routines
 export function* initialize(): Generator<any, void, any> {
   const adapter = getAdapter()
-  const settingsService = new SettingsService(new adapter())
+  const settingsService = new SettingsService(adapter)
   yield call(settingsService.initialize)
 
   try {
@@ -27,7 +27,7 @@ export function* initialize(): Generator<any, void, any> {
 
 function* saveSettings(action: any): Generator<any, void, any> {
   const adapter = getAdapter()
-  const settingsService = new SettingsService(new adapter())
+  const settingsService = new SettingsService(adapter)
   try {
     const settings = yield call(settingsService.save, 'settings', action.settingsPayload)
 
@@ -43,7 +43,7 @@ function* saveSettings(action: any): Generator<any, void, any> {
 export function* deleteSettings(): any {
   try {
     const adapter = getAdapter()
-    const settingsService = new SettingsService(new adapter())
+    const settingsService = new SettingsService(adapter)
     yield call(settingsService.removeAll)
     yield put({ type: types.SEND_NOTIFICATION, notification: 'notifications.settings.deleted' })
   } catch (e: any) {

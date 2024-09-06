@@ -10,7 +10,7 @@ import * as types from '../../constants/ActionTypes'
 import { IndexService } from '../../services/Search/IndexService'
 
 const adapter = getAdapter()
-const collectionService = new CollectionService(new adapter())
+const collectionService = new CollectionService(adapter)
 
 export function* saveToDbWorker(data: Array<any>): any {
   const prevCollection = yield select(getCollection)

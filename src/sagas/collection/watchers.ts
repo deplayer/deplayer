@@ -9,7 +9,7 @@ import { generateIndexWorker } from './workers'
 import IndexService from '../../services/Search/IndexService'
 
 const adapter = getAdapter()
-const collectionService = new CollectionService(new adapter())
+const collectionService = new CollectionService(adapter)
 
 export function* addToCollectionWatcher(): any {
   const handleChannel = yield actionChannel(types.ADD_TO_COLLECTION)

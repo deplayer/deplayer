@@ -38,7 +38,7 @@ export function* playAll(action: any): any {
 }
 
 const adapter = getAdapter()
-const queueService = new QueueService(new adapter())
+const queueService = new QueueService(adapter)
 
 export function* saveQueue(): any {
   const queue = yield select(getQueue)

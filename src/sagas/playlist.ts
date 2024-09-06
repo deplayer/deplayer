@@ -7,7 +7,7 @@ import logger from '../utils/logger'
 import * as types from '../constants/ActionTypes'
 
 const adapter = getAdapter()
-const playlistService = new PlaylistService(new adapter())
+const playlistService = new PlaylistService(adapter)
 
 // Application initialization routines
 function* initialize(): Generator<any, void, any> {

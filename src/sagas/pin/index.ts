@@ -68,7 +68,7 @@ function* unpinAlbum(action: PinAlbumAction): any {
 
 function* pinSong(action: PinAction): any {
   const adapter = getAdapter()
-  const collectionService = new CollectionService(new adapter())
+  const collectionService = new CollectionService(adapter)
 
   const collection = yield select(getCollection)
   const song = collection.rows[action.songId]
@@ -94,7 +94,7 @@ function* pinSong(action: PinAction): any {
 
 function* unpinSong(action: PinAction): any {
   const adapter = getAdapter()
-  const collectionService = new CollectionService(new adapter())
+  const collectionService = new CollectionService(adapter)
 
   const collection = yield select(getCollection)
   const song = collection.rows[action.songId]

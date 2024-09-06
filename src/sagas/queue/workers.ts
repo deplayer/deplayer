@@ -5,7 +5,7 @@ import logger from '../../utils/logger'
 import * as types from '../../constants/ActionTypes'
 
 const adapter = getAdapter()
-const queueService = new QueueService(new adapter())
+const queueService = new QueueService(adapter)
 
 // Application initialization routines
 export function* initialize(): Generator<any, void, unknown> {

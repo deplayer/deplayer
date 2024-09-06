@@ -111,7 +111,7 @@ export function* startFilesystemProcess(action: any): any {
     console.log('saving song: ', song)
 
     const adapter = getAdapter()
-    const collectionService = new CollectionService(new adapter())
+    const collectionService = new CollectionService(adapter)
 
     // Save song
     const songDocument = song.toDocument()
@@ -145,7 +145,7 @@ export function* handleIPFSFileLoad(): any {
       const song = yield call(metadataToSong, metadata, file.hash, 'ipfs')
 
       const adapter = getAdapter()
-      const collectionService = new CollectionService(new adapter())
+      const collectionService = new CollectionService(adapter)
 
       // Save song
       yield call(collectionService.save, song.id, song.toDocument())

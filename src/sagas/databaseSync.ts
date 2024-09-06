@@ -8,7 +8,7 @@ import * as types from "../constants/ActionTypes";
 // Database sync setup routines
 function* setupSync(dispatch: any): Generator<any, void, any> {
   const adapter = getAdapter();
-  const databaseSyncService = new DatabaseSyncService(new adapter());
+  const databaseSyncService = new DatabaseSyncService(adapter);
   const settings = yield select(getSettings);
 
   if (settings.app.databaseSync.enabled) {

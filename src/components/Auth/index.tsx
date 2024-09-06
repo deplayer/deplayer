@@ -2,11 +2,14 @@ import { Formik, Form, Field } from 'formik'
 
 import Button from '../common/Button'
 import Modal from '../common/Modal'
+import { getAdapter } from "../../services/database"
+const adapter = getAdapter()
 
 const REGISTER_TIMEOUT = 600
 
 const randomStringFromServer = "randomStringFromServer"
 const host = process.env.NODE_ENV === 'development' ? 'localhost' : window.location.origin
+
 
 async function startRegister(username: string, displayName: string, dispatch: Function) {
   const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
@@ -31,11 +34,11 @@ async function startRegister(username: string, displayName: string, dispatch: Fu
 
   const credential = await navigator.credentials.create({
     publicKey: publicKeyCredentialCreationOptions
-  })
+  }) as PublicKeyCredential
   console.log('credential', credential)
 
   localStorage.setItem('credential', JSON.stringify(credential))
-  window['credential_id'] = credential.rawId;
+  adapter.save('credential', 'credential', credential.rawId)
 
   dispatch({ type: 'SET_CREDENTIAL', payload: credential })
 }
@@ -45,9 +48,10 @@ const toUTF8String = (buf: Uint8Array) => {
 }
 
 const startAuth = async () => {
+  const id = await adapter.get('credential', 'credential') as BufferSource
   const publicKeyCredentialRequestOptions = {
     challenge: Uint8Array.from(randomStringFromServer, c => c.charCodeAt(0)),
-    allowCredentials: [{type: 'public-key', id: window['credential_id']}],
+    allowCredentials: [{ type: 'public-key', id: id }] as PublicKeyCredentialDescriptor[],
     pubKeyCredParams: [{ alg: -7, type: "public-key" }],
   }
 
@@ -63,7 +67,7 @@ const startAuth = async () => {
   const authClientDataRaw = new Uint8Array(assertion.response.clientDataJSON);
   const authClientData = JSON.parse(toUTF8String(authClientDataRaw));
 
-  window['credential_id'] = assertion.rawId;
+  adapter.save('credential', 'credential', assertion.rawId)
 
   console.log('authClientData', authClientData)
 }
