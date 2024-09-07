@@ -69,7 +69,7 @@
     "downloadMedia": "Download media"
   },
   "message": {
-    "noCollectionItems": "No collection items found, try adding more by searching or adding them manually: ",
+    "noCollectionItems": "Collection is empty, here you will see all discovered media by Deplayer.\nIn order to start filling your collection you need to either Add media or Add a provider and start searching.",
     "noMostPlayed": "You didn't played any song yet",
     "goToCollection": "Jump to collection to play something!"
   }

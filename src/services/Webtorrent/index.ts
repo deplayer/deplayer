@@ -12,6 +12,9 @@ const announceList = [
   'wss://tracker.openwebtorrent.com',
 ]
 
+const videoExtensions = ['.mp4', '.mkv']
+const audioExtensions = ['.mp3']
+
 export const magnetToMedia = async (torrentUrl: string): Promise<Array<Media>> => {
   const client = new Webtorrent()
 
@@ -23,11 +26,11 @@ export const magnetToMedia = async (torrentUrl: string): Promise<Array<Media>> =
     }, (torrent: any) => {
       console.log('files detected: ', torrent.files)
       const files = torrent.files.filter((file: any) => {
-        return file.name.endsWith('.mp4') || file.name.endsWith('.mp3') || file.name.endsWith('.mkv')
+        return [...videoExtensions, ...audioExtensions].some((ext) => file.name.endsWith(ext))
       })
 
       const medias = files.map((file: any) => {
-        const type = file.name.endsWith('.mp4') ? 'video' : 'audio'
+        const type = videoExtensions.some((ext) => file.name.endsWith(ext)) ? 'video' : 'audio'
         return new Media({
           title: file.name,
           artistName: 'webtorrent',

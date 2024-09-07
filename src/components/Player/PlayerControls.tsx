@@ -143,9 +143,9 @@ class PlayerControls extends React.Component<Props> {
 
     const config = {
       file: {
-        forceAudio: currentPlaying.media_type === 'audio',
+        forceAudio: currentPlaying.type === 'audio',
         attributes: {
-          className: currentPlaying.media_type === 'video' ? 'video-element' : 'video-element',
+          className: currentPlaying.type === 'video' ? 'video-element' : 'video-element',
           crossOrigin: 'anonymous'
         }
       }
@@ -154,7 +154,7 @@ class PlayerControls extends React.Component<Props> {
     // const visualizer = <Visualizer playerRef={this.playerRef.current} visualizerOnTop={this.props.player.fullscreen} /> 
     const visualizer = null
 
-    if (currentPlaying.media_type === 'audio') {
+    if (currentPlaying.type === 'audio') {
       config.file.attributes['crossOrigin'] = 'anonymous'
     }
 
@@ -192,9 +192,9 @@ class PlayerControls extends React.Component<Props> {
             />
           </InPortal>
         </div>
-        {!songFinder && currentPlaying.media_type === 'video' && (
+        {!songFinder && currentPlaying.type === 'video' && (
           <OutPortal
-            className={`left-0 right-0 top-0 botton-0 absolute ${currentPlaying.media_type === 'video' && 'bg-handler'}`}
+            className={`left-0 right-0 top-0 botton-0 absolute ${currentPlaying.type === 'video' && 'bg-handler'}`}
             node={this.props.playerPortal}
           />
         )}

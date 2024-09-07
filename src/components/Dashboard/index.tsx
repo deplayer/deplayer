@@ -16,10 +16,11 @@ import HeadsetSvg from './headset.svg?react'
 import PhonophoneSvg from './phonophone.svg?react'
 import Auth from '../Auth'
 import Button from '../common/Button'
+import { Dispatch } from 'redux'
 
 type Props = {
   collection: CollectionState
-  dispatch: Function
+  dispatch: Dispatch
 }
 
 const IMAGE_COMPONENTS: FunctionComponent<SVGProps<SVGSVGElement>>[] = [
@@ -52,7 +53,7 @@ const Image = () => {
   )
 }
 
-const WelcomeMessage = ({ dispatch }: { dispatch: Function }) => {
+const WelcomeMessage = ({ dispatch }: { dispatch: Dispatch }) => {
   const [showAuthModal, setShowAuthModal] = React.useState(false)
   const credentials = localStorage.getItem('credentials')
 

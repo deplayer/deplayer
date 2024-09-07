@@ -1,5 +1,5 @@
 import React from 'react'
-import WebTorrent from 'webtorrent'
+import WebTorrent, { Torrent } from 'webtorrent'
 import { useRegisterSW } from 'virtual:pwa-register/react'
 
 const announceList = [
@@ -23,35 +23,51 @@ function WebtorrentServer({ url, playing, muted, controls, player, style, loop }
     }
   })
 
+  function processTorrent(torrent: Torrent) {
+    const file = torrent.files.find((file: any) => {
+      return file.type.startsWith('video/')
+
+    }) as any
+    if (file === undefined) return () => { }
+
+    console.log('Video found! torrent file: ', file)
+
+    console.log('streaming file to player', player)
+    file.streamTo(player, {
+      autoplay: true,
+      muted: muted,
+      controls: controls
+    })
+  }
+
   React.useEffect(() => {
     console.log('loading webtorrent url: ', url)
 
-    try {
+    console.log('client torrents: ', client.torrents)
+
+    const existingTorrent = client.torrents.find((torrent: Torrent) => {
+      console.log('comparing torrent: ', torrent, torrent.magnetURI, url)
+      return torrent.magnetURI === url
+    })
+
+    console.log('existing torrent: ', existingTorrent)
+
+    if (!existingTorrent) {
       client.add(url, {
         announceList: announceList
       })
-    } catch (error) {
-      console.log('error: ', error)
+
+      client.on('torrent', (torrent: Torrent) => {
+        processTorrent(torrent)
+      })
+    } else {
+      processTorrent(existingTorrent)
     }
-
-    client.on('torrent', (torrent: any) => {
-      const file = torrent.files.find((file: any) => {
-        return file.type.startsWith('video/')
-      })
-
-      if (file === undefined) return () => { }
-
-      console.log('file: ', file)
-
-      file.streamTo(player, {
-        autoplay: playing,
-        muted: muted,
-        controls: controls
-      })
-    })
 
     return () => { }
   }, [url, player])
+
+  console.log('Rendering video element')
 
   return (
     <video

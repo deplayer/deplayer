@@ -137,13 +137,13 @@ const SongView = ({
       <div className="song sm:flex">
         <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className="w-full md:m-6 md:rounded-b-lg image lg:max-w-md xl:max-w-xl">
           <div className='flex flex-col w-full md:sticky md:top-0'>
-            {songFinder && song.media_type === 'video' && (
+            {songFinder && song.type === 'video' && (
               <OutPortal
                 className={`flex w-full`}
                 node={playerPortal}
               />
             )}
-            {(song.media_type !== 'video' || !songFinder) &&
+            {(song.type !== 'video' || !songFinder) &&
               <CoverImage
                 useImage
                 cover={song.cover}
@@ -288,7 +288,7 @@ const SongView = ({
             </div>
             <div className='mt-2 flex items-center'>
               <Translate className='mr-2' value='labels.mediaType' />
-              <Tag transparent>{song.media_type}</Tag>
+              <Tag transparent>{song.type}</Tag>
             </div>
             <div className='mt-2'>
               <Translate value='song.label.played' /> {song.playCount || 0} <Translate value='song.label.times' />

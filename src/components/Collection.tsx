@@ -47,7 +47,7 @@ const Collection = (props: Props) => {
   if (!mediaItems.length) {
     return (
       <BodyMessage message={
-        <div>
+        <div className='flex flex-col'>
           <Translate value='message.noCollectionItems' />
           <AddNewMediaButton />
         </div>

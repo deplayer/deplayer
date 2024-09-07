@@ -1,9 +1,9 @@
 import { Formik, Form, Field } from 'formik'
+import { set, get } from 'idb-keyval'
 
 import Button from '../common/Button'
 import Modal from '../common/Modal'
-import { getAdapter } from "../../services/database"
-const adapter = getAdapter()
+import { Dispatch } from 'redux'
 
 const REGISTER_TIMEOUT = 600
 
@@ -38,7 +38,7 @@ async function startRegister(username: string, displayName: string, dispatch: Fu
   console.log('credential', credential)
 
   localStorage.setItem('credential', JSON.stringify(credential))
-  adapter.save('credential', 'credential', credential.rawId)
+  await set('credential', credential.rawId)
 
   dispatch({ type: 'SET_CREDENTIAL', payload: credential })
 }
@@ -47,8 +47,20 @@ const toUTF8String = (buf: Uint8Array) => {
   return String.fromCharCode.apply(null, Array.from(buf))
 }
 
-const startAuth = async () => {
-  const id = await adapter.get('credential', 'credential') as BufferSource
+async function getCredential() {
+  return await get('credential') as BufferSource
+}
+
+const startAuth = async (dispatch: Dispatch) => {
+  const id = await getCredential()
+
+  if (!id) {
+    console.log('No credential found')
+    return
+  }
+
+  console.log('Credential id: ', id)
+
   const publicKeyCredentialRequestOptions = {
     challenge: Uint8Array.from(randomStringFromServer, c => c.charCodeAt(0)),
     allowCredentials: [{ type: 'public-key', id: id }] as PublicKeyCredentialDescriptor[],
@@ -67,14 +79,16 @@ const startAuth = async () => {
   const authClientDataRaw = new Uint8Array(assertion.response.clientDataJSON);
   const authClientData = JSON.parse(toUTF8String(authClientDataRaw));
 
-  adapter.save('credential', 'credential', assertion.rawId)
+  set('credential', assertion.rawId)
 
   console.log('authClientData', authClientData)
+
+  dispatch({ type: 'SET_CREDENTIAL', payload: assertion })
 }
 
 interface Props {
   onClose: Function,
-  dispatch: Function
+  dispatch: Dispatch
 }
 
 export default function Auth({ onClose, dispatch }: Props) {
@@ -99,7 +113,7 @@ export default function Auth({ onClose, dispatch }: Props) {
           </Formik>
         </div>
         <div className='p-4 flex flex-col items-center justify-center'>
-          <Button inverted onClick={() => startAuth()}>Authenticate!</Button>
+          <Button inverted onClick={() => startAuth(dispatch)}>Authenticate!</Button>
         </div>
       </div>
     </Modal>

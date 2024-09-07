@@ -19,6 +19,8 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
   client: any
 
   constructor(props: any) {
+    console.log('starting torrent player')
+
     super(props)
   }
 
