@@ -8,7 +8,7 @@ import { Dispatch } from 'redux'
 const REGISTER_TIMEOUT = 600
 
 const randomStringFromServer = "randomStringFromServer"
-const host = process.env.NODE_ENV === 'development' ? 'localhost' : window.location.origin
+const host = process.env.NODE_ENV === 'development' ? 'localhost' : window.location.host
 
 
 async function startRegister(username: string, displayName: string, dispatch: Function) {
