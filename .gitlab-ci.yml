@@ -12,6 +12,9 @@ test:
   script:
   - npm install
   - npm run coverage
+  artifacts:
+    paths:
+      - coverage/
 
 deploy:
   stage: deploy
