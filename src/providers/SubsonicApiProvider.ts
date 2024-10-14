@@ -38,11 +38,13 @@ export default class SubsonicApiProvider implements IMusicProvider {
 
     const secureSongs = songs instanceof Array ? songs : [songs]
     return secureSongs.map((song: any) => {
-      const album = albums.find((album) => album.id === song.albumId)
+      const album = albums.find((album) => album.id === song.album.id)
 
       return new Media({
         title: song.title ? song.title : song.path,
+        artist: { name: song.artist },
         artistName: song.artist,
+        album: { name: song.album, artist: { name: song.artist } },
         year: album?.year,
         albumName: song.album,
         cover: {

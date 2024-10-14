@@ -20,7 +20,7 @@ export function* initialize(): Generator<any, void, unknown> {
     } else {
       const unserialized = JSON.parse(JSON.stringify(queue))
       logger.log('queue-saga', 'queue recieved and unserialized')
-      yield put({ type: types.RECEIVE_QUEUE, queue: unserialized })
+      yield put({ type: types.RECEIVE_QUEUE, queue: unserialized[0] })
     }
   } catch (e: any) {
     yield put({ type: types.GET_QUEUE_REJECTED, error: e.message })

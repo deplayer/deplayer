@@ -18,7 +18,7 @@ mock.onGet(/search/).reply(200, {
 })
 
 describe('ItunesApiProvider', () => {
-  const itunesRepo = new ItunesApiProvider('itunes-0')
+  const itunesRepo = new ItunesApiProvider('media')
 
   it('should handle song search', () => {
     expect(itunesRepo.search('Bad brains')).toBeInstanceOf(Promise)
@@ -28,7 +28,7 @@ describe('ItunesApiProvider', () => {
     expect(itunesRepo.populateUrl('Bad brains')).toBe('https://itunes.apple.com/search?term=Bad%20brains')
   })
 
-  it('search should return an array of songs', () => {
+  it('search should return an array of songs', async () => {
     expect.assertions(1)
     return itunesRepo.search('Bad brains').then((results: Array<Media>) => {
       expect(results.length).toBe(1)

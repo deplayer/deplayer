@@ -1,5 +1,5 @@
 import { IStorageService } from '../IStorageService'
-import { IAdapter } from '../database/IAdapter'
+import { IAdapter, Models } from '../database/IAdapter'
 
 const MODEL = 'settings'
 
@@ -10,7 +10,7 @@ export default class SettingsService implements IStorageService {
     this.storageAdapter = storageAdapter
   }
 
-  initialize = async (model: string = MODEL) => {
+  initialize = async (model: Models = MODEL) => {
     await this.storageAdapter.initialize(model)
   }
 

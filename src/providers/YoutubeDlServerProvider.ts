@@ -22,6 +22,8 @@ export default class YoutubeDlServerProvider implements IMusicProvider {
   mapSong = (songInfo: any): Media => {
     return new Media({
       title: songInfo.title,
+      artist: { name: songInfo.artist },
+      album: { name: songInfo.album, artist: { name: songInfo.artist } },
       artistName: songInfo.artist,
       albumName: songInfo.album,
       cover: {

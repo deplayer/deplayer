@@ -20,7 +20,7 @@ import Lyrics from './Lyrics'
 import { getStreamUri } from '../../services/Song/StreamUriService'
 import Album from '../../entities/Album'
 import ServiceIcon from '../ServiceIcon'
-import Media from '../../entities/Media'
+import Media, { IMedia } from '../../entities/Media'
 import { State as SettingsState } from '../../reducers/settings'
 
 const MAX_LIST_ITEMS = 25
@@ -37,7 +37,7 @@ type Props = {
     albums: { [key: string]: Album },
     albumsByArtist: { [key: string]: string[] },
     songsByGenre: any,
-    rows: any
+    rows: { [key: string]: IMedia }
   },
   queue: { trackIds: any, currentPlaying?: string },
   songId: string,
@@ -119,14 +119,16 @@ const SongView = ({
     return <NotFound>The requested song can not be found</NotFound>
   }
 
-  const sameGenreSongs = song.genres && song.genres.length && songsByGenre[song.genres[0]]
-    ? songsByGenre[song.genres[0]]
+  const genres = song.genre ? song.genre.split(',') : []
+
+  const sameGenreSongs = genres.length && songsByGenre[genres[0]]
+    ? songsByGenre[genres[0]]
       .sort((songId1: string, songId2: string) => sortByPlayCount(songId1, songId2, rows))
       .slice(0, MAX_LIST_ITEMS)
       .map((songId: string) => rows[songId])
     : null
 
-  const relatedAlbums = albumsByArtist?.[song.artist.id].map((albumId: string) => {
+  const relatedAlbums = song.artist.id && albumsByArtist?.[song.artist.id].map((albumId: string) => {
     return new Album({ ...albums[albumId], artist: song.artist })
   }) || []
 
@@ -148,7 +150,7 @@ const SongView = ({
                 useImage
                 cover={song.cover}
                 size='thumbnail'
-                albumName={song.albumName || 'N/A'}
+                albumName={song.album.name || 'N/A'}
               />
             }
 
@@ -276,7 +278,7 @@ const SongView = ({
                   className='mr-1 w-8'
                   icon='faCompactDisc'
                 />
-                {song.albumName || 'N/A'} {song.album.year && `(${song.album.year})`}
+                {song.album.name || 'N/A'} {song.album.year && `(${song.album.year})`}
               </Link>
             </div>
             <div className='mt-4'>

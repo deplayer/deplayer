@@ -33,6 +33,13 @@ export const magnetToMedia = async (torrentUrl: string): Promise<Array<Media>> =
         const type = videoExtensions.some((ext) => file.name.endsWith(ext)) ? 'video' : 'audio'
         return new Media({
           title: file.name,
+          artist: {
+            name: 'webtorrent',
+          },
+          album: {
+            name: 'webtorrent',
+            artist: { name: 'webtorrent' }
+          },
           artistName: 'webtorrent',
           albumName: 'webtorrent',
           type: type,

@@ -1,9 +1,10 @@
 import AlbumId from './AlbumId'
-import Artist from './Artist'
+import Artist, { IArtist } from './Artist'
 
-interface AlbumParams {
+export interface IAlbum {
+  id?: string
   name: string
-  artist: Artist
+  artist: IArtist
   albumId?: string
   thumbnailUrl?: string
   year?: number
@@ -16,10 +17,10 @@ export default class Album {
   thumbnailUrl: string
   year?: number
 
-  constructor(albumParams: AlbumParams) {
+  constructor(albumParams: IAlbum) {
     const { name, artist, albumId, thumbnailUrl, year } = albumParams
     this.name = name
-    this.artist = artist
+    this.artist = new Artist(artist)
     this.thumbnailUrl = thumbnailUrl || ''
     this.year = year
 
@@ -31,7 +32,7 @@ export default class Album {
     this.id = compAlbumId
   }
 
-  toDocument(): any {
+  toDocument(): IAlbum {
     return {
       id: '' + this.id,
       name: this.name,

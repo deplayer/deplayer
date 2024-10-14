@@ -6,7 +6,7 @@ import Artist from '../../entities/Artist'
 const setup = (customProps: any) => {
   const defaultProps = {
     collection: {},
-    artist: new Artist(),
+    artist: new Artist({ name: 'foo' }),
     artistMetadata: {},
     dispatch: () => { },
     songsByAlbum: {},

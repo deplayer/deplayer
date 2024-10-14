@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+import { Models } from '../services/database/IAdapter'
 import { IMusicProvider } from './IMusicProvider'
 import Media from '../entities/Media'
 
@@ -7,7 +8,7 @@ export default class ItunesApiProvider implements IMusicProvider {
   baseUrl: string
   providerKey: string
 
-  constructor(_settings: any, providerKey = 'itunes') {
+  constructor(_settings: Models, providerKey = 'itunes') {
     this.baseUrl = 'https://itunes.apple.com'
     this.providerKey = providerKey
   }
@@ -30,6 +31,8 @@ export default class ItunesApiProvider implements IMusicProvider {
       artistName: itSong.artistName,
       title: itSong.trackName,
       albumName: itSong.collectionName,
+      album: { name: itSong.collectionName, artist: itSong.artistName },
+      artist: { name: itSong.artistName },
       cover: {
         thumbnailUrl: itSong.artworkUrl60.replace(/60x60/, '250x250'),
         fullUrl: itSong.artworkUrl100.replace(/100x100/, '600x600'),

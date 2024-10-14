@@ -1,16 +1,15 @@
 import { describe, it, expect } from 'vitest'
 
-import Media from './Media'
+import Media, { IMedia } from './Media'
 
-export const mediaParams = {
-  id: 1,
+export const mediaParams: IMedia = {
+  id: '1',
   title: 'title',
-  artist: 'artist',
+  artist: { name: 'artist' },
   artistName: 'artistName',
   artistId: '1',
-  albumId: '1',
   albumName: 'albumName',
-  album: 'album',
+  album: { id: 'album', name: 'album', artist: { name: 'foo' } },
   genre: 'genre',
   duration: 100,
   cover: { thumbnailUrl: 'thumbnail', fullUrl: '' },

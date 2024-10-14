@@ -1,4 +1,4 @@
-import Media from '../../entities/Media'
+import { IMedia } from '../../entities/Media'
 import { get } from 'idb-keyval'
 import { readFile } from '@happy-js/happy-opfs'
 
@@ -58,7 +58,7 @@ async function handleFilesystem(streamUri: string | null) {
 
 
 export const getStreamUri = async (
-  song: Media,
+  song: IMedia,
   settings: any,
   providerNum: number
 ): Promise<string | Blob> => {

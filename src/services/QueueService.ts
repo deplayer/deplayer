@@ -1,5 +1,5 @@
 import { IStorageService } from './IStorageService'
-import { IAdapter } from './database/IAdapter'
+import { IAdapter, Models } from './database/IAdapter'
 import logger from '../utils/logger'
 
 export default class QueueService implements IStorageService {
@@ -9,11 +9,11 @@ export default class QueueService implements IStorageService {
     this.storageAdapter = storageAdapter
   }
 
-  initialize = (model: string) => {
+  initialize = (model: Models) => {
     this.storageAdapter.initialize(model)
   }
 
-  save = (_id: string, payload: any): Promise<any> => {
+  save = async (_id: string, payload: any): Promise<any> => {
     return this.storageAdapter.save('queue', 'queue', payload)
       .catch((e) => {
         logger.log('Error saving queue', e.message)

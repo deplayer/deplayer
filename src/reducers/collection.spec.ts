@@ -16,9 +16,10 @@ describe('collection reducer', () => {
       ...mediaParams,
       forcedId: 'the-doors',
       artistName: 'The Doors',
+      type: 'video',
       artistId: 'the-doors',
       albumName: 'LIght my fire',
-      stream: { itunes: { uris: [{ uri: 'http://some-songs-api/song.mp4' }], service: 'itunes' }}
+      stream: { itunes: { uris: [{ uri: 'http://some-songs-api/song.mp4' }], service: 'itunes' } }
     })
     const rows = { [fixtureSong.id]: fixtureSong.toDocument() }
     const artists = { [fixtureSong.artist.id]: fixtureSong.artist.toDocument() }
