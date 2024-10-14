@@ -1,5 +1,5 @@
 import { IStorageService } from './IStorageService'
-import { IAdapter } from './database/IAdapter'
+import { IAdapter, Models } from './database/IAdapter'
 import MediaMergerService from './MediaMergerService'
 import Media from '../entities/Media'
 
@@ -12,7 +12,7 @@ export default class CollectionService implements IStorageService {
     this.storageAdapter = storageAdapter
   }
 
-  initialize = (model: string = MODEL) => {
+  initialize = (model: Models = MODEL) => {
     this.storageAdapter.initialize(model)
   }
 
@@ -57,7 +57,7 @@ export default class CollectionService implements IStorageService {
     return this.storageAdapter.importCollection(MODEL, data)
   }
 
-  get = (id: string): Promise<any> => {
+  get = (id: string): Promise<Media> => {
     return this.storageAdapter.get(MODEL, id)
   }
 

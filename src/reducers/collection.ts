@@ -3,6 +3,7 @@ import filterSongs from "../utils/filter-songs";
 import * as types from "../constants/ActionTypes";
 import IndexService from "../services/Search/IndexService";
 import Artist from "../entities/Artist"
+import IMedia from "../entities/Media"
 import merge from "deepmerge"
 
 const indexService = IndexService();
@@ -48,8 +49,9 @@ export const defaultState = {
   totalRows: 0,
 };
 
-const populateFromAction = (state: State, action: { data: any }): State => {
+const populateFromAction = (state: State, action: { data: IMedia[] }): State => {
   const aggregation = action.data
+    // Sort rows by ID alaphabetically
     .sort((a: any, b: any) => {
       if (a.id < b.id) return -1;
       if (a.id > b.id) return 1;
@@ -57,33 +59,25 @@ const populateFromAction = (state: State, action: { data: any }): State => {
     })
     .reduce(
       (acc: any, row: any) => {
-        const song = new Media({
-          ...row,
-          id: row.id,
-          forcedId: row.id,
-          artistName: row.artist.name,
-          artistId: row.artist.id,
-          albumId: row.album.id,
-        });
+        const songDocument = row
 
-        const songDocument = song.toDocument();
-
-        acc.rows[song.id] = songDocument
-        acc.albums[song.album.id] = songDocument.album
-        acc.artists[song.artist.id] = songDocument.artist
+        acc.rows[songDocument.id] = songDocument
+        acc.albums[songDocument.album.id] = songDocument.album
+        acc.artists[songDocument.artist.id] = songDocument.artist
 
         // Ensure initialization of arrays/maps
         acc.songsByArtist[songDocument.artist.id] =
           acc.songsByArtist[songDocument.artist.id] || [];
-        acc.songsByGenre = song.genres.reduce((genresAcc, genre) => {
+        const genres = songDocument.genre?.split(',') || []
+        acc.songsByGenre = genres.reduce((genresAcc: { [key: string]: string[] }, genre: string) => {
           genresAcc[genre] = genresAcc[genre] || [];
-          genresAcc[genre].push(song.id);
+          genresAcc[genre].push(songDocument.id);
           return genresAcc;
-        }, acc.songsByGenre);
+        }, acc.songsByGenre || {});
         acc.albumsByArtist[songDocument.artist.id] =
           acc.albumsByArtist[songDocument.artist.id] || [];
         acc.songsByAlbum[songDocument.album.id] = acc.songsByAlbum[songDocument.album.id] || [];
-        acc.mediaByType[songDocument.media_type] = acc.mediaByType[songDocument.type] || [];
+        acc.mediaByType[songDocument.type] = acc.mediaByType[songDocument.type] || [];
 
         // Add song ID to relevant arrays if not already present
         if (!acc.songsByArtist[songDocument.artist.id].includes(songDocument.id)) {
@@ -95,8 +89,8 @@ const populateFromAction = (state: State, action: { data: any }): State => {
         if (!acc.songsByAlbum[songDocument.album.id].includes(songDocument.id)) {
           acc.songsByAlbum[songDocument.album.id].push(songDocument.id);
         }
-        if (!acc.mediaByType[songDocument.media_type].includes(songDocument.id)) {
-          acc.mediaByType[songDocument.media_type].push(songDocument.id);
+        if (!acc.mediaByType[songDocument.type].includes(songDocument.id)) {
+          acc.mediaByType[songDocument.type].push(songDocument.id);
         }
 
         return acc;

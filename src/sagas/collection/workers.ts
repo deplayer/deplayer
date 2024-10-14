@@ -80,7 +80,7 @@ export function* generateIndexWorker(service: IndexService): any {
 export function* trackSongPlayed(action: { type: string, songId: string }): any {
   yield call(collectionService.initialize)
   const songRow = yield call(collectionService.get, action.songId)
-  const song = rowToSong(songRow)
+  const song = rowToSong(songRow[0])
   const prevCount = song.playCount || 0
   song.playCount = prevCount + 1
   const songDocument = song.toDocument()

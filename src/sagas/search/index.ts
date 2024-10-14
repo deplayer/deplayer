@@ -11,7 +11,6 @@ import {
 import { push } from "redux-first-history"
 import * as types from '../../constants/ActionTypes'
 import ProvidersService from '../../services/ProvidersService'
-import Media from '../../entities/Media'
 import { getSettings } from './../selectors'
 
 // Handle every provider as independent thread
@@ -23,10 +22,10 @@ function* performSingleSearch(
     const settings = yield select(getSettings)
     const providerService = new ProvidersService(settings)
     const searchResults = yield call(providerService.searchForProvider, searchTerm, provider)
-    const serializedResults = searchResults.map((r: Media) => r.toDocument())
-    yield put({ type: types.RECEIVE_COLLECTION, data: serializedResults })
+
+    yield put({ type: types.RECEIVE_COLLECTION, data: searchResults })
     yield put({ type: types.RECREATE_INDEX })
-    yield put({ type: types.ADD_TO_COLLECTION, data: serializedResults })
+    yield put({ type: types.ADD_TO_COLLECTION, data: searchResults })
   } catch (e: any) {
     console.log(e)
 

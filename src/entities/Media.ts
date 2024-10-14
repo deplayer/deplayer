@@ -1,6 +1,6 @@
 import MediaId from './MediaId'
-import Album from './Album'
-import Artist from './Artist'
+import Album, { IAlbum } from './Album'
+import Artist, { IArtist } from './Artist'
 
 type streamUri = {
   uri: string
@@ -11,50 +11,31 @@ export interface Stream {
   uris: Array<streamUri>
 }
 
-type MediaType = 'video' | 'audio'
-
 export interface Cover {
   thumbnailUrl: string,
   fullUrl: string
 }
 
-interface MediaParams {
+export interface IMedia {
+  id?: string
   title: string
+  cover?: Cover
+  artist: IArtist
+  album: IAlbum
   artistName: string
   artistId?: string
-  albumId?: string
-  albumName: string
+  type?: 'audio' | 'video'
   duration?: number
-  genre?: string
-  cover?: Cover
+  externalId?: string
   stream: { [key: string]: Stream }
   playCount?: number
-  shareUrl?: string
-  filePath?: string
-  forcedId?: string | null
-  type?: string
-  track?: number
-  year?: number
-}
-
-export interface IMedia {
-  id: string
-  title: string
-  cover?: Cover
-  artist: Artist
-  album: Album
-  artistName: string
-  type?: string
-  duration: number
-  externalId: string
-  stream: { [key: string]: Stream }
-  playCount: number
   genre?: string
   shareUrl?: string
   albumName: string
   filePath?: string
   forcedId?: string | null
   track?: number
+  year?: number
 }
 
 export default class Media implements IMedia {
@@ -64,19 +45,20 @@ export default class Media implements IMedia {
   artist: Artist
   album: Album
   artistName: string
-  type?: string
+  type?: 'audio' | 'video'
   duration: number
   externalId: string
   stream: { [key: string]: Stream }
   playCount: number
   genre?: string
+  year?: number
   shareUrl?: string
   albumName: string
   filePath?: string
   forcedId?: string | null
   track?: number
 
-  constructor(songParams: MediaParams) {
+  constructor(songParams: IMedia) {
     this.title = songParams.title
     this.playCount = songParams.playCount ?? 0
     this.duration = songParams.duration ?? 0
@@ -90,13 +72,8 @@ export default class Media implements IMedia {
     this.artist = artist
 
     this.artistName = artist.name
-    this.album = new Album({
-      albumId: songParams.albumId,
-      name: songParams.albumName || '',
-      artist: artist,
-      thumbnailUrl: songParams.cover?.thumbnailUrl,
-      year: songParams.year
-    })
+    const albumProps = songParams.album
+    this.album = new Album(albumProps)
 
     this.stream = songParams.stream || {}
 
@@ -140,21 +117,6 @@ export default class Media implements IMedia {
     return result
   }
 
-  get media_type(): MediaType {
-    const uris: Array<string> = []
-    Object.values(this.stream).forEach((stream) => stream.uris.forEach((uri) => uris.push(uri.uri)))
-
-    if (uris.filter((uri) => uri.endsWith('.mp4')).length) {
-      return 'video'
-    }
-
-    if (this.hasAnyProviderOf(['youtube', 'webtorrent'])) {
-      return 'video'
-    }
-
-    return 'audio'
-  }
-
   get genres(): Array<string> {
     return this.genre ? this.genre.split(',') : []
   }
@@ -171,13 +133,13 @@ export default class Media implements IMedia {
       albumName: this.albumName,
       playCount: this.playCount,
       filePath: this.filePath,
-      type: this.media_type,
+      type: this.type,
       track: this.track,
       duration: this.duration
     }
   }
 
   toJSON() {
-    return { ...this, type: this.media_type }
+    return { ...this }
   }
 }

@@ -7,8 +7,6 @@ describe('QueueService', () => {
   it('should handle save', () => {
     const queueService = new QueueService(new DummyAdapter())
 
-    expect.assertions(1)
-
     queueService.save('123', defaultState)
       .then((result) => {
         expect(result).toBeDefined()

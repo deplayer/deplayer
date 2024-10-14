@@ -23,6 +23,8 @@ export const metadataToSong = (
   const genre = metadata.common.genre ? metadata.common.genre.map((genre: any) => genre).join(', ') : ''
   const song = new Media({
     title: metadata.common.title || fileUri,
+    artist: { name: metadata.common.artist || '' },
+    album: { name: metadata.common.album || '', artist: { name: metadata.common.artist || '' } },
     artistName: metadata.common.artist || '',
     albumName: metadata.common.album || '',
     type: fileUri.endsWith('.mp4') ? 'video' : 'audio',

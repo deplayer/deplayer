@@ -15,7 +15,15 @@ type Props = {
   albumName: string
 }
 
-const Content = (props: any) => {
+interface ContentProps {
+  alt: string,
+  src?: string,
+  noImage?: boolean,
+  reflect?: boolean,
+  useImage?: boolean
+}
+
+const Content = (props: ContentProps) => {
   const placeholderUrl = '/disc.svg'
   const imageUrl = props.noImage ? placeholderUrl : props.src
 
@@ -59,7 +67,7 @@ const Img = (props: ImgProps) => {
       reflect={props.reflect}
       onClick={props.onClick}
     >
-      <Content useImage={props.useImage} src={props.src} />
+      <Content useImage={props.useImage} src={props.src} alt='' />
     </LazyImage>
   )
 }

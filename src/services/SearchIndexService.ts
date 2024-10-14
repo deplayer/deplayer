@@ -1,5 +1,5 @@
 import { IStorageService } from './IStorageService'
-import { IAdapter } from './database/IAdapter'
+import { IAdapter, Models } from './database/IAdapter'
 import logger from '../utils/logger'
 
 export default class SearchIndexService implements IStorageService {
@@ -9,7 +9,7 @@ export default class SearchIndexService implements IStorageService {
     this.storageAdapter = storageAdapter
   }
 
-  initialize = (model: string) => {
+  initialize = (model: Models) => {
     this.storageAdapter.initialize(model)
   }
 

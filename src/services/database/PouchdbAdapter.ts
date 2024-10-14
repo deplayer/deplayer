@@ -88,11 +88,6 @@ export default class PouchdbAdapter implements IAdapter {
     })
   }
 
-  getQueryObj = async (model: string): Promise<any> => {
-    const instance = await db.get()
-    return instance[model].find()
-  }
-
   exportCollection = async (model: string): Promise<any> => {
     const instance = await db.get()
     return instance[model].dump()

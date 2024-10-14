@@ -17,7 +17,8 @@ export function* initialize(): Generator<any, void, any> {
       yield put({ type: types.GET_SETTINGS_REJECTED })
     } else {
       const unserialized = JSON.parse(JSON.stringify(settings))
-      yield put({ type: types.RECEIVE_SETTINGS, settings: unserialized })
+      const settingsObj = unserialized[0].settings
+      yield put({ type: types.RECEIVE_SETTINGS, settings: settingsObj })
     }
     yield put({ type: types.RECEIVE_SETTINGS_FINISHED })
   } catch {
