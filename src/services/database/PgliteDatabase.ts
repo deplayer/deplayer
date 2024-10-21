@@ -1,8 +1,12 @@
 import { PGlite } from '@electric-sql/pglite'
+import { electricSync } from '@electric-sql/pglite-sync'
+
 import { drizzle, PgliteDatabase } from 'drizzle-orm/pglite'
 
 import type { MigrationConfig } from "drizzle-orm/migrator"
 import migrations from "./migrations.json"
+
+const BASE_URL = 'http://localhost:8080'
 
 let dbPromise: Promise<PgliteDatabase> | null = null
 
@@ -10,7 +14,7 @@ export function getClient(): PGlite {
   if (process.env.NODE_ENV === 'test') {
     return new PGlite()
   } else {
-    return new PGlite('idb://deplayer-pglite', { debug: 5 })
+    return new PGlite('idb://deplayer-pglite', { debug: 1, extensions: { electric: electricSync() } })
   }
 }
 
@@ -28,6 +32,12 @@ const _create = async (): Promise<PgliteDatabase> => {
   console.log('pglite object:', db)
 
   await migrate(db)
+
+  client.electric.syncShapeToTable({
+    url: `${BASE_URL}/v1/shape/media`,
+    table: 'media',
+    primaryKey: ['id'],
+  })
 
   return db
 }
