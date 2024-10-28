@@ -51,7 +51,6 @@ async function changeCurrentPlaying(song: any, index: number, dispatch: Dispatch
   dispatch({ type: types.SET_CURRENT_PLAYING_URL, url: streamUri })
 }
 
-
 const SongView = ({
   songId,
   loading,
@@ -129,7 +128,7 @@ const SongView = ({
     : null
 
   const relatedAlbums = song.artist.id && albumsByArtist?.[song.artist.id].map((albumId: string) => {
-    return new Album({ ...albums[albumId], artist: song.artist })
+    return new Album({ ...albums[albumId] })
   }) || []
 
   const songFinder = song.id === currentPlaying

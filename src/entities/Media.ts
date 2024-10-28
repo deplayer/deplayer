@@ -72,7 +72,7 @@ export default class Media implements IMedia {
     this.artist = artist
 
     this.artistName = artist.name
-    const albumProps = songParams.album
+    const albumProps = { ...songParams.album, thumbnailUrl: songParams.cover?.thumbnailUrl }
     this.album = new Album(albumProps)
 
     this.stream = songParams.stream || {}

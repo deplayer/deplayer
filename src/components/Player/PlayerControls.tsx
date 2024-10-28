@@ -14,7 +14,7 @@ import { State as AppState } from '../../reducers/app'
 import Controls from './Controls'
 import Cover from './Cover'
 import ProgressBar from './ProgressBar'
-// import Visualizer from './../Visualizer'
+import Visualizer from './../Visualizer'
 import WebtorrentPlayer from './CustomPlayers/WebtorrentPlayer'
 import * as types from '../../constants/ActionTypes'
 
@@ -151,8 +151,7 @@ class PlayerControls extends React.Component<Props> {
       }
     }
 
-    // const visualizer = <Visualizer playerRef={this.playerRef.current} visualizerOnTop={this.props.player.fullscreen} /> 
-    const visualizer = null
+    const visualizer = <Visualizer playerRef={this.playerRef.current} visualizerOnTop={this.props.player.fullscreen} />
 
     if (currentPlaying.type === 'audio') {
       config.file.attributes['crossOrigin'] = 'anonymous'
@@ -207,7 +206,7 @@ class PlayerControls extends React.Component<Props> {
               enter={true}
               exit={true}
             >
-              <div key='player-controls' className='flex justify-between items-center flex-col  bg-gray-100/70 dark:bg-black/90'>
+              <div key='player-controls' className='flex justify-between items-center flex-col  bg-gray-100/70 dark:bg-black/80'>
                 <div className='absolute w-full md:top-0'>
                   <ProgressBar
                     dispatch={this.props.dispatch}
