@@ -53,6 +53,11 @@ class AudioSpectrum extends React.Component<Props> {
   visualsCanvasId: string
   visualizer: any
   analyser: any
+  mediaSource: any = null;
+
+  // Add static property to track sources
+  private static audioSources = new WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>();
+  private static audioContext: AudioContext | null = null;
 
   constructor(props: Props) {
     super(props)
@@ -117,10 +122,14 @@ class AudioSpectrum extends React.Component<Props> {
   }
 
   componentWillUnmount() {
-    this.spectrumCanvas = null
-    this.visualsCanvas = null
-    this.audioContext = null
-    this.visualizer = null
+    if (this.analyser) {
+      this.analyser.disconnect();
+    }
+    // Don't disconnect mediaSource as it's shared
+    this.spectrumCanvas = null;
+    this.visualsCanvas = null;
+    this.audioContext = null;
+    this.visualizer = null;
   }
 
   initAudioEvents = (analyser: AnalyserNode) => {
@@ -222,16 +231,29 @@ class AudioSpectrum extends React.Component<Props> {
   }
 
   setupAudioNode = (audioEle: HTMLMediaElement) => {
-    const analyser = this.audioContext.createAnalyser()
-    analyser.smoothingTimeConstant = 0.8
-    analyser.fftSize = 2048
+    const analyser = this.audioContext.createAnalyser();
+    analyser.smoothingTimeConstant = 0.8;
+    analyser.fftSize = 2048;
 
-    const mediaEleSource = this.audioContext.createMediaElementSource(audioEle)
+    let source = AudioSpectrum.audioSources.get(audioEle as HTMLAudioElement);
+    
+    if (!source) {
+      source = this.audioContext.createMediaElementSource(audioEle);
+      AudioSpectrum.audioSources.set(audioEle as HTMLAudioElement, source);
+    }
 
-    mediaEleSource.connect(analyser)
-    mediaEleSource.connect(this.audioContext.destination);
+    // Disconnect existing connections
+    try {
+      source.disconnect();
+    } catch (e) {
+      // Ignore disconnect errors
+    }
 
-    return analyser
+    source.connect(analyser);
+    source.connect(this.audioContext.destination);
+    this.mediaSource = source;
+
+    return analyser;
   }
 
   prepareElements = () => {
@@ -243,9 +265,12 @@ class AudioSpectrum extends React.Component<Props> {
 
   prepareAPIs = () => {
     try {
-      this.audioContext = new AudioContext() // 1.set audioContext
+      if (!AudioSpectrum.audioContext) {
+        AudioSpectrum.audioContext = new AudioContext();
+      }
+      this.audioContext = AudioSpectrum.audioContext;
     } catch (e) {
-      logger.log('!Your browser does not support AudioContext')
+      logger.log('!Your browser does not support AudioContext');
     }
   }
 
