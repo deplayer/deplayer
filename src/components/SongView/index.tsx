@@ -292,7 +292,7 @@ const SongView = ({
               <Tag transparent>{song.type}</Tag>
             </div>
             <div className='mt-2'>
-              <Translate value='song.label.played' /> {song.playCount || 0} <Translate value='song.label.times' />
+              <Translate value='song.label.played' /> {song.playCount ?? 0} <Translate value='song.label.times' />
             </div>
             <div className='mt-2 flex items-center'>
               <Translate className='mr-2' value='labels.providers' />
