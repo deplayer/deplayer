@@ -8,6 +8,13 @@
       "when": 1728946028438,
       "tag": "0000_lazy_kulan_gath",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1731073136613,
+      "tag": "0001_nifty_paladin",
+      "breakpoints": true
     }
   ]
 }

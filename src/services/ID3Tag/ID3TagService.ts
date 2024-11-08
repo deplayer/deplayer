@@ -1,9 +1,12 @@
-import * as musicMetadata from 'music-metadata-browser'
+import * as musicMetadata from 'music-metadata'
 
 import Media from '../../entities/Media'
 
 export const readFileMetadata = async (file: any) => {
   const normFile = file.contents ? file.contents : file
+
+  console.log('reading metadata from file: ', normFile)
+
   const metadata = await musicMetadata.parseBlob(normFile)
   console.log('file metadata: ', metadata)
   return metadata
