@@ -24,6 +24,7 @@ export const metadataToSong = (
   service: string,
 ): Media => {
   const genre = metadata.common.genre ? metadata.common.genre.map((genre: any) => genre).join(', ') : ''
+  const cover = metadata.common.picture ? metadata.common.picture[0] : null
   const song = new Media({
     title: metadata.common.title || fileUri,
     artist: { name: metadata.common.artist || '' },

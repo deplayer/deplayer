@@ -1,0 +1,1 @@
+ALTER TABLE "media" ALTER COLUMN "duration" SET DATA TYPE real;

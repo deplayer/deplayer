@@ -7,7 +7,7 @@ export const media = pgTable("media", {
   artist: json("artist").notNull(),
   type: text("type").notNull(),
   album: json("album").notNull(),
-  cover: json("cover").notNull(),
+  cover: json("cover"),
   stream: json("stream").notNull(),
   duration: real("duration").notNull(),
   playCount: integer("playCount").notNull(),
