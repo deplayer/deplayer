@@ -14,6 +14,9 @@ export default defineConfig({
     srcDir: 'src',
     filename: 'sw.ts',
     includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+    workbox: {
+      globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,json}']
+    },
     injectManifest: {
       maximumFileSizeToCacheInBytes: 11 * 1024 * 1024,
     },
