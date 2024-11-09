@@ -41,6 +41,7 @@
     "@testing-library/react": "^15.0.7",
     "@types/parse-torrent": "^5.8.7",
     "@types/react": "^18.2.66",
+    "@types/react-command-palette": "^0.18.4",
     "@types/react-dom": "^18.2.22",
     "@types/react-key-handler": "^1.2.4",
     "@types/react-modal": "^3.16.3",

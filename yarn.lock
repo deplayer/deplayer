@@ -2566,6 +2566,13 @@
   resolved "https://registry.npmjs.org/@types/range-parser/-/range-parser-1.2.7.tgz"
   integrity sha512-hKormJbkJqzQGhziax5PItDUTMAM9uE2XXQmM37dyd4hVM+5aVl7oVxMVUiVQn2oCQFN/LKCZdvSM0pFRqbSmQ==
 
+"@types/react-command-palette@^0.18.4":
+  version "0.18.4"
+  resolved "https://registry.npmjs.org/@types/react-command-palette/-/react-command-palette-0.18.4.tgz"
+  integrity sha512-NwIi0AgU21kRBhGJfKWO6LeFgep9Id43q3rxjXOiVZ04dxBmItsnchk7WiYX+HvetZCHdWvGL6st099dTuY6PQ==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-dom@^18.0.0", "@types/react-dom@^18.2.22":
   version "18.3.0"
   resolved "https://registry.npmjs.org/@types/react-dom/-/react-dom-18.3.0.tgz"

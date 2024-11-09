@@ -1,6 +1,7 @@
 import { Dispatch } from 'redux'
 import React from 'react'
 
+import CommandPalette from '../CommandPalette'
 import CollectionMenuItem from './CollectionMenuItem'
 import SettingsMenuItem from './SettingsMenuItem'
 import PlaylistsMenuItem from './PlaylistsMenuItem'
@@ -58,6 +59,7 @@ const SidebarContents = (props: ContentProps) => {
 
   return (
     <div className='flex flex-col' onClick={() => props.onSetSidebarOpen()}>
+      <CommandPalette />
       <SwitchThemeButton />
       <h4 className="text-xl text-center py-4 bg-gray-900 text-blue-500 tracking-wider select-none">
         <span className='text-blue-200'>d</span>eplayer
