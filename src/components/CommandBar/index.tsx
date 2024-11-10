@@ -16,14 +16,14 @@ function CommandBar({ dispatch }: Props) {
       color: '#fff',
       name: "Add new media",
       command() {
-        dispatch({ type: types.SHOW_ADD_MEDIA_MODAL })
+        return dispatch({ type: types.SHOW_ADD_MEDIA_MODAL })
       }
     }, {
       id: 2,
       color: '#fff',
       name: "Toggle visuals",
       command() {
-        dispatch({ type: types.TOGGLE_VISUALS })
+        return dispatch({ type: types.TOGGLE_VISUALS })
       }
     },
     {
@@ -31,16 +31,14 @@ function CommandBar({ dispatch }: Props) {
       color: '#fff',
       name: "Toggle spectrum",
       command() {
-        dispatch({ type: types.TOGGLE_SPECTRUM })
+        return dispatch({ type: types.TOGGLE_SPECTRUM })
       }
     }
   ]
 
-  const trigger = "command bar"
-
   return (
-    <div className='absolute mt-5'>
-      <CommandPalette commands={commands} trigger={trigger} />
+    <div className='px-6 py-4 text-xs'>
+      <CommandPalette commands={commands} closeOnSelect />
     </div>
   )
 }
