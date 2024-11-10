@@ -1,6 +1,7 @@
 import { Dispatch } from 'redux'
 import React from 'react'
 
+import CommandBar from '../CommandBar'
 import CollectionMenuItem from './CollectionMenuItem'
 import SettingsMenuItem from './SettingsMenuItem'
 import PlaylistsMenuItem from './PlaylistsMenuItem'
@@ -91,6 +92,8 @@ const SidebarContents = (props: ContentProps) => {
         />
         <SettingsMenuItem current={inSection(location, 'settings')} />
       </ul>
+
+      <CommandBar dispatch={props.dispatch} />
 
       <section className='p-6 pt-8 bottom-0 text-xs text-center w-full'>
         <a

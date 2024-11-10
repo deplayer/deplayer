@@ -1,4 +1,4 @@
-import { text, json, boolean, pgTable, integer } from "drizzle-orm/pg-core";
+import { text, json, boolean, pgTable, integer, real } from "drizzle-orm/pg-core";
 
 export const media = pgTable("media", {
   id: text("id").primaryKey(),
@@ -7,9 +7,9 @@ export const media = pgTable("media", {
   artist: json("artist").notNull(),
   type: text("type").notNull(),
   album: json("album").notNull(),
-  cover: json("cover").notNull(),
+  cover: json("cover"),
   stream: json("stream").notNull(),
-  duration: integer("duration").notNull(),
+  duration: real("duration").notNull(),
   playCount: integer("playCount").notNull(),
   genre: text("genre"),
   track: integer("track"),

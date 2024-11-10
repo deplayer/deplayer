@@ -25,7 +25,7 @@ const Button = (props: Props) => {
     uppercase: props.uppercase,
     'text-sky-200': !props.transparent || !props.inverted,
     'text-sky-800': props.inverted || props.transparent,
-    'dark:text-sky-200': !props.transparent || props.inverted,
+    'dark:text-sky-200': props.transparent || props.inverted,
     'hover:dark:text-sky-200': !props.transparent || props.inverted,
     'bg-sky-700': !props.transparent && !props.inverted,
     'hover:bg-sky-500': !props.transparent && !props.inverted,

@@ -1,27 +1,27 @@
-import * as musicMetadata from 'music-metadata-browser'
+import * as musicMetadata from 'music-metadata'
+import { writeFile } from '@happy-js/happy-opfs'
 
-import Media from '../../entities/Media'
+import Media, { IMedia, Cover } from '../../entities/Media'
 
 export const readFileMetadata = async (file: any) => {
   const normFile = file.contents ? file.contents : file
+
+  console.log('reading metadata from file: ', normFile)
+
   const metadata = await musicMetadata.parseBlob(normFile)
   console.log('file metadata: ', metadata)
   return metadata
 }
 
-export const getFileMetadata = async (file: any, settings: any) => {
-  const { proto, host, port } = settings.app.ipfs
-  const metadata = await musicMetadata.fetchFromUrl(`${proto}://${host}:${port}/ipfs/${file.path}`)
-  return metadata
-}
-
-export const metadataToSong = (
+export async function metadataToSong(
   metadata: musicMetadata.IAudioMetadata,
   fileUri: string,
   service: string,
-): Media => {
-  const genre = metadata.common.genre ? metadata.common.genre.map((genre: any) => genre).join(', ') : ''
-  const song = new Media({
+): Promise<Media> {
+  const genre = metadata.common.genre ? metadata.common.genre.map((genre: string) => genre).join(', ') : ''
+  const cover = metadata.common.picture ? metadata.common.picture[0] : null
+
+  let mediaProps: IMedia = {
     title: metadata.common.title || fileUri,
     artist: { name: metadata.common.artist || '' },
     album: { name: metadata.common.album || '', artist: { name: metadata.common.artist || '' } },
@@ -40,7 +40,17 @@ export const metadataToSong = (
         ]
       }
     }
-  })
+  }
+
+  if (cover?.data) {
+    const coverFsUri = `/${fileUri}/${cover.name}`
+    await writeFile(coverFsUri, cover.data)
+
+    const mediaCover: Cover = { thumbnailUrl: coverFsUri, fullUrl: coverFsUri }
+    mediaProps = { ...mediaProps, cover: mediaCover }
+  }
+
+  const song = new Media(mediaProps)
 
   return song
 }

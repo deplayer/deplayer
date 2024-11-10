@@ -67,8 +67,6 @@ export default class Pglite implements IAdapter {
   }
 
   get = async (model: Models, id: string): Promise<any> => {
-    await db.get()
-
     return this.getDocObj(model, id)
   }
 
