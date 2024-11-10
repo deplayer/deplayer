@@ -3,6 +3,7 @@ import 'react-contexify/ReactContexify.css';
 import { Menu, useContextMenu, Item } from 'react-contexify'
 import { Translate } from 'react-redux-i18n'
 import React from 'react'
+import { Dispatch } from 'redux'
 
 import Button from '../common/Button'
 import Icon from '../common/Icon'
@@ -12,14 +13,16 @@ import VolumeControl from './VolumeControl'
 import * as types from '../../constants/ActionTypes'
 import Controls from './Controls'
 import { State as AppState } from '../../reducers/app'
+import { State as PlayerState } from '../../reducers/player'
+import { State as QueueState } from '../../reducers/queue'
 
 const MENU_ID = 'context-menu-player'
 
 type MenuProps = {
   app: AppState,
-  player: any,
-  queue: any,
-  dispatch: (action: any) => void,
+  player: PlayerState,
+  queue: QueueState,
+  dispatch: Dispatch,
   volume: number,
 }
 

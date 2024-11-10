@@ -151,7 +151,13 @@ class PlayerControls extends React.Component<Props> {
       }
     }
 
-    const visualizer = <Visualizer playerRef={this.playerRef.current} visualizerOnTop={this.props.player.fullscreen} />
+    const visualizer = this.playerRef.current ? (
+      <Visualizer
+        playerRef={this.playerRef.current}
+        visualizerOnTop={this.props.player.fullscreen}
+      />
+    ) : null;
+
 
     if (currentPlaying.type === 'audio') {
       config.file.attributes['crossOrigin'] = 'anonymous'

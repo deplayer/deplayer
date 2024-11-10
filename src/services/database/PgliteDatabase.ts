@@ -6,8 +6,6 @@ import { drizzle, PgliteDatabase } from 'drizzle-orm/pglite'
 import type { MigrationConfig } from "drizzle-orm/migrator"
 import migrations from "./migrations.json"
 
-const BASE_URL = 'http://localhost:8080'
-
 let dbPromise: Promise<PgliteDatabase> | null = null
 
 export function getClient(): PGlite {
@@ -33,11 +31,14 @@ const _create = async (): Promise<PgliteDatabase> => {
 
   await migrate(db)
 
+  /**
+  const BASE_URL = 'http://localhost:8080'
+
   client.electric.syncShapeToTable({
     url: `${BASE_URL}/v1/shape/media`,
     table: 'media',
     primaryKey: ['id'],
-  })
+  }) **/
 
   return db
 }

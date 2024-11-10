@@ -1,7 +1,7 @@
 import { Dispatch } from 'redux'
 import React from 'react'
 
-import CommandPalette from '../CommandPalette'
+import CommandBar from '../CommandBar'
 import CollectionMenuItem from './CollectionMenuItem'
 import SettingsMenuItem from './SettingsMenuItem'
 import PlaylistsMenuItem from './PlaylistsMenuItem'
@@ -59,7 +59,6 @@ const SidebarContents = (props: ContentProps) => {
 
   return (
     <div className='flex flex-col' onClick={() => props.onSetSidebarOpen()}>
-      <CommandPalette />
       <SwitchThemeButton />
       <h4 className="text-xl text-center py-4 bg-gray-900 text-blue-500 tracking-wider select-none">
         <span className='text-blue-200'>d</span>eplayer
@@ -93,6 +92,8 @@ const SidebarContents = (props: ContentProps) => {
         />
         <SettingsMenuItem current={inSection(location, 'settings')} />
       </ul>
+
+      <CommandBar dispatch={props.dispatch} />
 
       <section className='p-6 pt-8 bottom-0 text-xs text-center w-full'>
         <a

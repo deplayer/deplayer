@@ -1,16 +1,13 @@
 import {
-  actionChannel,
   call,
   put,
-  fork,
-  take,
   takeLatest,
   takeEvery,
   select
 } from 'redux-saga/effects'
 
 import { getAdapter } from '../../services/database'
-import { getFileMetadata, metadataToSong, readFileMetadata } from '../../services/ID3Tag/ID3TagService'
+import { metadataToSong, readFileMetadata } from '../../services/ID3Tag/ID3TagService'
 import { getSettings } from '../selectors'
 import CollectionService from '../../services/CollectionService'
 import YoutubeDlServerProvider from '../../providers/YoutubeDlServerProvider'
@@ -25,7 +22,7 @@ export function* startProvidersScan(): any {
     return key.match(/ipfs|youtube-dl-server/)
   })
 
-  for (let key of providerKeys) {
+  for (const key of providerKeys) {
     if (key.match(/youtube-dl-server/)) {
       yield put({ type: 'START_YOUTUBE_DL_SERVER_SCAN', data: settings.providers[key], key })
     }
@@ -129,39 +126,6 @@ export function* startFilesystemProcess(action: any): any {
   yield put({ type: types.RECREATE_INDEX })
 }
 
-// IPFS file scan Queue
-// Watcher
-export function* handleIPFSFileLoad(): any {
-  const handleChannel = yield actionChannel(types.IPFS_FILE_FOUND)
-
-  while (true) {
-    // 2- take from the channel
-    const { file } = yield take(handleChannel)
-    // 3- Note that we're using a blocking call
-    try {
-      const settings = yield select(getSettings)
-      const metadata = yield call(getFileMetadata, file, settings)
-
-      const song = yield call(metadataToSong, metadata, file.hash, 'ipfs')
-
-      const adapter = getAdapter()
-      const collectionService = new CollectionService(adapter)
-
-      // Save song
-      yield call(collectionService.save, song.id, song.toDocument())
-
-      yield put({ type: types.IPFS_SONG_SAVED, song })
-      yield put({
-        type: types.SEND_NOTIFICATION,
-        notification: song.title + ' - ' + song.artistName + ' saved',
-        level: 'info'
-      })
-    } catch (e) {
-      yield put({ type: types.IPFS_NON_SUPPORTED_ITEM, e })
-    }
-  }
-}
-
 function* startYoutubeDlScan(action: any): Generator<any, void, any> {
   try {
     const settings = yield select(getSettings)
@@ -183,7 +147,6 @@ function* providersSaga(): any {
   yield takeLatest(types.START_SCAN_SOURCES, startProvidersScan)
   yield takeEvery(types.START_YOUTUBE_DL_SERVER_SCAN, startYoutubeDlScan)
   yield takeLatest(types.START_FILESYSTEM_FILES_PROCESSING, startFilesystemProcess)
-  yield fork(handleIPFSFileLoad)
 }
 
 export default providersSaga

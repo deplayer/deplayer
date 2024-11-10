@@ -9,7 +9,7 @@ import classnames from 'classnames'
 
 import logger from '../utils/logger'
 
-declare var AudioContext: any;
+declare let AudioContext: any
 
 type Props = {
   spectrumId?: string,
@@ -21,7 +21,7 @@ type Props = {
   capHeight: number,
   meterWidth: number,
   meterCount: number,
-  meterColor: any,
+  meterColor: { stop: number, color: string }[],
   gap: number,
   showSpectrum?: boolean,
   showVisuals?: boolean,
@@ -45,7 +45,7 @@ class AudioSpectrum extends React.Component<Props> {
   }
 
   animationId: any
-  audioContext: any
+  audioContext: AudioContext | null
   spectrumCanvas: any
   visualsCanvas: any
   playStatus: string | null
@@ -53,7 +53,8 @@ class AudioSpectrum extends React.Component<Props> {
   visualsCanvasId: string
   visualizer: any
   analyser: any
-  mediaSource: any = null;
+  mediaSource: MediaElementAudioSourceNode | null = null;
+
 
   // Add static property to track sources
   private static audioSources = new WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>();
@@ -171,13 +172,13 @@ class AudioSpectrum extends React.Component<Props> {
   drawSpectrum = (analyser: AnalyserNode) => {
     const cwidth = this.spectrumCanvas.width
     const cheight = this.spectrumCanvas.height - this.props.capHeight
-    const capYPositionArray: Array<any> = [] // store the vertical position of hte caps for the preivous frame
+    const capYPositionArray: Array<number> = [] // store the vertical position of hte caps for the preivous frame
     const ctx = this.spectrumCanvas.getContext('2d')
     let gradient = ctx.createLinearGradient(0, 0, 0, 300)
 
     if (this.props.meterColor.constructor === Array) {
-      let stops = this.props.meterColor
-      let len = stops.length
+      const stops = this.props.meterColor
+      const len = stops.length
       for (let i = 0; i < len; i++) {
         gradient.addColorStop(stops[i]['stop'], stops[i]['color'])
       }
@@ -218,7 +219,7 @@ class AudioSpectrum extends React.Component<Props> {
           const y = (270 - value) * cheight / 270
           ctx.fillRect(i * (this.props.meterWidth + this.props.gap), y, this.props.meterWidth, this.props.capHeight)
           capYPositionArray[i] = value
-        };
+        }
         ctx.fillStyle = gradient; // set the filllStyle to gradient for a better look
 
         // let y = cheight - value + this.props.capHeight
@@ -231,15 +232,19 @@ class AudioSpectrum extends React.Component<Props> {
   }
 
   setupAudioNode = (audioEle: HTMLMediaElement) => {
+    if (!this.audioContext) {
+      return
+    }
+
     const analyser = this.audioContext.createAnalyser();
     analyser.smoothingTimeConstant = 0.8;
     analyser.fftSize = 2048;
 
     let source = AudioSpectrum.audioSources.get(audioEle as HTMLAudioElement);
-    
+
     if (!source) {
       source = this.audioContext.createMediaElementSource(audioEle);
-      AudioSpectrum.audioSources.set(audioEle as HTMLAudioElement, source);
+      source && AudioSpectrum.audioSources.set(audioEle as HTMLAudioElement, source)
     }
 
     // Disconnect existing connections
