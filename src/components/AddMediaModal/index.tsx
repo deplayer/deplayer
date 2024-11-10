@@ -34,6 +34,31 @@ const AddMediaModal = (props: Props) => {
       }}
     >
       <Header>Deplayer supports several ways to access your media! If you have a provider such as Subsonic compatible API visit Providers section!</Header>
+      { /* Filesystem */}
+      <div className='my-6'>
+        <Header>
+          Open local filesystem directory
+        </Header>
+
+        <input multiple className='hidden' id="filePicker" type="file" name="file" />
+
+        <div className='flex justify-end'>
+          <Button
+            fullWidth
+            type='submit'
+            onClick={async () => {
+              const files = await fileManager.openDialog()
+              props.dispatch({
+                type: types.START_FILESYSTEM_FILES_PROCESSING,
+                files: files
+              })
+            }}
+          >
+            Open
+          </Button>
+        </div>
+      </div>
+
       <div className='my-6'>
         <Header>
           Magnet link (powered by <a target="_blank" rel="noopener noreferrer" href='https://webtorrent.io/'><span>webtorrent</span></a>. check some <a target="_blank" rel="noopener noreferrer" href="https://webtorrent.io/free-torrents"><span>examples</span></a>)
@@ -78,31 +103,6 @@ const AddMediaModal = (props: Props) => {
             }}
           >
             Add and fetch
-          </Button>
-        </div>
-      </div>
-
-      { /* Filesystem */}
-      <div className='my-6'>
-        <Header>
-          Open local filesystem directory
-        </Header>
-
-        <input multiple className='hidden' id="filePicker" type="file" name="file" />
-
-        <div className='flex justify-end'>
-          <Button
-            fullWidth
-            type='submit'
-            onClick={async () => {
-              const files = await fileManager.openDialog()
-              props.dispatch({
-                type: types.START_FILESYSTEM_FILES_PROCESSING,
-                files: files
-              })
-            }}
-          >
-            Open
           </Button>
         </div>
       </div>

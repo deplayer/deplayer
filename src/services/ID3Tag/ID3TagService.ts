@@ -43,7 +43,8 @@ export async function metadataToSong(
   }
 
   if (cover?.data) {
-    const coverFsUri = `/${fileUri}/${cover.name}`
+    const coverFsUri = `/${fileUri}/${cover.type}.jpeg`
+    console.log(`cover:`, cover)
     await writeFile(coverFsUri, cover.data)
 
     const mediaCover: Cover = { thumbnailUrl: coverFsUri, fullUrl: coverFsUri }
