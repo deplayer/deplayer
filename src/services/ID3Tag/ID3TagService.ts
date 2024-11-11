@@ -3,6 +3,14 @@ import { writeFile } from '@happy-js/happy-opfs'
 
 import Media, { IMedia, Cover } from '../../entities/Media'
 
+function generateHexHash(length: number = 16): string {
+  let hash = '';
+  for (let i = 0; i < length; i++) {
+    hash += Math.floor(Math.random() * 16).toString(16);
+  }
+  return hash;
+}
+
 export const readFileMetadata = async (file: any) => {
   const normFile = file.contents ? file.contents : file
 
@@ -43,11 +51,11 @@ export async function metadataToSong(
   }
 
   if (cover?.data) {
-    const coverFsUri = `/${fileUri}/${cover.type}.jpeg`
-    console.log(`cover:`, cover)
-    await writeFile(coverFsUri, cover.data)
+    const fileName = generateHexHash(10)
+    const coverFs = `/opfs-${fileName}.jpeg`
+    await writeFile(coverFs, cover.data)
 
-    const mediaCover: Cover = { thumbnailUrl: coverFsUri, fullUrl: coverFsUri }
+    const mediaCover: Cover = { thumbnailUrl: coverFs, fullUrl: coverFs }
     mediaProps = { ...mediaProps, cover: mediaCover }
   }
 

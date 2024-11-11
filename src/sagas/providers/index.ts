@@ -14,6 +14,8 @@ import YoutubeDlServerProvider from '../../providers/YoutubeDlServerProvider'
 import * as types from '../../constants/ActionTypes'
 import FileManager from '../../services/Filesystem/FileManager'
 
+const validExtensions = ['mp3', 'mp4', 'flac']
+
 // Watcher should enque tasks to avoid concurrency
 export function* startProvidersScan(): any {
   const settings = yield select(getSettings)
@@ -99,6 +101,10 @@ export function* startFilesystemProcess(action: any): any {
 
       yield put({ type: types.START_FILESYSTEM_FILES_PROCESSING, files: files })
 
+      break
+    }
+
+    if (validExtensions[file.file.extension]) {
       break
     }
 
