@@ -5,6 +5,7 @@ import Media, { IMedia } from './Media'
 export const mediaParams: IMedia = {
   id: '1',
   title: 'title',
+  type: 'audio',
   artist: { name: 'artist' },
   artistName: 'artistName',
   artistId: '1',

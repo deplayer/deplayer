@@ -9,7 +9,7 @@ export default class Pglite implements IAdapter {
   }
 
   save = async (model: Models, id: string, payload: any): Promise<any> => {
-    const fixedPayload = { id: id, ...payload, type: model }
+    const fixedPayload = { id: id, ...payload }
 
     const instance = await db.get()
     console.log('instance:', instance)

@@ -24,7 +24,7 @@ export interface IMedia {
   album: IAlbum
   artistName: string
   artistId?: string
-  type?: 'audio' | 'video'
+  type: 'audio' | 'video'
   duration?: number
   externalId?: string
   stream: { [key: string]: Stream }
@@ -45,7 +45,7 @@ export default class Media implements IMedia {
   artist: Artist
   album: Album
   artistName: string
-  type?: 'audio' | 'video'
+  type: 'audio' | 'video'
   duration: number
   externalId: string
   stream: { [key: string]: Stream }
@@ -67,6 +67,7 @@ export default class Media implements IMedia {
     this.albumName = songParams.albumName
     this.filePath = songParams.filePath
     this.forcedId = songParams.forcedId
+    this.type = songParams.type
 
     const artist = this.generateArtist(songParams.artistName, songParams.artistId)
     this.artist = artist

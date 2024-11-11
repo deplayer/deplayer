@@ -28,9 +28,11 @@ import Wiki from './components/Wiki'
 import GlobalKeyHandlers from './components/GlobalKeyHandlers'
 import { store, history } from './store/configureStore'
 
-const Song = () => {
-  const playerPortal = React.useMemo(() => portals.createHtmlPortalNode(), [])
+interface SongProps {
+  playerPortal: portals.HtmlPortalNode
+}
 
+const Song = ({ playerPortal }: SongProps) => {
   return (
     <React.Fragment>
       <QueueContainer slim className='slim' />
@@ -53,7 +55,7 @@ const App = () => {
             <Route path="/playlists" element={<PlaylistsContainer />} />
             <Route path="/collection/*" element={<CollectionContainer />} />
             <Route path="/search-results" element={<SearchResultsContainer />} />
-            <Route path="/song/:id" element={<Song />} />
+            <Route path="/song/:id" element={<Song playerPortal={playerPortal} />} />
             <Route path="/album/:id" element={<AlbumContainer />} />
             <Route path="/artist/:id" element={<ArtistContainer />} />
             <Route path="/artists" element={<ArtistsContainer />} />

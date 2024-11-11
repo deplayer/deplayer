@@ -1,4 +1,4 @@
-import Webtorrent from 'webtorrent'
+import Webtorrent, { Torrent, TorrentFile } from 'webtorrent'
 
 import Media from '../../entities/Media'
 
@@ -18,18 +18,18 @@ const audioExtensions = ['.mp3']
 export const magnetToMedia = async (torrentUrl: string): Promise<Array<Media>> => {
   const client = new Webtorrent()
 
-  return new Promise((resolve): any => {
+  return new Promise((resolve): void => {
     console.log('adding: ', torrentUrl)
 
     client.add(torrentUrl, {
       announce: announceList
-    }, (torrent: any) => {
+    }, (torrent: Torrent) => {
       console.log('files detected: ', torrent.files)
-      const files = torrent.files.filter((file: any) => {
+      const files = torrent.files.filter((file: TorrentFile) => {
         return [...videoExtensions, ...audioExtensions].some((ext) => file.name.endsWith(ext))
       })
 
-      const medias = files.map((file: any) => {
+      const medias = files.map((file: TorrentFile) => {
         const type = videoExtensions.some((ext) => file.name.endsWith(ext)) ? 'video' : 'audio'
         return new Media({
           title: file.name,
