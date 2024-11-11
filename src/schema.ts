@@ -11,7 +11,7 @@ export const media = pgTable("media", {
   stream: json("stream").notNull(),
   duration: real("duration").notNull(),
   playCount: integer("playCount").notNull(),
-  genre: json("genre"),
+  genres: json("genres"),
   track: integer("track"),
   year: integer("year"),
 })

@@ -1,6 +1,6 @@
 {
-  "id": "a8f21c84-9f15-499f-ac6d-5382d6471094",
-  "prevId": "3fdd251b-0629-427d-826e-909d25adcf08",
+  "id": "e2b31631-3f9b-42cd-b70f-30854f9f288e",
+  "prevId": "a8f21c84-9f15-499f-ac6d-5382d6471094",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -61,12 +61,6 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
-        },
-        "genre": {
-          "name": "genre",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
         },
         "genres": {
           "name": "genres",

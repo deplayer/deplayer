@@ -118,7 +118,7 @@ const SongView = ({
     return <NotFound>The requested song can not be found</NotFound>
   }
 
-  const genres = song.genre || []
+  const genres = song.genres || []
 
   const sameGenreSongs = genres.length && songsByGenre[genres[0]]
     ? songsByGenre[genres[0]]
@@ -257,9 +257,9 @@ const SongView = ({
           </div>
         </div>
 
-        <div className="content flex-grow pt-6 sm:pt-0 md:pt-6 md:pr-6">
+        <div className="content flex-grow pt-6 sm:pt-0 md:pt-6 md:pr-6 justify-between">
           <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className="p-6 rounded-lg">
-            <h2 className='text-3xl'>{song.title}</h2>
+            <h2 className='text-3xl text-wrap truncate ...'>{song.title}</h2>
             <div className='text-lg mt-2'>
               <Link to={`/artist/${song.artist.id}`}>
                 <h3>
@@ -285,7 +285,7 @@ const SongView = ({
             </div>
             <div className='mt-2 flex items-center'>
               <Translate className='mr-2' value='labels.genres' />
-              <Tag transparent>{song.genre}</Tag>
+              <Tag transparent>{song.genres}</Tag>
             </div>
             <div className='mt-2 flex items-center'>
               <Translate className='mr-2' value='labels.mediaType' />

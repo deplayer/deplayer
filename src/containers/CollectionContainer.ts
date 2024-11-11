@@ -10,6 +10,6 @@ export default connect(
     collection: state.collection,
     location: ownProps.location,
     backgroundImage: state.app.backgroundImage,
-    visibleSongs: Object.keys(state.collection.rows)
+    visibleSongs: state.collection.visibleSongs
   })
 )(Collection)

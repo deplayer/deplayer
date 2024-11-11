@@ -38,7 +38,7 @@ export default class ItunesApiProvider implements IMusicProvider {
         fullUrl: itSong.artworkUrl100.replace(/100x100/, '600x600'),
       },
       duration: itSong.trackTimeMillis,
-      genre: [itSong.primaryGenreName],
+      genres: [itSong.primaryGenreName],
       shareUrl: itSong.trackViewUrl,
       type: isAudio ? 'audio' : 'video',
       stream: {

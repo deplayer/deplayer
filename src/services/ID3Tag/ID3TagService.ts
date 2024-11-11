@@ -11,14 +11,35 @@ function generateHexHash(length: number = 16): string {
   return hash;
 }
 
+const SUPPORTED_MIME_TYPES = [
+  'audio/mpeg',           // MP3
+  'audio/mp4',           // M4A, AAC
+  'audio/ogg',           // OGG
+  'audio/wav',           // WAV
+  'audio/flac',          // FLAC
+  'audio/x-flac',        // FLAC (alternative)
+  'audio/webm',          // WEBM
+  'video/mp4',           // MP4
+  'video/webm',          // WEBM video
+];
+
 export const readFileMetadata = async (file: any) => {
   const normFile = file.contents ? file.contents : file
+  
+  // Check if file type is supported
+  if (!normFile.type || !SUPPORTED_MIME_TYPES.includes(normFile.type)) {
+    throw new Error(`Unsupported file type: ${normFile.type || 'unknown'}. Supported types are: ${SUPPORTED_MIME_TYPES.join(', ')}`)
+  }
 
   console.log('reading metadata from file: ', normFile)
 
-  const metadata = await musicMetadata.parseBlob(normFile)
-  console.log('file metadata: ', metadata)
-  return metadata
+  try {
+    const metadata = await musicMetadata.parseBlob(normFile)
+    console.log('file metadata: ', metadata)
+    return metadata
+  } catch (error) {
+    throw new Error(`Failed to parse metadata: ${error.message}`)
+  }
 }
 
 export async function metadataToSong(
@@ -26,8 +47,9 @@ export async function metadataToSong(
   fileUri: string,
   service: string,
 ): Promise<Media> {
-  const genre = metadata.common.genre ? metadata.common.genre : []
   const cover = metadata.common.picture ? metadata.common.picture[0] : null
+
+  console.log('metadata.common.genre: ', metadata.common.genre)
 
   let mediaProps: IMedia = {
     title: metadata.common.title || fileUri,
@@ -37,7 +59,7 @@ export async function metadataToSong(
     albumName: metadata.common.album || '',
     type: fileUri.endsWith('.mp4') ? 'video' : 'audio',
     duration: metadata.format.duration || 0,
-    genre: genre,
+    genres: metadata.common.genre ?? [],
     stream: {
       filesystem: {
         service: service,

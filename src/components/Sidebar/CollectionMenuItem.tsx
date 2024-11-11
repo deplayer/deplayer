@@ -26,14 +26,6 @@ const CollectionMenuItem = ({ dispatch, collection, totalItems, current = false 
   }
 
   const children = current ? (
-    <ul>
-      <MenuItem
-        totalItems={totalItems}
-        title='all'
-        label='All'
-        url='/collection'
-        icon={<Icon icon='faDatabase' />}
-      />
       <div className="w-64 border-r">
         <FilterPanel
           collection={collection}
@@ -42,21 +34,6 @@ const CollectionMenuItem = ({ dispatch, collection, totalItems, current = false 
           onClearFilters={handleClearFilters}
         />
       </div>
-      <MenuItem
-        totalItems={collection.mediaByType['video'].length}
-        title='videos'
-        label='Videos'
-        url='/collection/video'
-        icon={<Icon icon='faFilm' />}
-      />
-      <MenuItem
-        totalItems={collection.mediaByType['audio'].length}
-        title='Audio'
-        label='Audio'
-        url='/collection/audio'
-        icon={<Icon icon='faFileAudio' />}
-      />
-    </ul>
   ) : null
 
   return (

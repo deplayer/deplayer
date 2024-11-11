@@ -29,7 +29,7 @@ export interface IMedia {
   externalId?: string
   stream: { [key: string]: Stream }
   playCount?: number
-  genre?: string[]
+  genres: string[]
   shareUrl?: string
   albumName: string
   filePath?: string
@@ -50,7 +50,7 @@ export default class Media implements IMedia {
   externalId: string
   stream: { [key: string]: Stream }
   playCount: number
-  genre?: string[]
+  genres: string[]
   year?: number
   shareUrl?: string
   albumName: string
@@ -62,7 +62,7 @@ export default class Media implements IMedia {
     this.title = songParams.title
     this.playCount = songParams.playCount ?? 0
     this.duration = songParams.duration ?? 0
-    this.genre = songParams.genre
+    this.genres = songParams.genres
     this.shareUrl = songParams.shareUrl
     this.albumName = songParams.albumName
     this.filePath = songParams.filePath
@@ -126,7 +126,7 @@ export default class Media implements IMedia {
       artist: this.artist.toDocument(),
       cover: this.cover,
       album: this.album.toDocument(),
-      genre: this.genre,
+      genres: this.genres,
       albumName: this.albumName,
       playCount: this.playCount,
       filePath: this.filePath,
