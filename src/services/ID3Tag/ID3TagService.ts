@@ -26,7 +26,7 @@ export async function metadataToSong(
   fileUri: string,
   service: string,
 ): Promise<Media> {
-  const genre = metadata.common.genre ? metadata.common.genre.map((genre: string) => genre).join(', ') : ''
+  const genre = metadata.common.genre ? metadata.common.genre : []
   const cover = metadata.common.picture ? metadata.common.picture[0] : null
 
   let mediaProps: IMedia = {

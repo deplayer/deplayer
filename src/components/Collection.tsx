@@ -1,4 +1,3 @@
-
 import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
 import AddNewMediaButton from './Buttons/AddNewMediaButton'
@@ -30,40 +29,33 @@ const mediaForPath = (location: Location, props: Props) => {
 }
 
 const Collection = (props: Props) => {
-
+  const dispatch = props.dispatch
+  
   if (props.app.loading) {
-    return (
-      <div className={`collection z-10`}>
-        <blockquote className='blockquote'>
-          <Spinner />
-        </blockquote>
-      </div>
-    )
+    return <Spinner />
   }
 
   const location = useLocation()
   const mediaItems = mediaForPath(location, props)
 
-  if (!mediaItems.length) {
-    return (
-      <BodyMessage message={
-        <div className='flex flex-col'>
-          <Translate value='message.noCollectionItems' />
-          <AddNewMediaButton />
-        </div>
-      } />
-    )
-  }
-
   return (
-    <div
-      className='collection z-10'
-    >
-      <MusicTable
-        tableIds={mediaItems}
-        disableCovers={false}
-        {...props}
-      />
+    <div className="collection z-10 flex">
+      <div className="flex-1">
+        {!mediaItems.length ? (
+          <BodyMessage message={
+            <div className='flex flex-col'>
+              <Translate value='message.noCollectionItems' />
+              <AddNewMediaButton />
+            </div>
+          } />
+        ) : (
+          <MusicTable
+            tableIds={mediaItems}
+            disableCovers={false}
+            {...props}
+          />
+        )}
+      </div>
     </div>
   )
 }

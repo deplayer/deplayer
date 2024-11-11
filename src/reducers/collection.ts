@@ -5,8 +5,15 @@ import IndexService from "../services/Search/IndexService";
 import Artist from "../entities/Artist"
 import IMedia from "../entities/Media"
 import merge from "deepmerge"
+import { applyFilters } from "../utils/apply-filters"
 
 const indexService = IndexService();
+
+export type Filter = {
+  genres: string[];
+  types: string[];
+  artists: string[];
+}
 
 export type State = {
   rows: { [key: string]: any };
@@ -25,6 +32,7 @@ export type State = {
   searchIndex: object | null;
   loading: boolean;
   totalRows: number;
+  activeFilters: Filter;
 };
 
 export const defaultState = {
@@ -47,6 +55,11 @@ export const defaultState = {
   searchIndex: null,
   loading: true,
   totalRows: 0,
+  activeFilters: {
+    genres: [],
+    types: [],
+    artists: []
+  }
 };
 
 const populateFromAction = (state: State, action: { data: IMedia[] }): State => {
@@ -237,6 +250,27 @@ export default (state: State = defaultState, action: any = {}) => {
       const media = action.media;
 
       return { ...state, [media.id]: media }
+    }
+
+    case types.SET_COLLECTION_FILTER: {
+      const newFilters = {
+        ...state.activeFilters,
+        [action.filterType]: action.values
+      }
+      
+      return {
+        ...state,
+        activeFilters: newFilters,
+        visibleSongs: applyFilters(state.rows, newFilters)
+      }
+    }
+
+    case types.CLEAR_COLLECTION_FILTERS: {
+      return {
+        ...state,
+        activeFilters: defaultState.activeFilters,
+        visibleSongs: Object.keys(state.rows)
+      }
     }
 
     default:
