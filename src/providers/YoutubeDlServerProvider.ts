@@ -30,7 +30,7 @@ export default class YoutubeDlServerProvider implements IMusicProvider {
         thumbnailUrl: songInfo.thumbnails?.[0].url,
         fullUrl: songInfo.thumbnails?.[0].url,
       },
-      genre: '',
+      genre: [''],
       duration: 0,
       track: 0,
       filePath: '',

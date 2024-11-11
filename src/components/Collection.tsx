@@ -29,8 +29,6 @@ const mediaForPath = (location: Location, props: Props) => {
 }
 
 const Collection = (props: Props) => {
-  const dispatch = props.dispatch
-  
   if (props.app.loading) {
     return <Spinner />
   }

@@ -10,9 +10,9 @@ type Props = {
 }
 
 const FilterPanel = ({ collection, activeFilters, onFilterChange, onClearFilters }: Props) => {
-  // Get unique genres
+  // Get unique genres - flatten arrays and create set
   const genres = Object.values(collection.rows).reduce((acc: Set<string>, media: any) => {
-    acc.add(media.genre)
+    media.genre?.forEach((g: string) => acc.add(g))
     return acc
   }, new Set())
 

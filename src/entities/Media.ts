@@ -29,7 +29,7 @@ export interface IMedia {
   externalId?: string
   stream: { [key: string]: Stream }
   playCount?: number
-  genre?: string
+  genre?: string[]
   shareUrl?: string
   albumName: string
   filePath?: string
@@ -50,7 +50,7 @@ export default class Media implements IMedia {
   externalId: string
   stream: { [key: string]: Stream }
   playCount: number
-  genre?: string
+  genre?: string[]
   year?: number
   shareUrl?: string
   albumName: string
@@ -116,10 +116,6 @@ export default class Media implements IMedia {
     })
 
     return result
-  }
-
-  get genres(): Array<string> {
-    return this.genre ? this.genre.split(',') : []
   }
 
   toDocument(): any {

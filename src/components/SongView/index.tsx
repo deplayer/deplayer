@@ -118,7 +118,7 @@ const SongView = ({
     return <NotFound>The requested song can not be found</NotFound>
   }
 
-  const genres = song.genre ? song.genre.split(',') : []
+  const genres = song.genre || []
 
   const sameGenreSongs = genres.length && songsByGenre[genres[0]]
     ? songsByGenre[genres[0]]

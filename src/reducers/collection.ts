@@ -81,8 +81,7 @@ const populateFromAction = (state: State, action: { data: IMedia[] }): State => 
         // Ensure initialization of arrays/maps
         acc.songsByArtist[songDocument.artist.id] =
           acc.songsByArtist[songDocument.artist.id] || [];
-        const genres = songDocument.genre?.split(',') || []
-        acc.songsByGenre = genres.reduce((genresAcc: { [key: string]: string[] }, genre: string) => {
+        acc.songsByGenre = (songDocument.genre || []).reduce((genresAcc: { [key: string]: string[] }, genre: string) => {
           genresAcc[genre] = genresAcc[genre] || [];
           genresAcc[genre].push(songDocument.id);
           return genresAcc;

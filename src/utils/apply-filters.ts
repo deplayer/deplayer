@@ -10,8 +10,7 @@ export const applyFilters = (
     
     // Check genre filters
     if (filters.genres.length > 0) {
-      const mediaGenres = media.genres
-      if (!filters.genres.some(g => mediaGenres.includes(g))) {
+      if (!filters.genres.some(g => media.genre?.includes(g))) {
         return false
       }
     }
