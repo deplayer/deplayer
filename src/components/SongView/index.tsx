@@ -1,5 +1,5 @@
 import { Dispatch } from 'redux'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
 import { AutoSizer } from 'react-virtualized'
@@ -22,6 +22,7 @@ import Album from '../../entities/Album'
 import ServiceIcon from '../ServiceIcon'
 import Media, { IMedia } from '../../entities/Media'
 import { State as SettingsState } from '../../reducers/settings'
+import * as filterTypes from '../../constants/FilterTypes'
 
 const MAX_LIST_ITEMS = 25
 
@@ -51,26 +52,32 @@ async function changeCurrentPlaying(song: any, index: number, dispatch: Dispatch
   dispatch({ type: types.SET_CURRENT_PLAYING_URL, url: streamUri })
 }
 
-const SongView = ({
-  songId,
-  loading,
-  className = '',
-  dispatch,
-  playerPortal,
-  player,
-  lyrics,
-  queue: {
-    trackIds,
-    currentPlaying
-  },
-  settings,
-  collection: {
-    rows,
-    albums,
-    albumsByArtist,
-    songsByGenre
-  }
-}: Props) => {
+const SongView = ({ songId, loading, className = '', dispatch, playerPortal, player, lyrics, queue, settings, collection }: Props) => {
+  const navigate = useNavigate()
+  const { trackIds, currentPlaying } = queue
+  const { rows, albums, albumsByArtist, songsByGenre } = collection
+  
+  const song = rows[songId]
+  const songObj = song ? new Media(song) : null
+  const isSongPinned = songObj?.hasAnyProviderOf(['opfs']) || false
+  
+  const [pinned, setPinnedSong] = React.useState(isSongPinned)
+  const [downloadUrls, setDownloadUrls] = React.useState([])
+  const [showLyrics, setShowLyrics] = React.useState(false)
+
+  React.useEffect(() => {
+    const retrieveUrls = async () => {
+      const urls: any = []
+      if (!song) return
+
+      for (let i = 0; i < Object.values(song.stream || {}).length; i++) {
+        urls.push(await getStreamUri(song, settings.settings, i))
+      }
+      setDownloadUrls(urls)
+    }
+    retrieveUrls()
+  }, [song, settings])
+
   if (loading) {
     return (
       <div className={`collection`}>
@@ -80,39 +87,6 @@ const SongView = ({
       </div>
     )
   }
-
-  const song = rows[songId]
-
-  if (!song) {
-    return <NotFound>The requested song can not be found</NotFound>
-  }
-
-  const songObj = new Media(song)
-  const isSongPinned = songObj.hasAnyProviderOf(['opfs'])
-
-  const [pinned, setPinnedSong] = React.useState(isSongPinned)
-  const [downloadUrls, setDownloadUrls] = React.useState([])
-  const [showLyrics, setShowLyrics] = React.useState(false)
-
-  React.useMemo(() => {
-    const retrieveUrls = async () => {
-      const urls: any = []
-
-      if (!song) {
-        return
-      }
-
-      for (let i = 0; i < Object.values(song.stream).length; i++) {
-        urls.push(
-          await getStreamUri(song, settings.settings, i)
-        )
-      }
-
-      setDownloadUrls(urls)
-    }
-
-    retrieveUrls()
-  }, [song, settings])
 
   if (!song || !song.id) {
     return <NotFound>The requested song can not be found</NotFound>
@@ -132,6 +106,19 @@ const SongView = ({
   }) || []
 
   const songFinder = song.id === currentPlaying
+
+  const handleGenreClick = (genre: string) => {
+    // Reset all filters first
+    dispatch({ type: types.CLEAR_COLLECTION_FILTERS })
+    // Set the genre filter
+    dispatch({ 
+      type: types.SET_COLLECTION_FILTER, 
+      filterType: 'genres',
+      values: [genre]
+    })
+    // Navigate to collection view
+    navigate('/collection')
+  }
 
   return (
     <div data-testid="song-view" className={`song-view ${className} w-full overflow-y-auto z-10 flex flex-col`}>
@@ -283,10 +270,21 @@ const SongView = ({
             <div className='mt-4'>
               <Icon icon='faStopwatch' /> {getDurationStr(song.duration)}
             </div>
-            <div className='mt-2 flex items-center'>
-              <Translate className='mr-2' value='labels.genres' />
-              <Tag transparent>{song.genres}</Tag>
-            </div>
+            {song.genres?.length > 0 && (
+              <div className='mt-2 flex items-center'>
+                <Translate className='mr-2' value='labels.genres' />
+                {song.genres.map((genre: string) => (
+                  <Tag 
+                    key={genre}
+                    transparent 
+                    onClick={() => handleGenreClick(genre)}
+                    className="cursor-pointer hover:bg-opacity-50"
+                  >
+                    {genre}
+                  </Tag>
+                ))}
+              </div>
+            )}
             <div className='mt-2 flex items-center'>
               <Translate className='mr-2' value='labels.mediaType' />
               <Tag transparent>{song.type}</Tag>

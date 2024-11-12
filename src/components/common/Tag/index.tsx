@@ -4,7 +4,9 @@ type Props = {
   children: any
   transparent?: boolean
   fullWidth?: boolean,
-  type?: 'primary'
+  type?: 'primary',
+  onClick?: () => void,
+  className?: string
 }
 
 const Tag = (props: Props) => {
@@ -27,10 +29,10 @@ const Tag = (props: Props) => {
     'flex': true,
     'items-center': true,
     'opacity-90': true
-  })
+  }, props.className)
 
   return (
-    <div className={classes}>
+    <div className={classes} onClick={props.onClick}>
       {props.children}
     </div>
   )
