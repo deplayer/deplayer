@@ -86,7 +86,7 @@ const populateFromAction = (
         // Ensure initialization of arrays/maps
         acc.songsByArtist[songDocument.artist.id] =
           acc.songsByArtist[songDocument.artist.id] || [];
-        acc.songsByGenre = (songDocument.genre || []).reduce(
+        acc.songsByGenre = (songDocument.genres || []).reduce(
           (genresAcc: { [key: string]: string[] }, genre: string) => {
             genresAcc[genre] = genresAcc[genre] || [];
             genresAcc[genre].push(songDocument.id);
