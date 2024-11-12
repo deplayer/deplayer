@@ -11,7 +11,7 @@ export const mediaParams: IMedia = {
   artistId: '1',
   albumName: 'albumName',
   album: { id: 'album', name: 'album', artist: { name: 'foo' } },
-  genre: 'genre',
+  genres: ['genre'],
   duration: 100,
   cover: { thumbnailUrl: 'thumbnail', fullUrl: '' },
   stream: {},

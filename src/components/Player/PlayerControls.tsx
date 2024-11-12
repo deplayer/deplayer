@@ -194,6 +194,7 @@ class PlayerControls extends React.Component<Props> {
               progressInterval={1000}
               width={'100%'}
               height={'100%'}
+              controls={currentPlaying.type === 'video'}
             />
           </InPortal>
         </div>
