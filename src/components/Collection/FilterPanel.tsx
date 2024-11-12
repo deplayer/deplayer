@@ -8,7 +8,7 @@ type Props = {
   onClearFilters: () => void
 }
 
-const FilterPanel = ({ collection, activeFilters, onFilterChange, onClearFilters }: Props) => {
+const FilterPanel = ({ collection, activeFilters, onFilterChange }: Props) => {
   // Get unique genres and types as before
   const genres = Object.values(collection.rows).reduce((acc: Set<string>, media: any) => {
     // Only process if genres exists and is an array
@@ -72,10 +72,10 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, onClearFilters
       label: collection.artists[a].name,
       color: '#9999ff'
     })),
-    ...activeFilters.providers.map(p => ({ 
-      value: `provider:${p}`, 
-      label: p, 
-      color: '#99ccff' 
+    ...activeFilters.providers.map(p => ({
+      value: `provider:${p}`,
+      label: p,
+      color: '#99ccff'
     }))
   ]
 
@@ -91,13 +91,13 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, onClearFilters
     }),
     option: (provided: any, state: any) => ({
       ...provided,
-      backgroundColor: state.isSelected 
-        ? state.data.color 
-        : state.isFocused 
-          ? `${state.data.color}80` 
+      backgroundColor: state.isSelected
+        ? state.data.color
+        : state.isFocused
+          ? `${state.data.color}80`
           : 'var(--select-option-bg)',
-      color: state.isSelected 
-        ? 'white' 
+      color: state.isSelected
+        ? 'white'
         : 'var(--select-text)',
       '&:hover': {
         backgroundColor: `${state.data.color}80`
@@ -162,7 +162,7 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, onClearFilters
           const providers = selectedItems
             .filter(item => item.value.startsWith('provider:'))
             .map(item => item.value.replace('provider:', ''))
-          
+
           onFilterChange('genres', genres)
           onFilterChange('types', types)
           onFilterChange('artists', artists)

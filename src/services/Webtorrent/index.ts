@@ -42,6 +42,7 @@ export const magnetToMedia = async (torrentUrl: string): Promise<Array<Media>> =
           },
           artistName: 'webtorrent',
           albumName: 'webtorrent',
+          genres: [],
           type: type,
           stream: {
             webtorrent: {

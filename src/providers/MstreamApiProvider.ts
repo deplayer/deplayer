@@ -40,6 +40,7 @@ export default class MstreamApiProvider implements IMusicProvider {
         artistName: song.metadata.artist,
         albumName: song.metadata.album,
         type: 'audio',
+        genres: [],
         album: {
           name: song.metadata.album,
           artist: { name: song.metadata.artist }

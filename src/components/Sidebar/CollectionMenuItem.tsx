@@ -12,7 +12,7 @@ type Props = {
   current?: Boolean
 }
 
-const CollectionMenuItem = ({ dispatch, collection, totalItems, current = false }: Props) => {
+const CollectionMenuItem = ({ dispatch, collection, current = false }: Props) => {
   const handleFilterChange = (filterType: keyof Filter, values: string[]) => {
     dispatch({
       type: types.SET_COLLECTION_FILTER,
@@ -26,14 +26,14 @@ const CollectionMenuItem = ({ dispatch, collection, totalItems, current = false 
   }
 
   const children = current ? (
-      <div className="w-64 border-r">
-        <FilterPanel
-          collection={collection}
-          activeFilters={collection.activeFilters}
-          onFilterChange={handleFilterChange}
-          onClearFilters={handleClearFilters}
-        />
-      </div>
+    <div className="w-64 border-r">
+      <FilterPanel
+        collection={collection}
+        activeFilters={collection.activeFilters}
+        onFilterChange={handleFilterChange}
+        onClearFilters={handleClearFilters}
+      />
+    </div>
   ) : null
 
   return (
