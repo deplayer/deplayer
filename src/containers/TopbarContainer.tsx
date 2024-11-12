@@ -127,20 +127,32 @@ const dynamicTitle = (
   }
 }
 
-
-export default connect((state: any) => {
+// Create a new wrapper component to handle hooks
+const TopbarWrapper = (props: any) => {
   const location = useLocation()
-  const title = dynamicTitle(location, state.collection, state.search.searchTerm)
-  const hasResults = state.queue.trackIds && state.queue.trackIds.length ? true : false
+  const title = dynamicTitle(location, props.collection, props.search.searchTerm)
+  const hasResults = props.queue.trackIds && props.queue.trackIds.length ? true : false
   const inHome = location.pathname === '/' ? true : false
-  return {
-    title: title,
-    hasResults,
-    loading: state.search.loading,
-    mqlMatch: state.app.mqlMatch,
-    showInCenter: !hasResults && inHome,
-    error: state.search.error,
-    searchTerm: state.search.searchTerm,
-    searchToggled: state.search.searchToggled
-  }
-})(Topbar)
+
+  return (
+    <Topbar
+      title={title}
+      loading={props.search.loading}
+      showInCenter={!hasResults && inHome}
+      error={props.search.error}
+      searchTerm={props.search.searchTerm}
+      searchToggled={props.search.searchToggled}
+      dispatch={props.dispatch}
+    >
+      {props.children}
+    </Topbar>
+  )
+}
+
+// Connect the wrapper component instead
+export default connect((state: any) => ({
+  collection: state.collection,
+  search: state.search,
+  queue: state.queue,
+  app: state.app
+}))(TopbarWrapper)

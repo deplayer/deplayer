@@ -28,12 +28,9 @@ class Topbar extends React.Component<Props, State> {
     focus: false
   }
   timer: any
-  props: Props
 
   constructor(props: Props) {
     super(props);
-
-    this.props = props
     this.timer = null
   }
 

@@ -2,7 +2,7 @@ import { IAdapter, Models } from './IAdapter'
 import * as db from './PgliteDatabase'
 import { PgliteDatabase } from 'drizzle-orm/pglite'
 import { eq } from 'drizzle-orm'
-import { media, settings, queue } from '../../schema'
+import { media, settings, queue, playlist } from '../../schema'
 
 export default class Pglite implements IAdapter {
   initialize = async () => {
@@ -36,6 +36,14 @@ export default class Pglite implements IAdapter {
           .values({ ...prev, ...fixedPayload })
           .onConflictDoUpdate({
             target: queue.id,
+            set: payload,
+          });
+        break
+      case 'playlist':
+        await instance.insert(playlist)
+          .values({ ...prev, ...fixedPayload })
+          .onConflictDoUpdate({
+            target: playlist.id,
             set: payload,
           });
         break
@@ -80,6 +88,8 @@ export default class Pglite implements IAdapter {
         return instance.select().from(settings).where(eq(settings.id, id))
       case 'queue':
         return instance.select().from(queue).where(eq(queue.id, id))
+      case 'playlist':
+        return instance.select().from(playlist).where(eq(playlist.id, id))
       default:
         console.log(`Model ${model} is not implemented for getDocObj method`)
         new Error('Model not supported')
