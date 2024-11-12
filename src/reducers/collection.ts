@@ -1,5 +1,5 @@
 import Media from "../entities/Media";
-import filterSongs from '../utils/filter-songs';
+import filterSongs from "../utils/filter-songs";
 import * as types from "../constants/ActionTypes";
 import IndexService from "../services/Search/IndexService";
 import Artist from "../entities/Artist";
@@ -61,7 +61,7 @@ export const defaultState = {
     artists: [],
     providers: [],
   },
-  filtererSongs: [],
+  filteredSongs: [],
 };
 
 const populateFromAction = (
