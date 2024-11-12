@@ -79,6 +79,10 @@ const MusicTable = (props: Props) => {
   const currentIndex = !props.disableCurrent ? props.tableIds.indexOf(props.queue.currentPlaying) : 0
 
   const getActions = () => {
+    if (location.pathname.match(/\/song\/.*/)) {
+      return <ToggleMiniQueueButton />
+    }
+
     switch (location.pathname) {
       case '/queue':
         return (
@@ -90,8 +94,6 @@ const MusicTable = (props: Props) => {
         )
       case '/collection':
         return (<><AddNewMediaButton /><PlayAllButton dispatch={props.dispatch} /></>)
-      case '/song/:id':
-        return (<ToggleMiniQueueButton />)
       case '/search-results':
         return <PlayAllButton dispatch={props.dispatch} />
       default:
