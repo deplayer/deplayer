@@ -101,7 +101,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
     : null
 
   const relatedAlbums = song.artist.id && albumsByArtist?.[song.artist.id].map((albumId: string) => {
-    return new Album({ ...albums[albumId] })
+    return new Album({ ...albums[albumId], albumId })
   }) || []
 
   const songFinder = song.id === currentPlaying
