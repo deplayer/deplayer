@@ -177,25 +177,19 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
         options={groupedOptions}
         value={selectedValues}
         onChange={(selected) => {
-          // Split selected items by type and update filters
           const selectedItems = selected || []
-          const genres = selectedItems
-            .filter(item => item.value.startsWith('genre:'))
-            .map(item => item.value.replace('genre:', ''))
-          const types = selectedItems
-            .filter(item => item.value.startsWith('type:'))
-            .map(item => item.value.replace('type:', ''))
-          const artists = selectedItems
-            .filter(item => item.value.startsWith('artist:'))
-            .map(item => item.value.replace('artist:', ''))
-          const providers = selectedItems
-            .filter(item => item.value.startsWith('provider:'))
-            .map(item => item.value.replace('provider:', ''))
-
-          onFilterChange('genres', genres)
-          onFilterChange('types', types)
-          onFilterChange('artists', artists)
-          onFilterChange('providers', providers)
+          
+          // Define filter types to process
+          const filterTypes = ['genre', 'type', 'artist', 'provider'] as const
+          
+          // Process each filter type
+          filterTypes.forEach(type => {
+            const values = selectedItems
+              .filter(item => item.value.startsWith(`${type}:`))
+              .map(item => item.value.replace(`${type}:`, ''))
+            
+            onFilterChange(`${type}s` as keyof Filter, values)
+          })
         }}
         styles={customStyles}
         className="react-select-container"

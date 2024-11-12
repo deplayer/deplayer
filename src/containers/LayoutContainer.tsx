@@ -11,7 +11,6 @@ import type { State } from '../reducers'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
 
-
 interface LayoutProps {
   backgroundImage: string,
   dispatch: Dispatch,
@@ -40,9 +39,7 @@ function Layout(props: LayoutProps) {
           <SearchButton />
         </TopbarContainer>
 
-        <div
-          className='layout-contents'
-        >
+        <div className='layout-contents'>
           {props.children}
         </div>
         <Placeholder mqlMatch={props.app.mqlMatch} />
@@ -59,8 +56,7 @@ const connector = connect(
       app: state.app,
       player: state.player,
       collection: state.collection,
-      tableIds: Object.keys(state.collection.artists),
-      visibleSongs: state.collection.visibleSongs
+      tableIds: Object.keys(state.collection.artists)
     }
   }
 )

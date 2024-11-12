@@ -22,7 +22,6 @@ import Album from '../../entities/Album'
 import ServiceIcon from '../ServiceIcon'
 import Media, { IMedia } from '../../entities/Media'
 import { State as SettingsState } from '../../reducers/settings'
-import * as filterTypes from '../../constants/FilterTypes'
 
 const MAX_LIST_ITEMS = 25
 

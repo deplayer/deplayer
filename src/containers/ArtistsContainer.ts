@@ -6,6 +6,6 @@ export default connect(
     queue: state.queue,
     player: state.player,
     collection: state.collection,
-    visibleSongs: state.collection.visibleSongs
+    filteredSongs: state.collection.filteredSongs
   })
 )(ArtistsTable)
