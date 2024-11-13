@@ -27,13 +27,13 @@ export type State = {
   songsByGenre: any;
   mediaByType: any;
   searchTerm: string;
-  visibleSongs: Array<string>;
   searchResults: Array<string>;
   enabledProviders: Array<string>;
   searchIndex: object | null;
   loading: boolean;
   totalRows: number;
   activeFilters: Filter;
+  filteredSongs: Array<string>;
 };
 
 export const defaultState = {
@@ -50,7 +50,6 @@ export const defaultState = {
   albumsByArtist: {},
   songsByNumberOfPlays: [],
   searchTerm: "",
-  visibleSongs: [],
   searchResults: [],
   enabledProviders: [],
   searchIndex: null,
@@ -62,6 +61,7 @@ export const defaultState = {
     artists: [],
     providers: [],
   },
+  filteredSongs: [],
 };
 
 const populateFromAction = (
@@ -148,6 +148,13 @@ const populateFromAction = (
     arrayMerge: overwriteMerge,
   });
 
+  const searchResults = filterSongs(indexService, rows, state.searchTerm);
+  const filteredSongs = applyFilters(
+    rows,
+    state.activeFilters,
+    Object.keys(rows)
+  );
+
   // Merge the aggregated data with the existing state
   return {
     ...state,
@@ -159,7 +166,8 @@ const populateFromAction = (
     albumsByArtist: { ...state.albumsByArtist, ...aggregation.albumsByArtist },
     songsByAlbum: { ...state.songsByAlbum, ...aggregation.songsByAlbum },
     mediaByType: { ...state.mediaByType, ...aggregation.mediaByType },
-    visibleSongs: filterSongs(indexService, rows, state.searchTerm),
+    searchResults,
+    filteredSongs,
     loading: false,
     totalRows: Object.keys(rows).length,
   };
@@ -238,7 +246,7 @@ export default (state: State = defaultState, action: any = {}) => {
         songsByArtist: {},
         songsByAlbum: {},
         albumsByArtist: {},
-        visibleSongs: [],
+        filteredSongs: [],
         searchResults: [],
         totalRows: 0,
         loading: false,
@@ -288,7 +296,7 @@ export default (state: State = defaultState, action: any = {}) => {
         state.rows,
         state.searchTerm
       );
-      const visibleSongs = applyFilters(
+      const filteredSongs = applyFilters(
         state.rows,
         newFilters,
         searchFilteredSongs
@@ -297,7 +305,7 @@ export default (state: State = defaultState, action: any = {}) => {
       return {
         ...state,
         activeFilters: newFilters,
-        visibleSongs,
+        filteredSongs,
       };
     }
 
@@ -305,7 +313,7 @@ export default (state: State = defaultState, action: any = {}) => {
       return {
         ...state,
         activeFilters: defaultState.activeFilters,
-        visibleSongs: Object.keys(state.rows),
+        filteredSongs: Object.keys(state.rows),
       };
     }
 

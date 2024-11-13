@@ -2,16 +2,18 @@ import * as types from '../constants/ActionTypes'
 import {
   sortTrackIds
 } from './utils/queues'
+import { SmartPlaylist } from '../types/SmartPlaylist'
 
 export type State = {
   trackIds: Array<string>,
-  playlists: Array<any>
+  playlists: Array<any>,
+  smartPlaylists: Array<SmartPlaylist>
 }
 
 export const defaultState = {
   trackIds: [],
-  currentPlaying: {},
-  playlists: []
+  playlists: [],
+  smartPlaylists: []
 }
 
 export default (state: State = defaultState, action: any = {}): State => {
@@ -35,6 +37,24 @@ export default (state: State = defaultState, action: any = {}): State => {
 
     case types.RECEIVE_PLAYLISTS:
       return { ...state, playlists: action.playlists }
+
+    case types.SAVE_SMART_PLAYLIST:
+      return {
+        ...state,
+        smartPlaylists: [...state.smartPlaylists, action.playlist]
+      }
+
+    case types.RECEIVE_SMART_PLAYLISTS:
+      return {
+        ...state,
+        smartPlaylists: action.playlists
+      }
+
+    case types.DELETE_SMART_PLAYLIST:
+      return {
+        ...state,
+        smartPlaylists: state.smartPlaylists.filter(p => p.id !== action.id)
+      }
 
     default:
       return state

@@ -13,7 +13,7 @@ type Props = {
   queue: any,
   player: any,
   collection: any,
-  visibleSongs: Array<string>,
+  filteredSongs: Array<string>,
   dispatch: Dispatch
 }
 
@@ -23,8 +23,10 @@ const mediaForPath = (location: Location, props: Props) => {
       return props.collection.mediaByType['audio']
     case '/collection/video':
       return props.collection.mediaByType['video']
+    case '/search-results':
+      return props.collection.searchResults
     default:
-      return props.visibleSongs
+      return props.filteredSongs
   }
 }
 

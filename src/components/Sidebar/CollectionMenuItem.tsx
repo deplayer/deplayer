@@ -28,6 +28,7 @@ const CollectionMenuItem = ({ dispatch, collection, current = false }: Props) =>
   const children = current ? (
     <div className="w-64 border-r">
       <FilterPanel
+        dispatch={dispatch}
         collection={collection}
         activeFilters={collection.activeFilters}
         onFilterChange={handleFilterChange}

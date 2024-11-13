@@ -22,7 +22,6 @@ import Album from '../../entities/Album'
 import ServiceIcon from '../ServiceIcon'
 import Media, { IMedia } from '../../entities/Media'
 import { State as SettingsState } from '../../reducers/settings'
-import * as filterTypes from '../../constants/FilterTypes'
 
 const MAX_LIST_ITEMS = 25
 
@@ -102,7 +101,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
     : null
 
   const relatedAlbums = song.artist.id && albumsByArtist?.[song.artist.id].map((albumId: string) => {
-    return new Album({ ...albums[albumId] })
+    return new Album({ ...albums[albumId], albumId })
   }) || []
 
   const songFinder = song.id === currentPlaying

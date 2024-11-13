@@ -1,14 +1,35 @@
 import Select from 'react-select'
 import { Filter } from '../../reducers/collection'
+import Button from '../common/Button'
+import Icon from '../common/Icon'
+import { Dispatch } from 'redux'
+import * as actionTypes from '../../constants/ActionTypes'
 
-type Props = {
-  collection: any
-  activeFilters: Filter
-  onFilterChange: (filterType: keyof Filter, values: string[]) => void
-  onClearFilters: () => void
+interface MediaItem {
+  genres?: string[];
+  type: string;
+  stream?: Record<string, unknown>;
 }
 
-const FilterPanel = ({ collection, activeFilters, onFilterChange }: Props) => {
+interface Artist {
+  id: string;
+  name: string;
+}
+
+interface Collection {
+  rows: Record<string, MediaItem>;
+  artists: Record<string, Artist>;
+}
+
+type Props = {
+  collection: Collection;
+  activeFilters: Filter;
+  onFilterChange: (filterType: keyof Filter, values: string[]) => void;
+  onClearFilters: () => void;
+  dispatch: Dispatch;
+}
+
+const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Props) => {
   // Get unique genres and types as before
   const genres = Object.values(collection.rows).reduce((acc: Set<string>, media: any) => {
     // Only process if genres exists and is an array
@@ -118,8 +139,32 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange }: Props) => {
     })
   }
 
+  const handleSaveSmartPlaylist = () => {
+    const name = window.prompt('Enter a name for this smart playlist:')
+    if (name) {
+      dispatch({
+        type: actionTypes.SAVE_SMART_PLAYLIST,
+        playlist: {
+          id: crypto.randomUUID(),
+          name,
+          filters: activeFilters,
+          createdAt: new Date()
+        }
+      })
+    }
+  }
+
   return (
     <div className="filter-panel py-2 pb-4 px-4 pr-6">
+      <div className="flex justify-between mb-4">
+        <Button
+          onClick={handleSaveSmartPlaylist}
+          disabled={!Object.values(activeFilters).some(arr => arr.length > 0)}
+        >
+          Save as Smart Playlist
+          <Icon className='pl-2' icon='faSave' />
+        </Button>
+      </div>
       <style>
         {`
           :root {
@@ -148,25 +193,19 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange }: Props) => {
         options={groupedOptions}
         value={selectedValues}
         onChange={(selected) => {
-          // Split selected items by type and update filters
           const selectedItems = selected || []
-          const genres = selectedItems
-            .filter(item => item.value.startsWith('genre:'))
-            .map(item => item.value.replace('genre:', ''))
-          const types = selectedItems
-            .filter(item => item.value.startsWith('type:'))
-            .map(item => item.value.replace('type:', ''))
-          const artists = selectedItems
-            .filter(item => item.value.startsWith('artist:'))
-            .map(item => item.value.replace('artist:', ''))
-          const providers = selectedItems
-            .filter(item => item.value.startsWith('provider:'))
-            .map(item => item.value.replace('provider:', ''))
 
-          onFilterChange('genres', genres)
-          onFilterChange('types', types)
-          onFilterChange('artists', artists)
-          onFilterChange('providers', providers)
+          // Define filter types to process
+          const filterTypes = ['genre', 'type', 'artist', 'provider'] as const
+
+          // Process each filter type
+          filterTypes.forEach(type => {
+            const values = selectedItems
+              .filter(item => item.value.startsWith(`${type}:`))
+              .map(item => item.value.replace(`${type}:`, ''))
+
+            onFilterChange(`${type}s` as keyof Filter, values)
+          })
         }}
         styles={customStyles}
         className="react-select-container"

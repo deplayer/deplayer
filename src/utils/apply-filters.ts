@@ -10,39 +10,49 @@ export const applyFilters = (
   return idsToFilter.filter((id) => {
     const media = rows[id];
 
-    // Check genre filters
+    // If no filters are active, include everything
+    if (
+      filters.genres.length === 0 &&
+      filters.types.length === 0 &&
+      filters.artists.length === 0 &&
+      filters.providers.length === 0
+    ) {
+      return true;
+    }
+
+    let hasMatches = false;
+
+    // Check if media matches any of the selected filters in each active category
     if (filters.genres.length > 0) {
       const mediaGenres = Array.isArray(media.genres)
         ? media.genres
         : media.genres
         ? [media.genres]
         : [];
-      if (!filters.genres.some((g) => mediaGenres.includes(g))) {
-        return false;
+      if (filters.genres.some((g) => mediaGenres.includes(g))) {
+        hasMatches = true;
       }
     }
 
-    // Check type filters
-    if (filters.types.length > 0 && !filters.types.includes(media.type)) {
-      return false;
+    if (filters.types.length > 0) {
+      if (filters.types.includes(media.type)) {
+        hasMatches = true;
+      }
     }
 
-    // Check artist filters
-    if (
-      filters.artists.length > 0 &&
-      !filters.artists.includes(media.artist.id)
-    ) {
-      return false;
+    if (filters.artists.length > 0) {
+      if (filters.artists.some((artistId) => artistId === media.artist.id)) {
+        hasMatches = true;
+      }
     }
 
-    // Check provider filters
     if (filters.providers.length > 0) {
       const mediaProviders = media.stream ? Object.keys(media.stream) : [];
-      if (!filters.providers.some(p => mediaProviders.includes(p))) {
-        return false;
+      if (filters.providers.some((p) => mediaProviders.includes(p))) {
+        hasMatches = true;
       }
     }
 
-    return true;
+    return hasMatches;
   });
 };

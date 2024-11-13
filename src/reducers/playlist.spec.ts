@@ -17,7 +17,6 @@ describe('collection reducer', () => {
       .toEqual({
         ...defaultState,
         trackIds: ['1234'],
-        currentPlaying: {}
       })
   })
 
@@ -36,7 +35,6 @@ describe('collection reducer', () => {
       .toEqual({
         ...defaultState,
         trackIds: Object.keys(expectedObj),
-        currentPlaying: {}
       })
   })
 
@@ -57,7 +55,6 @@ describe('collection reducer', () => {
     expect(reducer(addSongsState, { type: types.SET_COLUMN_SORT, column: 'price', direction: 'ASC', songs: expectedObj }))
       .toEqual({
         ...defaultState,
-        currentPlaying: {},
         trackIds: sortedSongsIds,
         prevSongId: undefined,
         nextSongId: undefined,

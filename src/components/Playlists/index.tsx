@@ -13,9 +13,9 @@ type Props = {
 
 const Playlists = (props: Props) => {
   const { collection } = props
-  const { playlists } = props.playlist
+  const { playlists, smartPlaylists } = props.playlist
 
-  if (!playlists.length) {
+  if (!playlists.length && !smartPlaylists.length) {
     return (
       <React.Fragment>
         <BodyMessage message={`You don't have any playlist yet.\n Add some songs to now playing and save it as playlist`} />
@@ -35,10 +35,21 @@ const Playlists = (props: Props) => {
     )
   })
 
+  const smartPlaylistsComps = smartPlaylists.map((playlist: any) => {
+    return (
+      <Playlist
+        dispatch={props.dispatch}
+        key={playlist._id}
+        collection={collection}
+        playlist={playlist}
+      />
+    );
+  });
 
   return (
-    <div className='playlists z-10 flex flex-col w-full'>
+    <div className='playlists z-10 flex flex-col w-full overflow-y-auto h-full'>
       {playlistsComps}
+      {smartPlaylistsComps}
     </div>
   )
 }

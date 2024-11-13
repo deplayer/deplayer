@@ -1,4 +1,4 @@
-import { text, json, boolean, pgTable, integer, real } from "drizzle-orm/pg-core";
+import { text, json, boolean, timestamp, pgTable, integer, real } from "drizzle-orm/pg-core";
 
 export const media = pgTable("media", {
   id: text("id").primaryKey(),
@@ -14,11 +14,15 @@ export const media = pgTable("media", {
   genres: json("genres"),
   track: integer("track"),
   year: integer("year"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow()
 })
 
 export const settings = pgTable("settings", {
   id: text("id").primaryKey(),
-  settings: json("settings").notNull()
+  settings: json("settings").notNull(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow()
 })
 
 export const queue = pgTable("queue", {
@@ -29,5 +33,23 @@ export const queue = pgTable("queue", {
   repeat: boolean("repeat"),
   shuffle: boolean("shuffle"),
   nextSongId: text("nextSongId"),
-  prevSongId: text("prevSongId")
+  prevSongId: text("prevSongId"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow()
+})
+
+export const smartPlaylist = pgTable("smart_playlist", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  filters: json("filters").notNull(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow()
+})
+
+export const playlist = pgTable("playlist", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  trackIds: json("trackIds").notNull(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow()
 })

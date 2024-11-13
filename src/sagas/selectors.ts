@@ -11,6 +11,10 @@ export const getQueue = (state: any): any => {
   return state ? state.queue : {}
 }
 
+export const getSmartPlaylists = (state: any): any => {
+  return state ? state.playlist.smartPlaylists : {}
+}
+
 export const getCollection = (state: any): any => {
   return state ? state.collection : {}
 }
