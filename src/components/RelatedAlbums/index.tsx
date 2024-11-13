@@ -3,7 +3,7 @@ import { Translate } from 'react-redux-i18n'
 
 import HorizontalSlider from '../HorizontalSlider'
 import CoverImage from '../MusicTable/CoverImage'
-import type Album from '../../entities/Album'
+import IAlbum from '../../entities/Album'
 
 const AlbumCover = ({ albumName, albumId, thumbnailUrl }: { albumName: string, albumId: string, thumbnailUrl: string }) => {
   return (
@@ -29,7 +29,7 @@ const AlbumCover = ({ albumName, albumId, thumbnailUrl }: { albumName: string, a
 }
 
 type Props = {
-  albums: Array<Album>
+  albums: Array<IAlbum>
 }
 
 const RelatedAlbums = (props: Props) => {

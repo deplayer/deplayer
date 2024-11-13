@@ -18,7 +18,7 @@ import MediaSlider from '../MediaSlider'
 import { sortByPlayCount } from '../../reducers/collection'
 import Lyrics from './Lyrics'
 import { getStreamUri } from '../../services/Song/StreamUriService'
-import Album from '../../entities/Album'
+import IAlbum from '../../entities/Album'
 import ServiceIcon from '../ServiceIcon'
 import Media, { IMedia } from '../../entities/Media'
 import { State as SettingsState } from '../../reducers/settings'
@@ -34,7 +34,7 @@ type Props = {
     lyrics: string
   },
   collection: {
-    albums: { [key: string]: Album },
+    albums: { [key: string]: IAlbum },
     albumsByArtist: { [key: string]: string[] },
     songsByGenre: any,
     rows: { [key: string]: IMedia }
@@ -55,11 +55,11 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
   const navigate = useNavigate()
   const { trackIds, currentPlaying } = queue
   const { rows, albums, albumsByArtist, songsByGenre } = collection
-  
+
   const song = rows[songId]
   const songObj = song ? new Media(song) : null
   const isSongPinned = songObj?.hasAnyProviderOf(['opfs']) || false
-  
+
   const [pinned, setPinnedSong] = React.useState(isSongPinned)
   const [downloadUrls, setDownloadUrls] = React.useState([])
   const [showLyrics, setShowLyrics] = React.useState(false)
@@ -100,9 +100,11 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
       .map((songId: string) => rows[songId])
     : null
 
-  const relatedAlbums = song.artist.id && albumsByArtist?.[song.artist.id].map((albumId: string) => {
-    return new Album({ ...albums[albumId], albumId })
-  }) || []
+  const relatedAlbums = song.artist.id && albumsByArtist?.[song.artist.id].reduce((acc: IAlbum[], albumId: string): IAlbum[] => {
+    if (!albums[albumId]) return acc
+    acc.push(albums[albumId])
+    return acc
+  }, []) || []
 
   const songFinder = song.id === currentPlaying
 
@@ -110,8 +112,8 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
     // Reset all filters first
     dispatch({ type: types.CLEAR_COLLECTION_FILTERS })
     // Set the genre filter
-    dispatch({ 
-      type: types.SET_COLLECTION_FILTER, 
+    dispatch({
+      type: types.SET_COLLECTION_FILTER,
       filterType: 'genres',
       values: [genre]
     })
@@ -273,9 +275,9 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
               <div className='mt-2 flex items-center'>
                 <Translate className='mr-2' value='labels.genres' />
                 {song.genres.map((genre: string) => (
-                  <Tag 
+                  <Tag
                     key={genre}
-                    transparent 
+                    transparent
                     onClick={() => handleGenreClick(genre)}
                     className="cursor-pointer hover:bg-opacity-50"
                   >
