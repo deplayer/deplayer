@@ -9,6 +9,7 @@ import { State as CollectionState } from '../../reducers/collection'
 import Modal from '../common/Modal'
 import SongRow from '../MusicTable/SongRow'
 import { applyFilters } from '../../utils/apply-filters'
+import { useNavigate } from 'react-router-dom'
 
 type Props = {
   playlist: {
@@ -25,6 +26,7 @@ type Props = {
 const Playlist = (props: Props) => {
   const { playlist, collection, dispatch } = props
   const [showSongs, setShowSongs] = React.useState(false)
+  const navigate = useNavigate()
 
   // Determine if this is a smart playlist
   const isSmartPlaylist = 'filters' in playlist
@@ -135,10 +137,22 @@ const Playlist = (props: Props) => {
           <>
             <Button
               onClick={() => {
-                dispatch({
-                  type: types.SET_COLLECTION_FILTER,
-                  filters: playlist.filters
+                // Reset all filters first
+                dispatch({ type: types.CLEAR_COLLECTION_FILTERS })
+                
+                // Apply all available filters
+                Object.entries(playlist.filters || {}).forEach(([filterType, values]) => {
+                  if (values.length) {
+                    dispatch({
+                      type: types.SET_COLLECTION_FILTER,
+                      filterType,
+                      values
+                    })
+                  }
                 })
+                
+                // Navigate to collection view
+                navigate('/collection')
               }}
             >
               Apply Filters

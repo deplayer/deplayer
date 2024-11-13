@@ -8,8 +8,8 @@ export default class PlaylistService implements IStorageService {
     this.storageAdapter = storageAdapter
   }
 
-  initialize = (model: 'playlist') => {
-    this.storageAdapter.initialize(model)
+  initialize = () => {
+    this.storageAdapter.initialize('playlist')
   }
 
   save = (_id: string, payload: any): Promise<any> => {
