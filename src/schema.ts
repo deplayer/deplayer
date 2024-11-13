@@ -50,4 +50,6 @@ export const playlist = pgTable("playlist", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   trackIds: json("trackIds").notNull(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow()
 })

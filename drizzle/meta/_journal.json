@@ -50,6 +50,13 @@
       "when": 1731404056034,
       "tag": "0006_thankful_patriot",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1731483325792,
+      "tag": "0007_sharp_rogue",
+      "breakpoints": true
     }
   ]
 }

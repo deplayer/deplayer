@@ -5,12 +5,28 @@ import Icon from '../common/Icon'
 import { Dispatch } from 'redux'
 import * as actionTypes from '../../constants/ActionTypes'
 
+interface MediaItem {
+  genres?: string[];
+  type: string;
+  stream?: Record<string, unknown>;
+}
+
+interface Artist {
+  id: string;
+  name: string;
+}
+
+interface Collection {
+  rows: Record<string, MediaItem>;
+  artists: Record<string, Artist>;
+}
+
 type Props = {
-  collection: any
-  activeFilters: Filter
-  onFilterChange: (filterType: keyof Filter, values: string[]) => void
-  onClearFilters: () => void
-  dispatch: Dispatch
+  collection: Collection;
+  activeFilters: Filter;
+  onFilterChange: (filterType: keyof Filter, values: string[]) => void;
+  onClearFilters: () => void;
+  dispatch: Dispatch;
 }
 
 const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Props) => {
@@ -178,16 +194,16 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
         value={selectedValues}
         onChange={(selected) => {
           const selectedItems = selected || []
-          
+
           // Define filter types to process
           const filterTypes = ['genre', 'type', 'artist', 'provider'] as const
-          
+
           // Process each filter type
           filterTypes.forEach(type => {
             const values = selectedItems
               .filter(item => item.value.startsWith(`${type}:`))
               .map(item => item.value.replace(`${type}:`, ''))
-            
+
             onFilterChange(`${type}s` as keyof Filter, values)
           })
         }}

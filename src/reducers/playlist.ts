@@ -12,7 +12,6 @@ export type State = {
 
 export const defaultState = {
   trackIds: [],
-  currentPlaying: {},
   playlists: [],
   smartPlaylists: []
 }

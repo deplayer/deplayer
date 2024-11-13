@@ -1,6 +1,7 @@
 import { connect } from 'react-redux'
 import { useLocation, Location } from 'react-router-dom'
 
+import { State as RootState } from '../reducers'
 import Icon from '../components/common/Icon'
 import Topbar from '../components/Topbar/Topbar'
 
@@ -127,8 +128,28 @@ const dynamicTitle = (
   }
 }
 
+interface TopbarWrapperProps {
+  collection: {
+    rows: Record<string, any>;
+    artists: Record<string, any>;
+    albums: Record<string, any>;
+  };
+  search: {
+    loading: boolean;
+    error?: string;
+    searchTerm: string;
+    searchToggled: boolean;
+  };
+  queue: {
+    trackIds?: string[];
+  };
+  app: Record<string, unknown>;
+  dispatch: (action: any) => void;
+  children?: React.ReactNode;
+}
+
 // Create a new wrapper component to handle hooks
-const TopbarWrapper = (props: any) => {
+const TopbarWrapper = (props: TopbarWrapperProps) => {
   const location = useLocation()
   const title = dynamicTitle(location, props.collection, props.search.searchTerm)
   const hasResults = props.queue.trackIds && props.queue.trackIds.length ? true : false
@@ -139,7 +160,7 @@ const TopbarWrapper = (props: any) => {
       title={title}
       loading={props.search.loading}
       showInCenter={!hasResults && inHome}
-      error={props.search.error}
+      error={props.search.error || ''}
       searchTerm={props.search.searchTerm}
       searchToggled={props.search.searchToggled}
       dispatch={props.dispatch}
@@ -150,7 +171,7 @@ const TopbarWrapper = (props: any) => {
 }
 
 // Connect the wrapper component instead
-export default connect((state: any) => ({
+export default connect((state: RootState) => ({
   collection: state.collection,
   search: state.search,
   queue: state.queue,
