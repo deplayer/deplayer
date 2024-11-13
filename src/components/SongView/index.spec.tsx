@@ -34,7 +34,7 @@ describe('SongView', () => {
   it('spinner if app loading', () => {
     const props = setup({ loading: true })
 
-    render(<SongView {...props} />)
+    render(<BrowserRouter><SongView {...props} /></BrowserRouter>)
     expect(screen.getByTestId('spinner')).toBeTruthy()
   })
 

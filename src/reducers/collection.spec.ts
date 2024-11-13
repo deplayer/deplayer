@@ -39,7 +39,8 @@ describe('collection reducer', () => {
       rows,
       loading: false,
       mediaByType: { audio: [] },
-      visibleSongs: [fixtureSong.id]
+      searchResults: [fixtureSong.id],
+      filteredSongs: [fixtureSong.id]
     }
 
     expect(reducer(initialState, { type: types.RECEIVE_COLLECTION, data: [fixtureSong] }))
