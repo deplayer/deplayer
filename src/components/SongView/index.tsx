@@ -121,6 +121,21 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
     navigate('/collection')
   }
 
+  const handleTypeClick = (type: string) => {
+    // Reset all filters first
+    dispatch({ type: types.CLEAR_COLLECTION_FILTERS })
+    // Set the type filter
+    dispatch({
+      type: types.SET_COLLECTION_FILTER,
+      filterType: 'types',
+      values: [type]
+    })
+    // Navigate to collection view
+    navigate('/collection')
+  }
+
+  const typeIcon = song.type === 'audio' ? <Icon className='pr-2' icon='faMusic' /> : <Icon className='pr-2' icon='faVideo' />
+
   return (
     <div data-testid="song-view" className={`song-view ${className} w-full overflow-y-auto z-10 flex flex-col`}>
       <div className="song sm:flex">
@@ -247,7 +262,10 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
 
         <div className="content flex-grow pt-6 sm:pt-0 md:pt-6 md:pr-6 justify-between">
           <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className="p-6 rounded-lg">
-            <h2 className='text-3xl text-wrap truncate ...'>{song.title}</h2>
+            <div className='flex items-center justify-between'>
+              <h2 className='text-3xl text-wrap truncate ...'>{song.title}</h2>
+              <Tag onClick={() => handleTypeClick(song.type)} className="cursor-pointer hover:bg-opacity-50 mr-2" transparent>{typeIcon} {song.type}</Tag>
+            </div>
             <div className='text-lg mt-2'>
               <Link to={`/artist/${song.artist.id}`}>
                 <h3>
@@ -268,27 +286,22 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
                 {song.album.name || 'N/A'} {song.album.year && `(${song.album.year})`}
               </Link>
             </div>
-            <div className='mt-4'>
-              <Icon icon='faStopwatch' /> {getDurationStr(song.duration)}
-            </div>
             {song.genres?.length > 0 && (
               <div className='mt-2 flex items-center'>
-                <Translate className='mr-2' value='labels.genres' />
                 {song.genres.map((genre: string) => (
                   <Tag
                     key={genre}
                     transparent
                     onClick={() => handleGenreClick(genre)}
-                    className="cursor-pointer hover:bg-opacity-50"
+                    className="cursor-pointer hover:bg-opacity-50 mr-2"
                   >
                     {genre}
                   </Tag>
                 ))}
               </div>
             )}
-            <div className='mt-2 flex items-center'>
-              <Translate className='mr-2' value='labels.mediaType' />
-              <Tag transparent>{song.type}</Tag>
+            <div className='mt-4'>
+              <Icon icon='faStopwatch' /> {getDurationStr(song.duration)}
             </div>
             <div className='mt-2'>
               <Translate value='song.label.played' /> {song.playCount ?? 0} <Translate value='song.label.times' />

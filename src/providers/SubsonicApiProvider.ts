@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import Media from '../entities/Media'
+import Media, { IMedia } from '../entities/Media'
 import { IMusicProvider } from './IMusicProvider'
 
 /**
@@ -30,7 +30,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
     this.coverBase = `${settings.baseUrl}/rest/getCoverArt.view?u=${settings.user}&p=${settings.password}&c=${appName}&v=1.11.0&f=json`
   }
 
-  mapSongs = (songs: Media[], albums: any[] = []): Array<any> => {
+  mapSongs = (songs: IMedia[], albums: any[] = []): Array<any> => {
     // Protect against empty responses
     if (!songs) {
       return []
@@ -51,7 +51,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
           thumbnailUrl: this.coverBase + '&id=' + song.coverArt,
           fullUrl: this.coverBase + '&id=' + song.coverArt,
         },
-        genres: Array.isArray(song.genre) ? song.genre : [],
+        genres: song.genres.map((genre: { name: string }) => genre.name),
         duration: song.duration * 1000,
         track: song.track,
         filePath: song.path,
@@ -66,7 +66,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
     })
   }
 
-  search(searchTerm: string): Promise<Array<Media>> {
+  search(searchTerm: string): Promise<Array<IMedia>> {
     return new Promise((resolve, reject) => {
       axios.get(`${this.searchUrl}&query=${searchTerm}`)
         .then((result) => {

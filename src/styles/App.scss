@@ -24,6 +24,10 @@ html, body {
   height: 100%;
 }
 
+body * {
+  @apply transition-colors duration-100;
+}
+
 body {
   margin: 0px;
   padding: 0px;

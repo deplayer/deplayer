@@ -4,6 +4,17 @@ import Button from '../common/Button'
 import { toast } from 'react-toastify'
 
 function ReloadPrompt() {
+  const intervalMS = 60 * 60 * 1000
+
+  useRegisterSW({
+    onRegistered(r) {
+      r && setInterval(() => {
+        console.log('SW: Checking for updates...')
+        r.update()
+      }, intervalMS)
+    }
+  })
+
   const {
     offlineReady: [offlineReady],
     needRefresh: [needRefresh],

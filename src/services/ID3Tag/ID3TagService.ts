@@ -29,8 +29,7 @@ export const readFileMetadata = async (file: any) => {
   // Check if file type is supported
   if (!normFile.type || !SUPPORTED_MIME_TYPES.includes(normFile.type)) {
     throw new Error(
-      `Unsupported file type: ${
-        normFile.type || "unknown"
+      `Unsupported file type: ${normFile.type || "unknown"
       }. Supported types are: ${SUPPORTED_MIME_TYPES.join(", ")}`
     );
   }
@@ -68,6 +67,7 @@ export async function metadataToSong(
     type: fileUri.endsWith(".mp4") ? "video" : "audio",
     duration: metadata.format.duration || 0,
     genres: metadata.common.genre ?? [],
+    track: metadata.common.track.no || 0,
     stream: {
       filesystem: {
         service: service,

@@ -15,7 +15,14 @@ export default defineConfig({
     filename: 'sw.ts',
     includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
     workbox: {
-      globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,json,mp3,wav,ogg,m4a,webm}']
+      globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,json,mp3,wav,ogg,m4a,webm}'],
+      runtimeCaching: [
+        {
+          // Handle urls like this https://deplayer.app/assets/postgres-DaF_UcUd.data
+          urlPattern: /^.*\/postgres-.+\.data$/,
+          handler: 'CacheFirst'
+        }
+      ]
     },
     injectManifest: {
       maximumFileSizeToCacheInBytes: 11 * 1024 * 1024,

@@ -199,10 +199,12 @@ class PlayerControls extends React.Component<Props> {
           </InPortal>
         </div>
         {!songFinder && currentPlaying.type === 'video' && (
-          <OutPortal
-            className={`background-video left-0 right-0 top-0 botton-0 absolute ${currentPlaying.type === 'video' && 'bg-handler'}`}
-            node={this.props.playerPortal}
-          />
+          <div className="background-video left-0 right-0 top-0 botton-0 absolute bg-handler">
+            <OutPortal
+              className={`background-video left-0 right-0 top-0 botton-0 absolute ${currentPlaying.type === 'video' && 'bg-handler'}`}
+              node={this.props.playerPortal}
+            />
+          </div>
         )}
         {showControls &&
           <div className={'player-container'} style={{ zIndex: 102 }}>

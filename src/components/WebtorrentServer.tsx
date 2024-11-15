@@ -14,26 +14,32 @@ const announceList = [
 
 function WebtorrentServer({ url, playing, muted, controls, player, style, loop }: { url: string, muted: boolean, playing: boolean, controls: boolean, player: any, style: any, loop: boolean }) {
   const client = new WebTorrent()
+  const [serverInitialized, setServerInitialized] = React.useState(false)
 
   // if (typeof url !== 'string' || url.length < 10) return
 
   useRegisterSW({
     onRegistered(r) {
+      console.log('SW registered: ', r)
+
       r?.active && client.createServer({ controller: r })
+      setServerInitialized(true)
     }
   })
 
-  function processTorrent(torrent: Torrent) {
+  function processTorrent(torrent: Torrent, client: any) {
     const file = torrent.files.find((file: any) => {
       return file.type.startsWith('video/')
 
     }) as any
     if (file === undefined) return () => { }
+    if (!serverInitialized) return
 
     console.log('Video found! torrent file: ', file)
 
     console.log('streaming file to player', player)
     file.streamTo(player, {
+      client: client,
       autoplay: true,
       muted: muted,
       controls: controls
@@ -58,10 +64,10 @@ function WebtorrentServer({ url, playing, muted, controls, player, style, loop }
       })
 
       client.on('torrent', (torrent: Torrent) => {
-        processTorrent(torrent)
+        processTorrent(torrent, client)
       })
     } else {
-      processTorrent(existingTorrent)
+      processTorrent(existingTorrent, client)
     }
 
     return () => { }
