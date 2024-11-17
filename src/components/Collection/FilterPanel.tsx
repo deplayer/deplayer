@@ -4,6 +4,8 @@ import Button from '../common/Button'
 import { Dispatch } from 'redux'
 import * as actionTypes from '../../constants/ActionTypes'
 import Icon from '../common/Icon'
+import Modal from '../common/Modal'
+import { useState, useEffect } from 'react'
 
 interface MediaItem {
   genres?: string[];
@@ -30,6 +32,17 @@ type Props = {
 }
 
 const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Props) => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   // Get unique genres and types as before
   const genres = Object.values(collection.rows).reduce((acc: Set<string>, media: any) => {
     // Only process if genres exists and is an array
@@ -127,6 +140,14 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
       ...provided,
       backgroundColor: 'var(--select-menu-bg)',
       border: '1px solid var(--select-border)',
+      backdropFilter: 'blur(8px)',
+      zIndex: 60,
+    }),
+    menuList: (provided: any) => ({
+      ...provided,
+      backgroundColor: 'var(--select-menu-bg)',
+      backdropFilter: 'blur(8px)',
+      maxHeight: '40vh',
     }),
     multiValue: (provided: any) => ({
       ...provided,
@@ -153,56 +174,30 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
     }
   }
 
-  return (
-    <div className="filter-panel flex">
-      <div className="flex w-full">
-        <style>
-          {`
-          :root {
-            --select-bg: #fff;
-            --select-border: #e2e8f0;
-            --select-border-hover: #cbd5e0;
-            --select-option-bg: #fff;
-            --select-text: #1a202c;
-            --select-menu-bg: #fff;
-            --select-multi-bg: #e2e8f0;
-          }
-          
-          .dark {
-            --select-bg: #1a202c;
-            --select-border: #2d3748;
-            --select-border-hover: #4a5568;
-            --select-option-bg: #1a202c;
-            --select-text: #e2e8f0;
-            --select-menu-bg: #1a202c;
-            --select-multi-bg: #2d3748;
-          }
-        `}
-        </style>
-
-        <div className="w-full">
-          <Select
-            isMulti
-            options={groupedOptions}
-            value={selectedValues}
-            placeholder='Filter by...'
-            onChange={(selected) => {
-              const selectedItems = selected || []
-              const filterTypes = ['genre', 'type', 'artist', 'provider'] as const
-              filterTypes.forEach(type => {
-                const values = selectedItems
-                  .filter(item => item.value.startsWith(`${type}:`))
-                  .map(item => item.value.replace(`${type}:`, ''))
-                onFilterChange(`${type}s` as keyof Filter, values)
-              })
-            }}
-            styles={customStyles}
-            className="react-select-container w-full"
-            classNamePrefix="react-select"
-          />
-        </div>
-      </div>
-      { Object.values(activeFilters).some(arr => arr.length > 0) && (
+  const filterContent = (
+    <div className='flex'>
+      <Select
+        isMulti
+        options={groupedOptions}
+        value={selectedValues}
+        placeholder='Filter by...'
+        onChange={(selected) => {
+          const selectedItems = selected || []
+          const filterTypes = ['genre', 'type', 'artist', 'provider'] as const
+          filterTypes.forEach(type => {
+            const values = selectedItems
+              .filter(item => item.value.startsWith(`${type}:`))
+              .map(item => item.value.replace(`${type}:`, ''))
+            onFilterChange(`${type}s` as keyof Filter, values)
+          })
+        }}
+        styles={customStyles}
+        className="react-select-container"
+        classNamePrefix="react-select"
+        menuPosition="fixed"
+        menuPlacement="auto"
+      />
+      {Object.values(activeFilters).some(arr => arr.length > 0) && (
         <Button
           size='xs'
           onClick={handleSaveSmartPlaylist}
@@ -215,6 +210,42 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
           <Icon icon="faSave" className='px-1' />
         </Button>
       )}
+    </div>
+  )
+
+  if (isMobile) {
+    return (
+      <>
+        {isModalOpen && (
+          <Modal
+            title="Filter Collection"
+            onClose={() => setIsModalOpen(false)}
+          >
+            <div className='w-full'>
+              {filterContent}
+            </div>
+          </Modal>
+        )}
+
+        <Button
+          transparent
+          onClick={() => setIsModalOpen(true)}
+          className="md:hidden"
+        >
+          <Icon icon="faFilter" className='px-1' />
+          {Object.values(activeFilters).some(arr => arr.length > 0) && (
+            <span className="ml-1 text-xs bg-blue-500 text-white rounded-full px-2">
+              {Object.values(activeFilters).reduce((acc, arr) => acc + arr.length, 0)}
+            </span>
+          )}
+        </Button>
+      </>
+    )
+  }
+
+  return (
+    <div className="filter-panel hidden md:flex items-center space-x-2">
+      {filterContent}
       <div className="vertical-divider border-l border-gray-500 mx-2" />
     </div>
   )
