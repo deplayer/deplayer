@@ -4,8 +4,6 @@ import Button from '../common/Button'
 import { Dispatch } from 'redux'
 import * as actionTypes from '../../constants/ActionTypes'
 import Icon from '../common/Icon'
-import { useState } from 'react'
-import Modal from '../common/Modal'
 
 interface MediaItem {
   genres?: string[];
@@ -32,9 +30,6 @@ type Props = {
 }
 
 const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Props) => {
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const isMobile = window.innerWidth < 768
-
   // Get unique genres and types as before
   const genres = Object.values(collection.rows).reduce((acc: Set<string>, media: any) => {
     // Only process if genres exists and is an array
@@ -158,26 +153,6 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
     }
   }
 
-  const selectProps = {
-    isMulti: true,
-    options: groupedOptions,
-    value: selectedValues,
-    placeholder: 'Filter by...',
-    onChange: (selected: { value: string; label: string; color: string; }[] | null) => {
-      const selectedItems = selected || []
-      const filterTypes = ['genre', 'type', 'artist', 'provider'] as const
-      filterTypes.forEach(type => {
-        const values = selectedItems
-          .filter(item => item.value.startsWith(`${type}:`))
-          .map(item => item.value.replace(`${type}:`, ''))
-        onFilterChange(`${type}s` as keyof Filter, values)
-      })
-    },
-    styles: customStyles,
-    className: "react-select-container w-full",
-    classNamePrefix: "react-select"
-  }
-
   return (
     <div className="filter-panel flex">
       <div className="flex w-full">
@@ -206,43 +181,28 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
         </style>
 
         <div className="w-full">
-          <div className="relative w-full">
-            {isMobile ? (
-              <Button
-                onClick={() => setIsModalOpen(true)}
-                fullWidth
-                className="text-left"
-              >
-                {selectedValues.length > 0 ? (
-                  `${selectedValues.length} filter${selectedValues.length > 1 ? 's' : ''} selected`
-                ) : (
-                  'Filter by...'
-                )}
-              </Button>
-            ) : (
-              <Select {...selectProps} />
-            )}
-          </div>
+          <Select
+            isMulti
+            options={groupedOptions}
+            value={selectedValues}
+            placeholder='Filter by...'
+            onChange={(selected) => {
+              const selectedItems = selected || []
+              const filterTypes = ['genre', 'type', 'artist', 'provider'] as const
+              filterTypes.forEach(type => {
+                const values = selectedItems
+                  .filter(item => item.value.startsWith(`${type}:`))
+                  .map(item => item.value.replace(`${type}:`, ''))
+                onFilterChange(`${type}s` as keyof Filter, values)
+              })
+            }}
+            styles={customStyles}
+            className="react-select-container w-full"
+            classNamePrefix="react-select"
+          />
         </div>
       </div>
-
-      {isModalOpen && (
-        <Modal
-          title="Select Filters"
-          onClose={() => setIsModalOpen(false)}
-        >
-          <div className="p-4">
-            <Select {...selectProps} />
-          </div>
-          <div className="border-t border-gray-200 dark:border-gray-700 p-4">
-            <Button onClick={() => setIsModalOpen(false)} fullWidth>
-              Done
-            </Button>
-          </div>
-        </Modal>
-      )}
-
-      {Object.values(activeFilters).some(arr => arr.length > 0) && (
+      { Object.values(activeFilters).some(arr => arr.length > 0) && (
         <Button
           size='xs'
           onClick={handleSaveSmartPlaylist}
