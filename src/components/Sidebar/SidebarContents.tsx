@@ -75,8 +75,6 @@ const SidebarContents = (props: ContentProps) => {
         />
         <PlaylistsMenuItem current={inSection(location, 'playlists')} totalItems={props.playlist.playlists.length} />
         <CollectionMenuItem
-          dispatch={props.dispatch}
-          collection={props.collection}
           current={inSection(location, '(collection.*)')}
           totalItems={props.collection.totalRows}
         />

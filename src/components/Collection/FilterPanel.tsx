@@ -174,7 +174,7 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
       backgroundColor: `${data.color}40`,
       border: `1px solid ${data.color}`,
     }),
-    multiValueLabel: (provided: any, { data }: any) => ({
+    multiValueLabel: (provided: any) => ({
       ...provided,
       color: 'var(--select-text)',
       fontSize: '0.85em',

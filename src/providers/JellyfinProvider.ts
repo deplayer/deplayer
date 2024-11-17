@@ -1,11 +1,9 @@
 import { Api, Jellyfin } from "@jellyfin/sdk";
 import { ItemFields } from "@jellyfin/sdk/lib/generated-client/models";
-import { getUserViewsApi } from "@jellyfin/sdk/lib/utils/api/user-views-api";
 import { getItemsApi } from "@jellyfin/sdk/lib/utils/api/items-api";
 import { getUserApi } from "@jellyfin/sdk/lib/utils/api/user-api";
 import Media from "../entities/Media";
 import { IMusicProvider } from "./IMusicProvider";
-import { all } from "deepmerge";
 
 export default class JellyfinProvider implements IMusicProvider {
   private api: Api;
