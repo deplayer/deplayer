@@ -118,9 +118,22 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
       ...provided,
       backgroundColor: 'var(--select-bg)',
       borderColor: 'var(--select-border)',
+      color: 'var(--select-text)',
       '&:hover': {
         borderColor: 'var(--select-border-hover)'
       }
+    }),
+    input: (provided: any) => ({
+      ...provided,
+      color: 'var(--select-text)',
+    }),
+    placeholder: (provided: any) => ({
+      ...provided,
+      color: 'var(--select-text)',
+    }),
+    singleValue: (provided: any) => ({
+      ...provided,
+      color: 'var(--select-text)',
     }),
     option: (provided: any, state: any) => ({
       ...provided,
@@ -156,14 +169,25 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
       maxHeight: '30vh',
       padding: '0',
     }),
-    multiValue: (provided: any) => ({
+    multiValue: (provided: any, { data }: any) => ({
       ...provided,
-      backgroundColor: 'var(--select-multi-bg)'
+      backgroundColor: `${data.color}40`,
+      border: `1px solid ${data.color}`,
     }),
-    multiValueLabel: (provided: any) => ({
+    multiValueLabel: (provided: any, { data }: any) => ({
       ...provided,
-      color: 'var(--select-text)'
-    })
+      color: 'var(--select-text)',
+      fontSize: '0.85em',
+      padding: '2px',
+    }),
+    multiValueRemove: (provided: any, { data }: any) => ({
+      ...provided,
+      color: data.color,
+      ':hover': {
+        backgroundColor: data.color,
+        color: 'white',
+      },
+    }),
   }
 
   const handleSaveSmartPlaylist = () => {
