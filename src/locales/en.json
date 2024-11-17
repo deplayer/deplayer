@@ -21,7 +21,11 @@
     "addProviders": "Add providers",
     "providers": "Providers",
     "lazyProviders": "Search providers",
-    "generalSettings": "General settings"
+    "generalSettings": "General settings",
+    "jellyfin": "Jellyfin",
+    "jellyfin.baseUrl": "Server URL",
+    "jellyfin.username": "Username",
+    "jellyfin.apiKey": "API Key"
   },
   "song": {
     "label": {

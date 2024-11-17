@@ -1,7 +1,6 @@
 import Select from 'react-select'
 import { Filter } from '../../reducers/collection'
 import Button from '../common/Button'
-import Icon from '../common/Icon'
 import { Dispatch } from 'redux'
 import * as actionTypes from '../../constants/ActionTypes'
 
@@ -155,18 +154,10 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
   }
 
   return (
-    <div className="filter-panel py-2 pb-4 px-4 pr-6">
-      <div className="flex justify-between mb-4">
-        <Button
-          onClick={handleSaveSmartPlaylist}
-          disabled={!Object.values(activeFilters).some(arr => arr.length > 0)}
-        >
-          Save as Smart Playlist
-          <Icon className='pl-2' icon='faSave' />
-        </Button>
-      </div>
-      <style>
-        {`
+    <div className="filter-panel flex">
+      <div className="flex">
+        <style>
+          {`
           :root {
             --select-bg: #fff;
             --select-border: #e2e8f0;
@@ -194,23 +185,32 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
         value={selectedValues}
         onChange={(selected) => {
           const selectedItems = selected || []
-
+          
           // Define filter types to process
           const filterTypes = ['genre', 'type', 'artist', 'provider'] as const
-
+          
           // Process each filter type
           filterTypes.forEach(type => {
             const values = selectedItems
               .filter(item => item.value.startsWith(`${type}:`))
               .map(item => item.value.replace(`${type}:`, ''))
-
-            onFilterChange(`${type}s` as keyof Filter, values)
-          })
-        }}
-        styles={customStyles}
-        className="react-select-container"
-        classNamePrefix="react-select"
-      />
+            
+              onFilterChange(`${type}s` as keyof Filter, values)
+            })
+          }}
+          styles={customStyles}
+          className="react-select-container w-full"
+          classNamePrefix="react-select"
+        />
+      </div>
+      <Button
+        size='xs'
+        onClick={handleSaveSmartPlaylist}
+        disabled={!Object.values(activeFilters).some(arr => arr.length > 0)}
+        inverted
+      >
+        Save smart playlist
+      </Button>
     </div>
   )
 }
