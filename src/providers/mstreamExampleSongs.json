@@ -1,6 +1,7 @@
 [
   {
     "filepath": "media/tdk/Carnevision (LP 1986)/11 - ¿Que es este temblor¿.mp3",
+    "genres": [],
     "metadata": {
       "artist": "undefined",
       "hash": "c768d921fbe84d7f92ab5578a2f7255622332d9f038fc5c69f0e0ffcccbff1ac",
@@ -15,6 +16,7 @@
   },
   {
     "filepath": "media/Commando 9mm/005-unete al commando.mp3",
+    "genres": [],
     "metadata": {
       "artist": "Commando 9MM",
       "hash": "01ded25b966951acbce9081944ec28921835ffc9b2075668cb9a13dff7b4b8b5",
