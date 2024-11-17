@@ -178,39 +178,60 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
             --select-multi-bg: #2d3748;
           }
         `}
-      </style>
-      <Select
-        isMulti
-        options={groupedOptions}
-        value={selectedValues}
-        onChange={(selected) => {
-          const selectedItems = selected || []
-          
-          // Define filter types to process
-          const filterTypes = ['genre', 'type', 'artist', 'provider'] as const
-          
-          // Process each filter type
-          filterTypes.forEach(type => {
-            const values = selectedItems
-              .filter(item => item.value.startsWith(`${type}:`))
-              .map(item => item.value.replace(`${type}:`, ''))
-            
-              onFilterChange(`${type}s` as keyof Filter, values)
-            })
-          }}
-          styles={customStyles}
-          className="react-select-container w-full"
-          classNamePrefix="react-select"
-        />
+        </style>
+
+        {/* Portal setup */}
+        <portals.InPortal node={portalNode}>
+          {SelectComponent}
+        </portals.InPortal>
+
+        {/* Main select component */}
+        <div className="w-full">
+          <portals.OutPortal
+            node={portalNode}
+            onMenuOpen={() => {
+              // Only open modal on mobile devices
+              if (window.innerWidth < 768) {
+                setIsModalOpen(true)
+              }
+            }}
+          />
+        </div>
+
+        {/* Modal with portaled select */}
+        {isModalOpen && (
+          <Modal
+            title="Select Filters"
+            onClose={() => setIsModalOpen(false)}
+          >
+            <div className="p-4">
+              <portals.OutPortal node={portalNode} />
+            </div>
+            <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+              <Button
+                onClick={() => setIsModalOpen(false)}
+                fullWidth
+              >
+                Done
+              </Button>
+            </div>
+          </Modal>
+        )}
       </div>
-      <Button
-        size='xs'
-        onClick={handleSaveSmartPlaylist}
-        disabled={!Object.values(activeFilters).some(arr => arr.length > 0)}
-        inverted
-      >
-        Save smart playlist
-      </Button>
+      { Object.values(activeFilters).some(arr => arr.length > 0) && (
+        <Button
+          size='xs'
+          onClick={handleSaveSmartPlaylist}
+          disabled={!Object.values(activeFilters).some(arr => arr.length > 0)}
+          inverted
+          transparent
+          title="Save as smart playlist"
+          className='cursor-pointer'
+        >
+          <Icon icon="faSave" className='px-1' />
+        </Button>
+      )}
+      <div className="vertical-divider border-l border-gray-500 mx-2" />
     </div>
   )
 }

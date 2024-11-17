@@ -126,14 +126,16 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
     }
   }
 
+  const actions = React.useMemo(() => getActions(), [location.pathname, collection.activeFilters])
+
   return (
     <React.Fragment>
-      <div className='p-2 h-12 toolbar flex justify-between items-center text-base'>
+      <div className='p-2 toolbar flex justify-between items-center text-base'>
         <div className='p-2'>
           #<b>{tableIds.length}</b>
         </div>
         <div className='flex'>
-          {getActions()}
+          {actions}
         </div>
       </div>
       <AutoSizer className='music-table'>

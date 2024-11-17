@@ -47,13 +47,13 @@ const Modal = (props: Props) => {
     <ReactModal
       shouldCloseOnOverlayClick
       isOpen={modalIsOpen}
-      className='absolute bg-gray-200 dark:bg-gray-900 rounded-sm max-w-md mx-auto flex flex-col'
+      className='absolute bg-gray-200 dark:bg-gray-900 rounded-sm max-w-md mx-auto flex flex-col mx-4'
       overlayClassName='fixed'
       onRequestClose={() => close()}
       style={customStyles}
     >
       <div className='w-full flex justify-between p-4'>
-        {props.title && <h2 className='py-4 text-2xl'>{props.title}</h2>}
+        {props.title && <h2 className='py-2 text-2xl'>{props.title}</h2>}
         <Button
           transparent
           onClick={() => close()}
