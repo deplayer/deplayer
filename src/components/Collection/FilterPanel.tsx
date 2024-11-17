@@ -141,13 +141,20 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
       backgroundColor: 'var(--select-menu-bg)',
       border: '1px solid var(--select-border)',
       backdropFilter: 'blur(8px)',
-      zIndex: 60,
+      zIndex: 9999,
+      width: '100%',
+      margin: '0',
+    }),
+    menuPortal: (provided: any) => ({
+      ...provided,
+      zIndex: 9999,
     }),
     menuList: (provided: any) => ({
       ...provided,
       backgroundColor: 'var(--select-menu-bg)',
       backdropFilter: 'blur(8px)',
-      maxHeight: '40vh',
+      maxHeight: '30vh',
+      padding: '0',
     }),
     multiValue: (provided: any) => ({
       ...provided,
@@ -194,6 +201,7 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
         styles={customStyles}
         className="react-select-container"
         classNamePrefix="react-select"
+        menuPortalTarget={document.body}
         menuPosition="fixed"
         menuPlacement="auto"
       />
@@ -216,17 +224,6 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
   if (isMobile) {
     return (
       <>
-        {isModalOpen && (
-          <Modal
-            title="Filter Collection"
-            onClose={() => setIsModalOpen(false)}
-          >
-            <div className='w-full'>
-              {filterContent}
-            </div>
-          </Modal>
-        )}
-
         <Button
           transparent
           onClick={() => setIsModalOpen(true)}
@@ -239,6 +236,54 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
             </span>
           )}
         </Button>
+        {isModalOpen && (
+          <Modal
+            title="Filter Collection"
+            onClose={() => setIsModalOpen(false)}
+          >
+            <div className="p-4 flex flex-col gap-4">
+              <div className="relative w-full">
+                <Select
+                  isMulti
+                  options={groupedOptions}
+                  value={selectedValues}
+                  placeholder='Filter by...'
+                  onChange={(selected) => {
+                    const selectedItems = selected || []
+                    const filterTypes = ['genre', 'type', 'artist', 'provider'] as const
+                    filterTypes.forEach(type => {
+                      const values = selectedItems
+                        .filter(item => item.value.startsWith(`${type}:`))
+                        .map(item => item.value.replace(`${type}:`, ''))
+                      onFilterChange(`${type}s` as keyof Filter, values)
+                    })
+                  }}
+                  styles={customStyles}
+                  className="react-select-container"
+                  classNamePrefix="react-select"
+                  menuPortalTarget={document.body}
+                  menuPosition="fixed"
+                  menuPlacement="auto"
+                />
+              </div>
+              {Object.values(activeFilters).some(arr => arr.length > 0) && (
+                <div className="flex justify-end">
+                  <Button
+                    size='xs'
+                    onClick={handleSaveSmartPlaylist}
+                    disabled={!Object.values(activeFilters).some(arr => arr.length > 0)}
+                    inverted
+                    transparent
+                    title="Save as smart playlist"
+                    className='cursor-pointer'
+                  >
+                    <Icon icon="faSave" className='px-1' />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </Modal>
+        )}
       </>
     )
   }
