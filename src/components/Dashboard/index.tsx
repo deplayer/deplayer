@@ -64,7 +64,7 @@ const WelcomeMessage = ({ dispatch }: { dispatch: Dispatch }) => {
         Hi <i>audiophile</i>! Welcome to <DeplayerTitle />
       </h4>
       <Image />
-      <div className='px-6 py-8'>
+      <div className='px-6 md:py-8'>
         <p className='py-4'>
           Access to you good ol' music library and enjoy it whenever you need it. <br />
           To start playing some content follow one of the steps below:
@@ -108,7 +108,7 @@ const Dashboard = ({
     .map((albumId) => albums[albumId])
 
   return (
-    <div className='z-10 w-full block px-12 mb-12'>
+    <div className='z-10 w-full block md:px-12 mb-12'>
       <WelcomeMessage dispatch={dispatch}></WelcomeMessage>
       {!!mediaItems.length &&
         <MediaSlider

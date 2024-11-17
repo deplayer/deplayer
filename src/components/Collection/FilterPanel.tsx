@@ -3,6 +3,9 @@ import { Filter } from '../../reducers/collection'
 import Button from '../common/Button'
 import { Dispatch } from 'redux'
 import * as actionTypes from '../../constants/ActionTypes'
+import Icon from '../common/Icon'
+import { useState } from 'react'
+import Modal from '../common/Modal'
 
 interface MediaItem {
   genres?: string[];
@@ -29,6 +32,9 @@ type Props = {
 }
 
 const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Props) => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const isMobile = window.innerWidth < 768
+
   // Get unique genres and types as before
   const genres = Object.values(collection.rows).reduce((acc: Set<string>, media: any) => {
     // Only process if genres exists and is an array
@@ -99,7 +105,6 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
     }))
   ]
 
-  // Update custom styles to support dark mode
   const customStyles = {
     control: (provided: any) => ({
       ...provided,
@@ -126,7 +131,7 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
     menu: (provided: any) => ({
       ...provided,
       backgroundColor: 'var(--select-menu-bg)',
-      border: '1px solid var(--select-border)'
+      border: '1px solid var(--select-border)',
     }),
     multiValue: (provided: any) => ({
       ...provided,
@@ -153,9 +158,29 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
     }
   }
 
+  const selectProps = {
+    isMulti: true,
+    options: groupedOptions,
+    value: selectedValues,
+    placeholder: 'Filter by...',
+    onChange: (selected: { value: string; label: string; color: string; }[] | null) => {
+      const selectedItems = selected || []
+      const filterTypes = ['genre', 'type', 'artist', 'provider'] as const
+      filterTypes.forEach(type => {
+        const values = selectedItems
+          .filter(item => item.value.startsWith(`${type}:`))
+          .map(item => item.value.replace(`${type}:`, ''))
+        onFilterChange(`${type}s` as keyof Filter, values)
+      })
+    },
+    styles: customStyles,
+    className: "react-select-container w-full",
+    classNamePrefix: "react-select"
+  }
+
   return (
     <div className="filter-panel flex">
-      <div className="flex">
+      <div className="flex w-full">
         <style>
           {`
           :root {
@@ -180,45 +205,44 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
         `}
         </style>
 
-        {/* Portal setup */}
-        <portals.InPortal node={portalNode}>
-          {SelectComponent}
-        </portals.InPortal>
-
-        {/* Main select component */}
         <div className="w-full">
-          <portals.OutPortal
-            node={portalNode}
-            onMenuOpen={() => {
-              // Only open modal on mobile devices
-              if (window.innerWidth < 768) {
-                setIsModalOpen(true)
-              }
-            }}
-          />
-        </div>
-
-        {/* Modal with portaled select */}
-        {isModalOpen && (
-          <Modal
-            title="Select Filters"
-            onClose={() => setIsModalOpen(false)}
-          >
-            <div className="p-4">
-              <portals.OutPortal node={portalNode} />
-            </div>
-            <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+          <div className="relative w-full">
+            {isMobile ? (
               <Button
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => setIsModalOpen(true)}
                 fullWidth
+                className="text-left"
               >
-                Done
+                {selectedValues.length > 0 ? (
+                  `${selectedValues.length} filter${selectedValues.length > 1 ? 's' : ''} selected`
+                ) : (
+                  'Filter by...'
+                )}
               </Button>
-            </div>
-          </Modal>
-        )}
+            ) : (
+              <Select {...selectProps} />
+            )}
+          </div>
+        </div>
       </div>
-      { Object.values(activeFilters).some(arr => arr.length > 0) && (
+
+      {isModalOpen && (
+        <Modal
+          title="Select Filters"
+          onClose={() => setIsModalOpen(false)}
+        >
+          <div className="p-4">
+            <Select {...selectProps} />
+          </div>
+          <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+            <Button onClick={() => setIsModalOpen(false)} fullWidth>
+              Done
+            </Button>
+          </div>
+        </Modal>
+      )}
+
+      {Object.values(activeFilters).some(arr => arr.length > 0) && (
         <Button
           size='xs'
           onClick={handleSaveSmartPlaylist}
