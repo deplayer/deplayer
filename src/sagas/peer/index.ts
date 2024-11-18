@@ -1,13 +1,12 @@
 import { takeLatest, put, select, call, takeEvery } from "redux-saga/effects";
 import { v4 as uuidv4 } from "uuid";
 import { DataPayload } from "trystero";
-
 import PeerService from "../../services/PeerService";
 import PeerStorageService from "../../services/PeerStorageService";
 import { getAdapter } from "../../services/database";
 import { getCurrentSong } from "../selectors";
 import * as types from "../../constants/ActionTypes";
-import { Dispatch } from "redux";
+import { Store } from "redux";
 
 const adapter = getAdapter();
 const peerStorageService = new PeerStorageService(adapter);
@@ -18,7 +17,7 @@ function* initializePeers(store: any): any {
 
   if (peers && peers.length > 0) {
     for (const peer of peers) {
-      yield call(joinRoom, store.dispatch, {
+      yield call(joinRoom, store, {
         roomCode: peer.roomCode,
         username: peer.username,
       });
@@ -26,10 +25,11 @@ function* initializePeers(store: any): any {
   }
 }
 
-function* joinRoom(dispatch: Dispatch, action: any): any {
-  console.log("joinRoom", action);
-
-  const peerService = PeerService.getInstance(dispatch);
+function* joinRoom(store: Store, action: any): any {
+  console.log("store.getState()", store.getState());
+  const collection = yield select((state) => state.collection);
+  const peerService = PeerService.getInstance(store.dispatch);
+  peerService.collection = collection;
 
   try {
     // Check if peer already exists
@@ -74,8 +74,10 @@ function* joinRoom(dispatch: Dispatch, action: any): any {
   }
 }
 
-function* updatePeerStatus(dispatch: Dispatch): any {
-  const peerService = PeerService.getInstance(dispatch);
+function* updatePeerStatus(store: Store): any {
+  const collection = yield select((state) => state.collection);
+  const peerService = PeerService.getInstance(store.dispatch);
+  peerService.collection = collection;
   const currentSong = yield select(getCurrentSong);
   const player = yield select((state) => state.player);
 
@@ -86,7 +88,7 @@ function* updatePeerStatus(dispatch: Dispatch): any {
       isPlaying: player.playing,
       peerId: peerService.getPeerId(),
       username: localStorage.getItem("username") || "Anonymous",
-      media: currentSong
+      media: currentSong,
     } as DataPayload;
 
     // Only try to update status if we have a valid peerId
@@ -97,14 +99,16 @@ function* updatePeerStatus(dispatch: Dispatch): any {
   }
 }
 
-function* leaveRoom(dispatch: Dispatch): any {
-  const peerService = PeerService.getInstance(dispatch);
+function* leaveRoom(store: Store): any {
+  const collection = yield select((state) => state.collection);
+  const peerService = PeerService.getInstance(store.dispatch);
+  peerService.collection = collection;
   yield call([peerService, "leaveRoom"]);
   yield put({ type: types.SET_CURRENT_ROOM, roomCode: undefined });
 }
 
 // Listen for player state changes to update peer status
-function* watchPlayerChanges(dispatch: Dispatch): any {
+function* watchPlayerChanges(store: Store): any {
   yield takeLatest(
     (action: any) =>
       [
@@ -117,27 +121,35 @@ function* watchPlayerChanges(dispatch: Dispatch): any {
         types.SET_CURRENT_PLAYING_URL,
       ].includes(action.type),
     updatePeerStatus,
-    dispatch
+    store
   );
 }
 
-function* requestStream(dispatch: Dispatch, action: any): any {
-  const peerService = PeerService.getInstance(dispatch);
-  yield call(peerService.requestStream, action.peerId, action.mediaId);
+function* requestStream(store: Store, action: any): any {
+  const collection = yield select((state) => state.collection);
+  const peerService = PeerService.getInstance(store.dispatch);
+  peerService.collection = collection;
+  const streamFromPeer = yield call(
+    peerService.requestStream,
+    action.peerId,
+    action.media
+  );
+
+  console.log("streamFromPeer", streamFromPeer);
+
+  // Replace the streams from IMedia with the streams from the peer
+  // const { updatedAt, createdAt, stream, ...mediaWithoutDates } = action.media as (IMedia & { updatedAt: string; createdAt: string })
+  // yield put({ type: types.ADD_TO_COLLECTION, data: [{...mediaWithoutDates, stream: streamFromPeer }] })
 }
 
 // Binding actions to sagas
-function* peerSaga(store: any): Generator {
+function* peerSaga(store: Store): Generator {
   yield call(initializePeers, store);
-  yield takeEvery(types.JOIN_PEER_ROOM, joinRoom, store.dispatch);
-  yield takeEvery(types.LEAVE_PEER_ROOM, leaveRoom, store.dispatch);
-  yield takeLatest(types.REQUEST_STREAM, requestStream, store.dispatch);
-  yield takeLatest(
-    types.SET_CURRENT_PLAYING_STREAMS,
-    updatePeerStatus,
-    store.dispatch
-  );
-  yield call(watchPlayerChanges, store.dispatch);
+  yield takeEvery(types.JOIN_PEER_ROOM, joinRoom, store);
+  yield takeEvery(types.LEAVE_PEER_ROOM, leaveRoom, store);
+  yield takeLatest(types.REQUEST_STREAM, requestStream, store);
+  yield takeLatest(types.SET_CURRENT_PLAYING_STREAMS, updatePeerStatus, store);
+  yield call(watchPlayerChanges, store);
 }
 
 export default peerSaga;

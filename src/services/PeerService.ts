@@ -2,8 +2,10 @@ import { Dispatch } from "redux";
 import { Room, ActionSender, DataPayload } from "trystero";
 import { joinRoom } from "trystero/nostr";
 import * as types from "../constants/ActionTypes";
-import { IMedia } from "../entities/Media";
-
+import { hasAnyProviderOf, IMedia } from "../entities/Media";
+import axios from "axios";
+import { writeFile, readFile } from "@happy-js/happy-opfs";
+import { State as CollectionState } from "../reducers/collection";
 /**
  * Interface representing the status of a peer in the network
  */
@@ -36,11 +38,15 @@ export default class PeerService {
   /** Function to send status updates to other peers */
   private sendStatus: ActionSender<DataPayload> | undefined;
   /** Function to send stream information to other peers */
-  private sendStream: ActionSender<DataPayload> | undefined;
+  private sendMediaRequest: ActionSender<DataPayload> | undefined;
   /** Redux dispatch function */
   private readonly dispatchFn: Dispatch;
+  /** Collection state */
+  collection: CollectionState | null;
 
-  static getInstance(dispatch: Dispatch): PeerService {
+  static getInstance(
+    dispatch: Dispatch
+  ): PeerService {
     if (!PeerService.instance) {
       PeerService.instance = new PeerService(dispatch);
     }
@@ -57,6 +63,7 @@ export default class PeerService {
       throw new Error("dispatch must be a function");
     }
     this.dispatchFn = dispatch;
+    this.collection = null
   }
 
   /**
@@ -69,7 +76,7 @@ export default class PeerService {
 
     // Set up communication channels
     const [sendStatus, getStatus] = this.room.makeAction("status");
-    const [sendStream, getStream] = this.room.makeAction("stream");
+    const [sendMediaRequest, getMedia] = this.room.makeAction("media");
 
     // Handle incoming status updates
     getStatus((data: DataPayload, peerId: string) => {
@@ -84,37 +91,50 @@ export default class PeerService {
     });
 
     // Handle incoming stream data
-    getStream(async (streamData: any, peerId: string) => {
-      console.log("Received stream request from peer:", peerId);
-      console.log("Stream data:", streamData);
+    getMedia(async (streamData: any, peerId: string) => {
+      const mediaId = streamData.mediaId;
+      const media = this.collection?.rows[mediaId];
 
-      if (streamData.streamUrl) {
-        this.dispatchFn({
-          type: "SET_CURRENT_PLAYING_URL",
-          url: streamData.streamUrl,
-        });
-        this.dispatchFn({
-          type: "SET_CURRENT_PLAYING",
-          songId: streamData.songId,
-        });
-      } else {
-        const playerElement = document.getElementById(
-          "react-player-internal"
-        ) as HTMLMediaElement;
-
-        console.log("playerElement:", playerElement);
-        if (playerElement) {
-          // @ts-ignore: Experimental API
-          const mediaStream = await playerElement.captureStream(30);
-          this.room?.addStream(mediaStream);
-        } else {
-          console.warn("Could not find ReactPlayer media element");
-        }
+      if (!media) {
+        console.log("Media not found in collection", this.collection?.rows);
+        console.error("Media not found in collection", mediaId);
+        return;
       }
+
+      const songFsUri = `/${mediaId}`;
+
+      if (hasAnyProviderOf(media, ["opfs"])) {
+        console.log("Media already in OPFS", media);
+
+        const songData = await readFile(songFsUri);
+        return songData;
+      }
+
+      if (hasAnyProviderOf(media, ["filesystem"])) {
+        // Read file from FileHandler
+        // const songData = await readFile(songFsUri)
+        // return songData
+        console.log("Requesting stream from filesystem", media);
+        return;
+      }
+
+      console.log("Storing song data", songFsUri, media);
+      const streamUrl = Object.values(
+        media.stream as Record<string, { uris: { uri: string }[] }>
+      )[0].uris[0].uri;
+
+      if (!streamUrl) {
+        console.error("No stream url found for song", media);
+        return;
+      }
+
+      const fileData = await axios.get(streamUrl, { responseType: "blob" });
+      await writeFile(songFsUri, fileData.data);
+      return streamData;
     });
 
     this.sendStatus = sendStatus;
-    this.sendStream = sendStream;
+    this.sendMediaRequest = sendMediaRequest;
 
     // Handle peer join events
     this.room.onPeerJoin((peerId) => {
@@ -159,10 +179,16 @@ export default class PeerService {
     this.sendStatus(status);
   };
 
-  requestStream = (peerId: string, mediaId: string) => {
-    if (this.sendStream) {
-      this.sendStream({ peerId, mediaId });
+  /**
+
+
+   */
+
+  requestStream = async (peerId: string, media: IMedia) => {
+    if (!this.sendMediaRequest) {
+      return;
     }
+    this.sendMediaRequest({ peerId, mediaId: media.id! });
   };
 
   /**
@@ -198,7 +224,7 @@ export default class PeerService {
       this.room = undefined;
       this.peers.clear();
       this.sendStatus = undefined;
-      this.sendStream = undefined;
+      this.sendMediaRequest = undefined;
       this.peerId = undefined;
 
       this.dispatchFn({

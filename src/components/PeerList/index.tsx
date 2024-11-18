@@ -7,6 +7,7 @@ import Modal from '../common/Modal'
 import { PeerStatus } from '../../services/PeerService'
 import { Dispatch } from 'redux'
 import * as types from '../../constants/ActionTypes'
+import { IMedia } from '../../entities/Media'
 
 interface Props {
   peers: PeerStatus[]
@@ -21,8 +22,8 @@ const PeerList = ({ peers, dispatch, currentRoom, onJoinRoom, onLeaveRoom }: Pro
   const [roomCode, setRoomCode] = React.useState('')
   const [username, setUsername] = React.useState(localStorage.getItem('username') || '')
 
-  const handleRequestStream = (peerId: string, mediaId: string) => {
-    dispatch({ type: types.REQUEST_STREAM, peerId, mediaId });
+  const requestSongFile = (peerId: string, media: IMedia) => {
+    dispatch({ type: types.REQUEST_STREAM, peerId, media: media });
   }
 
   const shareUrl = currentRoom ? 
@@ -90,10 +91,12 @@ const PeerList = ({ peers, dispatch, currentRoom, onJoinRoom, onLeaveRoom }: Pro
             </div>
             {peer.media && (
               <Button 
-                onClick={() => handleRequestStream(
-                  peer.peerId,
-                  peer.media?.id || ''
-                )}
+                onClick={() => {
+                  requestSongFile(
+                    peer.peerId,
+                    peer.media!
+                  )
+                }}
                 className="bg-primary hover:bg-primary-dark"
               >
                 <Icon icon="faPlay" className="mr-2" />

@@ -38,6 +38,22 @@ export interface IMedia {
   year?: number
 }
 
+export const hasAnyProviderOf = (media: IMedia, checkProviders: Array<string>): boolean => {
+  const providers = Object.values(media.stream).map((stream) => stream.service)
+
+  let result = false
+
+  providers.forEach((prov) => {
+    checkProviders.forEach((checkProv: string) => {
+      if (prov.startsWith(checkProv)) {
+        result = true
+      }
+    })
+  })
+
+  return result
+}
+
 export default class Media implements IMedia {
   id: string
   title: string
@@ -103,19 +119,7 @@ export default class Media implements IMedia {
   }
 
   hasAnyProviderOf(checkProviders: Array<string>): boolean {
-    const providers = Object.values(this.stream).map((stream) => stream.service)
-
-    let result = false
-
-    providers.forEach((prov) => {
-      checkProviders.forEach((checkProv: string) => {
-        if (prov.startsWith(checkProv)) {
-          result = true
-        }
-      })
-    })
-
-    return result
+    return hasAnyProviderOf(this, checkProviders)
   }
 
   toDocument(): any {
