@@ -291,15 +291,10 @@ export default (state: State = defaultState, action: any = {}) => {
         [action.filterType]: action.values,
       };
 
-      const searchFilteredSongs = filterSongs(
-        indexService,
-        state.rows,
-        state.searchTerm
-      );
       const filteredSongs = applyFilters(
         state.rows,
         newFilters,
-        searchFilteredSongs
+        Object.keys(state.rows)
       );
 
       return {

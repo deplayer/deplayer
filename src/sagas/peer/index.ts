@@ -140,6 +140,7 @@ function* peerSaga(store: any): Generator {
   yield takeEvery(types.JOIN_PEER_ROOM, joinRoom, store.dispatch);
   yield takeEvery(types.LEAVE_PEER_ROOM, leaveRoom, store.dispatch);
   yield takeLatest(types.SHARE_STREAM, shareStream, store.dispatch);
+  yield takeLatest(types.SET_CURRENT_PLAYING_STREAMS, updatePeerStatus, store.dispatch);
   yield call(watchPlayerChanges, store.dispatch);
 }
 

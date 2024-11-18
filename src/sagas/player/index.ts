@@ -37,8 +37,6 @@ function* setCurrentPlayingStream(songId: string, providerNum: number): any {
   yield put({ type: types.SET_CURRENT_PLAYING_STREAMS, streams: currentPlaying.stream })
   yield put({ type: types.START_PLAYING })
 
-  yield put({ type: types.UPDATE_PEER_STATUS })
-
   if (fullUrl) {
     yield put({
       type: types.SET_BACKGROUND_IMAGE,
