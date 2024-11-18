@@ -1,5 +1,4 @@
 import { takeLatest, put, select, call, takeEvery } from "redux-saga/effects";
-import { DataPayload } from "trystero"
 import { v4 as uuidv4 } from 'uuid';
 
 import PeerService from "../../services/PeerService";
@@ -79,18 +78,22 @@ function* updatePeerStatus(dispatch: Dispatch): any {
   const currentSong = yield select(getCurrentSong);
   const player = yield select((state) => state.player);
 
-  yield call([peerService, "updateStatus"], {
-    currentSong: currentSong?.title,
+  if (!currentSong) return;
+
+  const status = {
+    currentSong: currentSong.title,
     isPlaying: player.playing,
     peerId: peerService.getPeerId(),
     username: localStorage.getItem("username") || "Anonymous",
-    currentMedia: currentSong ? {
+    currentMedia: {
       id: currentSong.id,
       title: currentSong.title,
       artist: currentSong.artistName,
       thumbnailUrl: currentSong.cover?.thumbnailUrl
-    } : undefined
-  } as DataPayload);
+    }
+  };
+
+  yield call([peerService, "updateStatus"], status);
 }
 
 function* shareStream(dispatch: Dispatch): any {
@@ -108,6 +111,12 @@ function* shareStream(dispatch: Dispatch): any {
   }
 }
 
+function* leaveRoom(dispatch: Dispatch): any {
+  const peerService = new PeerService(dispatch);
+  yield call([peerService, 'leaveRoom']);
+  yield put({ type: types.SET_CURRENT_ROOM, roomCode: undefined });
+}
+
 // Listen for player state changes to update peer status
 function* watchPlayerChanges(dispatch: Dispatch): any {
   yield takeLatest(
@@ -117,6 +126,8 @@ function* watchPlayerChanges(dispatch: Dispatch): any {
       types.SET_CURRENT_PLAYING,
       types.PLAY_NEXT,
       types.PLAY_PREV,
+      types.PAUSE_PLAYING,
+      types.SET_CURRENT_PLAYING_URL,
     ].includes(action.type),
     updatePeerStatus,
     dispatch
@@ -127,6 +138,7 @@ function* watchPlayerChanges(dispatch: Dispatch): any {
 function* peerSaga(store: any): Generator {
   yield call(initializePeers, store);
   yield takeEvery(types.JOIN_PEER_ROOM, joinRoom, store.dispatch);
+  yield takeEvery(types.LEAVE_PEER_ROOM, leaveRoom, store.dispatch);
   yield takeLatest(types.SHARE_STREAM, shareStream, store.dispatch);
   yield call(watchPlayerChanges, store.dispatch);
 }

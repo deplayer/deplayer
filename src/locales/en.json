@@ -85,6 +85,7 @@
     "enterRoomCode": "Enter room code",
     "enterUsername": "Enter username",
     "nowPlaying": "Now playing",
-    "notPlaying": "Not playing"
+    "notPlaying": "Not playing",
+    "leaveRoom": "Leave room"
   }
 }

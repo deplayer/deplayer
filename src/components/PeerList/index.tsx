@@ -11,10 +11,11 @@ interface Props {
   currentRoom?: string
   onJoinRoom: (code: string) => void
   onShareStream: (peerId: string) => void
+  onLeaveRoom: () => void
   dispatch: any
 }
 
-const PeerList = ({ peers, currentRoom, onJoinRoom, onShareStream }: Props) => {
+const PeerList = ({ peers, currentRoom, onJoinRoom, onShareStream, onLeaveRoom }: Props) => {
   const [showJoinModal, setShowJoinModal] = React.useState(false)
   const [roomCode, setRoomCode] = React.useState('')
   const [username, setUsername] = React.useState(localStorage.getItem('username') || '')
@@ -37,7 +38,15 @@ const PeerList = ({ peers, currentRoom, onJoinRoom, onShareStream }: Props) => {
     <div className="peer-list p-4">
       {currentRoom ? (
         <div className="share-section mb-4">
-          <h3><Translate value="peer.shareRoom" /></h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3><Translate value="peer.shareRoom" /></h3>
+            <Button 
+              onClick={onLeaveRoom}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              <Translate value="peer.leaveRoom" />
+            </Button>
+          </div>
           <div className="flex items-center gap-4">
             <input 
               readOnly 

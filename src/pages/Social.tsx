@@ -22,6 +22,10 @@ const Social = ({ peers, currentRoom, dispatch }: Props) => {
     dispatch({ type: types.SHARE_STREAM, peerId })
   }
 
+  const handleLeaveRoom = () => {
+    dispatch({ type: types.LEAVE_PEER_ROOM });
+  }
+
   return (
     <div className="p-4">
       <h2 className="text-2xl font-bold mb-4">
@@ -39,6 +43,7 @@ const Social = ({ peers, currentRoom, dispatch }: Props) => {
         currentRoom={currentRoom}
         onJoinRoom={handleJoinRoom}
         onShareStream={handleShareStream}
+        onLeaveRoom={handleLeaveRoom}
         dispatch={dispatch}
       />
     </div>

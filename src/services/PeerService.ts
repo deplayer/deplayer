@@ -70,11 +70,25 @@ export default class PeerService {
 
       console.log(`${peerId} joined`)
     })
+
+    this.room.onPeerLeave(peerId => {
+      this.peers.delete(peerId);
+      this.dispatchFn({
+        type: "UPDATE_PEER_STATUS",
+        peers: Array.from(this.peers.values()),
+      });
+      console.log(`${peerId} left`)
+    })
   }
 
   updateStatus(status: DataPayload) {
     if (this.sendStatus) {
+      this.peers.set(this.getPeerId()!, status);
       this.sendStatus(status);
+      this.dispatchFn({
+        type: "UPDATE_PEER_STATUS",
+        peers: Array.from(this.peers.values()),
+      });
     }
   }
 
@@ -102,5 +116,21 @@ export default class PeerService {
 
   public getPeerId(): string | undefined {
     return this.peerId
+  }
+
+  leaveRoom() {
+    if (this.room) {
+      this.room.leave();
+      this.room = undefined;
+      this.peers.clear();
+      this.sendStatus = undefined;
+      this.sendStream = undefined;
+      this.peerId = undefined;
+      
+      this.dispatchFn({
+        type: "UPDATE_PEER_STATUS",
+        peers: [],
+      });
+    }
   }
 }
