@@ -1,5 +1,6 @@
 import { takeLatest, put, select, call, takeEvery } from "redux-saga/effects";
 import { v4 as uuidv4 } from 'uuid';
+import { DataPayload } from "trystero";
 
 import PeerService from "../../services/PeerService";
 import PeerStorageService from "../../services/PeerStorageService";
@@ -10,6 +11,7 @@ import { Dispatch } from "redux";
 
 const adapter = getAdapter();
 const peerStorageService = new PeerStorageService(adapter);
+let peerService: PeerService | null = null;
 
 function* initializePeers(store: any): any {
   yield call(peerStorageService.initialize);
@@ -28,7 +30,9 @@ function* initializePeers(store: any): any {
 function* joinRoom(dispatch: Dispatch, action: any): any {
   console.log("joinRoom", action);
 
-  const peerService = new PeerService(dispatch);
+  if (!peerService) {
+    peerService = new PeerService(dispatch);
+  }
 
   try {
     // Check if peer already exists
@@ -40,7 +44,7 @@ function* joinRoom(dispatch: Dispatch, action: any): any {
 
     // Only join room if peer doesn't exist
     yield call(
-      peerService!.joinWithCode.bind(peerService),
+      peerService.joinWithCode.bind(peerService),
       action.roomCode,
       action.username
     );
@@ -74,7 +78,10 @@ function* joinRoom(dispatch: Dispatch, action: any): any {
 }
 
 function* updatePeerStatus(dispatch: Dispatch): any {
-  const peerService = new PeerService(dispatch);
+  if (!peerService) {
+    peerService = new PeerService(dispatch);
+  }
+
   const currentSong = yield select(getCurrentSong);
   const player = yield select((state) => state.player);
 
@@ -91,9 +98,13 @@ function* updatePeerStatus(dispatch: Dispatch): any {
       artist: currentSong.artistName,
       thumbnailUrl: currentSong.cover?.thumbnailUrl
     }
-  };
+  } as DataPayload;
 
-  yield call([peerService, "updateStatus"], status);
+  try {
+    yield call([peerService, 'updateStatus'], status);
+  } catch (error) {
+    console.error('Failed to update peer status:', error);
+  }
 }
 
 function* shareStream(dispatch: Dispatch): any {
@@ -112,8 +123,12 @@ function* shareStream(dispatch: Dispatch): any {
 }
 
 function* leaveRoom(dispatch: Dispatch): any {
-  const peerService = new PeerService(dispatch);
+  if (!peerService) {
+    peerService = new PeerService(dispatch);
+  }
+  
   yield call([peerService, 'leaveRoom']);
+  peerService = null;
   yield put({ type: types.SET_CURRENT_ROOM, roomCode: undefined });
 }
 

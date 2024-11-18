@@ -1,6 +1,7 @@
 import { Dispatch } from 'redux';
 import { Room, ActionSender, DataPayload } from "trystero";
 import { joinRoom } from "trystero/nostr";
+import * as types from "../constants/ActionTypes";
 
 /**
  * Interface representing the status of a peer in the network
@@ -97,42 +98,41 @@ export default class PeerService {
 
     // Handle peer join events
     this.room.onPeerJoin(peerId => {
-      this.updateStatus({
-        username,
-        peerId: peerId,
-        isPlaying: false,
+      this.dispatchFn({
+        type: types.PEER_JOINED,
+        peer: {
+          username,
+          peerId: peerId,
+          isPlaying: false,
+        },
       });
-      console.log(`${peerId} joined`)
     })
 
     // Handle peer leave events
     this.room.onPeerLeave(peerId => {
-      this.peers.delete(peerId);
       this.dispatchFn({
-        type: "UPDATE_PEER_STATUS",
-        peers: Array.from(this.peers.values()),
+        type: types.PEER_LEFT,
+        peer: {
+          username,
+          peerId: peerId,
+          isPlaying: false,
+        },
       });
-      console.log(`${peerId} left`)
     })
   }
 
   /**
    * Updates and broadcasts the current peer's status
    * @param status - Current status information to share
+   * @throws {Error} If trying to update status before joining a room
    */
   updateStatus(status: DataPayload) {
-    console.log("updateStatus", status);
-    console.log("this.getPeerId()", this.getPeerId());
-    console.log("this.peers", this.peers);
-
-    if (this.sendStatus && this.peerId) {
-      this.peers.set(this.peerId, status);
-      this.sendStatus(status);
-      this.dispatchFn({
-        type: "UPDATE_PEER_STATUS",
-        peers: Array.from(this.peers.values()),
-      });
+    if (!this.room || !this.sendStatus) {
+      throw new Error('Cannot update status: Not connected to a room');
     }
+    
+    console.log("updateStatus", status);
+    this.sendStatus(status);
   }
 
   /**

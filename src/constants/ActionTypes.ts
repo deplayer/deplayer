@@ -184,4 +184,5 @@ export const SET_CURRENT_ROOM = "SET_CURRENT_ROOM";
 export const PEER_ERROR = "PEER_ERROR";
 export const LEAVE_PEER_ROOM = 'LEAVE_PEER_ROOM'
 export const UPDATE_PEER_STATUS = 'UPDATE_PEER_STATUS'
-
+export const PEER_JOINED = 'PEER_JOINED'
+export const PEER_LEFT = 'PEER_LEFT'

@@ -22,6 +22,16 @@ export default function peers(state = initialState, action: any): State {
         ...state,
         currentRoom: action.roomCode,
       };
+    case "PEER_JOINED":
+      return {
+        ...state,
+        peers: [...state.peers, action.peer],
+      };
+    case "PEER_LEFT":
+      return {
+        ...state,
+        peers: state.peers.filter((peer) => peer !== action.peer),
+      };
     default:
       return state;
   }
