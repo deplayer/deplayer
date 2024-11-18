@@ -3,19 +3,8 @@ import PeerService from "../../services/PeerService";
 import { getCurrentSong } from "../selectors";
 import * as types from "../../constants/ActionTypes";
 
-let peerService: PeerService | null = null;
-
-function* initializePeerService(action: any): any {
-  if (!peerService) {
-    peerService = new PeerService(action.dispatch);
-  }
-}
-
 function* joinRoom(action: any): any {
-  if (!peerService) {
-    // Initialize peer service if not already done
-    yield call(initializePeerService, { dispatch: action.dispatch });
-  }
+  const peerService = new PeerService(action.dispatch);
 
   try {
     yield call(
@@ -44,8 +33,8 @@ function* joinRoom(action: any): any {
   }
 }
 
-function* updatePeerStatus(): any {
-  if (!peerService) return;
+function* updatePeerStatus(action: any): any {
+  const peerService = new PeerService(action.dispatch);
 
   const currentSong = yield select(getCurrentSong);
   const player = yield select((state) => state.player);
@@ -59,7 +48,7 @@ function* updatePeerStatus(): any {
 }
 
 function* shareStream(action: any): any {
-  if (!peerService) return;
+  const peerService = new PeerService(action.dispatch);
 
   const currentSong = yield select(getCurrentSong);
   const { streamUri } = yield select((state) => state.player);
@@ -85,7 +74,6 @@ function* watchPlayerChanges(): any {
 
 // Binding actions to sagas
 function* peerSaga(): any {
-  yield takeLatest(types.INITIALIZED, initializePeerService);
   yield takeLatest(types.JOIN_PEER_ROOM, joinRoom);
   yield takeLatest(types.SHARE_STREAM, shareStream);
   yield call(watchPlayerChanges);

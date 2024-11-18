@@ -1,4 +1,4 @@
-import { joinRoom } from "trystero";
+import { joinRoom } from "trystero/torrent";
 
 export interface PeerStatus {
   currentSong?: string;
