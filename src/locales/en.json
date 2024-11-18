@@ -79,6 +79,7 @@
   },
   "peer": {
     "connectedPeers": "Connected peers",
-    "joinRoom": "Join room"
+    "joinRoom": "Join room",
+    "shareRoom": "Share room"
   }
 }

@@ -1,13 +1,12 @@
 import { takeLatest, put, select, call } from "redux-saga/effects";
+import { DataPayload } from "trystero"
 
 import PeerService from "../../services/PeerService";
 import { getCurrentSong } from "../selectors";
 import * as types from "../../constants/ActionTypes";
 import { Dispatch } from "redux";
 
-function* joinRoom(dispatch: Dispatch, action: { roomCode: string; username: string }): any {
-  console.log("joinRoom", action);
-
+function* joinRoom(dispatch: Dispatch, action: any): any {
   const peerService = new PeerService(dispatch);
 
   try {
@@ -37,8 +36,8 @@ function* joinRoom(dispatch: Dispatch, action: { roomCode: string; username: str
   }
 }
 
-function* updatePeerStatus(action: any): any {
-  const peerService = new PeerService(action.dispatch);
+function* updatePeerStatus(dispatch: Dispatch): any {
+  const peerService = new PeerService(dispatch);
 
   const currentSong = yield select(getCurrentSong);
   const player = yield select((state) => state.player);
@@ -48,11 +47,11 @@ function* updatePeerStatus(action: any): any {
     isPlaying: player.playing,
     peerId: peerService.getPeerId(),
     username: localStorage.getItem("username") || "Anonymous",
-  });
+  } as DataPayload);
 }
 
-function* shareStream(action: any): any {
-  const peerService = new PeerService(action.dispatch);
+function* shareStream(dispatch: Dispatch): any {
+  const peerService = new PeerService(dispatch);
 
   const currentSong = yield select(getCurrentSong);
   const { streamUri } = yield select((state) => state.player);
@@ -63,16 +62,17 @@ function* shareStream(action: any): any {
 }
 
 // Listen for player state changes to update peer status
-function* watchPlayerChanges(): any {
+function* watchPlayerChanges(dispatch: Dispatch): any {
   yield takeLatest(
-    [
+    (action: any) => [
       types.START_PLAYING,
       types.TOGGLE_PLAYING,
       types.SET_CURRENT_PLAYING,
       types.PLAY_NEXT,
       types.PLAY_PREV,
-    ],
-    updatePeerStatus
+    ].includes(action.type),
+    updatePeerStatus,
+    dispatch
   );
 }
 
@@ -80,7 +80,7 @@ function* watchPlayerChanges(): any {
 function* peerSaga(store: any): Generator {
   yield takeLatest(types.JOIN_PEER_ROOM, joinRoom, store.dispatch);
   yield takeLatest(types.SHARE_STREAM, shareStream, store.dispatch);
-  yield call(watchPlayerChanges);
+  yield call(watchPlayerChanges, store.dispatch);
 }
 
 export default peerSaga;
