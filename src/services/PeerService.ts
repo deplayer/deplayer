@@ -1,4 +1,6 @@
-import { joinRoom } from "trystero/torrent";
+import { Dispatch } from 'redux';
+import { Room, ActionSender, DataPayload } from "trystero";
+import { joinRoom } from "trystero/nostr";
 
 export interface PeerStatus {
   currentSong?: string;
@@ -8,14 +10,18 @@ export interface PeerStatus {
 }
 
 export default class PeerService {
-  private room: any;
-  private peers: Map<string, PeerStatus> = new Map();
+  private room: Room | undefined;
+  private peerId: string | undefined;
+  private peers: Map<string, DataPayload> = new Map();
   private config = { appId: "deplayer-p2p" };
-  private sendStatus: any;
-  private sendStream: any;
-  private readonly dispatchFn: any;
+  private sendStatus: ActionSender<DataPayload> | undefined;
+  private sendStream: ActionSender<DataPayload> | undefined;
+  private readonly dispatchFn: Dispatch;
 
-  constructor(dispatch: any) {
+  constructor(dispatch: Dispatch) {
+    if (typeof dispatch !== 'function') {
+      throw new Error('dispatch must be a function');
+    }
     this.dispatchFn = dispatch;
   }
 
@@ -24,8 +30,9 @@ export default class PeerService {
 
     const [sendStatus, getStatus] = this.room.makeAction("status");
 
-    getStatus((status: PeerStatus, peerId: string) => {
-      this.peers.set(peerId, status);
+    getStatus((data: DataPayload, peerId: string) => {
+      this.peers.set(peerId, data);
+      this.peerId = peerId;
       this.dispatchFn({
         type: "UPDATE_PEER_STATUS",
         peers: Array.from(this.peers.values()),
@@ -48,14 +55,18 @@ export default class PeerService {
     this.sendStatus = sendStatus;
     this.sendStream = sendStream;
 
-    this.updateStatus({
-      username,
-      peerId: this.room.peerId,
-      isPlaying: false,
-    });
+    this.room.onPeerJoin(peerId => {
+      this.updateStatus({
+        username,
+        peerId: peerId,
+        isPlaying: false,
+      });
+
+      console.log(`${peerId} joined`)
+    })
   }
 
-  updateStatus(status: PeerStatus) {
+  updateStatus(status: DataPayload) {
     if (this.sendStatus) {
       this.sendStatus(status);
     }
@@ -67,7 +78,7 @@ export default class PeerService {
     }
   }
 
-  getPeers(): PeerStatus[] {
+  getPeers(): DataPayload[] {
     return Array.from(this.peers.values());
   }
 
@@ -76,6 +87,6 @@ export default class PeerService {
   }
 
   public getPeerId(): string | undefined {
-    return this.room?.peerId;
+    return this.peerId
   }
 }

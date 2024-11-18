@@ -1,10 +1,14 @@
 import { takeLatest, put, select, call } from "redux-saga/effects";
+
 import PeerService from "../../services/PeerService";
 import { getCurrentSong } from "../selectors";
 import * as types from "../../constants/ActionTypes";
+import { Dispatch } from "redux";
 
-function* joinRoom(action: any): any {
-  const peerService = new PeerService(action.dispatch);
+function* joinRoom(dispatch: Dispatch, action: { roomCode: string; username: string }): any {
+  console.log("joinRoom", action);
+
+  const peerService = new PeerService(dispatch);
 
   try {
     yield call(
@@ -73,9 +77,9 @@ function* watchPlayerChanges(): any {
 }
 
 // Binding actions to sagas
-function* peerSaga(): any {
-  yield takeLatest(types.JOIN_PEER_ROOM, joinRoom);
-  yield takeLatest(types.SHARE_STREAM, shareStream);
+function* peerSaga(store: any): Generator {
+  yield takeLatest(types.JOIN_PEER_ROOM, joinRoom, store.dispatch);
+  yield takeLatest(types.SHARE_STREAM, shareStream, store.dispatch);
   yield call(watchPlayerChanges);
 }
 

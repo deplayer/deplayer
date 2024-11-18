@@ -36,7 +36,7 @@ function* rootSaga(store: any) {
     settingsSaga(),
     titleSaga(),
     webtorrentSaga(),
-    peerSaga(),
+    peerSaga(store),
   ])
 }
 
