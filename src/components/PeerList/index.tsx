@@ -10,12 +10,12 @@ interface Props {
   peers: PeerStatus[]
   currentRoom?: string
   onJoinRoom: (code: string) => void
-  onShareStream: (peerId: string) => void
+  requestStream: (peerId: string) => void
   onLeaveRoom: () => void
   dispatch: any
 }
 
-const PeerList = ({ peers, currentRoom, onJoinRoom, onShareStream, onLeaveRoom }: Props) => {
+const PeerList = ({ peers, currentRoom, onJoinRoom, requestStream, onLeaveRoom }: Props) => {
   const [showJoinModal, setShowJoinModal] = React.useState(false)
   const [roomCode, setRoomCode] = React.useState('')
   const [username, setUsername] = React.useState(localStorage.getItem('username') || '')
@@ -85,7 +85,7 @@ const PeerList = ({ peers, currentRoom, onJoinRoom, onShareStream, onLeaveRoom }
             </div>
             {peer.currentMedia && (
               <Button 
-                onClick={() => onShareStream(peer.peerId)}
+                onClick={() => requestStream(peer.peerId)}
                 className="bg-primary hover:bg-primary-dark"
               >
                 <Icon icon="faPlay" className="mr-2" />

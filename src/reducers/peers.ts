@@ -1,4 +1,5 @@
 import { PeerStatus } from "../services/PeerService";
+import * as types from '../constants/ActionTypes'
 
 export interface State {
   peers: PeerStatus[];
@@ -12,25 +13,28 @@ const initialState: State = {
 
 export default function peers(state = initialState, action: any): State {
   switch (action.type) {
-    case "UPDATE_PEER_STATUS":
+    case types.UPDATE_PEER_STATUS:
       return {
         ...state,
-        peers: action.peers,
+        peers: [
+          ...state.peers.filter(peer => peer.peerId !== action.peerId),
+          { ...action.data, peerId: action.peerId },
+        ],
       };
-    case "SET_CURRENT_ROOM":
+    case types.SET_CURRENT_ROOM:
       return {
         ...state,
         currentRoom: action.roomCode,
       };
-    case "PEER_JOINED":
+    case types.PEER_JOINED:
       return {
         ...state,
         peers: [...state.peers, action.peer],
       };
-    case "PEER_LEFT":
+    case types.PEER_LEFT:
       return {
         ...state,
-        peers: state.peers.filter((peer) => peer !== action.peer),
+        peers: state.peers.filter((peer) => peer !== action.peerd),
       };
     default:
       return state;

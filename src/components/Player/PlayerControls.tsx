@@ -168,6 +168,7 @@ class PlayerControls extends React.Component<Props> {
         <div id="player">
           <InPortal node={this.props.playerPortal}>
             <ReactPlayer
+              id="react-player"
               pip
               fullscreen={this.props.player.fullscreen.toString()}
               className={playerClassnames}
@@ -199,9 +200,9 @@ class PlayerControls extends React.Component<Props> {
           </InPortal>
         </div>
         {!songFinder && currentPlaying.type === 'video' && (
-          <div className="background-video left-0 right-0 top-0 botton-0 absolute bg-handler">
+          <div id='player-portal' className="background-video left-0 right-0 top-0 botton-0 absolute bg-handler">
             <OutPortal
-              className={`background-video left-0 right-0 top-0 botton-0 absolute ${currentPlaying.type === 'video' && 'bg-handler'}`}
+              className={`player-portal background-video left-0 right-0 top-0 botton-0 absolute ${currentPlaying.type === 'video' && 'bg-handler'}`}
               node={this.props.playerPortal}
             />
           </div>

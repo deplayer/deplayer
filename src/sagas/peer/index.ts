@@ -11,7 +11,6 @@ import { Dispatch } from "redux";
 
 const adapter = getAdapter();
 const peerStorageService = new PeerStorageService(adapter);
-let peerService: PeerService | null = null;
 
 function* initializePeers(store: any): any {
   yield call(peerStorageService.initialize);
@@ -30,9 +29,7 @@ function* initializePeers(store: any): any {
 function* joinRoom(dispatch: Dispatch, action: any): any {
   console.log("joinRoom", action);
 
-  if (!peerService) {
-    peerService = new PeerService(dispatch);
-  }
+  const peerService = PeerService.getInstance(dispatch);
 
   try {
     // Check if peer already exists
@@ -44,7 +41,7 @@ function* joinRoom(dispatch: Dispatch, action: any): any {
 
     // Only join room if peer doesn't exist
     yield call(
-      peerService.joinWithCode.bind(peerService),
+      peerService!.joinWithCode.bind(peerService),
       action.roomCode,
       action.username
     );
@@ -78,37 +75,36 @@ function* joinRoom(dispatch: Dispatch, action: any): any {
 }
 
 function* updatePeerStatus(dispatch: Dispatch): any {
-  if (!peerService) {
-    peerService = new PeerService(dispatch);
-  }
-
+  const peerService = PeerService.getInstance(dispatch);
   const currentSong = yield select(getCurrentSong);
   const player = yield select((state) => state.player);
 
   if (!currentSong) return;
 
-  const status = {
-    currentSong: currentSong.title,
-    isPlaying: player.playing,
-    peerId: peerService.getPeerId(),
-    username: localStorage.getItem("username") || "Anonymous",
-    currentMedia: {
-      id: currentSong.id,
-      title: currentSong.title,
-      artist: currentSong.artistName,
-      thumbnailUrl: currentSong.cover?.thumbnailUrl
-    }
-  } as DataPayload;
-
   try {
+    const status = {
+      currentSong: currentSong.title,
+      isPlaying: player.playing,
+      peerId: peerService.getPeerId(),
+      username: localStorage.getItem("username") || "Anonymous",
+      currentMedia: {
+        id: currentSong.id,
+        title: currentSong.title,
+        artist: currentSong.artistName,
+        thumbnailUrl: currentSong.cover?.thumbnailUrl
+      }
+    } as DataPayload;
+
+    // Only try to update status if we have a valid peerId
     yield call([peerService, 'updateStatus'], status);
   } catch (error) {
-    console.error('Failed to update peer status:', error);
+    console.error('Error updating peer status:', error);
+    // Optionally dispatch an error notification
   }
 }
 
 function* shareStream(dispatch: Dispatch): any {
-  const peerService = new PeerService(dispatch);
+  const peerService = PeerService.getInstance(dispatch);
   const currentSong = yield select(getCurrentSong);
   const { streamUri } = yield select((state) => state.player);
 
@@ -123,12 +119,8 @@ function* shareStream(dispatch: Dispatch): any {
 }
 
 function* leaveRoom(dispatch: Dispatch): any {
-  if (!peerService) {
-    peerService = new PeerService(dispatch);
-  }
-  
+  const peerService = PeerService.getInstance(dispatch);
   yield call([peerService, 'leaveRoom']);
-  peerService = null;
   yield put({ type: types.SET_CURRENT_ROOM, roomCode: undefined });
 }
 
@@ -149,12 +141,18 @@ function* watchPlayerChanges(dispatch: Dispatch): any {
   );
 }
 
+function* requestStream(dispatch: Dispatch, action: any): any {
+  const peerService = PeerService.getInstance(dispatch);
+  yield call([peerService, 'requestStream'], { peerId: action.peerId });
+}
+
 // Binding actions to sagas
 function* peerSaga(store: any): Generator {
   yield call(initializePeers, store);
   yield takeEvery(types.JOIN_PEER_ROOM, joinRoom, store.dispatch);
   yield takeEvery(types.LEAVE_PEER_ROOM, leaveRoom, store.dispatch);
   yield takeLatest(types.SHARE_STREAM, shareStream, store.dispatch);
+  yield takeLatest(types.REQUEST_STREAM, requestStream, store.dispatch);
   yield takeLatest(types.SET_CURRENT_PLAYING_STREAMS, updatePeerStatus, store.dispatch);
   yield call(watchPlayerChanges, store.dispatch);
 }

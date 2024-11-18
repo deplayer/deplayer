@@ -32,6 +32,7 @@ export interface PeerStatus {
  * Service class handling peer-to-peer communication and media sharing
  */
 export default class PeerService {
+  private static instance: PeerService | null = null;
   /** The current room instance */
   private room: Room | undefined;
   /** Unique identifier for the current peer */
@@ -47,12 +48,19 @@ export default class PeerService {
   /** Redux dispatch function */
   private readonly dispatchFn: Dispatch;
 
+  static getInstance(dispatch: Dispatch): PeerService {
+    if (!PeerService.instance) {
+      PeerService.instance = new PeerService(dispatch);
+    }
+    return PeerService.instance;
+  }
+
   /**
    * Creates a new PeerService instance
    * @param dispatch - Redux dispatch function for updating the store
    * @throws {Error} If dispatch is not a function
    */
-  constructor(dispatch: Dispatch) {
+  private constructor(dispatch: Dispatch) {
     if (typeof dispatch !== 'function') {
       throw new Error('dispatch must be a function');
     }
@@ -73,24 +81,41 @@ export default class PeerService {
 
     // Handle incoming status updates
     getStatus((data: DataPayload, peerId: string) => {
+      console.log("Received status update from peer:", peerId);
       this.peers.set(peerId, data);
       this.peerId = peerId;
       this.dispatchFn({
-        type: "UPDATE_PEER_STATUS",
-        peers: Array.from(this.peers.values()),
+        type: types.UPDATE_PEER_STATUS,
+        peerId: peerId,
+        data: data
       });
     });
 
     // Handle incoming stream data
-    getStream(async (streamData: any, _peerId: string) => {
-      this.dispatchFn({
-        type: "SET_CURRENT_PLAYING_URL",
-        url: streamData.streamUrl,
-      });
-      this.dispatchFn({
-        type: "SET_CURRENT_PLAYING",
-        songId: streamData.songId,
-      });
+    getStream(async (streamData: any, peerId: string) => {
+      console.log("Received stream request from peer:", peerId);
+      console.log("Stream data:", streamData);
+
+      if (streamData.streamUrl) {
+        this.dispatchFn({
+          type: "SET_CURRENT_PLAYING_URL",
+          url: streamData.streamUrl,
+        });
+        this.dispatchFn({
+          type: "SET_CURRENT_PLAYING",
+          songId: streamData.songId,
+        });
+      } else {
+        const playerElement = document.getElementById('react-player') as HTMLMediaElement;
+
+        console.log('playerElement:', playerElement);
+        if (playerElement) {
+          const mediaStream = await playerElement.captureStream(30);
+          this.room?.addStream(mediaStream);
+        } else {
+          console.warn('Could not find ReactPlayer media element');
+        }
+      }
     });
 
     this.sendStatus = sendStatus;
@@ -126,9 +151,13 @@ export default class PeerService {
    * @param status - Current status information to share
    * @throws {Error} If trying to update status before joining a room
    */
-  updateStatus(status: DataPayload) {
-    if (!this.room || !this.sendStatus) {
+  updateStatus = (status: DataPayload) => {
+    if (!this.room) {
       throw new Error('Cannot update status: Not connected to a room');
+    }
+
+    if (!this.sendStatus) {
+      throw new Error('Cannot update status: No sendStatus function');
     }
     
     console.log("updateStatus", status);
@@ -141,7 +170,7 @@ export default class PeerService {
    * @param songId - Unique identifier for the song
    * @param mediaInfo - Additional media metadata
    */
-  shareStream(streamUrl: string, songId: string, mediaInfo: any) {
+  shareStream = (streamUrl: string, songId: string, mediaInfo: any) => {
     if (this.sendStream) {
       this.sendStream({ 
         streamUrl, 
@@ -155,11 +184,17 @@ export default class PeerService {
     }
   }
 
+  requestStream = (peerId: string) => {
+    if (this.sendStream) {
+      this.sendStream({ peerId });
+    }
+  }
+
   /**
    * Returns an array of all connected peers
    * @returns Array of peer status information
    */
-  getPeers(): DataPayload[] {
+  getPeers = (): DataPayload[] => {
     return Array.from(this.peers.values());
   }
 
@@ -167,7 +202,7 @@ export default class PeerService {
    * Generates a random room code
    * @returns A 6-character alphanumeric code
    */
-  generateShareCode(): string {
+  generateShareCode = (): string => {
     return Math.random().toString(36).substring(2, 8);
   }
 
@@ -175,14 +210,14 @@ export default class PeerService {
    * Gets the current peer's ID
    * @returns The peer ID or undefined if not connected
    */
-  public getPeerId(): string | undefined {
+  public getPeerId = (): string | undefined => {
     return this.peerId
   }
 
   /**
    * Leaves the current room and cleans up all connections
    */
-  leaveRoom() {
+  leaveRoom = () => {
     if (this.room) {
       this.room.leave();
       this.room = undefined;
@@ -192,8 +227,7 @@ export default class PeerService {
       this.peerId = undefined;
       
       this.dispatchFn({
-        type: "UPDATE_PEER_STATUS",
-        peers: [],
+        type: types.RESET_PEER_STATUS
       });
     }
   }

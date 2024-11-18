@@ -143,7 +143,8 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
           <div className='flex flex-col w-full md:sticky md:top-0'>
             {songFinder && song.type === 'video' && (
               <OutPortal
-                className={`flex w-full`}
+                id='player-portal'
+                className={`flex w-full player-portal`}
                 node={playerPortal}
               />
             )}
