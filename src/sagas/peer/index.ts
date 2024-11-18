@@ -1,5 +1,5 @@
 import { takeLatest, put, select, call, takeEvery } from "redux-saga/effects";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { DataPayload } from "trystero";
 
 import PeerService from "../../services/PeerService";
@@ -15,12 +15,12 @@ const peerStorageService = new PeerStorageService(adapter);
 function* initializePeers(store: any): any {
   yield call(peerStorageService.initialize);
   const peers = yield call(peerStorageService.get);
-  
+
   if (peers && peers.length > 0) {
     for (const peer of peers) {
-      yield call(joinRoom, store.dispatch, { 
+      yield call(joinRoom, store.dispatch, {
         roomCode: peer.roomCode,
-        username: peer.username
+        username: peer.username,
       });
     }
   }
@@ -51,7 +51,7 @@ function* joinRoom(dispatch: Dispatch, action: any): any {
     if (!existingPeer) {
       yield call(peerStorageService.save, uuidv4(), {
         roomCode: action.roomCode,
-        username: action.username
+        username: action.username,
       });
     }
 
@@ -83,59 +83,39 @@ function* updatePeerStatus(dispatch: Dispatch): any {
 
   try {
     const status = {
-      currentSong: currentSong.title,
       isPlaying: player.playing,
       peerId: peerService.getPeerId(),
       username: localStorage.getItem("username") || "Anonymous",
-      currentMedia: {
-        id: currentSong.id,
-        title: currentSong.title,
-        artist: currentSong.artistName,
-        thumbnailUrl: currentSong.cover?.thumbnailUrl
-      }
+      media: currentSong
     } as DataPayload;
 
     // Only try to update status if we have a valid peerId
-    yield call([peerService, 'updateStatus'], status);
+    yield call([peerService, "updateStatus"], status);
   } catch (error) {
-    console.error('Error updating peer status:', error);
+    console.error("Error updating peer status:", error);
     // Optionally dispatch an error notification
-  }
-}
-
-function* shareStream(dispatch: Dispatch): any {
-  const peerService = PeerService.getInstance(dispatch);
-  const currentSong = yield select(getCurrentSong);
-  const { streamUri } = yield select((state) => state.player);
-
-  if (currentSong && streamUri) {
-    yield call(
-      [peerService, "shareStream"], 
-      streamUri, 
-      currentSong.id,
-      currentSong
-    );
   }
 }
 
 function* leaveRoom(dispatch: Dispatch): any {
   const peerService = PeerService.getInstance(dispatch);
-  yield call([peerService, 'leaveRoom']);
+  yield call([peerService, "leaveRoom"]);
   yield put({ type: types.SET_CURRENT_ROOM, roomCode: undefined });
 }
 
 // Listen for player state changes to update peer status
 function* watchPlayerChanges(dispatch: Dispatch): any {
   yield takeLatest(
-    (action: any) => [
-      types.START_PLAYING,
-      types.TOGGLE_PLAYING,
-      types.SET_CURRENT_PLAYING,
-      types.PLAY_NEXT,
-      types.PLAY_PREV,
-      types.PAUSE_PLAYING,
-      types.SET_CURRENT_PLAYING_URL,
-    ].includes(action.type),
+    (action: any) =>
+      [
+        types.START_PLAYING,
+        types.TOGGLE_PLAYING,
+        types.SET_CURRENT_PLAYING,
+        types.PLAY_NEXT,
+        types.PLAY_PREV,
+        types.PAUSE_PLAYING,
+        types.SET_CURRENT_PLAYING_URL,
+      ].includes(action.type),
     updatePeerStatus,
     dispatch
   );
@@ -143,7 +123,7 @@ function* watchPlayerChanges(dispatch: Dispatch): any {
 
 function* requestStream(dispatch: Dispatch, action: any): any {
   const peerService = PeerService.getInstance(dispatch);
-  yield call([peerService, 'requestStream'], { peerId: action.peerId });
+  yield call(peerService.requestStream, action.peerId, action.mediaId);
 }
 
 // Binding actions to sagas
@@ -151,9 +131,12 @@ function* peerSaga(store: any): Generator {
   yield call(initializePeers, store);
   yield takeEvery(types.JOIN_PEER_ROOM, joinRoom, store.dispatch);
   yield takeEvery(types.LEAVE_PEER_ROOM, leaveRoom, store.dispatch);
-  yield takeLatest(types.SHARE_STREAM, shareStream, store.dispatch);
   yield takeLatest(types.REQUEST_STREAM, requestStream, store.dispatch);
-  yield takeLatest(types.SET_CURRENT_PLAYING_STREAMS, updatePeerStatus, store.dispatch);
+  yield takeLatest(
+    types.SET_CURRENT_PLAYING_STREAMS,
+    updatePeerStatus,
+    store.dispatch
+  );
   yield call(watchPlayerChanges, store.dispatch);
 }
 

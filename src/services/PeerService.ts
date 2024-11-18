@@ -1,7 +1,8 @@
-import { Dispatch } from 'redux';
+import { Dispatch } from "redux";
 import { Room, ActionSender, DataPayload } from "trystero";
 import { joinRoom } from "trystero/nostr";
 import * as types from "../constants/ActionTypes";
+import { IMedia } from "../entities/Media";
 
 /**
  * Interface representing the status of a peer in the network
@@ -16,16 +17,7 @@ export interface PeerStatus {
   /** Whether the peer is currently playing media */
   isPlaying: boolean;
   /** Information about the currently playing media */
-  currentMedia?: {
-    /** Unique identifier for the media */
-    id: string;
-    /** Title of the media */
-    title: string;
-    /** Artist name */
-    artist: string;
-    /** URL to the media thumbnail image */
-    thumbnailUrl?: string;
-  };
+  media?: IMedia;
 }
 
 /**
@@ -61,8 +53,8 @@ export default class PeerService {
    * @throws {Error} If dispatch is not a function
    */
   private constructor(dispatch: Dispatch) {
-    if (typeof dispatch !== 'function') {
-      throw new Error('dispatch must be a function');
+    if (typeof dispatch !== "function") {
+      throw new Error("dispatch must be a function");
     }
     this.dispatchFn = dispatch;
   }
@@ -87,7 +79,7 @@ export default class PeerService {
       this.dispatchFn({
         type: types.UPDATE_PEER_STATUS,
         peerId: peerId,
-        data: data
+        data: data,
       });
     });
 
@@ -106,14 +98,17 @@ export default class PeerService {
           songId: streamData.songId,
         });
       } else {
-        const playerElement = document.getElementById('react-player') as HTMLMediaElement;
+        const playerElement = document.getElementById(
+          "react-player-internal"
+        ) as HTMLMediaElement;
 
-        console.log('playerElement:', playerElement);
+        console.log("playerElement:", playerElement);
         if (playerElement) {
+          // @ts-ignore: Experimental API
           const mediaStream = await playerElement.captureStream(30);
           this.room?.addStream(mediaStream);
         } else {
-          console.warn('Could not find ReactPlayer media element');
+          console.warn("Could not find ReactPlayer media element");
         }
       }
     });
@@ -122,7 +117,7 @@ export default class PeerService {
     this.sendStream = sendStream;
 
     // Handle peer join events
-    this.room.onPeerJoin(peerId => {
+    this.room.onPeerJoin((peerId) => {
       this.dispatchFn({
         type: types.PEER_JOINED,
         peer: {
@@ -131,10 +126,10 @@ export default class PeerService {
           isPlaying: false,
         },
       });
-    })
+    });
 
     // Handle peer leave events
-    this.room.onPeerLeave(peerId => {
+    this.room.onPeerLeave((peerId) => {
       this.dispatchFn({
         type: types.PEER_LEFT,
         peer: {
@@ -143,7 +138,7 @@ export default class PeerService {
           isPlaying: false,
         },
       });
-    })
+    });
   }
 
   /**
@@ -153,42 +148,22 @@ export default class PeerService {
    */
   updateStatus = (status: DataPayload) => {
     if (!this.room) {
-      throw new Error('Cannot update status: Not connected to a room');
+      throw new Error("Cannot update status: Not connected to a room");
     }
 
     if (!this.sendStatus) {
-      throw new Error('Cannot update status: No sendStatus function');
+      throw new Error("Cannot update status: No sendStatus function");
     }
-    
+
     console.log("updateStatus", status);
     this.sendStatus(status);
-  }
+  };
 
-  /**
-   * Shares stream information with other peers
-   * @param streamUrl - URL of the media stream
-   * @param songId - Unique identifier for the song
-   * @param mediaInfo - Additional media metadata
-   */
-  shareStream = (streamUrl: string, songId: string, mediaInfo: any) => {
+  requestStream = (peerId: string, mediaId: string) => {
     if (this.sendStream) {
-      this.sendStream({ 
-        streamUrl, 
-        songId,
-        mediaInfo: {
-          title: mediaInfo.title,
-          artist: mediaInfo.artistName,
-          thumbnailUrl: mediaInfo.cover?.thumbnailUrl
-        }
-      });
+      this.sendStream({ peerId, mediaId });
     }
-  }
-
-  requestStream = (peerId: string) => {
-    if (this.sendStream) {
-      this.sendStream({ peerId });
-    }
-  }
+  };
 
   /**
    * Returns an array of all connected peers
@@ -196,7 +171,7 @@ export default class PeerService {
    */
   getPeers = (): DataPayload[] => {
     return Array.from(this.peers.values());
-  }
+  };
 
   /**
    * Generates a random room code
@@ -204,15 +179,15 @@ export default class PeerService {
    */
   generateShareCode = (): string => {
     return Math.random().toString(36).substring(2, 8);
-  }
+  };
 
   /**
    * Gets the current peer's ID
    * @returns The peer ID or undefined if not connected
    */
   public getPeerId = (): string | undefined => {
-    return this.peerId
-  }
+    return this.peerId;
+  };
 
   /**
    * Leaves the current room and cleans up all connections
@@ -225,10 +200,10 @@ export default class PeerService {
       this.sendStatus = undefined;
       this.sendStream = undefined;
       this.peerId = undefined;
-      
+
       this.dispatchFn({
-        type: types.RESET_PEER_STATUS
+        type: types.RESET_PEER_STATUS,
       });
     }
-  }
+  };
 }

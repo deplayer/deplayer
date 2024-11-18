@@ -18,10 +18,6 @@ const Social = ({ peers, currentRoom, dispatch }: Props) => {
     })
   }
 
-  const handleRequestStream = (peerId: string) => {
-    dispatch({ type: types.REQUEST_STREAM, peerId });
-  }
-
   const handleLeaveRoom = () => {
     dispatch({ type: types.LEAVE_PEER_ROOM });
   }
@@ -44,7 +40,6 @@ const Social = ({ peers, currentRoom, dispatch }: Props) => {
         peers={peers}
         currentRoom={currentRoom}
         onJoinRoom={handleJoinRoom}
-        requestStream={handleRequestStream}
         onLeaveRoom={handleLeaveRoom}
         dispatch={dispatch}
       />

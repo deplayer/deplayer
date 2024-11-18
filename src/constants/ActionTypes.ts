@@ -179,7 +179,6 @@ export const GET_SMART_PLAYLISTS_REJECTED = "GET_SMART_PLAYLISTS_REJECTED";
 
 // Peers management
 export const JOIN_PEER_ROOM = "JOIN_PEER_ROOM";
-export const SHARE_STREAM = "SHARE_STREAM";
 export const SET_CURRENT_ROOM = "SET_CURRENT_ROOM";
 export const PEER_ERROR = "PEER_ERROR";
 export const LEAVE_PEER_ROOM = 'LEAVE_PEER_ROOM'

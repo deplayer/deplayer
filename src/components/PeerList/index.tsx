@@ -5,20 +5,25 @@ import Button from '../common/Button'
 import Icon from '../common/Icon'
 import Modal from '../common/Modal'
 import { PeerStatus } from '../../services/PeerService'
+import { Dispatch } from 'redux'
+import * as types from '../../constants/ActionTypes'
 
 interface Props {
   peers: PeerStatus[]
   currentRoom?: string
   onJoinRoom: (code: string) => void
-  requestStream: (peerId: string) => void
   onLeaveRoom: () => void
-  dispatch: any
+  dispatch: Dispatch
 }
 
-const PeerList = ({ peers, currentRoom, onJoinRoom, requestStream, onLeaveRoom }: Props) => {
+const PeerList = ({ peers, dispatch, currentRoom, onJoinRoom, onLeaveRoom }: Props) => {
   const [showJoinModal, setShowJoinModal] = React.useState(false)
   const [roomCode, setRoomCode] = React.useState('')
   const [username, setUsername] = React.useState(localStorage.getItem('username') || '')
+
+  const handleRequestStream = (peerId: string, mediaId: string) => {
+    dispatch({ type: types.REQUEST_STREAM, peerId, mediaId });
+  }
 
   const shareUrl = currentRoom ? 
     `${window.location.origin}/join/${currentRoom}` : ''
@@ -67,25 +72,28 @@ const PeerList = ({ peers, currentRoom, onJoinRoom, requestStream, onLeaveRoom }
         {peers.map(peer => (
           <div key={peer.peerId} className="peer-item flex items-center justify-between p-4 border-b">
             <div className="flex items-center gap-4">
-              {peer.currentMedia?.thumbnailUrl && (
+              {peer.media?.cover?.thumbnailUrl && (
                 <img 
-                  src={peer.currentMedia.thumbnailUrl} 
-                  alt={peer.currentMedia.title}
+                  src={peer.media?.cover?.thumbnailUrl} 
+                  alt={peer.media?.title}
                   className="w-12 h-12 rounded object-cover"
                 />
               )}
               <div>
                 <span className="font-bold block">{peer.username}</span>
-                {peer.currentMedia && (
+                {peer.media && (
                   <span className="text-sm opacity-70">
-                    {peer.isPlaying ? '▶' : '⏸'} {peer.currentMedia.title} - {peer.currentMedia.artist}
+                    {peer.isPlaying ? '▶' : '⏸'} {peer.media.title} - {peer.media.artist.name}
                   </span>
                 )}
               </div>
             </div>
-            {peer.currentMedia && (
+            {peer.media && (
               <Button 
-                onClick={() => requestStream(peer.peerId)}
+                onClick={() => handleRequestStream(
+                  peer.peerId,
+                  peer.media?.id || ''
+                )}
                 className="bg-primary hover:bg-primary-dark"
               >
                 <Icon icon="faPlay" className="mr-2" />
