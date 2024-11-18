@@ -7,6 +7,12 @@ export interface PeerStatus {
   username: string;
   peerId: string;
   isPlaying: boolean;
+  currentMedia?: {
+    id: string;
+    title: string;
+    artist: string;
+    thumbnailUrl?: string;
+  };
 }
 
 export default class PeerService {
@@ -72,9 +78,17 @@ export default class PeerService {
     }
   }
 
-  shareStream(streamUrl: string, songId: string) {
+  shareStream(streamUrl: string, songId: string, mediaInfo: any) {
     if (this.sendStream) {
-      this.sendStream({ streamUrl, songId });
+      this.sendStream({ 
+        streamUrl, 
+        songId,
+        mediaInfo: {
+          title: mediaInfo.title,
+          artist: mediaInfo.artistName,
+          thumbnailUrl: mediaInfo.cover?.thumbnailUrl
+        }
+      });
     }
   }
 

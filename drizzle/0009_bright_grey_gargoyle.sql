@@ -1,0 +1,1 @@
+ALTER TABLE "peer" ADD CONSTRAINT "peer_roomCode_username_unique" UNIQUE("roomCode","username");

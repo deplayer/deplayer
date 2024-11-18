@@ -5,7 +5,8 @@ export type Models =
   | "queue"
   | "appcache"
   | "search_index"
-  | "smart_playlist";
+  | "smart_playlist"
+  | "peer"
 
 export interface IAdapter {
   initialize(model: Models): Promise<void>;

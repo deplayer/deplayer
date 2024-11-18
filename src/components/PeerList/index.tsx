@@ -17,12 +17,16 @@ interface Props {
 const PeerList = ({ peers, currentRoom, onJoinRoom, onShareStream }: Props) => {
   const [showJoinModal, setShowJoinModal] = React.useState(false)
   const [roomCode, setRoomCode] = React.useState('')
+  const [username, setUsername] = React.useState(localStorage.getItem('username') || '')
 
   const shareUrl = currentRoom ? 
     `${window.location.origin}/join/${currentRoom}` : ''
 
   const handleJoinRoom = () => {
     if (roomCode.trim()) {
+      if (username.trim()) {
+        localStorage.setItem('username', username.trim())
+      }
       onJoinRoom(roomCode.trim())
       setShowJoinModal(false)
       setRoomCode('')
@@ -52,19 +56,33 @@ const PeerList = ({ peers, currentRoom, onJoinRoom, onShareStream }: Props) => {
       <div className="peers-section mt-4">
         <h3><Translate value="peer.connectedPeers" /></h3>
         {peers.map(peer => (
-          <div key={peer.peerId} className="peer-item flex items-center justify-between p-2">
-            <div>
-              <span className="font-bold">{peer.username}</span>
-              {peer.currentSong && (
-                <span className="ml-2 opacity-70">
-                  {peer.isPlaying ? '▶' : '⏸'} {peer.currentSong}
-                </span>
+          <div key={peer.peerId} className="peer-item flex items-center justify-between p-4 border-b">
+            <div className="flex items-center gap-4">
+              {peer.currentMedia?.thumbnailUrl && (
+                <img 
+                  src={peer.currentMedia.thumbnailUrl} 
+                  alt={peer.currentMedia.title}
+                  className="w-12 h-12 rounded object-cover"
+                />
               )}
+              <div>
+                <span className="font-bold block">{peer.username}</span>
+                {peer.currentMedia && (
+                  <span className="text-sm opacity-70">
+                    {peer.isPlaying ? '▶' : '⏸'} {peer.currentMedia.title} - {peer.currentMedia.artist}
+                  </span>
+                )}
+              </div>
             </div>
-            <Button onClick={() => onShareStream(peer.peerId)}>
-              <Icon icon="faPlay" className="mr-2" />
-              <Translate value="peer.listenAlong" />
-            </Button>
+            {peer.currentMedia && (
+              <Button 
+                onClick={() => onShareStream(peer.peerId)}
+                className="bg-primary hover:bg-primary-dark"
+              >
+                <Icon icon="faPlay" className="mr-2" />
+                <Translate value="peer.listenAlong" />
+              </Button>
+            )}
           </div>
         ))}
       </div>
@@ -85,6 +103,18 @@ const PeerList = ({ peers, currentRoom, onJoinRoom, onShareStream }: Props) => {
                 onChange={(e) => setRoomCode(e.target.value)}
                 className="w-full p-2 rounded border dark:bg-gray-800"
                 placeholder="Enter room code"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm mb-2">
+                <Translate value="peer.enterUsername" />
+              </label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full p-2 rounded border dark:bg-gray-800"
+                placeholder="Enter username"
               />
             </div>
             <div className="flex justify-end">

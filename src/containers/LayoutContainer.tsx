@@ -39,7 +39,7 @@ function Layout(props: LayoutProps) {
           <SearchButton />
         </TopbarContainer>
 
-        <div className='layout-contents z-100'>
+        <div className='layout-contents z-10'>
           {props.children}
         </div>
         <Placeholder mqlMatch={props.app.mqlMatch} />

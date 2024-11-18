@@ -80,6 +80,11 @@
   "peer": {
     "connectedPeers": "Connected peers",
     "joinRoom": "Join room",
-    "shareRoom": "Share room"
+    "shareRoom": "Share room",
+    "listenAlong": "Listen along",
+    "enterRoomCode": "Enter room code",
+    "enterUsername": "Enter username",
+    "nowPlaying": "Now playing",
+    "notPlaying": "Not playing"
   }
 }
