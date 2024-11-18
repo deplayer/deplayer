@@ -3,6 +3,7 @@ import { Translate } from 'react-redux-i18n'
 import { QRCodeSVG } from 'qrcode.react'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
+import Modal from '../common/Modal'
 import { PeerStatus } from '../../services/PeerService'
 
 interface Props {
@@ -19,6 +20,14 @@ const PeerList = ({ peers, currentRoom, onJoinRoom, onShareStream }: Props) => {
 
   const shareUrl = currentRoom ? 
     `${window.location.origin}/join/${currentRoom}` : ''
+
+  const handleJoinRoom = () => {
+    if (roomCode.trim()) {
+      onJoinRoom(roomCode.trim())
+      setShowJoinModal(false)
+      setRoomCode('')
+    }
+  }
 
   return (
     <div className="peer-list p-4">
@@ -59,6 +68,33 @@ const PeerList = ({ peers, currentRoom, onJoinRoom, onShareStream }: Props) => {
           </div>
         ))}
       </div>
+
+      {showJoinModal && (
+        <Modal
+          title="Join Room"
+          onClose={() => setShowJoinModal(false)}
+        >
+          <div className="p-4">
+            <div className="mb-4">
+              <label className="block text-sm mb-2">
+                <Translate value="peer.enterRoomCode" />
+              </label>
+              <input
+                type="text"
+                value={roomCode}
+                onChange={(e) => setRoomCode(e.target.value)}
+                className="w-full p-2 rounded border dark:bg-gray-800"
+                placeholder="Enter room code"
+              />
+            </div>
+            <div className="flex justify-end">
+              <Button onClick={handleJoinRoom}>
+                <Translate value="peer.join" />
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   )
 }

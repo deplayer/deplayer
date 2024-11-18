@@ -1,5 +1,4 @@
 import { connect } from 'react-redux'
-import { Translate } from 'react-redux-i18n'
 import PeerList from '../components/PeerList'
 import * as types from '../constants/ActionTypes'
 
@@ -26,12 +25,12 @@ const Social = ({ peers, currentRoom, dispatch }: Props) => {
   return (
     <div className="p-4">
       <h2 className="text-2xl font-bold mb-4">
-        <Translate value="social.title" />
+        Social
       </h2>
       
       <div className="mb-8">
         <p className="text-gray-600 dark:text-gray-400">
-          <Translate value="social.description" />
+          Connect with other users and share your stream
         </p>
       </div>
 

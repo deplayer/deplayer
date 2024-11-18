@@ -6,16 +6,40 @@ import * as types from "../../constants/ActionTypes";
 let peerService: PeerService | null = null;
 
 function* initializePeerService(action: any): any {
-  peerService = new PeerService(action.dispatch);
+  if (!peerService) {
+    peerService = new PeerService(action.dispatch);
+  }
 }
 
 function* joinRoom(action: any): any {
-  if (!peerService) return;
+  if (!peerService) {
+    // Initialize peer service if not already done
+    yield call(initializePeerService, { dispatch: action.dispatch });
+  }
 
   try {
-    yield call([peerService, "joinWithCode"], action.roomCode, action.username);
+    yield call(
+      peerService!.joinWithCode.bind(peerService),
+      action.roomCode,
+      action.username
+    );
     yield put({ type: types.SET_CURRENT_ROOM, roomCode: action.roomCode });
+
+    // Send notification of successful join
+    yield put({
+      type: types.SEND_NOTIFICATION,
+      notification: `Joined room ${action.roomCode}`,
+      level: "success",
+    });
   } catch (error) {
+    console.error("Error joining room:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    yield put({
+      type: types.SEND_NOTIFICATION,
+      notification: `Failed to join room: ${errorMessage}`,
+      level: "error",
+    });
     yield put({ type: types.PEER_ERROR, error });
   }
 }
@@ -29,7 +53,7 @@ function* updatePeerStatus(): any {
   yield call([peerService, "updateStatus"], {
     currentSong: currentSong?.title,
     isPlaying: player.playing,
-    peerId: peerService.room?.peerId,
+    peerId: peerService.getPeerId(),
     username: localStorage.getItem("username") || "Anonymous",
   });
 }
