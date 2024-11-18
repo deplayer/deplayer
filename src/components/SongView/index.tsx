@@ -288,7 +288,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
             </div>
             {song.genres?.length > 0 && (
               <div className='mt-2 flex items-center'>
-                {song.genres.map((genre: string) => (
+                {Array.from(new Set(song.genres)).map((genre: string) => (
                   <Tag
                     key={genre}
                     transparent

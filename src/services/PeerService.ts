@@ -13,44 +13,41 @@ export default class PeerService {
   private config = { appId: "deplayer-p2p" };
   private sendStatus: any;
   private sendStream: any;
+  private readonly dispatchFn: any;
 
-  constructor(private dispatch: any) {}
+  constructor(dispatch: any) {
+    this.dispatchFn = dispatch;
+  }
 
   async joinWithCode(roomCode: string, username: string) {
     this.room = joinRoom(this.config, roomCode);
 
-    // Set up listeners for peer status updates
     const [sendStatus, getStatus] = this.room.makeAction("status");
 
-    // Listen for peer status updates
     getStatus((status: PeerStatus, peerId: string) => {
       this.peers.set(peerId, status);
-      this.dispatch({
+      this.dispatchFn({
         type: "UPDATE_PEER_STATUS",
         peers: Array.from(this.peers.values()),
       });
     });
 
-    // Set up stream sharing
     const [sendStream, getStream] = this.room.makeAction("stream");
 
     getStream(async (streamData: any, _peerId: string) => {
-      // Handle incoming stream data
-      this.dispatch({
+      this.dispatchFn({
         type: "SET_CURRENT_PLAYING_URL",
         url: streamData.streamUrl,
       });
-      this.dispatch({
+      this.dispatchFn({
         type: "SET_CURRENT_PLAYING",
         songId: streamData.songId,
       });
     });
 
-    // Store references for external use
     this.sendStatus = sendStatus;
     this.sendStream = sendStream;
 
-    // Send initial status
     this.updateStatus({
       username,
       peerId: this.room.peerId,
