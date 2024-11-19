@@ -25,7 +25,8 @@ export default defineConfig({
       ]
     },
     injectManifest: {
-      maximumFileSizeToCacheInBytes: 11 * 1024 * 1024,
+      maximumFileSizeToCacheInBytes: 12 * 1024 * 1024,
+      globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,json,mp3,wav,ogg,m4a,webm}'],
     },
     devOptions: {
       enabled: true,
