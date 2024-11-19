@@ -143,7 +143,8 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
           <div className='flex flex-col w-full md:sticky md:top-0'>
             {songFinder && song.type === 'video' && (
               <OutPortal
-                className={`flex w-full`}
+                id='player-portal'
+                className={`flex w-full player-portal`}
                 node={playerPortal}
               />
             )}
@@ -287,13 +288,13 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
               </Link>
             </div>
             {song.genres?.length > 0 && (
-              <div className='mt-2 flex items-center'>
-                {song.genres.map((genre: string) => (
+              <div className='mt-2 flex flex-wrap'>
+                {Array.from(new Set(song.genres)).map((genre: string) => (
                   <Tag
                     key={genre}
                     transparent
                     onClick={() => handleGenreClick(genre)}
-                    className="cursor-pointer hover:bg-opacity-50 mr-2"
+                    className="cursor-pointer hover:bg-opacity-50 mr-2 mb-2"
                   >
                     {genre}
                   </Tag>

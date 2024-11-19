@@ -27,6 +27,7 @@ import SongContainer from './containers/SongContainer'
 import Wiki from './components/Wiki'
 import GlobalKeyHandlers from './components/GlobalKeyHandlers'
 import { store, history } from './store/configureStore'
+import Social from './pages/Social';
 
 interface SongProps {
   playerPortal: portals.HtmlPortalNode
@@ -51,6 +52,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<DashboardContainer />} />
             <Route path="/index.html" element={<DashboardContainer />} />
+            <Route path="/social" element={<Social />} />
             <Route path="/queue" element={<QueueContainer />} />
             <Route path="/playlists" element={<PlaylistsContainer />} />
             <Route path="/collection/*" element={<CollectionContainer />} />

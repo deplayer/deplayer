@@ -2,7 +2,7 @@ import { IAdapter, Models } from "./IAdapter";
 import * as db from "./PgliteDatabase";
 import { PgliteDatabase } from "drizzle-orm/pglite";
 import { eq } from "drizzle-orm";
-import { media, settings, queue, playlist, smartPlaylist } from "../../schema";
+import { media, settings, queue, playlist, smartPlaylist, peer } from "../../schema";
 
 export default class Pglite implements IAdapter {
   initialize = async () => {};
@@ -60,6 +60,15 @@ export default class Pglite implements IAdapter {
             set: payload,
           });
         break;
+      case "peer":
+        await instance
+          .insert(peer)
+          .values({ ...prev, ...fixedPayload })
+          .onConflictDoUpdate({
+            target: peer.id,
+            set: payload,
+          });
+        break;
       default:
         console.log(`Model ${model} is not implemented for save method`);
         new Error(`Model ${model} not supported for save method`);
@@ -108,6 +117,8 @@ export default class Pglite implements IAdapter {
           .select()
           .from(smartPlaylist)
           .where(eq(smartPlaylist.id, id));
+      case "peer":
+        return instance.select().from(peer).where(eq(peer.id, id));
       default:
         console.log(`Model ${model} is not implemented for getDocObj method`);
         new Error("Model not supported");
@@ -132,6 +143,9 @@ export default class Pglite implements IAdapter {
       case "smart_playlist":
         const smartPlaylists = await instance.select().from(smartPlaylist);
         return smartPlaylists || [];
+      case "peer":
+        const peers = await instance.select().from(peer);
+        return peers || [];
       default:
         console.log(`Model ${model} is not implemented for getAll method`);
         throw new Error(`Model ${model} not supported for getAll method`);

@@ -16,6 +16,7 @@ import settingsSaga from './settings'
 import titleSaga from './title'
 import webtorrentSaga from './webtorrent'
 import pinSaga from './pin'
+import peerSaga from './peer'
 
 function* rootSaga(store: any) {
   yield all([
@@ -34,7 +35,8 @@ function* rootSaga(store: any) {
     pinSaga(),
     settingsSaga(),
     titleSaga(),
-    webtorrentSaga()
+    webtorrentSaga(),
+    peerSaga(store),
   ])
 }
 

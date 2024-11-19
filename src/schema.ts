@@ -1,4 +1,4 @@
-import { text, json, boolean, timestamp, pgTable, integer, real } from "drizzle-orm/pg-core";
+import { text, json, boolean, timestamp, pgTable, integer, real, unique } from "drizzle-orm/pg-core";
 
 export const media = pgTable("media", {
   id: text("id").primaryKey(),
@@ -53,3 +53,13 @@ export const playlist = pgTable("playlist", {
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow()
 })
+
+export const peer = pgTable("peer", {
+  id: text("id").primaryKey(),
+  roomCode: text("roomCode").notNull(),
+  username: text("username").notNull(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow()
+}, (table) => ({
+  roomCodeUsername: unique().on(table.roomCode, table.username)
+}))

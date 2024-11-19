@@ -35,7 +35,45 @@ type Props = {
 }
 
 class PlayerControls extends React.Component<Props> {
-  playerRef: any = React.createRef()
+  private playerRef: React.RefObject<ReactPlayer>;
+
+  constructor(props: Props) {
+    super(props);
+    this.playerRef = React.createRef();
+  }
+
+  getMediaElement = () => {
+    if (!this.playerRef.current) return null;
+    
+    // Get the internal player instance
+    const internal = this.playerRef.current.getInternalPlayer();
+    console.log('Internal player:', internal);
+    
+    // If it's an iframe, we need to look inside it
+    if (internal instanceof HTMLIFrameElement) {
+      try {
+        const iframeMedia = internal.contentWindow?.document.querySelector('video, audio');
+        console.log('Iframe media:', iframeMedia);
+        return iframeMedia;
+      } catch (e) {
+        console.warn('Could not access iframe content:', e);
+      }
+    }
+    
+    // If it's directly a media element
+    if (internal instanceof HTMLVideoElement || internal instanceof HTMLAudioElement) {
+      return internal;
+    }
+    
+    return null;
+  }
+
+  // Add this method to expose the media element
+  getCurrentMedia = () => {
+    const element = this.getMediaElement();
+    console.log('Current media element:', element);
+    return element;
+  }
 
   state = {
     timeShown: 0,
@@ -51,9 +89,9 @@ class PlayerControls extends React.Component<Props> {
 
   onSeekChange = (value: any) => {
     this.props.dispatch({ type: types.SET_PLAYER_PLAYED_SECONDS, value: value / 1000 })
-    this.playerRef.current.seekTo(
-      value / 1000
-    )
+    if (this.playerRef.current) {
+      this.playerRef.current.seekTo(value / 1000)
+    }
   }
 
   onProgress = (state: any) => {
@@ -145,7 +183,8 @@ class PlayerControls extends React.Component<Props> {
       file: {
         forceAudio: currentPlaying.type === 'audio',
         attributes: {
-          className: currentPlaying.type === 'video' ? 'video-element' : 'video-element',
+          id: 'react-player-internal',
+          className: currentPlaying.type === 'video' ? 'video-element' : 'audio-element',
           crossOrigin: 'anonymous'
         }
       }
@@ -168,6 +207,7 @@ class PlayerControls extends React.Component<Props> {
         <div id="player">
           <InPortal node={this.props.playerPortal}>
             <ReactPlayer
+              id="react-player"
               pip
               fullscreen={this.props.player.fullscreen.toString()}
               className={playerClassnames}
@@ -199,9 +239,9 @@ class PlayerControls extends React.Component<Props> {
           </InPortal>
         </div>
         {!songFinder && currentPlaying.type === 'video' && (
-          <div className="background-video left-0 right-0 top-0 botton-0 absolute bg-handler">
+          <div id='player-portal' className="background-video left-0 right-0 top-0 botton-0 absolute bg-handler">
             <OutPortal
-              className={`background-video left-0 right-0 top-0 botton-0 absolute ${currentPlaying.type === 'video' && 'bg-handler'}`}
+              className={`player-portal background-video left-0 right-0 top-0 botton-0 absolute ${currentPlaying.type === 'video' && 'bg-handler'}`}
               node={this.props.playerPortal}
             />
           </div>

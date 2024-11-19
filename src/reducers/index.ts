@@ -11,6 +11,7 @@ import lyrics, { State as LyricsState } from './lyrics'
 import search, { State as SearchState } from './search'
 import settings, { State as SettingsState } from './settings'
 import queue, { State as QueueState } from './queue'
+import peers, { State as PeerState } from './peers'
 
 export type State = {
   app: AppState
@@ -23,6 +24,7 @@ export type State = {
   queue: QueueState
   search: SearchState
   settings: SettingsState
+  peers: PeerState
 }
 
 const reducers = {
@@ -36,6 +38,7 @@ const reducers = {
   queue,
   search,
   settings,
+  peers,
   i18n: i18nReducer
 }
 
