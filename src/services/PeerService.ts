@@ -91,7 +91,7 @@ export default class PeerService {
     });
 
     // Handle incoming stream data
-    getMedia(async (streamData: any, peerId: string) => {
+    getMedia(async (streamData: any) => {
       const mediaId = streamData.mediaId;
       const media = this.collection?.rows[mediaId];
 
