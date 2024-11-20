@@ -16,7 +16,8 @@ const setup = () => {
       heightMqlMatch: false,
       displayMiniQueue: false,
       version: '',
-      showAddMediaModal: false
+      showAddMediaModal: false,
+      rightPanelToggled: false
     },
     error: 'test',
     dispatch: (value) => value,
