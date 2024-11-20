@@ -263,10 +263,10 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
 
         <div className="content flex-grow pt-6 sm:pt-0 md:pt-6 md:pr-6 justify-between">
           <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className="p-6 rounded-lg">
-            <div className='flex items-center justify-between'>
-              <h2 className='text-3xl text-wrap truncate ...'>{song.title}</h2>
-              <Tag onClick={() => handleTypeClick(song.type)} className="cursor-pointer hover:bg-opacity-50 mr-2" transparent>{typeIcon} {song.type}</Tag>
-            </div>
+            <h2 className='text-3xl inline-block text-wrap truncate ...'>
+              {song.title}
+              <Tag onClick={() => handleTypeClick(song.type)} className="cursor-pointer hover:bg-opacity-50 mr-2 mt-4 w-fit inline-block" transparent>{typeIcon} {song.type}</Tag>
+            </h2>
             <div className='text-lg mt-2'>
               <Link to={`/artist/${song.artist.id}`}>
                 <h3>
@@ -308,7 +308,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
               <Translate value='song.label.played' /> {song.playCount ?? 0} <Translate value='song.label.times' />
             </div>
             <div className='mt-2 flex items-center'>
-              <Translate className='mr-2' value='labels.providers' />
+              <label><Translate className='mr-2' value='labels.providers' /></label>
               {
                 Object.values(song.stream).map((value: any, index: number) => {
                   return (
@@ -316,6 +316,8 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
                       onClick={() => changeCurrentPlaying(song, index, dispatch, settings)}
                       key={`${value.service}_${index}`}
                       inverted
+                      transparent
+                      className='mr-2'
                     >
                       <ServiceIcon service={value.service} />
                       <p className='capitalize'>{value.service}</p>

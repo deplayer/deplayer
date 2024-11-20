@@ -60,10 +60,12 @@ const WelcomeMessage = ({ dispatch }: { dispatch: Dispatch }) => {
   return (
     <div className='flex flex-col md:flex-row w-full content-start items-center'>
       {showAuthModal && <Auth dispatch={dispatch} onClose={() => setShowAuthModal(false)} />}
-      <h4 className="text-xl text-center py-4 text-sky-900 dark:text-sky-300 p-4">
-        Hi <i>audiophile</i>! Welcome to <DeplayerTitle />
-      </h4>
-      <Image />
+      <div className='flex flex-col items-center'>
+        <h4 className="text-xl text-center py-4 text-sky-900 dark:text-sky-300 p-4">
+          Hi <i>audiophile</i>! Welcome to <DeplayerTitle />
+        </h4>
+        <Image />
+      </div>
       <div className='px-6 md:py-8'>
         <p className='py-4'>
           Access to you good ol' music library and enjoy it whenever you need it. <br />

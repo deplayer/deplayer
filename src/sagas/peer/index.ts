@@ -26,7 +26,6 @@ function* initializePeers(store: any): any {
 }
 
 function* joinRoom(store: Store, action: any): any {
-  console.log("store.getState()", store.getState());
   const collection = yield select((state) => state.collection);
   const peerService = PeerService.getInstance(store.dispatch);
   peerService.collection = collection;

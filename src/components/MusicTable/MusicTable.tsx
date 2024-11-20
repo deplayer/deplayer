@@ -28,6 +28,10 @@ export type Props = {
 }
 
 const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disableCurrent, disableCovers, disableAddButton, slim }: Props) => {
+  const [isToolbarVisible, setIsToolbarVisible] = React.useState(true)
+  const [lastScrollTop, setLastScrollTop] = React.useState(0)
+  const [isToolbarHidden, setIsToolbarHidden] = React.useState(false)
+
   const errors = error && <div>{error}</div>
   const location = useLocation()
 
@@ -128,9 +132,38 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
 
   const actions = React.useMemo(() => getActions(), [location.pathname, collection.activeFilters])
 
+  const handleScroll = ({ clientHeight, scrollHeight, scrollTop }: { clientHeight: number, scrollHeight: number, scrollTop: number }) => {
+    // If content isn't scrollable, always keep toolbar visible
+    if (clientHeight === scrollHeight) {
+      setIsToolbarVisible(true)
+      setIsToolbarHidden(false)
+      return
+    }
+
+    if (scrollTop > lastScrollTop) {
+      setIsToolbarVisible(false)
+    } else {
+      setIsToolbarHidden(false)
+      setIsToolbarVisible(true)
+    }
+    setLastScrollTop(scrollTop)
+  }
+
+  const handleTransitionEnd = () => {
+    if (!isToolbarVisible) {
+      setIsToolbarHidden(true)
+    }
+  }
+
   return (
     <React.Fragment>
-      <div className='p-2 toolbar flex justify-between items-center text-base'>
+      <div 
+        className={`p-2 bg-gray-200/50 dark:bg-black/40 toolbar flex justify-between items-center text-base top-15 right-0 z-10 transition-transform duration-100 ${
+          isToolbarVisible ? 'translate-y-0' : '-translate-y-full'
+        }`}
+        style={{ display: isToolbarHidden ? 'none' : 'flex' }}
+        onTransitionEnd={handleTransitionEnd}
+      >
         <div className='p-2'>
           #<b>{tableIds.length}</b>
         </div>
@@ -149,6 +182,7 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
             overscanRowCount={6}
             scrollToIndex={currentIndex}
             recomputeRowHeights
+            onScroll={handleScroll}
           />
         )}
       </AutoSizer>

@@ -5,7 +5,6 @@ import {
   put
 } from 'redux-saga/effects'
 import { remove, writeFile } from '@happy-js/happy-opfs'
-import axios from 'axios'
 
 import { getCollection } from '../selectors'
 import * as types from '../../constants/ActionTypes'
@@ -13,6 +12,7 @@ import Media from '../../entities/Media'
 
 import { getAdapter } from '../../services/database'
 import CollectionService from '../../services/CollectionService'
+import { MediaFileService } from '../../services/MediaFileService'
 
 type PinAction = {
   type: string,
@@ -37,17 +37,14 @@ async function storeSongData(song: Media) {
   }
 
   const songFsUri = `/${song.id}`
-  console.log('Storing song data', songFsUri, song)
-  const streamUrl = Object.values(song.stream)[0].uris[0].uri
-
-  if (!streamUrl) {
-    console.error('No stream url found for song', song)
+  const mediaFile = await MediaFileService.getMediaFile(songMedia)
+  
+  if (!mediaFile) {
+    console.error('Could not get media file for song', song)
     return
   }
 
-  const streamData = await axios.get(streamUrl, { responseType: 'blob' })
-  await writeFile(songFsUri, streamData.data)
-  // const fileContents = await readTextFile(songFsUri)
+  await writeFile(songFsUri, mediaFile)
 }
 
 function* pinAlbum(action: PinAlbumAction): any {

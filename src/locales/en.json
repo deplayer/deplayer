@@ -36,7 +36,9 @@
       "time": "Duration",
       "genre": "Genre",
       "dateAdded": "Date added",
-      "price": "Price"
+      "price": "Price",
+      "played": "Played",
+      "times": "times"
     }
   },
   "placeholder": {
@@ -59,7 +61,7 @@
     "playAll": "Play this list",
     "clearQueue": "clear queue",
     "saveAsPlaylist": "save as playlist",
-    "addToQueue": "add to queue",
+    "addToQueue": "Add to queue",
     "removeFromCollection": "remove from collection",
     "removeFromQueue": "Remove from queue",
     "shuffle": "shuffle",
@@ -70,7 +72,8 @@
     "startPlaying": "start playing",
     "toggleSpectrum": "Toggle spectrum",
     "toggleVisuals": "Toggle visuals",
-    "downloadMedia": "Download media"
+    "downloadMedia": "Download media",
+    "pinAlbum": "Pin album"
   },
   "message": {
     "noCollectionItems": "Collection is empty, here you will see all discovered media by Deplayer.\nIn order to start filling your collection you need to either Add media or Add a provider and start searching.",
