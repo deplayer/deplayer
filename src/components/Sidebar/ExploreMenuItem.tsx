@@ -6,17 +6,6 @@ type Props = {
 }
 
 const ExploreMenuItem = ({ current = false }: Props) => {
-  const children = current ? (
-    <ul>
-      <MenuItem
-        title='social'
-        label='Social'
-        url='/social'
-        icon={<Icon icon='faDatabase' />}
-      />
-    </ul>
-  ) : null
-
   return (
     <MenuItem
       current={current}
@@ -25,7 +14,6 @@ const ExploreMenuItem = ({ current = false }: Props) => {
       label='Explore'
       icon={<Icon icon='faGlobe' />}
     >
-      {children}
     </MenuItem>
   )
 }

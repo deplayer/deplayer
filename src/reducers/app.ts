@@ -10,7 +10,8 @@ export type State = {
   displayMiniQueue: boolean,
   version: string,
   showSpectrum: boolean,
-  showVisuals: boolean
+  showVisuals: boolean,
+  rightPanelToggled: boolean
 }
 
 export const defaultState = {
@@ -24,13 +25,18 @@ export const defaultState = {
   displayMiniQueue: true,
   showSpectrum: false,
   showVisuals: false,
-  version: import.meta.env.REACT_APP_VERSION || 'development'
+  version: import.meta.env.REACT_APP_VERSION || 'development',
+  rightPanelToggled: false
 }
 
 export default (state: State = defaultState, action: any) => {
   switch (action.type) {
     case types.TOGGLE_SIDEBAR: {
       return { ...state, sidebarToggled: action.value ? action.value : !state.sidebarToggled }
+    }
+
+    case types.TOGGLE_RIGHT_PANEL: {
+      return { ...state, rightPanelToggled: action.value ? action.value : !state.rightPanelToggled }
     }
 
     case types.TOGGLE_SPECTRUM: {

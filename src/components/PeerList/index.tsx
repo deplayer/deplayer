@@ -41,34 +41,8 @@ const PeerList = ({ peers, dispatch, currentRoom, onJoinRoom, onLeaveRoom }: Pro
   }
 
   return (
-    <div className="peer-list p-4">
-      {currentRoom ? (
-        <div className="share-section mb-4">
-          <div className="flex justify-between items-center mb-4">
-            <h3><Translate value="peer.shareRoom" /></h3>
-            <Button 
-              onClick={onLeaveRoom}
-              className="bg-red-500 hover:bg-red-600"
-            >
-              <Translate value="peer.leaveRoom" />
-            </Button>
-          </div>
-          <div className="flex items-center gap-4">
-            <input 
-              readOnly 
-              value={shareUrl}
-              className="p-2 rounded"
-            />
-            <QRCodeSVG value={shareUrl} size={128} />
-          </div>
-        </div>
-      ) : (
-        <Button onClick={() => setShowJoinModal(true)}>
-          <Translate value="peer.joinRoom" />
-        </Button>
-      )}
-
-      <div className="peers-section mt-4">
+    <div className="peer-list flex flex-col">
+      <div className="peers-section mt-4 mb-10 border-b pb-4">
         <h3><Translate value="peer.connectedPeers" /></h3>
         {peers.map(peer => (
           <div key={peer.peerId} className="peer-item flex items-center justify-between p-4 border-b">
@@ -106,6 +80,32 @@ const PeerList = ({ peers, dispatch, currentRoom, onJoinRoom, onLeaveRoom }: Pro
           </div>
         ))}
       </div>
+
+      {currentRoom ? (
+        <div className="share-section mb-4">
+          <div className="flex justify-between items-center mb-4">
+            <h3><Translate value="peer.shareRoom" /></h3>
+            <Button 
+              onClick={onLeaveRoom}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              <Translate value="peer.leaveRoom" />
+            </Button>
+          </div>
+          <div className="flex items-center gap-4 flex-col">
+            <input 
+              readOnly 
+              value={shareUrl}
+              className="p-2 rounded dark:text-black"
+            />
+            <QRCodeSVG value={shareUrl} size={128} />
+          </div>
+        </div>
+      ) : (
+        <Button onClick={() => setShowJoinModal(true)}>
+          <Translate value="peer.joinRoom" />
+        </Button>
+      )}
 
       {showJoinModal && (
         <Modal

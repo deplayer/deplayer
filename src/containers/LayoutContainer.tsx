@@ -10,6 +10,7 @@ import type { State as AppState } from '../reducers/app'
 import type { State } from '../reducers'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
+import RightPanelContainer from './RightPanelContainer'
 
 interface LayoutProps {
   backgroundImage: string,
@@ -44,6 +45,7 @@ function Layout(props: LayoutProps) {
         </div>
         <Placeholder mqlMatch={props.app.mqlMatch} />
       </SidebarContainer>
+      <RightPanelContainer />
     </>
   )
 }

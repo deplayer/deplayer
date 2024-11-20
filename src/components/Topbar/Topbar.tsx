@@ -2,6 +2,7 @@ import * as React from 'react'
 
 import SearchInput from './SearchInput'
 import SidebarButton from '../Buttons/SidebarButton'
+import RightPanelButton from '../Buttons/RightPanelButton'
 import Title from './Title'
 import * as types from '../../constants/ActionTypes'
 
@@ -91,18 +92,21 @@ class Topbar extends React.Component<Props, State> {
     return (
       <div className='topbar bg-gray-200/70 dark:bg-black/70 flex justify-between overflow-hidden z-20 items-center px-2' style={{ gridArea: 'topbar' }}>
         <SidebarButton />
-        <SearchInput
-          setSearchOff={this.setSearchOff}
-          searchToggled={searchToggled}
-          loading={loading}
-          onSearchChange={this.onSearchChange}
-          onBlur={this.onFocusOut}
-          value={searchTerm}
-        />
-        {!this.state.focus && !this.props.searchToggled ? <Title title={title} onClick={this.setSearchOn} /> : null}
-        <div className='flex justify-end'>
-          {!this.state.focus && childrenWithProps}
+        <div className='flex flex-1 justify-between items-center'>
+          <SearchInput
+            setSearchOff={this.setSearchOff}
+            searchToggled={searchToggled}
+            loading={loading}
+            onSearchChange={this.onSearchChange}
+            onBlur={this.onFocusOut}
+            value={searchTerm}
+          />
+          {!this.state.focus && !this.props.searchToggled ? <Title className='self-center w-full text-center' title={title} onClick={this.setSearchOn} /> : null}
+          <div className='flex justify-end'>
+            {!this.state.focus && childrenWithProps}
+          </div>
         </div>
+        <RightPanelButton />
       </div>
     )
   }

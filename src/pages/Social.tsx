@@ -25,7 +25,7 @@ const Social = ({ peers, currentRoom, dispatch }: Props) => {
   console.log('peers:', peers)
 
   return (
-    <div className="p-4">
+    <div className="p-4 flex flex-col">
       <h2 className="text-2xl font-bold mb-4">
         Social
       </h2>
