@@ -35,13 +35,12 @@ export function* saveQueue(): any {
   const queue = yield select(getQueue)
   logger.log('queue-saga', 'saving queue', queue)
 
-  // https://redux-saga.js.org/docs/advanced/NonBlockingCalls.html
   yield call(queueService.save, 'queue', {
     trackIds: queue.trackIds,
     randomTrackIds: queue.randomTrackIds,
-    shuffleEnabled: queue.shuffle,
     currentPlaying: queue.currentPlaying,
     repeat: queue.repeat,
+    shuffle: queue.shuffle,
     nextSongId: queue.nextSongId,
     prevSongId: queue.prevSongId
   })
@@ -52,7 +51,7 @@ export function* clearQueue(): any {
   yield call(queueService.save, 'queue', {})
 }
 
-export function* addAlbumToPlaylist(action: any): any {
+export function* addAlbumToQueue(action: any): any {
   const songsByAlbum = yield select(getAlbumSongs)
   logger.log('queue-saga', songsByAlbum)
   yield put({ type: types.ADD_SONGS_TO_QUEUE, songs: songsByAlbum[action.albumId], replace: false })
@@ -61,12 +60,15 @@ export function* addAlbumToPlaylist(action: any): any {
 }
 
 // Binding actions to sagas
-function* queueSaga(): any {
-  yield takeLatest(types.PLAY_ALL, playAll)
-  yield takeLatest(types.ADD_SONGS_TO_QUEUE, saveQueue)
-  yield takeLatest(types.CLEAR_QUEUE, clearQueue)
+export default function* queueSaga(): any {
   yield takeLatest(types.INITIALIZED, initialize)
-  yield takeLatest(types.ADD_ALBUM_TO_PLAYLIST, addAlbumToPlaylist)
+  yield takeLatest(types.ADD_ALBUM_TO_QUEUE, addAlbumToQueue)
+  yield takeLatest([
+    types.SHUFFLE,
+    types.REPEAT,
+    types.SET_CURRENT_PLAYING,
+    types.ADD_TO_QUEUE,
+    types.REMOVE_FROM_QUEUE,
+    types.CLEAR_QUEUE
+  ], saveQueue)
 }
-
-export default queueSaga

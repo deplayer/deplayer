@@ -26,7 +26,7 @@ const PeerList = ({ peers, dispatch, currentRoom, onJoinRoom, onLeaveRoom }: Pro
     dispatch({ type: types.REQUEST_STREAM, peerId, media: media });
   }
 
-  const shareUrl = currentRoom ? 
+  const shareUrl = currentRoom ?
     `${window.location.origin}/join/${currentRoom}` : ''
 
   const handleJoinRoom = () => {
@@ -48,8 +48,8 @@ const PeerList = ({ peers, dispatch, currentRoom, onJoinRoom, onLeaveRoom }: Pro
           <div key={peer.peerId} className="peer-item flex items-center justify-between p-4 border-b">
             <div className="flex items-center gap-4">
               {peer.media?.cover?.thumbnailUrl && (
-                <img 
-                  src={peer.media?.cover?.thumbnailUrl} 
+                <img
+                  src={peer.media?.cover?.thumbnailUrl}
                   alt={peer.media?.title}
                   className="w-12 h-12 rounded object-cover"
                 />
@@ -64,7 +64,7 @@ const PeerList = ({ peers, dispatch, currentRoom, onJoinRoom, onLeaveRoom }: Pro
               </div>
             </div>
             {peer.media && (
-              <Button 
+              <Button
                 onClick={() => {
                   requestSongFile(
                     peer.peerId,
@@ -85,7 +85,7 @@ const PeerList = ({ peers, dispatch, currentRoom, onJoinRoom, onLeaveRoom }: Pro
         <div className="share-section mb-4">
           <div className="flex justify-between items-center mb-4">
             <h3><Translate value="peer.shareRoom" /></h3>
-            <Button 
+            <Button
               onClick={onLeaveRoom}
               className="bg-red-500 hover:bg-red-600"
             >
@@ -93,12 +93,12 @@ const PeerList = ({ peers, dispatch, currentRoom, onJoinRoom, onLeaveRoom }: Pro
             </Button>
           </div>
           <div className="flex items-center gap-4 flex-col">
-            <input 
-              readOnly 
+            <input
+              readOnly
               value={shareUrl}
               className="p-2 rounded dark:text-black"
             />
-            <QRCodeSVG value={shareUrl} size={128} />
+            <QRCodeSVG value={shareUrl} marginSize={2} />
           </div>
         </div>
       ) : (

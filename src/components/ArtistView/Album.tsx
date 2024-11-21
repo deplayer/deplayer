@@ -40,7 +40,7 @@ const Album = (props: AlbumProps) => {
           isCurrent={false}
           slim={true}
           onClick={() => {
-            props.dispatch({ type: types.SET_CURRENT_PLAYING, songId: songRow.id })
+            props.dispatch({ type: types.ADD_ALBUM_TO_QUEUE, albumId })
           }}
           song={songRow}
         />
@@ -57,7 +57,7 @@ const Album = (props: AlbumProps) => {
         <div
           className='h-56 w-56 mb-2 p-4 md:h-56 md:w-56 cursor-pointer md:mr-4'
           onClick={() => {
-            props.dispatch({ type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
+            props.dispatch({ type: types.ADD_ALBUM_TO_QUEUE, albumId })
           }}
         >
           <CoverImage
@@ -74,7 +74,7 @@ const Album = (props: AlbumProps) => {
           <Button
             transparent
             onClick={() => {
-              props.dispatch({ type: types.ADD_ALBUM_TO_PLAYLIST, albumId })
+              props.dispatch({ type: types.ADD_ALBUM_TO_QUEUE, albumId })
             }}
           >
             <Icon

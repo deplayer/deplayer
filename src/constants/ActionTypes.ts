@@ -105,6 +105,7 @@ export const CLEAR_QUEUE = "CLEAR_QUEUE";
 export const SHUFFLE = "SHUFFLE";
 export const REPEAT = "REPEAT";
 export const ADD_TO_QUEUE_NEXT = "ADD_TO_QUEUE_NEXT";
+export const ADD_ALBUM_TO_QUEUE = "ADD_ALBUM_TO_QUEUE";
 
 // Search
 export const TOGGLE_SEARCH = "TOGGLE_SEARCH";
@@ -181,6 +182,8 @@ export const GET_SMART_PLAYLISTS_REJECTED = "GET_SMART_PLAYLISTS_REJECTED";
 // Peers management
 export const JOIN_PEER_ROOM = "JOIN_PEER_ROOM";
 export const SET_CURRENT_ROOM = "SET_CURRENT_ROOM";
+export const HOST_PEER_JOINED = "HOST_PEER_JOINED";
+export const HOST_PEER_LEFT = "HOST_PEER_LEFT";
 export const PEER_ERROR = "PEER_ERROR";
 export const LEAVE_PEER_ROOM = 'LEAVE_PEER_ROOM'
 export const UPDATE_PEER_STATUS = 'UPDATE_PEER_STATUS'
@@ -188,3 +191,4 @@ export const PEER_JOINED = 'PEER_JOINED'
 export const PEER_LEFT = 'PEER_LEFT'
 export const REQUEST_STREAM = 'REQUEST_STREAM'
 export const RESET_PEER_STATUS = 'RESET_PEER_STATUS'
+export const PEER_SET_USERNAME = 'PEER_SET_USERNAME'

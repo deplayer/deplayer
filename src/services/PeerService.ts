@@ -1,6 +1,6 @@
 import { Dispatch } from "redux";
 import { Room, ActionSender, DataPayload } from "trystero";
-import { joinRoom } from "trystero/nostr";
+import { joinRoom, selfId } from "trystero/nostr";
 import * as types from "../constants/ActionTypes";
 import { IMedia } from "../entities/Media";
 import { State as CollectionState } from "../reducers/collection";
@@ -23,7 +23,9 @@ export default class PeerService {
   private config = { appId: "deplayer-p2p" };
   private sendStatus: ActionSender<DataPayload> | undefined;
   private sendMediaRequest: ActionSender<DataPayload> | undefined;
+  private sendUsername: ActionSender<DataPayload> | undefined;
   private readonly dispatchFn: Dispatch;
+  private username: string = '';
   collection: CollectionState | null;
 
   // Singleton getter
@@ -50,7 +52,8 @@ export default class PeerService {
    */
   async joinWithCode(roomCode: string, username: string) {
     this.room = joinRoom(this.config, roomCode);
-    await this.setupCommunicationChannels(username);
+    this.username = username;
+    await this.setupCommunicationChannels()
   }
 
   /**
@@ -115,50 +118,63 @@ export default class PeerService {
   // HELPER METHODS
   // -------------
 
-  private async setupCommunicationChannels(username: string) {
+  private async setupCommunicationChannels() {
     if (!this.room) return;
 
     // Set up communication channels
     const [sendStatus, getStatus] = this.room.makeAction("status");
     const [sendMediaRequest, getMedia] = this.room.makeAction("media");
+    const [sendUsername, getUsername] = this.room.makeAction("username");
 
     // Bind handlers
     getStatus(this.handlePeerStatus);
     getMedia(this.handleMediaRequest);
+    getUsername(this.handleGetUsername);
 
     this.sendStatus = sendStatus;
+    this.sendUsername = sendUsername;
     this.sendMediaRequest = sendMediaRequest;
 
+    if (this.sendUsername) {
+      this.sendUsername({ peerId: selfId, username: this.username });
+    }
+
     // Set up peer event handlers
-    this.setupPeerEventHandlers(username);
+    this.setupPeerEventHandlers();
   }
 
-  private setupPeerEventHandlers(username: string) {
+  private handleGetUsername = (data: DataPayload, peerId: string) => {
+    if (peerId === selfId) return;
+
+    const username = (data as { username: string });
+
+    this.dispatchFn({
+      type: types.PEER_SET_USERNAME,
+      peer: { peerId, username: username.username },
+    });
+
+    this.dispatchFn({
+      type: types.SEND_NOTIFICATION,
+      notification: `${username.username} joined the room`,
+      level: "info",
+    });
+  }
+
+  private setupPeerEventHandlers() {
     if (!this.room) return;
 
+    // This is called when host joined a room. 
     this.room.onPeerJoin((peerId) => {
       this.dispatchFn({
         type: types.PEER_JOINED,
-        peer: { username, peerId, isPlaying: false },
+        peer: { peerId, isPlaying: false },
       })
-
-      this.dispatchFn({
-        type: types.SEND_NOTIFICATION,
-        notification: `${username} joined the room`,
-        level: "info",
-      });
     })
 
     this.room.onPeerLeave((peerId) => {
       this.dispatchFn({
         type: types.PEER_LEFT,
-        peer: { username, peerId, isPlaying: false },
-      });
-
-      this.dispatchFn({
-        type: types.SEND_NOTIFICATION,
-        notification: `${username} left the room`,
-        level: "info",
+        peer: { peerId, isPlaying: false },
       });
     });
   }

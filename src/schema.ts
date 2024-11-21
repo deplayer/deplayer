@@ -50,6 +50,10 @@ export const playlist = pgTable("playlist", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   trackIds: json("trackIds").notNull(),
+  randomTrackIds: json("randomTrackIds").notNull(),
+  currentPlaying: text("currentPlaying"),
+  repeat: boolean("repeat"),
+  shuffle: boolean("shuffle"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow()
 })

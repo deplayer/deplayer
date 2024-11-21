@@ -26,6 +26,13 @@ export default function peers(state = initialState, action: any): State {
         ...state,
         currentRoom: action.roomCode,
       };
+    case types.PEER_SET_USERNAME:
+      const { peerId, username } = action.peer;
+
+      return {
+        ...state,
+        peers: state.peers.map(peer => peer.peerId === peerId ? { ...peer, username } : peer),
+      };
     case types.PEER_JOINED:
       return {
         ...state,
