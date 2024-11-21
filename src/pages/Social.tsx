@@ -1,9 +1,10 @@
 import { connect } from 'react-redux'
 import PeerList from '../components/PeerList'
 import * as types from '../constants/ActionTypes'
+import { PeerStatus } from '../services/PeerService'
 
 interface Props {
-  peers: any
+  peers: Record<string, PeerStatus>
   currentRoom?: string
   dispatch: any
 }
@@ -21,8 +22,6 @@ const Social = ({ peers, currentRoom, dispatch }: Props) => {
   const handleLeaveRoom = () => {
     dispatch({ type: types.LEAVE_PEER_ROOM });
   }
-
-  console.log('peers:', peers)
 
   return (
     <div className="p-4 flex flex-col">
@@ -47,9 +46,11 @@ const Social = ({ peers, currentRoom, dispatch }: Props) => {
   )
 }
 
-const mapStateToProps = (state: any) => ({
-  peers: state.peers.peers,
-  currentRoom: state.peers.currentRoom
-})
+const mapStateToProps = (state: any) => {
+  return {
+    peers: state.peers.peers,
+    currentRoom: state.peers.currentRoom
+  }
+}
 
 export default connect(mapStateToProps)(Social) 

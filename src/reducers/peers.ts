@@ -1,13 +1,13 @@
 import { PeerStatus } from "../services/PeerService";
-import * as types from '../constants/ActionTypes'
+import * as types from "../constants/ActionTypes";
 
 export interface State {
-  peers: PeerStatus[];
+  peers: Record<string, PeerStatus>;
   currentRoom?: string;
 }
 
 const initialState: State = {
-  peers: [],
+  peers: {},
   currentRoom: undefined,
 };
 
@@ -16,10 +16,10 @@ export default function peers(state = initialState, action: any): State {
     case types.UPDATE_PEER_STATUS:
       return {
         ...state,
-        peers: [
-          ...state.peers.filter(peer => peer.peerId !== action.peerId),
-          { ...action.data, peerId: action.peerId },
-        ],
+        peers: {
+          ...state.peers,
+          [action.peerId]: action.data,
+        },
       };
     case types.SET_CURRENT_ROOM:
       return {
@@ -31,17 +31,25 @@ export default function peers(state = initialState, action: any): State {
 
       return {
         ...state,
-        peers: state.peers.map(peer => peer.peerId === peerId ? { ...peer, username } : peer),
+        peers: {
+          ...state.peers,
+          [peerId]: { ...state.peers[peerId], username },
+        },
       };
     case types.PEER_JOINED:
       return {
         ...state,
-        peers: [...state.peers, action.peer],
+        peers: {
+          ...state.peers,
+          [action.peer.peerId]: action.peer,
+        },
       };
     case types.PEER_LEFT:
+      const { [action.peer.peerId]: removedPeer, ...remainingPeers } =
+        state.peers;
       return {
         ...state,
-        peers: state.peers.filter((peer) => peer !== action.peerd),
+        peers: remainingPeers,
       };
     default:
       return state;

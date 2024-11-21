@@ -7,6 +7,7 @@ import { getAdapter } from "../../services/database";
 import { getCurrentSong } from "../selectors";
 import * as types from "../../constants/ActionTypes";
 import { Store } from "redux";
+import { selfId } from "trystero/nostr";
 
 const adapter = getAdapter();
 const peerStorageService = new PeerStorageService(adapter);
@@ -59,6 +60,7 @@ function* joinRoom(store: Store, action: any): any {
       type: types.SEND_NOTIFICATION,
       notification: `Joined room ${action.roomCode}`,
       level: "success",
+      duration: 1000,
     });
   } catch (error) {
     console.error("Error joining room:", error);
@@ -82,12 +84,14 @@ function* updatePeerStatus(store: Store): any {
 
   if (!currentSong) return;
 
+  const { stream, ...songWithoutStreams } = currentSong;
+
   try {
     const status = {
+      peerId: selfId,
       isPlaying: player.playing,
-      peerId: peerService.getPeerId(),
       username: localStorage.getItem("username") || "Anonymous",
-      media: currentSong,
+      media: songWithoutStreams,
     } as DataPayload;
 
     // Only try to update status if we have a valid peerId
@@ -128,17 +132,7 @@ function* requestStream(store: Store, action: any): any {
   const collection = yield select((state) => state.collection);
   const peerService = PeerService.getInstance(store.dispatch);
   peerService.collection = collection;
-  const streamFromPeer = yield call(
-    peerService.requestStream,
-    action.peerId,
-    action.media
-  );
-
-  console.log("streamFromPeer", streamFromPeer);
-
-  // Replace the streams from IMedia with the streams from the peer
-  // const { updatedAt, createdAt, stream, ...mediaWithoutDates } = action.media as (IMedia & { updatedAt: string; createdAt: string })
-  // yield put({ type: types.ADD_TO_COLLECTION, data: [{...mediaWithoutDates, stream: streamFromPeer }] })
+  yield call(peerService.requestStream, action.peerId, action.media);
 }
 
 // Binding actions to sagas

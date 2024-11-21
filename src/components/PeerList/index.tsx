@@ -10,7 +10,7 @@ import * as types from '../../constants/ActionTypes'
 import { IMedia } from '../../entities/Media'
 
 interface Props {
-  peers: PeerStatus[]
+  peers: Record<string, PeerStatus>
   currentRoom?: string
   onJoinRoom: (code: string) => void
   onLeaveRoom: () => void
@@ -44,7 +44,7 @@ const PeerList = ({ peers, dispatch, currentRoom, onJoinRoom, onLeaveRoom }: Pro
     <div className="peer-list flex flex-col">
       <div className="peers-section mt-4 mb-10 border-b pb-4">
         <h3><Translate value="peer.connectedPeers" /></h3>
-        {peers.map(peer => (
+        {Object.values(peers).map(peer => (
           <div key={peer.peerId} className="peer-item flex items-center justify-between p-4 border-b">
             <div className="flex items-center gap-4">
               {peer.media?.cover?.thumbnailUrl && (

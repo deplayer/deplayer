@@ -1,10 +1,11 @@
 import { Dispatch } from "redux";
-import { Room, ActionSender, DataPayload } from "trystero";
-import { joinRoom, selfId } from "trystero/nostr";
+import { Room, ActionSender, DataPayload, JsonValue } from "trystero";
+import { joinRoom } from "trystero/nostr";
 import * as types from "../constants/ActionTypes";
 import { IMedia } from "../entities/Media";
 import { State as CollectionState } from "../reducers/collection";
 import { MediaFileService } from "./MediaFileService";
+import { writeFile } from "@happy-js/happy-opfs";
 
 // Interfaces
 export interface PeerStatus {
@@ -18,14 +19,14 @@ export interface PeerStatus {
 export default class PeerService {
   private static instance: PeerService | null = null;
   private room: Room | undefined;
-  private peerId: string | undefined;
   private peers: Map<string, DataPayload> = new Map();
   private config = { appId: "deplayer-p2p" };
   private sendStatus: ActionSender<DataPayload> | undefined;
   private sendMediaRequest: ActionSender<DataPayload> | undefined;
   private sendUsername: ActionSender<DataPayload> | undefined;
+  private sendStream: ActionSender<DataPayload> | undefined;
   private readonly dispatchFn: Dispatch;
-  private username: string = '';
+  private username: string = "";
   collection: CollectionState | null;
 
   // Singleton getter
@@ -51,9 +52,9 @@ export default class PeerService {
    * Client initiates joining a room
    */
   async joinWithCode(roomCode: string, username: string) {
-    this.room = joinRoom(this.config, roomCode);
     this.username = username;
-    await this.setupCommunicationChannels()
+    this.room = joinRoom(this.config, roomCode);
+    await this.setupCommunicationChannels();
   }
 
   /**
@@ -92,7 +93,6 @@ export default class PeerService {
    */
   private handlePeerStatus = (data: DataPayload, peerId: string) => {
     this.peers.set(peerId, data);
-    this.peerId = peerId;
     this.dispatchFn({
       type: types.UPDATE_PEER_STATUS,
       peerId: peerId,
@@ -104,6 +104,8 @@ export default class PeerService {
    * Server handles incoming media requests
    */
   private handleMediaRequest = async (streamData: any) => {
+    console.log("Preparing media request", streamData);
+
     const mediaId = streamData.mediaId;
     const media = this.collection?.rows[mediaId];
 
@@ -117,36 +119,32 @@ export default class PeerService {
 
   // HELPER METHODS
   // -------------
-
   private async setupCommunicationChannels() {
     if (!this.room) return;
 
     // Set up communication channels
     const [sendStatus, getStatus] = this.room.makeAction("status");
     const [sendMediaRequest, getMedia] = this.room.makeAction("media");
+    const [sendStream, getStream] = this.room.makeAction("stream");
     const [sendUsername, getUsername] = this.room.makeAction("username");
 
     // Bind handlers
     getStatus(this.handlePeerStatus);
     getMedia(this.handleMediaRequest);
+    getStream(this.handleStream);
     getUsername(this.handleGetUsername);
 
     this.sendStatus = sendStatus;
     this.sendUsername = sendUsername;
     this.sendMediaRequest = sendMediaRequest;
-
-    if (this.sendUsername) {
-      this.sendUsername({ peerId: selfId, username: this.username });
-    }
+    this.sendStream = sendStream;
 
     // Set up peer event handlers
     this.setupPeerEventHandlers();
   }
 
   private handleGetUsername = (data: DataPayload, peerId: string) => {
-    if (peerId === selfId) return;
-
-    const username = (data as { username: string });
+    const username = data as { username: string };
 
     this.dispatchFn({
       type: types.PEER_SET_USERNAME,
@@ -158,18 +156,54 @@ export default class PeerService {
       notification: `${username.username} joined the room`,
       level: "info",
     });
-  }
+  };
+
+  private handleStream = async (
+    data: DataPayload,
+    peerId: string,
+    metadata: JsonValue | undefined
+  ) => {
+    if (!data || !metadata) return;
+
+    const media = (metadata as any).media as IMedia;
+    const songFsUri = `/${media.id}`;
+    await writeFile(songFsUri, data as ArrayBuffer);
+    const modifiedMedia = {
+      ...media,
+      stream: {
+        ...media.stream,
+        opfs: {
+          service: "opfs",
+          uris: [{ uri: `opfs:///${media.id}` }],
+        },
+      },
+    };
+
+    this.dispatchFn({ type: types.ADD_TO_COLLECTION, data: [modifiedMedia] });
+    this.dispatchFn({
+      type: types.RECEIVE_COLLECTION,
+      data: [modifiedMedia],
+    });
+    this.dispatchFn({
+      type: types.SEND_NOTIFICATION,
+      notification: `${this.username} shared ${media.title}`,
+    });
+  };
 
   private setupPeerEventHandlers() {
     if (!this.room) return;
 
-    // This is called when host joined a room. 
+    // This is called when host joined a room.
     this.room.onPeerJoin((peerId) => {
+      if (this.sendUsername) {
+        this.sendUsername({ peerId: peerId, username: this.username });
+      }
+
       this.dispatchFn({
         type: types.PEER_JOINED,
         peer: { peerId, isPlaying: false },
-      })
-    })
+      });
+    });
 
     this.room.onPeerLeave((peerId) => {
       this.dispatchFn({
@@ -181,10 +215,21 @@ export default class PeerService {
 
   private async processMediaRequest(media: IMedia) {
     const mediaFile = await MediaFileService.getMediaFile(media);
+
     if (!mediaFile) {
       console.error("Could not get media file", media);
       return null;
     }
+
+    if (this.sendStream) {
+      const { stream, createdAt, updatedAt, ...fixedMedia } =
+        media as IMedia & { createdAt: string; updatedAt: string };
+
+      this.sendStream(mediaFile, null, {
+        media: fixedMedia,
+      } as unknown as JsonValue);
+    }
+
     return mediaFile;
   }
 
@@ -193,19 +238,14 @@ export default class PeerService {
     this.peers.clear();
     this.sendStatus = undefined;
     this.sendMediaRequest = undefined;
-    this.peerId = undefined;
     this.dispatchFn({ type: types.RESET_PEER_STATUS });
   }
 
   // PUBLIC GETTERS
   // -------------
-  
+
   getPeers = (): DataPayload[] => {
     return Array.from(this.peers.values());
-  };
-
-  getPeerId = (): string | undefined => {
-    return this.peerId;
   };
 
   generateShareCode = (): string => {

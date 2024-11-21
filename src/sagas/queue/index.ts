@@ -63,6 +63,7 @@ export function* addAlbumToQueue(action: any): any {
 export default function* queueSaga(): any {
   yield takeLatest(types.INITIALIZED, initialize)
   yield takeLatest(types.ADD_ALBUM_TO_QUEUE, addAlbumToQueue)
+  yield takeLatest(types.PLAY_ALL, playAll)
   yield takeLatest([
     types.SHUFFLE,
     types.REPEAT,
