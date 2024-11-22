@@ -28,6 +28,7 @@ import Wiki from './components/Wiki'
 import GlobalKeyHandlers from './components/GlobalKeyHandlers'
 // import JoinRoom from './pages/JoinRoom'
 import { store, history } from './store/configureStore'
+import JoinRoom from './pages/JoinRoom';
 
 interface SongProps {
   playerPortal: portals.HtmlPortalNode
@@ -50,6 +51,7 @@ const App = () => {
       <Router history={history}>
         <LayoutContainer>
           <Routes>
+            <Route path="/join/:id" element={<JoinRoom />} />
             <Route path="/" element={<DashboardContainer />} />
             <Route path="/index.html" element={<DashboardContainer />} />
             <Route path="/queue" element={<QueueContainer />} />

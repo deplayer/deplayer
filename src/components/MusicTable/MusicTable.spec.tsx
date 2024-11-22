@@ -7,7 +7,8 @@ import MusicTable, { Props } from './MusicTable'
 const setup = () => {
   const props: Props = {
     app: {
-      backgroundImage: '',
+      ready: false,
+      backgroundImage: "",
       loading: false,
       sidebarToggled: false,
       showVisuals: false,

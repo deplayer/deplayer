@@ -158,11 +158,7 @@ export default class PeerService {
     });
   };
 
-  private handleStream = async (
-    data: DataPayload,
-    peerId: string,
-    metadata: JsonValue | undefined
-  ) => {
+  private handleStream = async (data: DataPayload, metadata: JsonValue | undefined) => {
     if (!data || !metadata) return;
 
     const media = (metadata as any).media as IMedia;

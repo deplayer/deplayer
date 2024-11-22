@@ -1,4 +1,5 @@
 // App
+export const APP_READY = "APP_READY";
 export const INITIALIZE = "INITIALIZE";
 export const INITIALIZED = "INITIALIZED";
 export const INITIALIZE_SETTINGS = "INITIALIZE_SETTINGS";

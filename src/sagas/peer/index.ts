@@ -24,6 +24,9 @@ function* initializePeers(store: any): any {
       });
     }
   }
+
+  // Dispatch app ready after peer initialization
+  yield put({ type: types.APP_READY });
 }
 
 function* joinRoom(store: Store, action: any): any {

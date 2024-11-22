@@ -2,6 +2,7 @@ import { connect } from 'react-redux'
 import PeerList from '../components/PeerList'
 import * as types from '../constants/ActionTypes'
 import { PeerStatus } from '../services/PeerService'
+import Icon from '../components/common/Icon'
 
 interface Props {
   peers: Record<string, PeerStatus>
@@ -23,15 +24,23 @@ const Social = ({ peers, currentRoom, dispatch }: Props) => {
     dispatch({ type: types.LEAVE_PEER_ROOM });
   }
 
+  const handleCloseRightPanel = () => {
+    dispatch({ type: types.TOGGLE_RIGHT_PANEL })
+  }
+
   return (
     <div className="p-4 flex flex-col">
-      <h2 className="text-2xl font-bold mb-4">
+      <h2 className="text-2xl font-bold mb-4 flex items-center justify-between">
         Social
+
+        <button onClick={handleCloseRightPanel}>
+          <Icon icon="faTimes" />
+        </button>
       </h2>
       
-      <div className="mb-8">
+      <div>
         <p className="text-gray-600 dark:text-gray-400">
-          Connect with other users and share your stream
+          Connect with your friends and share your contents!
         </p>
       </div>
 

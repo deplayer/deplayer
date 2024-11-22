@@ -43,9 +43,12 @@ const PeerList = ({ peers, dispatch, currentRoom, onJoinRoom, onLeaveRoom }: Pro
   return (
     <div className="peer-list flex flex-col">
       <div className="peers-section mt-4 mb-10 border-b pb-4">
-        <h3><Translate value="peer.connectedPeers" /></h3>
+        <h3 className="mb-3"><Translate value="peer.connectedPeers" /></h3>
         {Object.values(peers).map(peer => (
-          <div key={peer.peerId} className="peer-item flex items-center justify-between p-4 border-b">
+          <div key={peer.peerId} className="peer-item flex flex-col items-center justify-between border-b border-t py-2">
+            <div className="flex items-center justify-between w-full">
+              <span className="font-bold block">{peer.username}</span>
+            </div>
             <div className="flex items-center gap-4">
               {peer.media?.cover?.thumbnailUrl && (
                 <img
@@ -55,7 +58,6 @@ const PeerList = ({ peers, dispatch, currentRoom, onJoinRoom, onLeaveRoom }: Pro
                 />
               )}
               <div>
-                <span className="font-bold block">{peer.username}</span>
                 {peer.media && (
                   <span className="text-sm opacity-70">
                     {peer.isPlaying ? '▶' : '⏸'} {peer.media.title} - {peer.media.artist.name}
@@ -63,20 +65,23 @@ const PeerList = ({ peers, dispatch, currentRoom, onJoinRoom, onLeaveRoom }: Pro
                 )}
               </div>
             </div>
-            {peer.media && (
-              <Button
-                onClick={() => {
-                  requestSongFile(
-                    peer.peerId,
-                    peer.media!
-                  )
-                }}
-                className="bg-primary hover:bg-primary-dark"
-              >
-                <Icon icon="faPlay" className="mr-2" />
-                <Translate value="peer.listenAlong" />
-              </Button>
-            )}
+            <div className="w-full pt-2">
+              {peer.media && (
+                <Button
+                  size="xs"
+                  onClick={() => {
+                    requestSongFile(
+                      peer.peerId,
+                      peer.media!
+                    )
+                  }}
+                  className="bg-primary hover:bg-primary-dark"
+                >
+                  <Icon icon="faPlay" className="mr-2" />
+                  <Translate value="peer.request" />
+                </Button>
+                )}
+            </div>
           </div>
         ))}
       </div>
