@@ -158,10 +158,17 @@ export default class PeerService {
     });
   };
 
-  private handleStream = async (data: DataPayload, metadata: JsonValue | undefined) => {
+  private handleStream = async (
+    data: DataPayload,
+    _peerId: string,
+    metadata: JsonValue | undefined
+  ) => {
     if (!data || !metadata) return;
 
+    console.log("Received stream", data, metadata);
+
     const media = (metadata as any).media as IMedia;
+
     const songFsUri = `/${media.id}`;
     await writeFile(songFsUri, data as ArrayBuffer);
     const modifiedMedia = {
@@ -220,6 +227,8 @@ export default class PeerService {
     if (this.sendStream) {
       const { stream, createdAt, updatedAt, ...fixedMedia } =
         media as IMedia & { createdAt: string; updatedAt: string };
+
+      console.log("Sending stream", mediaFile, fixedMedia);
 
       this.sendStream(mediaFile, null, {
         media: fixedMedia,
