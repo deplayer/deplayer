@@ -6,9 +6,9 @@ import { PeerStatus } from '../../services/PeerService'
 import { Dispatch } from 'redux'
 import * as types from '../../constants/ActionTypes'
 import { IMedia } from '../../entities/Media'
-import PeerService from '../../services/PeerService'
 import CreateRoomModal from '../CreateRoomModal'
 import ShareRoomModal from '../ShareRoomModal'
+import { useSelector } from 'react-redux'
 
 interface Props {
   peers: Record<string, Record<string, PeerStatus>>
@@ -26,19 +26,16 @@ const PeerList = ({ peers, dispatch, onJoinRoom, onLeaveRoom }: Props) => {
   const [showJoinModal, setShowJoinModal] = React.useState(false)
   const [showShareModal, setShowShareModal] = React.useState(false)
   const [selectedRoom, setSelectedRoom] = React.useState('')
-  const [connectedRooms, setConnectedRooms] = React.useState<string[]>([])
+
+  const rooms = useSelector((state: any) => state.rooms.rooms)
 
   const requestSongFile = (peerId: string, media: IMedia, roomCode: string) => {
     dispatch({ type: types.REQUEST_STREAM, peerId, media: media, roomCode })
   }
 
   const groupedPeers = React.useMemo<RoomGroup[]>(() => {
-    // Get all rooms from the peer service
-    const peerService = PeerService.getInstance(dispatch);
-    const allRooms = peerService.getRooms();
-    
     // Create groups for all rooms, including empty ones
-    const groups = allRooms.map(roomCode => {
+    const groups = rooms.map((roomCode: string) => {
       const roomPeers = peers[roomCode] || {};
       return {
         roomCode,
@@ -47,23 +44,21 @@ const PeerList = ({ peers, dispatch, onJoinRoom, onLeaveRoom }: Props) => {
     });
 
     // Sort rooms with peers first
-    return groups.sort((a, b) => {
-      // If both have peers or both are empty, maintain original order
+    return groups.sort((a: RoomGroup, b: RoomGroup) => {
       if ((a.peers.length > 0 && b.peers.length > 0) || 
           (a.peers.length === 0 && b.peers.length === 0)) {
         return 0;
       }
-      // Push rooms with peers to the top
       return b.peers.length - a.peers.length;
     });
-  }, [peers, dispatch]);
+  }, [peers, rooms]);
 
   React.useEffect(() => {
     console.log('Current peers:', peers)
     console.log('Grouped peers:', groupedPeers)
   }, [peers, groupedPeers])
   
-  const handleCreateRoom = (roomCode: string, username: string) => {
+  const handleCreateRoom = (roomCode: string) => {
     onJoinRoom(roomCode)
   }
 
@@ -74,7 +69,6 @@ const PeerList = ({ peers, dispatch, onJoinRoom, onLeaveRoom }: Props) => {
 
   const handleLeaveRoom = (roomCode: string) => {
     onLeaveRoom(roomCode)
-    setConnectedRooms(prev => prev.filter(room => room !== roomCode))
     dispatch({ type: types.REMOVE_ROOM, room: roomCode })
   }
 
@@ -117,6 +111,37 @@ const PeerList = ({ peers, dispatch, onJoinRoom, onLeaveRoom }: Props) => {
     </div>
   )
 
+  const [foldedRooms, setFoldedRooms] = React.useState<Set<string>>(new Set())
+
+  React.useEffect(() => {
+    if (groupedPeers.length > 0) {
+      const newFoldedRooms = new Set<string>()
+      
+      let foundFirstWithPeers = false
+      groupedPeers.forEach(group => {
+        if (!foundFirstWithPeers && group.peers.length > 0) {
+          foundFirstWithPeers = true
+        } else {
+          newFoldedRooms.add(group.roomCode)
+        }
+      })
+      
+      setFoldedRooms(newFoldedRooms)
+    }
+  }, [groupedPeers])
+
+  const toggleFold = (roomCode: string) => {
+    setFoldedRooms(prev => {
+      const newFolded = new Set(prev)
+      if (newFolded.has(roomCode)) {
+        newFolded.delete(roomCode)
+      } else {
+        newFolded.add(roomCode)
+      }
+      return newFolded
+    })
+  }
+
   return (
     <div className="peer-list flex flex-col">
       <div className="peers-section mt-4 mb-10">
@@ -124,12 +149,28 @@ const PeerList = ({ peers, dispatch, onJoinRoom, onLeaveRoom }: Props) => {
           groupedPeers.map((group) => (
             <div key={group.roomCode} className="mb-6 border border-gray-600 rounded-lg p-4">
               <div className="flex justify-between items-center mb-4">
-                <h4 
-                  className="text-lg font-semibold cursor-pointer hover:text-blue-500"
-                  onClick={() => handleShareRoom(group.roomCode)}
-                >
-                  Room: {group.roomCode}
-                </h4>
+                <div className="flex items-center gap-2">
+                  {group.peers.length > 0 && (
+                    <button
+                      onClick={() => toggleFold(group.roomCode)}
+                      className="text-gray-400 hover:text-white transition-colors"
+                    >
+                      <Icon 
+                        icon={foldedRooms.has(group.roomCode) ? "faChevronRight" : "faChevronDown"} 
+                        className="w-4 h-4" 
+                      />
+                    </button>
+                  )}
+                  <h4 
+                    className="text-lg font-semibold cursor-pointer hover:text-blue-500"
+                    onClick={() => handleShareRoom(group.roomCode)}
+                  >
+                    Room: {group.roomCode}
+                    <span className="text-sm text-gray-400 ml-2">
+                      ({group.peers.length} {group.peers.length === 1 ? 'peer' : 'peers'})
+                    </span>
+                  </h4>
+                </div>
                 <Button
                   onClick={() => handleLeaveRoom(group.roomCode)}
                   size="xs"
@@ -140,13 +181,11 @@ const PeerList = ({ peers, dispatch, onJoinRoom, onLeaveRoom }: Props) => {
                   <Icon icon="faSignOutAlt" className="ml-2" />
                 </Button>
               </div>
-              <div className="space-y-4">
-                {group.peers.length > 0 ? (
-                  group.peers.map(renderPeer)
-                ) : (
-                  <p className="text-gray-500 italic">No peers in this room</p>
-                )}
-              </div>
+              {!foldedRooms.has(group.roomCode) && (
+                <div className="space-y-4">
+                  {group.peers.map(renderPeer)}
+                </div>
+              )}
             </div>
           ))
         ) : (
