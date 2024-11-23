@@ -89,6 +89,8 @@
     "enterUsername": "Enter username",
     "nowPlaying": "Now playing",
     "notPlaying": "Not playing",
-    "leaveRoom": "Leave room"
+    "leaveRoom": "Leave room",
+    "roomLink": "Room link",
+    "createRoom": "Create room"
   }
 }

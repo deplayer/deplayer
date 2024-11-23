@@ -14,17 +14,22 @@ export interface PeerStatus {
   peerId: string;
   isPlaying: boolean;
   media?: IMedia;
+  roomCode: string;
+}
+
+interface RoomState {
+  room: Room;
+  sendStatus: ActionSender<DataPayload>;
+  sendMediaRequest: ActionSender<DataPayload>;
+  sendUsername: ActionSender<DataPayload>;
+  sendStream: ActionSender<DataPayload>;
+  peers: Map<string, DataPayload>;
 }
 
 export default class PeerService {
   private static instance: PeerService | null = null;
-  private room: Room | undefined;
-  private peers: Map<string, DataPayload> = new Map();
+  private rooms: Map<string, RoomState> = new Map();
   private config = { appId: "deplayer-p2p" };
-  private sendStatus: ActionSender<DataPayload> | undefined;
-  private sendMediaRequest: ActionSender<DataPayload> | undefined;
-  private sendUsername: ActionSender<DataPayload> | undefined;
-  private sendStream: ActionSender<DataPayload> | undefined;
   private readonly dispatchFn: Dispatch;
   private username: string = "";
   collection: CollectionState | null;
@@ -53,57 +58,77 @@ export default class PeerService {
    */
   async joinWithCode(roomCode: string, username: string) {
     this.username = username;
-    this.room = joinRoom(this.config, roomCode);
-    await this.setupCommunicationChannels();
+    const room = joinRoom(this.config, roomCode);
+    await this.setupCommunicationChannels(room, roomCode);
   }
 
   /**
-   * Client sends status update to peers
+   * Client sends status update to peers in a specific room
    */
-  updateStatus = (status: DataPayload) => {
-    if (!this.room || !this.sendStatus) {
-      throw new Error("Cannot update status: Not properly connected");
+  updateStatus = (status: DataPayload, roomCode: string) => {
+    const roomState = this.rooms.get(roomCode);
+    if (!roomState) {
+      throw new Error(`Cannot update status: Room ${roomCode} not found`);
     }
-    this.sendStatus(status);
+    console.log("Updating status", status, roomCode);
+
+    roomState.sendStatus(status);
   };
 
   /**
-   * Client requests media stream from a peer
+   * Client requests media stream from a peer in a specific room
    */
-  requestStream = async (peerId: string, media: IMedia) => {
-    if (!this.sendMediaRequest) return;
-    this.sendMediaRequest({ peerId, mediaId: media.id! });
+  requestStream = async (peerId: string, media: IMedia, roomCode: string) => {
+    const roomState = this.rooms.get(roomCode);
+    if (!roomState) return;
+
+    console.log("Requesting stream", peerId, media, roomCode);
+    roomState.sendMediaRequest({ peerId, mediaId: media.id! });
   };
 
   /**
-   * Client leaves the room
+   * Client leaves a specific room
    */
-  leaveRoom = () => {
-    if (this.room) {
-      this.room.leave();
-      this.cleanupRoom();
+  leaveRoom = (roomCode: string) => {
+    const roomState = this.rooms.get(roomCode);
+    if (roomState) {
+      roomState.room.leave();
+      this.cleanupRoom(roomCode);
+    }
+  };
+
+  /**
+   * Client leaves all rooms
+   */
+  leaveAllRooms = () => {
+    for (const roomCode of this.rooms.keys()) {
+      this.leaveRoom(roomCode);
     }
   };
 
   // SERVER METHODS
   // -------------
 
-  /**
-   * Server handles incoming status updates
-   */
-  private handlePeerStatus = (data: DataPayload, peerId: string) => {
-    this.peers.set(peerId, data);
-    this.dispatchFn({
-      type: types.UPDATE_PEER_STATUS,
-      peerId: peerId,
-      data: data,
-    });
-  };
+  private handlePeerStatus =
+    (roomCode: string) => (data: DataPayload, peerId: string) => {
+      const roomState = this.rooms.get(roomCode);
+      if (!roomState) return;
 
-  /**
-   * Server handles incoming media requests
-   */
-  private handleMediaRequest = async (streamData: any) => {
+      const peerData = {
+        ...(data as object),
+        roomCode,
+      };
+
+      roomState.peers.set(peerId, peerData);
+      this.dispatchFn({
+        type: types.UPDATE_PEER_STATUS,
+        peerId,
+        data: peerData,
+        roomCode,
+      });
+    };
+
+  private handleMediaRequest = async (roomCode: string, streamData: any) => {
     console.log("Preparing media request", streamData);
 
     const mediaId = streamData.mediaId;
@@ -114,46 +139,64 @@ export default class PeerService {
       return;
     }
 
-    return await this.processMediaRequest(media);
+    return await this.processMediaRequest(media, roomCode);
   };
 
   // HELPER METHODS
   // -------------
-  private async setupCommunicationChannels() {
-    if (!this.room) return;
-
+  private async setupCommunicationChannels(room: Room, roomCode: string) {
     // Set up communication channels
-    const [sendStatus, getStatus] = this.room.makeAction("status");
-    const [sendMediaRequest, getMedia] = this.room.makeAction("media");
-    const [sendStream, getStream] = this.room.makeAction("stream");
-    const [sendUsername, getUsername] = this.room.makeAction("username");
+    const [sendStatus, getStatus] = room.makeAction("status");
+    const [sendMediaRequest, getMedia] = room.makeAction("media");
+    const [sendStream, getStream] = room.makeAction("stream");
+    const [sendUsername, getUsername] = room.makeAction("username");
 
-    // Bind handlers
-    getStatus(this.handlePeerStatus);
-    getMedia(this.handleMediaRequest);
-    getStream(this.handleStream);
-    getUsername(this.handleGetUsername);
+    // Create room state
+    const roomState: RoomState = {
+      room,
+      sendStatus,
+      sendMediaRequest,
+      sendUsername,
+      sendStream,
+      peers: new Map(),
+    };
 
-    this.sendStatus = sendStatus;
-    this.sendUsername = sendUsername;
-    this.sendMediaRequest = sendMediaRequest;
-    this.sendStream = sendStream;
+    // Store room state
+    this.rooms.set(roomCode, roomState);
+
+    // Dispatch room added to Redux
+    this.dispatchFn({ type: types.ADD_ROOM, room: roomCode });
+
+    // Bind handlers with room context
+    getStatus(this.handlePeerStatus(roomCode));
+    getMedia((data) => this.handleMediaRequest(roomCode, data));
+    getStream((data, peerId, metadata) => {
+      console.log("Received stream", data, peerId, metadata, roomCode);
+      this.handleStream(data, peerId, metadata);
+    });
+    getUsername((data, peerId) =>
+      this.handleGetUsername(data, peerId, roomCode)
+    );
 
     // Set up peer event handlers
-    this.setupPeerEventHandlers();
+    this.setupPeerEventHandlers(room, roomCode);
   }
 
-  private handleGetUsername = (data: DataPayload, peerId: string) => {
+  private handleGetUsername = (
+    data: DataPayload,
+    peerId: string,
+    roomCode: string
+  ) => {
     const username = data as { username: string };
 
     this.dispatchFn({
       type: types.PEER_SET_USERNAME,
-      peer: { peerId, username: username.username },
+      peer: { peerId, username: username.username, roomCode },
     });
 
     this.dispatchFn({
       type: types.SEND_NOTIFICATION,
-      notification: `${username.username} joined the room`,
+      notification: `${username.username} joined the room ${roomCode}`,
       level: "info",
     });
   };
@@ -164,8 +207,6 @@ export default class PeerService {
     metadata: JsonValue | undefined
   ) => {
     if (!data || !metadata) return;
-
-    console.log("Received stream", data, metadata);
 
     const media = (metadata as any).media as IMedia;
 
@@ -193,64 +234,84 @@ export default class PeerService {
     });
   };
 
-  private setupPeerEventHandlers() {
-    if (!this.room) return;
-
-    // This is called when host joined a room.
-    this.room.onPeerJoin((peerId) => {
-      if (this.sendUsername) {
-        this.sendUsername({ peerId: peerId, username: this.username });
+  private setupPeerEventHandlers(room: Room, roomCode: string) {
+    room.onPeerJoin((peerId) => {
+      const roomState = this.rooms.get(roomCode);
+      if (roomState && roomState.sendUsername) {
+        roomState.sendUsername({ peerId, username: this.username });
       }
 
       this.dispatchFn({
         type: types.PEER_JOINED,
-        peer: { peerId, isPlaying: false },
+        peer: { peerId, isPlaying: false, roomCode },
       });
     });
 
-    this.room.onPeerLeave((peerId) => {
+    room.onPeerLeave((peerId) => {
       this.dispatchFn({
         type: types.PEER_LEFT,
-        peer: { peerId, isPlaying: false },
+        peer: { peerId, isPlaying: false, roomCode },
       });
     });
   }
 
-  private async processMediaRequest(media: IMedia) {
+  private async processMediaRequest(media: IMedia, roomCode: string) {
     const mediaFile = await MediaFileService.getMediaFile(media);
+    const roomState = this.rooms.get(roomCode);
 
-    if (!mediaFile) {
-      console.error("Could not get media file", media);
+    if (!mediaFile || !roomState) {
+      console.error("Could not process media request", {
+        mediaFile,
+        roomState,
+      });
       return null;
     }
 
-    if (this.sendStream) {
-      const { stream, createdAt, updatedAt, ...fixedMedia } =
-        media as IMedia & { createdAt: string; updatedAt: string };
+    const { stream, createdAt, updatedAt, ...fixedMedia } = media as IMedia & {
+      createdAt: string;
+      updatedAt: string;
+    };
 
-      console.log("Sending stream", mediaFile, fixedMedia);
+    console.log("Sending stream", mediaFile, fixedMedia);
 
-      this.sendStream(mediaFile, null, {
-        media: fixedMedia,
-      } as unknown as JsonValue);
-    }
+    roomState.sendStream(mediaFile, null, {
+      media: fixedMedia,
+    } as unknown as JsonValue);
 
     return mediaFile;
   }
 
-  private cleanupRoom() {
-    this.room = undefined;
-    this.peers.clear();
-    this.sendStatus = undefined;
-    this.sendMediaRequest = undefined;
-    this.dispatchFn({ type: types.RESET_PEER_STATUS });
+  private cleanupRoom(roomCode: string) {
+    const roomState = this.rooms.get(roomCode);
+    if (roomState) {
+      roomState.peers.clear();
+      this.rooms.delete(roomCode);
+
+      // Dispatch room removed to Redux
+      this.dispatchFn({ type: types.REMOVE_ROOM, room: roomCode });
+    }
+    this.dispatchFn({ type: types.RESET_PEER_STATUS, roomCode });
   }
 
   // PUBLIC GETTERS
   // -------------
 
-  getPeers = (): DataPayload[] => {
-    return Array.from(this.peers.values());
+  getPeers = (roomCode: string): DataPayload[] => {
+    const roomState = this.rooms.get(roomCode);
+    return roomState ? Array.from(roomState.peers.values()) : [];
+  };
+
+  getAllPeers = (): DataPayload[] => {
+    const allPeers: DataPayload[] = [];
+    for (const roomState of this.rooms.values()) {
+      allPeers.push(...Array.from(roomState.peers.values()));
+    }
+    return allPeers;
+  };
+
+  getRooms = (): string[] => {
+    // This method can be removed as rooms will be accessed from Redux state
+    return Array.from(this.rooms.keys());
   };
 
   generateShareCode = (): string => {

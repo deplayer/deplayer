@@ -28,6 +28,7 @@ const RightPanelContainer = ({ rightPanelToggled, dispatch }: { rightPanelToggle
       contentId='right-sidebar-content'
       styles={{ overlay: { zIndex: '10' }, sidebar: { zIndex: '20' } }}
     >
+      <div id='right-sidebar-content' />
     </Sidebar>
   )
 }

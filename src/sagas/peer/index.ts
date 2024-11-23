@@ -8,6 +8,7 @@ import { getCurrentSong } from "../selectors";
 import * as types from "../../constants/ActionTypes";
 import { Store } from "redux";
 import { selfId } from "trystero/nostr";
+import { IMedia } from "../../entities/Media";
 
 const adapter = getAdapter();
 const peerStorageService = new PeerStorageService(adapter);
@@ -48,7 +49,6 @@ function* joinRoom(store: Store, action: any): any {
       action.roomCode,
       action.username
     );
-    yield put({ type: types.SET_CURRENT_ROOM, roomCode: action.roomCode });
 
     // Save peer to database only if it doesn't exist
     if (!existingPeer) {
@@ -92,25 +92,32 @@ function* updatePeerStatus(store: Store): any {
   try {
     const status = {
       peerId: selfId,
+      roomCode: yield select((state) => state.currentRoom),
       isPlaying: player.playing,
       username: localStorage.getItem("username") || "Anonymous",
       media: songWithoutStreams,
     } as DataPayload;
 
-    // Only try to update status if we have a valid peerId
-    yield call([peerService, "updateStatus"], status);
+    for (const roomCode of peerService.getRooms()) {
+      // Only try to update status if we have a valid peerId
+      yield call(peerService.updateStatus.bind(peerService), status, roomCode);
+    }
   } catch (error) {
     console.error("Error updating peer status:", error);
     // Optionally dispatch an error notification
   }
 }
 
-function* leaveRoom(store: Store): any {
+interface LeaveRoomAction {
+  type: typeof types.LEAVE_PEER_ROOM;
+  roomCode: string;
+}
+
+function* leaveRoom(store: Store, action: LeaveRoomAction): any {
   const collection = yield select((state) => state.collection);
   const peerService = PeerService.getInstance(store.dispatch);
   peerService.collection = collection;
-  yield call([peerService, "leaveRoom"]);
-  yield put({ type: types.SET_CURRENT_ROOM, roomCode: undefined });
+  yield call(peerService.leaveRoom.bind(peerService), action.roomCode);
 }
 
 // Listen for player state changes to update peer status
@@ -131,11 +138,25 @@ function* watchPlayerChanges(store: Store): any {
   );
 }
 
-function* requestStream(store: Store, action: any): any {
+
+interface RequestStreamAction {
+  type: typeof types.REQUEST_STREAM;
+  peerId: string;
+  media: IMedia;
+  roomCode: string;
+}
+
+function* requestStream(store: Store, action: RequestStreamAction): any {
   const collection = yield select((state) => state.collection);
   const peerService = PeerService.getInstance(store.dispatch);
   peerService.collection = collection;
-  yield call(peerService.requestStream, action.peerId, action.media);
+
+  yield call(
+    peerService.requestStream.bind(peerService),
+    action.peerId,
+    action.media,
+    action.roomCode
+  );
 }
 
 // Binding actions to sagas

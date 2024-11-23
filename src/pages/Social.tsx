@@ -3,21 +3,44 @@ import PeerList from '../components/PeerList'
 import * as types from '../constants/ActionTypes'
 import { PeerStatus } from '../services/PeerService'
 import Icon from '../components/common/Icon'
+import { Dispatch } from 'redux'
+import { useState } from 'react'
 
 interface Props {
-  peers: Record<string, PeerStatus>
-  currentRoom?: string
-  dispatch: any
+  peers: Record<string, Record<string, PeerStatus>>
+  dispatch: Dispatch
 }
 
-const Social = ({ peers, currentRoom, dispatch }: Props) => {
+const Social = ({ peers, dispatch }: Props) => {
+  const [showUsernameModal, setShowUsernameModal] = useState(false)
+  const [pendingRoomCode, setPendingRoomCode] = useState<string | null>(null)
+
   const handleJoinRoom = (code: string) => {
-    const username = localStorage.getItem('username') || 'Anonymous'
+    const savedUsername = localStorage.getItem('username')
+    if (!savedUsername) {
+      setPendingRoomCode(code)
+      setShowUsernameModal(true)
+      return
+    }
+    
     dispatch({ 
       type: types.JOIN_PEER_ROOM, 
       roomCode: code,
-      username 
+      username: savedUsername
     })
+  }
+
+  const handleUsernameSubmit = (username: string) => {
+    localStorage.setItem('username', username)
+    if (pendingRoomCode) {
+      dispatch({
+        type: types.JOIN_PEER_ROOM,
+        roomCode: pendingRoomCode,
+        username
+      })
+    }
+    setShowUsernameModal(false)
+    setPendingRoomCode(null)
   }
 
   const handleLeaveRoom = () => {
@@ -44,9 +67,44 @@ const Social = ({ peers, currentRoom, dispatch }: Props) => {
         </p>
       </div>
 
+      {showUsernameModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h3 className="text-xl font-bold mb-4">Enter Your Username</h3>
+            <form onSubmit={(e) => {
+              e.preventDefault()
+              const input = e.currentTarget.elements.namedItem('username') as HTMLInputElement
+              handleUsernameSubmit(input.value)
+            }}>
+              <input
+                type="text"
+                name="username"
+                className="border p-2 rounded dark:bg-gray-700 dark:border-gray-600"
+                placeholder="Enter username"
+                autoFocus
+              />
+              <div className="mt-4 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowUsernameModal(false)}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Join Room
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <PeerList
         peers={peers}
-        currentRoom={currentRoom}
         onJoinRoom={handleJoinRoom}
         onLeaveRoom={handleLeaveRoom}
         dispatch={dispatch}
@@ -58,7 +116,6 @@ const Social = ({ peers, currentRoom, dispatch }: Props) => {
 const mapStateToProps = (state: any) => {
   return {
     peers: state.peers.peers,
-    currentRoom: state.peers.currentRoom
   }
 }
 

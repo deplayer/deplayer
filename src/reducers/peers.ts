@@ -2,38 +2,61 @@ import { PeerStatus } from "../services/PeerService";
 import * as types from "../constants/ActionTypes";
 
 export interface State {
-  peers: Record<string, PeerStatus>;
-  currentRoom?: string;
+  peers: Record<string, Record<string, PeerStatus>>;
 }
 
 const initialState: State = {
   peers: {},
-  currentRoom: undefined,
 };
 
-export default function peers(state = initialState, action: any): State {
+interface UpdatePeerStatusAction {
+  type: typeof types.UPDATE_PEER_STATUS
+  data: PeerStatus
+  peerId: string
+  roomCode: string
+}
+
+interface SetUsernameAction {
+  type: typeof types.PEER_SET_USERNAME
+  peer: PeerStatus
+}
+
+interface JoinRoomAction {
+  type: typeof types.PEER_JOINED
+  peer: PeerStatus
+}
+
+interface LeaveRoomAction {
+  type: typeof types.PEER_LEFT
+  peer: PeerStatus
+}
+
+export default function peers(state = initialState, action: UpdatePeerStatusAction | SetUsernameAction | JoinRoomAction | LeaveRoomAction): State {
   switch (action.type) {
     case types.UPDATE_PEER_STATUS:
+      if (!action.data.roomCode) {
+        return state;
+      }
       return {
         ...state,
         peers: {
           ...state.peers,
-          [action.peerId]: action.data,
+          [action.data.roomCode]: {
+            ...(state.peers[action.data.roomCode] || {}),
+            [action.peerId]: action.data,
+          },
         },
       };
-    case types.SET_CURRENT_ROOM:
-      return {
-        ...state,
-        currentRoom: action.roomCode,
-      };
     case types.PEER_SET_USERNAME:
-      const { peerId, username } = action.peer;
-
+      const { peerId, username, roomCode } = action.peer;
       return {
         ...state,
         peers: {
           ...state.peers,
-          [peerId]: { ...state.peers[peerId], username },
+          [roomCode]: {
+            ...(state.peers[roomCode] || {}),
+            [peerId]: { ...state.peers[roomCode]?.[peerId], username },
+          },
         },
       };
     case types.PEER_JOINED:
@@ -41,15 +64,22 @@ export default function peers(state = initialState, action: any): State {
         ...state,
         peers: {
           ...state.peers,
-          [action.peer.peerId]: action.peer,
+          [action.peer.roomCode]: {
+            ...(state.peers[action.peer.roomCode] || {}),
+            [action.peer.peerId]: action.peer,
+          },
         },
       };
     case types.PEER_LEFT:
+      const roomPeers = state.peers[action.peer.roomCode] || {};
       const { [action.peer.peerId]: removedPeer, ...remainingPeers } =
-        state.peers;
+        roomPeers;
       return {
         ...state,
-        peers: remainingPeers,
+        peers: {
+          ...state.peers,
+          [action.peer.roomCode]: remainingPeers,
+        },
       };
     default:
       return state;
