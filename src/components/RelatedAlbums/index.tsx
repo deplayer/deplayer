@@ -35,9 +35,11 @@ type Props = {
 const RelatedAlbums = (props: Props) => {
   const title = <Translate value='titles.albums' />
 
+  if (!props.albums) return null;
+
   const Albums = props.albums
-    .filter((album) => {
-      return album.name !== '' // We don't want empty titles
+    ?.filter((album) => {
+      return album.name !== "" // We don't want empty titles
     })
     .map((album) => {
       return (

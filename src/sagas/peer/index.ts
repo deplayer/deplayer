@@ -114,26 +114,36 @@ interface LeaveRoomAction {
 }
 
 function* leaveRoom(store: Store, action: LeaveRoomAction): any {
-  const collection = yield select((state) => state.collection);
-  const peerService = PeerService.getInstance(store.dispatch);
-  peerService.collection = collection;
+  try {
+    const collection = yield select((state) => state.collection);
+    const peerService = PeerService.getInstance(store.dispatch);
+    peerService.collection = collection;
 
-  // Leave the room in peer service
-  yield call(peerService.leaveRoom.bind(peerService), action.roomCode);
+    // Leave the room in peer service
+    yield call(peerService.leaveRoom.bind(peerService), action.roomCode);
 
-  // Remove from database
-  yield call(
-    peerStorageService.removeByRoom.bind(peerStorageService),
-    action.roomCode
-  );
+    // Remove from database and wait for completion
+    yield call(
+      peerStorageService.removeByRoom.bind(peerStorageService),
+      action.roomCode
+    );
 
-  // Send notification
-  yield put({
-    type: types.SEND_NOTIFICATION,
-    notification: `Left room ${action.roomCode}`,
-    level: "success",
-    duration: 1000,
-  });
+    // Send notification
+    yield put({
+      type: types.SEND_NOTIFICATION,
+      notification: `Left room ${action.roomCode}`,
+      level: "success",
+      duration: 1000,
+    });
+  } catch (error) {
+    console.error("Error leaving room:", error);
+    yield put({
+      type: types.SEND_NOTIFICATION,
+      notification: "Failed to leave room",
+      level: "error",
+      duration: 1000,
+    });
+  }
 }
 
 // Listen for player state changes to update peer status
@@ -184,7 +194,6 @@ function* requestRealtimeStream(
 
   yield call(
     peerService.sendRealtimeStream.bind(peerService),
-    action.peerId,
     action.roomCode
   );
 }

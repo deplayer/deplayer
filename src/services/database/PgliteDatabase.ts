@@ -8,11 +8,13 @@ import migrations from "./migrations.json"
 
 let dbPromise: Promise<PgliteDatabase> | null = null
 
+const debugLevel = 0
+
 export function getClient(): PGlite {
   if (process.env.NODE_ENV === 'test') {
     return new PGlite()
   } else {
-    return new PGlite('idb://deplayer-pglite', { debug: 1, extensions: { electric: electricSync() } })
+    return new PGlite('idb://deplayer-pglite', { debug: debugLevel, extensions: { electric: electricSync() } })
   }
 }
 

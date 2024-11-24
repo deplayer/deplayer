@@ -1,5 +1,12 @@
 import ReactPlayer from "react-player";
 
+declare global {
+  interface HTMLMediaElement {
+    captureStream?(fps?: number): MediaStream;
+    mozCaptureStream?(fps?: number): MediaStream;
+  }
+}
+
 class PlayerRefService {
   private static instance: PlayerRefService;
   private playerRef: React.RefObject<ReactPlayer> | null = null;
@@ -28,7 +35,25 @@ class PlayerRefService {
 
     if (internal instanceof HTMLIFrameElement) {
       try {
-        return internal.contentWindow?.document.querySelector("video, audio");
+        const media = internal.contentWindow?.document.querySelector(
+          "video, audio"
+        ) as HTMLMediaElement;
+        if (media) {
+          if (
+            !(media as any).captureStream &&
+            (media as any).mozCaptureStream
+          ) {
+            return {
+              element: media,
+              captureStream: (fps?: number) =>
+                (media as any).mozCaptureStream(fps),
+            };
+          }
+          return {
+            element: media,
+            captureStream: media.captureStream?.bind(media),
+          };
+        }
       } catch (e) {
         console.warn("Could not access iframe content:", e);
       }
@@ -38,7 +63,17 @@ class PlayerRefService {
       internal instanceof HTMLVideoElement ||
       internal instanceof HTMLAudioElement
     ) {
-      return internal;
+      if (!internal.captureStream && (internal as any).mozCaptureStream) {
+        return {
+          element: internal,
+          captureStream: (fps?: number) =>
+            (internal as any).mozCaptureStream(fps),
+        };
+      }
+      return {
+        element: internal,
+        captureStream: internal.captureStream?.bind(internal),
+      };
     }
 
     return null;

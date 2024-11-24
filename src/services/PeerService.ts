@@ -1,11 +1,12 @@
 import { Dispatch } from "redux";
-import { Room, ActionSender, DataPayload, JsonValue } from "trystero";
+import { Room, ActionSender, DataPayload, JsonValue, selfId } from "trystero";
 import { joinRoom } from "trystero/nostr";
 import * as types from "../constants/ActionTypes";
 import { IMedia } from "../entities/Media";
 import { State as CollectionState } from "../reducers/collection";
 import { MediaFileService } from "./MediaFileService";
 import { writeFile } from "@happy-js/happy-opfs";
+import PlayerRefService from "./PlayerRefService";
 
 // Interfaces
 export interface PeerStatus {
@@ -173,8 +174,8 @@ export default class PeerService {
     getStream((data, peerId, metadata) => {
       this.handleStream(data, peerId, metadata);
     });
-    getRealtimeStream((data, peerId, metadata) => {
-      this.handleRealtimeStream(data, peerId, metadata);
+    getRealtimeStream((data, peerId) => {
+      this.handleRealtimeStream(data, peerId);
     });
     getUsername((data, peerId) =>
       this.handleGetUsername(data, peerId, roomCode)
@@ -186,10 +187,29 @@ export default class PeerService {
 
   private handleRealtimeStream = (
     data: DataPayload,
-    peerId: string,
-    metadata: JsonValue | undefined
+    _peerId: string,
   ) => {
-    console.log("Received realtime stream", data, peerId, metadata);
+    const playerRef = PlayerRefService.getInstance();
+    const mediaElement = playerRef.getCurrentMedia();
+
+    const roomCode = (data as any).roomCode;
+    const roomState = this.rooms.get(roomCode);
+
+    if (!roomState || !mediaElement?.captureStream) {
+      console.warn(
+        "Cannot capture stream: Media element or captureStream not supported"
+      );
+      return;
+    }
+
+    try {
+      const mediaStream = mediaElement.captureStream(30);
+      if (mediaStream) {
+        roomState.room.addStream(mediaStream, null);
+      }
+    } catch (error) {
+      console.error("Error capturing media stream:", error);
+    }
   };
 
   private handleGetUsername = (
@@ -265,6 +285,19 @@ export default class PeerService {
     });
   }
 
+  sendRealtimeStream = async (roomCode: string) => {
+    const roomState = this.rooms.get(roomCode);
+    if (!roomState) return;
+
+    roomState.room.onPeerStream((stream, peerId) => {
+      console.log("Peer stream", peerId, stream);
+      const audio = new Audio();
+      audio.srcObject = stream;
+      audio.autoplay = true;
+    });
+    return roomState.sendRealtimeStream({ requesterId: selfId, roomCode });
+  };
+
   private async processMediaRequest(media: IMedia, roomCode: string) {
     const mediaFile = await MediaFileService.getMediaFile(media);
     const roomState = this.rooms.get(roomCode);
@@ -286,34 +319,6 @@ export default class PeerService {
 
     roomState.sendStream(mediaFile, null, {
       media: fixedMedia,
-    } as unknown as JsonValue);
-
-    return mediaFile;
-  }
-
-  private async processRealtimeStreamRequest(media: IMedia, roomCode: string) {
-    const mediaFile = await MediaFileService.getMediaFile(media);
-    const roomState = this.rooms.get(roomCode);
-
-    if (!mediaFile || !roomState) {
-      console.error("Could not process realtime stream request", {
-        mediaFile,
-        roomState,
-      });
-      return null;
-    }
-
-    const { stream, createdAt, updatedAt, ...fixedMedia } = media as IMedia & {
-      createdAt: string;
-      updatedAt: string;
-    };
-
-    console.log("Setting up realtime stream", mediaFile, fixedMedia);
-
-    // Send stream with realtime flag
-    roomState.sendStream(mediaFile, null, {
-      media: fixedMedia,
-      realtime: true,
     } as unknown as JsonValue);
 
     return mediaFile;

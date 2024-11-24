@@ -8,19 +8,20 @@ import CoverImage from './../CoverImage'
 import Media from '../../../entities/Media'
 import Tag from '../../common/Tag'
 import ServiceIcon from '../../ServiceIcon'
+import { State as QueueState } from '../../../reducers/queue'
 
 export type Props = {
   songsLength: number, // Listening this in order to recreate context menu
   song: Media,
-  queue?: any,
+  queue?: QueueState,
   isCurrent?: boolean | null,
-  onClick: () => any,
+  onClick: () => void,
   dispatch: Dispatch,
   disableAddButton?: boolean,
   disableCovers?: boolean,
   mqlMatch?: boolean,
   slim?: boolean,
-  style: any
+  style: React.CSSProperties
 }
 
 const SongRow = (props: Props) => {
@@ -86,7 +87,7 @@ const SongRow = (props: Props) => {
             <span className='text-yellow-400'>{getDurationStr(song.duration)}</span>
           )}
         </div>
-        <div className='h-10 relative'>
+        <div className='h-10'>
           <ContextualMenu {...props} />
         </div>
       </div>

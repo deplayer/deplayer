@@ -9,14 +9,15 @@ import React from 'react'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
 import Media from '../../entities/Media'
+import { State as QueueState } from '../../reducers/queue'
 import * as types from '../../constants/ActionTypes'
 
 type MenuProps = {
   songsLength: number, // Used to re-render
   dispatch: Dispatch,
   disableAddButton?: boolean,
-  queue?: any,
-  onClick: () => any,
+  queue?: QueueState,
+  onClick: () => void,
   song: Media,
 }
 

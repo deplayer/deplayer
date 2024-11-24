@@ -17,6 +17,7 @@ import PhonophoneSvg from './phonophone.svg?react'
 import Auth from '../Auth'
 import Button from '../common/Button'
 import { Dispatch } from 'redux'
+import DeplayerTitle from '../DeplayerTitle'
 
 type Props = {
   collection: CollectionState
@@ -33,15 +34,6 @@ const IMAGE_COMPONENTS: FunctionComponent<SVGProps<SVGSVGElement>>[] = [
 ]
 
 const pickImage = () => IMAGE_COMPONENTS[Math.floor(Math.random() * IMAGE_COMPONENTS.length)]
-
-function DeplayerTitle(): JSX.Element {
-  return (
-    <>
-      <span className='text-blue-500'>d</span>
-      <span className='text-blue-900 '>eplayer</span>
-    </>
-  )
-}
 
 const Image = () => {
   const ImageComponent = pickImage()
@@ -110,7 +102,7 @@ const Dashboard = ({
     .map((albumId) => albums[albumId])
 
   return (
-    <div className='z-10 w-full block md:px-12 mb-12'>
+    <div className='z-10 w-full md:px-12 mb-12'>
       <WelcomeMessage dispatch={dispatch}></WelcomeMessage>
       {!!mediaItems.length &&
         <MediaSlider
@@ -119,6 +111,11 @@ const Dashboard = ({
           mediaItems={mediaItems.slice(0, MAX_LIST_ITEMS)}
         />}
       {!!slicedAlbums.length && <RelatedAlbums albums={slicedAlbums} />}
+      <div className='flex flex-col items-center mt-12'>
+        <h4 className="text-xl text-center py-4 text-sky-900 dark:text-sky-300 p-4">
+          <DeplayerTitle />
+        </h4>
+      </div>
     </div>
   )
 }

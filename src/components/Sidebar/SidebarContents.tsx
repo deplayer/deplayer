@@ -18,6 +18,7 @@ import { State as QueueState } from '../../reducers/queue'
 import { State as AppState } from '../../reducers/app'
 import { State as PlaylistsState } from '../../reducers/playlist'
 import { useLocation } from 'react-router'
+import DeplayerTitle from '../DeplayerTitle'
 
 type ContentProps = {
   dispatch: Dispatch,
@@ -60,8 +61,8 @@ const SidebarContents = (props: ContentProps) => {
   return (
     <div className='flex flex-col' onClick={() => props.onSetSidebarOpen()}>
       <SwitchThemeButton />
-      <h4 className="text-xl text-center py-4 bg-gray-900 text-blue-500 tracking-wider select-none">
-        <span className='text-blue-200'>d</span>eplayer
+      <h4 className="text-xl text-center py-4 bg-gray-50 dark:bg-gray-900 text-blue-500 tracking-wider select-none">
+        <DeplayerTitle />
       </h4>
       <ul className='flex flex-col'>
         <ExploreMenuItem current={inSection(location, '$')} />

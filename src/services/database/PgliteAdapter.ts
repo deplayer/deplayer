@@ -1,7 +1,7 @@
 import { IAdapter, Models } from "./IAdapter";
 import * as db from "./PgliteDatabase";
 import { PgliteDatabase } from "drizzle-orm/pglite";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { media, settings, queue, playlist, smartPlaylist, peer } from "../../schema";
 
 export default class Pglite implements IAdapter {
@@ -90,11 +90,32 @@ export default class Pglite implements IAdapter {
   };
 
   async removeMany(model: Models, payload: Array<string>): Promise<any> {
-    for (let i = 0; i < payload.length; i++) {
-      const object = await this.getDocObj(model, payload[i]);
-      object.remove();
+    const instance = await db.get();
+
+    console.log("payload:", payload);
+
+    switch (model) {
+      case "media":
+        await instance.delete(media).where(inArray(media.id, payload));
+        break;
+      case "playlist":
+        await instance.delete(playlist).where(inArray(playlist.id, payload));
+        break;
+      case "smart_playlist":
+        await instance
+          .delete(smartPlaylist)
+          .where(inArray(smartPlaylist.id, payload));
+        break;
+      case "peer":
+        await instance.delete(peer).where(inArray(peer.id, payload));
+        break;
+      default:
+        console.log(
+              `Model ${model} is not implemented for removeMany method`
+        );
+        throw new Error(`Model ${model} not supported for removeMany method`);
     }
-  }
+  };
 
   get = async (model: Models, id: string): Promise<any> => {
     return this.getDocObj(model, id);

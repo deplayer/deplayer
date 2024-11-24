@@ -46,9 +46,8 @@ export default class PeerStorageService implements IStorageService {
     const peers = await this.get();
     const peersToRemove = peers.filter((peer) => peer.roomCode === roomCode);
 
-    for (const peer of peersToRemove) {
-      const database = await this.storageAdapter.getDb();
-      await database.collection(MODEL).doc(peer).delete();
-    }
+    console.log("peersToRemove:", peersToRemove);
+
+    await this.storageAdapter.removeMany(MODEL, peersToRemove);
   };
 }
