@@ -33,6 +33,10 @@ const PeerList = ({ peers, dispatch, onJoinRoom, onLeaveRoom }: Props) => {
     dispatch({ type: types.REQUEST_STREAM, peerId, media: media, roomCode })
   }
 
+  const requestRealtimeStream = (peerId: string, roomCode: string) => {
+    dispatch({ type: types.REQUEST_REALTIME_STREAM, peerId, roomCode })
+  }
+
   const groupedPeers = React.useMemo<RoomGroup[]>(() => {
     // Create groups for all rooms, including empty ones
     const groups = rooms.map((roomCode: string) => {
@@ -96,16 +100,27 @@ const PeerList = ({ peers, dispatch, onJoinRoom, onLeaveRoom }: Props) => {
           )}
         </div>
       </div>
-      <div className="w-full pt-2">
+      <div className="w-full pt-2 flex gap-2">
         {peer.media && (
-          <Button
-            size="xs"
-            onClick={() => requestSongFile(peer.peerId, peer.media!, peer.roomCode)}
-            className="bg-primary hover:bg-primary-dark"
-          >
-            <Icon icon="faPlay" className="mr-2" />
-            <Translate value="peer.request" />
-          </Button>
+          <>
+            <Button
+              size="xs"
+              onClick={() => requestSongFile(peer.peerId, peer.media!, peer.roomCode)}
+              className="bg-primary hover:bg-primary-dark flex-1"
+            >
+              <Icon icon="faDownload" className="mr-2" />
+              <Translate value="peer.request" />
+            </Button>
+            
+            <Button
+              size="xs"
+              onClick={() => requestRealtimeStream(peer.peerId, peer.roomCode)}
+              className="bg-green-600 hover:bg-green-700 flex-1"
+            >
+              <Icon icon="faStream" className="mr-2" />
+              <Translate value="peer.streamRealtime" />
+            </Button>
+          </>
         )}
       </div>
     </div>

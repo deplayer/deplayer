@@ -23,6 +23,7 @@ interface RoomState {
   sendMediaRequest: ActionSender<DataPayload>;
   sendUsername: ActionSender<DataPayload>;
   sendStream: ActionSender<DataPayload>;
+  sendRealtimeStream: ActionSender<DataPayload>;
   peers: Map<string, DataPayload>;
 }
 
@@ -70,7 +71,6 @@ export default class PeerService {
     if (!roomState) {
       throw new Error(`Cannot update status: Room ${roomCode} not found`);
     }
-    console.log("Updating status", status, roomCode);
 
     roomState.sendStatus(status);
   };
@@ -129,8 +129,6 @@ export default class PeerService {
     };
 
   private handleMediaRequest = async (roomCode: string, streamData: any) => {
-    console.log("Preparing media request", streamData);
-
     const mediaId = streamData.mediaId;
     const media = this.collection?.rows[mediaId];
 
@@ -149,6 +147,7 @@ export default class PeerService {
     const [sendStatus, getStatus] = room.makeAction("status");
     const [sendMediaRequest, getMedia] = room.makeAction("media");
     const [sendStream, getStream] = room.makeAction("stream");
+    const [sendRealtimeStream, getRealtimeStream] = room.makeAction("realtime");
     const [sendUsername, getUsername] = room.makeAction("username");
 
     // Create room state
@@ -158,6 +157,7 @@ export default class PeerService {
       sendMediaRequest,
       sendUsername,
       sendStream,
+      sendRealtimeStream,
       peers: new Map(),
     };
 
@@ -171,8 +171,10 @@ export default class PeerService {
     getStatus(this.handlePeerStatus(roomCode));
     getMedia((data) => this.handleMediaRequest(roomCode, data));
     getStream((data, peerId, metadata) => {
-      console.log("Received stream", data, peerId, metadata, roomCode);
       this.handleStream(data, peerId, metadata);
+    });
+    getRealtimeStream((data, peerId, metadata) => {
+      this.handleRealtimeStream(data, peerId, metadata);
     });
     getUsername((data, peerId) =>
       this.handleGetUsername(data, peerId, roomCode)
@@ -181,6 +183,14 @@ export default class PeerService {
     // Set up peer event handlers
     this.setupPeerEventHandlers(room, roomCode);
   }
+
+  private handleRealtimeStream = (
+    data: DataPayload,
+    peerId: string,
+    metadata: JsonValue | undefined
+  ) => {
+    console.log("Received realtime stream", data, peerId, metadata);
+  };
 
   private handleGetUsername = (
     data: DataPayload,
@@ -276,6 +286,34 @@ export default class PeerService {
 
     roomState.sendStream(mediaFile, null, {
       media: fixedMedia,
+    } as unknown as JsonValue);
+
+    return mediaFile;
+  }
+
+  private async processRealtimeStreamRequest(media: IMedia, roomCode: string) {
+    const mediaFile = await MediaFileService.getMediaFile(media);
+    const roomState = this.rooms.get(roomCode);
+
+    if (!mediaFile || !roomState) {
+      console.error("Could not process realtime stream request", {
+        mediaFile,
+        roomState,
+      });
+      return null;
+    }
+
+    const { stream, createdAt, updatedAt, ...fixedMedia } = media as IMedia & {
+      createdAt: string;
+      updatedAt: string;
+    };
+
+    console.log("Setting up realtime stream", mediaFile, fixedMedia);
+
+    // Send stream with realtime flag
+    roomState.sendStream(mediaFile, null, {
+      media: fixedMedia,
+      realtime: true,
     } as unknown as JsonValue);
 
     return mediaFile;

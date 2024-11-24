@@ -17,6 +17,7 @@ import ProgressBar from './ProgressBar'
 import Visualizer from './../Visualizer'
 import WebtorrentPlayer from './CustomPlayers/WebtorrentPlayer'
 import * as types from '../../constants/ActionTypes'
+import PlayerRefService from '../../services/PlayerRefService'
 
 ReactPlayer.addCustomPlayer((WebtorrentPlayer as any))
 
@@ -40,6 +41,14 @@ class PlayerControls extends React.Component<Props> {
   constructor(props: Props) {
     super(props);
     this.playerRef = React.createRef();
+  }
+
+  componentDidMount() {
+    PlayerRefService.getInstance().setPlayerRef(this.playerRef)
+  }
+
+  componentWillUnmount() {
+    PlayerRefService.getInstance().setPlayerRef(null)
   }
 
   getMediaElement = () => {

@@ -195,3 +195,4 @@ export const PEER_SET_USERNAME = "PEER_SET_USERNAME";
 export const SET_ROOMS = "SET_ROOMS";
 export const ADD_ROOM = "ADD_ROOM";
 export const REMOVE_ROOM = "REMOVE_ROOM";
+export const REQUEST_REALTIME_STREAM = "REQUEST_REALTIME_STREAM";

@@ -117,7 +117,23 @@ function* leaveRoom(store: Store, action: LeaveRoomAction): any {
   const collection = yield select((state) => state.collection);
   const peerService = PeerService.getInstance(store.dispatch);
   peerService.collection = collection;
+
+  // Leave the room in peer service
   yield call(peerService.leaveRoom.bind(peerService), action.roomCode);
+
+  // Remove from database
+  yield call(
+    peerStorageService.removeByRoom.bind(peerStorageService),
+    action.roomCode
+  );
+
+  // Send notification
+  yield put({
+    type: types.SEND_NOTIFICATION,
+    notification: `Left room ${action.roomCode}`,
+    level: "success",
+    duration: 1000,
+  });
 }
 
 // Listen for player state changes to update peer status
@@ -137,7 +153,6 @@ function* watchPlayerChanges(store: Store): any {
     store
   );
 }
-
 
 interface RequestStreamAction {
   type: typeof types.REQUEST_STREAM;
@@ -159,9 +174,25 @@ function* requestStream(store: Store, action: RequestStreamAction): any {
   );
 }
 
+function* requestRealtimeStream(
+  store: Store,
+  action: RequestStreamAction
+): any {
+  const collection = yield select((state) => state.collection);
+  const peerService = PeerService.getInstance(store.dispatch);
+  peerService.collection = collection;
+
+  yield call(
+    peerService.sendRealtimeStream.bind(peerService),
+    action.peerId,
+    action.roomCode
+  );
+}
+
 // Binding actions to sagas
 function* peerSaga(store: Store): Generator {
   yield call(initializePeers, store);
+  yield takeLatest(types.REQUEST_REALTIME_STREAM, requestRealtimeStream, store);
   yield takeEvery(types.JOIN_PEER_ROOM, joinRoom, store);
   yield takeEvery(types.LEAVE_PEER_ROOM, leaveRoom, store);
   yield takeLatest(types.REQUEST_STREAM, requestStream, store);

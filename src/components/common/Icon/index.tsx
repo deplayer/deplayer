@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
+  faStream,
   faSignOutAlt,
   faUser,
   faCopy,
@@ -57,6 +58,7 @@ import {
 import { faGitlab, faDeezer } from "@fortawesome/free-brands-svg-icons"
 
 const icons = {
+  faStream,
   faSignOutAlt,
   faUser,
   faCopy,

@@ -91,6 +91,9 @@
     "notPlaying": "Not playing",
     "leaveRoom": "Leave room",
     "roomLink": "Room link",
-    "createRoom": "Create room"
+    "createRoom": "Create room",
+    "request": "Download",
+    "streamRealtime": "Stream Live",
+    "leave": "Leave Room"
   }
 }
