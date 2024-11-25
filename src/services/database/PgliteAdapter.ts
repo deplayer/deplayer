@@ -11,7 +11,6 @@ export default class Pglite implements IAdapter {
     const fixedPayload = { id: id, ...payload };
 
     const instance = await db.get();
-    console.log("instance:", instance);
     const prev = await this.getDocObj(model, id);
 
     switch (model) {

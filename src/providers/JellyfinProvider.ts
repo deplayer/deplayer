@@ -48,12 +48,8 @@ export default class JellyfinProvider implements IMusicProvider {
 
       const users = await getUserApi(this.api).getUsers();
 
-      console.log("users: ", users.data);
-
       this.userId =
         users.data.find((user) => user.Name === this.username)?.Id || null;
-
-      console.log("userId", this.userId);
     } catch (error) {
       console.error("Jellyfin authentication error:", error);
       throw new Error("Failed to authenticate with Jellyfin server");
@@ -63,10 +59,11 @@ export default class JellyfinProvider implements IMusicProvider {
   private mapSongs(items: any[]): Array<Media> {
     return items.map((item) => {
       const type = item.Type?.toLowerCase() === "movie" ? "video" : "audio";
+
       const artistName =
         type === "video"
           ? item.Studios?.[0]?.Name || "Unknown Studio"
-          : item.AlbumArtist?.Name || "Unknown Artist";
+          : item.AlbumArtist || "Unknown Artist";
       const albumName =
         type === "video" ? "Movies" : item.Album || "Unknown Album";
 
@@ -79,6 +76,7 @@ export default class JellyfinProvider implements IMusicProvider {
           name: albumName,
           artist: { name: artistName },
         },
+        track: item.IndexNumber || null,
         cover: {
           thumbnailUrl: `${this.baseUrl}/Items/${item.Id}/Images/Primary?maxHeight=250&api_key=${this.apiKey}`,
           fullUrl: `${this.baseUrl}/Items/${item.Id}/Images/Primary?api_key=${this.apiKey}`,
@@ -111,33 +109,45 @@ export default class JellyfinProvider implements IMusicProvider {
     }
 
     try {
-      // Single query for both audio and movies
-      const results = await getItemsApi(this.api).getItems({
-        userId: this.userId,
-        searchTerm,
-        includeItemTypes: [
-          "Audio",
-          "Movie",
-          "Episode",
-          "MusicVideo",
-          "Series",
-          "MusicAlbum",
-          "MusicArtist",
-          "MusicGenre",
-        ],
-        recursive: true,
-        fields: [
-          ItemFields.Path,
-          ItemFields.Genres,
-          ItemFields.Studios,
-          ItemFields.ParentId,
-        ] as ItemFields[],
-        limit: 50,
-      });
+      let allItems: any[] = [];
+      let startIndex = 0;
+      const limit = 100;
+      
+      while (true) {
+        const results = await getItemsApi(this.api).getItems({
+          userId: this.userId,
+          searchTerm,
+          includeItemTypes: [
+            "Audio",
+            "Movie",
+            "Episode",
+            "MusicVideo",
+            "Series",
+            "MusicAlbum",
+            "MusicArtist",
+            "MusicGenre",
+          ],
+          recursive: true,
+          fields: [
+            ItemFields.Path,
+            ItemFields.Genres,
+            ItemFields.Studios,
+            ItemFields.ParentId,
+          ] as ItemFields[],
+          limit,
+          startIndex,
+        });
 
-      console.log("results", results);
+        const items = results.data.Items || [];
+        if (items.length === 0) break;
 
-      return this.mapSongs(results.data.Items || []);
+        allItems = allItems.concat(items);
+        startIndex += limit;
+
+        if (items.length < limit) break;
+      }
+
+      return this.mapSongs(allItems);
     } catch (error) {
       console.error("Jellyfin search error:", error);
       throw new Error("Failed to search Jellyfin server");
