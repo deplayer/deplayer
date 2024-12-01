@@ -10,6 +10,7 @@ import CollectionService from "../../services/CollectionService";
 import YoutubeDlServerProvider from "../../providers/YoutubeDlServerProvider";
 import * as types from "../../constants/ActionTypes";
 import FileManager from "../../services/Filesystem/FileManager";
+import providers from '../../providers'
 
 const validExtensions = ["mp3", "mp4", "flac"];
 
@@ -167,6 +168,45 @@ function* startYoutubeDlScan(action: any): Generator<any, void, any> {
   }
 }
 
+function* startProviderSync(action: any): Generator<any, void, any> {
+  try {
+    const provider = providers[action.providerKey as keyof typeof providers]
+    if (!provider || !provider.fullSync) {
+      throw new Error('Provider does not support full sync')
+    }
+
+    yield put({ 
+      type: types.SEND_NOTIFICATION, 
+      notification: `Starting full sync with ${action.providerKey}`,
+      level: 'info'
+    })
+
+    const songs = yield call(provider.fullSync.bind(provider))
+    
+    yield put({ type: types.ADD_TO_COLLECTION, data: songs })
+    yield put({ type: types.RECREATE_INDEX })
+    yield put({ type: types.PROVIDER_SYNC_FINISHED, providerKey: action.providerKey })
+    
+    yield put({ 
+      type: types.SEND_NOTIFICATION, 
+      notification: `Sync completed with ${action.providerKey}. Added ${songs.length} songs.`,
+      level: 'success'
+    });
+  } catch (error: any) {
+    console.error("Sync error:", error);
+    yield put({
+      type: types.PROVIDER_SYNC_FAILED, 
+      providerKey: action.providerKey,
+      error: error.message 
+    })
+    yield put({ 
+      type: types.SEND_NOTIFICATION, 
+      notification: `Sync failed with ${action.providerKey}: ${error.message}`,
+      level: 'error'
+    })
+  }
+}
+
 // Binding actions to sagas
 function* providersSaga(): any {
   yield takeLatest(types.START_SCAN_SOURCES, startProvidersScan);
@@ -175,6 +215,7 @@ function* providersSaga(): any {
     types.START_FILESYSTEM_FILES_PROCESSING,
     startFilesystemProcess
   );
+  yield takeLatest(types.START_PROVIDER_SYNC, startProviderSync)
 }
 
 export default providersSaga;

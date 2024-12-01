@@ -143,4 +143,32 @@ export default class JellyfinProvider implements IMusicProvider {
       throw new Error("Failed to search Jellyfin server");
     }
   }
+
+  async fullSync(): Promise<Array<any>> {
+    await this.initialize();
+
+    if (!this.userId) {
+      throw new Error("User ID not found");
+    }
+
+    try {
+      const results = await getItemsApi(this.api).getItems({
+        userId: this.userId,
+        includeItemTypes: ["Audio", "Movie"],
+        recursive: true,
+        fields: [
+          ItemFields.Path,
+          ItemFields.Genres,
+          ItemFields.Studios,
+          ItemFields.ParentId,
+        ] as ItemFields[],
+        limit: 10000, // Adjust as needed
+      });
+
+      return this.mapSongs(results.data.Items || []);
+    } catch (error) {
+      console.error("Jellyfin sync error:", error);
+      throw error;
+    }
+  }
 }

@@ -1,6 +1,8 @@
 import { Translate } from 'react-redux-i18n'
 
 import FormField, { TYPES } from './FormField'
+import Button from '../common/Button'
+import SyncButton from '../Buttons/SyncButton'
 
 interface Field {
   title: string
@@ -8,6 +10,7 @@ interface Field {
   type: string
 }
 type Props = {
+  providerKey: string
   schema: { fields: Field[] }
 }
 
@@ -20,6 +23,10 @@ const FormSchema = (props: Props) => {
       return (
         <h3 className='text-2xl leading-loose py-2 uppercase tracking-wide pt-4 pb-2' key={index}><Translate value={field.title} /></h3>
       )
+    }
+
+    if (field.type === "sync") {
+      return <SyncButton providerKey={props.providerKey} />;
     }
 
     return (

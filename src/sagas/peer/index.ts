@@ -203,6 +203,8 @@ function* peerSaga(store: Store): Generator {
   yield call(initializePeers, store);
   yield takeLatest(types.REQUEST_REALTIME_STREAM, requestRealtimeStream, store);
   yield takeEvery(types.JOIN_PEER_ROOM, joinRoom, store);
+  yield takeEvery(types.PEER_LEFT, updatePeerStatus, store);
+  yield takeEvery(types.PEER_JOINED, updatePeerStatus, store);
   yield takeEvery(types.LEAVE_PEER_ROOM, leaveRoom, store);
   yield takeLatest(types.REQUEST_STREAM, requestStream, store);
   yield takeLatest(types.SET_CURRENT_PLAYING_STREAMS, updatePeerStatus, store);

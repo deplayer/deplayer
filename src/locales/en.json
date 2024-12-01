@@ -73,7 +73,8 @@
     "toggleSpectrum": "Toggle spectrum",
     "toggleVisuals": "Toggle visuals",
     "downloadMedia": "Download media",
-    "pinAlbum": "Pin album"
+    "pinAlbum": "Pin album",
+    "syncProvider": "Sync All Music"
   },
   "message": {
     "noCollectionItems": "Collection is empty, here you will see all discovered media by Deplayer.\nIn order to start filling your collection you need to either Add media or Add a provider and start searching.",

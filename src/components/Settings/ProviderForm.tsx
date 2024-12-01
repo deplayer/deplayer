@@ -39,7 +39,7 @@ const ProviderForm = (props: ProviderFormProps) => {
         />
       </div>
 
-      <FormSchema schema={props.settings.settingsForm.providers[props.providerKey]} />
+      <FormSchema providerKey={props.providerKey} schema={props.settings.settingsForm.providers[props.providerKey]} />
     </div>
   )
 }

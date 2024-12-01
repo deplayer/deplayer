@@ -81,4 +81,24 @@ export default class SubsonicApiProvider implements IMusicProvider {
         })
     })
   }
+
+  async fullSync(): Promise<Array<any>> {
+    try {
+      const result = await axios.get(`${this.baseUrl}/rest/getAlbumList2.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.11.0&f=json&type=alphabeticalByName`)
+      const albums = result.data['subsonic-response'].albumList2.album
+      
+      const allSongs = []
+      
+      for (const album of albums) {
+        const albumDetails = await axios.get(`${this.baseUrl}/rest/getAlbum.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.11.0&f=json&id=${album.id}`)
+        const songs = albumDetails.data['subsonic-response'].album.song
+        allSongs.push(...this.mapSongs(songs, [album]))
+      }
+      
+      return allSongs
+    } catch (error) {
+      console.error('Error during full sync:', error)
+      throw error
+    }
+  }
 }
