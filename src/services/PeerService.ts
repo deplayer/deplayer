@@ -16,6 +16,7 @@ export interface PeerStatus {
   isPlaying: boolean;
   media?: IMedia;
   roomCode: string;
+  streaming: boolean
 }
 
 interface RoomState {
@@ -137,6 +138,19 @@ export default class PeerService {
       console.error("Media not found in collection", mediaId);
       return;
     }
+
+    this.dispatchFn({
+      type: types.ADD_TO_COLLECTION,
+      data: [media],
+    });
+
+    // Mark something in the database so I can persist the opened session between songs and restarts
+    this.dispatchFn({
+      type: types.SET_STREAMING_PEER, 
+      data: {
+        peerId: streamData.peerId,
+      },
+    });
 
     return await this.processMediaRequest(media, roomCode);
   };

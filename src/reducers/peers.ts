@@ -10,28 +10,41 @@ const initialState: State = {
 };
 
 interface UpdatePeerStatusAction {
-  type: typeof types.UPDATE_PEER_STATUS
-  data: PeerStatus
-  peerId: string
-  roomCode: string
+  type: typeof types.UPDATE_PEER_STATUS;
+  data: PeerStatus;
+  peerId: string;
+  roomCode: string;
 }
 
 interface SetUsernameAction {
-  type: typeof types.PEER_SET_USERNAME
-  peer: PeerStatus
+  type: typeof types.PEER_SET_USERNAME;
+  peer: PeerStatus;
 }
 
 interface JoinRoomAction {
-  type: typeof types.PEER_JOINED
-  peer: PeerStatus
+  type: typeof types.PEER_JOINED;
+  peer: PeerStatus;
 }
 
 interface LeaveRoomAction {
-  type: typeof types.PEER_LEFT
-  peer: PeerStatus
+  type: typeof types.PEER_LEFT;
+  peer: PeerStatus;
 }
 
-export default function peers(state = initialState, action: UpdatePeerStatusAction | SetUsernameAction | JoinRoomAction | LeaveRoomAction): State {
+interface SetStreamingPeerAction {
+  type: typeof types.SET_STREAMING_PEER;
+  peerId: string;
+}
+
+export default function peers(
+  state = initialState,
+  action:
+    | UpdatePeerStatusAction
+    | SetUsernameAction
+    | JoinRoomAction
+    | LeaveRoomAction
+    | SetStreamingPeerAction
+): State {
   switch (action.type) {
     case types.UPDATE_PEER_STATUS:
       if (!action.data.roomCode) {
@@ -79,6 +92,25 @@ export default function peers(state = initialState, action: UpdatePeerStatusActi
         peers: {
           ...state.peers,
           [action.peer.roomCode]: remainingPeers,
+        },
+      };
+    case types.SET_STREAMING_PEER:
+      const foundPeer = Object.values(state.peers)
+        .flatMap((roomPeers) => Object.values(roomPeers))
+        .find((peer) => peer.peerId === action.peerId);
+
+      if (!foundPeer) {
+        return state;
+      }
+
+      return {
+        ...state,
+        peers: {
+          ...state.peers,
+          [foundPeer.roomCode]: {
+            ...state.peers[foundPeer.roomCode],
+            [action.peerId]: { ...foundPeer, streaming: true },
+          },
         },
       };
     default:
