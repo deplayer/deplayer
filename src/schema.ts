@@ -60,10 +60,16 @@ export const playlist = pgTable("playlist", {
 
 export const peer = pgTable("peer", {
   id: text("id").primaryKey(),
-  roomCode: text("roomCode").notNull(),
+  roomCode: text("roomCode").notNull().references(() => room.id, { onDelete: 'cascade' }),
   username: text("username").notNull(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow()
 }, (table) => ({
   roomCodeUsername: unique().on(table.roomCode, table.username)
 }))
+
+export const room = pgTable("room", {
+  id: text("id").primaryKey(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow()
+})

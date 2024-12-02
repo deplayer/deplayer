@@ -1,10 +1,16 @@
 import * as types from "../constants/ActionTypes";
 
-export type State = {
-  rooms: string[];
+export type Room = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
-export const defaultState = {
+export type State = {
+  rooms: Room[];
+};
+
+export const defaultState: State = {
   rooms: [],
 };
 
@@ -19,13 +25,17 @@ export default (state: State = defaultState, action: any = {}) => {
     case types.ADD_ROOM:
       return {
         ...state,
-        rooms: [...state.rooms, action.room],
+        rooms: [...state.rooms, {
+          ...action.room,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }],
       };
 
     case types.REMOVE_ROOM:
       return {
         ...state,
-        rooms: state.rooms.filter((room) => room !== action.room),
+        rooms: state.rooms.filter((room) => room.id !== action.room),
       };
 
     default:

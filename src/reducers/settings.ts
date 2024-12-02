@@ -26,18 +26,6 @@ export const defaultState = {
       lastfm: {
         enabled: false,
         apikey: ''
-      },
-      databaseSync: {
-        enabled: false,
-        remote: ''
-      },
-      ipfs: {
-        host: 'ipfs.io',
-        port: 443,
-        proto: 'https'
-      },
-      'youtube-dl-server': {
-        host: 'http://localhost'
       }
     }
   }

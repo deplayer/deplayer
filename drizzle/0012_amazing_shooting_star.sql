@@ -1,0 +1,1 @@
+ALTER TABLE "room" RENAME COLUMN "code" TO "id";

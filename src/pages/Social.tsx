@@ -1,17 +1,14 @@
-import { connect } from 'react-redux'
-import PeerList from '../components/PeerList'
+import RoomList from '../components/RoomList'
 import * as types from '../constants/ActionTypes'
-import { PeerStatus } from '../services/PeerService'
 import Icon from '../components/common/Icon'
 import { Dispatch } from 'redux'
 import { useState } from 'react'
 
 interface Props {
-  peers: Record<string, Record<string, PeerStatus>>
   dispatch: Dispatch
 }
 
-const Social = ({ peers, dispatch }: Props) => {
+const Social = ({ dispatch }: Props) => {
   const [showUsernameModal, setShowUsernameModal] = useState(false)
   const [pendingRoomCode, setPendingRoomCode] = useState<string | null>(null)
 
@@ -103,20 +100,12 @@ const Social = ({ peers, dispatch }: Props) => {
         </div>
       )}
 
-      <PeerList
-        peers={peers}
+      <RoomList
         onJoinRoom={handleJoinRoom}
         onLeaveRoom={handleLeaveRoom}
-        dispatch={dispatch}
       />
     </div>
   )
 }
 
-const mapStateToProps = (state: any) => {
-  return {
-    peers: state.peers.peers,
-  }
-}
-
-export default connect(mapStateToProps)(Social) 
+export default Social

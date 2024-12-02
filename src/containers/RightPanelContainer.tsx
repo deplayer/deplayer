@@ -5,9 +5,9 @@ import Social from '../pages/Social'
 import { Dispatch } from 'redux'
 import * as types from '../constants/ActionTypes'
 
-const SidebarContents = () => {
+const SidebarContents = ({ dispatch }: { dispatch: Dispatch }) => {
   return <div className='w-full h-full' style={{ zIndex: '10' }}>
-    <Social />
+    <Social dispatch={dispatch} />
   </div>
 }
 
@@ -18,7 +18,7 @@ const RightPanelContainer = ({ rightPanelToggled, dispatch }: { rightPanelToggle
 
   return (
     <Sidebar
-      sidebar={<SidebarContents />}
+      sidebar={<SidebarContents dispatch={dispatch} />}
       open={rightPanelToggled}
       pullRight={true}
       onSetOpen={(open) => handleSetSidebarOpen(open)}

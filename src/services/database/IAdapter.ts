@@ -7,6 +7,7 @@ export type Models =
   | "search_index"
   | "smart_playlist"
   | "peer"
+  | "room"
 
 export interface IAdapter {
   initialize(model: Models): Promise<void>;

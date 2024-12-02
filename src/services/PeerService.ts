@@ -177,14 +177,11 @@ export default class PeerService {
     // Store room state
     this.rooms.set(roomCode, roomState);
 
-    // Dispatch room added to Redux
-    this.dispatchFn({ type: types.ADD_ROOM, room: roomCode });
-
     // Bind handlers with room context
     getStatus(this.handlePeerStatus(roomCode));
     getMedia((data) => this.handleMediaRequest(roomCode, data));
-    getStream((data, peerId, metadata) => {
-      this.handleStream(data, peerId, metadata);
+    getStream((data, metadata) => {
+      this.handleStream(data, metadata);
     });
     getRealtimeStream((data, peerId) => {
       this.handleRealtimeStream(data, peerId);
@@ -250,7 +247,6 @@ export default class PeerService {
 
   private handleStream = async (
     data: DataPayload,
-    peerId: string,
     metadata: JsonValue | undefined
   ) => {
     if (!data || !metadata) return;

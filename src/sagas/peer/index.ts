@@ -9,24 +9,31 @@ import * as types from "../../constants/ActionTypes";
 import { Store } from "redux";
 import { selfId } from "trystero/nostr";
 import { IMedia } from "../../entities/Media";
+import RoomStorageService from "../../services/RoomStorageService";
 
 const adapter = getAdapter();
 const peerStorageService = new PeerStorageService(adapter);
+const roomStorageService = new RoomStorageService(adapter);
 
 function* initializePeers(store: any): any {
+  yield call(roomStorageService.initialize);
   yield call(peerStorageService.initialize);
-  const peers = yield call(peerStorageService.get);
-
-  if (peers && peers.length > 0) {
-    for (const peer of peers) {
+  
+  // Get rooms from storage
+  const rooms = yield call(roomStorageService.get);
+  if (rooms && rooms.length > 0) {
+    yield put({ type: types.SET_ROOMS, rooms });
+    
+    // Join each room
+    for (const room of rooms) {
+      const username = localStorage.getItem("username") || "Anonymous";
       yield call(joinRoom, store, {
-        roomCode: peer.roomCode,
-        username: peer.username,
+        roomCode: room.id,
+        username,
       });
     }
   }
 
-  // Dispatch app ready after peer initialization
   yield put({ type: types.APP_READY });
 }
 
@@ -36,29 +43,22 @@ function* joinRoom(store: Store, action: any): any {
   peerService.collection = collection;
 
   try {
-    // Check if peer already exists
-    const existingPeer = yield call(
-      peerStorageService.findByRoomAndUsername.bind(peerStorageService),
-      action.roomCode,
-      action.username
-    );
-
-    // Only join room if peer doesn't exist
+    // Save room first
+    yield call(roomStorageService.save, action.roomCode);
+    
+    // Then handle peer joining
     yield call(
       peerService!.joinWithCode.bind(peerService),
       action.roomCode,
       action.username
     );
 
-    // Save peer to database only if it doesn't exist
-    if (!existingPeer) {
-      yield call(peerStorageService.save, uuidv4(), {
-        roomCode: action.roomCode,
-        username: action.username,
-      });
-    }
+    // Save peer to database
+    yield call(peerStorageService.save, uuidv4(), {
+      roomCode: action.roomCode,
+      username: action.username,
+    });
 
-    // Send notification of successful join
     yield put({
       type: types.SEND_NOTIFICATION,
       notification: `Joined room ${action.roomCode}`,
@@ -67,8 +67,7 @@ function* joinRoom(store: Store, action: any): any {
     });
   } catch (error) {
     console.error("Error joining room:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     yield put({
       type: types.SEND_NOTIFICATION,
       notification: `Failed to join room: ${errorMessage}`,
@@ -122,13 +121,15 @@ function* leaveRoom(store: Store, action: LeaveRoomAction): any {
     // Leave the room in peer service
     yield call(peerService.leaveRoom.bind(peerService), action.roomCode);
 
-    // Remove from database and wait for completion
+    // Remove room from storage
+    yield call(roomStorageService.remove, action.roomCode);
+
+    // Remove associated peers
     yield call(
       peerStorageService.removeByRoom.bind(peerStorageService),
       action.roomCode
     );
 
-    // Send notification
     yield put({
       type: types.SEND_NOTIFICATION,
       notification: `Left room ${action.roomCode}`,

@@ -2,7 +2,7 @@ import { IAdapter, Models } from "./IAdapter";
 import * as db from "./PgliteDatabase";
 import { PgliteDatabase } from "drizzle-orm/pglite";
 import { eq, inArray } from "drizzle-orm";
-import { media, settings, queue, playlist, smartPlaylist, peer } from "../../schema";
+import { media, settings, queue, playlist, smartPlaylist, peer, room } from "../../schema";
 
 export default class Pglite implements IAdapter {
   initialize = async () => {};
@@ -68,6 +68,15 @@ export default class Pglite implements IAdapter {
             set: payload,
           });
         break;
+      case "room":
+        await instance
+          .insert(room)
+          .values({ ...prev, ...fixedPayload })
+          .onConflictDoUpdate({
+            target: room.id,
+            set: payload,
+          });
+        break;
       default:
         console.log(`Model ${model} is not implemented for save method`);
         new Error(`Model ${model} not supported for save method`);
@@ -108,6 +117,9 @@ export default class Pglite implements IAdapter {
       case "peer":
         await instance.delete(peer).where(inArray(peer.id, payload));
         break;
+      case "room":
+        await instance.delete(room).where(inArray(room.id, payload));
+        break;
       default:
         console.log(
               `Model ${model} is not implemented for removeMany method`
@@ -139,6 +151,8 @@ export default class Pglite implements IAdapter {
           .where(eq(smartPlaylist.id, id));
       case "peer":
         return instance.select().from(peer).where(eq(peer.id, id));
+      case "room":
+        return instance.select().from(room).where(eq(room.id, id));
       default:
         console.log(`Model ${model} is not implemented for getDocObj method`);
         new Error("Model not supported");
@@ -166,6 +180,9 @@ export default class Pglite implements IAdapter {
       case "peer":
         const peers = await instance.select().from(peer);
         return peers || [];
+      case "room":
+        const rooms = await instance.select().from(room);
+        return rooms || [];
       default:
         console.log(`Model ${model} is not implemented for getAll method`);
         throw new Error(`Model ${model} not supported for getAll method`);
