@@ -8,13 +8,15 @@ import * as types from '../../constants/ActionTypes'
 import { IMedia } from '../../entities/Media'
 import CreateRoomModal from '../CreateRoomModal'
 import ShareRoomModal from '../ShareRoomModal'
-import { useSelector } from 'react-redux'
+import { connect } from 'react-redux'
+import { State as RootState } from '../../reducers'
 
 interface Props {
   peers: Record<string, Record<string, PeerStatus>>
   onJoinRoom: (code: string) => void
   onLeaveRoom: (code: string) => void
   dispatch: Dispatch
+  rooms: string[]
 }
 
 interface RoomGroup {
@@ -22,12 +24,10 @@ interface RoomGroup {
   peers: PeerStatus[]
 }
 
-const PeerList = ({ peers, dispatch, onJoinRoom, onLeaveRoom }: Props) => {
+const PeerList = ({ peers, dispatch, onJoinRoom, onLeaveRoom, rooms }: Props) => {
   const [showJoinModal, setShowJoinModal] = React.useState(false)
   const [showShareModal, setShowShareModal] = React.useState(false)
   const [selectedRoom, setSelectedRoom] = React.useState('')
-
-  const rooms = useSelector((state: any) => state.rooms.rooms)
 
   const requestSongFile = (peerId: string, media: IMedia, roomCode: string) => {
     dispatch({ type: types.REQUEST_STREAM, peerId, media: media, roomCode })
@@ -232,4 +232,9 @@ const PeerList = ({ peers, dispatch, onJoinRoom, onLeaveRoom }: Props) => {
   )
 }
 
-export default PeerList 
+const mapStateToProps = (state: RootState) => ({
+  peers: state.peers.peers,
+  rooms: state.rooms.rooms,
+})
+
+export default connect(mapStateToProps)(PeerList) 

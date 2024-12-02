@@ -198,6 +198,18 @@ function* requestRealtimeStream(
   );
 }
 
+interface RemoveRoomAction {
+  type: typeof types.REMOVE_ROOM;
+  room: string;
+}
+
+function* removeRoom(_store: Store, action: RemoveRoomAction): any {
+  yield call(
+    peerStorageService.removeByRoom.bind(peerStorageService),
+    action.room
+  );
+}
+
 // Binding actions to sagas
 function* peerSaga(store: Store): Generator {
   yield call(initializePeers, store);
@@ -206,6 +218,7 @@ function* peerSaga(store: Store): Generator {
   yield takeEvery(types.PEER_LEFT, updatePeerStatus, store);
   yield takeEvery(types.PEER_JOINED, updatePeerStatus, store);
   yield takeEvery(types.LEAVE_PEER_ROOM, leaveRoom, store);
+  yield takeLatest(types.REMOVE_ROOM, removeRoom, store);
   yield takeLatest(types.REQUEST_STREAM, requestStream, store);
   yield takeLatest(types.SET_CURRENT_PLAYING_STREAMS, updatePeerStatus, store);
   yield call(watchPlayerChanges, store);

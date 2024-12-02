@@ -2,6 +2,7 @@ import { IStorageService } from "./IStorageService";
 import { IAdapter } from "./database/IAdapter";
 
 interface Peer {
+  id: string;
   roomCode: string;
   username: string;
 }
@@ -44,10 +45,18 @@ export default class PeerStorageService implements IStorageService {
 
   removeByRoom = async (roomCode: string): Promise<void> => {
     const peers = await this.get();
+
+    console.log("Total peers:", peers);
+
     const peersToRemove = peers.filter((peer) => peer.roomCode === roomCode);
 
     console.log("peersToRemove:", peersToRemove);
 
-    await this.storageAdapter.removeMany(MODEL, peersToRemove);
+    if (peersToRemove.length > 0) {
+      await this.storageAdapter.removeMany(
+        MODEL,
+        peersToRemove.map((peer) => peer.id)
+      );
+    }
   };
 }

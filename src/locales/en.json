@@ -95,6 +95,8 @@
     "createRoom": "Create room",
     "request": "Download",
     "streamRealtime": "Stream Live",
-    "leave": "Leave Room"
+    "leave": "Leave Room",
+    "joinOrCreateRoom": "Join or create a room",
+    "join": "Get in"
   }
 }
