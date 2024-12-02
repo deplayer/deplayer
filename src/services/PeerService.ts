@@ -16,7 +16,7 @@ export interface PeerStatus {
   isPlaying: boolean;
   media?: IMedia;
   roomCode: string;
-  streaming: boolean
+  streaming: boolean;
 }
 
 interface RoomState {
@@ -147,9 +147,7 @@ export default class PeerService {
     // Mark something in the database so I can persist the opened session between songs and restarts
     this.dispatchFn({
       type: types.SET_STREAMING_PEER, 
-      data: {
-        peerId: streamData.peerId,
-      },
+      peerId: streamData.peerId,
     });
 
     return await this.processMediaRequest(media, roomCode);
@@ -201,7 +199,7 @@ export default class PeerService {
 
   private handleRealtimeStream = (
     data: DataPayload,
-    _peerId: string,
+    peerId: string,
   ) => {
     const playerRef = PlayerRefService.getInstance();
     const mediaElement = playerRef.getCurrentMedia();
@@ -215,6 +213,11 @@ export default class PeerService {
       );
       return;
     }
+
+    this.dispatchFn({
+      type: types.SET_STREAMING_PEER,
+      peerId,
+    });
 
     try {
       const mediaStream = mediaElement.captureStream(30);
@@ -247,7 +250,7 @@ export default class PeerService {
 
   private handleStream = async (
     data: DataPayload,
-    _peerId: string,
+    peerId: string,
     metadata: JsonValue | undefined
   ) => {
     if (!data || !metadata) return;
