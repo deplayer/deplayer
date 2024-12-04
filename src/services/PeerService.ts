@@ -180,8 +180,8 @@ export default class PeerService {
     // Bind handlers with room context
     getStatus(this.handlePeerStatus(roomCode));
     getMedia((data) => this.handleMediaRequest(roomCode, data));
-    getStream((data, metadata) => {
-      this.handleStream(data, metadata);
+    getStream((data, _peerId, metadata) => {
+      this.handleStream(data, _peerId, metadata);
     });
     getRealtimeStream((data, peerId) => {
       this.handleRealtimeStream(data, peerId);
@@ -247,9 +247,12 @@ export default class PeerService {
 
   private handleStream = async (
     data: DataPayload,
+    _peerId: string,
     metadata: JsonValue | undefined
   ) => {
     if (!data || !metadata) return;
+
+    console.log("Handling stream", data, metadata);
 
     const media = (metadata as any).media as IMedia;
 
