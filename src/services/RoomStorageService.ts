@@ -33,6 +33,8 @@ export default class RoomStorageService implements IStorageService {
   };
 
   remove = async (id: string): Promise<void> => {
+    console.log("Removing room:", id);
+
     await this.storageAdapter.removeMany(MODEL, [id]);
   };
 

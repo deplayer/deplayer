@@ -16,11 +16,10 @@ interface Props {
   peers: Record<string, Record<string, PeerStatus>>
   rooms: Room[]
   onJoinRoom: (code: string) => void
-  onLeaveRoom: (code: string) => void
   dispatch: Dispatch
 }
 
-const RoomList = ({ peers, rooms, dispatch, onJoinRoom, onLeaveRoom }: Props) => {
+const RoomList = ({ peers, rooms, dispatch, onJoinRoom }: Props) => {
   const [showJoinModal, setShowJoinModal] = React.useState(false)
   const [showShareModal, setShowShareModal] = React.useState(false)
   const [selectedRoom, setSelectedRoom] = React.useState('')
@@ -44,7 +43,6 @@ const RoomList = ({ peers, rooms, dispatch, onJoinRoom, onLeaveRoom }: Props) =>
   }
 
   const handleLeaveRoom = (roomCode: string) => {
-    onLeaveRoom(roomCode)
     dispatch({ type: types.REMOVE_ROOM, room: roomCode })
   }
 

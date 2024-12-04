@@ -27,7 +27,12 @@ function* setCurrentPlayingStream(songId: string, providerNum: number): any {
 
   // Getting the first stream URI, in the future will be choosen based on
   // priorities
-  const streamUri = yield getStreamUri(currentPlaying, settings, providerNum)
+  let streamUri = ''
+  try {
+    streamUri = yield getStreamUri(currentPlaying, settings, providerNum)
+  } catch (error) {
+    console.error('Error getting stream URI', error)
+  }
 
   if (!streamUri) {
     return yield put({ type: types.PLAY_NEXT })

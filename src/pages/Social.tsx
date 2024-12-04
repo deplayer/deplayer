@@ -40,10 +40,6 @@ const Social = ({ dispatch }: Props) => {
     setPendingRoomCode(null)
   }
 
-  const handleLeaveRoom = () => {
-    dispatch({ type: types.LEAVE_PEER_ROOM });
-  }
-
   const handleCloseRightPanel = () => {
     dispatch({ type: types.TOGGLE_RIGHT_PANEL })
   }
@@ -102,7 +98,6 @@ const Social = ({ dispatch }: Props) => {
 
       <RoomList
         onJoinRoom={handleJoinRoom}
-        onLeaveRoom={handleLeaveRoom}
       />
     </div>
   )

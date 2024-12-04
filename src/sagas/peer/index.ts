@@ -107,46 +107,6 @@ function* updatePeerStatus(store: Store): any {
   }
 }
 
-interface LeaveRoomAction {
-  type: typeof types.LEAVE_PEER_ROOM;
-  roomCode: string;
-}
-
-function* leaveRoom(store: Store, action: LeaveRoomAction): any {
-  try {
-    const collection = yield select((state) => state.collection);
-    const peerService = PeerService.getInstance(store.dispatch);
-    peerService.collection = collection;
-
-    // Leave the room in peer service
-    yield call(peerService.leaveRoom.bind(peerService), action.roomCode);
-
-    // Remove room from storage
-    yield call(roomStorageService.remove, action.roomCode);
-
-    // Remove associated peers
-    yield call(
-      peerStorageService.removeByRoom.bind(peerStorageService),
-      action.roomCode
-    );
-
-    yield put({
-      type: types.SEND_NOTIFICATION,
-      notification: `Left room ${action.roomCode}`,
-      level: "success",
-      duration: 1000,
-    });
-  } catch (error) {
-    console.error("Error leaving room:", error);
-    yield put({
-      type: types.SEND_NOTIFICATION,
-      notification: "Failed to leave room",
-      level: "error",
-      duration: 1000,
-    });
-  }
-}
-
 // Listen for player state changes to update peer status
 function* watchPlayerChanges(store: Store): any {
   yield takeLatest(
@@ -218,7 +178,6 @@ function* peerSaga(store: Store): Generator {
   yield takeEvery(types.JOIN_PEER_ROOM, joinRoom, store);
   yield takeEvery(types.PEER_LEFT, updatePeerStatus, store);
   yield takeEvery(types.PEER_JOINED, updatePeerStatus, store);
-  yield takeEvery(types.LEAVE_PEER_ROOM, leaveRoom, store);
   yield takeLatest(types.REMOVE_ROOM, removeRoom, store);
   yield takeLatest(types.REQUEST_STREAM, requestStream, store);
   yield takeLatest(types.SET_CURRENT_PLAYING_STREAMS, updatePeerStatus, store);
