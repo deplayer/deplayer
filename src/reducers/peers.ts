@@ -113,6 +113,7 @@ export default function peers(
           },
         },
       };
+
     default:
       return state;
   }

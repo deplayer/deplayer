@@ -118,6 +118,7 @@ export default class Pglite implements IAdapter {
         await instance.delete(peer).where(inArray(peer.id, payload));
         break;
       case "room":
+        console.log("Removing rooms:", payload);
         await instance.delete(room).where(inArray(room.id, payload));
         break;
       default:

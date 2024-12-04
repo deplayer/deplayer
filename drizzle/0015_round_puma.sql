@@ -1,0 +1,1 @@
+ALTER TABLE "peer" DROP CONSTRAINT "peer_roomCode_username_unique";

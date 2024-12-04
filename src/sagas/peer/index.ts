@@ -169,6 +169,7 @@ function* removeRoom(_store: Store, action: RemoveRoomAction): any {
     peerStorageService.removeByRoom.bind(peerStorageService),
     action.room
   );
+  yield call(roomStorageService.remove, action.room);
 }
 
 // Binding actions to sagas
