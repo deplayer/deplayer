@@ -1,4 +1,4 @@
-import { text, json, boolean, timestamp, pgTable, integer, real, unique } from "drizzle-orm/pg-core";
+import { text, json, boolean, timestamp, pgTable, integer, real } from "drizzle-orm/pg-core";
 
 export const media = pgTable("media", {
   id: text("id").primaryKey(),
