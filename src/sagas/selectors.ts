@@ -49,3 +49,7 @@ export const getCurrentSong = (state: any) => {
   const currentId = state.queue.currentPlaying
   return rows[currentId]
 }
+
+export const getSongById = (state: any, id: string) => {
+  return state.collection.rows[id]
+}

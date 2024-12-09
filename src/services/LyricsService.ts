@@ -9,6 +9,10 @@ class LyricsService implements IStorageService {
   async save(songId: string, lyrics: string) {
     await this.adapter.save('media_lyrics', songId, { id: songId, mediaId: songId, lyrics })
   }
+
+  async get(songId: string) {   
+    return await this.adapter.get('media_lyrics', songId)
+  }
 }
 
 export default LyricsService

@@ -1,6 +1,6 @@
 import { takeLatest, call, put, select } from "redux-saga/effects";
 
-import { getCurrentSong } from "./../selectors";
+import { getSongById } from "./../selectors";
 import Artist from "../../entities/Artist";
 import LyricsovhProvider from "../../providers/LyricsovhProvider";
 import * as types from "../../constants/ActionTypes";
@@ -16,14 +16,24 @@ const adapter = getAdapter()
 
 const lyricsService = new LyricsService(adapter)
 
-export function* fetchSongMetadata(_action: LoadArtistAction): any {
-  const song = yield select(getCurrentSong);
+type FetchSongMetadataAction = {
+  type: string;
+  songId: string;
+};
+
+export function* fetchSongMetadata(action: FetchSongMetadataAction): any {
+  const song = yield select(getSongById, action.songId);
 
   try {
-    const mbProvider = new LyricsovhProvider();
-    const lyrics = yield call(mbProvider.searchLyrics, song);
+    const lyrics = yield call(lyricsService.get, song.id) 
+
+    if (!lyrics) {
+      const mbProvider = new LyricsovhProvider();
+      const lyrics = yield call(mbProvider.searchLyrics, song);
+      yield call(lyricsService.save, song.id, lyrics.data.lyrics)
+    }
+
     yield put({ type: types.LYRICS_FOUND, data: lyrics.data.lyrics });
-    yield call(lyricsService.save, song.id, lyrics.data.lyrics)
   } catch (e: any) {
     yield put({ type: types.NO_LYRICS_FOUND, error: e.message });
   }
