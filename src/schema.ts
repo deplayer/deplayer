@@ -71,3 +71,11 @@ export const room = pgTable("room", {
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow()
 })
+
+export const mediaLyrics = pgTable("media_lyrics", {
+  id: text("id").primaryKey(),
+  mediaId: text("mediaId").notNull().references(() => media.id, { onDelete: 'cascade' }),
+  lyrics: text("lyrics").notNull(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow()
+})

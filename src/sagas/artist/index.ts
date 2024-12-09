@@ -4,11 +4,17 @@ import { getCurrentSong } from "./../selectors";
 import Artist from "../../entities/Artist";
 import LyricsovhProvider from "../../providers/LyricsovhProvider";
 import * as types from "../../constants/ActionTypes";
+import LyricsService from "../../services/LyricsService"
+import { getAdapter } from '../../services/database'
 
 type LoadArtistAction = {
   type: string;
   artist: typeof Artist;
 };
+
+const adapter = getAdapter()
+
+const lyricsService = new LyricsService(adapter)
 
 export function* fetchSongMetadata(_action: LoadArtistAction): any {
   const song = yield select(getCurrentSong);
@@ -17,6 +23,7 @@ export function* fetchSongMetadata(_action: LoadArtistAction): any {
     const mbProvider = new LyricsovhProvider();
     const lyrics = yield call(mbProvider.searchLyrics, song);
     yield put({ type: types.LYRICS_FOUND, data: lyrics.data.lyrics });
+    yield call(lyricsService.save, song.id, lyrics.data.lyrics)
   } catch (e: any) {
     yield put({ type: types.NO_LYRICS_FOUND, error: e.message });
   }

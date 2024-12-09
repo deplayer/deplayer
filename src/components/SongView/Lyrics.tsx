@@ -2,18 +2,21 @@ import React from 'react'
 import Modal from '../common/Modal'
 import Header from '../common/Header'
 import * as types from '../../constants/ActionTypes'
+import { Dispatch } from 'redux'
 
 type Props = {
   onClose: () => void
   lyrics: string,
   songId: string,
-  dispatch: (action: { type: string, songId: string }) => void
+  dispatch: Dispatch<any>
 }
 
 const Lyrics = (props: Props) => {
   React.useEffect(() => {
+    if (props.lyrics) return
+
     props.dispatch({ type: types.FETCH_LYRICS, songId: props.songId })
-  }, [props.songId])
+  }, [props.songId, props.lyrics])
 
   return (
     <Modal
