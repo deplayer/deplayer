@@ -36,6 +36,11 @@ interface SetStreamingPeerAction {
   peerId: string;
 }
 
+interface PeerStatusReceivedAction {
+  type: typeof types.PEER_STATUS_RECEIVED;
+  payload: { data: PeerStatus; peerId: string; roomCode: string };
+}
+
 export default function peers(
   state = initialState,
   action:
@@ -44,6 +49,7 @@ export default function peers(
     | JoinRoomAction
     | LeaveRoomAction
     | SetStreamingPeerAction
+    | PeerStatusReceivedAction
 ): State {
   switch (action.type) {
     case types.UPDATE_PEER_STATUS:
@@ -92,6 +98,17 @@ export default function peers(
         peers: {
           ...state.peers,
           [action.peer.roomCode]: remainingPeers,
+        },
+      };
+    case types.PEER_STATUS_RECEIVED:
+      return {
+        ...state,
+        peers: {
+          ...state.peers,
+          [action.payload.roomCode]: {
+            ...(state.peers[action.payload.roomCode] || {}),
+            [action.payload.peerId]: action.payload.data,
+          },
         },
       };
     case types.SET_STREAMING_PEER:

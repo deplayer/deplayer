@@ -1,6 +1,5 @@
 import { Dispatch } from "redux";
 import { Room, ActionSender, DataPayload, JsonValue, selfId } from "trystero";
-import { joinRoom } from "trystero/nostr";
 import * as types from "../constants/ActionTypes";
 import { IMedia } from "../entities/Media";
 import { State as CollectionState } from "../reducers/collection";
@@ -61,42 +60,53 @@ export default class PeerService {
    */
   async joinWithCode(roomCode: string, username: string) {
     this.username = username;
-    const room = joinRoom(this.config, roomCode);
-    await this.setupCommunicationChannels(room, roomCode);
+    this.dispatchFn({
+      type: types.JOIN_ROOM_REQUESTED,
+      payload: {
+        roomCode,
+        username,
+        config: this.config,
+      },
+    });
   }
 
   /**
    * Client sends status update to peers in a specific room
    */
   updateStatus = (status: DataPayload, roomCode: string) => {
-    const roomState = this.rooms.get(roomCode);
-    if (!roomState) {
-      throw new Error(`Cannot update status: Room ${roomCode} not found`);
-    }
-
-    roomState.sendStatus(status);
+    this.dispatchFn({
+      type: types.UPDATE_PEER_STATUS_REQUESTED,
+      payload: {
+        status,
+        roomCode,
+      },
+    });
   };
 
   /**
    * Client requests media stream from a peer in a specific room
    */
   requestStream = async (peerId: string, media: IMedia, roomCode: string) => {
-    const roomState = this.rooms.get(roomCode);
-    if (!roomState) return;
-
-    console.log("Requesting stream", peerId, media, roomCode);
-    roomState.sendMediaRequest({ peerId, mediaId: media.id! });
+    this.dispatchFn({
+      type: types.REQUEST_PEER_STREAM,
+      payload: {
+        peerId,
+        media,
+        roomCode,
+      },
+    });
   };
 
   /**
    * Client leaves a specific room
    */
   leaveRoom = (roomCode: string) => {
-    const roomState = this.rooms.get(roomCode);
-    if (roomState) {
-      roomState.room.leave();
-      this.cleanupRoom(roomCode);
-    }
+    this.dispatchFn({
+      type: types.LEAVE_ROOM_REQUESTED,
+      payload: {
+        roomCode,
+      },
+    });
   };
 
   /**
@@ -113,20 +123,13 @@ export default class PeerService {
 
   private handlePeerStatus =
     (roomCode: string) => (data: DataPayload, peerId: string) => {
-      const roomState = this.rooms.get(roomCode);
-      if (!roomState) return;
-
-      const peerData = {
-        ...(data as object),
-        roomCode,
-      };
-
-      roomState.peers.set(peerId, peerData);
       this.dispatchFn({
-        type: types.UPDATE_PEER_STATUS,
-        peerId,
-        data: peerData,
-        roomCode,
+        type: types.PEER_STATUS_RECEIVED,
+        payload: {
+          data,
+          peerId,
+          roomCode,
+        },
       });
     };
 
@@ -146,7 +149,7 @@ export default class PeerService {
 
     // Mark something in the database so I can persist the opened session between songs and restarts
     this.dispatchFn({
-      type: types.SET_STREAMING_PEER, 
+      type: types.SET_STREAMING_PEER,
       peerId: streamData.peerId,
     });
 
@@ -155,7 +158,7 @@ export default class PeerService {
 
   // HELPER METHODS
   // -------------
-  private async setupCommunicationChannels(room: Room, roomCode: string) {
+  setupCommunicationChannels(room: Room, roomCode: string) {
     // Set up communication channels
     const [sendStatus, getStatus] = room.makeAction("status");
     const [sendMediaRequest, getMedia] = room.makeAction("media");
@@ -192,12 +195,11 @@ export default class PeerService {
 
     // Set up peer event handlers
     this.setupPeerEventHandlers(room, roomCode);
+
+    return roomState;
   }
 
-  private handleRealtimeStream = (
-    data: DataPayload,
-    peerId: string,
-  ) => {
+  private handleRealtimeStream = (data: DataPayload, peerId: string) => {
     const playerRef = PlayerRefService.getInstance();
     const mediaElement = playerRef.getCurrentMedia();
 

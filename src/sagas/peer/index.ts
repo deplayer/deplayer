@@ -58,13 +58,6 @@ function* joinRoom(store: Store, action: any): any {
       roomCode: action.roomCode,
       username: action.username,
     });
-
-    yield put({
-      type: types.SEND_NOTIFICATION,
-      notification: `Joined room ${action.roomCode}`,
-      level: "success",
-      duration: 1000,
-    });
   } catch (error) {
     console.error("Error joining room:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
@@ -182,6 +175,7 @@ function* peerSaga(store: Store): Generator {
   yield takeLatest(types.REMOVE_ROOM, removeRoom, store);
   yield takeLatest(types.REQUEST_STREAM, requestStream, store);
   yield takeLatest(types.SET_CURRENT_PLAYING_STREAMS, updatePeerStatus, store);
+  // yield takeLatest(types.PEER_STATUS_RECEIVED, updatePeerStatus, store);
   yield call(watchPlayerChanges, store);
 }
 
