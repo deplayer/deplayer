@@ -10,6 +10,7 @@ declare global {
 class PlayerRefService {
   private static instance: PlayerRefService;
   private playerRef: React.RefObject<ReactPlayer> | null = null;
+  private peerStream: MediaStream | null = null;
 
   private constructor() {}
 
@@ -77,6 +78,14 @@ class PlayerRefService {
     }
 
     return null;
+  }
+
+  setPeerStream(stream: MediaStream | null) {
+    this.peerStream = stream;
+  }
+
+  getPeerStream(): MediaStream | null {
+    return this.peerStream;
   }
 }
 

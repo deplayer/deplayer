@@ -13,7 +13,11 @@ export type State = {
   streamUri: string | null,
   streams: object,
   providers: object,
-  volume: number
+  volume: number,
+  peerStreaming: {
+    isStreaming: boolean;
+    peerId: string | null;
+  };
 }
 
 export const defaultState = {
@@ -29,7 +33,11 @@ export const defaultState = {
   streams: {},
   streamUri: null,
   errorCount: 0,
-  volume: 100
+  volume: 100,
+  peerStreaming: {
+    isStreaming: false,
+    peerId: null
+  }
 }
 
 export default (state: State = defaultState, action: any): State => {
@@ -89,6 +97,15 @@ export default (state: State = defaultState, action: any): State => {
 
     case types.SET_CURRENT_PLAYING_STREAMS:
       return { ...state, streams: action.streams }
+
+    case types.SET_PEER_STREAMING:
+      return {
+        ...state,
+        peerStreaming: {
+          isStreaming: action.payload.isStreaming,
+          peerId: action.payload.peerId
+        }
+      };
 
     default:
       return state

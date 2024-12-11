@@ -1,12 +1,11 @@
 import { Dispatch } from "redux";
 import { Room, ActionSender, DataPayload, JsonValue, selfId } from "trystero";
 import * as types from "../constants/ActionTypes";
-import { IMedia } from "../entities/Media";
+import Media, { IMedia } from "../entities/Media";
 import { State as CollectionState } from "../reducers/collection";
 import { MediaFileService } from "./MediaFileService";
 import { writeFile } from "@happy-js/happy-opfs";
 import PlayerRefService from "./PlayerRefService";
-
 // Interfaces
 export interface PeerStatus {
   currentSong?: string;
@@ -141,8 +140,8 @@ export default class PeerService {
     getStream((data, _peerId, metadata) => {
       this.handleStream(data, _peerId, metadata);
     });
-    getRealtimeStream((data, peerId) => {
-      this.handleRealtimeStream(data, peerId);
+    getRealtimeStream((data, peerId, metadata) => {
+      this.handleRealtimeStream(data, peerId, metadata);
     });
     getUsername((data, peerId) =>
       this.handleGetUsername(data, peerId, roomCode)
@@ -167,9 +166,13 @@ export default class PeerService {
     });
   };
 
-  private handleRealtimeStream = (data: DataPayload, peerId: string) => {
+  private handleRealtimeStream = (data: DataPayload, peerId: string, metadata: JsonValue | undefined) => {
     const playerRef = PlayerRefService.getInstance();
     const mediaElement = playerRef.getCurrentMedia();
+    // const currentMedia = this.collection?.rows[mediaId]
+
+    console.log("Sending the following data to be streamed", metadata)
+
 
     const roomCode = (data as any).roomCode;
     const roomState = this.rooms.get(roomCode);
@@ -269,17 +272,40 @@ export default class PeerService {
     });
   }
 
-  sendRealtimeStream = async (roomCode: string) => {
+  sendRealtimeStream = async (roomCode: string, media: IMedia) => {
     const roomState = this.rooms.get(roomCode);
     if (!roomState) return;
 
     roomState.room.onPeerStream((stream, peerId) => {
-      console.log("Peer stream", peerId, stream);
-      const audio = new Audio();
-      audio.srcObject = stream;
-      audio.autoplay = true;
+      console.log("Peer stream received", peerId, stream);
+      const fixedMedia = new Media(media);
+
+      this.dispatchFn({ type: types.ADD_TO_COLLECTION, data: [fixedMedia] });
+      this.dispatchFn({
+        type: types.SET_PEER_STREAMING,
+        payload: {
+          peerId,
+          isStreaming: true
+        }
+      });
+      this.dispatchFn({ type: types.SET_CURRENT_PLAYING, songId: media.id });
+      this.dispatchFn({ type: types.START_PLAYING });
+
+      // Add a small delay to ensure ReactPlayer is rendered
+      setTimeout(() => {
+        const playerRef = PlayerRefService.getInstance();
+        console.log("Player ref", playerRef);
+        const mediaElement = playerRef.getCurrentMedia();
+        
+        if (mediaElement) {
+          mediaElement.element.srcObject = stream;
+        } else {
+          console.error("Media element not found - ReactPlayer may not be rendered");
+        }
+      }, 100);
     });
-    return roomState.sendRealtimeStream({ requesterId: selfId, roomCode });
+    
+    return roomState.sendRealtimeStream({ requesterId: selfId, roomCode, media: media as unknown as JsonValue });
   };
 
   private async processMediaRequest(media: IMedia, roomCode: string) {

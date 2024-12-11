@@ -16,10 +16,12 @@ import Cover from './Cover'
 import ProgressBar from './ProgressBar'
 import Visualizer from './../Visualizer'
 import WebtorrentPlayer from './CustomPlayers/WebtorrentPlayer'
+import PeerStreamPlayer from './CustomPlayers/PeerStreamPlayer'
 import * as types from '../../constants/ActionTypes'
 import PlayerRefService from '../../services/PlayerRefService'
 
 ReactPlayer.addCustomPlayer((WebtorrentPlayer as any))
+ReactPlayer.addCustomPlayer(PeerStreamPlayer as any)
 
 type Props = {
   app: AppState,
@@ -32,7 +34,7 @@ type Props = {
   collection: CollectionState,
   dispatch: Dispatch,
   playerPortal: any,
-  match: any
+  match: any,
 }
 
 class PlayerControls extends React.Component<Props> {
@@ -49,39 +51,6 @@ class PlayerControls extends React.Component<Props> {
 
   componentWillUnmount() {
     PlayerRefService.getInstance().setPlayerRef(null)
-  }
-
-  getMediaElement = () => {
-    if (!this.playerRef.current) return null;
-    
-    // Get the internal player instance
-    const internal = this.playerRef.current.getInternalPlayer();
-    console.log('Internal player:', internal);
-    
-    // If it's an iframe, we need to look inside it
-    if (internal instanceof HTMLIFrameElement) {
-      try {
-        const iframeMedia = internal.contentWindow?.document.querySelector('video, audio');
-        console.log('Iframe media:', iframeMedia);
-        return iframeMedia;
-      } catch (e) {
-        console.warn('Could not access iframe content:', e);
-      }
-    }
-    
-    // If it's directly a media element
-    if (internal instanceof HTMLVideoElement || internal instanceof HTMLAudioElement) {
-      return internal;
-    }
-    
-    return null;
-  }
-
-  // Add this method to expose the media element
-  getCurrentMedia = () => {
-    const element = this.getMediaElement();
-    console.log('Current media element:', element);
-    return element;
   }
 
   state = {
@@ -232,6 +201,10 @@ class PlayerControls extends React.Component<Props> {
               muted={false}
               onPlay={this.onPlay}
               onEnded={() => {
+                if (this.props.player.peerStreaming.isStreaming) {
+                  return
+                }
+
                 this.resetPlayedSeconds()
                 this.saveTrackPlayed(currentPlayingId)
                 this.playNext()
@@ -243,7 +216,7 @@ class PlayerControls extends React.Component<Props> {
               progressInterval={1000}
               width={'100%'}
               height={'100%'}
-              controls={currentPlaying.type === 'video'}
+              controls={currentPlaying.type === 'video' || this.props.player.peerStreaming.isStreaming}
             />
           </InPortal>
         </div>

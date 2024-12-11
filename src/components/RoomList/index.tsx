@@ -29,8 +29,8 @@ const RoomList = ({ peers, rooms, dispatch, onJoinRoom }: Props) => {
     dispatch({ type: types.REQUEST_SONG_FILE, peerId, media: media, roomCode })
   }
 
-  const requestRealtimeStream = (peerId: string, roomCode: string) => {
-    dispatch({ type: types.REQUEST_REALTIME_STREAM, peerId, roomCode })
+  const requestRealtimeStream = (peerId: string, roomCode: string, media: IMedia) => {
+    dispatch({ type: types.REQUEST_REALTIME_STREAM, peerId, roomCode, media })
   }
 
   const handleCreateRoom = (roomCode: string) => {
@@ -92,7 +92,7 @@ const RoomList = ({ peers, rooms, dispatch, onJoinRoom }: Props) => {
             
             <Button
               size="xs"
-              onClick={() => requestRealtimeStream(peer.peerId, peer.roomCode)}
+              onClick={() => requestRealtimeStream(peer.peerId, peer.roomCode, peer.media!)}
               className="bg-green-600 hover:bg-green-700 flex-1"
             >
               <Icon icon="faStream" className="mr-2" />

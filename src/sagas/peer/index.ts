@@ -155,6 +155,7 @@ interface RequestRealtimeStreamAction {
   type: typeof types.REQUEST_REALTIME_STREAM;
   peerId: string;
   roomCode: string;
+  media: IMedia;
 }
 
 function* requestRealtimeStream(
@@ -165,7 +166,7 @@ function* requestRealtimeStream(
   const peerService = PeerService.getInstance(store.dispatch);
   peerService.collection = collection;
 
-  yield call(peerService.sendRealtimeStream.bind(peerService), action.roomCode);
+  yield call(peerService.sendRealtimeStream.bind(peerService), action.roomCode, action.media);
 }
 
 interface RemoveRoomAction {
