@@ -35,7 +35,14 @@ export type AddRoomAction = {
   room: Room;
 };
 
-export type Action = JoinPeerRoomAction | RemoveRoomAction | SetRoomsAction | AddRoomAction
+export type JoinRoomSuccessAction = {
+  type: typeof types.JOIN_ROOM_SUCCESS;
+  payload: {
+    roomCode: string;
+  };
+};
+
+export type Action = JoinPeerRoomAction | RemoveRoomAction | SetRoomsAction | AddRoomAction | JoinRoomSuccessAction;
 
 export default (state: State = defaultState, action: Action) => {
   switch (action.type) {
@@ -65,6 +72,12 @@ export default (state: State = defaultState, action: Action) => {
       return {
         ...state,
         rooms: state.rooms.filter((room) => room.id !== action.room),
+      };
+
+    case types.JOIN_ROOM_SUCCESS:
+      return {
+        ...state,
+        rooms: [...state.rooms, action.payload.roomCode],
       };
 
     default:

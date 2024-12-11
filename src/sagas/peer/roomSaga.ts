@@ -4,14 +4,6 @@ import * as types from "../../constants/ActionTypes";
 import PeerService from "../../services/PeerService";
 import { Store } from "redux";
 
-function* handleRequestStream(action: any): Generator<any, void, any> {
-  const { peerId, media, roomCode } = action.payload;
-  const roomState = yield select((state) => state.rooms.get(roomCode));
-  if (!roomState) return;
-
-  roomState.sendMediaRequest({ peerId, mediaId: media.id! });
-}
-
 interface JoinRoomAction {
   type: typeof types.JOIN_ROOM_REQUESTED;
   payload: { roomCode: string; username: string; config: any };
@@ -56,27 +48,6 @@ function* handleJoinRoom(
   }
 }
 
-interface UpdatePeerStatusAction {
-  type: typeof types.UPDATE_PEER_STATUS_REQUESTED;
-  payload: { status: string; roomCode: string };
-}
-
-function* handleUpdatePeerStatus(store: Store, action: UpdatePeerStatusAction): Generator<any, void> {
-  const { status, roomCode } = action.payload;
-  const peerService = PeerService.getInstance(store.dispatch);
-
-  try {
-    yield call(peerService.updateStatus, status, roomCode);
-    yield put({ type: types.UPDATE_PEER_STATUS_SUCCESS });
-  } catch (error: any) {
-    yield put({
-      type: types.UPDATE_PEER_STATUS_FAILED,
-      error: true,
-      payload: error.message,
-    });
-  }
-}
-
 function* handleLeaveRoom(action: any): Generator<any, void, any> {
   const { roomCode } = action.payload;
 
@@ -99,7 +70,5 @@ function* handleLeaveRoom(action: any): Generator<any, void, any> {
 
 export default function* roomSaga(store: Store) {
   yield takeEvery(types.JOIN_ROOM_REQUESTED, handleJoinRoom, store);
-  yield takeEvery(types.UPDATE_PEER_STATUS_REQUESTED, handleUpdatePeerStatus, store);
   yield takeEvery(types.LEAVE_ROOM_REQUESTED, handleLeaveRoom);
-  yield takeEvery(types.REQUEST_PEER_STREAM, handleRequestStream);
 }

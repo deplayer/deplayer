@@ -26,7 +26,7 @@ const RoomList = ({ peers, rooms, dispatch, onJoinRoom }: Props) => {
   const [expandedRooms, setExpandedRooms] = React.useState<string[]>([])
 
   const requestSongFile = (peerId: string, media: IMedia, roomCode: string) => {
-    dispatch({ type: types.REQUEST_STREAM, peerId, media: media, roomCode })
+    dispatch({ type: types.REQUEST_SONG_FILE, peerId, media: media, roomCode })
   }
 
   const requestRealtimeStream = (peerId: string, roomCode: string) => {

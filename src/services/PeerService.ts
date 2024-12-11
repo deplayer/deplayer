@@ -20,20 +20,20 @@ export interface PeerStatus {
 
 interface RoomState {
   room: Room;
-  sendStatus: ActionSender<DataPayload>;
   sendMediaRequest: ActionSender<DataPayload>;
   sendUsername: ActionSender<DataPayload>;
   sendStream: ActionSender<DataPayload>;
   sendRealtimeStream: ActionSender<DataPayload>;
+  notifyCurrentPlayingToRoom: ActionSender<DataPayload>;
   peers: Map<string, DataPayload>;
 }
 
 export default class PeerService {
   private static instance: PeerService | null = null;
-  private rooms: Map<string, RoomState> = new Map();
   private config = { appId: "deplayer-p2p" };
   private readonly dispatchFn: Dispatch;
   private username: string = "";
+  rooms: Map<string, RoomState> = new Map();
   collection: CollectionState | null;
 
   // Singleton getter
@@ -71,24 +71,11 @@ export default class PeerService {
   }
 
   /**
-   * Client sends status update to peers in a specific room
-   */
-  updateStatus = (status: DataPayload, roomCode: string) => {
-    this.dispatchFn({
-      type: types.UPDATE_PEER_STATUS_REQUESTED,
-      payload: {
-        status,
-        roomCode,
-      },
-    });
-  };
-
-  /**
    * Client requests media stream from a peer in a specific room
    */
-  requestStream = async (peerId: string, media: IMedia, roomCode: string) => {
+  requestSongFile = async (peerId: string, media: IMedia, roomCode: string) => {
     this.dispatchFn({
-      type: types.REQUEST_PEER_STREAM,
+      type: types.REQUEST_SONG_FILE,
       payload: {
         peerId,
         media,
@@ -109,42 +96,10 @@ export default class PeerService {
     });
   };
 
-  /**
-   * Client leaves all rooms
-   */
-  leaveAllRooms = () => {
-    for (const roomCode of this.rooms.keys()) {
-      this.leaveRoom(roomCode);
-    }
-  };
-
-  // SERVER METHODS
-  // -------------
-
-  private handlePeerStatus =
-    (roomCode: string) => (data: DataPayload, peerId: string) => {
-      this.dispatchFn({
-        type: types.PEER_STATUS_RECEIVED,
-        payload: {
-          data,
-          peerId,
-          roomCode,
-        },
-      });
-    };
-
   private handleMediaRequest = async (roomCode: string, streamData: any) => {
-    const mediaId = streamData.mediaId;
-    const media = this.collection?.rows[mediaId];
-
-    if (!media) {
-      console.error("Media not found in collection", mediaId);
-      return;
-    }
-
     this.dispatchFn({
       type: types.ADD_TO_COLLECTION,
-      data: [media],
+      data: [streamData.media],
     });
 
     // Mark something in the database so I can persist the opened session between songs and restarts
@@ -153,27 +108,28 @@ export default class PeerService {
       peerId: streamData.peerId,
     });
 
-    return await this.processMediaRequest(media, roomCode);
+    return await this.processMediaRequest(streamData.media, roomCode);
   };
 
   // HELPER METHODS
   // -------------
   setupCommunicationChannels(room: Room, roomCode: string) {
     // Set up communication channels
-    const [sendStatus, getStatus] = room.makeAction("status");
     const [sendMediaRequest, getMedia] = room.makeAction("media");
     const [sendStream, getStream] = room.makeAction("stream");
     const [sendRealtimeStream, getRealtimeStream] = room.makeAction("realtime");
+    const [notifyCurrentPlayingToRoom, getCurrentPlaying] =
+      room.makeAction("playing");
     const [sendUsername, getUsername] = room.makeAction("username");
 
     // Create room state
     const roomState: RoomState = {
       room,
-      sendStatus,
       sendMediaRequest,
       sendUsername,
       sendStream,
       sendRealtimeStream,
+      notifyCurrentPlayingToRoom,
       peers: new Map(),
     };
 
@@ -181,7 +137,6 @@ export default class PeerService {
     this.rooms.set(roomCode, roomState);
 
     // Bind handlers with room context
-    getStatus(this.handlePeerStatus(roomCode));
     getMedia((data) => this.handleMediaRequest(roomCode, data));
     getStream((data, _peerId, metadata) => {
       this.handleStream(data, _peerId, metadata);
@@ -192,12 +147,25 @@ export default class PeerService {
     getUsername((data, peerId) =>
       this.handleGetUsername(data, peerId, roomCode)
     );
+    getCurrentPlaying((data, peerId) => {
+      this.handleCurrentPlaying(data, peerId);
+    });
 
     // Set up peer event handlers
     this.setupPeerEventHandlers(room, roomCode);
 
     return roomState;
   }
+
+  private handleCurrentPlaying = (data: DataPayload, peerId: string) => {
+    this.dispatchFn({
+      type: types.SET_PEER_CURRENT_PLAYING,
+      payload: {
+        data,
+        peerId,
+      },
+    });
+  };
 
   private handleRealtimeStream = (data: DataPayload, peerId: string) => {
     const playerRef = PlayerRefService.getInstance();
@@ -253,8 +221,6 @@ export default class PeerService {
     metadata: JsonValue | undefined
   ) => {
     if (!data || !metadata) return;
-
-    console.log("Handling stream", data, metadata);
 
     const media = (metadata as any).media as IMedia;
 
@@ -340,18 +306,6 @@ export default class PeerService {
     } as unknown as JsonValue);
 
     return mediaFile;
-  }
-
-  private cleanupRoom(roomCode: string) {
-    const roomState = this.rooms.get(roomCode);
-    if (roomState) {
-      roomState.peers.clear();
-      this.rooms.delete(roomCode);
-
-      // Dispatch room removed to Redux
-      this.dispatchFn({ type: types.REMOVE_ROOM, room: roomCode });
-    }
-    this.dispatchFn({ type: types.RESET_PEER_STATUS, roomCode });
   }
 
   // PUBLIC GETTERS
