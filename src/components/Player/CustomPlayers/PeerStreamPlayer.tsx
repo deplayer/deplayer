@@ -1,5 +1,6 @@
 import React from 'react'
 import { ReactPlayerProps } from 'react-player'
+import PlayerRefService from '../../../services/PlayerRefService'
 
 function canPlay(url: string) {
   return typeof url === 'string' && url.startsWith('peer://')
@@ -81,8 +82,24 @@ export default class PeerStreamPlayer extends React.Component<ReactPlayerProps> 
     return end > duration ? duration : end
   }
 
+  componentDidMount() {
+    const stream = PlayerRefService.getInstance().getPeerStream();
+    if (this.player && stream) {
+      this.player.srcObject = stream;
+    }
+  }
+
+  componentDidUpdate(prevProps: ReactPlayerProps) {
+    if (this.player && this.props.url !== prevProps.url) {
+      const stream = PlayerRefService.getInstance().getPeerStream();
+      if (stream) {
+        this.player.srcObject = stream;
+      }
+    }
+  }
+
   render() {
-    const { playing, loop, muted, width, height } = this.props
+    const { loop, muted, width, height } = this.props
     const style = {
       width: width === 'auto' ? width : '100%',
       height: height === 'auto' ? height : '100%'
@@ -92,10 +109,11 @@ export default class PeerStreamPlayer extends React.Component<ReactPlayerProps> 
       <video
         ref={this.ref}
         style={style}
-        autoPlay={playing}
+        autoPlay={true}
         controls={false}
         loop={loop}
         muted={muted}
+        playsInline
         id='peer-stream-player'
       />
     )

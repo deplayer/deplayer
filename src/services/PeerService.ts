@@ -166,13 +166,16 @@ export default class PeerService {
     });
   };
 
-  private handleRealtimeStream = (data: DataPayload, peerId: string, metadata: JsonValue | undefined) => {
+  private handleRealtimeStream = (
+    data: DataPayload,
+    peerId: string,
+    metadata: JsonValue | undefined
+  ) => {
     const playerRef = PlayerRefService.getInstance();
     const mediaElement = playerRef.getCurrentMedia();
     // const currentMedia = this.collection?.rows[mediaId]
 
-    console.log("Sending the following data to be streamed", metadata)
-
+    console.log("Sending the following data to be streamed", metadata);
 
     const roomCode = (data as any).roomCode;
     const roomState = this.rooms.get(roomCode);
@@ -277,35 +280,38 @@ export default class PeerService {
     if (!roomState) return;
 
     roomState.room.onPeerStream((stream, peerId) => {
-      console.log("Peer stream received", peerId, stream);
-      const fixedMedia = new Media(media);
+      // Store the stream first
+      PlayerRefService.getInstance().setPeerStream(stream);
 
+      const streamDef = {
+        uris: [{ url: "peer://" + peerId, service: "peer" }],
+        service: "peer",
+      };
+      const fixedMedia = new Media({ ...media, stream: streamDef as any });
+
+      // Dispatch actions
       this.dispatchFn({ type: types.ADD_TO_COLLECTION, data: [fixedMedia] });
       this.dispatchFn({
         type: types.SET_PEER_STREAMING,
         payload: {
           peerId,
-          isStreaming: true
-        }
+          isStreaming: true,
+        },
       });
+      this.dispatchFn({ type: types.SHOW_PLAYER });
       this.dispatchFn({ type: types.SET_CURRENT_PLAYING, songId: media.id });
+      this.dispatchFn({
+        type: types.SET_CURRENT_PLAYING_URL,
+        url: "peer://" + peerId,
+      });
       this.dispatchFn({ type: types.START_PLAYING });
-
-      // Add a small delay to ensure ReactPlayer is rendered
-      setTimeout(() => {
-        const playerRef = PlayerRefService.getInstance();
-        console.log("Player ref", playerRef);
-        const mediaElement = playerRef.getCurrentMedia();
-        
-        if (mediaElement) {
-          mediaElement.element.srcObject = stream;
-        } else {
-          console.error("Media element not found - ReactPlayer may not be rendered");
-        }
-      }, 100);
     });
-    
-    return roomState.sendRealtimeStream({ requesterId: selfId, roomCode, media: media as unknown as JsonValue });
+
+    return roomState.sendRealtimeStream({
+      requesterId: selfId,
+      roomCode,
+      media: media as unknown as JsonValue,
+    });
   };
 
   private async processMediaRequest(media: IMedia, roomCode: string) {
