@@ -42,7 +42,12 @@ export type JoinRoomSuccessAction = {
   };
 };
 
-export type Action = JoinPeerRoomAction | RemoveRoomAction | SetRoomsAction | AddRoomAction | JoinRoomSuccessAction;
+export type Action =
+  | JoinPeerRoomAction
+  | RemoveRoomAction
+  | SetRoomsAction
+  | AddRoomAction
+  | JoinRoomSuccessAction;
 
 export default (state: State = defaultState, action: Action) => {
   switch (action.type) {
@@ -53,19 +58,45 @@ export default (state: State = defaultState, action: Action) => {
       };
 
     case types.ADD_ROOM:
+      if (state.rooms.some((room) => room.id === action.room.id)) {
+        return state;
+      }
       return {
         ...state,
-        rooms: [...state.rooms, {
-          ...action.room,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }],
+        rooms: [
+          ...state.rooms,
+          {
+            ...action.room,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
       };
 
     case types.JOIN_PEER_ROOM:
+      const existingRoomIndex = state.rooms.findIndex(
+        (room) => room.id === action.roomCode
+      );
+      if (existingRoomIndex >= 0) {
+        return {
+          ...state,
+          rooms: state.rooms.map((room, index) =>
+            index === existingRoomIndex
+              ? { ...room, updatedAt: new Date() }
+              : room
+          ),
+        };
+      }
       return {
         ...state,
-        rooms: [...state.rooms, action.roomCode],
+        rooms: [
+          ...state.rooms,
+          {
+            id: action.roomCode,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
       };
 
     case types.REMOVE_ROOM:
@@ -75,9 +106,19 @@ export default (state: State = defaultState, action: Action) => {
       };
 
     case types.JOIN_ROOM_SUCCESS:
+      if (state.rooms.some((room) => room.id === action.payload.roomCode)) {
+        return state;
+      }
       return {
         ...state,
-        rooms: [...state.rooms, action.payload.roomCode],
+        rooms: [
+          ...state.rooms,
+          {
+            id: action.payload.roomCode,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
       };
 
     default:
