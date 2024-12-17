@@ -60,7 +60,6 @@ async function handleFilesystem(streamUri: string | null) {
 
 export const getStreamUri = async (
   song: IMedia,
-  settings: any,
   providerNum: number
 ): Promise<string | Blob> => {
   const service = song.stream && Object.values(song.stream)[providerNum] && Object.values(song.stream)[providerNum].service
@@ -68,9 +67,6 @@ export const getStreamUri = async (
   if (!service) {
     return ''
   }
-
-  const { proto, host, port } = settings.app.ipfs
-  const prepend = service === 'ipfs' ? `${proto}://${host}:${port}/ipfs/` : ''
 
   const streamUri = song &&
     Object.values(song.stream).length ?
@@ -85,5 +81,5 @@ export const getStreamUri = async (
     return await handleOpfs(streamUri)
   }
 
-  return prepend + streamUri
+  return streamUri || ''
 }

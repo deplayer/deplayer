@@ -45,8 +45,7 @@ interface JoinRoomAction {
 
 function* joinRoom(store: Store, action: JoinRoomAction): any {
   const collection = yield select((state) => state.collection);
-  const peerService = PeerService.getInstance(store.dispatch);
-  peerService.collection = collection;
+  const peerService = PeerService.getInstance(store.dispatch, collection);
 
   try {
     // Save room first
@@ -80,7 +79,8 @@ function* joinRoom(store: Store, action: JoinRoomAction): any {
 }
 
 function* reportCurrentPlaying(store: Store): any {
-  const peerService = PeerService.getInstance(store.dispatch);
+  const collection = yield select((state) => state.collection);
+  const peerService = PeerService.getInstance(store.dispatch, collection);
   const currentSong = yield select(getCurrentSong);
   const player = yield select((state) => state.player);
 
@@ -140,15 +140,10 @@ interface RequestSongFileAction {
 
 function* requestSongFile(store: Store, action: RequestSongFileAction): any {
   const collection = yield select((state) => state.collection);
-  const peerService = PeerService.getInstance(store.dispatch);
-  peerService.collection = collection;
+  const peerService = PeerService.getInstance(store.dispatch, collection);
 
-  yield call(
-    peerService.requestSongFile.bind(peerService),
-    action.peerId,
-    action.media,
-    action.roomCode
-  );
+  console.log("Requesting song file", action)
+  yield call(peerService.requestSongFile.bind(peerService), action.peerId, action.media, action.roomCode)
 }
 
 interface RequestRealtimeStreamAction {
@@ -163,8 +158,7 @@ function* requestRealtimeStream(
   action: RequestRealtimeStreamAction
 ): any {
   const collection = yield select((state) => state.collection);
-  const peerService = PeerService.getInstance(store.dispatch);
-  peerService.collection = collection;
+  const peerService = PeerService.getInstance(store.dispatch, collection);
 
   yield call(peerService.sendRealtimeStream.bind(peerService), action.roomCode, action.media);
 }
@@ -183,7 +177,8 @@ function* removeRoom(_store: Store, action: RemoveRoomAction): any {
 }
 
 function* notifyCurrentPlayingToRoom(store: Store, action: any): any {
-  const peerService = PeerService.getInstance(store.dispatch);
+  const collection = yield select((state) => state.collection);
+  const peerService = PeerService.getInstance(store.dispatch, collection);
   const roomState = peerService.rooms.get(action.payload.roomCode);
 
   if (!roomState) return;

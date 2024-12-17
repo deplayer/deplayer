@@ -6,6 +6,7 @@ import { State as CollectionState } from "../reducers/collection";
 import { MediaFileService } from "./MediaFileService";
 import { writeFile } from "@happy-js/happy-opfs";
 import PlayerRefService from "./PlayerRefService";
+
 // Interfaces
 export interface PeerStatus {
   currentSong?: string;
@@ -36,10 +37,11 @@ export default class PeerService {
   collection: CollectionState | null;
 
   // Singleton getter
-  static getInstance(dispatch: Dispatch): PeerService {
+  static getInstance(dispatch: Dispatch, collection: CollectionState): PeerService {
     if (!PeerService.instance) {
       PeerService.instance = new PeerService(dispatch);
     }
+    PeerService.instance.collection = collection
     return PeerService.instance;
   }
 
@@ -73,41 +75,22 @@ export default class PeerService {
    * Client requests media stream from a peer in a specific room
    */
   requestSongFile = async (peerId: string, media: IMedia, roomCode: string) => {
-    this.dispatchFn({
-      type: types.REQUEST_SONG_FILE,
-      payload: {
-        peerId,
-        media,
-        roomCode,
-      },
-    });
+    const roomState = this.rooms.get(roomCode)
+    if (!roomState) return
+
+    roomState.sendMediaRequest({ peerId, mediaId: media.id!})
   };
 
-  /**
-   * Client leaves a specific room
-   */
-  leaveRoom = (roomCode: string) => {
-    this.dispatchFn({
-      type: types.LEAVE_ROOM_REQUESTED,
-      payload: {
-        roomCode,
-      },
-    });
-  };
+  private handleMediaDownloadRequest = async (roomCode: string, streamData: DataPayload) => {
+    console.log("Handling media download request", streamData)
+    const mediaId = (streamData as any).mediaId
+    const media = this.collection?.rows[mediaId]
+    if (!media) {
+      console.error("Media not found", mediaId)
+      return
+    }
 
-  private handleMediaRequest = async (roomCode: string, streamData: any) => {
-    this.dispatchFn({
-      type: types.ADD_TO_COLLECTION,
-      data: [streamData.media],
-    });
-
-    // Mark something in the database so I can persist the opened session between songs and restarts
-    this.dispatchFn({
-      type: types.SET_STREAMING_PEER,
-      peerId: streamData.peerId,
-    });
-
-    return await this.processMediaRequest(streamData.media, roomCode);
+    return await this.processMediaRequest(media, roomCode);
   };
 
   // HELPER METHODS
@@ -136,7 +119,7 @@ export default class PeerService {
     this.rooms.set(roomCode, roomState);
 
     // Bind handlers with room context
-    getMedia((data) => this.handleMediaRequest(roomCode, data));
+    getMedia((data) => this.handleMediaDownloadRequest(roomCode, data));
     getStream((data, _peerId, metadata) => {
       this.handleStream(data, _peerId, metadata);
     });
