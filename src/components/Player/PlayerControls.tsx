@@ -180,6 +180,8 @@ class PlayerControls extends React.Component<Props> {
       config.file.attributes['crossOrigin'] = 'anonymous'
     }
 
+    const showFullscreen = this.props.app.showVisuals
+
     return (
       <React.Fragment>
         <div id="player">
@@ -202,12 +204,12 @@ class PlayerControls extends React.Component<Props> {
               onPlay={this.onPlay}
               onEnded={() => {
                 if (this.props.player.peerStreaming.isStreaming) {
-                  return
+                  console.log("Peer streaming is active, skipping next");
+                } else {
+                  this.resetPlayedSeconds()
+                  this.saveTrackPlayed(currentPlayingId)
+                  this.playNext()
                 }
-
-                this.resetPlayedSeconds()
-                this.saveTrackPlayed(currentPlayingId)
-                this.playNext()
               }}
               config={config}
               onError={this.onError}
@@ -272,6 +274,8 @@ class PlayerControls extends React.Component<Props> {
                         isPlaying={this.props.player.playing}
                         playPause={this.playPause}
                         playNext={this.playNext}
+                        showFullscreen={showFullscreen}
+                        toggleFullscreen={() => this.props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
                       />
                       <div className='w-16'>
                       </div>

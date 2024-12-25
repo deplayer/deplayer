@@ -1,5 +1,6 @@
 import PlayPauseButton from './PlayPauseButton'
 import SkipButton from './SkipButton'
+import FullscreenButton from './FullscreenButton'
 
 type ControlProps = {
   playPrev: () => void,
@@ -7,6 +8,8 @@ type ControlProps = {
   mqlMatch: boolean,
   playPause: () => void,
   playNext: () => void,
+  showFullscreen: boolean,
+  toggleFullscreen: () => void,
 }
 
 const Controls = (props: ControlProps) => {
@@ -26,6 +29,11 @@ const Controls = (props: ControlProps) => {
         onClick={props.playNext}
         type="next"
       />
+      { props.showFullscreen &&
+        <FullscreenButton
+          onClick={props.toggleFullscreen}
+        />
+      }
     </>
   )
 }

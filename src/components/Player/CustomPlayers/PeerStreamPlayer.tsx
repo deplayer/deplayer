@@ -3,6 +3,7 @@ import { ReactPlayerProps } from 'react-player'
 import PlayerRefService from '../../../services/PlayerRefService'
 
 function canPlay(url: string) {
+  console.log("canPlay", url)
   return typeof url === 'string' && url.startsWith('peer://')
 }
 
@@ -85,7 +86,16 @@ export default class PeerStreamPlayer extends React.Component<ReactPlayerProps> 
   componentDidMount() {
     const stream = PlayerRefService.getInstance().getPeerStream();
     if (this.player && stream) {
-      this.player.srcObject = stream;
+      try {
+        this.player.srcObject = stream;
+        this.play();
+      } catch (error) {
+        console.error("Error setting peer stream:", error);
+        // Notify error through props
+        this.props.onError && this.props.onError(error);
+      }
+    } else {
+      console.warn("No peer stream available on mount");
     }
   }
 
@@ -94,6 +104,7 @@ export default class PeerStreamPlayer extends React.Component<ReactPlayerProps> 
       const stream = PlayerRefService.getInstance().getPeerStream();
       if (stream) {
         this.player.srcObject = stream;
+        this.play();
       }
     }
   }

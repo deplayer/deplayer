@@ -21,13 +21,13 @@ const MenuItem = (props: Props) => {
     'select-none': true,
     'bg-gray-200': props.current,
     'dark:bg-gray-900': props.current,
-    'font-semibold': props.current,
-    'hover:font-bold': true
+    'text-gray-900': props.current,
+    'dark:text-gray-200': props.current,
   })
   return (
     <li className={classNames}>
       <Link
-        className='flex justify-between items-center focus:bg-blue-400 focus:text-blue-900'
+        className='flex justify-between items-center focus:bg-blue-400 focus:text-blue-900 hover:bg-blue-400 hover:text-blue-900'
         to={props.url}
         onClick={props.onClick}
         title={props.title}

@@ -6,7 +6,6 @@ import {
   getCollection,
   getPlayer,
   getQueue,
-  getSettings,
   getSongBg,
   getState
 } from '../selectors'
@@ -15,21 +14,15 @@ import * as routes from '../../routes'
 import * as types from '../../constants/ActionTypes'
 
 function* setCurrentPlayingStream(songId: string, providerNum: number): any {
-  const settings = yield select(getSettings)
   const collection = yield select(getCollection)
   const fullUrl = yield select(getSongBg)
   const currentPlaying = collection.rows[songId]
-
-  // The song can't be found
-  if (!currentPlaying) {
-    return yield put({ type: types.PLAY_NEXT })
-  }
 
   // Getting the first stream URI, in the future will be choosen based on
   // priorities
   let streamUri = ''
   try {
-    streamUri = yield getStreamUri(currentPlaying, settings, providerNum)
+    streamUri = yield getStreamUri(currentPlaying, providerNum)
   } catch (error) {
     console.error('Error getting stream URI', error)
   }

@@ -222,6 +222,8 @@ const ContextualMenu = (props: MenuProps) => {
         <Item>
           <div className='flex justify-center w-full my-4'>
             <Controls
+              showFullscreen={showFullscreen}
+              toggleFullscreen={() => props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
               playPrev={() => props.dispatch({ type: types.PLAY_PREV })}
               isPlaying={props.player.playing}
               mqlMatch={true}

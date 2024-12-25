@@ -17,7 +17,7 @@ function* handleJoinRoom(
 
   try {
     const room = yield call(joinRoom, config, roomCode);
-    const peerService = PeerService.getInstance(store.dispatch);
+    const peerService = PeerService.getInstance(store.dispatch, store.getState().collection);
 
     console.log("About to setup communication channels...");
     try {

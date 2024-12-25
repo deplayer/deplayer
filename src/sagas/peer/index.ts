@@ -138,6 +138,7 @@ interface RequestSongFileAction {
   roomCode: string;
 }
 
+// This is used to request a song file from a peer who's currently playing the song
 function* requestSongFile(store: Store, action: RequestSongFileAction): any {
   const collection = yield select((state) => state.collection);
   const peerService = PeerService.getInstance(store.dispatch, collection);
@@ -153,6 +154,7 @@ interface RequestRealtimeStreamAction {
   media: IMedia;
 }
 
+// This is used to request a realtime stream from a peer who's currently playing the song
 function* requestRealtimeStream(
   store: Store,
   action: RequestRealtimeStreamAction
@@ -168,6 +170,7 @@ interface RemoveRoomAction {
   room: string;
 }
 
+// This is used to remove a room from the database
 function* removeRoom(_store: Store, action: RemoveRoomAction): any {
   yield call(
     peerStorageService.removeByRoom.bind(peerStorageService),
@@ -176,6 +179,7 @@ function* removeRoom(_store: Store, action: RemoveRoomAction): any {
   yield call(roomStorageService.remove, action.room);
 }
 
+// This is used to notify the current playing song to a room
 function* notifyCurrentPlayingToRoom(store: Store, action: any): any {
   const collection = yield select((state) => state.collection);
   const peerService = PeerService.getInstance(store.dispatch, collection);
@@ -194,16 +198,9 @@ function* peerSaga(store: Store): Generator {
   yield call(initializePeers, store);
   yield takeLatest(types.REQUEST_REALTIME_STREAM, requestRealtimeStream, store);
   yield takeEvery(types.JOIN_PEER_ROOM, joinRoom, store);
-  // yield takeEvery(types.PEER_LEFT, updatePeerStatus, store);
-  // yield takeEvery(types.PEER_JOINED, updatePeerStatus, store);
   yield takeLatest(types.REMOVE_ROOM, removeRoom, store);
   yield takeLatest(types.REQUEST_SONG_FILE, requestSongFile, store);
-  yield takeLatest(
-    types.NOTIFY_CURRENT_PLAYING_TO_ROOM,
-    notifyCurrentPlayingToRoom,
-    store
-  );
-  // yield takeLatest(types.SET_CURRENT_PLAYING_STREAMS, updatePeerStatus, store);
+  yield takeLatest(types.NOTIFY_CURRENT_PLAYING_TO_ROOM, notifyCurrentPlayingToRoom, store);
   yield call(watchPlayerChanges, store);
 }
 
