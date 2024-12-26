@@ -4,6 +4,8 @@ import PlayerRefService from '../../../services/PlayerRefService'
 
 function canPlay(url: string) {
   console.log("canPlay", url)
+  console.log("PlayerRefService", PlayerRefService.getInstance().getPeerStream())
+
   return typeof url === 'string' && url.startsWith('peer://')
 }
 
@@ -24,7 +26,6 @@ export default class PeerStreamPlayer extends React.Component<ReactPlayerProps> 
     }
     this.player = player
   }
-
 
   play() {
     if (!this.player) return

@@ -263,25 +263,26 @@ export default class PeerService {
       // Here the needed player is not yet started because redux actions happens after this
       PlayerRefService.getInstance().setPeerStream(stream);
 
-      // Set the player streaming state
-      this.dispatchFn({
-        type: types.SET_PLAYER_STREAMING_STATE,
-        payload: { peerId, isStreaming: true }
-      });
+      const fixedMedia = {
+        ...media,
+        stream: {
+          peer: {
+            uris: [{ uri: `peer://${peerId}` }],
+            service: 'peer'
+          }
+        }
+      }
+
+      this.dispatchFn({ 
+        type: types.RECEIVE_COLLECTION,
+        data: [fixedMedia]
+      })
 
       this.dispatchFn({ 
         type: types.SET_CURRENT_PLAYING, 
         songId: media.id,
         url: `peer://${peerId}`,
-        media: new Media({ 
-          ...media, 
-          stream: { 
-            peer: {
-              uris: [{ uri: `peer://${peerId}` }],
-              service: 'peer' 
-            }
-          } 
-        })
+        media: fixedMedia
       });
     });
 

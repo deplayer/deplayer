@@ -134,6 +134,7 @@ class PlayerControls extends React.Component<Props> {
 
     const currentPlayingId = this.props.queue.currentPlaying
     if (!currentPlayingId) {
+      console.log("No current playing id")
       return null
     }
 
@@ -141,7 +142,8 @@ class PlayerControls extends React.Component<Props> {
 
     const { streamUri } = this.props.player
 
-    if (!this.props.itemCount || !currentPlaying || !streamUri) {
+    if (!this.props.itemCount || !streamUri || !currentPlaying) {
+      console.log("No current playing or stream uri", this.props.itemCount, streamUri, currentPlayingId)
       return
     }
 
@@ -203,13 +205,9 @@ class PlayerControls extends React.Component<Props> {
               muted={false}
               onPlay={this.onPlay}
               onEnded={() => {
-                if (this.props.player.peerStreaming.isStreaming) {
-                  console.log("Peer streaming is active, skipping next");
-                } else {
-                  this.resetPlayedSeconds()
-                  this.saveTrackPlayed(currentPlayingId)
-                  this.playNext()
-                }
+                this.resetPlayedSeconds()
+                this.saveTrackPlayed(currentPlayingId)
+                this.playNext()
               }}
               config={config}
               onError={this.onError}
@@ -218,7 +216,7 @@ class PlayerControls extends React.Component<Props> {
               progressInterval={1000}
               width={'100%'}
               height={'100%'}
-              controls={currentPlaying.type === 'video' || this.props.player.peerStreaming.isStreaming}
+              controls={currentPlaying.type === 'video'}
             />
           </InPortal>
         </div>

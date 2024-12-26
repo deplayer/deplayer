@@ -1,6 +1,7 @@
 import { call, takeLatest, takeEvery, put, select } from 'redux-saga/effects'
 import screenfull from 'screenfull'
 import { push } from "redux-first-history"
+import Media from '../../entities/Media'
 
 import {
   getCollection,
@@ -13,10 +14,17 @@ import { getStreamUri } from '../../services/Song/StreamUriService'
 import * as routes from '../../routes'
 import * as types from '../../constants/ActionTypes'
 
-function* setCurrentPlayingStream(songId: string, providerNum: number): any {
+function* setCurrentPlayingStream(songId: string, providerNum: number, media?: Media): any {
   const collection = yield select(getCollection)
   const fullUrl = yield select(getSongBg)
-  const currentPlaying = collection.rows[songId]
+  const currentPlaying = media || collection.rows[songId]
+
+  console.log("Setting current playing stream", currentPlaying, songId);
+
+  // The song can't be found
+  if (!currentPlaying) {
+    return yield put({ type: types.PLAY_NEXT })
+  }
 
   // Getting the first stream URI, in the future will be choosen based on
   // priorities
@@ -33,6 +41,7 @@ function* setCurrentPlayingStream(songId: string, providerNum: number): any {
 
   yield put({ type: types.SET_CURRENT_PLAYING_URL, url: streamUri })
   yield put({ type: types.SET_CURRENT_PLAYING_STREAMS, streams: currentPlaying.stream })
+  yield put({ type: types.SHOW_PLAYER })
   yield put({ type: types.START_PLAYING })
 
   if (fullUrl) {
@@ -43,12 +52,19 @@ function* setCurrentPlayingStream(songId: string, providerNum: number): any {
   }
 }
 
+interface SetCurrentPlayingAction {
+  type: typeof types.SET_CURRENT_PLAYING
+  songId: string
+  url: string
+  media: Media
+}
+
 // Handling setCurrentPlaying saga
-export function* setCurrentPlaying(action: any): any {
+export function* setCurrentPlaying(action: SetCurrentPlayingAction): any {
   // Redirect to song view page
   yield put({ type: types.PUSH_TO_VIEW, song: action.songId })
 
-  yield call(setCurrentPlayingStream, action.songId, 0)
+  yield call(setCurrentPlayingStream, action.songId, 0, action.media)
 }
 
 export function* handleError(): any {
