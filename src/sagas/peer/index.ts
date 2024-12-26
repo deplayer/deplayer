@@ -143,8 +143,13 @@ function* requestSongFile(store: Store, action: RequestSongFileAction): any {
   const collection = yield select((state) => state.collection);
   const peerService = PeerService.getInstance(store.dispatch, collection);
 
-  console.log("Requesting song file", action)
-  yield call(peerService.requestSongFile.bind(peerService), action.peerId, action.media, action.roomCode)
+  console.log("Requesting song file", action);
+  yield call(
+    peerService.requestSongFile.bind(peerService),
+    action.peerId,
+    action.media,
+    action.roomCode
+  );
 }
 
 interface RequestRealtimeStreamAction {
@@ -162,7 +167,7 @@ function* requestRealtimeStream(
   const collection = yield select((state) => state.collection);
   const peerService = PeerService.getInstance(store.dispatch, collection);
 
-  yield call(peerService.sendRealtimeStream.bind(peerService), action.roomCode, action.media);
+  yield call(peerService.sendRealtimeStream.bind(peerService, action.roomCode));
 }
 
 interface RemoveRoomAction {
@@ -187,10 +192,10 @@ function* notifyCurrentPlayingToRoom(store: Store, action: any): any {
 
   if (!roomState) return;
 
-  yield call(
-    roomState.notifyCurrentPlayingToRoom.bind(roomState),
-    { ...action.payload.status, roomCode: action.payload.roomCode }
-  );
+  yield call(roomState.notifyCurrentPlayingToRoom.bind(roomState), {
+    ...action.payload.status,
+    roomCode: action.payload.roomCode,
+  });
 }
 
 // Binding actions to sagas
@@ -200,7 +205,11 @@ function* peerSaga(store: Store): Generator {
   yield takeEvery(types.JOIN_PEER_ROOM, joinRoom, store);
   yield takeLatest(types.REMOVE_ROOM, removeRoom, store);
   yield takeLatest(types.REQUEST_SONG_FILE, requestSongFile, store);
-  yield takeLatest(types.NOTIFY_CURRENT_PLAYING_TO_ROOM, notifyCurrentPlayingToRoom, store);
+  yield takeLatest(
+    types.NOTIFY_CURRENT_PLAYING_TO_ROOM,
+    notifyCurrentPlayingToRoom,
+    store
+  );
   yield call(watchPlayerChanges, store);
 }
 

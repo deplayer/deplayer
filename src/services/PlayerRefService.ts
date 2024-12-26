@@ -1,4 +1,5 @@
 import ReactPlayer from "react-player";
+import { store } from "../store/configureStore";
 
 declare global {
   interface HTMLMediaElement {
@@ -27,6 +28,11 @@ class PlayerRefService {
 
   getPlayerRef(): React.RefObject<ReactPlayer> | null {
     return this.playerRef;
+  }
+
+  getCurrentPlayingId(): string | null {
+    const state = store.getState();
+    return state.queue.currentPlaying;
   }
 
   getCurrentMedia() {

@@ -22,7 +22,7 @@ interface RoomState {
   room: Room;
   sendMediaRequest: ActionSender<DataPayload>;
   sendUsername: ActionSender<DataPayload>;
-  sendStream: ActionSender<DataPayload>;
+  sendMediaFile: ActionSender<DataPayload>;
   sendRealtimeStream: ActionSender<DataPayload>;
   notifyCurrentPlayingToRoom: ActionSender<DataPayload>;
   peers: Map<string, DataPayload>;
@@ -38,11 +38,14 @@ export default class PeerService {
   collection: CollectionState | null;
 
   // Singleton getter
-  static getInstance(dispatch: Dispatch, collection: CollectionState): PeerService {
+  static getInstance(
+    dispatch: Dispatch,
+    collection: CollectionState
+  ): PeerService {
     if (!PeerService.instance) {
       PeerService.instance = new PeerService(dispatch);
     }
-    PeerService.instance.collection = collection
+    PeerService.instance.collection = collection;
     return PeerService.instance;
   }
 
@@ -76,19 +79,22 @@ export default class PeerService {
    * Client requests media stream from a peer in a specific room
    */
   requestSongFile = async (peerId: string, media: IMedia, roomCode: string) => {
-    const roomState = this.rooms.get(roomCode)
-    if (!roomState) return
+    const roomState = this.rooms.get(roomCode);
+    if (!roomState) return;
 
-    roomState.sendMediaRequest({ peerId, mediaId: media.id!})
+    roomState.sendMediaRequest({ peerId, mediaId: media.id! });
   };
 
-  private handleMediaDownloadRequest = async (roomCode: string, streamData: DataPayload) => {
-    console.log("Handling media download request", streamData)
-    const mediaId = (streamData as any).mediaId
-    const media = this.collection?.rows[mediaId]
+  private handleMediaDownloadRequest = async (
+    roomCode: string,
+    streamData: DataPayload
+  ) => {
+    console.log("Handling media download request", streamData);
+    const mediaId = (streamData as any).mediaId;
+    const media = this.collection?.rows[mediaId];
     if (!media) {
-      console.error("Media not found", mediaId)
-      return
+      console.error("Media not found", mediaId);
+      return;
     }
 
     return await this.processMediaRequest(media, roomCode);
@@ -99,7 +105,7 @@ export default class PeerService {
   setupCommunicationChannels(room: Room, roomCode: string) {
     // Set up communication channels
     const [sendMediaRequest, getMedia] = room.makeAction("media");
-    const [sendStream, getStream] = room.makeAction("stream");
+    const [sendMediaFile, getMediaFile] = room.makeAction("stream");
     const [sendRealtimeStream, getRealtimeStream] = room.makeAction("realtime");
     const [notifyCurrentPlayingToRoom, getCurrentPlaying] =
       room.makeAction("playing");
@@ -110,7 +116,7 @@ export default class PeerService {
       room,
       sendMediaRequest,
       sendUsername,
-      sendStream,
+      sendMediaFile,
       sendRealtimeStream,
       notifyCurrentPlayingToRoom,
       peers: new Map(),
@@ -121,15 +127,13 @@ export default class PeerService {
 
     // Bind handlers with room context
     getMedia((data) => this.handleMediaDownloadRequest(roomCode, data));
-    getStream((data, _peerId, metadata) => {
-      this.handleStream(data, _peerId, metadata);
+    getMediaFile((data, _peerId, metadata) => {
+      this.receiveMediaFile(data, _peerId, metadata);
     });
     getRealtimeStream((data, peerId) => {
-      this.handleRealtimeStreamFromHost(data, peerId);
+      this.receiveRealtimeStreamFromHost(data, peerId);
     });
-    getUsername((data, peerId) =>
-      this.handleGetUsername(data, peerId, roomCode)
-    );
+    getUsername((data, peerId) => this.receiveUsername(data, peerId, roomCode));
     getCurrentPlaying((data, peerId) => {
       this.handleCurrentPlaying(data, peerId);
     });
@@ -150,52 +154,92 @@ export default class PeerService {
     });
   };
 
-  private handleRealtimeStreamFromHost = (
+  private receiveRealtimeStreamFromHost = (
     data: DataPayload,
-    peerId: string,
+    peerId: string
   ) => {
     const mediaElement = PlayerRefService.getInstance().getCurrentMedia();
     const roomCode = (data as any).roomCode;
     const roomState = this.rooms.get(roomCode);
-    console.log("Handling realtime stream from host", data)
-    const currentMedia = (data as any).media;
 
     if (!roomState || !mediaElement?.captureStream) {
-      console.warn("Cannot capture stream: Media element or captureStream not supported");
+      console.warn(
+        "Cannot capture stream: Media element or captureStream not supported"
+      );
       return;
     }
 
     try {
-      const mediaStream = mediaElement.captureStream(30);
-      if (mediaStream) {
-        this.dispatchFn({
-          type: types.SET_HOST_STREAMING_STATUS,
-          peerId,
-        });
+      // Get the current playing media from the host's collection
+      const currentPlayingId =
+        PlayerRefService.getInstance().getCurrentPlayingId();
 
-        // Store the stream reference for reconnection on song changes
-        roomState.currentStream = mediaStream;
-        roomState.room.addStream(mediaStream, peerId, {
-          media: currentMedia
-        });
-
-        // Listen for media element changes to update stream
-        mediaElement.element.addEventListener('loadedmetadata', () => {
-          if (!mediaElement.captureStream) return;
-
-          const newStream = mediaElement.captureStream(30);
-          roomState.currentStream = newStream;
-          roomState.room.addStream(newStream, peerId, {
-            media: currentMedia
-          });
-        });
+      if (!currentPlayingId) {
+        console.warn("No media currently playing in host");
+        return;
       }
+
+      const hostMedia = this.collection?.rows[currentPlayingId];
+
+      if (!hostMedia) {
+        console.warn("No media currently playing in host");
+        return;
+      }
+
+      // Create new stream
+      const mediaStream = mediaElement.captureStream(30);
+
+      // Store the stream reference and add it
+      roomState.currentStream = mediaStream;
+      roomState.room.addStream(mediaStream, (data as any).requesterId, {
+        media: hostMedia,
+      });
+
+      this.dispatchFn({
+        type: types.SET_HOST_STREAMING_STATUS,
+        peerId,
+      });
+
+      // Listen for media element changes to update stream
+      const onMediaChange = () => {
+        if (!mediaElement.captureStream) return;
+
+        // Get the updated current playing media
+        const updatedPlayingId =
+          PlayerRefService.getInstance().getCurrentPlayingId();
+
+        if (!updatedPlayingId) {
+          console.warn("No media currently playing in host after change");
+          return;
+        }
+
+        const updatedMedia = this.collection?.rows[updatedPlayingId];
+
+        if (!updatedMedia) {
+          console.warn("No media currently playing in host after change");
+          return;
+        }
+
+        // Create new stream
+        const newStream = mediaElement.captureStream(30);
+
+        // Update the stream
+        roomState.currentStream = newStream;
+        roomState.room.addStream(newStream, (data as any).requesterId, {
+          media: updatedMedia,
+        });
+      };
+
+      // Remove existing listener if any
+      mediaElement.element.removeEventListener("loadedmetadata", onMediaChange);
+      // Add new listener
+      mediaElement.element.addEventListener("loadedmetadata", onMediaChange);
     } catch (error) {
       console.error("Error capturing media stream:", error);
     }
   };
 
-  private handleGetUsername = (
+  private receiveUsername = (
     data: DataPayload,
     peerId: string,
     roomCode: string
@@ -214,7 +258,7 @@ export default class PeerService {
     });
   };
 
-  private handleStream = async (
+  private receiveMediaFile = async (
     data: DataPayload,
     _peerId: string,
     metadata: JsonValue | undefined
@@ -267,44 +311,56 @@ export default class PeerService {
     });
   }
 
-  sendRealtimeStream = async (roomCode: string, media: IMedia) => {
+  sendRealtimeStream = async (roomCode: string) => {
     const roomState = this.rooms.get(roomCode);
     if (!roomState) return;
-    
-    roomState.room.onPeerStream((stream, peerId, metadata) => {
-      console.log("Received peer stream with metadata", stream, peerId, metadata);
+
+    // Set up one-time stream handler
+    const streamHandler = (
+      stream: MediaStream,
+      _peerId: string,
+      metadata: JsonValue
+    ) => {
+      console.log("Received peer stream with metadata", metadata);
+
+      // Update the peer stream reference
       PlayerRefService.getInstance().setPeerStream(stream);
 
       const media = (metadata as any)?.media;
+      if (!media) return;
 
       const { createdAt, updatedAt, ...mediaWithoutDates } = media;
       const fixedMedia = {
         ...mediaWithoutDates,
         stream: {
           peer: {
-            uris: [{ uri: `peer://${peerId}` }],
-            service: 'peer'
-          }
-        }
-      }
+            uris: [{ uri: `peer://${selfId}/${media.id}` }],
+            service: "peer",
+          },
+        },
+      };
 
-      this.dispatchFn({ 
+      // Update collection and current playing
+      this.dispatchFn({
         type: types.RECEIVE_COLLECTION,
-        data: [fixedMedia]
+        data: [fixedMedia],
       });
 
-      this.dispatchFn({ 
-        type: types.SET_CURRENT_PLAYING, 
+      this.dispatchFn({
+        type: types.SET_CURRENT_PLAYING,
         songId: fixedMedia.id,
-        url: `peer://${peerId}`,
-        media: fixedMedia
+        url: `peer://${selfId}/${fixedMedia.id}`,
+        media: fixedMedia,
       });
-    });
+    };
 
+    // Set up the stream handler
+    roomState.room.onPeerStream(streamHandler);
+
+    // Send stream request
     return roomState.sendRealtimeStream({
       requesterId: selfId,
       roomCode,
-      media: media as unknown as JsonValue,
     } as JsonValue);
   };
 
@@ -326,7 +382,7 @@ export default class PeerService {
 
     console.log("Sending stream", mediaFile, fixedMedia);
 
-    roomState.sendStream(mediaFile, null, {
+    roomState.sendMediaFile(mediaFile, null, {
       media: fixedMedia,
     } as unknown as JsonValue);
 
