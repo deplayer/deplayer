@@ -25,6 +25,18 @@ const RoomList = ({ peers, rooms, dispatch, onJoinRoom }: Props) => {
   const [selectedRoom, setSelectedRoom] = React.useState('')
   const [expandedRooms, setExpandedRooms] = React.useState<string[]>([])
 
+  // Auto-expand first room with peers when component mounts or rooms/peers change
+  React.useEffect(() => {
+    if (rooms.length > 0) {
+      const firstRoom = rooms[0];
+      const hasPeers = Object.keys(peers[firstRoom.id] || {}).length > 0;
+      
+      if (hasPeers && !expandedRooms.includes(firstRoom.id)) {
+        setExpandedRooms(prev => [...prev, firstRoom.id]);
+      }
+    }
+  }, [rooms, peers]);
+
   const requestSongFile = (peerId: string, media: IMedia, roomCode: string) => {
     dispatch({ type: types.REQUEST_SONG_FILE, peerId, media: media, roomCode })
   }

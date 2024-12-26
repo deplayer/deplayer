@@ -30,7 +30,7 @@ function* handleJoinRoom(
 
     yield put({
       type: types.SEND_NOTIFICATION,
-      notification: `Joined room ${roomCode}`,
+      notification: `Joined room #${roomCode}`,
       level: "success",
       duration: 1000,
     });

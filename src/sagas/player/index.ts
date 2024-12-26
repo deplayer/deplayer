@@ -52,7 +52,7 @@ function* setCurrentPlayingStream(songId: string, providerNum: number, media?: M
   }
 }
 
-interface SetCurrentPlayingAction {
+export interface SetCurrentPlayingAction {
   type: typeof types.SET_CURRENT_PLAYING
   songId: string
   url: string

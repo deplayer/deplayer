@@ -1,7 +1,7 @@
 import { Dispatch } from "redux";
 import { Room, ActionSender, DataPayload, JsonValue, selfId } from "trystero";
 import * as types from "../constants/ActionTypes";
-import Media, { IMedia } from "../entities/Media";
+import { IMedia } from "../entities/Media";
 import { State as CollectionState } from "../reducers/collection";
 import { MediaFileService } from "./MediaFileService";
 import { writeFile } from "@happy-js/happy-opfs";
@@ -26,6 +26,7 @@ interface RoomState {
   sendRealtimeStream: ActionSender<DataPayload>;
   notifyCurrentPlayingToRoom: ActionSender<DataPayload>;
   peers: Map<string, DataPayload>;
+  currentStream?: MediaStream;
 }
 
 export default class PeerService {
@@ -124,7 +125,7 @@ export default class PeerService {
       this.handleStream(data, _peerId, metadata);
     });
     getRealtimeStream((data, peerId) => {
-      this.handleRealtimeStream(data, peerId);
+      this.handleRealtimeStreamFromHost(data, peerId);
     });
     getUsername((data, peerId) =>
       this.handleGetUsername(data, peerId, roomCode)
@@ -149,13 +150,15 @@ export default class PeerService {
     });
   };
 
-  private handleRealtimeStream = (
+  private handleRealtimeStreamFromHost = (
     data: DataPayload,
     peerId: string,
   ) => {
     const mediaElement = PlayerRefService.getInstance().getCurrentMedia();
     const roomCode = (data as any).roomCode;
     const roomState = this.rooms.get(roomCode);
+    console.log("Handling realtime stream from host", data)
+    const currentMedia = (data as any).media;
 
     if (!roomState || !mediaElement?.captureStream) {
       console.warn("Cannot capture stream: Media element or captureStream not supported");
@@ -170,8 +173,22 @@ export default class PeerService {
           peerId,
         });
 
-        console.log("Adding stream", mediaStream, roomState.room);
-        roomState.room.addStream(mediaStream, null);
+        // Store the stream reference for reconnection on song changes
+        roomState.currentStream = mediaStream;
+        roomState.room.addStream(mediaStream, peerId, {
+          media: currentMedia
+        });
+
+        // Listen for media element changes to update stream
+        mediaElement.element.addEventListener('loadedmetadata', () => {
+          if (!mediaElement.captureStream) return;
+
+          const newStream = mediaElement.captureStream(30);
+          roomState.currentStream = newStream;
+          roomState.room.addStream(newStream, peerId, {
+            media: currentMedia
+          });
+        });
       }
     } catch (error) {
       console.error("Error capturing media stream:", error);
@@ -219,7 +236,6 @@ export default class PeerService {
       },
     };
 
-    this.dispatchFn({ type: types.ADD_TO_COLLECTION, data: [modifiedMedia] });
     this.dispatchFn({
       type: types.RECEIVE_COLLECTION,
       data: [modifiedMedia],
@@ -254,17 +270,16 @@ export default class PeerService {
   sendRealtimeStream = async (roomCode: string, media: IMedia) => {
     const roomState = this.rooms.get(roomCode);
     if (!roomState) return;
-
-    PlayerRefService.getInstance().setPeerStream(null);
     
-    roomState.room.onPeerStream((stream, peerId) => {
-      console.log("Received peer stream", stream, peerId);
-
-      // Here the needed player is not yet started because redux actions happens after this
+    roomState.room.onPeerStream((stream, peerId, metadata) => {
+      console.log("Received peer stream with metadata", stream, peerId, metadata);
       PlayerRefService.getInstance().setPeerStream(stream);
 
+      const media = (metadata as any)?.media;
+
+      const { createdAt, updatedAt, ...mediaWithoutDates } = media;
       const fixedMedia = {
-        ...media,
+        ...mediaWithoutDates,
         stream: {
           peer: {
             uris: [{ uri: `peer://${peerId}` }],
@@ -276,11 +291,11 @@ export default class PeerService {
       this.dispatchFn({ 
         type: types.RECEIVE_COLLECTION,
         data: [fixedMedia]
-      })
+      });
 
       this.dispatchFn({ 
         type: types.SET_CURRENT_PLAYING, 
-        songId: media.id,
+        songId: fixedMedia.id,
         url: `peer://${peerId}`,
         media: fixedMedia
       });
@@ -290,7 +305,7 @@ export default class PeerService {
       requesterId: selfId,
       roomCode,
       media: media as unknown as JsonValue,
-    });
+    } as JsonValue);
   };
 
   private async processMediaRequest(media: IMedia, roomCode: string) {
@@ -305,8 +320,7 @@ export default class PeerService {
       return null;
     }
 
-    const { stream, createdAt, updatedAt, ...fixedMedia } = media as IMedia & {
-      createdAt: string;
+    const { stream, updatedAt, ...fixedMedia } = media as IMedia & {
       updatedAt: string;
     };
 
