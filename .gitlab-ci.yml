@@ -2,16 +2,16 @@ include:
   - template: Code-Quality.gitlab-ci.yml
 
 stages:
-- test
-- deploy
-- report
+  - test
+  - deploy
+  - report
 
 test:
   stage: test
   image: node:20
   script:
-  - npm install
-  - npm run coverage
+    - npm install
+    - npm run coverage
   artifacts:
     paths:
       - coverage/
@@ -20,20 +20,16 @@ deploy:
   stage: deploy
   image: node:20
   script:
-  - npm install
-  - npm run build
-  - cp dist/index.html dist/200.html # Creating fallback page
-  - node_modules/.bin/surge --project ./dist --domain deplayer.surge.sh
-  - npm install -g wrangler --unsafe-perm=true
-  - wrangler pages deploy ./dist --project-name=deplayer --branch=main
+    - npm install
+    - npm run build
+    - cp dist/index.html dist/200.html # Creating fallback page
+    - npm install -g wrangler --unsafe-perm=true
+    - wrangler pages deploy ./dist --project-name=deplayer --branch=main
   only:
-  - master
+    - master
   variables:
     CLOUDFLARE_API_TOKEN: $CLOUDFLARE_API_TOKEN
     CLOUDFLARE_ACCOUNT_ID: $CLOUDFLARE_ACCOUNT_ID
-    SURGE_LOGIN: $SURGE_LOGIN
-    SURGE_TOKEN: $SURGE_TOKEN
-    PUBLIC_URL: https://deplayer.surge.sh
     REACT_APP_VERSION: $CI_COMMIT_TAG
 
 send-results:
