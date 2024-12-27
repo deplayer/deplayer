@@ -16,24 +16,17 @@ export default class PeerStreamPlayer extends React.Component<ReactPlayerProps> 
   static canEnablePIP = canEnablePIP
   player: HTMLVideoElement | null = null
   prevPlayer: HTMLVideoElement | null = null
-  currentStream: MediaStream | null = null
 
   ref = (player: HTMLVideoElement) => {
     if (this.player) {
-      // Clean up old player
-      if (this.player.srcObject instanceof MediaStream) {
-        this.player.srcObject = null;
-      }
       this.prevPlayer = this.player
     }
     this.player = player
   }
 
   play() {
-    console.log("Attempting to play stream");
-
     if (!this.player) return
-    console.log("Player exists");
+    console.log("Attempting to play stream");
     const promise = this.player.play()
     if (promise) {
       promise.catch((error) => {
@@ -50,9 +43,6 @@ export default class PeerStreamPlayer extends React.Component<ReactPlayerProps> 
 
   stop() {
     if (!this.player) return
-    if (this.player.srcObject instanceof MediaStream) {
-      this.player.srcObject = null;
-    }
     this.player.removeAttribute('src')
   }
 
@@ -95,43 +85,20 @@ export default class PeerStreamPlayer extends React.Component<ReactPlayerProps> 
     return end > duration ? duration : end
   }
 
-  setStream(stream: MediaStream | null) {
-    console.log("setStream called with stream:", stream);
-    if (!this.player || !stream) return;
-
-    try {
-      // Clean up old stream if exists
-      if (this.player.srcObject instanceof MediaStream) {
-        this.player.srcObject = null;
-      }
-
-      // Set new stream
-      this.player.srcObject = stream;
-      this.currentStream = stream;
-      
-      // Add error handler
-      this.player.onerror = (e) => {
-        console.error("Video element error:", e);
-        this.props.onError && this.props.onError(e);
-      };
-
-      console.log("About to call play() in setStream");
-      // Wait for loadedmetadata event before playing
-      this.player.onloadedmetadata = () => {
-        console.log("Stream metadata loaded, attempting to play");
-        this.play();
-      };
-    } catch (error) {
-      console.error("Error setting stream:", error);
-      this.props.onError && this.props.onError(error);
-    }
-  }
-
   componentDidMount() {
     console.log("PeerStreamPlayer mounted");
     const stream = PlayerRefService.getInstance().getPeerStream();
     console.log("Initial stream:", stream);
-    this.setStream(stream);
+    if (this.player && stream) {
+      try {
+        console.log("Setting initial stream to player");
+        this.player.srcObject = stream;
+        this.play();
+      } catch (error) {
+        console.error("Error setting peer stream:", error);
+        this.props.onError && this.props.onError(error);
+      }
+    }
   }
 
   componentDidUpdate(prevProps: ReactPlayerProps) {
@@ -139,12 +106,12 @@ export default class PeerStreamPlayer extends React.Component<ReactPlayerProps> 
       console.log("URL changed, updating stream");
       const stream = PlayerRefService.getInstance().getPeerStream();
       console.log("Updated stream:", stream);
-      this.setStream(stream);
+      if (this.player && stream) {
+        console.log("Setting updated stream to player");
+        this.player.srcObject = stream;
+        this.play();
+      }
     }
-  }
-
-  componentWillUnmount() {
-    this.stop();
   }
 
   render() {
@@ -164,6 +131,10 @@ export default class PeerStreamPlayer extends React.Component<ReactPlayerProps> 
         muted={muted}
         playsInline
         id='peer-stream-player'
+        onError={(e) => {
+          console.error("Video element error:", e);
+          this.props.onError && this.props.onError(e);
+        }}
       />
     )
   }

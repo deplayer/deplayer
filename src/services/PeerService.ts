@@ -202,6 +202,7 @@ export default class PeerService {
 
       // Listen for media element changes to update stream
       const onMediaChange = () => {
+        console.log("Media element changed, updating stream");
         if (!mediaElement.captureStream) return;
 
         // Get the updated current playing media
@@ -220,12 +221,24 @@ export default class PeerService {
           return;
         }
 
+        console.log("Creating new stream for updated media");
         // Create new stream
         const newStream = mediaElement.captureStream(30);
 
         // Update the stream
         roomState.currentStream = newStream;
         roomState.room.addStream(newStream, (data as any).requesterId, {
+          media: updatedMedia,
+        });
+
+        // Update the peer's stream reference
+        PlayerRefService.getInstance().setPeerStream(newStream);
+
+        // Dispatch current playing update with a new URL to trigger component update
+        this.dispatchFn({
+          type: types.SET_CURRENT_PLAYING,
+          songId: updatedMedia.id,
+          url: `peer://${selfId}/${updatedMedia.id}?t=${Date.now()}`,
           media: updatedMedia,
         });
       };
@@ -349,7 +362,7 @@ export default class PeerService {
       this.dispatchFn({
         type: types.SET_CURRENT_PLAYING,
         songId: fixedMedia.id,
-        url: `peer://${selfId}/${fixedMedia.id}`,
+        url: `peer://${selfId}/${fixedMedia.id}?t=${Date.now()}`,
         media: fixedMedia,
       });
     };
