@@ -21,7 +21,6 @@ import { getStreamUri } from '../../services/Song/StreamUriService'
 import IAlbum from '../../entities/Album'
 import ServiceIcon from '../ServiceIcon'
 import Media, { IMedia } from '../../entities/Media'
-import { State as SettingsState } from '../../reducers/settings'
 
 const MAX_LIST_ITEMS = 25
 
@@ -46,8 +45,8 @@ type Props = {
   className?: string | null
 }
 
-async function changeCurrentPlaying(song: any, index: number, dispatch: Dispatch, settings: SettingsState) {
-  const streamUri = await getStreamUri(song, settings.settings, index)
+async function changeCurrentPlaying(song: any, index: number, dispatch: Dispatch) {
+  const streamUri = await getStreamUri(song, index)
   dispatch({ type: types.SET_CURRENT_PLAYING_URL, url: streamUri })
 }
 
@@ -70,7 +69,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
       if (!song) return
 
       for (let i = 0; i < Object.values(song.stream || {}).length; i++) {
-        urls.push(await getStreamUri(song, settings.settings, i))
+        urls.push(await getStreamUri(song, i))
       }
       setDownloadUrls(urls)
     }
@@ -313,7 +312,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
                 Object.values(song.stream).map((value: any, index: number) => {
                   return (
                     <Button
-                      onClick={() => changeCurrentPlaying(song, index, dispatch, settings)}
+                      onClick={() => changeCurrentPlaying(song, index, dispatch)}
                       key={`${value.service}_${index}`}
                       inverted
                       transparent

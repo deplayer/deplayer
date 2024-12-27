@@ -8,7 +8,6 @@ export type State = {
   heightMqlMatch: boolean;
   loading: boolean;
   displayMiniQueue: boolean;
-  version: string;
   showSpectrum: boolean;
   showVisuals: boolean;
   rightPanelToggled: boolean;
@@ -26,7 +25,6 @@ export const defaultState = {
   displayMiniQueue: true,
   showSpectrum: false,
   showVisuals: false,
-  version: import.meta.env.REACT_APP_VERSION || "development",
   rightPanelToggled: false,
   ready: false,
 };

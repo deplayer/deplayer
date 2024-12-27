@@ -1,21 +1,22 @@
-import { all } from 'redux-saga/effects'
+import { all } from "redux-saga/effects";
 
-import artistSaga from './artist'
-import collectionSaga from './collection'
-import connectionSaga from './connection'
-import mediaSessionSaga from './mediaSession'
-import wakeLock from './wakeLock'
-import notificationsSaga from './notifications'
-import playerSaga from './player'
-import playlistSaga from './playlist'
-import providersSaga from './providers'
-import queueSaga from './queue'
-import searchSaga from './search'
-import settingsSaga from './settings'
-import titleSaga from './title'
-import webtorrentSaga from './webtorrent'
-import pinSaga from './pin'
-import peerSaga from './peer'
+import artistSaga from "./artist";
+import collectionSaga from "./collection";
+import connectionSaga from "./connection";
+import mediaSessionSaga from "./mediaSession";
+import wakeLock from "./wakeLock";
+import notificationsSaga from "./notifications";
+import playerSaga from "./player";
+import playlistSaga from "./playlist";
+import providersSaga from "./providers";
+import queueSaga from "./queue";
+import searchSaga from "./search";
+import settingsSaga from "./settings";
+import titleSaga from "./title";
+import webtorrentSaga from "./webtorrent";
+import pinSaga from "./pin";
+import peerSaga from "./peer";
+import roomSaga from "./peer/roomSaga";
 
 function* rootSaga(store: any) {
   yield all([
@@ -35,7 +36,8 @@ function* rootSaga(store: any) {
     titleSaga(),
     webtorrentSaga(),
     peerSaga(store),
-  ])
+    roomSaga(store),
+  ]);
 }
 
-export default rootSaga
+export default rootSaga;

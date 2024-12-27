@@ -16,10 +16,12 @@ import Cover from './Cover'
 import ProgressBar from './ProgressBar'
 import Visualizer from './../Visualizer'
 import WebtorrentPlayer from './CustomPlayers/WebtorrentPlayer'
+import PeerStreamPlayer from './CustomPlayers/PeerStreamPlayer'
 import * as types from '../../constants/ActionTypes'
 import PlayerRefService from '../../services/PlayerRefService'
 
 ReactPlayer.addCustomPlayer((WebtorrentPlayer as any))
+ReactPlayer.addCustomPlayer(PeerStreamPlayer as any)
 
 type Props = {
   app: AppState,
@@ -32,7 +34,7 @@ type Props = {
   collection: CollectionState,
   dispatch: Dispatch,
   playerPortal: any,
-  match: any
+  match: any,
 }
 
 class PlayerControls extends React.Component<Props> {
@@ -49,39 +51,6 @@ class PlayerControls extends React.Component<Props> {
 
   componentWillUnmount() {
     PlayerRefService.getInstance().setPlayerRef(null)
-  }
-
-  getMediaElement = () => {
-    if (!this.playerRef.current) return null;
-    
-    // Get the internal player instance
-    const internal = this.playerRef.current.getInternalPlayer();
-    console.log('Internal player:', internal);
-    
-    // If it's an iframe, we need to look inside it
-    if (internal instanceof HTMLIFrameElement) {
-      try {
-        const iframeMedia = internal.contentWindow?.document.querySelector('video, audio');
-        console.log('Iframe media:', iframeMedia);
-        return iframeMedia;
-      } catch (e) {
-        console.warn('Could not access iframe content:', e);
-      }
-    }
-    
-    // If it's directly a media element
-    if (internal instanceof HTMLVideoElement || internal instanceof HTMLAudioElement) {
-      return internal;
-    }
-    
-    return null;
-  }
-
-  // Add this method to expose the media element
-  getCurrentMedia = () => {
-    const element = this.getMediaElement();
-    console.log('Current media element:', element);
-    return element;
   }
 
   state = {
@@ -165,6 +134,7 @@ class PlayerControls extends React.Component<Props> {
 
     const currentPlayingId = this.props.queue.currentPlaying
     if (!currentPlayingId) {
+      console.log("No current playing id")
       return null
     }
 
@@ -172,7 +142,8 @@ class PlayerControls extends React.Component<Props> {
 
     const { streamUri } = this.props.player
 
-    if (!this.props.itemCount || !currentPlaying || !streamUri) {
+    if (!this.props.itemCount || !streamUri || !currentPlaying) {
+      console.log("No current playing or stream uri", this.props.itemCount, streamUri, currentPlaying)
       return
     }
 
@@ -210,6 +181,8 @@ class PlayerControls extends React.Component<Props> {
     if (currentPlaying.type === 'audio') {
       config.file.attributes['crossOrigin'] = 'anonymous'
     }
+
+    const showFullscreen = this.props.app.showVisuals
 
     return (
       <React.Fragment>
@@ -299,6 +272,8 @@ class PlayerControls extends React.Component<Props> {
                         isPlaying={this.props.player.playing}
                         playPause={this.playPause}
                         playNext={this.playNext}
+                        showFullscreen={showFullscreen}
+                        toggleFullscreen={() => this.props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
                       />
                       <div className='w-16'>
                       </div>

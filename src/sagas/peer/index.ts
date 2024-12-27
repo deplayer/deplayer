@@ -1,5 +1,4 @@
 import { takeLatest, put, select, call, takeEvery } from "redux-saga/effects";
-import { v4 as uuidv4 } from "uuid";
 import { DataPayload } from "trystero";
 import PeerService from "../../services/PeerService";
 import PeerStorageService from "../../services/PeerStorageService";
@@ -18,16 +17,17 @@ const roomStorageService = new RoomStorageService(adapter);
 function* initializePeers(store: any): any {
   yield call(roomStorageService.initialize);
   yield call(peerStorageService.initialize);
-  
+
   // Get rooms from storage
   const rooms = yield call(roomStorageService.get);
   if (rooms && rooms.length > 0) {
     yield put({ type: types.SET_ROOMS, rooms });
-    
+
     // Join each room
     for (const room of rooms) {
       const username = localStorage.getItem("username") || "Anonymous";
       yield call(joinRoom, store, {
+        type: types.JOIN_PEER_ROOM,
         roomCode: room.id,
         username,
       });
@@ -37,15 +37,20 @@ function* initializePeers(store: any): any {
   yield put({ type: types.APP_READY });
 }
 
-function* joinRoom(store: Store, action: any): any {
+interface JoinRoomAction {
+  type: typeof types.JOIN_PEER_ROOM;
+  roomCode: string;
+  username: string;
+}
+
+function* joinRoom(store: Store, action: JoinRoomAction): any {
   const collection = yield select((state) => state.collection);
-  const peerService = PeerService.getInstance(store.dispatch);
-  peerService.collection = collection;
+  const peerService = PeerService.getInstance(store.dispatch, collection);
 
   try {
     // Save room first
     yield call(roomStorageService.save, action.roomCode);
-    
+
     // Then handle peer joining
     yield call(
       peerService!.joinWithCode.bind(peerService),
@@ -53,21 +58,17 @@ function* joinRoom(store: Store, action: any): any {
       action.username
     );
 
+    const peerId = `${action.username}-${action.roomCode}`;
+
     // Save peer to database
-    yield call(peerStorageService.save, uuidv4(), {
+    yield call(peerStorageService.save, peerId, {
       roomCode: action.roomCode,
       username: action.username,
     });
-
-    yield put({
-      type: types.SEND_NOTIFICATION,
-      notification: `Joined room ${action.roomCode}`,
-      level: "success",
-      duration: 1000,
-    });
   } catch (error) {
     console.error("Error joining room:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     yield put({
       type: types.SEND_NOTIFICATION,
       notification: `Failed to join room: ${errorMessage}`,
@@ -77,10 +78,9 @@ function* joinRoom(store: Store, action: any): any {
   }
 }
 
-function* updatePeerStatus(store: Store): any {
+function* reportCurrentPlaying(store: Store): any {
   const collection = yield select((state) => state.collection);
-  const peerService = PeerService.getInstance(store.dispatch);
-  peerService.collection = collection;
+  const peerService = PeerService.getInstance(store.dispatch, collection);
   const currentSong = yield select(getCurrentSong);
   const player = yield select((state) => state.player);
 
@@ -99,7 +99,13 @@ function* updatePeerStatus(store: Store): any {
 
     for (const roomCode of peerService.getRooms()) {
       // Only try to update status if we have a valid peerId
-      yield call(peerService.updateStatus.bind(peerService), status, roomCode);
+      yield put({
+        type: types.NOTIFY_CURRENT_PLAYING_TO_ROOM,
+        payload: {
+          status,
+          roomCode,
+        },
+      });
     }
   } catch (error) {
     console.error("Error updating peer status:", error);
@@ -120,43 +126,48 @@ function* watchPlayerChanges(store: Store): any {
         types.PAUSE_PLAYING,
         types.SET_CURRENT_PLAYING_URL,
       ].includes(action.type),
-    updatePeerStatus,
+    reportCurrentPlaying,
     store
   );
 }
 
-interface RequestStreamAction {
-  type: typeof types.REQUEST_STREAM;
+interface RequestSongFileAction {
+  type: typeof types.REQUEST_SONG_FILE;
   peerId: string;
   media: IMedia;
   roomCode: string;
 }
 
-function* requestStream(store: Store, action: RequestStreamAction): any {
+// This is used to request a song file from a peer who's currently playing the song
+function* requestSongFile(store: Store, action: RequestSongFileAction): any {
   const collection = yield select((state) => state.collection);
-  const peerService = PeerService.getInstance(store.dispatch);
-  peerService.collection = collection;
+  const peerService = PeerService.getInstance(store.dispatch, collection);
 
+  console.log("Requesting song file", action);
   yield call(
-    peerService.requestStream.bind(peerService),
+    peerService.requestSongFile.bind(peerService),
     action.peerId,
     action.media,
     action.roomCode
   );
 }
 
+interface RequestRealtimeStreamAction {
+  type: typeof types.REQUEST_REALTIME_STREAM;
+  peerId: string;
+  roomCode: string;
+  media: IMedia;
+}
+
+// This is used to request a realtime stream from a peer who's currently playing the song
 function* requestRealtimeStream(
   store: Store,
-  action: RequestStreamAction
+  action: RequestRealtimeStreamAction
 ): any {
   const collection = yield select((state) => state.collection);
-  const peerService = PeerService.getInstance(store.dispatch);
-  peerService.collection = collection;
+  const peerService = PeerService.getInstance(store.dispatch, collection);
 
-  yield call(
-    peerService.sendRealtimeStream.bind(peerService),
-    action.roomCode
-  );
+  yield call(peerService.sendRealtimeStream.bind(peerService, action.roomCode));
 }
 
 interface RemoveRoomAction {
@@ -164,6 +175,7 @@ interface RemoveRoomAction {
   room: string;
 }
 
+// This is used to remove a room from the database
 function* removeRoom(_store: Store, action: RemoveRoomAction): any {
   yield call(
     peerStorageService.removeByRoom.bind(peerStorageService),
@@ -172,16 +184,32 @@ function* removeRoom(_store: Store, action: RemoveRoomAction): any {
   yield call(roomStorageService.remove, action.room);
 }
 
+// This is used to notify the current playing song to a room
+function* notifyCurrentPlayingToRoom(store: Store, action: any): any {
+  const collection = yield select((state) => state.collection);
+  const peerService = PeerService.getInstance(store.dispatch, collection);
+  const roomState = peerService.rooms.get(action.payload.roomCode);
+
+  if (!roomState) return;
+
+  yield call(roomState.notifyCurrentPlayingToRoom.bind(roomState), {
+    ...action.payload.status,
+    roomCode: action.payload.roomCode,
+  });
+}
+
 // Binding actions to sagas
 function* peerSaga(store: Store): Generator {
   yield call(initializePeers, store);
   yield takeLatest(types.REQUEST_REALTIME_STREAM, requestRealtimeStream, store);
   yield takeEvery(types.JOIN_PEER_ROOM, joinRoom, store);
-  yield takeEvery(types.PEER_LEFT, updatePeerStatus, store);
-  yield takeEvery(types.PEER_JOINED, updatePeerStatus, store);
   yield takeLatest(types.REMOVE_ROOM, removeRoom, store);
-  yield takeLatest(types.REQUEST_STREAM, requestStream, store);
-  yield takeLatest(types.SET_CURRENT_PLAYING_STREAMS, updatePeerStatus, store);
+  yield takeLatest(types.REQUEST_SONG_FILE, requestSongFile, store);
+  yield takeLatest(
+    types.NOTIFY_CURRENT_PLAYING_TO_ROOM,
+    notifyCurrentPlayingToRoom,
+    store
+  );
   yield call(watchPlayerChanges, store);
 }
 

@@ -7,6 +7,7 @@ import {
 import Media from '../../entities/Media'
 import { mediaParams } from '../../entities/Media.spec'
 import * as types from '../../constants/ActionTypes'
+import { SetCurrentPlayingAction } from './index'
 
 const IdbKevalMock = vi.fn(() => ({
   open: vi.fn()
@@ -50,8 +51,12 @@ describe('setCurrentPlaying', async () => {
       }
     }
     const action = {
-      songId: 'foo'
-    }
+      type: types.SET_CURRENT_PLAYING,
+      songId: 'foo',
+      url: streamUrl,
+      media: song
+    } as SetCurrentPlayingAction
+
     return expectSaga(setCurrentPlaying, action)
       .withState(state)
       .put({ type: types.PUSH_TO_VIEW, song: action.songId })

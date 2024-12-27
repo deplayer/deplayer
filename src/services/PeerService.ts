@@ -1,6 +1,5 @@
 import { Dispatch } from "redux";
 import { Room, ActionSender, DataPayload, JsonValue, selfId } from "trystero";
-import { joinRoom } from "trystero/nostr";
 import * as types from "../constants/ActionTypes";
 import { IMedia } from "../entities/Media";
 import { State as CollectionState } from "../reducers/collection";
@@ -21,27 +20,32 @@ export interface PeerStatus {
 
 interface RoomState {
   room: Room;
-  sendStatus: ActionSender<DataPayload>;
   sendMediaRequest: ActionSender<DataPayload>;
   sendUsername: ActionSender<DataPayload>;
-  sendStream: ActionSender<DataPayload>;
+  sendMediaFile: ActionSender<DataPayload>;
   sendRealtimeStream: ActionSender<DataPayload>;
+  notifyCurrentPlayingToRoom: ActionSender<DataPayload>;
   peers: Map<string, DataPayload>;
+  currentStream?: MediaStream;
 }
 
 export default class PeerService {
   private static instance: PeerService | null = null;
-  private rooms: Map<string, RoomState> = new Map();
   private config = { appId: "deplayer-p2p" };
   private readonly dispatchFn: Dispatch;
   private username: string = "";
+  rooms: Map<string, RoomState> = new Map();
   collection: CollectionState | null;
 
   // Singleton getter
-  static getInstance(dispatch: Dispatch): PeerService {
+  static getInstance(
+    dispatch: Dispatch,
+    collection: CollectionState
+  ): PeerService {
     if (!PeerService.instance) {
       PeerService.instance = new PeerService(dispatch);
     }
+    PeerService.instance.collection = collection;
     return PeerService.instance;
   }
 
@@ -61,116 +65,60 @@ export default class PeerService {
    */
   async joinWithCode(roomCode: string, username: string) {
     this.username = username;
-    const room = joinRoom(this.config, roomCode);
-    await this.setupCommunicationChannels(room, roomCode);
+    this.dispatchFn({
+      type: types.JOIN_ROOM_REQUESTED,
+      payload: {
+        roomCode,
+        username,
+        config: this.config,
+      },
+    });
   }
-
-  /**
-   * Client sends status update to peers in a specific room
-   */
-  updateStatus = (status: DataPayload, roomCode: string) => {
-    const roomState = this.rooms.get(roomCode);
-    if (!roomState) {
-      throw new Error(`Cannot update status: Room ${roomCode} not found`);
-    }
-
-    roomState.sendStatus(status);
-  };
 
   /**
    * Client requests media stream from a peer in a specific room
    */
-  requestStream = async (peerId: string, media: IMedia, roomCode: string) => {
+  requestSongFile = async (peerId: string, media: IMedia, roomCode: string) => {
     const roomState = this.rooms.get(roomCode);
     if (!roomState) return;
 
-    console.log("Requesting stream", peerId, media, roomCode);
     roomState.sendMediaRequest({ peerId, mediaId: media.id! });
   };
 
-  /**
-   * Client leaves a specific room
-   */
-  leaveRoom = (roomCode: string) => {
-    const roomState = this.rooms.get(roomCode);
-    if (roomState) {
-      roomState.room.leave();
-      this.cleanupRoom(roomCode);
-    }
-  };
-
-  /**
-   * Client leaves all rooms
-   */
-  leaveAllRooms = () => {
-    for (const roomCode of this.rooms.keys()) {
-      this.leaveRoom(roomCode);
-    }
-  };
-
-  // SERVER METHODS
-  // -------------
-
-  private handlePeerStatus =
-    (roomCode: string) => (data: DataPayload, peerId: string) => {
-      const roomState = this.rooms.get(roomCode);
-      if (!roomState) return;
-
-      const peerData = {
-        ...(data as object),
-        roomCode,
-      };
-
-      roomState.peers.set(peerId, peerData);
-      this.dispatchFn({
-        type: types.UPDATE_PEER_STATUS,
-        peerId,
-        data: peerData,
-        roomCode,
-      });
-    };
-
-  private handleMediaRequest = async (roomCode: string, streamData: any) => {
-    const mediaId = streamData.mediaId;
+  private handleMediaDownloadRequest = async (
+    roomCode: string,
+    streamData: DataPayload
+  ) => {
+    console.log("Handling media download request", streamData);
+    const mediaId = (streamData as any).mediaId;
     const media = this.collection?.rows[mediaId];
-
     if (!media) {
-      console.error("Media not found in collection", mediaId);
+      console.error("Media not found", mediaId);
       return;
     }
-
-    this.dispatchFn({
-      type: types.ADD_TO_COLLECTION,
-      data: [media],
-    });
-
-    // Mark something in the database so I can persist the opened session between songs and restarts
-    this.dispatchFn({
-      type: types.SET_STREAMING_PEER, 
-      peerId: streamData.peerId,
-    });
 
     return await this.processMediaRequest(media, roomCode);
   };
 
   // HELPER METHODS
   // -------------
-  private async setupCommunicationChannels(room: Room, roomCode: string) {
+  setupCommunicationChannels(room: Room, roomCode: string) {
     // Set up communication channels
-    const [sendStatus, getStatus] = room.makeAction("status");
     const [sendMediaRequest, getMedia] = room.makeAction("media");
-    const [sendStream, getStream] = room.makeAction("stream");
+    const [sendMediaFile, getMediaFile] = room.makeAction("stream");
     const [sendRealtimeStream, getRealtimeStream] = room.makeAction("realtime");
+    const [notifyCurrentPlayingToRoom, getCurrentPlaying] =
+      room.makeAction("playing");
     const [sendUsername, getUsername] = room.makeAction("username");
 
     // Create room state
     const roomState: RoomState = {
       room,
-      sendStatus,
       sendMediaRequest,
       sendUsername,
-      sendStream,
+      sendMediaFile,
       sendRealtimeStream,
+      notifyCurrentPlayingToRoom,
       peers: new Map(),
     };
 
@@ -178,29 +126,39 @@ export default class PeerService {
     this.rooms.set(roomCode, roomState);
 
     // Bind handlers with room context
-    getStatus(this.handlePeerStatus(roomCode));
-    getMedia((data) => this.handleMediaRequest(roomCode, data));
-    getStream((data, _peerId, metadata) => {
-      this.handleStream(data, _peerId, metadata);
+    getMedia((data) => this.handleMediaDownloadRequest(roomCode, data));
+    getMediaFile((data, _peerId, metadata) => {
+      this.receiveMediaFile(data, _peerId, metadata);
     });
     getRealtimeStream((data, peerId) => {
-      this.handleRealtimeStream(data, peerId);
+      this.receiveRealtimeStreamFromHost(data, peerId);
     });
-    getUsername((data, peerId) =>
-      this.handleGetUsername(data, peerId, roomCode)
-    );
+    getUsername((data, peerId) => this.receiveUsername(data, peerId, roomCode));
+    getCurrentPlaying((data, peerId) => {
+      this.handleCurrentPlaying(data, peerId);
+    });
 
     // Set up peer event handlers
     this.setupPeerEventHandlers(room, roomCode);
+
+    return roomState;
   }
 
-  private handleRealtimeStream = (
-    data: DataPayload,
-    peerId: string,
-  ) => {
-    const playerRef = PlayerRefService.getInstance();
-    const mediaElement = playerRef.getCurrentMedia();
+  private handleCurrentPlaying = (data: DataPayload, peerId: string) => {
+    this.dispatchFn({
+      type: types.SET_PEER_CURRENT_PLAYING,
+      payload: {
+        data,
+        peerId,
+      },
+    });
+  };
 
+  private receiveRealtimeStreamFromHost = (
+    data: DataPayload,
+    peerId: string
+  ) => {
+    const mediaElement = PlayerRefService.getInstance().getCurrentMedia();
     const roomCode = (data as any).roomCode;
     const roomState = this.rooms.get(roomCode);
 
@@ -211,22 +169,90 @@ export default class PeerService {
       return;
     }
 
-    this.dispatchFn({
-      type: types.SET_STREAMING_PEER,
-      peerId,
-    });
-
     try {
-      const mediaStream = mediaElement.captureStream(30);
-      if (mediaStream) {
-        roomState.room.addStream(mediaStream, null);
+      // Get the current playing media from the host's collection
+      const currentPlayingId =
+        PlayerRefService.getInstance().getCurrentPlayingId();
+
+      if (!currentPlayingId) {
+        console.warn("No media currently playing in host");
+        return;
       }
+
+      const hostMedia = this.collection?.rows[currentPlayingId];
+
+      if (!hostMedia) {
+        console.warn("No media currently playing in host");
+        return;
+      }
+
+      // Create new stream
+      const mediaStream = mediaElement.captureStream(30);
+
+      // Store the stream reference and add it
+      roomState.currentStream = mediaStream;
+      roomState.room.addStream(mediaStream, (data as any).requesterId, {
+        media: hostMedia,
+      });
+
+      this.dispatchFn({
+        type: types.SET_HOST_STREAMING_STATUS,
+        peerId,
+      });
+
+      // Listen for media element changes to update stream
+      const onMediaChange = () => {
+        console.log("Media element changed, updating stream");
+        if (!mediaElement.captureStream) return;
+
+        // Get the updated current playing media
+        const updatedPlayingId =
+          PlayerRefService.getInstance().getCurrentPlayingId();
+
+        if (!updatedPlayingId) {
+          console.warn("No media currently playing in host after change");
+          return;
+        }
+
+        const updatedMedia = this.collection?.rows[updatedPlayingId];
+
+        if (!updatedMedia) {
+          console.warn("No media currently playing in host after change");
+          return;
+        }
+
+        console.log("Creating new stream for updated media");
+        // Create new stream
+        const newStream = mediaElement.captureStream(30);
+
+        // Update the stream
+        roomState.currentStream = newStream;
+        roomState.room.addStream(newStream, (data as any).requesterId, {
+          media: updatedMedia,
+        });
+
+        // Update the peer's stream reference
+        PlayerRefService.getInstance().setPeerStream(newStream);
+
+        // Dispatch current playing update with a new URL to trigger component update
+        this.dispatchFn({
+          type: types.SET_CURRENT_PLAYING,
+          songId: updatedMedia.id,
+          url: `peer://${selfId}/${updatedMedia.id}?t=${Date.now()}`,
+          media: updatedMedia,
+        });
+      };
+
+      // Remove existing listener if any
+      mediaElement.element.removeEventListener("loadedmetadata", onMediaChange);
+      // Add new listener
+      mediaElement.element.addEventListener("loadedmetadata", onMediaChange);
     } catch (error) {
       console.error("Error capturing media stream:", error);
     }
   };
 
-  private handleGetUsername = (
+  private receiveUsername = (
     data: DataPayload,
     peerId: string,
     roomCode: string
@@ -245,14 +271,12 @@ export default class PeerService {
     });
   };
 
-  private handleStream = async (
+  private receiveMediaFile = async (
     data: DataPayload,
     _peerId: string,
     metadata: JsonValue | undefined
   ) => {
     if (!data || !metadata) return;
-
-    console.log("Handling stream", data, metadata);
 
     const media = (metadata as any).media as IMedia;
 
@@ -269,7 +293,6 @@ export default class PeerService {
       },
     };
 
-    this.dispatchFn({ type: types.ADD_TO_COLLECTION, data: [modifiedMedia] });
     this.dispatchFn({
       type: types.RECEIVE_COLLECTION,
       data: [modifiedMedia],
@@ -305,13 +328,53 @@ export default class PeerService {
     const roomState = this.rooms.get(roomCode);
     if (!roomState) return;
 
-    roomState.room.onPeerStream((stream, peerId) => {
-      console.log("Peer stream", peerId, stream);
-      const audio = new Audio();
-      audio.srcObject = stream;
-      audio.autoplay = true;
-    });
-    return roomState.sendRealtimeStream({ requesterId: selfId, roomCode });
+    // Set up one-time stream handler
+    const streamHandler = (
+      stream: MediaStream,
+      _peerId: string,
+      metadata: JsonValue
+    ) => {
+      console.log("Received peer stream with metadata", metadata);
+
+      // Update the peer stream reference
+      PlayerRefService.getInstance().setPeerStream(stream);
+
+      const media = (metadata as any)?.media;
+      if (!media) return;
+
+      const { createdAt, updatedAt, ...mediaWithoutDates } = media;
+      const fixedMedia = {
+        ...mediaWithoutDates,
+        stream: {
+          peer: {
+            uris: [{ uri: `peer://${selfId}/${media.id}` }],
+            service: "peer",
+          },
+        },
+      };
+
+      // Update collection and current playing
+      this.dispatchFn({
+        type: types.RECEIVE_COLLECTION,
+        data: [fixedMedia],
+      });
+
+      this.dispatchFn({
+        type: types.SET_CURRENT_PLAYING,
+        songId: fixedMedia.id,
+        url: `peer://${selfId}/${fixedMedia.id}?t=${Date.now()}`,
+        media: fixedMedia,
+      });
+    };
+
+    // Set up the stream handler
+    roomState.room.onPeerStream(streamHandler);
+
+    // Send stream request
+    return roomState.sendRealtimeStream({
+      requesterId: selfId,
+      roomCode,
+    } as JsonValue);
   };
 
   private async processMediaRequest(media: IMedia, roomCode: string) {
@@ -326,30 +389,17 @@ export default class PeerService {
       return null;
     }
 
-    const { stream, createdAt, updatedAt, ...fixedMedia } = media as IMedia & {
-      createdAt: string;
+    const { stream, updatedAt, ...fixedMedia } = media as IMedia & {
       updatedAt: string;
     };
 
     console.log("Sending stream", mediaFile, fixedMedia);
 
-    roomState.sendStream(mediaFile, null, {
+    roomState.sendMediaFile(mediaFile, null, {
       media: fixedMedia,
     } as unknown as JsonValue);
 
     return mediaFile;
-  }
-
-  private cleanupRoom(roomCode: string) {
-    const roomState = this.rooms.get(roomCode);
-    if (roomState) {
-      roomState.peers.clear();
-      this.rooms.delete(roomCode);
-
-      // Dispatch room removed to Redux
-      this.dispatchFn({ type: types.REMOVE_ROOM, room: roomCode });
-    }
-    this.dispatchFn({ type: types.RESET_PEER_STATUS, roomCode });
   }
 
   // PUBLIC GETTERS

@@ -16,7 +16,6 @@ const setup = () => {
       mqlMatch: false,
       heightMqlMatch: false,
       displayMiniQueue: false,
-      version: '',
       showAddMediaModal: false,
       rightPanelToggled: false
     },

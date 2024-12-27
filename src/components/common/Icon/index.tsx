@@ -39,7 +39,6 @@ import {
   faCompactDisc,
   faStopwatch,
   faMicrophoneAlt,
-  faExpand,
   faPlusCircle,
   faMinusCircle,
   faArrowLeft,
@@ -54,7 +53,9 @@ import {
   faSave,
   faSearch,
   faBars,
-  faPlayCircle
+  faPlayCircle,
+  faCompress,
+  faExpand
 } from "@fortawesome/free-solid-svg-icons"
 import { faGitlab, faDeezer } from "@fortawesome/free-brands-svg-icons"
 
@@ -98,7 +99,6 @@ const icons = {
   faCompactDisc,
   faStopwatch,
   faMicrophoneAlt,
-  faExpand,
   faPlusCircle,
   faMinusCircle,
   faEyeSlash,
@@ -115,7 +115,9 @@ const icons = {
   faBars,
   faFolderPlus,
   faBahai,
-  faDeezer
+  faDeezer,
+  faCompress,
+  faExpand
 }
 
 type Props = {

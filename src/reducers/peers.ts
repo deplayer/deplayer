@@ -36,6 +36,16 @@ interface SetStreamingPeerAction {
   peerId: string;
 }
 
+interface PeerStatusReceivedAction {
+  type: typeof types.PEER_STATUS_RECEIVED;
+  payload: { data: PeerStatus; peerId: string; roomCode: string };
+}
+
+interface SetPeerCurrentPlayingAction {
+  type: typeof types.SET_PEER_CURRENT_PLAYING;
+  payload: { data: PeerStatus; peerId: string; roomCode: string };
+}
+
 export default function peers(
   state = initialState,
   action:
@@ -44,6 +54,8 @@ export default function peers(
     | JoinRoomAction
     | LeaveRoomAction
     | SetStreamingPeerAction
+    | PeerStatusReceivedAction
+    | SetPeerCurrentPlayingAction
 ): State {
   switch (action.type) {
     case types.UPDATE_PEER_STATUS:
@@ -94,6 +106,29 @@ export default function peers(
           [action.peer.roomCode]: remainingPeers,
         },
       };
+    case types.PEER_STATUS_RECEIVED:
+      return {
+        ...state,
+        peers: {
+          ...state.peers,
+          [action.payload.roomCode]: {
+            ...(state.peers[action.payload.roomCode] || {}),
+            [action.payload.peerId]: action.payload.data,
+          },
+        },
+      };
+    case types.SET_PEER_CURRENT_PLAYING:
+      return {
+        ...state,
+        peers: {
+          ...state.peers,
+          [action.payload.data.roomCode]: {
+            ...(state.peers[action.payload.data.roomCode] || {}),
+            [action.payload.peerId]: action.payload.data,
+          },
+        },
+      };
+
     case types.SET_STREAMING_PEER:
       const foundPeer = Object.values(state.peers)
         .flatMap((roomPeers) => Object.values(roomPeers))

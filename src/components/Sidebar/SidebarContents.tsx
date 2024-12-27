@@ -96,24 +96,16 @@ const SidebarContents = (props: ContentProps) => {
       <CommandBar dispatch={props.dispatch} />
 
       <section className='p-6 pt-8 bottom-0 text-xs text-center w-full'>
+        <DeplayerTitle /> is 
         <a
           href={'https://gitlab.com/deplayer/deplayer'}
           rel="noreferrer"
           title="Show me the code"
           target="_blank"
         >
-          <Icon icon='faGitlab' />
+          open source!
         </a>
-
-        <a
-          href={'https://gitlab.com/deplayer/deplayer/tags'}
-          className='ml-2'
-          rel="noreferrer"
-          title="Show me the code"
-          target="_blank"
-        >
-          {props.app.version}
-        </a>
+        <Icon icon='faGitlab' className='ml-2' />
       </section>
     </div>
   )

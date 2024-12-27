@@ -1,12 +1,12 @@
 import { call, takeLatest, takeEvery, put, select } from 'redux-saga/effects'
 import screenfull from 'screenfull'
 import { push } from "redux-first-history"
+import Media from '../../entities/Media'
 
 import {
   getCollection,
   getPlayer,
   getQueue,
-  getSettings,
   getSongBg,
   getState
 } from '../selectors'
@@ -14,11 +14,12 @@ import { getStreamUri } from '../../services/Song/StreamUriService'
 import * as routes from '../../routes'
 import * as types from '../../constants/ActionTypes'
 
-function* setCurrentPlayingStream(songId: string, providerNum: number): any {
-  const settings = yield select(getSettings)
+function* setCurrentPlayingStream(songId: string, providerNum: number, media?: Media): any {
   const collection = yield select(getCollection)
   const fullUrl = yield select(getSongBg)
-  const currentPlaying = collection.rows[songId]
+  const currentPlaying = media || collection.rows[songId]
+
+  console.log("Setting current playing stream", currentPlaying, songId);
 
   // The song can't be found
   if (!currentPlaying) {
@@ -29,7 +30,7 @@ function* setCurrentPlayingStream(songId: string, providerNum: number): any {
   // priorities
   let streamUri = ''
   try {
-    streamUri = yield getStreamUri(currentPlaying, settings, providerNum)
+    streamUri = yield getStreamUri(currentPlaying, providerNum)
   } catch (error) {
     console.error('Error getting stream URI', error)
   }
@@ -40,6 +41,7 @@ function* setCurrentPlayingStream(songId: string, providerNum: number): any {
 
   yield put({ type: types.SET_CURRENT_PLAYING_URL, url: streamUri })
   yield put({ type: types.SET_CURRENT_PLAYING_STREAMS, streams: currentPlaying.stream })
+  yield put({ type: types.SHOW_PLAYER })
   yield put({ type: types.START_PLAYING })
 
   if (fullUrl) {
@@ -50,12 +52,19 @@ function* setCurrentPlayingStream(songId: string, providerNum: number): any {
   }
 }
 
+export interface SetCurrentPlayingAction {
+  type: typeof types.SET_CURRENT_PLAYING
+  songId: string
+  url: string
+  media: Media
+}
+
 // Handling setCurrentPlaying saga
-export function* setCurrentPlaying(action: any): any {
+export function* setCurrentPlaying(action: SetCurrentPlayingAction): any {
   // Redirect to song view page
   yield put({ type: types.PUSH_TO_VIEW, song: action.songId })
 
-  yield call(setCurrentPlayingStream, action.songId, 0)
+  yield call(setCurrentPlayingStream, action.songId, 0, action.media)
 }
 
 export function* handleError(): any {

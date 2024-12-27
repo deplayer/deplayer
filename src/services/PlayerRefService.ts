@@ -1,4 +1,5 @@
 import ReactPlayer from "react-player";
+import { store } from "../store/configureStore";
 
 declare global {
   interface HTMLMediaElement {
@@ -10,6 +11,7 @@ declare global {
 class PlayerRefService {
   private static instance: PlayerRefService;
   private playerRef: React.RefObject<ReactPlayer> | null = null;
+  private peerStream: MediaStream | null = null;
 
   private constructor() {}
 
@@ -26,6 +28,11 @@ class PlayerRefService {
 
   getPlayerRef(): React.RefObject<ReactPlayer> | null {
     return this.playerRef;
+  }
+
+  getCurrentPlayingId(): string | null {
+    const state = store.getState();
+    return state.queue.currentPlaying;
   }
 
   getCurrentMedia() {
@@ -77,6 +84,14 @@ class PlayerRefService {
     }
 
     return null;
+  }
+
+  setPeerStream(stream: MediaStream | null) {
+    this.peerStream = stream;
+  }
+
+  getPeerStream(): MediaStream | null {
+    return this.peerStream;
   }
 }
 
