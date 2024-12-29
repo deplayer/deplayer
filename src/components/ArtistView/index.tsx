@@ -24,13 +24,13 @@ function extractBackground(
   collection: CollectionState,
   songsByAlbum: any[],
   albumsByArtist: any[]
-): string {
+): string | undefined {
   const albumId = albumsByArtist && albumsByArtist.length && albumsByArtist[0]
   if (albumId && songsByAlbum[albumId]) {
     return collection.rows[songsByAlbum[albumId][0]]?.cover?.fullUrl
   }
 
-  return ''
+  return undefined
 }
 
 

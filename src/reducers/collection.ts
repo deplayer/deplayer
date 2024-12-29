@@ -4,7 +4,6 @@ import * as types from "../constants/ActionTypes";
 import IndexService from "../services/Search/IndexService";
 import Artist from "../entities/Artist";
 import IMedia from "../entities/Media";
-import merge from "deepmerge";
 import { applyFilters } from "../utils/apply-filters";
 
 const indexService = IndexService();

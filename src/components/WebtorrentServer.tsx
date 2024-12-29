@@ -13,79 +13,151 @@ const announceList = [
 ]
 
 function WebtorrentServer({ url, playing, muted, controls, player, style, loop }: { url: string, muted: boolean, playing: boolean, controls: boolean, player: any, style: any, loop: boolean }) {
-  const client = new WebTorrent()
+  const [client] = React.useState(() => new WebTorrent())
   const [serverInitialized, setServerInitialized] = React.useState(false)
+  const [currentTorrent, setCurrentTorrent] = React.useState<Torrent | null>(null)
+  const videoRef = React.useRef<HTMLVideoElement | null>(null)
 
-  // if (typeof url !== 'string' || url.length < 10) return
-
+  // Register service worker and initialize server
   useRegisterSW({
     onRegistered(r) {
       console.log('SW registered: ', r)
-
-      r?.active && client.createServer({ controller: r })
-      setServerInitialized(true)
+      if (r?.active) {
+        client.createServer({ controller: r })
+        setServerInitialized(true)
+        console.log('WebTorrent server initialized successfully')
+      }
     }
   })
 
-  function processTorrent(torrent: Torrent, client: any) {
-    const file = torrent.files.find((file: any) => {
-      return file.type.startsWith('video/')
-
-    }) as any
-
-    console.log('file', file)
-
-    if (file === undefined) return () => { }
+  // Handle torrent streaming
+  const processTorrent = React.useCallback((torrent: Torrent) => {
     if (!serverInitialized) {
-      console.log('server not initialized')
+      console.log('Server not initialized yet, waiting...')
       return
     }
 
-    console.log('Video found! torrent file: ', file)
+    if (!videoRef.current) {
+      console.log('Video element not ready yet')
+      return
+    }
 
-    console.log('streaming file to player', player)
-    file.streamTo(player, {
-      client: client,
-      autoplay: true,
-      muted: muted,
-      controls: controls
-    })
-  }
+    console.log('Processing torrent:', torrent)
+    console.log('Available files:', torrent.files.map(f => ({ name: f.name, type: (f as any).type })))
 
+    const file = torrent.files.find((file: any) => (file as any).type?.startsWith('video/'))
+    if (!file) {
+      console.log('No video file found in torrent')
+      return
+    }
+
+    console.log('Found video file:', { name: file.name, type: (file as any).type, size: file.length })
+    try {
+      // Use streamTo for direct streaming to video element
+      if (videoRef.current) {
+        const streamUrl = file.streamURL
+        console.log('Streaming to video element', streamUrl)
+        videoRef.current.src = streamUrl
+        videoRef.current.play()
+      }
+
+      // Monitor torrent progress
+      torrent.on('download', () => {
+        console.log('Download progress:', {
+          progress: torrent.progress,
+          downloaded: torrent.downloaded,
+          downloadSpeed: torrent.downloadSpeed
+        })
+      })
+
+      // Add file-specific error handling
+      file.on('error', (err: Error) => {
+        console.error('File streaming error:', err)
+      })
+
+    } catch (err) {
+      console.error('Error streaming torrent:', err)
+    }
+  }, [serverInitialized])
+
+  // Handle torrent loading
   React.useEffect(() => {
-    console.log('loading webtorrent url: ', url)
+    if (!serverInitialized) {
+      console.log('Server not initialized yet, waiting to load torrent')
+      return
+    }
 
-    console.log('client torrents: ', client.torrents)
+    console.log('Loading torrent:', url)
+    
+    // Check for existing torrent
+    const existing = client.torrents.find(t => t.magnetURI === url)
+    if (existing) {
+      console.log('Using existing torrent')
+      setCurrentTorrent(existing)
+      processTorrent(existing)
+      return
+    }
 
-    const existingTorrent = client.torrents.find((torrent: Torrent) => {
-      console.log('comparing torrent: ', torrent, torrent.magnetURI, url)
-      return torrent.magnetURI === url
-    })
+    // Add new torrent
+    try {
+      client.add(url, { announceList }, (torrent) => {
+        console.log('Torrent added successfully:', {
+          infoHash: torrent.infoHash,
+          name: torrent.name,
+          files: torrent.files.map(f => f.name)
+        })
+        setCurrentTorrent(torrent)
+        processTorrent(torrent)
+      })
+    } catch (err) {
+      console.error('Error adding torrent:', err)
+    }
 
-    console.log('existing torrent: ', existingTorrent)
+    // Cleanup
+    return () => {
+      if (currentTorrent) {
+        console.log('Removing torrent')
+        currentTorrent.destroy()
+      }
+    }
+  }, [url, serverInitialized, client, processTorrent])
 
-    client.add(url, {
-      announceList: announceList,
-    });
-
-    client.on("torrent", (torrent: Torrent) => {
-      processTorrent(torrent, client);
-    });
-
-    return () => { }
-  }, [url, player])
-
-  console.log('Rendering video element')
+  const defaultStyle = {
+    width: '100%',
+    height: '100%',
+    maxWidth: '100%',
+    maxHeight: '100%',
+    ...style
+  }
 
   return (
     <video
-      ref={player}
-      style={style}
+      ref={(el) => {
+        videoRef.current = el
+        if (typeof player === 'function') {
+          player(el)
+        }
+      }}
+      style={defaultStyle}
       autoPlay={playing}
-      controls={false}
+      controls={controls}
       loop={loop}
       muted={muted}
+      playsInline
       id='torrent-video-player'
+      onError={(e) => {
+        console.error('Video error:', e.currentTarget.error)
+        const error = e.currentTarget.error
+        if (error) {
+          console.error('Error code:', error.code)
+          console.error('Error message:', error.message)
+        }
+      }}
+      onLoadStart={() => console.log('Video loadStart')}
+      onLoadedMetadata={() => console.log('Video loadedMetadata')}
+      onLoadedData={() => console.log('Video loadedData')}
+      onCanPlay={() => console.log('Video canPlay')}
+      onPlaying={() => console.log('Video playing')}
     />
   )
 }

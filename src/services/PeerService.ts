@@ -193,7 +193,7 @@ export default class PeerService {
       roomState.currentStream = mediaStream;
       roomState.room.addStream(mediaStream, (data as any).requesterId, {
         media: hostMedia,
-      });
+      } as unknown as JsonValue);
 
       this.dispatchFn({
         type: types.SET_HOST_STREAMING_STATUS,
@@ -229,7 +229,7 @@ export default class PeerService {
         roomState.currentStream = newStream;
         roomState.room.addStream(newStream, (data as any).requesterId, {
           media: updatedMedia,
-        });
+        } as unknown as JsonValue);
 
         // Update the peer's stream reference
         PlayerRefService.getInstance().setPeerStream(newStream);
