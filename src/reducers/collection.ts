@@ -17,36 +17,33 @@ export type Filter = {
 };
 
 export type State = {
-  rows: { [key: string]: any };
-  artists: { [key: string]: Artist };
+  rows: { [key: string]: IMedia };
   albums: { [key: string]: any };
-  albumsByArtist: any;
-  songsByAlbum: any;
-  songsByNumberOfPlays: Array<string>;
-  songsByArtist: any;
-  songsByGenre: any;
-  mediaByType: any;
+  artists: { [key: string]: Artist };
+  songsByArtist: { [key: string]: string[] };
+  songsByGenre: { [key: string]: string[] };
+  albumsByArtist: { [key: string]: string[] };
+  songsByAlbum: { [key: string]: string[] };
+  mediaByType: { [key: string]: string[] };
+  songsByNumberOfPlays: string[];
   searchTerm: string;
-  searchResults: Array<string>;
-  enabledProviders: Array<string>;
+  searchResults: string[];
+  enabledProviders: string[];
   searchIndex: object | null;
   loading: boolean;
   totalRows: number;
   activeFilters: Filter;
-  filteredSongs: Array<string>;
+  filteredSongs: string[];
 };
 
-export const defaultState = {
+export const defaultState: State = {
   rows: {},
-  artists: {},
   albums: {},
+  artists: {},
   songsByArtist: {},
   songsByGenre: {},
   songsByAlbum: {},
-  mediaByType: {
-    audio: [],
-    video: [],
-  },
+  mediaByType: {},
   albumsByArtist: {},
   songsByNumberOfPlays: [],
   searchTerm: "",
@@ -69,107 +66,101 @@ const populateFromAction = (
   action: { data: IMedia[] }
 ): State => {
   const aggregation = action.data
-    // Sort rows by ID alaphabetically
-    .sort((a: any, b: any) => {
+    .sort((a: IMedia, b: IMedia) => {
       if (a.id < b.id) return -1;
       if (a.id > b.id) return 1;
       return 0;
     })
     .reduce(
-      (acc: any, row: any) => {
-        const songDocument = row;
+      (acc: State, songDocument: IMedia) => {
+        // Deduplicate genres
+        const uniqueGenres = [...new Set(songDocument.genres || [])];
+        const processedSong = {
+          ...songDocument,
+          genres: uniqueGenres,
+        } as IMedia;
 
-        acc.rows[songDocument.id] = songDocument;
-        acc.albums[songDocument.album.id] = songDocument.album;
-        acc.artists[songDocument.artist.id] = songDocument.artist;
+        // Add to main collections
+        acc.rows[processedSong.id] = processedSong;
+        acc.albums[processedSong.album.id] = processedSong.album;
+        acc.artists[processedSong.artist.id] = processedSong.artist;
 
-        // Ensure initialization of arrays/maps
-        acc.songsByArtist[songDocument.artist.id] =
-          acc.songsByArtist[songDocument.artist.id] || [];
-        acc.songsByGenre = (songDocument.genres || []).reduce(
-          (genresAcc: { [key: string]: string[] }, genre: string) => {
-            genresAcc[genre] = genresAcc[genre] || [];
-            genresAcc[genre].push(songDocument.id);
-            return genresAcc;
-          },
-          acc.songsByGenre || {}
-        );
-        acc.albumsByArtist[songDocument.artist.id] =
-          acc.albumsByArtist[songDocument.artist.id] || [];
-        acc.songsByAlbum[songDocument.album.id] =
-          acc.songsByAlbum[songDocument.album.id] || [];
-        acc.mediaByType[songDocument.type] =
-          acc.mediaByType[songDocument.type] || [];
+        // Initialize arrays if they don't exist
+        acc.songsByArtist[processedSong.artist.id] =
+          acc.songsByArtist[processedSong.artist.id] || [];
+        acc.albumsByArtist[processedSong.artist.id] =
+          acc.albumsByArtist[processedSong.artist.id] || [];
+        acc.songsByAlbum[processedSong.album.id] =
+          acc.songsByAlbum[processedSong.album.id] || [];
 
-        // Add song ID to relevant arrays if not already present
+        // Add song to artist's songs if not already present
         if (
-          !acc.songsByArtist[songDocument.artist.id].includes(songDocument.id)
+          !acc.songsByArtist[processedSong.artist.id].includes(processedSong.id)
         ) {
-          acc.songsByArtist[songDocument.artist.id].push(songDocument.id);
+          acc.songsByArtist[processedSong.artist.id].push(processedSong.id);
         }
+
+        // Add album to artist's albums if not already present
         if (
-          !acc.albumsByArtist[songDocument.artist.id].includes(
-            songDocument.album.id
+          !acc.albumsByArtist[processedSong.artist.id].includes(
+            processedSong.album.id
           )
         ) {
-          acc.albumsByArtist[songDocument.artist.id].push(
-            songDocument.album.id
+          acc.albumsByArtist[processedSong.artist.id].push(
+            processedSong.album.id
           );
         }
+
+        // Add song to album's songs if not already present
         if (
-          !acc.songsByAlbum[songDocument.album.id].includes(songDocument.id)
+          !acc.songsByAlbum[processedSong.album.id].includes(processedSong.id)
         ) {
-          acc.songsByAlbum[songDocument.album.id].push(songDocument.id);
+          acc.songsByAlbum[processedSong.album.id].push(processedSong.id);
         }
-        if (!acc.mediaByType[songDocument.type].includes(songDocument.id)) {
-          acc.mediaByType[songDocument.type].push(songDocument.id);
+
+        // Handle genres
+        uniqueGenres.forEach((genre) => {
+          acc.songsByGenre[genre] = acc.songsByGenre[genre] || [];
+          if (!acc.songsByGenre[genre].includes(processedSong.id)) {
+            acc.songsByGenre[genre].push(processedSong.id);
+          }
+        });
+
+        // Handle media type
+        acc.mediaByType[processedSong.type] =
+          acc.mediaByType[processedSong.type] || [];
+        if (!acc.mediaByType[processedSong.type].includes(processedSong.id)) {
+          acc.mediaByType[processedSong.type].push(processedSong.id);
         }
 
         return acc;
       },
       {
-        rows: {},
-        albums: {},
-        artists: {},
-        songsByArtist: {},
-        songsByGenre: {},
-        albumsByArtist: {},
-        songsByAlbum: {},
-        mediaByType: {},
+        ...defaultState,
+        rows: { ...state.rows },
+        albums: { ...state.albums },
+        artists: { ...state.artists },
+        songsByArtist: { ...state.songsByArtist },
+        songsByGenre: { ...state.songsByGenre },
+        albumsByArtist: { ...state.albumsByArtist },
+        songsByAlbum: { ...state.songsByAlbum },
+        mediaByType: { ...state.mediaByType },
       }
     );
 
-  const overwriteMerge = (
-    _destinationArray: [],
-    sourceArray: [],
-    _options: any
-  ) => sourceArray;
-  const rows = merge(state.rows, aggregation.rows, {
-    arrayMerge: overwriteMerge,
-  });
-
-  const searchResults = filterSongs(indexService, rows, state.searchTerm);
-  const filteredSongs = applyFilters(
-    rows,
-    state.activeFilters,
-    Object.keys(rows)
+  const searchResults = filterSongs(
+    indexService,
+    aggregation.rows,
+    state.searchTerm
   );
+  const filteredSongs = applyFilters(aggregation.rows, state.activeFilters);
 
-  // Merge the aggregated data with the existing state
   return {
-    ...state,
-    rows: rows,
-    artists: { ...state.artists, ...aggregation.artists },
-    albums: { ...state.albums, ...aggregation.albums },
-    songsByArtist: { ...state.songsByArtist, ...aggregation.songsByArtist },
-    songsByGenre: { ...state.songsByGenre, ...aggregation.songsByGenre },
-    albumsByArtist: { ...state.albumsByArtist, ...aggregation.albumsByArtist },
-    songsByAlbum: { ...state.songsByAlbum, ...aggregation.songsByAlbum },
-    mediaByType: { ...state.mediaByType, ...aggregation.mediaByType },
+    ...aggregation,
     searchResults,
     filteredSongs,
+    totalRows: Object.keys(aggregation.rows).length,
     loading: false,
-    totalRows: Object.keys(rows).length,
   };
 };
 

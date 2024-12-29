@@ -143,7 +143,6 @@ class PlayerControls extends React.Component<Props> {
     const { streamUri } = this.props.player
 
     if (!this.props.itemCount || !streamUri || !currentPlaying) {
-      console.log("No current playing or stream uri", this.props.itemCount, streamUri, currentPlaying)
       return
     }
 

@@ -32,8 +32,14 @@ function WebtorrentServer({ url, playing, muted, controls, player, style, loop }
       return file.type.startsWith('video/')
 
     }) as any
+
+    console.log('file', file)
+
     if (file === undefined) return () => { }
-    if (!serverInitialized) return
+    if (!serverInitialized) {
+      console.log('server not initialized')
+      return
+    }
 
     console.log('Video found! torrent file: ', file)
 
@@ -58,17 +64,13 @@ function WebtorrentServer({ url, playing, muted, controls, player, style, loop }
 
     console.log('existing torrent: ', existingTorrent)
 
-    if (!existingTorrent) {
-      client.add(url, {
-        announceList: announceList
-      })
+    client.add(url, {
+      announceList: announceList,
+    });
 
-      client.on('torrent', (torrent: Torrent) => {
-        processTorrent(torrent, client)
-      })
-    } else {
-      processTorrent(existingTorrent, client)
-    }
+    client.on("torrent", (torrent: Torrent) => {
+      processTorrent(torrent, client);
+    });
 
     return () => { }
   }, [url, player])
