@@ -20,25 +20,23 @@ import Lyrics from './Lyrics'
 import { getStreamUri } from '../../services/Song/StreamUriService'
 import IAlbum from '../../entities/Album'
 import ServiceIcon from '../ServiceIcon'
-import Media, { IMedia } from '../../entities/Media'
+import Media from '../../entities/Media'
+import { State as QueueState } from '../../reducers/queue'
+import { State as CollectionState } from '../../reducers/collection'
+import { State as PlayerState } from '../../reducers/player'
+import { State as SettingsState } from '../../reducers/settings'
+import { State as LyricsState } from '../../reducers/lyrics'
 
 const MAX_LIST_ITEMS = 25
 
 type Props = {
   playerPortal: any,
-  location: any,
-  player: any,
-  settings: any,
-  lyrics: {
-    lyrics: string
-  },
-  collection: {
-    albums: { [key: string]: IAlbum },
-    albumsByArtist: { [key: string]: string[] },
-    songsByGenre: any,
-    rows: { [key: string]: IMedia }
-  },
-  queue: { trackIds: any, currentPlaying?: string },
+  location: Location,
+  player: PlayerState,
+  settings: SettingsState,
+  lyrics: LyricsState,
+  collection: CollectionState,
+  queue: QueueState,
   songId: string,
   dispatch: Dispatch,
   loading: boolean,
@@ -53,6 +51,7 @@ async function changeCurrentPlaying(song: any, index: number, dispatch: Dispatch
 const SongView = ({ songId, loading, className = '', dispatch, playerPortal, player, lyrics, queue, settings, collection }: Props) => {
   const navigate = useNavigate()
   const { trackIds, currentPlaying } = queue
+
   const { rows, albums, albumsByArtist, songsByGenre } = collection
 
   const song = rows[songId]
@@ -288,7 +287,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
             </div>
             {song.genres?.length > 0 && (
               <div className='mt-2 flex flex-wrap'>
-                {Array.from(new Set(song.genres)).map((genre: string) => (
+                {song.genres.map((genre: string) => (
                   <Tag
                     key={genre}
                     transparent
@@ -331,7 +330,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
               <Lyrics
                 dispatch={dispatch}
                 songId={song.id}
-                lyrics={lyrics.lyrics}
+                lyrics={lyrics.lyrics || 'gg'}
                 onClose={() => setShowLyrics(false)}
               />
             )
