@@ -30,7 +30,7 @@ describe('queue reducer', () => {
 
     const addSongsState = reducer(undefined, {
       type: types.ADD_SONGS_TO_QUEUE,
-      songs: songs.map((song: Media) => song.id)
+      songs: songs
     })
 
     expect(addSongsState)
@@ -83,7 +83,7 @@ describe('queue reducer', () => {
       currentPlaying: '1234',
       prevSongId: '4321'
     }
-    expect(reducer(props, { type: types.RECEIVE_QUEUE }))
+    expect(reducer(props, { type: types.RECEIVE_QUEUE, queue: { ...props, trackIds: ['1234', '4321'] } }))
       .toEqual(props)
   })
 })
