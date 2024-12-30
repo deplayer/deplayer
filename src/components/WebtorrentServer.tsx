@@ -1,6 +1,7 @@
 import React from 'react'
-import WebTorrent, { Torrent } from 'webtorrent'
+import { Torrent } from 'webtorrent'
 import { useRegisterSW } from 'virtual:pwa-register/react'
+import WebtorrentService from '../services/WebtorrentService'
 
 const announceList = [
   ['wss://tracker.btorrent.xyz'],
@@ -12,27 +13,127 @@ const announceList = [
   ['wss://tracker.openwebtorrent.com'],
 ]
 
-function WebtorrentServer({ url, playing, muted, controls, player, style, loop }: { url: string, muted: boolean, playing: boolean, controls: boolean, player: any, style: any, loop: boolean }) {
-  const [client] = React.useState(() => new WebTorrent())
-  const [serverInitialized, setServerInitialized] = React.useState(false)
+interface WebtorrentServerProps {
+  url: string;
+  playing?: boolean;
+  muted?: boolean;
+  controls?: boolean;
+  volume?: number;
+  playbackRate?: number;
+  loop?: boolean;
+  style?: React.CSSProperties;
+  player?: (player: HTMLVideoElement) => void;
+  onReady?: () => void;
+  onPlay?: () => void;
+  onPause?: () => void;
+  onBuffer?: () => void;
+  onBufferEnd?: () => void;
+  onError?: (error: Error) => void;
+  onEnded?: () => void;
+  onProgress?: (state: { played: number; playedSeconds: number; loaded: number; loadedSeconds: number }) => void;
+  onDuration?: (duration: number) => void;
+  onSeek?: (seconds: number) => void;
+}
+
+function WebtorrentServer({
+  url,
+  playing = false,
+  muted = false,
+  controls = false,
+  volume = 1,
+  playbackRate = 1,
+  loop = false,
+  style = {},
+  player,
+  onReady,
+  onPlay,
+  onPause,
+  onBuffer,
+  onBufferEnd,
+  onError,
+  onEnded,
+  onProgress,
+  onDuration,
+  onSeek
+}: WebtorrentServerProps) {
+  const webtorrentService = WebtorrentService.getInstance()
+  const client = webtorrentService.getClient()
   const [currentTorrent, setCurrentTorrent] = React.useState<Torrent | null>(null)
   const videoRef = React.useRef<HTMLVideoElement | null>(null)
+  const progressInterval = React.useRef<number>()
 
   // Register service worker and initialize server
   useRegisterSW({
     onRegistered(r) {
       console.log('SW registered: ', r)
-      if (r?.active) {
-        client.createServer({ controller: r })
-        setServerInitialized(true)
-        console.log('WebTorrent server initialized successfully')
-      }
+      webtorrentService.initializeServer(r as ServiceWorkerRegistration)
     }
   })
 
+  // Handle progress tracking
+  React.useEffect(() => {
+    if (!videoRef.current || !onProgress) return
+
+    const handleProgress = () => {
+      if (!videoRef.current) return
+      const duration = videoRef.current.duration
+      const currentTime = videoRef.current.currentTime
+      const buffered = videoRef.current.buffered
+      
+      const played = currentTime / duration
+      const playedSeconds = currentTime
+      
+      const loaded = buffered.length ? buffered.end(buffered.length - 1) / duration : 0
+      const loadedSeconds = buffered.length ? buffered.end(buffered.length - 1) : 0
+
+      onProgress({
+        played,
+        playedSeconds,
+        loaded,
+        loadedSeconds
+      })
+    }
+
+    progressInterval.current = window.setInterval(handleProgress, 1000)
+    return () => {
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current)
+      }
+    }
+  }, [onProgress])
+
+  // Handle play/pause
+  React.useEffect(() => {
+    if (!videoRef.current) return
+    
+    if (playing) {
+      const playPromise = videoRef.current.play()
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.error('Error attempting to play:', error)
+          onError?.(error)
+        })
+      }
+    } else {
+      videoRef.current.pause()
+    }
+  }, [playing, onError])
+
+  // Handle volume changes
+  React.useEffect(() => {
+    if (!videoRef.current) return
+    videoRef.current.volume = volume
+  }, [volume])
+
+  // Handle playback rate
+  React.useEffect(() => {
+    if (!videoRef.current) return
+    videoRef.current.playbackRate = playbackRate
+  }, [playbackRate])
+
   // Handle torrent streaming
   const processTorrent = React.useCallback((torrent: Torrent) => {
-    if (!serverInitialized) {
+    if (!webtorrentService.isServerInitialized()) {
       console.log('Server not initialized yet, waiting...')
       return
     }
@@ -42,55 +143,57 @@ function WebtorrentServer({ url, playing, muted, controls, player, style, loop }
       return
     }
 
-    console.log('Processing torrent:', torrent)
-    console.log('Available files:', torrent.files.map(f => ({ name: f.name, type: (f as any).type })))
-
     const file = torrent.files.find((file: any) => (file as any).type?.startsWith('video/'))
     if (!file) {
-      console.log('No video file found in torrent')
+      const error = new Error('No video file found in torrent')
+      console.error(error)
+      onError?.(error)
       return
     }
 
-    console.log('Found video file:', { name: file.name, type: (file as any).type, size: file.length })
     try {
-      // Use streamTo for direct streaming to video element
       if (videoRef.current) {
-        const streamUrl = file.streamURL
-        console.log('Streaming to video element', streamUrl)
-        videoRef.current.src = streamUrl
-        videoRef.current.play()
+        (file as any).streamTo(videoRef.current)
+          .on('ready', () => {
+            console.log('Stream is ready')
+            onReady?.()
+          })
+          .on('error', (err: Error) => {
+            console.error('Stream error:', err)
+            onError?.(err)
+          })
       }
 
-      // Monitor torrent progress
       torrent.on('download', () => {
-        console.log('Download progress:', {
-          progress: torrent.progress,
-          downloaded: torrent.downloaded,
-          downloadSpeed: torrent.downloadSpeed
-        })
+        if (!videoRef.current) return
+        const buffered = videoRef.current.buffered
+        if (buffered.length) {
+          const loaded = buffered.end(buffered.length - 1) / videoRef.current.duration
+          if (loaded > 0.1) {
+            onBufferEnd?.()
+          }
+        }
       })
 
-      // Add file-specific error handling
       file.on('error', (err: Error) => {
         console.error('File streaming error:', err)
+        onError?.(err)
       })
 
     } catch (err) {
       console.error('Error streaming torrent:', err)
+      onError?.(err as Error)
     }
-  }, [serverInitialized])
+  }, [onReady, onError, onBufferEnd])
 
   // Handle torrent loading
   React.useEffect(() => {
-    if (!serverInitialized) {
+    if (!client) {
       console.log('Server not initialized yet, waiting to load torrent')
       return
     }
 
-    console.log('Loading torrent:', url)
-    
-    // Check for existing torrent
-    const existing = client.torrents.find(t => t.magnetURI === url)
+    const existing = client.torrents.find((t: Torrent) => t.magnetURI === url)
     if (existing) {
       console.log('Using existing torrent')
       setCurrentTorrent(existing)
@@ -98,29 +201,27 @@ function WebtorrentServer({ url, playing, muted, controls, player, style, loop }
       return
     }
 
-    // Add new torrent
     try {
-      client.add(url, { announceList }, (torrent) => {
-        console.log('Torrent added successfully:', {
-          infoHash: torrent.infoHash,
-          name: torrent.name,
-          files: torrent.files.map(f => f.name)
-        })
+      client.add(url, { announceList }, (torrent: Torrent) => {
+        console.log('Torrent added successfully')
         setCurrentTorrent(torrent)
         processTorrent(torrent)
       })
     } catch (err) {
       console.error('Error adding torrent:', err)
+      onError?.(err as Error)
     }
 
-    // Cleanup
     return () => {
       if (currentTorrent) {
         console.log('Removing torrent')
         currentTorrent.destroy()
       }
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current)
+      }
     }
-  }, [url, serverInitialized, client, processTorrent])
+  }, [url, client, processTorrent, onError])
 
   const defaultStyle = {
     width: '100%',
@@ -134,30 +235,31 @@ function WebtorrentServer({ url, playing, muted, controls, player, style, loop }
     <video
       ref={(el) => {
         videoRef.current = el
-        if (typeof player === 'function') {
+        if (typeof player === 'function' && el) {
           player(el)
         }
       }}
       style={defaultStyle}
-      autoPlay={playing}
       controls={controls}
       loop={loop}
       muted={muted}
       playsInline
       id='torrent-video-player'
+      onPlay={onPlay}
+      onPause={onPause}
+      onEnded={onEnded}
+      onLoadStart={onBuffer}
+      onWaiting={onBuffer}
+      onPlaying={onBufferEnd}
+      onDurationChange={(e) => onDuration?.(e.currentTarget.duration)}
+      onSeeked={(e) => onSeek?.(e.currentTarget.currentTime)}
       onError={(e) => {
         console.error('Video error:', e.currentTarget.error)
         const error = e.currentTarget.error
         if (error) {
-          console.error('Error code:', error.code)
-          console.error('Error message:', error.message)
+          onError?.(new Error(`Video error: ${error.message}`))
         }
       }}
-      onLoadStart={() => console.log('Video loadStart')}
-      onLoadedMetadata={() => console.log('Video loadedMetadata')}
-      onLoadedData={() => console.log('Video loadedData')}
-      onCanPlay={() => console.log('Video canPlay')}
-      onPlaying={() => console.log('Video playing')}
     />
   )
 }

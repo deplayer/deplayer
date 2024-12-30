@@ -1,5 +1,6 @@
 import { clientsClaim } from "workbox-core";
 import { cleanupOutdatedCaches, precacheAndRoute } from "workbox-precaching";
+import listener from "./worker-server";
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -16,6 +17,9 @@ self.addEventListener("fetch", async (event) => {
   if (url.origin === self.origin && url.pathname.startsWith("/opfs-")) {
     event.respondWith(handleOpfsRequest(url.pathname));
   }
+
+  const res = listener(event);
+  if (res) event.respondWith(res);
 });
 
 async function handleOpfsRequest(pathname: string) {
