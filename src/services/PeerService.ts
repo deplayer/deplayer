@@ -164,7 +164,8 @@ export default class PeerService {
 
     if (!roomState || !mediaElement?.captureStream) {
       console.warn(
-        "Cannot capture stream: Media element or captureStream not supported"
+        "Cannot capture stream: Media element or captureStream not supported",
+        mediaElement
       );
       return;
     }

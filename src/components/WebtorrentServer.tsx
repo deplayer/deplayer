@@ -29,6 +29,7 @@ interface WebtorrentServerProps {
   onBuffer?: () => void;
   onBufferEnd?: () => void;
   onError?: (error: Error) => void;
+  seek?: number;
   onEnded?: () => void;
   onProgress?: (state: { played: number; playedSeconds: number; loaded: number; loadedSeconds: number }) => void;
   onDuration?: (duration: number) => void;
@@ -54,7 +55,7 @@ function WebtorrentServer({
   onEnded,
   onProgress,
   onDuration,
-  onSeek
+  onSeek,
 }: WebtorrentServerProps) {
   const webtorrentService = WebtorrentService.getInstance()
   const client = webtorrentService.getClient()

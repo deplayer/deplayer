@@ -86,6 +86,10 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
 
   seekTo(seconds: any) {
     this.player.currentTime = seconds
+
+    if (this.props.onSeek) {
+      this.props.onSeek(seconds)
+    }
   }
 
   setVolume(fraction: any) {
@@ -149,10 +153,19 @@ export class TorrentPlayer extends React.Component<ReactPlayerProps> {
       <WebtorrentServer
         player={this.ref}
         loop={!!loop}
-        style={style}
         muted={!!muted}
+        style={style}
         playing={!!playing}
-        controls={false}
+        onPlay={this.props.onPlay}
+        onPause={this.props.onPause}
+        onBuffer={this.props.onBuffer}
+        onBufferEnd={this.props.onBufferEnd}
+        onError={this.props.onError}
+        onEnded={this.props.onEnded}
+        onProgress={this.props.onProgress}
+        onDuration={this.props.onDuration}
+        onSeek={this.props.onSeek}
+        controls={true}
         url={url?.toString()}
       />
     )
