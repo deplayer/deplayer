@@ -144,6 +144,7 @@ const populateFromAction = (
         albumsByArtist: { ...state.albumsByArtist },
         songsByAlbum: { ...state.songsByAlbum },
         mediaByType: { ...state.mediaByType },
+        enabledProviders: [...state.enabledProviders],
       }
     );
 

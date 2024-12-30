@@ -38,7 +38,7 @@ describe('collection reducer', () => {
       albums,
       rows,
       loading: false,
-      mediaByType: { audio: [] },
+      mediaByType: { },
       searchResults: [fixtureSong.id],
       filteredSongs: [fixtureSong.id]
     }
