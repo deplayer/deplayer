@@ -101,7 +101,9 @@ const SidebarContents = (props: ContentProps) => {
         <SettingsMenuItem current={inSection(location, 'settings')} />
       </ul>
 
-      <CommandBar dispatch={props.dispatch} />
+      <div className='w-full'>  
+        <CommandBar dispatch={props.dispatch} />
+      </div>
 
       <section className='p-6 pt-8 text-sm text-center w-full text-base-content/70'>
         <DeplayerTitle /> is 

@@ -10,7 +10,6 @@ type Props = {
   title: React.ReactNode,
   loading: boolean,
   showInCenter: boolean,
-  error: string,
   searchTerm: string,
   searchToggled: boolean,
   dispatch: Dispatch,
@@ -86,11 +85,6 @@ const Topbar = (props: Props) => {
         <div className='flex items-center'>
           {props.loading && (
             <div className='loading loading-spinner loading-sm mx-2'></div>
-          )}
-          {props.error && (
-            <div className='text-error mx-2'>
-              <Icon icon='faExclamationTriangle' />
-            </div>
           )}
         </div>
       </div>

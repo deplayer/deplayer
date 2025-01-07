@@ -191,21 +191,35 @@ export default (state: State = defaultState, action: any = {}): State => {
 
     case types.ADD_SONGS_TO_QUEUE:
       if (action.replace) {
+        const newTrackIds = action.songs.map((song: Media) => song.id)
         return {
           ...state,
-          trackIds: action.songs.map((song: Media) => song.id),
-        };
+          trackIds: newTrackIds,
+          randomTrackIds: state.shuffle ? shuffleArray(newTrackIds) : [],
+          currentPlaying: null,
+          nextSongId: newTrackIds.length > 0 ? newTrackIds[0] : null,
+          prevSongId: null
+        }
       }
+
+      const updatedTrackIds = Array.from(
+        new Set([
+          ...state.trackIds,
+          ...action.songs.map((song: Media) => song.id),
+        ])
+      )
 
       return {
         ...state,
-        trackIds: Array.from(
-          new Set([
-            ...state.trackIds,
-            ...action.songs.map((song: Media) => song.id),
-          ])
-        ),
-      };
+        trackIds: updatedTrackIds,
+        randomTrackIds: state.shuffle ? shuffleArray(updatedTrackIds) : state.randomTrackIds,
+        nextSongId: state.currentPlaying 
+          ? getSiblingSong(updatedTrackIds, state.currentPlaying, true)
+          : updatedTrackIds[0],
+        prevSongId: state.currentPlaying
+          ? getSiblingSong(updatedTrackIds, state.currentPlaying)
+          : null
+      }
 
     case types.SET_CURRENT_PLAYING:
       return setCurrentPlaying(state, action);

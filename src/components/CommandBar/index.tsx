@@ -37,7 +37,7 @@ function CommandBar({ dispatch }: Props) {
   ]
 
   return (
-    <div className='px-6 py-4 text-xs'>
+    <div className='px-6 py-4 text-xs w-full flex justify-center items-center'>
       <CommandPalette commands={commands} closeOnSelect />
     </div>
   )
