@@ -1,3 +1,6 @@
+This is a local-first media player which is multi provider and runs entirely in the browser 
+without needing any server.
+
 Try to perform as much TDD as possible.
 Use vitest for testing.
 
@@ -6,3 +9,8 @@ Use vitest for testing.
 - Don't leave any unused imports.
 - Don't couple component matchers to translatable text or labels.
 - Don't use `getByTitle` in tests.
+
+
+Application style:
+- Use the `Translate` component to translate text.
+- Translations should be placed in `en.json` file.

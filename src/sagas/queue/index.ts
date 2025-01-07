@@ -10,11 +10,27 @@ import { initialize } from './workers'
 
 // Extract songs from collection state
 export const getSongs = (state: any, action: { path: string }): Array<string> => {
+  if (!state) return []
+  
   if (action.path === 'search-results') {
-    return state ? state.collection.searchResults : []
+    return state.collection.searchResults
   }
 
-  return state ? state.collection.filteredSongs : []
+  // Handle different routes
+  const pathParts = action.path.split('/')
+  if (pathParts[0] === 'albums' && pathParts[1]) {
+    return state.collection.songsByAlbum[pathParts[1]] || []
+  }
+  
+  if (pathParts[0] === 'artists' && pathParts[1]) {
+    return state.collection.songsByArtist[pathParts[1]] || []
+  }
+  
+  if (pathParts[0] === 'genres' && pathParts[1]) {
+    return state.collection.songsByGenre[pathParts[1]] || []
+  }
+
+  return state.collection.filteredSongs
 }
 
 // Handling playAll saga
