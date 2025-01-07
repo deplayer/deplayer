@@ -57,7 +57,7 @@ const ShareRoomModal = ({ isOpen, roomCode, onClose, dispatch }: Props) => {
               value={`${window.location.origin}/join/${roomCode}`}
               className="input input-bordered w-full"
             />
-            <Button onClick={handleCopyUrl} className="btn btn-primary btn-square">
+            <Button onClick={handleCopyUrl} className="btn btn-primary btn-square" title="Copy room link">
               <Icon icon="faCopy" />
             </Button>
           </div>

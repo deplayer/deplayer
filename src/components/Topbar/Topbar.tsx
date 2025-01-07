@@ -6,6 +6,7 @@ import ShareRoomModal from '../ShareRoomModal'
 import { State as CollectionState } from '../../reducers/collection'
 import { State as AppState } from '../../reducers/app'
 import * as types from '../../constants/ActionTypes'
+import { State as PeersState } from '../../reducers/peers'
 
 type Props = {
   title: React.ReactNode,
@@ -17,7 +18,8 @@ type Props = {
   dispatch: Dispatch,
   onSetSidebarOpen?: (open: boolean) => void,
   collection?: CollectionState,
-  app?: AppState & { roomId?: string },
+  app?: AppState,
+  peers?: PeersState,
   children?: React.ReactNode
 }
 
@@ -124,11 +126,11 @@ const Topbar = (props: Props) => {
         </button>
       </div>
 
-      {props.app?.roomId && (
+      {Object.keys(props.peers?.peers || {}).length > 0 && (
         <ShareRoomModal
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
-          roomCode={props.app.roomId}
+          roomCode={Object.keys(props.peers?.peers || {})[0]}
           dispatch={props.dispatch}
         />
       )}

@@ -1,13 +1,13 @@
 /// <reference types="vitest" />
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import React from 'react'
-import { render, screen, fireEvent, act, cleanup } from '@testing-library/react'
+import { render, fireEvent, act, cleanup } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import Topbar from './Topbar'
 import * as types from '../../constants/ActionTypes'
 import { State as AppState } from '../../reducers/app'
+import { State as PeersState } from '../../reducers/peers'
 
-// Mock react-redux-i18n
+// We only mock I18n since it's an external dependency
 vi.mock('react-redux-i18n', () => ({
   I18n: {
     t: (key: string) => key === 'placeholder.search' ? 'Search...' : key
@@ -15,16 +15,25 @@ vi.mock('react-redux-i18n', () => ({
   Translate: ({ value }: { value: string }) => value
 }))
 
-// Mock Icon component
-vi.mock('../common/Icon', () => ({
-  default: ({ icon }: { icon: string }) => <span data-testid={icon}>{icon}</span>
-}))
+// Mock clipboard API
+const mockClipboard = {
+  writeText: vi.fn()
+}
 
-// Mock ShareRoomModal component
-vi.mock('../ShareRoomModal', () => ({
-  default: ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => 
-    isOpen ? <div data-testid="share-room-modal"><button onClick={onClose}>Close</button></div> : null
-}))
+Object.defineProperty(navigator, 'clipboard', {
+  value: mockClipboard,
+  writable: true
+})
+
+// Mock window.location
+const locationMock = {
+  origin: 'http://localhost:3000'
+} as Location
+
+Object.defineProperty(window, 'location', {
+  value: locationMock,
+  writable: true
+})
 
 vi.useFakeTimers()
 
@@ -50,18 +59,42 @@ describe('Topbar', () => {
       showVisuals: false,
       rightPanelToggled: false,
       ready: false,
-      roomId: undefined
-    } satisfies AppState & { roomId?: string }
+    } satisfies AppState,
+    peers: {
+      peers: {
+        'test-room-123': {
+          'test-peer-1': {
+            peerId: 'test-peer-1',
+            username: 'Test User',
+            roomCode: 'test-room-123',
+            isPlaying: false,
+            streaming: false
+          }
+        }
+      }
+    } satisfies PeersState
   }
 
   beforeEach(() => {
     mockDispatch.mockClear()
     vi.clearAllTimers()
+    mockClipboard.writeText.mockClear()
+
+    // Add modal container
+    const modalRoot = document.createElement('div')
+    modalRoot.setAttribute('id', 'modal')
+    document.body.appendChild(modalRoot)
   })
 
   afterEach(() => {
     vi.clearAllMocks()
     cleanup()
+
+    // Clean up modal container
+    const modalRoot = document.getElementById('modal')
+    if (modalRoot) {
+      document.body.removeChild(modalRoot)
+    }
   })
 
   const renderTopbar = (props = {}) => {
@@ -71,6 +104,79 @@ describe('Topbar', () => {
       </BrowserRouter>
     )
   }
+
+  describe('ShareRoomModal', () => {
+    it('should open modal when share button is clicked', () => {
+      const { getByTitle, getByText } = renderTopbar()
+      
+      // Click share button
+      const shareButton = getByTitle('Share room')
+      fireEvent.click(shareButton)
+
+      // Modal should be visible
+      expect(getByText('Share Room')).toBeInTheDocument()
+      expect(getByText(/Share this link with your friends/)).toBeInTheDocument()
+    })
+
+    it('should copy room URL to clipboard when copy button is clicked', () => {
+      const { getByTitle } = renderTopbar()
+      
+      // Click share button to open modal
+      const shareButton = getByTitle('Share room')
+      fireEvent.click(shareButton)
+
+      // Click copy button
+      const copyButton = getByTitle('Copy room link')
+      expect(copyButton).toBeTruthy()
+      fireEvent.click(copyButton)
+
+      // Should copy URL to clipboard
+      expect(mockClipboard.writeText).toHaveBeenCalledWith(
+        'http://localhost:3000/join/test-room-123'
+      )
+
+      // Should show notification
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: types.SEND_NOTIFICATION,
+        notification: 'Room URL copied to clipboard',
+        level: 'success',
+        duration: 2000
+      })
+    })
+
+    it('should close modal when close button is clicked', () => {
+      const { getByTitle, getByText, queryByText } = renderTopbar()
+      
+      // Click share button to open modal
+      const shareButton = getByTitle('Share room')
+      fireEvent.click(shareButton)
+
+      // Modal should be visible
+      expect(getByText('Share Room')).toBeInTheDocument()
+
+      // Click close button
+      const closeButton = getByText('Close')
+      fireEvent.click(closeButton)
+
+      // Modal should be hidden
+      expect(queryByText('Share Room')).not.toBeInTheDocument()
+    })
+
+    it('should not render modal when roomId is not present', () => {
+      const { getByTitle, queryByText } = renderTopbar({
+        peers: {
+          peers: {}
+        }
+      })
+      
+      // Click share button
+      const shareButton = getByTitle('Share room')
+      fireEvent.click(shareButton)
+
+      // Modal should not be visible
+      expect(queryByText('Share Room')).not.toBeInTheDocument()
+    })
+  })
 
   describe('Search functionality', () => {
     it('should update search term immediately but debounce the search action', async () => {
