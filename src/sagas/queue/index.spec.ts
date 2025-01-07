@@ -24,6 +24,11 @@ describe('Queue Saga', () => {
       expect(result).toEqual(['search1', 'search2'])
     })
 
+    it('should return filtered songs for collection path', () => {
+      const result = getSongs(mockState, { path: 'collection' })
+      expect(result).toEqual(['filtered1', 'filtered2'])
+    })
+
     it('should return songs by album for album route', () => {
       const result = getSongs(mockState, { path: 'albums/album1' })
       expect(result).toEqual(['song1', 'song2'])

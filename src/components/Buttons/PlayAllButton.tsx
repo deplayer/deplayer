@@ -13,10 +13,11 @@ type Props = {
 const PlayAllButton = (props: Props) => {
   const location = useLocation()
   const playAll = () => {
-    props.dispatch({ type: PLAY_ALL, path: location.pathname.replace(/\//, '') })
+    const path = location.pathname === '/' ? 'collection' : location.pathname.replace(/^\//, '')
+    props.dispatch({ type: PLAY_ALL, path })
   }
 
-  if (location.pathname.match(/^\/settings?$/)) {
+  if (location.pathname === '/settings') {
     return null
   }
 

@@ -16,6 +16,10 @@ export const getSongs = (state: any, action: { path: string }): Array<string> =>
     return state.collection.searchResults
   }
 
+  if (action.path === 'collection') {
+    return state.collection.filteredSongs
+  }
+
   // Handle different routes
   const pathParts = action.path.split('/')
   if (pathParts[0] === 'albums' && pathParts[1]) {
