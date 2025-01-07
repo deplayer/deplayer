@@ -29,28 +29,35 @@ const ShareRoomModal = ({ isOpen, roomCode, onClose, dispatch }: Props) => {
 
   return (
     <Modal
-      title={<Translate value="peer.shareRoom" />}
+      isOpen={isOpen}
+      title="Share Room"
       onClose={onClose}
     >
       <div className="p-4 flex flex-col items-center gap-4">
-        <p className="mb-4">Share this link with your friends to join this room. <br />You will be able to share your current playing song with them.</p>
-        <QRCodeSVG 
-          value={`${window.location.origin}/join/${roomCode}`}
-          size={200}
-          includeMargin
-        />
+        <p className="mb-4 text-base-content/80">
+          Share this link with your friends to join this room. <br />
+          You will be able to share your current playing song with them.
+        </p>
+        
+        <div className="bg-base-100 p-4 rounded-lg">
+          <QRCodeSVG 
+            value={`${window.location.origin}/join/${roomCode}`}
+            size={200}
+            includeMargin
+          />
+        </div>
 
         <div className="w-full">
-          <label className="block text-sm mb-2">
+          <label className="block text-sm mb-2 text-base-content/70">
             <Translate value="peer.roomLink" />
           </label>
           <div className="flex gap-2">
             <input
               readOnly
               value={`${window.location.origin}/join/${roomCode}`}
-              className="w-full p-2 rounded border dark:bg-gray-800"
+              className="input input-bordered w-full"
             />
-            <Button onClick={handleCopyUrl}>
+            <Button onClick={handleCopyUrl} className="btn btn-primary btn-square">
               <Icon icon="faCopy" />
             </Button>
           </div>

@@ -1,6 +1,7 @@
 import { Dispatch } from 'redux'
 import { Link } from 'react-router-dom'
 import { Translate } from 'react-redux-i18n'
+import React from 'react'
 
 import { getDurationStr } from '../../../utils/timeFormatter'
 import ContextualMenu from './../ContextualMenu'
@@ -11,7 +12,7 @@ import ServiceIcon from '../../ServiceIcon'
 import { State as QueueState } from '../../../reducers/queue'
 
 export type Props = {
-  songsLength: number, // Listening this in order to recreate context menu
+  songsLength: number,
   song: Media,
   queue?: QueueState,
   isCurrent?: boolean | null,
@@ -53,26 +54,28 @@ const SongRow = (props: Props) => {
 
   return (
     <div
-      className={`song-row ${props.isCurrent && 'current'} p-2 flex justify-between`}
+      className={`song-row p-2 flex justify-between ${props.isCurrent ? 'bg-base-200' : ''} hover:bg-base-200/50`}
       style={props.style}
       onClick={onClick}
     >
       {disableCovers || cover}
       <div className='media-info truncate w-full whitespace-no-wrap'>
-        <h4 className='text-sky-900 dark:text-sky-400 text-lg -mt-1'>
-          <Link to={`/song/${song.id}`}>
-            {song.track && <span className='mr-1 text-yellow-900 dark:text-yellow-500 hover:dark:text-yellow-200 text-xl font-bold inline-block'>{song.track}</span>}
+        <h4 className='text-lg -mt-1'>
+          <Link to={`/song/${song.id}`} className="text-base-content hover:text-primary">
+            {song.track && <span className='mr-1 text-primary text-xl font-bold inline-block'>{song.track}</span>}
             {song.title}
           </Link>
         </h4>
-        <h5 className='text-yellow-900 dark:text-yellow-600 text-sm'>
+        <h5 className='text-base-content/70 text-sm'>
           {song.album ? song.album.name : nonAvailable}
         </h5>
-        <h6 className='text-yellow-900 dark:text-yellow-600 text-sm'>
-          <Link to={`/artist/${song.artist.id}`}>{song.artist ? song.artist.name : nonAvailable}</Link>
+        <h6 className='text-sm'>
+          <Link to={`/artist/${song.artist.id}`} className="text-base-content/70 hover:text-primary">
+            {song.artist ? song.artist.name : nonAvailable}
+          </Link>
         </h6>
         {props.slim || (
-          <div className='inline-block text-yellow-900 dark:text-yellow-400 text-sm'>{getDurationStr(song.duration)}</div>
+          <div className='inline-block text-base-content/60 text-sm'>{getDurationStr(song.duration)}</div>
         )}
       </div>
       <div className='flex' tabIndex={0}>
@@ -84,14 +87,14 @@ const SongRow = (props: Props) => {
             })
           }
           {props.slim && (
-            <span className='text-yellow-400'>{getDurationStr(song.duration)}</span>
+            <span className='text-primary'>{getDurationStr(song.duration)}</span>
           )}
         </div>
         <div className='h-10'>
           <ContextualMenu {...props} />
         </div>
       </div>
-    </div >
+    </div>
   )
 }
 

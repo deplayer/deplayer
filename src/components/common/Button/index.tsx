@@ -20,17 +20,15 @@ type Props = {
 
 const Button = (props: Props) => {
   const classNames = classnames({
-    btn: true,
-    flex: true,
+    'btn': true,
+    'flex': true,
     'items-center': true,
-    uppercase: props.uppercase,
-    'btn-outline': props.inverted,
-    'text-sky-200': !props.transparent || !props.inverted,
-    'text-sky-800': props.inverted || props.transparent,
-    'dark:text-sky-200': props.transparent || props.inverted,
-    'hover:dark:text-sky-200': !props.transparent || props.inverted,
-    'bg-sky-700': !props.transparent && !props.inverted,
-    'hover:bg-sky-500': !props.transparent && !props.inverted,
+    'uppercase': props.uppercase,
+    'btn-ghost': props.transparent,
+    'text-primary': props.transparent,
+    'hover:text-primary-focus': props.transparent,
+    'hover:bg-base-200': props.transparent,
+    'btn-circle': props.roundedFull,
     'text-base': props.size === 'lg',
     'text-xl': props.size === 'lg',
     'text-4xl': props.size === '4xl',
@@ -39,21 +37,10 @@ const Button = (props: Props) => {
     'text-left': props.alignLeft,
     'justify-center': !props.alignLeft,
     'text-center': !props.alignLeft,
-    'p-2': true,
-    'px-2': true,
-    'px-4': props.long || props.large,
     'rounded': true,
     'rounded-full': props.roundedFull,
     'w-full': props.fullWidth,
-    'border': !props.transparent && props.inverted,
-    'border-sky-500': !props.inverted,
-    'border-sky-800': props.inverted,
-    'dark:border-sky-200': props.inverted,
-    'hover:border-sky-200': props.inverted,
-    'border-solid': props.inverted,
-    'border-transparent': props.transparent,
-    'bg-transparent': props.inverted || props.transparent,
-  })
+  }, props.className)
 
   return (
     <button

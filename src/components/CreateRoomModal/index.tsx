@@ -28,7 +28,8 @@ const CreateRoomModal = ({ isOpen, onClose, onCreateRoom }: Props) => {
 
   return (
     <Modal
-      title={<Translate value="peer.joinOrCreateRoom" />}
+      isOpen={isOpen}
+      title="Create a room"
       onClose={onClose}
     >
       <div className="p-4">

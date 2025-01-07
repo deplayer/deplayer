@@ -40,7 +40,7 @@ const Image = () => {
 
   return (
     <ImageComponent
-      className='w-60 cursor-pointer fill-sky-700 dark:fill-sky-500 h-auto'
+      className={`w-60 cursor-pointer fill-accent h-auto`}
     />
   )
 }
@@ -53,28 +53,28 @@ const WelcomeMessage = ({ dispatch }: { dispatch: Dispatch }) => {
     <div className='flex flex-col md:flex-row w-full content-start items-center'>
       {showAuthModal && <Auth dispatch={dispatch} onClose={() => setShowAuthModal(false)} />}
       <div className='flex flex-col items-center'>
-        <h4 className="text-xl text-center py-4 text-sky-900 dark:text-sky-300 p-4">
+        <h4 className="text-xl text-center py-4 p-4">
           Hi <i>audiophile</i>! Welcome to <DeplayerTitle />
         </h4>
         <Image />
       </div>
       <div className='px-6 md:py-8'>
-        <p className='py-4'>
+        <p className='py-4 text-base-content'>
           Access to you good ol' music library and enjoy it whenever you need it. <br />
           To start playing some content follow one of the steps below:
         </p>
         <ul>
-          <li><Link to='/providers' className='text-blue-500'>Setup your media providers</Link>, (Subsonic API, mstream or ITunes)</li>
+          <li><Link to='/providers' className='text-primary hover:text-primary-focus'>Setup your media providers</Link>, (Subsonic API, mstream or ITunes)</li>
           <li>
-            <a onClick={() => dispatch({ type: types.SHOW_ADD_MEDIA_MODAL })} className='text-blue-500 cursor-pointer'>Add new media to your collection</a> Webtorrent, Filesystem, IPFS or youtube-dl-server
+            <a onClick={() => dispatch({ type: types.SHOW_ADD_MEDIA_MODAL })} className='text-primary hover:text-primary-focus cursor-pointer'>Add new media to your collection</a> Webtorrent, Filesystem, IPFS or youtube-dl-server
           </li>
-          <li><Link to='/collection' className='text-blue-500'>Or go to your collection</Link></li>
+          <li><Link to='/collection' className='text-primary hover:text-primary-focus'>Or go to your collection</Link></li>
         </ul>
         <div className='pt-6 flex flex-col items-center md:justify-start'>
-          {credentials && <p className='py-2'>You are authenticated with your passkey</p>}
+          {credentials && <p className='py-2 text-base-content'>You are authenticated with your passkey</p>}
           {!credentials && (
             <>
-              <p className='py-2'>Access social capabilities by authenticating with your passkey</p>
+              <p className='py-2 text-base-content'>Access social capabilities by authenticating with your passkey</p>
               <Button long onClick={() => setShowAuthModal(true)}>🔒 Auth</Button>
             </>
           )
@@ -112,7 +112,7 @@ const Dashboard = ({
         />}
       {!!slicedAlbums.length && <RelatedAlbums albums={slicedAlbums} />}
       <div className='flex flex-col items-center mt-12'>
-        <h4 className="text-xl text-center py-4 text-sky-900 dark:text-sky-300 p-4">
+        <h4 className="text-xl text-center py-4 text-primary p-4">
           <DeplayerTitle />
         </h4>
       </div>

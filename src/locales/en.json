@@ -55,6 +55,7 @@
     }
   },
   "buttons": {
+    "save": "Save",
     "addNext": "Enqueue next",
     "addNewMedia": "Add new media",
     "addProvider": "Set up new provider",

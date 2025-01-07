@@ -70,11 +70,9 @@ const ArrowLeft = () => {
   }
 
   return (
-    <div
-      className='text-4xl z-10 absolute inset-y-0 flex left-0 bg-gradient-to-l from-transparent to-gray-800/20 dark:to-gray-400/20'
-    >
+    <div className='text-4xl z-10 absolute inset-y-0 flex items-center left-0 bg-gradient-to-l from-transparent to-base-200/20'>
       <Button onClick={() => visibility.scrollPrev()} transparent>
-        <Icon icon='faArrowCircleLeft' className='arrow-prev text-sky-500 dark:text-sky-200 hover:text-blue-800' />
+        <Icon icon='faArrowCircleLeft' className='arrow-prev text-primary hover:text-primary-focus' />
       </Button>
     </div>
   )
@@ -89,11 +87,9 @@ const ArrowRight = () => {
   }
 
   return (
-    <div
-      className='text-4xl z-10 absolute inset-y-0 flex right-0 bg-gradient-to-r from-transparent to-gray-800/20 dark:to-gray-400/20'
-    >
+    <div className='text-4xl z-10 absolute inset-y-0 flex items-center right-0 bg-gradient-to-r from-transparent to-base-200/20'>
       <Button onClick={() => visibility.scrollNext()} transparent>
-        <Icon icon='faArrowCircleRight' className='arrow-prev text-sky-500 dark:text-sky-200 hover:text-blue-800' />
+        <Icon icon='faArrowCircleRight' className='arrow-prev text-primary hover:text-primary-focus' />
       </Button>
     </div>
   )
@@ -127,7 +123,7 @@ const HorizontalSlider = (props: Props) => {
 
   return (
     <div className='w-full overflow-hidden' onMouseLeave={dragState.current.dragStop}>
-      <h2 className='my-4 px-4 text-xl'>{props.title}</h2>
+      <h2 className='my-4 px-4 text-xl text-base-content'>{props.title}</h2>
       <ScrollMenu
         LeftArrow={ArrowLeft}
         RightArrow={ArrowRight}

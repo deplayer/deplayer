@@ -157,8 +157,8 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
 
   return (
     <React.Fragment>
-      <div 
-        className={`p-2 bg-gray-200/50 dark:bg-black/40 toolbar flex justify-between items-center text-base top-15 right-0 z-10 transition-transform duration-100 ${
+      <div
+        className={`p-2 bg-base-200/50 toolbar flex justify-between items-center text-base-content top-15 right-0 z-10 transition-transform duration-100 ${
           isToolbarVisible ? 'translate-y-0' : '-translate-y-full'
         }`}
         style={{ display: isToolbarHidden ? 'none' : 'flex' }}
@@ -171,6 +171,7 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
           {actions}
         </div>
       </div>
+      
       <AutoSizer className='music-table'>
         {({ height, width }: { height: number, width: number }) => (
           <List

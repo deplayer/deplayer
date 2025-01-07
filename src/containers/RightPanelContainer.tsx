@@ -6,7 +6,7 @@ import { Dispatch } from 'redux'
 import * as types from '../constants/ActionTypes'
 
 const SidebarContents = ({ dispatch }: { dispatch: Dispatch }) => {
-  return <div className='w-full h-full' style={{ zIndex: '10' }}>
+  return <div className='w-full h-full'>
     <Social dispatch={dispatch} />
   </div>
 }
@@ -21,12 +21,17 @@ const RightPanelContainer = ({ rightPanelToggled, dispatch }: { rightPanelToggle
       sidebar={<SidebarContents dispatch={dispatch} />}
       open={rightPanelToggled}
       pullRight={true}
-      onSetOpen={(open) => handleSetSidebarOpen(open)}
+      onSetOpen={handleSetSidebarOpen}
       sidebarId='right-sidebar'
-      sidebarClassName='w-64 z-50 bg-gray-200 dark:bg-black z-50'
+      sidebarClassName='w-64 bg-base-200/70 backdrop-blur fixed'
       overlayId='right-sidebar-overlay'
+      overlayClassName='fixed inset-0'
       contentId='right-sidebar-content'
-      styles={{ overlay: { zIndex: '10' }, sidebar: { zIndex: '20' } }}
+      styles={{ 
+        overlay: { backgroundColor: 'rgba(0, 0, 0, 0.3)', zIndex: '40' }, 
+        sidebar: { position: 'fixed', zIndex: '50' },
+        content: { position: 'relative' }
+      }}
     >
       <div id='right-sidebar-content' />
     </Sidebar>

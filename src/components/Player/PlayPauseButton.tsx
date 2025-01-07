@@ -15,6 +15,8 @@ const PlayPauseButton = (props: Props) => {
         transparent
         inverted
         size='4xl'
+        roundedFull
+        className='text-primary'
         onClick={props.onClick}
       >
         {props.playing ? <Icon icon='faPauseCircle' /> : <Icon icon='faPlayCircle' />}

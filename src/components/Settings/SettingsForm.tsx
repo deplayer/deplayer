@@ -16,8 +16,7 @@ type Props = {
 
 export const settingsCard = classNames({
   'relative': true,
-  'dark:bg-gray-900': true,
-  'bg-gray-200': true,
+  'bg-base-200': true,
   'p-10': true,
   'mb-4': true,
   'rounded-lg': true
@@ -45,7 +44,7 @@ const SettingsForm = (props: Props) => {
         <Form
           className='settings-form'
         >
-          <h2 className='text-2xl py-3'><Translate value="labels.generalSettings" /></h2>
+          <h2 className='text-2xl py-3 text-base-content'><Translate value="labels.generalSettings" /></h2>
 
           <div className={settingsCard}>
             <FormSchema schema={schema} />
@@ -53,12 +52,11 @@ const SettingsForm = (props: Props) => {
             <div className='w-full flex justify-center mt-12'>
               <div className='max-w-xs w-full'>
                 <Button
-                  long
                   fullWidth
-                  uppercase
                   size='2xl'
                   disabled={isSubmitting}
                   type='submit'
+                  className='btn-primary'
                 >
                   <Translate value="buttons.save" />
                 </Button>

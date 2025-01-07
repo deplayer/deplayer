@@ -9,17 +9,14 @@
     <meta name="theme-color" content="#0e1b1e">
     <title>deplayer</title>
   </head>
-  <body class='text-sky-950 bg-gray-100 dark:text-sky-200 dark:bg-deplayer-dark'>
+  <body class='bg-base-100 text-base-content'>
     <div id="root"></div>
     <div id="modal"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      // On page load or when changing themes, best to add inline in `head` to avoid FOUC
-      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark')
-      } else {
-        document.documentElement.classList.remove('dark')
-      }
+      // Initialize theme on page load
+      const theme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
     </script>
   </body>
 </html>
