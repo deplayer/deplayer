@@ -267,7 +267,7 @@ class PlayerControls extends React.Component<Props> {
                 exit={true}
               >
                 <div key='player-controls' className='flex justify-between items-center flex-col bg-base-200/90 backdrop-blur'>
-                  <div className='absolute w-full md:top-0'>
+                  <div className='absolute w-full md:top-0 pointer-events-none'>
                     <ProgressBar
                       dispatch={this.props.dispatch}
                       total={duration * 1000}
