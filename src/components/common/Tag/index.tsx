@@ -8,7 +8,7 @@ type Props = {
   onClick?: () => void,
   className?: string
 }
-
+ 
 const Tag = (props: Props) => {
   const classes = classnames({
     'w-full': props.fullWidth,

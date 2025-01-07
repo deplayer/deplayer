@@ -1,0 +1,6 @@
+Try to perform as much TDD as possible.
+Use vitest for testing.
+
+Don't import react from 'react' in the top level of the file.
+
+Avoid mocking as much as possible and use dependency injection when possible.

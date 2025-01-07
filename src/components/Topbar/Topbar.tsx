@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Dispatch } from 'redux'
 import SearchInput from './SearchInput'
 import Icon from '../common/Icon'
@@ -23,12 +23,31 @@ type Props = {
 
 const Topbar = (props: Props) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null)
 
   const handleSearchChange = (event: React.FormEvent<HTMLInputElement>) => {
+    const searchTerm = event.currentTarget.value
     props.dispatch({
       type: types.SET_SEARCH_TERM,
-      searchTerm: event.currentTarget.value
+      searchTerm
     })
+
+    // Clear any existing timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
+    }
+
+    // Only set a new timeout if the search term is long enough
+    if (searchTerm.length > 2) {
+      const timeout = setTimeout(() => {
+        props.dispatch({
+          type: types.START_SEARCH,
+          searchTerm
+        })
+      }, 500) // Wait 500ms after last keystroke before searching
+
+      setSearchTimeout(timeout)
+    }
   }
 
   const handleSearchBlur = () => {
@@ -36,12 +55,24 @@ const Topbar = (props: Props) => {
   }
 
   const handleSearchOff = () => {
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
+    }
     props.dispatch({ type: types.TOGGLE_SEARCH_OFF })
   }
 
   const handleToggleSidebar = () => {
     props.onSetSidebarOpen?.(!props.app?.sidebarToggled)
   }
+
+  // Clean up timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout)
+      }
+    }
+  }, [searchTimeout])
 
   return (
     <div className='topbar bg-base-200/70 backdrop-blur flex justify-between overflow-hidden z-20 items-center px-2' style={{ gridArea: 'topbar' }}>
