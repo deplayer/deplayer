@@ -61,17 +61,7 @@ describe('Topbar', () => {
       ready: false,
     } satisfies AppState,
     peers: {
-      peers: {
-        'test-room-123': {
-          'test-peer-1': {
-            peerId: 'test-peer-1',
-            username: 'Test User',
-            roomCode: 'test-room-123',
-            isPlaying: false,
-            streaming: false
-          }
-        }
-      }
+      peers: {}
     } satisfies PeersState
   }
 
@@ -105,76 +95,18 @@ describe('Topbar', () => {
     )
   }
 
-  describe('ShareRoomModal', () => {
-    it('should open modal when share button is clicked', () => {
-      const { getByTitle, getByText } = renderTopbar()
-      
-      // Click share button
-      const shareButton = getByTitle('Share room')
-      fireEvent.click(shareButton)
-
-      // Modal should be visible
-      expect(getByText('Share Room')).toBeInTheDocument()
-      expect(getByText(/Share this link with your friends/)).toBeInTheDocument()
-    })
-
-    it('should copy room URL to clipboard when copy button is clicked', () => {
+  describe('Share room button', () => {
+    it('should dispatch TOGGLE_RIGHT_PANEL when share button is clicked', () => {
       const { getByTitle } = renderTopbar()
       
-      // Click share button to open modal
-      const shareButton = getByTitle('Share room')
-      fireEvent.click(shareButton)
-
-      // Click copy button
-      const copyButton = getByTitle('Copy room link')
-      expect(copyButton).toBeTruthy()
-      fireEvent.click(copyButton)
-
-      // Should copy URL to clipboard
-      expect(mockClipboard.writeText).toHaveBeenCalledWith(
-        'http://localhost:3000/join/test-room-123'
-      )
-
-      // Should show notification
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: types.SEND_NOTIFICATION,
-        notification: 'Room URL copied to clipboard',
-        level: 'success',
-        duration: 2000
-      })
-    })
-
-    it('should close modal when close button is clicked', () => {
-      const { getByTitle, getByText, queryByText } = renderTopbar()
-      
-      // Click share button to open modal
-      const shareButton = getByTitle('Share room')
-      fireEvent.click(shareButton)
-
-      // Modal should be visible
-      expect(getByText('Share Room')).toBeInTheDocument()
-
-      // Click close button
-      const closeButton = getByText('Close')
-      fireEvent.click(closeButton)
-
-      // Modal should be hidden
-      expect(queryByText('Share Room')).not.toBeInTheDocument()
-    })
-
-    it('should not render modal when roomId is not present', () => {
-      const { getByTitle, queryByText } = renderTopbar({
-        peers: {
-          peers: {}
-        }
-      })
-      
       // Click share button
       const shareButton = getByTitle('Share room')
       fireEvent.click(shareButton)
 
-      // Modal should not be visible
-      expect(queryByText('Share Room')).not.toBeInTheDocument()
+      // Should dispatch TOGGLE_RIGHT_PANEL action
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: types.TOGGLE_RIGHT_PANEL
+      })
     })
   })
 

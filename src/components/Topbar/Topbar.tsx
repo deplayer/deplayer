@@ -1,12 +1,10 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState } from 'react'
 import { Dispatch } from 'redux'
 import SearchInput from './SearchInput'
 import Icon from '../common/Icon'
-import ShareRoomModal from '../ShareRoomModal'
 import { State as CollectionState } from '../../reducers/collection'
 import { State as AppState } from '../../reducers/app'
 import * as types from '../../constants/ActionTypes'
-import { State as PeersState } from '../../reducers/peers'
 
 type Props = {
   title: React.ReactNode,
@@ -19,12 +17,10 @@ type Props = {
   onSetSidebarOpen?: (open: boolean) => void,
   collection?: CollectionState,
   app?: AppState,
-  peers?: PeersState,
   children?: React.ReactNode
 }
 
 const Topbar = (props: Props) => {
-  const [isOpen, setIsOpen] = useState(false)
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null)
 
   const handleSearchChange = (event: React.FormEvent<HTMLInputElement>) => {
@@ -118,22 +114,13 @@ const Topbar = (props: Props) => {
       <div className='flex items-center'>
         {props.children}
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={() => props.dispatch({ type: types.TOGGLE_RIGHT_PANEL })}
           className="btn btn-ghost btn-circle"
           title="Share room"
         >
           <Icon icon='faShareAlt' />
         </button>
       </div>
-
-      {Object.keys(props.peers?.peers || {}).length > 0 && (
-        <ShareRoomModal
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-          roomCode={Object.keys(props.peers?.peers || {})[0]}
-          dispatch={props.dispatch}
-        />
-      )}
     </div>
   )
 }

@@ -47,7 +47,7 @@ const SearchInput = (props: Props) => {
         type='text'
       />
       <div className='p-2'>
-        {props.loading ? <Icon icon='faSpinner' className='fa-pulse' /> : <Icon icon='faSearch' />}
+        {props.loading ? <Icon icon='faSpinner' className='fa-pulse text-primary' /> : <Icon icon='faSearch' className='text-primary' />}
       </div>
     </div>
   )

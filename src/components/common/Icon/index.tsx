@@ -57,7 +57,8 @@ import {
   faCompress,
   faExpand,
   faExclamationTriangle,
-  faShareAlt
+  faShareAlt,
+  faPalette
 } from "@fortawesome/free-solid-svg-icons"
 import { faGitlab, faDeezer } from "@fortawesome/free-brands-svg-icons"
 
@@ -121,6 +122,7 @@ const icons = {
   faCompress,
   faExpand,
   faExclamationTriangle,
+  faPalette,
   faShareAlt
 }
 

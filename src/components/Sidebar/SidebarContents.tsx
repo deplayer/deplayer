@@ -46,7 +46,7 @@ const SwitchThemeButton = () => {
     <>
       <div className="absolute right-1 top-2 z-50">
         <button onClick={() => setIsModalOpen(true)} className="btn btn-ghost btn-circle">
-          <Icon icon='faMoon' className='text-lg' />
+          <Icon icon='faPalette' className='text-lg text-primary' />
         </button>
       </div>
       <ThemeModal 
