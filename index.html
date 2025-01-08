@@ -20,7 +20,7 @@
         document.documentElement.setAttribute('data-theme', storedTheme);
       } else {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const defaultTheme = prefersDark ? 'deplayer' : 'nord';
+        const defaultTheme = prefersDark ? 'deplayer' : 'deplayer-light';
         document.documentElement.setAttribute('data-theme', defaultTheme);
         localStorage.setItem('theme', defaultTheme);
       }
