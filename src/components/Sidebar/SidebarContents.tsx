@@ -31,7 +31,11 @@ type ContentProps = {
 }
 
 function getInitialTheme() {
-  return localStorage.getItem('theme') || 'dark'
+  const storedTheme = localStorage.getItem('theme');
+  if (storedTheme) {
+    return storedTheme;
+  }
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'deplayer' : 'nord';
 }
 
 const SwitchThemeButton = () => {
@@ -40,7 +44,8 @@ const SwitchThemeButton = () => {
 
   React.useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
-  }, [])
+    localStorage.setItem('theme', theme)
+  }, [theme])
 
   return (
     <>
