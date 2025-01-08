@@ -29,6 +29,7 @@ const AddMediaModal = (props: Props) => {
   return (
     <Modal
       title='Select media to add'
+      isOpen={props.showAddMediaModal}
       onClose={() => {
         props.dispatch({ type: types.HIDE_ADD_MEDIA_MODAL })
       }}

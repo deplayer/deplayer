@@ -14,17 +14,13 @@ const Tag = (props: Props) => {
     'w-full': props.fullWidth,
     'p-1': true,
     'px-2': true,
-    'rounded': true,
-    'text-success': true,
-    'border-success': true,
-    'bg-base-200': !props.transparent,
-    'border-none': !props.transparent,
+    'rounded-lg': true,
     'border': props.transparent,
+    'border-base-content': true,
     'text-sm': true,
     'pw-2': true,
     'flex': true,
     'items-center': true,
-    'opacity-90': true
   }, props.className)
 
   return (

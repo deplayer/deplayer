@@ -40,7 +40,7 @@ const Image = () => {
 
   return (
     <ImageComponent
-      className={`w-60 cursor-pointer fill-accent h-auto`}
+      className={`w-60 cursor-pointer fill-base-content h-auto`}
     />
   )
 }
@@ -112,9 +112,10 @@ const Dashboard = ({
         />}
       {!!slicedAlbums.length && <RelatedAlbums albums={slicedAlbums} />}
       <div className='flex flex-col items-center mt-12'>
-        <h4 className="text-xl text-center py-4 text-primary p-4">
+        <h4 className="text-xl text-center pt-4 text-primary px-4">
           <DeplayerTitle />
         </h4>
+        <p className='text-base'>Your music, your way</p>
       </div>
     </div>
   )

@@ -1,7 +1,7 @@
 const DeplayerTitle = () => (
   <>
     <span className='text-primary'>d</span>
-    <span className='text-accent'>eplayer</span>
+    <span className='text-base-content'>eplayer</span>
   </>
 )
 

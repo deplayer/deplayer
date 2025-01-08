@@ -121,8 +121,8 @@ const RoomList = ({ peers, rooms, dispatch, onJoinRoom }: Props) => {
       <div className="peers-section mt-4 mb-10">
         { rooms.length > 0 && (
           rooms.map((room) => (
-            <div key={room.id} className="mb-6 border border-gray-600 rounded-lg p-4">
-              <div className="flex justify-between items-center mb-4">
+            <div key={room.id} className="mb-6 rounded-lg p-4">
+              <div className="flex justify-between mb-4">
                 <div className="flex items-center gap-2">
                   {Object.keys(peers[room.id] || {}).length > 0 && (
                     <button
@@ -149,7 +149,7 @@ const RoomList = ({ peers, rooms, dispatch, onJoinRoom }: Props) => {
                   onClick={() => handleLeaveRoom(room.id)}
                   size="xs"
                   transparent
-                  className="bg-red-500 hover:bg-red-600"
+                  className="bg-danger hover:bg-danger-dark"
                 >
                   <Translate value="peer.leave" />
                   <Icon icon="faSignOutAlt" className="ml-2" />
