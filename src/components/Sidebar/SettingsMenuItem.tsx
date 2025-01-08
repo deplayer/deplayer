@@ -2,7 +2,7 @@ import MenuItem from './MenuItem'
 import Icon from '../common/Icon'
 
 type Props = {
-  current?: Boolean
+  current?: boolean
 }
 
 const SettingsMenuItem = ({ current = false }: Props) => {

@@ -1,4 +1,4 @@
-import React from 'react'
+import { useEffect } from 'react'
 import Modal from '../common/Modal'
 import Header from '../common/Header'
 import * as types from '../../constants/ActionTypes'
@@ -8,11 +8,12 @@ type Props = {
   onClose: () => void
   lyrics: string,
   songId: string,
-  dispatch: Dispatch<any>
+  dispatch: Dispatch<any>,
+  isOpen: boolean
 }
 
 const Lyrics = (props: Props) => {
-  React.useEffect(() => {
+  useEffect(() => {
     if (props.lyrics) return
 
     props.dispatch({ type: types.FETCH_LYRICS, songId: props.songId })
@@ -23,6 +24,7 @@ const Lyrics = (props: Props) => {
       onClose={() => {
         props.onClose()
       }}
+      isOpen={props.isOpen}
     >
       <Header>Lyrics</Header>
       <div className='p-4 my-6'>

@@ -180,6 +180,7 @@ const Playlist = (props: Props) => {
           onClose={() => {
             setShowSongs(false)
           }}
+          isOpen={showSongs}
         >
           <ul className='media'>
             {songs}

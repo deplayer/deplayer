@@ -88,12 +88,13 @@ const startAuth = async (dispatch: Dispatch) => {
 
 interface Props {
   onClose: Function,
-  dispatch: Dispatch
+  dispatch: Dispatch,
+  isOpen: boolean
 }
 
-export default function Auth({ onClose, dispatch }: Props) {
+export default function Auth({ onClose, dispatch, isOpen }: Props) {
   return (
-    <Modal title='Authentication' onClose={() => onClose()}>
+    <Modal title='Authentication' onClose={() => onClose()} isOpen={isOpen}>
       <div className='flex'>
         <div className='p-4'>
           <Formik

@@ -264,6 +264,7 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
           <Modal
             title="Filter Collection"
             onClose={() => setIsModalOpen(false)}
+            isOpen={isModalOpen}
           >
             <div className="p-4 flex flex-col gap-4">
               <div className="relative w-full">

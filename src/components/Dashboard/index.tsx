@@ -51,7 +51,7 @@ const WelcomeMessage = ({ dispatch }: { dispatch: Dispatch }) => {
 
   return (
     <div className='flex flex-col md:flex-row w-full content-start items-center'>
-      {showAuthModal && <Auth dispatch={dispatch} onClose={() => setShowAuthModal(false)} />}
+      {showAuthModal && <Auth dispatch={dispatch} onClose={() => setShowAuthModal(false)} isOpen={showAuthModal} />}
       <div className='flex flex-col items-center'>
         <h4 className="text-xl text-center py-4 p-4">
           Hi <i>audiophile</i>! Welcome to <DeplayerTitle />

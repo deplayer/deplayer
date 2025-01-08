@@ -3,7 +3,6 @@ import { MemoryRouter, useLocation } from 'react-router-dom'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
-import React from 'react'
 
 import PlayAllButton from './PlayAllButton'
 

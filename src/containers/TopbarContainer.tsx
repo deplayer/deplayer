@@ -160,7 +160,6 @@ const TopbarWrapper = (props: TopbarWrapperProps) => {
       title={title}
       loading={props.search.loading}
       showInCenter={!hasResults && inHome}
-      error={props.search.error || ''}
       searchTerm={props.search.searchTerm}
       searchToggled={props.search.searchToggled}
       dispatch={props.dispatch}

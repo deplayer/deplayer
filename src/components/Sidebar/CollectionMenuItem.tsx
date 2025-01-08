@@ -3,7 +3,7 @@ import Icon from '../common/Icon'
 
 type Props = {
   totalItems: number,
-  current?: Boolean
+  current?: boolean
 }
 
 const CollectionMenuItem = ({ current = false }: Props) => {
