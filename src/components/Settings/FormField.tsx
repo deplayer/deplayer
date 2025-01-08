@@ -48,18 +48,7 @@ const FormField = (props: Props) => {
 
   return (
     <Field
-      className={`
-      ${props.field.type === TYPES.checkbox ? 'form-check' : 'form-control'}
-      p-3
-      w-full
-      bg-sky-900
-      dark:bg-sky-300
-      text-sky-100
-      dark:text-sky-900
-      font-sans
-      rounded
-      text-lg
-    `}
+      className="input input-bordered w-full"
       name={props.field.name}
       type={props.field.type}
     />

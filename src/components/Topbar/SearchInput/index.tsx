@@ -22,18 +22,18 @@ const SearchInput = (props: Props) => {
     'w-full': true,
     'p-3': true,
     'bg-transparent': true,
-    'dark:text-sky-100': true,
-    'text-sky-900': true,
     'text-xl': true,
     'font-sans': true,
     'focus:outline-none': true,
+    'focus:ring-0': true,
+    'focus:border-none': true,
     loading: props.loading,
     action: true
   })
 
   return (
     <div
-      className={'w-full flex bg-transparent border-b-4 border-blue-400 items-center'}
+      className={'w-full flex bg-transparent border-b-4 border-accent items-center'}
     >
       <input
         className={classes}
@@ -47,7 +47,7 @@ const SearchInput = (props: Props) => {
         type='text'
       />
       <div className='p-2'>
-        {props.loading ? <Icon icon='faSpinner' className='fa-pulse' /> : <Icon icon='faSearch' />}
+        {props.loading ? <Icon icon='faSpinner' className='fa-pulse text-primary' /> : <Icon icon='faSearch' className='text-primary' />}
       </div>
     </div>
   )

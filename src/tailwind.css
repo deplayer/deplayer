@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 @tailwind responsive;
+@plugin "daisyui";
 
 .markdown {
   @apply flex;

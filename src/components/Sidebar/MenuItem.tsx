@@ -1,53 +1,38 @@
-import classnames from 'classnames'
-import * as React from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
+import classnames from 'classnames'
 
-import Tag from '../common/Tag'
-
-type Props = {
-  totalItems?: number,
-  current?: Boolean,
-  children?: React.ReactNode,
-  onClick?: () => void,
+type MenuItemProps = {
+  current: boolean,
   url: string,
   title: string,
   label: string,
-  icon: React.ReactNode
+  icon: React.ReactNode,
+  totalItems?: number
 }
 
-const MenuItem = (props: Props) => {
-  const classNames = classnames({
-    button: true,
-    'select-none': true,
-    'bg-gray-200': props.current,
-    'dark:bg-gray-900': props.current,
-    'text-gray-900': props.current,
-    'dark:text-gray-200': props.current,
-  })
+const MenuItem = (props: MenuItemProps) => {
+  const linkClasses = classnames(
+    'flex items-center py-2 px-4 hover:bg-base-200 transition-colors duration-200 w-full',
+  )
+
+  const liClasses = classnames( 
+    'w-full',
+    {
+      'bg-base-200': props.current,
+      'text-primary': props.current,
+    }
+  )
+
   return (
-    <li className={classNames}>
-      <Link
-        className='flex justify-between items-center focus:bg-blue-400 focus:text-blue-900 hover:bg-blue-400 hover:text-blue-900'
-        to={props.url}
-        onClick={props.onClick}
-        title={props.title}
-      >
-        <div className='py-4'>
-          {props.icon}
-          <span className='ml-4'>{props.label}</span>
-        </div>
-
-        {props.totalItems &&
-          props.totalItems > 0 &&
-          <div className=''>
-            <Tag>
-              {props.totalItems}
-            </Tag>
-          </div>
-        }
+    <li className={liClasses}>
+      <Link to={props.url} className={linkClasses} title={props.title}>
+        <span className='w-8'>{props.icon}</span>
+        <span className='flex-1'>{props.label}</span>
+        {props.totalItems !== undefined && (
+          <span className='badge badge-sm'>{props.totalItems}</span>
+        )}
       </Link>
-
-      {props.children}
     </li>
   )
 }

@@ -1,9 +1,15 @@
 import { connect } from 'react-redux'
 import { useLocation, Location } from 'react-router-dom'
+import { Dispatch } from 'redux'
 
 import { State as RootState } from '../reducers'
 import Icon from '../components/common/Icon'
 import Topbar from '../components/Topbar/Topbar'
+import { State as CollectionState } from '../reducers/collection'
+import { State as SearchState } from '../reducers/search'
+import { State as QueueState } from '../reducers/queue'
+import { State as AppState } from '../reducers/app'
+import * as types from '../constants/ActionTypes'
 
 type TitleCollection = {
   rows: any
@@ -129,23 +135,13 @@ const dynamicTitle = (
 }
 
 interface TopbarWrapperProps {
-  collection: {
-    rows: Record<string, any>;
-    artists: Record<string, any>;
-    albums: Record<string, any>;
-  };
-  search: {
-    loading: boolean;
-    error?: string;
-    searchTerm: string;
-    searchToggled: boolean;
-  };
-  queue: {
-    trackIds?: string[];
-  };
-  app: Record<string, unknown>;
-  dispatch: (action: any) => void;
-  children?: React.ReactNode;
+  collection: CollectionState,  
+  search: SearchState,
+  queue: QueueState,
+  app: AppState,
+  dispatch: Dispatch,
+  children?: React.ReactNode,
+  onSetSidebarOpen?: (open: boolean) => void
 }
 
 // Create a new wrapper component to handle hooks
@@ -154,6 +150,10 @@ const TopbarWrapper = (props: TopbarWrapperProps) => {
   const title = dynamicTitle(location, props.collection, props.search.searchTerm)
   const hasResults = props.queue.trackIds && props.queue.trackIds.length ? true : false
   const inHome = location.pathname === '/' ? true : false
+
+  const handleSidebarToggle = (open: boolean) => {
+    props.dispatch({ type: types.TOGGLE_SIDEBAR, value: open })
+  }
 
   return (
     <Topbar
@@ -164,6 +164,9 @@ const TopbarWrapper = (props: TopbarWrapperProps) => {
       searchTerm={props.search.searchTerm}
       searchToggled={props.search.searchToggled}
       dispatch={props.dispatch}
+      onSetSidebarOpen={handleSidebarToggle}
+      collection={props.collection}
+      app={props.app}
     >
       {props.children}
     </Topbar>

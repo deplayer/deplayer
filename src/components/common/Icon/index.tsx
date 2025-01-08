@@ -55,7 +55,10 @@ import {
   faBars,
   faPlayCircle,
   faCompress,
-  faExpand
+  faExpand,
+  faExclamationTriangle,
+  faShareAlt,
+  faPalette
 } from "@fortawesome/free-solid-svg-icons"
 import { faGitlab, faDeezer } from "@fortawesome/free-brands-svg-icons"
 
@@ -117,7 +120,10 @@ const icons = {
   faBahai,
   faDeezer,
   faCompress,
-  faExpand
+  faExpand,
+  faExclamationTriangle,
+  faPalette,
+  faShareAlt
 }
 
 type Props = {

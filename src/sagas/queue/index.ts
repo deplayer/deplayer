@@ -10,20 +10,58 @@ import { initialize } from './workers'
 
 // Extract songs from collection state
 export const getSongs = (state: any, action: { path: string }): Array<string> => {
+  if (!state) return []
+  
+  logger.log('queue-saga', 'getSongs path:', action.path)
+  
   if (action.path === 'search-results') {
-    return state ? state.collection.searchResults : []
+    logger.log('queue-saga', 'search results:', state.collection.searchResults)
+    return state.collection.searchResults
   }
 
-  return state ? state.collection.filteredSongs : []
+  if (action.path === 'collection') {
+    logger.log('queue-saga', 'filtered songs:', state.collection.filteredSongs)
+    return state.collection.filteredSongs
+  }
+
+  // Handle different routes
+  const pathParts = action.path.split('/')
+  if (pathParts[0] === 'albums' && pathParts[1]) {
+    logger.log('queue-saga', 'songs by album:', state.collection.songsByAlbum[pathParts[1]])
+    return state.collection.songsByAlbum[pathParts[1]] || []
+  }
+  
+  if (pathParts[0] === 'artists' && pathParts[1]) {
+    logger.log('queue-saga', 'songs by artist:', state.collection.songsByArtist[pathParts[1]])
+    return state.collection.songsByArtist[pathParts[1]] || []
+  }
+  
+  if (pathParts[0] === 'genres' && pathParts[1]) {
+    logger.log('queue-saga', 'songs by genre:', state.collection.songsByGenre[pathParts[1]])
+    return state.collection.songsByGenre[pathParts[1]] || []
+  }
+
+  logger.log('queue-saga', 'fallback to filtered songs:', state.collection.filteredSongs)
+  return state.collection.filteredSongs
+}
+
+// Get song objects from collection
+export const getSongObjects = (state: any, songIds: Array<string>) => {
+  return songIds.map(id => state.collection.rows[id]).filter(Boolean)
 }
 
 // Handling playAll saga
 export function* playAll(action: any): any {
-  const songs = yield select(getSongs, action)
+  logger.log('queue-saga', 'playAll action:', action)
+  const songIds = yield select(getSongs, action)
+  logger.log('queue-saga', 'song ids to play:', songIds)
 
-  if (songs.length) {
-    yield put({ type: types.ADD_SONGS_TO_QUEUE, songs: Object.values(songs) })
-    yield put({ type: types.SET_CURRENT_PLAYING, songId: songs[0] })
+  if (songIds.length) {
+    const songs = yield select(getSongObjects, songIds)
+    logger.log('queue-saga', 'song objects to play:', songs)
+    
+    yield put({ type: types.ADD_SONGS_TO_QUEUE, songs, replace: true })
+    yield put({ type: types.SET_CURRENT_PLAYING, songId: songIds[0] })
     yield put({ type: types.START_PLAYING })
   }
 }

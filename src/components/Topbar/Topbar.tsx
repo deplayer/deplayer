@@ -1,115 +1,122 @@
-import * as React from 'react'
-
+import React, { useState } from 'react'
+import { Dispatch } from 'redux'
 import SearchInput from './SearchInput'
-import SidebarButton from '../Buttons/SidebarButton'
-import RightPanelButton from '../Buttons/RightPanelButton'
-import Title from './Title'
+import Icon from '../common/Icon'
+import { State as CollectionState } from '../../reducers/collection'
+import { State as AppState } from '../../reducers/app'
 import * as types from '../../constants/ActionTypes'
 
-type State = {
-  focus: boolean,
-}
-
 type Props = {
-  title?: string | React.ReactNode,
-  dispatch: (params: any) => void,
+  title: React.ReactNode,
   loading: boolean,
   showInCenter: boolean,
-  children: React.ReactNode
   searchTerm: string,
   searchToggled: boolean,
-  error: string
+  dispatch: Dispatch,
+  onSetSidebarOpen?: (open: boolean) => void,
+  collection?: CollectionState,
+  app?: AppState,
+  children?: React.ReactNode
 }
 
-const WAIT_INTERVAL = 1000
-const ENTER_KEY = 13
+const Topbar = (props: Props) => {
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null)
 
-class Topbar extends React.Component<Props, State> {
-  state = {
-    focus: false
-  }
-  timer: any
-
-  constructor(props: Props) {
-    super(props);
-    this.timer = null
-  }
-
-  // Handling searchTerm text change
-  onSearchChange = (event: React.FormEvent<HTMLInputElement>) => {
-    clearTimeout(this.timer)
-    this.props.dispatch({
+  const handleSearchChange = (event: React.FormEvent<HTMLInputElement>) => {
+    const searchTerm = event.currentTarget.value
+    props.dispatch({
       type: types.SET_SEARCH_TERM,
-      searchTerm: event.currentTarget.value
+      searchTerm
     })
-    this.timer = setTimeout(this.triggerChange, WAIT_INTERVAL)
-  }
 
-  // Handling enter keydown in search bar
-  handleKeyDown(e: KeyboardEvent) {
-    if (e.keyCode === ENTER_KEY) {
-      this.triggerChange()
+    // Clear any existing timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
+    }
+
+    // Only set a new timeout if the search term is long enough
+    if (searchTerm.length > 2) {
+      const timeout = setTimeout(() => {
+        props.dispatch({
+          type: types.START_SEARCH,
+          searchTerm
+        })
+      }, 500) // Wait 500ms after last keystroke before searching
+
+      setSearchTimeout(timeout)
     }
   }
 
-  // Starting to search when the user press enter key or stops to writte in the interval
-  triggerChange = () => {
-    if (this.props.searchTerm) {
-      this.props.dispatch({
-        type: types.START_SEARCH, searchTerm: this.props.searchTerm
-      })
+  const handleSearchBlur = () => {
+    props.dispatch({ type: types.TOGGLE_SEARCH })
+  }
+
+  const handleSearchOff = () => {
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
     }
+    props.dispatch({ type: types.TOGGLE_SEARCH_OFF })
   }
 
-  onFocusOut = () => {
-    this.setState({ focus: false })
-    this.props.dispatch({ type: types.TOGGLE_SEARCH })
+  const handleToggleSidebar = () => {
+    props.onSetSidebarOpen?.(!props.app?.sidebarToggled)
   }
 
-  setSearchOn = () => {
-    this.props.dispatch({ type: types.TOGGLE_SEARCH })
-    this.setState({ focus: true })
-  }
+  // Clean up timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout)
+      }
+    }
+  }, [searchTimeout])
 
-  setSearchOff = () => {
-    this.props.dispatch({ type: types.TOGGLE_SEARCH_OFF })
-    this.setState({ focus: false })
-  }
+  return (
+    <div className='topbar bg-base-200/70 backdrop-blur flex justify-between overflow-hidden z-20 items-center px-2' style={{ gridArea: 'topbar' }}>
+      <div className='flex items-center'>
+        <button
+          onClick={handleToggleSidebar}
+          className="btn btn-ghost btn-circle btn-sm"
+          title="Toggle menu"
+        >
+          <Icon icon='faBars' />
+        </button>
 
-  render() {
-    const {
-      children,
-      title,
-      searchTerm,
-      searchToggled,
-      loading
-    } = this.props
-
-    const childrenWithProps = React.Children.map(children, (child: any) =>
-      React.cloneElement(child, { dispatch: this.props.dispatch })
-    )
-
-    return (
-      <div className='topbar bg-gray-200/70 dark:bg-black/70 flex justify-between overflow-hidden z-20 items-center px-2' style={{ gridArea: 'topbar' }}>
-        <SidebarButton />
-        <div className='flex flex-1 justify-between items-center'>
-          <SearchInput
-            setSearchOff={this.setSearchOff}
-            searchToggled={searchToggled}
-            loading={loading}
-            onSearchChange={this.onSearchChange}
-            onBlur={this.onFocusOut}
-            value={searchTerm}
-          />
-          {!this.state.focus && !this.props.searchToggled ? <Title className='self-center w-full text-center' title={title} onClick={this.setSearchOn} /> : null}
-          <div className='flex justify-end'>
-            {!this.state.focus && childrenWithProps}
-          </div>
+        <div className='flex items-center'>
+          {props.loading && (
+            <div className='loading loading-spinner loading-sm mx-2'></div>
+          )}
         </div>
-        <RightPanelButton />
       </div>
-    )
-  }
+
+      <div className='flex-1 mx-4'>
+        {!props.showInCenter && (
+          <SearchInput
+            loading={props.loading}
+            value={props.searchTerm}
+            searchToggled={props.searchToggled}
+            onSearchChange={handleSearchChange}
+            onBlur={handleSearchBlur}
+            setSearchOff={handleSearchOff}
+          />
+        )}
+        {props.showInCenter && props.title && (
+          <div className="text-center">{props.title}</div>
+        )}
+      </div>
+
+      <div className='flex items-center'>
+        {props.children}
+        <button
+          onClick={() => props.dispatch({ type: types.TOGGLE_RIGHT_PANEL })}
+          className="btn btn-ghost btn-circle"
+          title="Share room"
+        >
+          <Icon icon='faShareAlt' />
+        </button>
+      </div>
+    </div>
+  )
 }
 
 export default Topbar

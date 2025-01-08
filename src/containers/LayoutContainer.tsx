@@ -22,9 +22,9 @@ interface LayoutProps {
 function Layout(props: LayoutProps) {
   const background = props.backgroundImage && (
     <>
-      <div className='bg-handler before:bg-gray-100/70 dark:before:bg-black/70'></div>
+      <div className='bg-handler before:bg-base-200/70'></div>
       <div
-        className='absolute w-full h-full bg-cover bg-center bg-no-repeat bg-fixed'
+        className='absolute w-full h-full bg-cover bg-center bg-no-repeat bg-fixed glass'
         style={{ backgroundImage: `url(${props.backgroundImage})`, filter: 'blur(10px)' }}
       />
     </>

@@ -12,6 +12,9 @@
     "sameGenreSongs": "Songs of the same genre"
   },
   "labels": {
+    "pgliteRepl": "PGLite Repl",
+    "pgliteReplDescription": "Run arbitrary SQL queries against deplayer's database",
+    "actions": "Actions",
     "enableReactPlayer": "use react-player (beta)",
     "enableSpectrum": "player spectrum",
     "deleteCollection": "Delete collection",
@@ -55,6 +58,7 @@
     }
   },
   "buttons": {
+    "save": "Save",
     "addNext": "Enqueue next",
     "addNewMedia": "Add new media",
     "addProvider": "Set up new provider",

@@ -51,29 +51,36 @@ const Settings: React.FC = () => {
   return (
     <MainContainer centerContents>
       <div className='flex flex-col'>
-        <div className='pt-10'>
-          <Repl pg={pg} />
-        </div>
-
         <SettingsForm
           schema={settingsForm}
           settings={settings}
           dispatch={dispatch}
         />
-        <div className='my-12 flex'>
-          <Button onClick={exportCollection} inverted>
-            <Translate value="labels.exportCollection" />
-          </Button>
-          <Button onClick={toggleImporter} inverted>
-            <Translate value="labels.importCollection" />
-          </Button>
-          <Button onClick={deleteCollection} inverted>
-            <Translate value="labels.deleteCollection" />
-          </Button>
-          <Button onClick={deleteSettings} inverted>
-            <Translate value="labels.deleteSettings" />
-          </Button>
-          {ImporterComp}
+        <div className='pt-10'>
+          <h2 className='text-2xl py-3 text-base-content'><Translate value="labels.pgliteRepl" /></h2>
+          <p className='text-base-content'>
+            <Translate value="labels.pgliteReplDescription" />
+          </p>
+          <Repl pg={pg} />
+        </div>
+
+        <div className='my-12'>
+          <h2 className='text-2xl py-3 text-base-content'><Translate value="labels.actions" /></h2>
+          <div className='flex'>
+            <Button onClick={exportCollection} inverted>
+              <Translate value="labels.exportCollection" />
+            </Button>
+            <Button onClick={toggleImporter} inverted>
+              <Translate value="labels.importCollection" />
+            </Button>
+            <Button onClick={deleteCollection} inverted>
+              <Translate value="labels.deleteCollection" />
+            </Button>
+            <Button onClick={deleteSettings} inverted>
+              <Translate value="labels.deleteSettings" />
+            </Button>
+            {ImporterComp}
+          </div>
         </div>
       </div>
     </MainContainer>

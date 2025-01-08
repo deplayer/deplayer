@@ -10,18 +10,17 @@ type Props = {
 }
 
 const RightPanelButton = ({ dispatch }: Props) => {
-  const toggleSidebar = () => {
-    dispatch({ type: types.TOGGLE_RIGHT_PANEL })
+  const toggleRightPanel = () => {
+    dispatch({ type: types.TOGGLE_RIGHT_PANEL, value: true })
   }
 
   return (
     <Button
       transparent
       inverted
-      onClick={toggleSidebar}
+      onClick={toggleRightPanel}
     >
       <Icon icon='faAddressBook' />
-
     </Button>
   )
 }

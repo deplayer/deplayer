@@ -1,11 +1,22 @@
 import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeAll, vi } from 'vitest'
 import SongView from './index'
 import Media from '../../entities/Media'
 import { defaultState as collectionDefaultState } from '../../reducers/collection'
 import { BrowserRouter } from 'react-router-dom'
 
 import { mediaParams } from '../../entities/Media.spec'
+
+// Mock IntersectionObserver
+beforeAll(() => {
+  const mockIntersectionObserver = vi.fn()
+  mockIntersectionObserver.mockReturnValue({
+    observe: () => null,
+    unobserve: () => null,
+    disconnect: () => null
+  })
+  window.IntersectionObserver = mockIntersectionObserver
+})
 
 const setup = (customProps: any) => {
   const defaultProps = {

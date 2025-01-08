@@ -1,9 +1,8 @@
+const DeplayerTitle = () => (
+  <>
+    <span className='text-primary'>d</span>
+    <span className='text-base-content'>eplayer</span>
+  </>
+)
 
-export default function DeplayerTitle(): JSX.Element {
-  return (
-    <>
-      <span className='text-blue-500'>d</span>
-      <span className='text-blue-900 dark:text-blue-300'>eplayer</span>
-    </>
-  )
-} 
+export default DeplayerTitle 

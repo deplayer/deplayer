@@ -37,6 +37,36 @@ type Props = {
   match: any,
 }
 
+/**
+ * PlayerControls is a comprehensive media player interface component that manages audio/video playback
+ * and provides user controls. It combines several key features:
+ * 
+ * Core Features:
+ * - Media playback using ReactPlayer with support for both audio and video
+ * - Transport controls (play/pause, previous, next)
+ * - Progress bar showing playback position and buffering status
+ * - Dynamic display of current track information (title, artist)
+ * - Volume control
+ * 
+ * Advanced Features:
+ * - Portal-based rendering for flexible positioning of video content
+ * - Fullscreen mode with auto-hiding controls
+ * - Audio visualization support
+ * - Custom player support for WebTorrent and PeerStream playback
+ * - Automatic track progression
+ * 
+ * Layout:
+ * - Main player container with progress bar at the top
+ * - Cover art display
+ * - Track information (title + artist) with links to detailed views
+ * - Control buttons (prev, play/pause, next)
+ * - Optional video display area when playing video content
+ * 
+ * The component uses portals to manage video content positioning, allowing the video
+ * to be rendered in a different part of the DOM while maintaining playback control.
+ * This is particularly useful for fullscreen and picture-in-picture modes.
+ */
+
 class PlayerControls extends React.Component<Props> {
   private playerRef: React.RefObject<ReactPlayer>;
 
@@ -151,6 +181,7 @@ class PlayerControls extends React.Component<Props> {
       'fullscreen': this.props.player.fullscreen
     })
 
+    // Show controls only if player is shown
     const showControls = this.props.player.showPlayer
 
     const songFinder = this.props
@@ -185,7 +216,7 @@ class PlayerControls extends React.Component<Props> {
 
     return (
       <React.Fragment>
-        <div id="player">
+        <div id="player" style={{ gridArea: 'player' }}>
           <InPortal node={this.props.playerPortal}>
             <ReactPlayer
               id="react-player"
@@ -218,72 +249,71 @@ class PlayerControls extends React.Component<Props> {
               controls={currentPlaying.type === 'video'}
             />
           </InPortal>
-        </div>
-        {!songFinder && currentPlaying.type === 'video' && (
-          <div id='player-portal' className="background-video left-0 right-0 top-0 botton-0 absolute bg-handler">
-            <OutPortal
-              className={`player-portal background-video left-0 right-0 top-0 botton-0 absolute ${currentPlaying.type === 'video' && 'bg-handler'}`}
-              node={this.props.playerPortal}
-            />
-          </div>
-        )}
-        {showControls &&
-          <div className={'player-container'} style={{ zIndex: 102 }}>
-            <CSSTransition
-              classNames="player"
-              appear={true}
-              timeout={{ enter: 500, exit: 500, appear: 500 }}
-              enter={true}
-              exit={true}
-            >
-              <div key='player-controls' className='flex justify-between items-center flex-col  bg-gray-100/70 dark:bg-black/80'>
-                <div className='absolute w-full md:top-0'>
-                  <ProgressBar
-                    dispatch={this.props.dispatch}
-                    total={duration * 1000}
-                    buffered={loadedSeconds * 1000}
-                    current={playedSeconds * 1000}
-                    onChange={this.onSeekChange}
-                  />
-                </div>
-
-                <div className='flex flex-initial items-center justify-between min-w-0 max-w-full w-full'>
-                  <Cover song={currentPlaying} />
-                  <div className='flex justify-between items-center w-full'>
-                    <div className='mx-2 pr-2 md:text-center w-full truncate overflow-hidden'>
-                      <Link to={`/song/${currentPlaying.id}`} className='text-lg md:text-xl text-sky-900 dark:text-sky-200 block'>
-                        <h5 className='truncate'>
-                          {currentPlaying.title}
-                        </h5>
-                      </Link>
-                      {currentPlaying.artist &&
-                        <Link to={`/artist/${currentPlaying.artist.id}`} className='block'>
-                          <h6 className='truncate text-blue-400'>
-                            {currentPlaying.artist.name}
-                          </h6>
+          {!songFinder && currentPlaying.type === 'video' && (
+            <div id='player-portal' className="background-video left-0 right-0 top-0 botton-0 absolute bg-handler">
+              <OutPortal
+                className={`player-portal background-video left-0 right-0 top-0 botton-0 absolute ${currentPlaying.type === 'video' && 'bg-handler'}`}
+                node={this.props.playerPortal}
+              />
+            </div>
+          )}
+          {showControls &&
+            <div className={'player-container'} style={{ gridArea: 'player', zIndex: 102 }}>
+              <CSSTransition
+                classNames="player"
+                appear={true}
+                timeout={{ enter: 500, exit: 500, appear: 500 }}
+                enter={true}
+                exit={true}
+              >
+                <div key='player-controls' className='flex justify-between items-center flex-col bg-base-200/90 backdrop-blur'>
+                  <div className='absolute w-full md:top-0 pointer-events-none'>
+                    <ProgressBar
+                      dispatch={this.props.dispatch}
+                      total={duration * 1000}
+                      buffered={loadedSeconds * 1000}
+                      current={playedSeconds * 1000}
+                      onChange={this.onSeekChange}
+                    />
+                  </div>
+                  <div className='flex flex-initial items-center justify-between min-w-0 max-w-full w-full'>
+                    <Cover song={currentPlaying} />
+                    <div className='flex justify-between items-center w-full'>
+                      <div className='mx-2 pr-2 md:text-center w-full truncate overflow-hidden'>
+                        <Link to={`/song/${currentPlaying.id}`} className='text-lg md:text-xl text-base-content block hover:text-primary'>
+                          <h5 className='truncate'>
+                            {currentPlaying.title}
+                          </h5>
                         </Link>
-                      }
-                    </div>
-                    <div className='player-tools flex fustify-center items-center'>
-                      <Controls
-                        mqlMatch={this.props.app.mqlMatch}
-                        playPrev={this.playPrev}
-                        isPlaying={this.props.player.playing}
-                        playPause={this.playPause}
-                        playNext={this.playNext}
-                        showFullscreen={showFullscreen}
-                        toggleFullscreen={() => this.props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
-                      />
-                      <div className='w-16'>
+                        {currentPlaying.artist &&
+                          <Link to={`/artist/${currentPlaying.artist.id}`} className='block hover:text-primary'>
+                            <h6 className='truncate text-base-content/70'>
+                              {currentPlaying.artist.name}
+                            </h6>
+                          </Link>
+                        }
+                      </div>
+                      <div className='player-tools flex justify-center items-center'>
+                        <Controls
+                          mqlMatch={this.props.app.mqlMatch}
+                          playPrev={this.playPrev}
+                          isPlaying={this.props.player.playing}
+                          playPause={this.playPause}
+                          playNext={this.playNext}
+                          showFullscreen={showFullscreen}
+                          toggleFullscreen={() => this.props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
+                        />
+                        <div className='w-16'>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </CSSTransition>
-          </div>
-        }
-        {visualizer}
+              </CSSTransition>
+            </div>
+          }
+          {visualizer}
+        </div>
       </React.Fragment>
     )
   }

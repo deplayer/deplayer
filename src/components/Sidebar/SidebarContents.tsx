@@ -10,6 +10,7 @@ import QueueMenuItem from './QueueMenuItem'
 import ArtistsMenuItem from './ArtistsMenuItem'
 import MenuItem from './MenuItem'
 import ExploreMenuItem from './ExploreMenuItem'
+import ThemeModal from './ThemeModal'
 
 import { inSection } from '../../utils/router'
 import Icon from '../common/Icon'
@@ -30,28 +31,37 @@ type ContentProps = {
 }
 
 function getInitialTheme() {
-  const theme = localStorage.getItem('theme')
-  return theme || document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+  const storedTheme = localStorage.getItem('theme');
+  if (storedTheme) {
+    return storedTheme;
+  }
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'deplayer' : 'nord';
 }
 
 const SwitchThemeButton = () => {
   const [theme, setTheme] = React.useState(getInitialTheme())
+  const [isModalOpen, setIsModalOpen] = React.useState(false)
 
-  const toggleTheme = () => {
-    if (theme === 'light') {
-      setTheme('dark')
-      document.documentElement.classList.add('dark')
-    } else {
-      setTheme('light')
-      document.documentElement.classList.remove('dark')
-    }
-  }
+  React.useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+  }, [theme])
 
-  if (theme === 'light') {
-    return <Icon onClick={toggleTheme} icon='faMoon' className='cursor-pointer text-center text-sky-900 hover:text-sky-600 text-xl absolute right-4 top-5' />
-  } else {
-    return <Icon onClick={toggleTheme} icon='faSun' className='cursor-pointer text-center text-sky-900 hover:text-sky-600 text-xl absolute right-4 top-5' />
-  }
+  return (
+    <>
+      <div className="absolute right-1 top-2 z-50">
+        <button onClick={() => setIsModalOpen(true)} className="btn btn-ghost btn-circle">
+          <Icon icon='faPalette' className='text-lg text-primary' />
+        </button>
+      </div>
+      <ThemeModal 
+        theme={theme} 
+        setTheme={setTheme} 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
+    </>
+  )
 }
 
 const SidebarContents = (props: ContentProps) => {
@@ -59,12 +69,12 @@ const SidebarContents = (props: ContentProps) => {
   const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
 
   return (
-    <div className='flex flex-col' onClick={() => props.onSetSidebarOpen()}>
+    <div className='flex flex-col h-full bg-base-100' onClick={() => props.onSetSidebarOpen(true)}>
       <SwitchThemeButton />
-      <h4 className="text-xl text-center py-4 bg-gray-50 dark:bg-gray-900 text-blue-500 tracking-wider select-none">
+      <h4 className="text-xl text-center py-4 bg-base-200 text-primary tracking-wider select-none">
         <DeplayerTitle />
       </h4>
-      <ul className='flex flex-col'>
+      <ul className='menu menu-lg w-full flex-1 overflow-y-auto'>
         <ExploreMenuItem current={inSection(location, '$')} />
         <QueueMenuItem
           current={inSection(location, 'queue')}
@@ -74,7 +84,10 @@ const SidebarContents = (props: ContentProps) => {
           current={inSection(location, 'search-results')}
           totalItems={props.collection.searchResults.length}
         />
-        <PlaylistsMenuItem current={inSection(location, 'playlists')} totalItems={props.playlist.playlists.length} />
+        <PlaylistsMenuItem 
+          current={inSection(location, 'playlists')} 
+          totalItems={props.playlist.playlists.length} 
+        />
         <CollectionMenuItem
           current={inSection(location, '(collection.*)')}
           totalItems={props.collection.totalRows}
@@ -93,15 +106,18 @@ const SidebarContents = (props: ContentProps) => {
         <SettingsMenuItem current={inSection(location, 'settings')} />
       </ul>
 
-      <CommandBar dispatch={props.dispatch} />
+      <div className='w-full'>  
+        <CommandBar dispatch={props.dispatch} />
+      </div>
 
-      <section className='p-6 pt-8 bottom-0 text-xs text-center w-full'>
+      <section className='p-6 pt-8 text-sm text-center w-full text-base-content/70'>
         <DeplayerTitle /> is 
         <a
           href={'https://gitlab.com/deplayer/deplayer'}
           rel="noreferrer"
           title="Show me the code"
           target="_blank"
+          className="link link-primary mx-1"
         >
           open source!
         </a>

@@ -53,7 +53,7 @@ function MSidebar({
       sidebar={contents}
       open={sidebarToggled}
       sidebarId='left-sidebar'
-      sidebarClassName='w-64 z-50 bg-gray-200/70 dark:bg-black/70'
+      sidebarClassName='w-64 z-50 bg-base-200/70 backdrop-blur'
       overlayClassName='z-50'
       overlayId='left-sidebar-overlay'
       contentId='left-sidebar-content'
