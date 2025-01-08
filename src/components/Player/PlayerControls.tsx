@@ -213,10 +213,19 @@ class PlayerControls extends React.Component<Props> {
     }
 
     const showFullscreen = this.props.app.showVisuals
+    const playerControlsClassnames = classNames({
+      'flex': true,
+      'justify-between': true,
+      'items-center': true,
+      'flex-col': true,
+      'bg-base-200/70': true,
+      'backdrop-blur': this.props.player.fullscreen
+    })
 
     return (
       <React.Fragment>
-        <div id="player" style={{ gridArea: 'player' }}>
+        {visualizer}
+        <div id="player" style={{ gridArea: 'player' }} className='before:content-[""] before:absolute before:inset-0 before:blur-sm before:bg-base-200/70'>
           <InPortal node={this.props.playerPortal}>
             <ReactPlayer
               id="react-player"
@@ -258,16 +267,17 @@ class PlayerControls extends React.Component<Props> {
             </div>
           )}
           {showControls &&
-            <div className={'player-container'} style={{ gridArea: 'player', zIndex: 102 }}>
+            <div className='player-container' style={{ gridArea: 'player', zIndex: 101 }}>
               <CSSTransition
                 classNames="player"
+                style={{ zIndex: 102 }}
                 appear={true}
                 timeout={{ enter: 500, exit: 500, appear: 500 }}
                 enter={true}
                 exit={true}
               >
-                <div key='player-controls' className='flex justify-between items-center flex-col bg-base-200/90 backdrop-blur'>
-                  <div className='absolute w-full md:top-0 pointer-events-none'>
+                <div key='player-controls' className={playerControlsClassnames} style={{ zIndex: 103 }}>
+                  <div className='absolute w-full md:top-0 pointer-events-none' style={{ zIndex: 104 }}>
                     <ProgressBar
                       dispatch={this.props.dispatch}
                       total={duration * 1000}
@@ -276,7 +286,7 @@ class PlayerControls extends React.Component<Props> {
                       onChange={this.onSeekChange}
                     />
                   </div>
-                  <div className='flex flex-initial items-center justify-between min-w-0 max-w-full w-full'>
+                  <div className='flex flex-initial items-center justify-between min-w-0 max-w-full w-full' style={{ zIndex: 150 }}>
                     <Cover song={currentPlaying} />
                     <div className='flex justify-between items-center w-full'>
                       <div className='mx-2 pr-2 md:text-center w-full truncate overflow-hidden'>
@@ -312,7 +322,6 @@ class PlayerControls extends React.Component<Props> {
               </CSSTransition>
             </div>
           }
-          {visualizer}
         </div>
       </React.Fragment>
     )

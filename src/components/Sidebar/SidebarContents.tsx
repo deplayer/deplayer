@@ -21,6 +21,8 @@ import { State as PlaylistsState } from '../../reducers/playlist'
 import { useLocation } from 'react-router'
 import DeplayerTitle from '../DeplayerTitle'
 
+import LogoSvg from '../../../public/logo.svg?react'
+
 type ContentProps = {
   dispatch: Dispatch,
   collection: CollectionState,
@@ -49,9 +51,9 @@ const SwitchThemeButton = () => {
 
   return (
     <>
-      <div className="absolute right-1 top-2 z-50">
-        <button onClick={() => setIsModalOpen(true)} className="btn btn-ghost btn-circle">
-          <Icon icon='faPalette' className='text-lg text-primary' />
+      <div className="mr-2">
+        <button onClick={() => setIsModalOpen(true)} className="btn btn-ghost btn-circle btn-sm">
+          <Icon icon='faPalette' className='text-lg text-base-content/40' />
         </button>
       </div>
       <ThemeModal 
@@ -64,16 +66,25 @@ const SwitchThemeButton = () => {
   )
 }
 
+const DeplayerLogo = () => {
+  return (
+    <LogoSvg className="w-8 h-8 p-1 ml-2 text-primary" />
+  )
+}
+
 const SidebarContents = (props: ContentProps) => {
   const location = useLocation()
   const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
 
   return (
     <div className='flex flex-col h-full bg-base-100' onClick={() => props.onSetSidebarOpen(true)}>
-      <SwitchThemeButton />
-      <h4 className="text-xl text-center py-4 bg-base-200 text-primary tracking-wider select-none">
-        <DeplayerTitle />
-      </h4>
+      <div className="flex justify-between bg-base-200 border-b border-base-300 py-4">
+        <DeplayerLogo />
+        <h4 className="text-xl text-center text-primary tracking-wider select-none">
+          <DeplayerTitle />
+        </h4>
+        <SwitchThemeButton />
+      </div>
       <ul className='menu menu-lg w-full flex-1 overflow-y-auto'>
         <ExploreMenuItem current={inSection(location, '$')} />
         <QueueMenuItem

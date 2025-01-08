@@ -306,7 +306,8 @@ class AudioSpectrum extends React.Component<Props> {
         )}
         {showSpectrum && (
           <canvas
-            className='opacity-75'
+            className='opacity-100'
+            style={{ zIndex: 101 }}
             id={this.spectrumCanvasId}
             width={this.props.width}
             height={this.props.height}
