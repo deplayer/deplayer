@@ -1,7 +1,7 @@
 This is a local-first media player which is multi provider and runs entirely in the browser 
 without needing any server.
 
-Try to perform as much TDD as possible.
+Try to perform as much TDD as possible. Tests command is `npm run test`
 Use vitest for testing.
 
 - Don't import react from 'react' in the top level of the file.
@@ -9,6 +9,7 @@ Use vitest for testing.
 - Don't leave any unused imports.
 - Don't couple component matchers to translatable text or labels.
 - Don't use `getByTitle` in tests.
+- Don't create __tests__ folders. Put tests next to implementation files (ex: foo.tsx and foo.spec.tsx)
 
 
 Application style:

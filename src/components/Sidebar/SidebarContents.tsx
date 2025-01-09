@@ -21,7 +21,7 @@ import { State as PlaylistsState } from '../../reducers/playlist'
 import { useLocation } from 'react-router'
 import DeplayerTitle from '../DeplayerTitle'
 
-import LogoSvg from '../../../public/logo.svg?react'
+import LogoSvg from '../../logo.svg?react'
 
 type ContentProps = {
   dispatch: Dispatch,

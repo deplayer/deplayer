@@ -11,6 +11,8 @@ type Props = {
 const Modal = ({ isOpen, onClose, children, title }: Props) => {
   if (!isOpen) return null
 
+  const modalRoot = document.getElementById('modal-root') || document.body
+
   return ReactDOM.createPortal(
     <div className="modal modal-open">
       <div className="modal-box">
@@ -22,7 +24,7 @@ const Modal = ({ isOpen, onClose, children, title }: Props) => {
       </div>
       <div className="modal-backdrop" onClick={onClose}></div>
     </div>,
-    document.getElementById('modal')!
+    modalRoot
   )
 }
 

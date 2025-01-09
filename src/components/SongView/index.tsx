@@ -330,7 +330,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
               <Lyrics
                 dispatch={dispatch}
                 songId={song.id}
-                lyrics={lyrics.lyrics || 'gg'}
+                lyrics={lyrics.lyrics || ''}
                 onClose={() => setShowLyrics(false)}
                 isOpen={showLyrics}
               />

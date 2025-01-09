@@ -22,18 +22,23 @@ type FetchSongMetadataAction = {
 };
 
 export function* fetchSongMetadata(action: FetchSongMetadataAction): any {
-  const song = yield select(getSongById, action.songId);
-
   try {
-    const lyrics = yield call(lyricsService.get, song.id) 
-
-    if (!lyrics) {
-      const mbProvider = new LyricsovhProvider();
-      const lyrics = yield call(mbProvider.searchLyrics, song);
-      yield call(lyricsService.save, song.id, lyrics.data.lyrics)
+    const song = yield select(getSongById, action.songId);
+    if (!song) {
+      throw new Error('Song not found');
     }
 
-    yield put({ type: types.LYRICS_FOUND, data: lyrics.data.lyrics });
+    let storedLyrics = yield call(lyricsService.get.bind(lyricsService), song.id) 
+
+    if (!storedLyrics) {
+      const mbProvider = new LyricsovhProvider();
+      const response = yield call(mbProvider.searchLyrics.bind(mbProvider), song);
+      const lyrics = response.data.lyrics;
+      yield call(lyricsService.save.bind(lyricsService), song.id, lyrics);
+      yield put({ type: types.LYRICS_FOUND, data: lyrics });
+    } else {
+      yield put({ type: types.LYRICS_FOUND, data: storedLyrics.lyrics });
+    }
   } catch (e: any) {
     yield put({ type: types.NO_LYRICS_FOUND, error: e.message });
   }
