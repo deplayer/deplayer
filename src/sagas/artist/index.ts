@@ -28,14 +28,18 @@ export function* fetchSongMetadata(action: FetchSongMetadataAction): any {
       throw new Error('Song not found');
     }
 
-    let storedLyrics = yield call(lyricsService.get.bind(lyricsService), song.id) 
+    const storedLyrics = yield call([lyricsService, 'get'], song.id);
 
     if (!storedLyrics) {
       const mbProvider = new LyricsovhProvider();
-      const response = yield call(mbProvider.searchLyrics.bind(mbProvider), song);
-      const lyrics = response.data.lyrics;
-      yield call(lyricsService.save.bind(lyricsService), song.id, lyrics);
-      yield put({ type: types.LYRICS_FOUND, data: lyrics });
+      try {
+        const response = yield call([mbProvider, 'searchLyrics'], song);
+        const lyrics = response.data.lyrics;
+        yield call([lyricsService, 'save'], song.id, lyrics);
+        yield put({ type: types.LYRICS_FOUND, data: lyrics });
+      } catch (apiError: any) {
+        throw new Error(apiError.message || 'Failed to fetch lyrics');
+      }
     } else {
       yield put({ type: types.LYRICS_FOUND, data: storedLyrics.lyrics });
     }

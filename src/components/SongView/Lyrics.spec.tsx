@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import Lyrics from '../Lyrics'
-import * as types from '../../../constants/ActionTypes'
+import Lyrics from './Lyrics'
+import * as types from '../../constants/ActionTypes'
 
 describe('Lyrics', () => {
   const mockDispatch = vi.fn()
