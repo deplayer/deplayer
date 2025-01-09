@@ -35,7 +35,7 @@ class AudioSpectrum extends React.Component<Props> {
     capColor: '#FFF',
     capHeight: 2,
     meterWidth: 2,
-    meterCount: 40 * (2 + 2),
+    meterCount: 20 * (2 + 2),
     meterColor: [
       { stop: 0, color: '#f00' },
       { stop: 0.5, color: '#0CD7FD' },

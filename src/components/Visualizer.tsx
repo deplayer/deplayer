@@ -11,7 +11,7 @@ type Props = {
 }
 class Visualizer extends React.Component<Props> {
   render() {
-    const widthFactor = 8
+    const widthFactor = 10
 
     if (!this.props?.playerRef?.getInternalPlayer()) {
       return null
@@ -23,10 +23,10 @@ class Visualizer extends React.Component<Props> {
           <AudioSpectrum
             spectrumId="audio-canvas"
             visualsId="visuals"
-            capColor={'#ecc94b'}
-            capHeight={2}
+            capColor={'red'}
+            capHeight={40}
             meterWidth={width / (width / widthFactor)}
-            meterCount={width}
+            meterCount={width / 2}
             width={width}
             height={height}
             playerRef={this.props?.playerRef?.getInternalPlayer()}
@@ -35,10 +35,10 @@ class Visualizer extends React.Component<Props> {
             visualsOnTop={this.props.visualizerOnTop}
             meterColor={[
               { stop: 0, color: '#f00' },
-              { stop: 0.5, color: '#0CD7FD' },
+              { stop: 0.2, color: '#0CD7FD' },
               { stop: 1, color: '#ecc94b' }
             ]}
-            gap={0.5}
+            gap={1}
           />
         )}
       </AutoSizer>
