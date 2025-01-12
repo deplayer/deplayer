@@ -1,4 +1,13 @@
-import { text, json, boolean, timestamp, pgTable, integer, real } from "drizzle-orm/pg-core";
+import {
+  text,
+  json,
+  boolean,
+  timestamp,
+  pgTable,
+  integer,
+  real,
+} from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const media = pgTable("media", {
   id: text("id").primaryKey(),
@@ -14,16 +23,19 @@ export const media = pgTable("media", {
   genres: json("genres"),
   track: integer("track"),
   year: integer("year"),
+  // Full-text search columns
+  searchableText: text("searchable_text").notNull().default(""),
+  searchVector: text("search_vector").default(sql`to_tsvector('english', '')`),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
-  updatedAt: timestamp("updatedAt").notNull().defaultNow()
-})
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
 
 export const settings = pgTable("settings", {
   id: text("id").primaryKey(),
   settings: json("settings").notNull(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
-  updatedAt: timestamp("updatedAt").notNull().defaultNow()
-})
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
 
 export const queue = pgTable("queue", {
   id: text("id").primaryKey(),
@@ -35,16 +47,16 @@ export const queue = pgTable("queue", {
   nextSongId: text("nextSongId"),
   prevSongId: text("prevSongId"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
-  updatedAt: timestamp("updatedAt").notNull().defaultNow()
-})
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
 
 export const smartPlaylist = pgTable("smart_playlist", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   filters: json("filters").notNull(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
-  updatedAt: timestamp("updatedAt").notNull().defaultNow()
-})
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
 
 export const playlist = pgTable("playlist", {
   id: text("id").primaryKey(),
@@ -55,27 +67,31 @@ export const playlist = pgTable("playlist", {
   repeat: boolean("repeat"),
   shuffle: boolean("shuffle"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
-  updatedAt: timestamp("updatedAt").notNull().defaultNow()
-})
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
 
 export const peer = pgTable("peer", {
   id: text("id").primaryKey(),
-  roomCode: text("roomCode").notNull().references(() => room.id, { onDelete: 'cascade' }),
+  roomCode: text("roomCode")
+    .notNull()
+    .references(() => room.id, { onDelete: "cascade" }),
   username: text("username").notNull(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
-  updatedAt: timestamp("updatedAt").notNull().defaultNow()
-})
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
 
 export const room = pgTable("room", {
   id: text("id").primaryKey(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
-  updatedAt: timestamp("updatedAt").notNull().defaultNow()
-})
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
 
 export const mediaLyrics = pgTable("media_lyrics", {
   id: text("id").primaryKey(),
-  mediaId: text("mediaId").notNull().references(() => media.id, { onDelete: 'cascade' }),
+  mediaId: text("mediaId")
+    .notNull()
+    .references(() => media.id, { onDelete: "cascade" }),
   lyrics: text("lyrics").notNull(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
-  updatedAt: timestamp("updatedAt").notNull().defaultNow()
-})
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});

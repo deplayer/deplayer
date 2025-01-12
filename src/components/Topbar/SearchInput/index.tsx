@@ -13,6 +13,9 @@ type Props = {
   value: string,
 }
 
+// Search input is the main place to perform a local collection filtering + search online providers for the criteria.
+// If any search provider returns media it's automatically added to the local collection and included in the search results.
+// Whenever this input is not being used (focused) it's automatically hidden and the regular topbar title is shown.
 const SearchInput = (props: Props) => {
   if (!props.searchToggled) {
     return null;
