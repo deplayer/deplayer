@@ -133,16 +133,17 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
   }
 
   const typeIcon = song.type === 'audio' ? <Icon className='pr-2' icon='faMusic' /> : <Icon className='pr-2' icon='faVideo' />
+  const flexDirection = song.type === 'video' ? 'flex-col' : 'flex-row'
+  const imageSize = song.type === 'video' ? 'w-full' : 'md:m-6 md:rounded-b-lg image lg:max-w-md xl:max-w-xl'
 
   return (
     <div data-testid="song-view" className={`song-view ${className} w-full overflow-y-auto z-10 flex flex-col`}>
-      <div className="song sm:flex">
-        <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className="w-full md:m-6 md:rounded-b-lg image lg:max-w-md xl:max-w-xl">
-          <div className='flex flex-col w-full md:sticky md:top-0'>
+      <div className={`song sm:flex ${flexDirection}`}>
+        <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className={`w-full ${imageSize}`}>
+          <div className='flex flex-col w-full md:sticky md:top-0 h-full'>
             {songFinder && song.type === 'video' && (
               <OutPortal
                 id='player-portal'
-                className={`flex w-full player-portal`}
                 node={playerPortal}
               />
             )}

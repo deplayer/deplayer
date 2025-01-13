@@ -92,9 +92,6 @@ export default (state: State = defaultState, action: any): State => {
     case types.TOGGLE_FULL_SCREEN:
       return { ...state, fullscreen: !state.fullscreen }
 
-    case types.SET_FULL_SCREEN:
-      return { ...state, fullscreen: true }
-
     case types.SET_CURRENT_PLAYING_STREAMS:
       return { ...state, streams: action.streams }
 

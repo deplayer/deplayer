@@ -41,7 +41,7 @@ const Topbar = (props: Props) => {
           type: types.START_SEARCH,
           searchTerm
         })
-      }, 500) // Wait 500ms after last keystroke before searching
+      }, 800) // Wait 800ms after last keystroke before searching
 
       setSearchTimeout(timeout)
     }
@@ -81,27 +81,19 @@ const Topbar = (props: Props) => {
         >
           <Icon icon='faBars' />
         </button>
-
-        <div className='flex items-center'>
-          {props.loading && (
-            <div className='loading loading-spinner loading-sm mx-2'></div>
-          )}
-        </div>
       </div>
 
       <div className='flex-1 mx-4'>
-        {!props.showInCenter && (
-          <SearchInput
-            loading={props.loading}
-            value={props.searchTerm}
-            searchToggled={props.searchToggled}
-            onSearchChange={handleSearchChange}
-            onBlur={handleSearchBlur}
-            setSearchOff={handleSearchOff}
-          />
-        )}
-        {props.showInCenter && props.title && (
-          <div className="text-center">{props.title}</div>
+        <SearchInput
+          loading={props.loading}
+          value={props.searchTerm}
+          searchToggled={props.searchToggled}
+          onSearchChange={handleSearchChange}
+          onBlur={handleSearchBlur}
+          setSearchOff={handleSearchOff}
+        />
+        {!props.searchToggled && props.title && (
+          <div onClick={() => props.dispatch({ type: types.TOGGLE_SEARCH })} className="text-center">{props.title}</div>
         )}
       </div>
 

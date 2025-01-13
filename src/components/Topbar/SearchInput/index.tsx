@@ -30,7 +30,6 @@ const SearchInput = (props: Props) => {
     'focus:outline-none': true,
     'focus:ring-0': true,
     'focus:border-none': true,
-    loading: props.loading,
     action: true
   })
 

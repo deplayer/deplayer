@@ -212,7 +212,7 @@ class PlayerControls extends React.Component<Props> {
       config.file.attributes['crossOrigin'] = 'anonymous'
     }
 
-    const showFullscreen = this.props.app.showVisuals
+    const showFullscreen = this.props.app.showVisuals || currentPlaying.type === 'video'
     const playerControlsClassnames = classNames({
       'flex': true,
       'justify-between': true,
@@ -230,7 +230,7 @@ class PlayerControls extends React.Component<Props> {
             <ReactPlayer
               id="react-player"
               pip
-              fullscreen={this.props.player.fullscreen.toString()}
+              fullscreen={this.props.player.fullscreen}
               className={playerClassnames}
               ref={this.playerRef}
               url={streamUri}

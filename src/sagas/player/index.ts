@@ -131,7 +131,6 @@ function* playerSaga(): any {
   yield takeLatest(types.PLAY_NEXT, handlePlayNext)
   yield takeLatest(types.PLAY_PREV, handlePlayPrev)
   yield takeLatest(types.TOGGLE_FULL_SCREEN, handleFullscreen)
-  yield takeLatest(types.SET_FULL_SCREEN, handleFullscreen)
   yield takeLatest(types.PUSH_TO_VIEW, goToViewPage)
 }
 

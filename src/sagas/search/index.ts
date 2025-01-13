@@ -39,6 +39,7 @@ function* performSingleSearch(
 
     // First add to collection
     yield put({ type: types.ADD_TO_COLLECTION, data: searchResults });
+    yield put({ type: types.RECEIVE_COLLECTION, data: searchResults });
 
     // After collection is updated, get all matching results from PostgreSQL
     const results = yield call(collectionService.search, searchTerm);
@@ -54,10 +55,6 @@ function* performSingleSearch(
       notification: "notifications.search.failed",
     });
   }
-}
-
-function* emptySearch() {
-  yield put({ type: types.ADD_TO_COLLECTION, data: [] });
 }
 
 type SearchAction = {
@@ -93,10 +90,13 @@ export function* search(action: SearchAction): any {
     yield take([types.ADD_TO_COLLECTION, types.SEARCH_REJECTED]);
   }
 
+  // First perform local search and show results immediately
+  const newResults = yield call(collectionService.search, action.searchTerm);
+  yield put({ type: types.SET_SEARCH_RESULTS, searchResults: newResults });
+
   yield put({
     type: types.SEARCH_FINISHED,
     searchTerm: action.searchTerm,
-    data: localResults,
   });
   yield put({
     type: types.SEND_NOTIFICATION,
