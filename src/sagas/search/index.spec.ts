@@ -1,12 +1,15 @@
 import { describe, it, vi } from "vitest";
 import { expectSaga } from "redux-saga-test-plan";
-import { call } from "redux-saga/effects";
+import { call, fork } from "redux-saga/effects";
 import { push } from "redux-first-history";
+import { dynamic } from "redux-saga-test-plan/providers";
 
-import { search } from "./index";
+import { search, goToSearchResults } from "./index";
 import * as types from "../../constants/ActionTypes";
 import CollectionService from "../../services/CollectionService";
 import * as database from "../../services/database";
+import { getAdapter } from "../../services/database";
+import ProvidersService from "../../services/ProvidersService";
 
 // Mock the adapter
 vi.mock("../../services/database", () => ({
@@ -15,8 +18,21 @@ vi.mock("../../services/database", () => ({
   }),
 }));
 
+// Mock the providers service
+vi.mock("../../services/ProvidersService", () => ({
+  default: vi.fn().mockImplementation(() => ({
+    providers: { itunes: { enabled: true } },
+    searchForProvider: vi
+      .fn()
+      .mockResolvedValue([{ id: "2", title: "Rock the Casbah" }]),
+  })),
+}));
+
+const adapter = getAdapter();
+const collectionService = new CollectionService(adapter);
+
 describe("search", () => {
-  it("works", () => {
+  it("shows local results immediately and updates with remote results", () => {
     const searchTerm = "The Clash";
     const action = {
       type: types.START_SEARCH,
@@ -24,35 +40,45 @@ describe("search", () => {
       noRedirect: false,
     };
 
-    const mockResults = [{ id: "1", title: "London Calling" }];
+    const mockLocalResults = [{ id: "1", title: "London Calling" }];
+    const mockRemoteResults = [{ id: "2", title: "Rock the Casbah" }];
 
-    return expectSaga(search, action)
-      .provide({
-        call: (effect, next) => {
-          // Mock the provider search
-          if (effect.fn.name === "bound searchForProvider") {
-            return mockResults;
-          }
-          // Mock the goToSearchResults function
-          if (effect.fn.name === "goToSearchResults") {
-            return undefined;
-          }
-          return next();
-        },
-        select: () => ({
-          providers: {}, // No providers to avoid waiting for ADD_TO_COLLECTION
-        }),
-      })
-      .put({ type: types.RECEIVE_COLLECTION, data: mockResults })
-      .put({
-        type: types.SEARCH_FINISHED,
-        searchTerm,
-        data: mockResults,
-      })
-      .put({
-        type: types.SEND_NOTIFICATION,
-        notification: "notifications.search.finished",
-      })
-      .run();
+    return (
+      expectSaga(search, action)
+        .provide([
+          [call(collectionService.search, searchTerm), mockLocalResults],
+          {
+            select: () => ({
+              providers: {
+                itunes: { enabled: true },
+              },
+            }),
+          },
+        ])
+        // First show local results
+        .put({
+          type: types.SET_SEARCH_RESULTS,
+          searchResults: mockLocalResults,
+        })
+        // Then redirect to search results page
+        .put(push("/search-results"))
+        // Then add remote results to collection and update search results
+        .put({ type: types.ADD_TO_COLLECTION, data: mockRemoteResults })
+        .put({
+          type: types.SET_SEARCH_RESULTS,
+          searchResults: mockLocalResults,
+        })
+        // Finally mark search as finished
+        .put({
+          type: types.SEARCH_FINISHED,
+          searchTerm,
+          data: mockLocalResults,
+        })
+        .put({
+          type: types.SEND_NOTIFICATION,
+          notification: "notifications.search.finished",
+        })
+        .silentRun()
+    );
   });
 });

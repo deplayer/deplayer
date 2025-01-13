@@ -18,6 +18,11 @@ import CollectionService from "../../services/CollectionService";
 const adapter = getAdapter();
 const collectionService = new CollectionService(adapter);
 
+// Going to search results page
+export function* goToSearchResults(): any {
+  yield put(push("/search-results"));
+}
+
 // Handle every provider as independent thread
 function* performSingleSearch(
   searchTerm: string,
@@ -39,7 +44,7 @@ function* performSingleSearch(
     const results = yield call(collectionService.search, searchTerm);
 
     // Update search results with all matching media
-    yield put({ type: types.RECEIVE_COLLECTION, data: results });
+    yield put({ type: types.SET_SEARCH_RESULTS, searchResults: results });
   } catch (e: any) {
     console.log(e);
 
@@ -68,9 +73,14 @@ export function* search(action: SearchAction): any {
   const redirect = !action.noRedirect;
   const hasProviders = Object.keys(providersService.providers).length;
 
-  // First perform local search
+  // First perform local search and show results immediately
   const localResults = yield call(collectionService.search, action.searchTerm);
-  yield put({ type: types.RECEIVE_COLLECTION, data: localResults });
+  yield put({ type: types.SET_SEARCH_RESULTS, searchResults: localResults });
+
+  // Redirect early to show local results
+  if (redirect) {
+    yield call(goToSearchResults);
+  }
 
   // Then search in providers if any
   if (hasProviders) {
@@ -83,9 +93,6 @@ export function* search(action: SearchAction): any {
     yield take([types.ADD_TO_COLLECTION, types.SEARCH_REJECTED]);
   }
 
-  if (redirect) {
-    yield call(goToSearchResults);
-  }
   yield put({
     type: types.SEARCH_FINISHED,
     searchTerm: action.searchTerm,
@@ -95,11 +102,6 @@ export function* search(action: SearchAction): any {
     type: types.SEND_NOTIFICATION,
     notification: "notifications.search.finished",
   });
-}
-
-// Going to home page
-export function* goToSearchResults(): any {
-  yield put(push("/search-results"));
 }
 
 // Binding actions to sagas
