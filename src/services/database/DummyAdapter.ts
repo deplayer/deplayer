@@ -1,4 +1,4 @@
-import { IAdapter } from "./IAdapter";
+import { IAdapter, Models } from "./IAdapter";
 
 export default class DummyAdapter implements IAdapter {
   async initialize() {
@@ -39,5 +39,9 @@ export default class DummyAdapter implements IAdapter {
 
   getDb() {
     return Promise.resolve({});
+  }
+
+  async search(_model: Models, _searchTerm: string): Promise<Array<any>> {
+    return Promise.resolve([]);
   }
 }

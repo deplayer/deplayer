@@ -1,15 +1,12 @@
 import { describe, it, vi } from "vitest";
 import { expectSaga } from "redux-saga-test-plan";
-import { call, fork } from "redux-saga/effects";
+import { call } from "redux-saga/effects";
 import { push } from "redux-first-history";
-import { dynamic } from "redux-saga-test-plan/providers";
 
-import { search, goToSearchResults } from "./index";
+import { search } from "./index";
 import * as types from "../../constants/ActionTypes";
 import CollectionService from "../../services/CollectionService";
-import * as database from "../../services/database";
 import { getAdapter } from "../../services/database";
-import ProvidersService from "../../services/ProvidersService";
 
 // Mock the adapter
 vi.mock("../../services/database", () => ({

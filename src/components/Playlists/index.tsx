@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import Playlist from './Playlist'
 import CenteredMessage from '../common/CenteredMessage'
 import { State as CollectionState } from '../../reducers/collection'

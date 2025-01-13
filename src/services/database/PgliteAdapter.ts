@@ -209,7 +209,7 @@ export default class Pglite implements IAdapter {
     return db.get();
   };
 
-  async search(model: Models, searchTerm: string): Promise<Array<any>> {
+  async search(_model: Models, searchTerm: string): Promise<Array<any>> {
     try {
       const db = await this.getDb();
 
