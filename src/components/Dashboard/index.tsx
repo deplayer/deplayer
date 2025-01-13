@@ -7,6 +7,7 @@ import MediaSlider from '../MediaSlider'
 import RelatedAlbums from '../RelatedAlbums'
 import { State as CollectionState } from '../../reducers/collection'
 import * as types from '../../constants/ActionTypes'
+import Footer from '../Footer'
 
 import RecordPlayerSvg from './record-player.svg?react'
 import CasseteSvg from './cassete.svg?react'
@@ -111,12 +112,7 @@ const Dashboard = ({
           mediaItems={mediaItems.slice(0, MAX_LIST_ITEMS)}
         />}
       {!!slicedAlbums.length && <RelatedAlbums albums={slicedAlbums} />}
-      <div className='flex flex-col items-center mt-12'>
-        <h4 className="text-xl text-center pt-4 text-primary px-4">
-          <DeplayerTitle />
-        </h4>
-        <p className='text-base'>Your music, your way</p>
-      </div>
+      <Footer />
     </div>
   )
 }

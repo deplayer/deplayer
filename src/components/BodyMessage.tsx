@@ -1,16 +1,17 @@
-import * as React from 'react'
+import CenteredMessage from './common/CenteredMessage'
 
 type Props = {
   message: React.ReactNode
+  showFooter?: boolean
 }
 
-const BodyMessage = (props: Props) => {
+const BodyMessage = ({ message, showFooter = true }: Props) => {
   return (
-    <div className='queue z-10 w-full h-full flex justify-center '>
-      <blockquote className='blockquote text-lg text-center px-12'>
-        { props.message }
-      </blockquote>
-    </div>
+    <CenteredMessage showFooter={showFooter}>
+      <div className='text-center'>
+        {message}
+      </div>
+    </CenteredMessage>
   )
 }
 

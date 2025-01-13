@@ -2,7 +2,15 @@ import { IAdapter, Models } from "./IAdapter";
 import * as db from "./PgliteDatabase";
 import { PgliteDatabase } from "drizzle-orm/pglite";
 import { eq, inArray } from "drizzle-orm";
-import { media, settings, queue, playlist, smartPlaylist, peer, room } from "../../schema";
+import {
+  media,
+  settings,
+  queue,
+  playlist,
+  smartPlaylist,
+  peer,
+  room,
+} from "../../schema";
 
 export default class Pglite implements IAdapter {
   initialize = async () => {};
@@ -122,12 +130,10 @@ export default class Pglite implements IAdapter {
         await instance.delete(room).where(inArray(room.id, payload));
         break;
       default:
-        console.log(
-              `Model ${model} is not implemented for removeMany method`
-        );
+        console.log(`Model ${model} is not implemented for removeMany method`);
         throw new Error(`Model ${model} not supported for removeMany method`);
     }
-  };
+  }
 
   get = async (model: Models, id: string): Promise<any> => {
     return this.getDocObj(model, id);

@@ -1,25 +1,25 @@
-import indexSingleton, { IndexService } from '../services/Search/IndexService'
+import indexSingleton, { IndexService } from "../services/Search/IndexService";
 
 const filterSongs = (
   indexService: IndexService = indexSingleton(),
   songs: any,
-  term: string = ''
+  term: string = ""
 ) => {
   if (!songs) {
-    []
+    [];
   }
 
-  if (term === '' && songs) {
-    return Object.keys(songs)
+  if (term === "" && songs) {
+    return Object.keys(songs);
   }
 
-  const results = indexService.search(term)
+  const results = indexService.search(term);
 
   const mappedResults = results.map((result: any) => {
-    return result.ref
-  })
+    return result.ref;
+  });
 
-  return mappedResults
-}
+  return mappedResults;
+};
 
-export default filterSongs
+export default filterSongs;

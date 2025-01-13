@@ -1,10 +1,9 @@
 import { Dispatch } from 'redux'
-
 import { Link } from 'react-router-dom'
 import { State as CollectionState } from '../reducers/collection'
-import BodyMessage from './BodyMessage'
 import MusicTable from './MusicTable/MusicTable'
 import Spinner from './Spinner'
+import CenteredMessage from './common/CenteredMessage'
 
 type Props = {
   queue: any,
@@ -35,31 +34,29 @@ const Queue = (props: Props) => {
   if (props.app.loading) {
     return (
       <div className={`queue`}>
-        <blockquote className='blockquote'>
+        <CenteredMessage>
           <Spinner />
-        </blockquote>
+        </CenteredMessage>
       </div>
     )
   }
 
   if (!trackIds.length) {
-    const message = (
-      <div className='flex flex-col'>
-        Add songs from the collection or search for new ones
-
-        <Link
-          to="/collection"
-          title="collection"
-        >
-          Jump to collection <br />
-          <i className='icon database outline'></i>
-        </Link>
-      </div>
-    )
-
     return (
       <div className={`queue z-10 no-results ${props.className || ''}`}>
-        <BodyMessage message={message} />
+        <CenteredMessage>
+          <div className='flex flex-col'>
+            Add songs from the collection or search for new ones
+
+            <Link
+              to="/collection"
+              title="collection"
+            >
+              Jump to collection <br />
+              <i className='icon database outline'></i>
+            </Link>
+          </div>
+        </CenteredMessage>
       </div>
     )
   }

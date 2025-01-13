@@ -11,6 +11,7 @@ import MainContainer from '../common/MainContainer'
 import SettingsForm from './SettingsForm'
 import * as types from '../../constants/ActionTypes'
 import { State as SettingsState } from '../../reducers/settings'
+import CenteredMessage from '../common/CenteredMessage'
 
 const Settings: React.FC = () => {
   const dispatch = useDispatch()
@@ -45,44 +46,50 @@ const Settings: React.FC = () => {
   const pg = getClient()
 
   if (!pg) {
-    return <MainContainer centerContents>Loading...</MainContainer>
+    return (
+      <CenteredMessage>
+        <div>Loading...</div>
+      </CenteredMessage>
+    )
   }
 
   return (
     <MainContainer centerContents>
-      <div className='flex flex-col'>
-        <SettingsForm
-          schema={settingsForm}
-          settings={settings}
-          dispatch={dispatch}
-        />
-        <div className='pt-10'>
-          <h2 className='text-2xl py-3 text-base-content'><Translate value="labels.pgliteRepl" /></h2>
-          <p className='text-base-content'>
-            <Translate value="labels.pgliteReplDescription" />
-          </p>
-          <Repl pg={pg} />
-        </div>
+      <CenteredMessage>
+        <div className='flex flex-col'>
+          <SettingsForm
+            schema={settingsForm}
+            settings={settings}
+            dispatch={dispatch}
+          />
+          <div className='pt-10'>
+            <h2 className='text-2xl py-3 text-base-content'><Translate value="labels.pgliteRepl" /></h2>
+            <p className='text-base-content'>
+              <Translate value="labels.pgliteReplDescription" />
+            </p>
+            <Repl pg={pg} />
+          </div>
 
-        <div className='my-12'>
-          <h2 className='text-2xl py-3 text-base-content'><Translate value="labels.actions" /></h2>
-          <div className='flex'>
-            <Button onClick={exportCollection} inverted>
-              <Translate value="labels.exportCollection" />
-            </Button>
-            <Button onClick={toggleImporter} inverted>
-              <Translate value="labels.importCollection" />
-            </Button>
-            <Button onClick={deleteCollection} inverted>
-              <Translate value="labels.deleteCollection" />
-            </Button>
-            <Button onClick={deleteSettings} inverted>
-              <Translate value="labels.deleteSettings" />
-            </Button>
-            {ImporterComp}
+          <div className='my-12'>
+            <h2 className='text-2xl py-3 text-base-content'><Translate value="labels.actions" /></h2>
+            <div className='flex'>
+              <Button onClick={exportCollection} inverted>
+                <Translate value="labels.exportCollection" />
+              </Button>
+              <Button onClick={toggleImporter} inverted>
+                <Translate value="labels.importCollection" />
+              </Button>
+              <Button onClick={deleteCollection} inverted>
+                <Translate value="labels.deleteCollection" />
+              </Button>
+              <Button onClick={deleteSettings} inverted>
+                <Translate value="labels.deleteSettings" />
+              </Button>
+              {ImporterComp}
+            </div>
           </div>
         </div>
-      </div>
+      </CenteredMessage>
     </MainContainer>
   )
 }

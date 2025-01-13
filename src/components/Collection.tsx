@@ -1,11 +1,11 @@
 import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
 import AddNewMediaButton from './Buttons/AddNewMediaButton'
-import BodyMessage from './BodyMessage'
 import MusicTable from './MusicTable/MusicTable'
 import Spinner from './Spinner'
 import { useLocation } from 'react-router'
 import { Location } from 'react-router'
+import CenteredMessage from './common/CenteredMessage'
 
 type Props = {
   app: any,
@@ -42,12 +42,12 @@ const Collection = (props: Props) => {
     <div className="collection z-10 flex">
       <div className="flex-1">
         {!mediaItems.length ? (
-          <BodyMessage message={
+          <CenteredMessage>
             <div className='flex flex-col'>
               <Translate value='message.noCollectionItems' />
               <AddNewMediaButton />
             </div>
-          } />
+          </CenteredMessage>
         ) : (
           <MusicTable
             tableIds={mediaItems}

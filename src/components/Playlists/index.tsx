@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import Playlist from './Playlist'
-import BodyMessage from '../BodyMessage'
+import CenteredMessage from '../common/CenteredMessage'
 import { State as CollectionState } from '../../reducers/collection'
 import { State as PlaylistState } from '../../reducers/playlist'
 
@@ -17,12 +17,15 @@ const Playlists = (props: Props) => {
 
   if (!playlists.length && !smartPlaylists.length) {
     return (
-      <React.Fragment>
-        <BodyMessage message={`You don't have any playlist yet.\n Add some songs to now playing and save it as playlist`} />
-      </React.Fragment>
+      <CenteredMessage>
+        <div className='text-center'>
+          You don't have any playlist yet.
+          <br />
+          Add some songs to now playing and save it as playlist
+        </div>
+      </CenteredMessage>
     )
   }
-
 
   const playlistsComps = playlists.map((playlist: any) => {
     return (
@@ -43,8 +46,8 @@ const Playlists = (props: Props) => {
         collection={collection}
         playlist={playlist}
       />
-    );
-  });
+    )
+  })
 
   return (
     <div className='playlists z-10 flex flex-col w-full overflow-y-auto h-full'>

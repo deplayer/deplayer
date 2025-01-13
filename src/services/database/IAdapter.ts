@@ -8,7 +8,7 @@ export type Models =
   | "smart_playlist"
   | "peer"
   | "room"
-  | "media_lyrics"
+  | "media_lyrics";
 
 export interface IAdapter {
   initialize(model: Models): Promise<void>;
