@@ -1,85 +1,76 @@
-import * as types from '../constants/ActionTypes'
+import * as types from "../constants/ActionTypes";
 
 export type State = {
-  error: string,
-  searchTerm: string,
-  loading: boolean,
-  searchIndex: object,
-  searchToggled: boolean,
-  searchResults: string[]
-}
+  error: string;
+  searchTerm: string;
+  loading: boolean;
+  searchToggled: boolean;
+  searchResults: string[];
+};
 
 export const defaultState = {
-  error: '',
-  searchTerm: '',
+  error: "",
+  searchTerm: "",
   loading: false,
-  searchIndex: {},
   searchToggled: false,
-  searchResults: []
-}
+  searchResults: [],
+};
 
 export default (state: State = defaultState, action: any = {}) => {
   switch (action.type) {
     case types.SET_SEARCH_TERM: {
       return {
         ...state,
-        searchTerm: action.searchTerm
-      }
-    }
-
-    case types.RECEIVE_SEARCH_INDEX: {
-      return {
-        ...state,
-        searchIndex: action.data
-      }
+        searchTerm: action.searchTerm,
+      };
     }
 
     case types.SET_SEARCH_RESULTS: {
       return {
         ...state,
-        searchResults: action.searchResults
-      }
+        searchResults: action.searchResults,
+      };
     }
 
     case types.TOGGLE_SEARCH_OFF: {
       return {
         ...state,
-        searchToggled: false
-      }
+        searchToggled: false,
+      };
     }
 
     case types.TOGGLE_SEARCH: {
       return {
         ...state,
-        searchToggled: !state.searchToggled
-      }
+        searchToggled: !state.searchToggled,
+      };
     }
 
     case types.START_SEARCH: {
       return {
         ...state,
         searchTerm: action.searchTerm,
-        loading: true
-      }
+        loading: true,
+      };
     }
 
     case types.SEARCH_REJECTED: {
       return {
         ...state,
         error: action.message,
-        loading: false
-      }
+        loading: false,
+      };
     }
 
     case types.SEARCH_FINISHED: {
       return {
         ...state,
-        error: '',
-        loading: false
-      }
+        error: "",
+        loading: false,
+      };
     }
 
     default:
-      return state
+      return state;
   }
-}
+};
