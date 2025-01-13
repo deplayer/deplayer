@@ -1,67 +1,74 @@
-import { IStorageService } from './IStorageService'
-import { IAdapter, Models } from './database/IAdapter'
-import MediaMergerService from './MediaMergerService'
-import Media from '../entities/Media'
+import { IStorageService } from "./IStorageService";
+import { IAdapter, Models } from "./database/IAdapter";
+import MediaMergerService from "./MediaMergerService";
+import Media from "../entities/Media";
+import logger from "../utils/logger";
 
-const MODEL = 'media'
+const MODEL = "media";
 
 export default class CollectionService implements IStorageService {
-  storageAdapter: IAdapter
+  storageAdapter: IAdapter;
 
   constructor(storageAdapter: IAdapter) {
-    this.storageAdapter = storageAdapter
+    this.storageAdapter = storageAdapter;
   }
 
   initialize = (model: Models = MODEL) => {
-    this.storageAdapter.initialize(model)
-  }
+    this.storageAdapter.initialize(model);
+  };
 
   save = (id: string, payload: any): Promise<any> => {
-    return this.storageAdapter.save(MODEL, id, payload)
-  }
+    return this.storageAdapter.save(MODEL, id, payload).catch((e) => {
+      logger.log("Error saving collection", e.message);
+    });
+  };
 
   bulkSave = (collection: Array<Media>, prevCollection: any): Promise<any> => {
     const collectionItems = collection.map((elem) => {
       if (prevCollection.rows[elem.id]) {
+        const prevItem = prevCollection.rows[elem.id];
+        const mediaMergerService = new MediaMergerService(prevItem, elem);
 
-        const prevItem = prevCollection.rows[elem.id]
-        const mediaMergerService = new MediaMergerService(prevItem, elem)
+        const mergedMedia = mediaMergerService.getMerged();
 
-        const mergedMedia = mediaMergerService.getMerged()
-
-        return mergedMedia
+        return mergedMedia;
       }
 
-      return elem
-    })
+      return elem;
+    });
 
-    return this.storageAdapter.addMany(MODEL, collectionItems)
-  }
+    return this.storageAdapter.addMany(MODEL, collectionItems);
+  };
 
   bulkRemove = (collection: Array<Media>): Promise<any> => {
     const collectionIds = collection.map((elem) => {
-      return elem.id
-    })
-    return this.storageAdapter.removeMany(MODEL, collectionIds)
-  }
+      return elem.id;
+    });
+    return this.storageAdapter.removeMany(MODEL, collectionIds);
+  };
 
   removeAll = (): Promise<any> => {
-    return this.storageAdapter.removeCollection(MODEL)
-  }
+    return this.storageAdapter.removeCollection(MODEL);
+  };
 
   exportCollection = (): Promise<any> => {
-    return this.storageAdapter.exportCollection(MODEL)
-  }
+    return this.storageAdapter.exportCollection(MODEL);
+  };
 
   importCollection = (data: any): Promise<any> => {
-    return this.storageAdapter.importCollection(MODEL, data)
-  }
+    return this.storageAdapter.importCollection(MODEL, data);
+  };
 
   get = (id: string): Promise<Media> => {
-    return this.storageAdapter.get(MODEL, id)
-  }
+    return this.storageAdapter.get(MODEL, id);
+  };
 
   getAll = (): Promise<Array<any>> => {
-    return this.storageAdapter.getAll(MODEL, {})
-  }
+    return this.storageAdapter.getAll(MODEL, {});
+  };
+
+  search = async (searchTerm: string) => {
+    // Use PostgreSQL's full-text search
+    return await this.storageAdapter.search(MODEL, searchTerm);
+  };
 }

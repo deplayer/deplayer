@@ -1,7 +1,4 @@
-import indexSingleton, { IndexService } from "../services/Search/IndexService";
-
 const filterSongs = (
-  indexService: IndexService = indexSingleton(),
   songs: any,
   term: string = ""
 ) => {
@@ -13,10 +10,8 @@ const filterSongs = (
     return Object.keys(songs);
   }
 
-  const results = indexService.search(term);
-
-  const mappedResults = results.map((result: any) => {
-    return result.ref;
+  const mappedResults = songs.map((song: any) => {
+    return song.id;
   });
 
   return mappedResults;

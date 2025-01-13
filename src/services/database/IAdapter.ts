@@ -21,4 +21,5 @@ export interface IAdapter {
   exportCollection(model: Models): Promise<any>;
   importCollection(model: Models, data: any): Promise<any>;
   getDb(): Promise<any>;
+  search(model: Models, searchTerm: string): Promise<Array<any>>;
 }

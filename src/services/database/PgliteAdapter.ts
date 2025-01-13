@@ -1,7 +1,7 @@
 import { IAdapter, Models } from "./IAdapter";
 import * as db from "./PgliteDatabase";
 import { PgliteDatabase } from "drizzle-orm/pglite";
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import {
   media,
   settings,
@@ -11,6 +11,7 @@ import {
   peer,
   room,
 } from "../../schema";
+import logger from "../../utils/logger";
 
 export default class Pglite implements IAdapter {
   initialize = async () => {};
@@ -162,7 +163,7 @@ export default class Pglite implements IAdapter {
         return instance.select().from(room).where(eq(room.id, id));
       default:
         console.log(`Model ${model} is not implemented for getDocObj method`);
-        new Error("Model not supported");
+        throw new Error("Model not supported");
     }
   };
 
@@ -207,4 +208,45 @@ export default class Pglite implements IAdapter {
   getDb = (): Promise<PgliteDatabase> => {
     return db.get();
   };
+
+  async search(model: Models, searchTerm: string): Promise<Array<any>> {
+    try {
+      const db = await this.getDb();
+
+      // Create a tsquery from the search term, handling multiple words
+      const tsquery = searchTerm
+        .trim()
+        .split(/\s+/)
+        .map((term) => `${term}:*`)
+        .join(" & ");
+
+      // Search across title, artist and album using to_tsvector
+      // Order by rank to get most relevant results first
+      const results = await db
+        .select()
+        .from(media)
+        .where(
+          sql`to_tsvector('english', 
+            coalesce(title, '') || ' ' || 
+            coalesce("artistName", '') || ' ' || 
+            coalesce("albumName", '')
+          ) @@ to_tsquery('english', ${tsquery})`
+        )
+        .orderBy(
+          sql`ts_rank(
+            to_tsvector('english',
+              coalesce(title, '') || ' ' || 
+              coalesce("artistName", '') || ' ' || 
+              coalesce("albumName", '')
+            ),
+            to_tsquery('english', ${tsquery})
+          ) DESC`
+        );
+
+      return results;
+    } catch (error) {
+      logger.error("Error performing search:", error);
+      return [];
+    }
+  }
 }

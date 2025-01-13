@@ -1,12 +1,7 @@
-import Media from "../entities/Media";
-import filterSongs from "../utils/filter-songs";
 import * as types from "../constants/ActionTypes";
-import IndexService from "../services/Search/IndexService";
 import Artist from "../entities/Artist";
 import IMedia from "../entities/Media";
 import { applyFilters } from "../utils/apply-filters";
-
-const indexService = IndexService();
 
 export type Filter = {
   genres: string[];
@@ -28,7 +23,6 @@ export type State = {
   searchTerm: string;
   searchResults: string[];
   enabledProviders: string[];
-  searchIndex: object | null;
   loading: boolean;
   totalRows: number;
   activeFilters: Filter;
@@ -48,7 +42,6 @@ export const defaultState: State = {
   searchTerm: "",
   searchResults: [],
   enabledProviders: [],
-  searchIndex: null,
   loading: true,
   totalRows: 0,
   activeFilters: {
@@ -148,16 +141,11 @@ const populateFromAction = (
       }
     );
 
-  const searchResults = filterSongs(
-    indexService,
-    aggregation.rows,
-    state.searchTerm
-  );
   const filteredSongs = applyFilters(aggregation.rows, state.activeFilters);
 
   return {
     ...aggregation,
-    searchResults,
+    searchResults: state.searchResults, // Keep existing search results
     filteredSongs,
     totalRows: Object.keys(aggregation.rows).length,
     loading: false,
@@ -170,7 +158,6 @@ export const sortByPlayCount = (
   rows: any
 ) => {
   const song1 = rows[songId1];
-
   const song2 = rows[songId2];
 
   if (song1.playCount < song2.playCount) return 1;
@@ -181,41 +168,31 @@ export const sortByPlayCount = (
 
 export default (state: State = defaultState, action: any = {}) => {
   switch (action.type) {
-    case types.SET_SEARCH_TERM: {
+    case types.SET_SEARCH_TERM:
       return {
         ...state,
         searchTerm: action.searchTerm,
       };
-    }
 
     case types.START_SEARCH:
-    case types.SEARCH_FINISHED: {
       return {
         ...state,
-        searchResults:
-          state.searchTerm !== ""
-            ? filterSongs(indexService, state.rows, state.searchTerm)
-            : [],
+        loading: true,
+        searchResults: [],
       };
-    }
 
-    case types.RECEIVE_SEARCH_INDEX: {
+    case types.SEARCH_FINISHED:
       return {
         ...state,
-        searchIndex: action.data,
-        searchResults:
-          state.searchTerm !== ""
-            ? filterSongs(indexService, state.rows, state.searchTerm)
-            : [],
+        loading: false,
+        searchResults: action.data.map((item: IMedia) => item.id),
       };
-    }
 
     case types.RECEIVE_COLLECTION_ITEM:
-    case types.RECEIVE_COLLECTION: {
+    case types.RECEIVE_COLLECTION:
       return populateFromAction(state, action);
-    }
 
-    case types.RECEIVE_SETTINGS: {
+    case types.RECEIVE_SETTINGS:
       const enabledProviders = Object.keys(action.settings.providers).filter(
         (key) => {
           return action.settings.providers[key].enabled;
@@ -226,9 +203,8 @@ export default (state: State = defaultState, action: any = {}) => {
         ...state,
         enabledProviders,
       };
-    }
 
-    case types.CLEAR_COLLECTION: {
+    case types.CLEAR_COLLECTION:
       return {
         ...state,
         rows: {},
@@ -242,9 +218,8 @@ export default (state: State = defaultState, action: any = {}) => {
         totalRows: 0,
         loading: false,
       };
-    }
 
-    case types.APPLY_MOST_PLAYED_SORT: {
+    case types.APPLY_MOST_PLAYED_SORT:
       const songsByNumberOfPlays = Object.keys(state.rows)
         .filter((songId) => {
           return state.rows[songId].playCount > 0;
@@ -257,26 +232,26 @@ export default (state: State = defaultState, action: any = {}) => {
         ...state,
         songsByNumberOfPlays,
       };
-    }
 
-    case types.REMOVE_FROM_COLLECTION_FULFILLED: {
-      const songIds = action.data.map((media: Media) => media.id);
-
-      const newRows = state.rows;
+    case types.REMOVE_FROM_COLLECTION_FULFILLED:
+      const songIds = action.data.map((media: IMedia) => media.id);
+      const newRows = { ...state.rows };
       songIds.forEach((songId: string) => {
         delete newRows[songId];
       });
-
       return populateFromAction(state, { data: Object.values(newRows) });
-    }
 
-    case types.UPDATE_MEDIA: {
+    case types.UPDATE_MEDIA:
       const media = action.media;
+      return {
+        ...state,
+        rows: {
+          ...state.rows,
+          [media.id]: media,
+        },
+      };
 
-      return { ...state, [media.id]: media };
-    }
-
-    case types.SET_COLLECTION_FILTER: {
+    case types.SET_COLLECTION_FILTER:
       const newFilters = {
         ...state.activeFilters,
         [action.filterType]: action.values,
@@ -293,15 +268,13 @@ export default (state: State = defaultState, action: any = {}) => {
         activeFilters: newFilters,
         filteredSongs,
       };
-    }
 
-    case types.CLEAR_COLLECTION_FILTERS: {
+    case types.CLEAR_COLLECTION_FILTERS:
       return {
         ...state,
         activeFilters: defaultState.activeFilters,
         filteredSongs: Object.keys(state.rows),
       };
-    }
 
     default:
       return state;

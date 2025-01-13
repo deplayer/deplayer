@@ -1,22 +1,10 @@
-import React, { useEffect, useState } from 'react'
-
 const TOTAL_BARS = 32
 const BAR_WIDTH = 12
 const GAP = 4
 const MAX_HEIGHT = 24
 
 const SpectrumSVG = () => {
-  const [heights, setHeights] = useState<number[]>(Array(TOTAL_BARS).fill(0))
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setHeights(heights => 
-        heights.map(() => Math.floor(Math.random() * MAX_HEIGHT))
-      )
-    }, 300)
-
-    return () => clearInterval(interval)
-  }, [])
+  const heights = Array(TOTAL_BARS).fill(0).map(() => Math.floor(Math.random() * MAX_HEIGHT))
 
   const totalWidth = TOTAL_BARS * (BAR_WIDTH + GAP)
 
@@ -24,7 +12,7 @@ const SpectrumSVG = () => {
     <svg 
       width={totalWidth} 
       height={MAX_HEIGHT} 
-      className="opacity-30"
+      className="opacity-20"
       aria-hidden="true"
     >
       {heights.map((height, index) => (

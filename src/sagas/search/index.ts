@@ -19,61 +19,83 @@ function* performSingleSearch(
   provider: string
 ): Generator<any, void, any> {
   try {
-    const settings = yield select(getSettings)
-    const providerService = new ProvidersService(settings)
-    const searchResults = yield call(providerService.searchForProvider, searchTerm, provider)
+    const settings = yield select(getSettings);
+    const providerService = new ProvidersService(settings);
+    const searchResults = yield call(
+      providerService.searchForProvider,
+      searchTerm,
+      provider
+    );
 
-    yield put({ type: types.RECEIVE_COLLECTION, data: searchResults })
-    yield put({ type: types.RECREATE_INDEX })
-    yield put({ type: types.ADD_TO_COLLECTION, data: searchResults })
+    // First add to collection
+    yield put({ type: types.ADD_TO_COLLECTION, data: searchResults });
+
+    // After collection is updated, get all matching results from PostgreSQL
+    const results = yield call(collectionService.search, searchTerm);
+
+    // Update search results with all matching media
+    yield put({ type: types.RECEIVE_COLLECTION, data: results });
   } catch (e: any) {
-    console.log(e)
+    console.log(e);
 
-    yield put({ type: types.SEARCH_REJECTED, message: e.message })
-    yield put({ type: types.SEND_NOTIFICATION, notification: 'notifications.search.failed' })
+    yield put({ type: types.SEARCH_REJECTED, message: e.message });
+    yield put({
+      type: types.SEND_NOTIFICATION,
+      notification: "notifications.search.failed",
+    });
   }
 }
 
 function* emptySearch() {
-  yield put({ type: types.ADD_TO_COLLECTION, data: [] })
+  yield put({ type: types.ADD_TO_COLLECTION, data: [] });
 }
 
 type SearchAction = {
-  type: string,
-  searchTerm: string,
-  noRedirect?: boolean
-}
+  type: string;
+  searchTerm: string;
+  noRedirect?: boolean;
+};
 
 // Handling search saga
 export function* search(action: SearchAction): any {
-  const settings = yield select(getSettings)
-  const providersService = new ProvidersService(settings)
-  const redirect = !action.noRedirect
-  const hasProviders = Object.keys(providersService.providers).length
+  const settings = yield select(getSettings);
+  const providersService = new ProvidersService(settings);
+  const redirect = !action.noRedirect;
+  const hasProviders = Object.keys(providersService.providers).length;
 
-  const searchPromises = hasProviders ? Object.keys(providersService.providers).map((provider) => {
-    return fork(performSingleSearch, action.searchTerm, provider)
-  }) : [yield fork(emptySearch)]
+  // First perform local search
+  const localResults = yield call(collectionService.search, action.searchTerm);
+  yield put({ type: types.RECEIVE_COLLECTION, data: localResults });
 
-  yield all(searchPromises)
-
-  yield take([types.ADD_TO_COLLECTION, types.SEARCH_REJECTED])
+  // Then search in providers if any
+  if (hasProviders) {
+    const searchPromises = Object.keys(providersService.providers).map(
+      (provider) => {
+        return fork(performSingleSearch, action.searchTerm, provider);
+      }
+    );
+    yield all(searchPromises);
+    yield take([types.ADD_TO_COLLECTION, types.SEARCH_REJECTED]);
+  }
 
   if (redirect) {
-    yield call(goToSearchResults)
+    yield call(goToSearchResults);
   }
-  yield put({ type: types.SEARCH_FINISHED, searchTerm: action.searchTerm })
-  yield put({ type: types.SEND_NOTIFICATION, notification: 'notifications.search.finished' })
+  yield put({ type: types.SEARCH_FINISHED, searchTerm: action.searchTerm });
+  yield put({
+    type: types.SEND_NOTIFICATION,
+    notification: "notifications.search.finished",
+  });
 }
 
 // Going to home page
 export function* goToSearchResults(): any {
-  yield put(push('/search-results'))
+  yield put(push("/search-results"));
 }
 
 // Binding actions to sagas
 function* searchSaga(): any {
-  yield takeLatest(types.START_SEARCH, search)
+  yield takeLatest(types.START_SEARCH, search);
 }
 
-export default searchSaga
+export default searchSaga;

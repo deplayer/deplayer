@@ -148,8 +148,6 @@ export function* startFilesystemProcess(action: any): any {
       console.error("error reading metadata: ", error);
     }
   }
-
-  yield put({ type: types.RECREATE_INDEX });
 }
 
 function* startYoutubeDlScan(action: any): Generator<any, void, any> {
@@ -162,7 +160,6 @@ function* startYoutubeDlScan(action: any): Generator<any, void, any> {
 
     const result = yield service.search(action.data.url);
     yield put({ type: types.ADD_TO_COLLECTION, data: result });
-    yield put({ type: types.RECREATE_INDEX });
   } catch (error) {
     yield put({ type: "YOUTUBE_FETCH_ERROR", error });
   }
@@ -188,7 +185,6 @@ function* startProviderSync(action: any): Generator<any, void, any> {
     const songs = yield call(provider.fullSync.bind(provider));
 
     yield put({ type: types.ADD_TO_COLLECTION, data: songs });
-    yield put({ type: types.RECREATE_INDEX });
     yield put({
       type: types.PROVIDER_SYNC_FINISHED,
       providerKey: action.providerKey,

@@ -7,7 +7,6 @@ import CollectionService from "../../services/CollectionService";
 import logger from "../../utils/logger";
 import rowToSong from "../../mappers/rowToSong";
 import * as types from "../../constants/ActionTypes";
-import { IndexService } from "../../services/Search/IndexService";
 
 const adapter = getAdapter();
 const collectionService = new CollectionService(adapter);
@@ -31,7 +30,6 @@ export function* removeFromDbWorker(action: any): any {
       type: types.REMOVE_FROM_COLLECTION_FULFILLED,
       data: action.data,
     });
-    yield put({ type: types.RECREATE_INDEX });
   } catch (e: any) {
     yield put({
       type: types.REMOVE_FROM_COLLECTION_REJECTED,
@@ -74,26 +72,6 @@ export function* importCollectionWorker(action: {
   logger.log("settings-saga", "importingCollection");
   const result = yield collectionService.importCollection(action.data);
   yield put({ type: types.IMPORT_COLLECTION_FINISHED, result });
-}
-
-// generate fulltext index
-//
-export function* generateIndexWorker(service: IndexService): any {
-  const collection = yield select(getCollection);
-  const index = yield call(
-    service.generateIndexFrom,
-    Object.values(collection.rows)
-  );
-
-  try {
-    const data = JSON.parse(JSON.stringify(index));
-    yield put({ type: types.RECEIVE_SEARCH_INDEX, data });
-  } catch (e: any) {
-    yield put({
-      type: types.RECEIVE_SEARCH_INDEX_REJECTED,
-      message: e.message,
-    });
-  }
 }
 
 export function* trackSongPlayed(action: {
