@@ -185,7 +185,9 @@ export default (state: State = defaultState, action: any = {}) => {
       return {
         ...state,
         loading: false,
-        searchResults: action.data.map((item: IMedia) => item.id),
+        searchResults: action.data
+          ? action.data.map((item: IMedia) => item.id)
+          : [],
       };
 
     case types.RECEIVE_COLLECTION_ITEM:

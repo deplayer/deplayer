@@ -5,13 +5,18 @@ import {
   select,
   all,
   fork,
-  take
-} from 'redux-saga/effects'
+  take,
+} from "redux-saga/effects";
 
-import { push } from "redux-first-history"
-import * as types from '../../constants/ActionTypes'
-import ProvidersService from '../../services/ProvidersService'
-import { getSettings } from './../selectors'
+import { push } from "redux-first-history";
+import * as types from "../../constants/ActionTypes";
+import ProvidersService from "../../services/ProvidersService";
+import { getSettings } from "./../selectors";
+import { getAdapter } from "../../services/database";
+import CollectionService from "../../services/CollectionService";
+
+const adapter = getAdapter();
+const collectionService = new CollectionService(adapter);
 
 // Handle every provider as independent thread
 function* performSingleSearch(
@@ -81,7 +86,11 @@ export function* search(action: SearchAction): any {
   if (redirect) {
     yield call(goToSearchResults);
   }
-  yield put({ type: types.SEARCH_FINISHED, searchTerm: action.searchTerm });
+  yield put({
+    type: types.SEARCH_FINISHED,
+    searchTerm: action.searchTerm,
+    data: localResults,
+  });
   yield put({
     type: types.SEND_NOTIFICATION,
     notification: "notifications.search.finished",

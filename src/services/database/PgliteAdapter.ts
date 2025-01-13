@@ -220,7 +220,7 @@ export default class Pglite implements IAdapter {
         .map((term) => `${term}:*`)
         .join(" & ");
 
-      // Search across title, artist and album using to_tsvector
+      // Search across title and JSON fields using to_tsvector
       // Order by rank to get most relevant results first
       const results = await db
         .select()
@@ -228,16 +228,16 @@ export default class Pglite implements IAdapter {
         .where(
           sql`to_tsvector('english', 
             coalesce(title, '') || ' ' || 
-            coalesce("artistName", '') || ' ' || 
-            coalesce("albumName", '')
+            coalesce(artist->>'name', '') || ' ' || 
+            coalesce(album->>'name', '')
           ) @@ to_tsquery('english', ${tsquery})`
         )
         .orderBy(
           sql`ts_rank(
             to_tsvector('english',
               coalesce(title, '') || ' ' || 
-              coalesce("artistName", '') || ' ' || 
-              coalesce("albumName", '')
+              coalesce(artist->>'name', '') || ' ' || 
+              coalesce(album->>'name', '')
             ),
             to_tsquery('english', ${tsquery})
           ) DESC`
