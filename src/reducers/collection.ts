@@ -278,6 +278,13 @@ export default (state: State = defaultState, action: any = {}) => {
         filteredSongs: Object.keys(state.rows),
       };
 
+    case types.SET_SEARCH_RESULTS:
+      const searchResults = action.searchResults || [];
+      return {
+        ...state,
+        searchResults: searchResults.map((media: IMedia) => media.id),
+      };
+
     default:
       return state;
   }

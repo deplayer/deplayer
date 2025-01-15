@@ -100,4 +100,22 @@ describe("collection reducer", () => {
     };
     expect(reducer(defaultState, action)).toEqual(expected);
   });
+
+  it("should handle SET_SEARCH_RESULTS", () => {
+    const searchResults = [
+      new Media({ ...mediaParams, forcedId: "song1" }).toDocument(),
+      new Media({ ...mediaParams, forcedId: "song2" }).toDocument(),
+    ];
+    expect(reducer(defaultState, { type: types.SET_SEARCH_RESULTS, searchResults })).toEqual({
+      ...defaultState,
+      searchResults: ["song1", "song2"],
+    });
+  });
+
+  it("should handle SET_SEARCH_RESULTS with undefined results", () => {
+    expect(reducer(defaultState, { type: types.SET_SEARCH_RESULTS })).toEqual({
+      ...defaultState,
+      searchResults: [],
+    });
+  });
 });
