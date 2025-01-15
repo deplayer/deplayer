@@ -36,7 +36,6 @@ collection as you wish and play it from any device.
 ## Features
 
 - Progressive Web App, you can install it in your phone or as a desktop app.
-- Fulltext search support thanks to [lunr](https://lunrjs.com/).
 - Desktop and mobile notifications thanks to [Notification Web
   API](https://developer.mozilla.org/en-US/docs/Web/API/notification)
 - [Media Session
