@@ -1,8 +1,9 @@
 import { takeLatest, call, put, select } from "redux-saga/effects";
 
-import { getSongById } from "./../selectors";
+import { getSongById, getSettings } from "./../selectors";
 import Artist from "../../entities/Artist";
 import LyricsovhProvider from "../../providers/LyricsovhProvider";
+import MusicbrainzProvider from "../../providers/MusicbrainzProvider";
 import * as types from "../../constants/ActionTypes";
 import LyricsService from "../../services/LyricsService"
 import { getAdapter } from '../../services/database'
@@ -13,7 +14,6 @@ type LoadArtistAction = {
 };
 
 const adapter = getAdapter()
-
 const lyricsService = new LyricsService(adapter)
 
 type FetchSongMetadataAction = {
@@ -51,11 +51,27 @@ export function* fetchSongMetadata(action: FetchSongMetadataAction): any {
 export function* loadMoreArtistSongsFromProvider(
   action: LoadArtistAction
 ): any {
+  // First dispatch search action to load more songs
   yield put({
     type: types.START_SEARCH,
     searchTerm: action.artist.name,
     noRedirect: true,
   });
+
+  // Then fetch artist metadata from MusicBrainz
+  try {
+    const settings = yield select(getSettings);
+    const mbProvider = new MusicbrainzProvider(settings.providers.musicbrainz || {}, 'musicbrainz');
+    
+    if (settings.providers.musicbrainz?.enabled) {
+      const artistMetadata = yield call([mbProvider, 'searchArtistInfo'], action.artist.name);
+      if (artistMetadata) {
+        yield put({ type: types.RECEIVE_ARTIST_METADATA, data: artistMetadata });
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch artist metadata:', error);
+  }
 }
 
 // Binding actions to sagas

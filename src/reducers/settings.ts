@@ -18,7 +18,11 @@ export const defaultState = {
   saving: false,
   settingsForm: settingsBuilder.getFormSchema(),
   settings: {
-    providers: {},
+    providers: {
+      musicbrainz: {
+        enabled: true
+      }
+    },
     app: {
       spectrum: {
         enabled: false

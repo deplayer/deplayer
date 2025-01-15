@@ -6,24 +6,26 @@ import Album from './Album'
 import Artist from '../../entities/Artist'
 import * as types from '../../constants/ActionTypes'
 import { State as CollectionState } from '../../reducers/collection'
+import { State as QueueState } from '../../reducers/queue'
+import Media from '../../entities/Media'
 
 type Props = {
-  queue: any,
-  albums: any,
-  albumsByArtist: any[],
+  queue: QueueState,
+  albums: { [key: string]: Album },
+  albumsByArtist: string[],
   artist: Artist,
   artistMetadata: any,
   className: string | null,
-  collection: any,
+  collection: CollectionState,
   dispatch: Dispatch,
-  songs: any,
-  songsByAlbum: any
+  songs: Media[],
+  songsByAlbum: { [key: string]: string[] }
 }
 
 function extractBackground(
   collection: CollectionState,
-  songsByAlbum: any[],
-  albumsByArtist: any[]
+  songsByAlbum: { [key: string]: string[] },
+  albumsByArtist: string[]
 ): string | undefined {
   const albumId = albumsByArtist && albumsByArtist.length && albumsByArtist[0]
   if (albumId && songsByAlbum[albumId]) {

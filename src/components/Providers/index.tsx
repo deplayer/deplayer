@@ -45,6 +45,7 @@ const Providers = (props: Props) => {
               <ProviderButton providerKey='mstream' />
               <ProviderButton providerKey='itunes' />
               <ProviderButton providerKey='jellyfin' />
+              <ProviderButton providerKey='musicbrainz' />
             </div>
           </div>
 
