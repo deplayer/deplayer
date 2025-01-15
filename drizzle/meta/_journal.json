@@ -127,6 +127,20 @@
       "when": 1736723827067,
       "tag": "0017_blue_maggott",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1736956248433,
+      "tag": "0018_plain_puppet_master",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1736956573915,
+      "tag": "0019_brief_stranger",
+      "breakpoints": true
     }
   ]
 }

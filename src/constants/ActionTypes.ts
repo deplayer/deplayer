@@ -138,6 +138,7 @@ export const SET_OFFLINE_CONNECTION = "SET_OFFLINE_CONNECTION";
 export const LOAD_ARTIST = "LOAD_ARTIST";
 export const RECEIVE_ARTIST_METADATA = "RECEIVE_ARTIST_METADATA";
 export const NO_ARTIST_NAME = "NO_ARTIST_NAME";
+export const CLEAR_ARTIST_METADATA = "CLEAR_ARTIST_METADATA";
 
 // Store songs in the browser
 export const PIN_SONG = "PIN_SONG";

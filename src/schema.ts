@@ -9,6 +9,17 @@ import {
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
+export const artist = pgTable("artist", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  bio: text("bio"),
+  country: text("country"),
+  lifeSpan: json("lifeSpan"),
+  relations: json("relations"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
+
 export const media = pgTable("media", {
   id: text("id").primaryKey(),
   title: text("title"),

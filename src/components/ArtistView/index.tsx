@@ -9,12 +9,33 @@ import { State as CollectionState } from '../../reducers/collection'
 import { State as QueueState } from '../../reducers/queue'
 import Media from '../../entities/Media'
 
+type ArtistRelation = {
+  type: string
+  url: {
+    resource: string
+  }
+}
+
+type ArtistMetadata = {
+  'life-span'?: {
+    begin?: string
+    end?: string
+  }
+  country?: string
+  relations?: ArtistRelation[]
+  artist?: {
+    bio: {
+      content: string
+    }
+  }
+}
+
 type Props = {
   queue: QueueState,
   albums: { [key: string]: Album },
   albumsByArtist: string[],
   artist: Artist,
-  artistMetadata: any,
+  artistMetadata: ArtistMetadata | null,
   className: string | null,
   collection: CollectionState,
   dispatch: Dispatch,
@@ -51,13 +72,13 @@ export default function ArtistView(props: Props) {
         type: types.LOAD_ARTIST,
         artist: props.artist
       })
-    }
 
-    props.dispatch({
-      type: types.SET_BACKGROUND_IMAGE,
-      backgroundImage: extractBackground(collection, songsByAlbum, albumsByArtist)
-    })
-  }, [])
+      props.dispatch({
+        type: types.SET_BACKGROUND_IMAGE,
+        backgroundImage: extractBackground(collection, songsByAlbum, albumsByArtist)
+      })
+    }
+  }, [props.artist.name, props.dispatch])
 
   const extractSummary = (): string => {
     if (props.artistMetadata && props.artistMetadata.artist) {
@@ -84,24 +105,24 @@ export default function ArtistView(props: Props) {
     <div data-testid="artist-view" className={`artist-view ${props.className} z-50`}>
       <div className='main w-full z-10 md:p-4'>
         <h2 className='text-center text-3xl py-2'>{artist.name}</h2>
-        <p dangerouslySetInnerHTML={{ __html: extractSummary() }} />
+        <p className='text-center' dangerouslySetInnerHTML={{ __html: extractSummary() }} />
         {
-          props.artistMetadata && props.artistMetadata['life-span'] && (
+          props.artistMetadata?.['life-span'] && (
             <div className='text-center text-md'>
               {props.artistMetadata['life-span'].begin} {props.artistMetadata['life-span'].end && '- ' + props.artistMetadata['life-span'].end}
             </div>
           )
         }
         {
-          props.artistMetadata && props.artistMetadata['country'] && (
+          props.artistMetadata?.country && (
             <div className='text-center text-md'>
-              {props.artistMetadata['country']}
+              {props.artistMetadata.country}
             </div>
           )
         }
         <div className='py-4 text-center'>
           {
-            props.artistMetadata && props.artistMetadata['relations'] && props.artistMetadata['relations'].map((relation: any, index: number) => {
+            props.artistMetadata?.relations && props.artistMetadata.relations.map((relation: any, index: number) => {
               return (
                 <div className='mr-2 py-1 inline-block'>
                   <Tag key={index} transparent>
