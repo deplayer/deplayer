@@ -7,6 +7,11 @@ without needing any server.
   - Use redux-sagas for async actions.
 - Use Drizzle for the database.
   - Run `npm run db:generate` to generate the database schema.
+- Use Vite as the build tool and development server.
+- Use TypeScript for type safety.
+- Use Tailwind CSS for styling.
+  - Custom styles should be placed in `src/styles/` directory.
+  - Use SCSS for complex custom styles.
 
 # Development
 
@@ -20,7 +25,21 @@ Use vitest for testing.
 - Don't use `getByTitle` in tests.
 - Don't create **tests** folders. Put tests next to implementation files (ex: foo.tsx and foo.spec.tsx)
 
-Application style:
+# Project Structure
+
+- Place components in `src/components/`
+  - Common/reusable components go in `src/components/common/`
+- Place Redux containers in `src/containers/`
+- Place Redux sagas in `src/sagas/`
+- Place database schema and migrations in `drizzle/` directory
+
+# Application Style
 
 - Use the `Translate` component to translate text.
 - Translations should be placed in `en.json` file.
+- Follow TypeScript strict mode guidelines.
+- Use functional components with hooks.
+- Don't refactor class components to functional ones if not asked
+- Keep components small and focused on a single responsibility.
+- Use proper semantic HTML elements.
+- Ensure components are accessible (use ARIA attributes when needed).

@@ -40,42 +40,40 @@ describe("search", () => {
     const mockLocalResults = [{ id: "1", title: "London Calling" }];
     const mockRemoteResults = [{ id: "2", title: "Rock the Casbah" }];
 
-    return (
-      expectSaga(search, action)
-        .provide([
-          [call(collectionService.search, searchTerm), mockLocalResults],
-          {
-            select: () => ({
-              providers: {
-                itunes: { enabled: true },
-              },
-            }),
-          },
-        ])
-        // First show local results
-        .put({
-          type: types.SET_SEARCH_RESULTS,
-          searchResults: mockLocalResults,
-        })
-        // Then redirect to search results page
-        .put(push("/search-results"))
-        // Then add remote results to collection and update search results
-        .put({ type: types.ADD_TO_COLLECTION, data: mockRemoteResults })
-        .put({
-          type: types.SET_SEARCH_RESULTS,
-          searchResults: mockLocalResults,
-        })
-        // Finally mark search as finished
-        .put({
-          type: types.SEARCH_FINISHED,
-          searchTerm,
-          data: mockLocalResults,
-        })
-        .put({
-          type: types.SEND_NOTIFICATION,
-          notification: "notifications.search.finished",
-        })
-        .silentRun()
-    );
+    return expectSaga(search, action)
+      .provide([
+        [call(collectionService.search, searchTerm), mockLocalResults],
+        {
+          select: () => ({
+            providers: {
+              itunes: { enabled: true },
+            },
+          }),
+        },
+      ])
+      // First show local results
+      .put({
+        type: types.SET_SEARCH_RESULTS,
+        searchResults: mockLocalResults,
+      })
+      // Then redirect to search results page
+      .put(push("/search-results"))
+      // Then add remote results to collection
+      .put({ type: types.RECEIVE_COLLECTION, data: mockRemoteResults })
+      // Update search results with remote results
+      .put({
+        type: types.SET_SEARCH_RESULTS,
+        searchResults: mockLocalResults,
+      })
+      // Finally mark search as finished
+      .put({
+        type: types.SEARCH_FINISHED,
+        searchTerm,
+      })
+      .put({
+        type: types.SEND_NOTIFICATION,
+        notification: "notifications.search.finished",
+      })
+      .silentRun();
   });
 });

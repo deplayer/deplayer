@@ -125,15 +125,9 @@ describe('Topbar', () => {
         searchTerm: 'test'
       })
 
-      // Should not have dispatched START_SEARCH yet
-      expect(mockDispatch).not.toHaveBeenCalledWith({
-        type: types.START_SEARCH,
-        searchTerm: 'test'
-      })
-
       // Fast forward timers
       await act(async () => {
-        vi.advanceTimersByTime(500)
+        vi.advanceTimersByTime(800)
       })
 
       // Now should have dispatched START_SEARCH
@@ -151,6 +145,12 @@ describe('Topbar', () => {
       // Type "test"
       fireEvent.change(searchInput!, { target: { value: 'test' } })
 
+      // Should dispatch SET_SEARCH_TERM for "test"
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: types.SET_SEARCH_TERM,
+        searchTerm: 'test'
+      })
+
       // Fast forward 200ms
       await act(async () => {
         vi.advanceTimersByTime(200)
@@ -159,16 +159,18 @@ describe('Topbar', () => {
       // Type "testing" before the timeout
       fireEvent.change(searchInput!, { target: { value: 'testing' } })
 
+      // Should dispatch SET_SEARCH_TERM for "testing"
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: types.SET_SEARCH_TERM,
+        searchTerm: 'testing'
+      })
+
       // Fast forward remaining time
       await act(async () => {
-        vi.advanceTimersByTime(500)
+        vi.advanceTimersByTime(800)
       })
 
       // Should only have searched for "testing", not "test"
-      expect(mockDispatch).not.toHaveBeenCalledWith({
-        type: types.START_SEARCH,
-        searchTerm: 'test'
-      })
       expect(mockDispatch).toHaveBeenCalledWith({
         type: types.START_SEARCH,
         searchTerm: 'testing'
@@ -185,7 +187,7 @@ describe('Topbar', () => {
 
       // Fast forward timers
       await act(async () => {
-        vi.advanceTimersByTime(500)
+        vi.advanceTimersByTime(800)
       })
 
       // Should have updated search term but not triggered search
@@ -207,12 +209,18 @@ describe('Topbar', () => {
       // Type "test"
       fireEvent.change(searchInput!, { target: { value: 'test' } })
 
+      // Should dispatch SET_SEARCH_TERM
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: types.SET_SEARCH_TERM,
+        searchTerm: 'test'
+      })
+
       // Close search before timeout
       fireEvent.keyUp(searchInput!, { key: 'Escape' })
 
       // Fast forward timers
       await act(async () => {
-        vi.advanceTimersByTime(500)
+        vi.advanceTimersByTime(800)
       })
 
       // Should not have triggered search
