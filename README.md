@@ -47,11 +47,8 @@ collection as you wish and play it from any device.
   your collection and session between devices and browsers!
 - Multi provider, add your data sources and listen the music from there. Keep
   reading to see the list of available providers.
-- **BETA** Awesome visuals thanks to [butterchurn](https://github.com/jberg/butterchurn)
-- **BETA** Supports scanning IPFS folder and importing music, analysing its id3.
-- **WORK IN PROGRESS** Spectum audio visual thanks to
-  [react-audio-spectrum](https://github.com/hu-ke/react-audio-spectrum)
-  tags.
+-  Awesome visuals thanks to [butterchurn](https://github.com/jberg/butterchurn)
+- Spectum audio visual thanks to [react-audio-spectrum](https://github.com/hu-ke/react-audio-spectrum)
 
 ## Implemented artists metadata providers
 
