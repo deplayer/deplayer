@@ -83,7 +83,7 @@ const Topbar = (props: Props) => {
         </button>
       </div>
 
-      <div className='flex-1 mx-4'>
+      <div className='flex-1 ml-4' style={{ marginRight: '70px' }}>
         <SearchInput
           loading={props.loading}
           value={props.searchTerm}
@@ -97,7 +97,7 @@ const Topbar = (props: Props) => {
         )}
       </div>
 
-      <div className='flex items-center'>
+      <div className='flex items-center absolute right-5'>
         {props.children}
         <button
           onClick={() => props.dispatch({ type: types.TOGGLE_RIGHT_PANEL })}
