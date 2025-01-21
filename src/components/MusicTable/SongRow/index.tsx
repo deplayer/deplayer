@@ -12,7 +12,6 @@ import ServiceIcon from '../../ServiceIcon'
 import { State as QueueState } from '../../../reducers/queue'
 
 export type Props = {
-  songsLength: number,
   song: Media,
   queue?: QueueState,
   isCurrent?: boolean | null,
@@ -78,7 +77,7 @@ const SongRow = (props: Props) => {
           <div className='inline-block text-base-content/60 text-sm'>{getDurationStr(song.duration)}</div>
         )}
       </div>
-      <div className='flex' tabIndex={0}>
+      <div className='flex items-center min-w-fit' tabIndex={0}>
         <div className='mx-4'>
           {
             !props.slim && props.mqlMatch &&
@@ -90,7 +89,7 @@ const SongRow = (props: Props) => {
             <span className='text-primary'>{getDurationStr(song.duration)}</span>
           )}
         </div>
-        <div className='h-10'>
+        <div className='relative'>
           <ContextualMenu {...props} />
         </div>
       </div>

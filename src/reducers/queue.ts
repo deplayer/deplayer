@@ -136,30 +136,36 @@ export default (state: State = defaultState, action: any = {}): State => {
         ? state.randomTrackIds
         : [];
 
-      const currPosition = currentTrackIds.indexOf(state.currentPlaying);
       const newIds = action.songs.map((song: Media) => song.id);
 
-      // Insert new songs after current playing song
-      const newTrackIds = [...currentTrackIds];
-      newTrackIds.splice(currPosition + 1, 0, ...newIds);
+      // Handle both normal and shuffle queues
+      const currPosition = state.shuffle 
+        ? currentRandomTrackIds.indexOf(state.currentPlaying)
+        : currentTrackIds.indexOf(state.currentPlaying);
 
-      // Deduplicate the arrays
+      // Insert new songs after current playing song in both queues
+      const newTrackIds = [...currentTrackIds];
+      const newRandomTrackIds = [...currentRandomTrackIds];
+
+      // Always update the normal queue
+      newTrackIds.splice(currPosition + 1, 0, ...newIds);
       const deduplicatedTrackIds = Array.from(new Set(newTrackIds));
-      const newRandomTrackIds = state.shuffle
-        ? Array.from(new Set([...currentRandomTrackIds, ...newIds]))
-        : currentRandomTrackIds;
+
+      // If shuffle is enabled, also update the random queue in the same way
+      if (state.shuffle) {
+        newRandomTrackIds.splice(currPosition + 1, 0, ...newIds);
+      }
+
+      const deduplicatedRandomTrackIds = Array.from(new Set(newRandomTrackIds));
+      const activeQueue = state.shuffle ? deduplicatedRandomTrackIds : deduplicatedTrackIds;
 
       return {
         ...state,
         trackIds: deduplicatedTrackIds,
-        randomTrackIds: newRandomTrackIds,
+        randomTrackIds: deduplicatedRandomTrackIds,
         currentPlaying: state.currentPlaying,
-        prevSongId: getSiblingSong(deduplicatedTrackIds, state.currentPlaying),
-        nextSongId: getSiblingSong(
-          deduplicatedTrackIds,
-          state.currentPlaying,
-          true
-        ),
+        prevSongId: getSiblingSong(activeQueue, state.currentPlaying),
+        nextSongId: getSiblingSong(activeQueue, state.currentPlaying, true),
       };
     }
 

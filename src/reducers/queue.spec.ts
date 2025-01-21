@@ -184,4 +184,110 @@ describe('Queue Reducer', () => {
       expect(result.nextSongId).toBe('song2')
     })
   })
+
+  describe('ADD_TO_QUEUE_NEXT', () => {
+    it('should do nothing if no current playing song', () => {
+      const initialState = {
+        ...defaultState,
+        trackIds: ['old1', 'old2']
+      }
+
+      const result = reducer(initialState, {
+        type: types.ADD_TO_QUEUE_NEXT,
+        songs: mockSongs
+      })
+
+      expect(result).toEqual(initialState)
+    })
+
+    it('should add songs after current playing song in normal mode', () => {
+      const initialState = {
+        ...defaultState,
+        trackIds: ['old1', 'old2', 'old3'],
+        currentPlaying: 'old2'
+      }
+
+      const result = reducer(initialState, {
+        type: types.ADD_TO_QUEUE_NEXT,
+        songs: mockSongs
+      })
+
+      expect(result.trackIds).toEqual(['old1', 'old2', 'song1', 'song2', 'song3', 'old3'])
+      expect(result.nextSongId).toBe('song1')
+      expect(result.prevSongId).toBe('old1')
+    })
+
+    it('should add songs after current playing song in shuffle mode', () => {
+      const initialState = {
+        ...defaultState,
+        trackIds: ['old1', 'old2', 'old3'],
+        randomTrackIds: ['old2', 'old3', 'old1'],
+        currentPlaying: 'old2',
+        shuffle: true
+      }
+
+      const result = reducer(initialState, {
+        type: types.ADD_TO_QUEUE_NEXT,
+        songs: mockSongs
+      })
+
+      // Check that songs were added after current playing in random queue
+      const currentIndex = result.randomTrackIds.indexOf('old2')
+      const nextThreeSongs = result.randomTrackIds.slice(currentIndex + 1, currentIndex + 4)
+      expect(nextThreeSongs).toEqual(['song1', 'song2', 'song3'])
+
+      // Check that normal queue was also updated
+      expect(result.trackIds).toContain('song1')
+      expect(result.trackIds).toContain('song2')
+      expect(result.trackIds).toContain('song3')
+
+      // Check next/prev are correct based on random queue
+      expect(result.nextSongId).toBe('song1')
+      expect(result.prevSongId).toBe(undefined)
+    })
+
+    it('should handle duplicate songs', () => {
+      const initialState = {
+        ...defaultState,
+        trackIds: ['old1', 'song1', 'old2'],
+        currentPlaying: 'old1'
+      }
+
+      const result = reducer(initialState, {
+        type: types.ADD_TO_QUEUE_NEXT,
+        songs: mockSongs
+      })
+
+      // Should not duplicate song1, but add song2 and song3
+      expect(result.trackIds).toEqual(['old1', 'song1', 'song2', 'song3', 'old2'])
+      expect(result.nextSongId).toBe('song1')
+    })
+
+    it('should maintain both queues in shuffle mode', () => {
+      const initialState = {
+        ...defaultState,
+        trackIds: ['old1', 'old2', 'old3'],
+        randomTrackIds: ['old2', 'old3', 'old1'],
+        currentPlaying: 'old2',
+        shuffle: true
+      }
+
+      const result = reducer(initialState, {
+        type: types.ADD_TO_QUEUE_NEXT,
+        songs: [{ id: 'song1' }]
+      })
+
+      // Check normal queue
+      expect(result.trackIds).toContain('song1')
+      expect(result.trackIds.length).toBe(4)
+
+      // Check random queue
+      expect(result.randomTrackIds).toContain('song1')
+      expect(result.randomTrackIds.length).toBe(4)
+
+      // Check song1 is after old2 in random queue
+      const randomIndex = result.randomTrackIds.indexOf('old2')
+      expect(result.randomTrackIds[randomIndex + 1]).toBe('song1')
+    })
+  })
 })

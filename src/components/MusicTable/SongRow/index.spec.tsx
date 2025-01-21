@@ -11,7 +11,6 @@ const setup = () => {
   const props: Props = {
     dispatch: (_action: any) => _action,
     song: new Media(mediaParams),
-    songsLength: 1,
     queue: {
       trackIds: [],
       randomTrackIds: [],

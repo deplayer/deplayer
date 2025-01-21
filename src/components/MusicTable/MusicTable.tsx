@@ -6,6 +6,7 @@ import { Filter } from '../../reducers/collection'
 import AddNewMediaButton from '../Buttons/AddNewMediaButton'
 import ClearQueueButton from '../Buttons/ClearQueueButton'
 import PlayAllButton from '../Buttons/PlayAllButton'
+import PlayNextButton from '../Buttons/PlayNextButton'
 import SaveQueueButton from '../Buttons/SaveQueueButton'
 import SongRow from './SongRow'
 import Spinner from '../Spinner'
@@ -64,7 +65,6 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
     return (
       <SongRow
         queue={queue}
-        songsLength={tableIds.length}
         mqlMatch={app.mqlMatch}
         key={key}
         song={song}
@@ -121,10 +121,16 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
           />
           <AddNewMediaButton />
           <PlayAllButton dispatch={dispatch} />
+          {queue.currentPlaying && <PlayNextButton dispatch={dispatch} />}
         </>
       )
       case '/search-results':
-        return <PlayAllButton dispatch={dispatch} />
+        return (
+          <>
+            <PlayAllButton dispatch={dispatch} />
+            {queue.currentPlaying && <PlayNextButton dispatch={dispatch} />}
+          </>
+        )
       default:
         return null
     }

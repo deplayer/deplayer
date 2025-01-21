@@ -49,7 +49,6 @@ const Playlist = (props: Props) => {
       <SongRow
         key={song.id}
         mqlMatch={false}
-        songsLength={song.duration}
         disableCovers
         style={{}}
         dispatch={props.dispatch}

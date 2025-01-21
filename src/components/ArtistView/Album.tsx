@@ -31,7 +31,6 @@ const Album = (props: AlbumProps) => {
       const songRow = props.collection.rows[songId]
       return (
         <SongRow
-          songsLength={props.songs.length}
           mqlMatch={false}
           disableCovers
           style={{}}
@@ -83,6 +82,22 @@ const Album = (props: AlbumProps) => {
             />
             <Translate value='buttons.addToQueue' />
           </Button>
+
+          {props.queue?.currentPlaying && (
+            <Button
+              transparent
+              onClick={() => {
+                const songs = props.songs.map(songId => props.collection.rows[songId]);
+                props.dispatch({ type: types.ADD_TO_QUEUE_NEXT, songs })
+              }}
+            >
+              <Icon
+                icon='faPlusCircle'
+                className='mx-2'
+              />
+              <Translate value='buttons.addNext' />
+            </Button>
+          )}
 
           <Button
             transparent
