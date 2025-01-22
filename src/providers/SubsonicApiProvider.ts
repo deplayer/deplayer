@@ -84,7 +84,9 @@ export default class SubsonicApiProvider implements IMusicProvider {
 
   async fullSync(): Promise<Array<any>> {
     try {
-      const result = await axios.get(`${this.baseUrl}/rest/getAlbumList2.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.11.0&f=json&type=alphabeticalByName`)
+      // Request a large number of albums to ensure we get all of them
+      // Subsonic default is 500, we'll request 10000 to be safe
+      const result = await axios.get(`${this.baseUrl}/rest/getAlbumList2.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.11.0&f=json&type=alphabeticalByName&size=10000`)
       const albums = result.data['subsonic-response'].albumList2.album
       
       const allSongs = []

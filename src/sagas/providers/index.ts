@@ -167,12 +167,30 @@ function* startYoutubeDlScan(action: any): Generator<any, void, any> {
 
 function* startProviderSync(action: any): Generator<any, void, any> {
   try {
-    const provider = providers[
-      action.providerKey as keyof typeof providers
-    ] as {
-      fullSync?: () => Promise<any[]>;
-    };
-    if (!provider || !provider.fullSync) {
+    // Extract base provider type from the key (e.g. "subsonic" from "subsonic1")
+    const providerType = action.providerKey.replace(/\d+$/, '');
+    
+    const ProviderClass = providers[
+      providerType as keyof typeof providers
+    ];
+    
+    if (!ProviderClass) {
+      throw new Error(`Provider type ${providerType} not found`);
+    }
+
+    // Get settings for this specific provider instance
+    const settings = yield select(getSettings);
+    const providerSettings = settings.providers[action.providerKey];
+    
+    if (!providerSettings) {
+      throw new Error(`Settings not found for provider ${action.providerKey}`);
+    }
+
+    // Instantiate the provider with its settings
+    const provider = new ProviderClass(providerSettings, action.providerKey);
+
+    // Type guard to check if provider supports fullSync
+    if (!('fullSync' in provider)) {
       throw new Error("Provider does not support full sync");
     }
 
@@ -182,7 +200,7 @@ function* startProviderSync(action: any): Generator<any, void, any> {
       level: "info",
     });
 
-    const songs = yield call(provider.fullSync.bind(provider));
+    const songs = yield call([provider, (provider as any).fullSync]);
 
     yield put({ type: types.ADD_TO_COLLECTION, data: songs });
     yield put({

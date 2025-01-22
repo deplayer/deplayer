@@ -10,6 +10,7 @@ import {
   smartPlaylist,
   peer,
   room,
+  mediaLyrics,
 } from "../../schema";
 import logger from "../../utils/logger";
 
@@ -83,6 +84,15 @@ export default class Pglite implements IAdapter {
           .values({ ...prev, ...fixedPayload })
           .onConflictDoUpdate({
             target: room.id,
+            set: payload,
+          });
+        break;
+      case "media_lyrics":
+        await instance
+          .insert(mediaLyrics)
+          .values({ ...prev, ...fixedPayload })
+          .onConflictDoUpdate({
+            target: mediaLyrics.id,
             set: payload,
           });
         break;
@@ -161,6 +171,8 @@ export default class Pglite implements IAdapter {
         return instance.select().from(peer).where(eq(peer.id, id));
       case "room":
         return instance.select().from(room).where(eq(room.id, id));
+      case "media_lyrics":
+        return instance.select().from(mediaLyrics).where(eq(mediaLyrics.id, id));
       default:
         console.log(`Model ${model} is not implemented for getDocObj method`);
         throw new Error("Model not supported");
