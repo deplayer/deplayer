@@ -47,6 +47,7 @@ const SearchInput = (props: Props) => {
         value={props.value}
         placeholder={I18n.t('placeholder.search')}
         type='text'
+        data-testid="search-input"
       />
       <div className='p-2'>
         {props.loading ? <Icon icon='faSpinner' className='fa-pulse text-primary' /> : <Icon icon='faSearch' className='text-primary' />}

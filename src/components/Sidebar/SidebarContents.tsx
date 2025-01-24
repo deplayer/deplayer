@@ -118,7 +118,7 @@ const SidebarContents = (props: ContentProps) => {
       </ul>
 
       <div className='w-full'>  
-        <CommandBar dispatch={props.dispatch} />
+        <CommandBar />
       </div>
 
       <section className='p-6 pt-8 text-sm text-center w-full text-base-content/70'>

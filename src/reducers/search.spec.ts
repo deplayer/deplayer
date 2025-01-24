@@ -5,7 +5,7 @@ import * as types from '../constants/ActionTypes'
 
 describe('search reducer', () => {
   it('should return the initial state', () => {
-    expect(reducer(undefined, {}))
+    expect(reducer(undefined, { type: '' }))
       .toEqual(defaultState)
   })
 

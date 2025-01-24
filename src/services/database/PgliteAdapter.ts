@@ -224,40 +224,54 @@ export default class Pglite implements IAdapter {
   async search(_model: Models, searchTerm: string): Promise<Array<any>> {
     try {
       const db = await this.getDb();
+      logger.debug("Search term received:", searchTerm);
 
       // Create a tsquery from the search term, handling multiple words
-      const tsquery = searchTerm
+      const terms = searchTerm
         .trim()
         .split(/\s+/)
-        .map((term) => `${term}:*`)
-        .join(" & ");
+        .map(term => term.replace(/[^\w\s]/g, '')) // Remove special characters
+        .filter(Boolean);
 
-      // Search across title and JSON fields using to_tsvector
-      // Order by rank to get most relevant results first
+      if (terms.length === 0) {
+        return [];
+      }
+
+      // Build the tsquery string
+      const tsqueryStr = terms.map(term => `${term}:*`).join(' & ');
+      logger.debug("Generated tsquery:", tsqueryStr);
+
+      // Search across title, artist name, and album name using to_tsvector
       const results = await db
         .select()
         .from(media)
         .where(
           sql`to_tsvector('english', 
-            coalesce(title, '') || ' ' || 
-            coalesce(artist->>'name', '') || ' ' || 
-            coalesce(album->>'name', '')
-          ) @@ to_tsquery('english', ${tsquery})`
+            coalesce(${media.title}, '') || ' ' || 
+            coalesce(${media.artist}->>'name', '') || ' ' || 
+            coalesce(${media.album}->>'name', '')
+          ) @@ to_tsquery('english', ${tsqueryStr})`
         )
         .orderBy(
           sql`ts_rank(
             to_tsvector('english',
-              coalesce(title, '') || ' ' || 
-              coalesce(artist->>'name', '') || ' ' || 
-              coalesce(album->>'name', '')
+              coalesce(${media.title}, '') || ' ' || 
+              coalesce(${media.artist}->>'name', '') || ' ' || 
+              coalesce(${media.album}->>'name', '')
             ),
-            to_tsquery('english', ${tsquery})
+            to_tsquery('english', ${tsqueryStr})
           ) DESC`
         );
 
+      logger.debug("Search results:", results);
       return results;
-    } catch (error) {
-      logger.error("Error performing search:", error);
+    } catch (err: any) {
+      logger.error("Error performing search:", err);
+      logger.debug("Error details:", {
+        name: err.name,
+        message: err.message,
+        stack: err.stack
+      });
       return [];
     }
   }

@@ -1,4 +1,5 @@
 import * as types from "../constants/ActionTypes";
+import { StartSearchAction } from "../types/search";
 
 export type State = {
   error: string;
@@ -16,7 +17,9 @@ export const defaultState = {
   searchResults: [],
 };
 
-export default (state: State = defaultState, action: any = {}) => {
+type SearchAction = StartSearchAction | { type: string; [key: string]: any };
+
+export default (state: State = defaultState, action: SearchAction = { type: '' }) => {
   switch (action.type) {
     case types.SET_SEARCH_TERM: {
       return {
@@ -65,8 +68,9 @@ export default (state: State = defaultState, action: any = {}) => {
     case types.SEARCH_FINISHED: {
       return {
         ...state,
-        error: "",
         loading: false,
+        error: '',
+        searchResults: action.data ? action.data.map((item: any) => item.id) : []
       };
     }
 

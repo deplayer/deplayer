@@ -5,6 +5,7 @@ import Icon from '../common/Icon'
 import { State as CollectionState } from '../../reducers/collection'
 import { State as AppState } from '../../reducers/app'
 import * as types from '../../constants/ActionTypes'
+import { startSearch, StartSearchAction } from '../../types/search'
 
 type Props = {
   title: React.ReactNode,
@@ -12,7 +13,7 @@ type Props = {
   showInCenter: boolean,
   searchTerm: string,
   searchToggled: boolean,
-  dispatch: Dispatch,
+  dispatch: Dispatch<StartSearchAction | { type: string; [key: string]: any }>,
   onSetSidebarOpen?: (open: boolean) => void,
   collection?: CollectionState,
   app?: AppState,
@@ -37,10 +38,7 @@ const Topbar = (props: Props) => {
     // Only set a new timeout if the search term is long enough
     if (searchTerm.length > 2) {
       const timeout = setTimeout(() => {
-        props.dispatch({
-          type: types.START_SEARCH,
-          searchTerm
-        })
+        props.dispatch(startSearch(searchTerm))
       }, 800) // Wait 800ms after last keystroke before searching
 
       setSearchTimeout(timeout)

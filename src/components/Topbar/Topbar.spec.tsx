@@ -112,78 +112,74 @@ describe('Topbar', () => {
 
   describe('Search functionality', () => {
     it('should update search term immediately but debounce the search action', async () => {
-      const { container } = renderTopbar()
-      const searchInput = container.querySelector('input[placeholder="Search..."]')
-      expect(searchInput).toBeTruthy()
+      const { getByTestId } = renderTopbar({ searchToggled: true })
+      const input = getByTestId('search-input')
 
-      // Type "test" in the search input
-      fireEvent.change(searchInput!, { target: { value: 'test' } })
+      // Type in search
+      fireEvent.change(input, { target: { value: 'test' } })
 
-      // Should immediately dispatch SET_SEARCH_TERM
+      // Should have dispatched SET_SEARCH_TERM immediately
       expect(mockDispatch).toHaveBeenCalledWith({
         type: types.SET_SEARCH_TERM,
         searchTerm: 'test'
       })
 
-      // Fast forward timers
+      // Wait for debounce
       await act(async () => {
         vi.advanceTimersByTime(800)
       })
 
       // Now should have dispatched START_SEARCH
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: types.START_SEARCH,
-        searchTerm: 'test'
-      })
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: types.START_SEARCH,
+          searchTerm: 'test'
+        })
+      )
     })
 
     it('should cancel previous search timeout when typing quickly', async () => {
-      const { container } = renderTopbar()
-      const searchInput = container.querySelector('input[placeholder="Search..."]')
-      expect(searchInput).toBeTruthy()
+      const { getByTestId } = renderTopbar({ searchToggled: true })
+      const input = getByTestId('search-input')
 
-      // Type "test"
-      fireEvent.change(searchInput!, { target: { value: 'test' } })
+      // Type 'test'
+      fireEvent.change(input, { target: { value: 'test' } })
 
-      // Should dispatch SET_SEARCH_TERM for "test"
+      // Should have dispatched SET_SEARCH_TERM immediately
       expect(mockDispatch).toHaveBeenCalledWith({
         type: types.SET_SEARCH_TERM,
         searchTerm: 'test'
       })
 
-      // Fast forward 200ms
-      await act(async () => {
-        vi.advanceTimersByTime(200)
-      })
+      // Type 'testing' before debounce timeout
+      fireEvent.change(input, { target: { value: 'testing' } })
 
-      // Type "testing" before the timeout
-      fireEvent.change(searchInput!, { target: { value: 'testing' } })
-
-      // Should dispatch SET_SEARCH_TERM for "testing"
+      // Should have dispatched SET_SEARCH_TERM immediately
       expect(mockDispatch).toHaveBeenCalledWith({
         type: types.SET_SEARCH_TERM,
         searchTerm: 'testing'
       })
 
-      // Fast forward remaining time
+      // Wait for debounce
       await act(async () => {
         vi.advanceTimersByTime(800)
       })
 
-      // Should only have searched for "testing", not "test"
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: types.START_SEARCH,
-        searchTerm: 'testing'
-      })
+      // Should only have searched for "testing"
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: types.START_SEARCH,
+          searchTerm: 'testing'
+        })
+      )
     })
 
     it('should not trigger search for terms less than 3 characters', async () => {
-      const { container } = renderTopbar()
-      const searchInput = container.querySelector('input[placeholder="Search..."]')
-      expect(searchInput).toBeTruthy()
+      const { getByTestId } = renderTopbar({ searchToggled: true })
+      const input = getByTestId('search-input')
 
       // Type "te" (2 characters)
-      fireEvent.change(searchInput!, { target: { value: 'te' } })
+      fireEvent.change(input, { target: { value: 'te' } })
 
       // Fast forward timers
       await act(async () => {
@@ -195,19 +191,20 @@ describe('Topbar', () => {
         type: types.SET_SEARCH_TERM,
         searchTerm: 'te'
       })
-      expect(mockDispatch).not.toHaveBeenCalledWith({
-        type: types.START_SEARCH,
-        searchTerm: 'te'
-      })
+      expect(mockDispatch).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: types.START_SEARCH,
+          searchTerm: 'te'
+        })
+      )
     })
 
     it('should clear timeout when search is closed', async () => {
-      const { container } = renderTopbar()
-      const searchInput = container.querySelector('input[placeholder="Search..."]')
-      expect(searchInput).toBeTruthy()
+      const { getByTestId } = renderTopbar({ searchToggled: true })
+      const input = getByTestId('search-input')
 
       // Type "test"
-      fireEvent.change(searchInput!, { target: { value: 'test' } })
+      fireEvent.change(input, { target: { value: 'test' } })
 
       // Should dispatch SET_SEARCH_TERM
       expect(mockDispatch).toHaveBeenCalledWith({
@@ -216,7 +213,7 @@ describe('Topbar', () => {
       })
 
       // Close search before timeout
-      fireEvent.keyUp(searchInput!, { key: 'Escape' })
+      fireEvent.keyUp(input, { key: 'Escape' })
 
       // Fast forward timers
       await act(async () => {
@@ -224,10 +221,12 @@ describe('Topbar', () => {
       })
 
       // Should not have triggered search
-      expect(mockDispatch).not.toHaveBeenCalledWith({
-        type: types.START_SEARCH,
-        searchTerm: 'test'
-      })
+      expect(mockDispatch).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: types.START_SEARCH,
+          searchTerm: 'test'
+        })
+      )
       expect(mockDispatch).toHaveBeenCalledWith({
         type: types.TOGGLE_SEARCH_OFF
       })

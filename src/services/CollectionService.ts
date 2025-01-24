@@ -68,7 +68,20 @@ export default class CollectionService implements IStorageService {
   };
 
   search = async (searchTerm: string) => {
-    // Use PostgreSQL's full-text search
-    return await this.storageAdapter.search(MODEL, searchTerm);
+    logger.debug("CollectionService search called with term:", searchTerm);
+    try {
+      // Use PostgreSQL's full-text search
+      const results = await this.storageAdapter.search(MODEL, searchTerm);
+      logger.debug("CollectionService search results:", results);
+      return results;
+    } catch (err: any) {
+      logger.error("CollectionService search error:", err);
+      logger.debug("CollectionService error details:", {
+        name: err.name,
+        message: err.message,
+        stack: err.stack
+      });
+      throw err;
+    }
   };
 }
