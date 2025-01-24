@@ -103,4 +103,16 @@ export default class SubsonicApiProvider implements IMusicProvider {
       throw error
     }
   }
+
+  async getRecentMedia(): Promise<IMedia[]> {
+    try {
+      // Get recently added media items
+      const result = await axios.get(`${this.baseUrl}/rest/getAlbumList2.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.11.0&f=json&type=recent&size=50`)
+      const songs = result.data['subsonic-response'].albumList2.song || []
+      return this.mapSongs(songs)
+    } catch (error) {
+      console.error('Error fetching recent media:', error)
+      return []
+    }
+  }
 }

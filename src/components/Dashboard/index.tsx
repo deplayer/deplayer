@@ -5,6 +5,7 @@ import React from 'react'
 
 import MediaSlider from '../MediaSlider'
 import RelatedAlbums from '../RelatedAlbums'
+import RecentAlbums from './RecentAlbums'
 import { State as CollectionState } from '../../reducers/collection'
 import * as types from '../../constants/ActionTypes'
 import Footer from '../Footer'
@@ -104,7 +105,8 @@ const Dashboard = ({
 
   return (
     <div className='z-10 w-full md:px-12 mb-12'>
-      <WelcomeMessage dispatch={dispatch}></WelcomeMessage>
+      <WelcomeMessage dispatch={dispatch} />
+      <RecentAlbums />
       {!!mediaItems.length &&
         <MediaSlider
           loading={loading}

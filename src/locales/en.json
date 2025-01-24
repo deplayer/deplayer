@@ -104,5 +104,8 @@
     "leave": "Leave Room",
     "joinOrCreateRoom": "Join or create a room",
     "join": "Get in"
+  },
+  "dashboard": {
+    "recentlyAdded": "Recently Added Albums"
   }
 }

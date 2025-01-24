@@ -27,6 +27,7 @@ export type State = {
   totalRows: number;
   activeFilters: Filter;
   filteredSongs: string[];
+  recentAlbums: IMedia[];
 };
 
 export const defaultState: State = {
@@ -51,6 +52,7 @@ export const defaultState: State = {
     providers: [],
   },
   filteredSongs: [],
+  recentAlbums: [],
 };
 
 const populateFromAction = (
@@ -284,6 +286,12 @@ export default (state: State = defaultState, action: any = {}) => {
         ...state,
         searchResults: searchResults.map((media: IMedia) => media.id),
       };
+
+    case types.FETCH_RECENT_ALBUMS_SUCCESS:
+      return {
+        ...state,
+        recentAlbums: action.albums
+      }
 
     default:
       return state;

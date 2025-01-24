@@ -126,6 +126,8 @@ const icons = {
   faShareAlt
 }
 
+export type IconType = keyof typeof icons
+
 type Props = {
   icon: keyof typeof icons,
   className?: string,
