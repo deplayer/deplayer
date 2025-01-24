@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom'
 import Modal from '../common/Modal'
 import Icon from '../common/Icon'
 import Button from '../common/Button'
-import * as types from '../../constants/ActionTypes'
 import { IconType } from '../common/Icon'
 import { State as RootState } from '../../reducers'
 import { State as CollectionState } from '../../reducers/collection'
@@ -23,6 +22,7 @@ interface SearchResult {
   id: string
   name: string
   type: 'artist' | 'album' | 'song'
+  cover?: string
 }
 
 interface Props {
@@ -30,44 +30,145 @@ interface Props {
   searchResults: SearchResult[]
   loading: boolean
   collection: CollectionState
+  togglePlaying: () => void
+  playNext: () => void
+  playPrev: () => void
+  navigateToArtists: () => void
+  navigateToAlbums: () => void
+  navigateToQueue: () => void
+  navigateToPlaylists: () => void
+  navigateToSettings: () => void
+  navigateToExplore: () => void
 }
 
-function CommandBar({ dispatch, searchResults, loading, }: Props) {
+function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext, playPrev }: Props) {
   const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [debouncedSearch, setDebouncedSearch] = useState('')
 
-  const commands = useMemo(() => [
+  const commands: Command[] = [
     {
       id: 1,
-      name: "Add new media",
-      icon: 'faPlusCircle',
-      category: 'Actions',
-      command() {
-        return dispatch({ type: types.SHOW_ADD_MEDIA_MODAL })
-      }
+      name: 'Play/Pause',
+      icon: 'faPlayCircle',
+      category: 'Playback',
+      command: togglePlaying
     },
     {
       id: 2,
-      name: "Toggle visuals",
-      icon: 'faBahai',
-      category: 'Player',
-      command() {
-        return dispatch({ type: types.TOGGLE_VISUALS })
-      }
+      name: 'Next Track',
+      icon: 'faStepForward',
+      category: 'Playback',
+      command: playNext
     },
     {
       id: 3,
-      name: "Toggle spectrum",
+      name: 'Previous Track',
+      icon: 'faStepBackward',
+      category: 'Playback',
+      command: playPrev
+    },
+    {
+      id: 10,
+      name: 'Toggle Visuals',
+      icon: 'faBahai',
+      category: 'Player',
+      command: () => dispatch({ type: 'TOGGLE_VISUALS' })
+    },
+    {
+      id: 11,
+      name: 'Toggle Spectrum',
       icon: 'faDeezer',
       category: 'Player',
-      command() {
-        return dispatch({ type: types.TOGGLE_SPECTRUM })
+      command: () => dispatch({ type: 'TOGGLE_SPECTRUM' })
+    },
+    {
+      id: 12,
+      name: 'Shuffle Queue',
+      icon: 'faRandom',
+      category: 'Queue',
+      command: () => dispatch({ type: 'SHUFFLE' })
+    },
+    {
+      id: 13,
+      name: 'Toggle Repeat',
+      icon: 'faRedo',
+      category: 'Queue',
+      command: () => dispatch({ type: 'REPEAT' })
+    },
+    {
+      id: 14,
+      name: 'Add New Media',
+      icon: 'faPlusCircle',
+      category: 'Collection',
+      command: () => {
+        dispatch({ type: 'SHOW_ADD_MEDIA_MODAL' })
+        handleClose()
       }
-    }
-  ], [dispatch])
+    },
+    {
+      id: 4,
+      name: 'Artists',
+      icon: 'faMicrophoneAlt',
+      category: 'Navigation',
+      command: () => {
+        navigate('/artists')
+        handleClose()
+      }
+    },
+    {
+      id: 5,
+      name: 'Albums',
+      icon: 'faCompactDisc',
+      category: 'Navigation',
+      command: () => {
+        navigate('/albums')
+        handleClose()
+      }
+    },
+    {
+      id: 6,
+      name: 'Queue',
+      icon: 'faMusic',
+      category: 'Navigation',
+      command: () => {
+        navigate('/queue')
+        handleClose()
+      }
+    },
+    {
+      id: 7,
+      name: 'Playlists',
+      icon: 'faBookmark',
+      category: 'Navigation',
+      command: () => {
+        navigate('/playlists')
+        handleClose()
+      }
+    },
+    {
+      id: 8,
+      name: 'Settings',
+      icon: 'faCogs',
+      category: 'Navigation',
+      command: () => {
+        navigate('/settings')
+        handleClose()
+      }
+    },
+    {
+      id: 9,
+      name: 'Explore',
+      icon: 'faGlobe',
+      category: 'Navigation',
+      command: () => {
+        navigate('/explore')
+        handleClose()
+      }
+    },
+  ]
 
   // Update debounced value after 500ms of no changes and minimum length
   useEffect(() => {
@@ -194,6 +295,7 @@ function CommandBar({ dispatch, searchResults, loading, }: Props) {
         isOpen={isOpen}
         onClose={handleClose}
         title="Search"
+        className="w-[800px] max-w-[90vw]"
       >
         <div className="flex flex-col">
           <div className="w-full flex bg-transparent border-b-4 border-accent items-center">
@@ -203,33 +305,33 @@ function CommandBar({ dispatch, searchResults, loading, }: Props) {
               value={search}
               onChange={handleSearchChange}
               placeholder="Search for artists, albums, songs, or commands..."
-              className="w-full p-3 bg-transparent text-xl font-sans focus:outline-none focus:ring-0 focus:border-none action"
+              className="w-full p-4 bg-transparent text-2xl font-sans focus:outline-none focus:ring-0 focus:border-none action"
               data-testid="command-search-input"
             />
             <div className="p-2">
               {loading ? (
-                <Icon icon="faSpinner" className="fa-pulse text-primary" />
+                <Icon icon="faSpinner" className="fa-pulse text-primary text-2xl" />
               ) : (
-                <Icon icon="faSearch" className="text-primary" />
+                <Icon icon="faSearch" className="text-primary text-2xl" />
               )}
             </div>
           </div>
 
-          <div className="max-h-[300px] overflow-y-auto">
+          <div className="max-h-[60vh] overflow-y-auto w-full">
             {loading && search.length > 1 && (
-              <div className="p-4 text-center">Searching...</div>
+              <div className="p-6 text-center text-lg">Searching...</div>
             )}
             
             {!loading && allItems.length === 0 && search.length > 1 && (
-              <div className="p-4 text-center">No results found</div>
+              <div className="p-6 text-center text-lg">No results found</div>
             )}
 
-            {allItems.map((item, index) => {
+            {allItems.slice(0, 500).map((item, index) => {
               const isCommand = 'command' in item
               return (
                 <button
                   key={isCommand ? `command-${item.id}` : `result-${item.id}`}
-                  className={`flex items-center p-2 ${selectedIndex === index ? 'bg-base-200' : ''}`}
+                  className={`flex items-center p-4 w-full hover:bg-base-200 h-20 ${selectedIndex === index ? 'bg-base-200' : ''}`}
                   onClick={() => {
                     if (isCommand) {
                       item.command()
@@ -250,11 +352,35 @@ function CommandBar({ dispatch, searchResults, loading, }: Props) {
                     handleClose()
                   }}
                 >
-                  <Icon 
-                    icon={isCommand ? (item as Command).icon || 'faSearch' : getIconForType((item as SearchResult).type)} 
-                    className="mr-2" 
-                  />
-                  {isCommand ? item.name : `${item.name} (${(item as SearchResult).type})`}
+                  <div className="w-14 h-14 mr-4 flex-shrink-0 bg-base-300 rounded overflow-hidden flex items-center justify-center">
+                    {isCommand ? (
+                      <Icon 
+                        icon={(item as Command).icon || 'faSearch'} 
+                        className="text-primary text-2xl" 
+                      />
+                    ) : (
+                      <>
+                        {item.cover ? (
+                          <img 
+                            src={item.cover} 
+                            alt="" 
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <Icon 
+                            icon={getIconForType((item as SearchResult).type)} 
+                            className="text-primary text-2xl" 
+                          />
+                        )}
+                      </>
+                    )}
+                  </div>
+                  <div className="flex flex-col items-start justify-center min-w-0">
+                    <span className="text-lg truncate w-full">{isCommand ? item.name : item.name}</span>
+                    <span className="text-sm opacity-60">
+                      {isCommand ? item.category : (item as SearchResult).type}
+                    </span>
+                  </div>
                 </button>
               )
             })}
@@ -266,54 +392,24 @@ function CommandBar({ dispatch, searchResults, loading, }: Props) {
 }
 
 export default connect(
-  (state: RootState) => {
-    // Process each media item from search results
-    const processedResults = new Set<string>();
-    const searchResults: SearchResult[] = [];
-
-    // Process each media item from search results
-    state.collection.searchResults.forEach((id: string) => {
+  (state: RootState) => ({
+    searchResults: state.collection.searchResults.map(id => {
       const media = state.collection.rows[id];
-      if (!media) return;
-
-      // Add artist if not already added
-      if (media.artist?.name && !processedResults.has(`artist-${media.artist.name}`)) {
-        processedResults.add(`artist-${media.artist.name}`);
-        searchResults.push({
-          id: media.artist.id || id,
-          name: media.artist.name,
-          type: 'artist'
-        });
-      }
-
-      // Add album if not already added
-      if (media.album?.name && !processedResults.has(`album-${media.album.name}`)) {
-        processedResults.add(`album-${media.album.name}`);
-        searchResults.push({
-          id: media.album.id || id,
-          name: media.album.name,
-          type: 'album'
-        });
-      }
-
-      // Add song if not already added
-      if (!processedResults.has(`song-${id}`)) {
-        processedResults.add(`song-${id}`);
-        searchResults.push({
-          id,
-          name: media.title || id,
-          type: 'song'
-        });
-      }
-    });
-
-    return {
-      searchResults,
-      loading: state.collection.loading,
-      collection: state.collection
-    };
-  },
+      if (!media) return null;
+      return {
+        id,
+        name: media.title || id,
+        type: 'song',
+        cover: media.cover?.thumbnailUrl
+      };
+    }).filter(Boolean) as SearchResult[],
+    loading: state.collection.loading,
+    collection: state.collection
+  }),
   (dispatch: Dispatch<StartSearchAction | { type: string; [key: string]: any }>) => ({
-    dispatch
+    dispatch,
+    togglePlaying: () => dispatch({ type: 'TOGGLE_PLAYING' }),
+    playNext: () => dispatch({ type: 'PLAY_NEXT' }),
+    playPrev: () => dispatch({ type: 'PLAY_PREV' }),
   })
 )(CommandBar)

@@ -124,8 +124,8 @@ export default function ArtistView(props: Props) {
           {
             props.artistMetadata?.relations && props.artistMetadata.relations.map((relation: any, index: number) => {
               return (
-                <div className='mr-2 py-1 inline-block'>
-                  <Tag key={index} transparent>
+                <div key={index} className='mr-2 py-1 inline-block'>
+                  <Tag transparent>
                     <a target="_blank" href={relation.url.resource}>{relation.type}</a>
                   </Tag>
                 </div>

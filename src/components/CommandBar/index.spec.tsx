@@ -1,9 +1,8 @@
-import { render, screen, fireEvent, cleanup, act } from '@testing-library/react'
+import { render, fireEvent, cleanup, act } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import CommandBar from './index'
-import { startSearch } from '../../types/search'
 import { BrowserRouter } from 'react-router-dom'
 
 const mockStore = configureStore([])
@@ -33,7 +32,14 @@ describe('CommandBar', () => {
     return render(
       <Provider store={store}>
         <BrowserRouter>
-          <CommandBar />
+          <CommandBar 
+            navigateToArtists={() => {}}
+            navigateToAlbums={() => {}}
+            navigateToQueue={() => {}}
+            navigateToPlaylists={() => {}}
+            navigateToSettings={() => {}}
+            navigateToExplore={() => {}}
+          />
         </BrowserRouter>
       </Provider>
     )
@@ -142,9 +148,8 @@ describe('CommandBar', () => {
     // Open modal
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
     
-    expect(getByText('Test Artist (artist)')).toBeTruthy()
-    expect(getByText('Test Album (album)')).toBeTruthy()
-    expect(getByText('Test Song (song)')).toBeTruthy()
+    expect(getByText('Test Song')).toBeTruthy()
+    expect(getByText('song')).toBeTruthy()
   })
 
   it('navigates results with arrow keys', () => {
@@ -194,6 +199,6 @@ describe('CommandBar', () => {
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
     
     // Click on result
-    fireEvent.click(getByText('Test Song (song)'))
+    fireEvent.click(getByText('Test Song'))
   })
 }) 

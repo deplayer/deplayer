@@ -70,10 +70,6 @@ describe("search", () => {
         type: types.SEARCH_FINISHED,
         searchTerm,
       })
-      .put({
-        type: types.SEND_NOTIFICATION,
-        notification: "notifications.search.finished",
-      })
       .silentRun();
   });
 });

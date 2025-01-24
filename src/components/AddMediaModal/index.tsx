@@ -6,7 +6,6 @@ import { toMagnetURI, remote } from 'parse-torrent'
 import Button from '../common/Button'
 import Input from '../common/Input'
 import Modal from '../common/Modal'
-import Header from '../common/Header'
 import * as types from '../../constants/ActionTypes'
 
 import fileManager from '../../services/Filesystem/FileManager'
@@ -20,7 +19,6 @@ const AddMediaModal = (props: Props) => {
   const [magnetLink, setMagnetLink] = React.useState('')
   const [torrent, setTorrent] = React.useState<File>()
   const [youtubeLink, setYoutubeLink] = React.useState('')
-  const [ipfsHash, setIpfsHash] = React.useState('')
 
   if (!props.showAddMediaModal) {
     return null
@@ -33,17 +31,21 @@ const AddMediaModal = (props: Props) => {
       onClose={() => {
         props.dispatch({ type: types.HIDE_ADD_MEDIA_MODAL })
       }}
+      className="w-[800px] max-w-[90vw]"
     >
-      <Header>Deplayer supports several ways to access your media! If you have a provider such as Subsonic compatible API visit Providers section!</Header>
-      { /* Filesystem */}
-      <div className='my-6'>
-        <Header>
-          Open local filesystem directory
-        </Header>
+      <div className="p-4">
+        <p className="text-base opacity-70 mb-8">
+          Deplayer supports several ways to access your media! If you have a provider such as Subsonic compatible API visit Providers section!
+        </p>
 
-        <input multiple className='hidden' id="filePicker" type="file" name="file" />
+        { /* Filesystem */}
+        <div className='mb-8 space-y-4'>
+          <h3 className="text-lg font-medium">
+            Open local filesystem directory
+          </h3>
 
-        <div className='flex justify-end'>
+          <input multiple className='hidden' id="filePicker" type="file" name="file" />
+
           <Button
             fullWidth
             type='submit'
@@ -54,27 +56,34 @@ const AddMediaModal = (props: Props) => {
                 files: files
               })
             }}
+            className="btn-primary"
           >
-            Open
+            Open Directory
           </Button>
         </div>
-      </div>
 
-      <div className='my-6'>
-        <Header>
-          Magnet link (powered by <a target="_blank" rel="noopener noreferrer" href='https://webtorrent.io/'><span>webtorrent</span></a>. check some <a target="_blank" rel="noopener noreferrer" href="https://webtorrent.io/free-torrents"><span>examples</span></a>)
-        </Header>
-        <div className='my-2'>
+        <div className='mb-8 space-y-4'>
+          <h3 className="text-lg font-medium">
+            Magnet link <span className="text-sm opacity-70">(powered by <a className="text-accent hover:underline" target="_blank" rel="noopener noreferrer" href='https://webtorrent.io/'>webtorrent</a>. check some <a className="text-accent hover:underline" target="_blank" rel="noopener noreferrer" href="https://webtorrent.io/free-torrents">examples</a>)</span>
+          </h3>
+
           <Input
             type="text"
             value={magnetLink}
             onChange={(event) => setMagnetLink(event.target.value)}
+            placeholder="Enter magnet link..."
+            className="w-full"
           />
-        </div>
 
-        <input className='my-4' type="file" name="file" onChange={(event) => event.target.files && setTorrent(event.target.files[0])} />
+          <div className="flex items-center space-x-2">
+            <input 
+              type="file" 
+              name="file" 
+              onChange={(event) => event.target.files && setTorrent(event.target.files[0])} 
+              className="file-input file-input-bordered w-full"
+            />
+          </div>
 
-        <div className='flex justify-end'>
           <Button
             fullWidth
             type='submit'
@@ -84,7 +93,6 @@ const AddMediaModal = (props: Props) => {
               }
               if (torrent) {
                 remote(torrent, (err, parsedTorrent: any) => {
-
                   if (err) {
                     props.dispatch({
                       type: types.SEND_NOTIFICATION,
@@ -93,31 +101,30 @@ const AddMediaModal = (props: Props) => {
                     })
                     return
                   }
-
                   console.log('parsedTorrent', parsedTorrent)
                   const magnet = toMagnetURI(parsedTorrent)
                   props.dispatch({ type: types.ADD_WEBTORRENT_MEDIA, magnet: magnet })
-
                 })
               }
               props.dispatch({ type: types.HIDE_ADD_MEDIA_MODAL })
             }}
+            className="btn-primary"
           >
             Add and fetch
           </Button>
         </div>
-      </div>
 
-      <div className='my-6'>
-        <Header>Youtube link</Header>
-        <div className='my-2'>
+        <div className='mb-8 space-y-4'>
+          <h3 className="text-lg font-medium">Youtube link</h3>
+          
           <Input
             type="text"
             value={youtubeLink}
             onChange={(event) => setYoutubeLink(event.target.value)}
+            placeholder="Enter YouTube URL..."
+            className="w-full"
           />
-        </div>
-        <div className='flex justify-end'>
+
           <Button
             fullWidth
             type='submit'
@@ -129,33 +136,7 @@ const AddMediaModal = (props: Props) => {
               })
               props.dispatch({ type: types.HIDE_ADD_MEDIA_MODAL })
             }}
-          >
-            Add and fetch
-          </Button>
-        </div>
-      </div>
-
-      <div className='my-6'>
-        <Header>IPFS Hash</Header>
-        <div className='my-2'>
-          <Input
-            type="text"
-            value={ipfsHash}
-            onChange={(event) => setIpfsHash(event.target.value)}
-          />
-        </div>
-        <div className='flex justify-end'>
-          <Button
-            fullWidth
-            type='submit'
-            onClick={() => {
-              props.dispatch({
-                type: types.SEND_NOTIFICATION,
-                notification: `starting to scan hash: ${ipfsHash}`,
-                level: 'info'
-              })
-              props.dispatch({ type: types.IPFS_FOLDER_FOUND, hash: ipfsHash })
-            }}
+            className="btn-primary"
           >
             Add and fetch
           </Button>

@@ -230,7 +230,7 @@ class PlayerControls extends React.Component<Props> {
             <ReactPlayer
               id="react-player"
               pip
-              fullscreen={this.props.player.fullscreen}
+              fullscreen={this.props.player.fullscreen ? "true" : "false"}
               className={playerClassnames}
               ref={this.playerRef}
               url={streamUri}

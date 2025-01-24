@@ -107,18 +107,14 @@ describe('Cover', () => {
   })
 
   it('should close modal when clicking close button', () => {
-    const { container } = render(<Cover song={mockSong} />)
-    const coverElement = container.querySelector('[data-testid="cover-container"]')
-    expect(coverElement).toBeTruthy()
+    render(<Cover song={mockSong} slim={false} />)
+
+    // Open modal
+    fireEvent.click(screen.getByTestId('cover-container'))
+    expect(screen.getByText('Test Album')).toBeInTheDocument()
     
-    if (coverElement) {
-      // Open modal
-      fireEvent.click(coverElement)
-      expect(screen.getByText('Test Album')).toBeInTheDocument()
-      
-      // Close modal
-      fireEvent.click(screen.getByText('Close'))
-      expect(screen.queryByText('Test Album')).not.toBeInTheDocument()
-    }
+    // Close modal
+    fireEvent.click(screen.getByRole('button', { name: '' }))
+    expect(screen.queryByText('Test Album')).not.toBeInTheDocument()
   })
 }) 

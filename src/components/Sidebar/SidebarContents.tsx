@@ -1,5 +1,6 @@
 import { Dispatch } from 'redux'
 import React from 'react'
+import { useNavigate } from 'react-router'
 
 import CommandBar from '../CommandBar'
 import CollectionMenuItem from './CollectionMenuItem'
@@ -75,6 +76,7 @@ const DeplayerLogo = () => {
 const SidebarContents = (props: ContentProps) => {
   const location = useLocation()
   const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
+  const navigate = useNavigate()
 
   return (
     <div className='flex flex-col h-full bg-base-100' onClick={() => props.onSetSidebarOpen(true)}>
@@ -118,7 +120,14 @@ const SidebarContents = (props: ContentProps) => {
       </ul>
 
       <div className='w-full'>  
-        <CommandBar />
+        <CommandBar 
+          navigateToArtists={() => navigate('/artists')}
+          navigateToAlbums={() => navigate('/albums')}
+          navigateToQueue={() => navigate('/queue')}
+          navigateToPlaylists={() => navigate('/playlists')}
+          navigateToSettings={() => navigate('/settings')}
+          navigateToExplore={() => navigate('/explore')}
+        />
       </div>
 
       <section className='p-6 pt-8 text-sm text-center w-full text-base-content/70'>

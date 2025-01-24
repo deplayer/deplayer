@@ -30,23 +30,6 @@ export function* startProvidersScan(): any {
         key,
       });
     }
-
-    if (key.match(/ipfs/)) {
-      const ipfsSettings = settings.providers[key];
-      yield put({ type: "PROVIDER_SCAN_STARTED", key });
-
-      const { hash } = ipfsSettings;
-
-      yield put({
-        type: types.SEND_NOTIFICATION,
-        notification: `starting to scan hash: ${hash}`,
-        level: "info",
-      });
-
-      // Dispatching an event with configured ipfs hash
-      yield put({ type: types.IPFS_FOLDER_FOUND, hash });
-      yield put({ type: "PROVIDER_SCAN_FINISHED", key });
-    }
   }
 }
 

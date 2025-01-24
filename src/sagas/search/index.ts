@@ -113,10 +113,6 @@ export function* search(action: SearchAction): any {
     type: types.SEARCH_FINISHED,
     searchTerm: action.searchTerm,
   });
-  yield put({
-    type: types.SEND_NOTIFICATION,
-    notification: "notifications.search.finished",
-  });
 }
 
 // Binding actions to sagas

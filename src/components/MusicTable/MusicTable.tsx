@@ -50,7 +50,6 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
 
   const rowRenderer = ({
     index,       // Index of row
-    key,         // Unique key within array of rendered rows
     style,        // Style object to be applied to row (to position it);
     slim
     // This must be passed through to the rendered row element.
@@ -66,7 +65,7 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
       <SongRow
         queue={queue}
         mqlMatch={app.mqlMatch}
-        key={key}
+        key={song.id}
         song={song}
         isCurrent={id === song.id}
         style={style}
