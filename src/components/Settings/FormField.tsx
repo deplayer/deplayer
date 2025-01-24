@@ -1,16 +1,12 @@
 import { Field } from 'formik'
 import Toggle from 'react-toggle'
 import { useFormikContext } from 'formik'
+import { FormField as FormFieldType } from '../../types/forms'
 
 import 'react-toggle/style.css'
 
-interface Field {
-  title: string
-  name: string
-  type: string
-}
 type Props = {
-  field: Field
+  field: FormFieldType
 }
 
 export const TYPES = {

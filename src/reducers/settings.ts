@@ -1,39 +1,39 @@
-import * as types from '../constants/ActionTypes'
-import SettingsBuilder from '../services/settings/SettingsBuilder'
+import * as types from "../constants/ActionTypes";
+import SettingsBuilder from "../services/settings/SettingsBuilder";
 
 export type State = {
-  error: string,
-  saving: boolean,
-  settings: any,
+  error: string;
+  saving: boolean;
+  settings: any;
   settingsForm: {
-    providers: any,
-    fields: any
-  }
-}
+    providers: any;
+    fields: any;
+  };
+};
 
-const settingsBuilder = new SettingsBuilder()
+const settingsBuilder = new SettingsBuilder();
 
 export const defaultState = {
-  error: '',
+  error: "",
   saving: false,
   settingsForm: settingsBuilder.getFormSchema(),
   settings: {
     providers: {
       musicbrainz: {
-        enabled: true
-      }
+        enabled: true,
+      },
     },
     app: {
       spectrum: {
-        enabled: false
+        enabled: false,
       },
       lastfm: {
         enabled: false,
-        apikey: ''
-      }
-    }
-  }
-}
+        apikey: "",
+      },
+    },
+  },
+};
 
 export default (state: State = defaultState, action: any = {}) => {
   switch (action.type) {
@@ -41,43 +41,43 @@ export default (state: State = defaultState, action: any = {}) => {
     case types.SETTINGS_SAVED_SUCCESSFULLY: {
       const settingsForm = settingsBuilder.getFormSchema(
         action.settings ? action.settings.providers : state.settings.providers
-      )
+      );
 
       return {
         ...state,
         settingsForm,
-        settings: action.settings
-      }
+        settings: action.settings,
+      };
     }
 
     case types.ADD_PROVIDER: {
-      const { providers } = state.settingsForm
-      providers[action.providerKey] = true
+      const { providers } = state.settingsForm;
+      providers[action.providerKey] = true;
 
-      const settingsForm = settingsBuilder.getFormSchema(providers)
+      const settingsForm = settingsBuilder.getFormSchema(providers);
 
       return {
         ...state,
-        settingsForm
-      }
+        settingsForm,
+      };
     }
 
     case types.REMOVE_PROVIDER: {
-      const { providers } = state.settingsForm
-      delete providers[action.providerKey]
+      const { providers } = state.settingsForm;
+      delete providers[action.providerKey];
 
-      const { settings } = state
-      delete settings.providers[action.providerKey]
+      const { settings } = state;
+      delete settings.providers[action.providerKey];
 
-      const settingsForm = settingsBuilder.getFormSchema(providers)
+      const settingsForm = settingsBuilder.getFormSchema(providers);
 
       return {
         ...state,
-        settingsForm
-      }
+        settingsForm,
+      };
     }
 
     default:
-      return state
+      return state;
   }
-}
+};
