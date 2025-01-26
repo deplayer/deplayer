@@ -1,29 +1,30 @@
-import { call, actionChannel, fork, take, put } from 'redux-saga/effects'
+import { call, actionChannel, fork, take, put } from "redux-saga/effects";
 
-import { saveToDbWorker } from './workers'
-import { getAdapter } from '../../services/database'
-import { initialize } from '../settings'
-import CollectionService from '../../services/CollectionService'
-import * as types from '../../constants/ActionTypes'
+import { saveToDbWorker } from "./workers";
+import { getAdapter } from "../../services/database";
+import { initialize } from "../settings";
+import CollectionService from "../../services/CollectionService";
+import * as types from "../../constants/ActionTypes";
+import defaultMedia from "../../constants/defaultMedia";
 
-const adapter = getAdapter()
-const collectionService = new CollectionService(adapter)
+const adapter = getAdapter();
+const collectionService = new CollectionService(adapter);
 
 export function* addToCollectionWatcher(): any {
-  const handleChannel = yield actionChannel(types.ADD_TO_COLLECTION)
+  const handleChannel = yield actionChannel(types.ADD_TO_COLLECTION);
 
   while (true) {
-    const { data } = yield take(handleChannel)
+    const { data } = yield take(handleChannel);
 
     try {
-      yield fork(saveToDbWorker, data)
+      yield fork(saveToDbWorker, data);
       yield take([
         types.SAVE_COLLECTION_FULLFILLED,
-        types.SAVE_COLLECTION_FAILED
-      ])
-      yield put({ type: types.RECEIVE_COLLECTION_FINISHED })
+        types.SAVE_COLLECTION_FAILED,
+      ]);
+      yield put({ type: types.RECEIVE_COLLECTION_FINISHED });
     } catch (error) {
-      yield put({ type: 'ADD_TO_COLLECTION_HANDLER_FAILED', error })
+      yield put({ type: "ADD_TO_COLLECTION_HANDLER_FAILED", error });
     }
   }
 }
@@ -31,15 +32,30 @@ export function* addToCollectionWatcher(): any {
 // Application initialization routines
 export function* initializeWatcher(): Generator<any, void, any> {
   while (true) {
-    yield take(types.INITIALIZE)
-    yield call(initialize)
-    yield call(collectionService.initialize)
-    const collection = yield call(collectionService.getAll)
-    const mappedData = collection.map((elem: any) => elem)
+    yield take(types.INITIALIZE);
+    yield call(initialize);
+    yield call(collectionService.initialize);
+    const collection = yield call(collectionService.getAll);
+    const mappedData = collection.map((elem: any) => elem);
 
-    yield put({ type: types.RECEIVE_COLLECTION, data: mappedData })
+    // If collection is empty, add default media
+    if (mappedData.length === 0) {
+      yield put({ type: types.ADD_TO_COLLECTION, data: [defaultMedia] });
+      yield take([
+        types.SAVE_COLLECTION_FULLFILLED,
+        types.SAVE_COLLECTION_FAILED,
+      ]);
+      yield put({ type: types.RECEIVE_COLLECTION, data: [defaultMedia] });
+      yield put({
+        type: types.SET_CURRENT_PLAYING,
+        songId: defaultMedia.id,
+        media: defaultMedia,
+      });
+    } else {
+      yield put({ type: types.RECEIVE_COLLECTION, data: mappedData });
+    }
 
-    yield put({ type: types.INITIALIZED })
-    yield put({ type: types.APPLY_MOST_PLAYED_SORT })
+    yield put({ type: types.INITIALIZED });
+    yield put({ type: types.APPLY_MOST_PLAYED_SORT });
   }
 }
