@@ -1,5 +1,5 @@
 import { Dispatch } from 'redux'
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { connect } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import Modal from '../common/Modal'
@@ -9,37 +9,65 @@ import { IconType } from '../common/Icon'
 import { State as RootState } from '../../reducers'
 import { State as CollectionState } from '../../reducers/collection'
 import { startSearch, StartSearchAction } from '../../types/search'
+import { THEMES } from '../Sidebar/ThemeModal'
 
-interface Command {
-  id: number
+interface BaseItem {
+  id: string | number
   name: string
-  command: () => void
   icon?: IconType
-  category?: string
-}
-
-interface SearchResult {
-  id: string
-  name: string
-  type: 'artist' | 'album' | 'song'
+  description?: string
   cover?: string
 }
 
-interface SearchResultGroup {
+interface Command extends BaseItem {
+  type: 'command'
+  command: () => void
+  category: string
+  shortcut?: string
+}
+
+interface NavigationItem extends BaseItem {
+  type: 'navigation'
+  path: string
+  category: 'sidebar' | 'section' | 'other'
+}
+
+interface ThemeItem extends BaseItem {
+  type: 'theme'
+  value: string
+  category: 'theme'
+}
+
+interface PeerItem extends BaseItem {
+  type: 'peer'
+  status: 'online' | 'offline'
+  lastSeen?: Date
+}
+
+interface MediaItem extends BaseItem {
+  type: 'song' | 'artist' | 'album'
+  artist?: string
+  album?: string
+}
+
+type CommandBarItem = Command | NavigationItem | ThemeItem | PeerItem | MediaItem
+
+interface GroupConfig {
   title: string
-  items: (Command | SearchResult)[]
   icon: IconType
+  priority: number
+  filter?: (items: CommandBarItem[]) => CommandBarItem[]
 }
 
 interface GroupedItems {
   title: string
-  items: (Command | SearchResult)[]
+  items: CommandBarItem[]
   icon: IconType
 }
 
 interface Props {
   dispatch: Dispatch<StartSearchAction | { type: string; [key: string]: any }>
-  searchResults: SearchResult[]
+  searchResults: MediaItem[]
   loading: boolean
   collection: CollectionState
   togglePlaying: () => void
@@ -53,37 +81,115 @@ interface Props {
   navigateToExplore: () => void
 }
 
+// Group configurations with priorities
+const GROUP_CONFIGS: Record<string, GroupConfig> = {
+  commands: {
+    title: 'Actions',
+    icon: 'faSearch',
+    priority: 1,
+    filter: items => items.filter(item => item.type === 'command')
+  },
+  navigation: {
+    title: 'Navigation',
+    icon: 'faStream',
+    priority: 2,
+    filter: items => items.filter(item => item.type === 'navigation')
+  },
+  themes: {
+    title: 'Themes',
+    icon: 'faPalette',
+    priority: 3,
+    filter: items => items.filter(item => item.type === 'theme')
+  },
+  peers: {
+    title: 'Friends',
+    icon: 'faUser',
+    priority: 4,
+    filter: items => items.filter(item => item.type === 'peer')
+  },
+  artists: {
+    title: 'Artists',
+    icon: 'faMicrophoneAlt',
+    priority: 5,
+    filter: items => items.filter(item => item.type === 'artist')
+  },
+  albums: {
+    title: 'Albums',
+    icon: 'faCompactDisc',
+    priority: 6,
+    filter: items => items.filter(item => item.type === 'album')
+  },
+  songs: {
+    title: 'Songs',
+    icon: 'faMusic',
+    priority: 7,
+    filter: items => items.filter(item => item.type === 'song')
+  }
+}
+
+// Map titles to config keys
+const getConfigKey = (title: string): string => {
+  const key = title.toLowerCase()
+  switch (key) {
+    case 'actions':
+      return 'commands'
+    case 'friends':
+      return 'peers'
+    default:
+      return key
+  }
+}
+
 function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext, playPrev }: Props) {
   const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [debouncedSearch, setDebouncedSearch] = useState('')
+  const lastMediaSearch = useRef('')
 
+  // Define available themes
+  const themeItems: ThemeItem[] = THEMES.map(themeName => ({
+    id: `theme-${themeName}`,
+    type: 'theme',
+    name: themeName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+    value: themeName,
+    category: 'theme',
+    description: `Switch to ${themeName} theme`
+  }))
+
+  // Define available commands
   const commands: Command[] = [
     {
       id: 1,
+      type: 'command',
       name: 'Play/Pause',
       icon: 'faPlayCircle',
       category: 'Playback',
-      command: togglePlaying
+      command: togglePlaying,
+      shortcut: 'Space'
     },
     {
       id: 2,
+      type: 'command',
       name: 'Next Track',
       icon: 'faStepForward',
       category: 'Playback',
-      command: playNext
+      command: playNext,
+      shortcut: '⌘→'
     },
     {
       id: 3,
+      type: 'command',
       name: 'Previous Track',
       icon: 'faStepBackward',
       category: 'Playback',
-      command: playPrev
+      command: playPrev,
+      shortcut: '⌘←'
     },
     {
       id: 10,
+      type: 'command',
       name: 'Toggle Visuals',
       icon: 'faBahai',
       category: 'Player',
@@ -91,6 +197,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
     },
     {
       id: 11,
+      type: 'command',
       name: 'Toggle Spectrum',
       icon: 'faDeezer',
       category: 'Player',
@@ -98,6 +205,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
     },
     {
       id: 12,
+      type: 'command',
       name: 'Shuffle Queue',
       icon: 'faRandom',
       category: 'Queue',
@@ -105,6 +213,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
     },
     {
       id: 13,
+      type: 'command',
       name: 'Toggle Repeat',
       icon: 'faRedo',
       category: 'Queue',
@@ -112,6 +221,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
     },
     {
       id: 14,
+      type: 'command',
       name: 'Add New Media',
       icon: 'faPlusCircle',
       category: 'Collection',
@@ -119,68 +229,75 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
         dispatch({ type: 'SHOW_ADD_MEDIA_MODAL' })
         handleClose()
       }
-    },
+    }
+  ]
+
+  // Define navigation items
+  const navigationItems: NavigationItem[] = [
     {
-      id: 4,
+      id: 'nav-artists',
+      type: 'navigation',
       name: 'Artists',
       icon: 'faMicrophoneAlt',
-      category: 'Navigation',
-      command: () => {
-        navigate('/artists')
-        handleClose()
-      }
+      category: 'sidebar',
+      path: '/artists'
     },
     {
-      id: 5,
+      id: 'nav-albums',
+      type: 'navigation',
       name: 'Albums',
       icon: 'faCompactDisc',
-      category: 'Navigation',
-      command: () => {
-        navigate('/albums')
-        handleClose()
-      }
+      category: 'sidebar',
+      path: '/albums'
     },
     {
-      id: 6,
+      id: 'nav-queue',
+      type: 'navigation',
       name: 'Queue',
       icon: 'faMusic',
-      category: 'Navigation',
-      command: () => {
-        navigate('/queue')
-        handleClose()
-      }
+      category: 'sidebar',
+      path: '/queue'
     },
     {
-      id: 7,
+      id: 'nav-playlists',
+      type: 'navigation',
       name: 'Playlists',
       icon: 'faBookmark',
-      category: 'Navigation',
-      command: () => {
-        navigate('/playlists')
-        handleClose()
-      }
+      category: 'sidebar',
+      path: '/playlists'
     },
     {
-      id: 8,
+      id: 'nav-settings',
+      type: 'navigation',
       name: 'Settings',
       icon: 'faCogs',
-      category: 'Navigation',
-      command: () => {
-        navigate('/settings')
-        handleClose()
-      }
+      category: 'sidebar',
+      path: '/settings'
     },
     {
-      id: 9,
+      id: 'nav-explore',
+      type: 'navigation',
       name: 'Explore',
       icon: 'faGlobe',
-      category: 'Navigation',
-      command: () => {
-        navigate('/explore')
-        handleClose()
-      }
-    },
+      category: 'sidebar',
+      path: '/explore'
+    }
   ]
+
+  const filterItems = useCallback((items: CommandBarItem[], searchTerm: string): CommandBarItem[] => {
+    if (!searchTerm) return items
+    const lowerSearch = searchTerm.toLowerCase()
+    return items.filter(item => {
+      const matches = [
+        item.name.toLowerCase().includes(lowerSearch),
+        item.description?.toLowerCase().includes(lowerSearch),
+        'category' in item && item.category.toLowerCase().includes(lowerSearch),
+        'artist' in item && item.artist?.toLowerCase().includes(lowerSearch),
+        'album' in item && item.album?.toLowerCase().includes(lowerSearch)
+      ]
+      return matches.some(match => match)
+    })
+  }, [])
 
   // Update debounced value after 500ms of no changes and minimum length
   useEffect(() => {
@@ -196,11 +313,16 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
   }, [search])
 
   // Trigger search only when debounced value changes and is not empty
+  // AND there are no matching local items
   useEffect(() => {
-    if (debouncedSearch) {
-      dispatch(startSearch(debouncedSearch, 'all', true))
+    if (debouncedSearch && debouncedSearch !== lastMediaSearch.current) {
+      const localItems = filterItems([...commands, ...navigationItems, ...themeItems], debouncedSearch)
+      if (localItems.length === 0) {
+        lastMediaSearch.current = debouncedSearch
+        dispatch(startSearch(debouncedSearch, 'all', true))
+      }
     }
-  }, [debouncedSearch, dispatch])
+  }, [debouncedSearch, dispatch, commands, navigationItems, themeItems, filterItems])
 
   // Reset search state when modal closes
   useEffect(() => {
@@ -208,78 +330,43 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
       setSearch('')
       setDebouncedSearch('')
       setSelectedIndex(0)
+      lastMediaSearch.current = ''
     }
   }, [isOpen])
 
   const groupedItems = useMemo((): GroupedItems[] => {
-    if (!search) {
-      // Group commands by category when not searching
-      const grouped = commands.reduce((acc: { [key: string]: Command[] }, command) => {
-        const category = command.category || 'Other'
-        if (!acc[category]) acc[category] = []
-        acc[category].push(command)
-        return acc
-      }, {})
+    // Combine all available items
+    const allAvailableItems: CommandBarItem[] = [
+      ...commands,
+      ...navigationItems,
+      ...themeItems,
+      ...searchResults
+    ]
 
-      return Object.entries(grouped).map(([category, items]) => ({
-        title: category,
-        items,
-        icon: items[0]?.icon || 'faEllipsisV'
-      }))
-    }
+    // Filter items based on search
+    const filteredItems = filterItems(allAvailableItems, search)
 
-    // Group search results by type when searching
-    const groups: GroupedItems[] = []
-    
-    // Commands that match the search
-    const matchingCommands = commands.filter(cmd => 
-      cmd.name.toLowerCase().includes(search.toLowerCase())
-    )
-    if (matchingCommands.length > 0) {
-      groups.push({
-        title: 'Commands',
-        items: matchingCommands,
-        icon: 'faSearch'
+    // Group items by type using the configuration
+    return Object.entries(GROUP_CONFIGS)
+      .map(([key, config]) => {
+        const items = config.filter ? config.filter(filteredItems) : []
+        return items.length > 0 ? {
+          title: config.title,
+          items,
+          icon: config.icon,
+          key
+        } : null
       })
-    }
-
-    // Group search results by type
-    const resultsByType = searchResults.reduce((acc: { [key: string]: SearchResult[] }, item) => {
-      if (!acc[item.type]) acc[item.type] = []
-      acc[item.type].push(item)
-      return acc
-    }, {})
-
-    // Add each type group with appropriate icons
-    if (resultsByType.artist?.length) {
-      groups.push({
-        title: 'Artists',
-        items: resultsByType.artist,
-        icon: 'faMicrophoneAlt'
+      .filter((group): group is (GroupedItems & { key: string }) => group !== null)
+      .sort((a, b) => {
+        const priorityA = GROUP_CONFIGS[a.key].priority
+        const priorityB = GROUP_CONFIGS[b.key].priority
+        return priorityA - priorityB
       })
-    }
-
-    if (resultsByType.album?.length) {
-      groups.push({
-        title: 'Albums',
-        items: resultsByType.album,
-        icon: 'faCompactDisc'
-      })
-    }
-
-    if (resultsByType.song?.length) {
-      groups.push({
-        title: 'Songs',
-        items: resultsByType.song,
-        icon: 'faMusic'
-      })
-    }
-
-    return groups
-  }, [search, commands, searchResults])
+  }, [search, commands, navigationItems, themeItems, searchResults, filterItems])
 
   const allItems = useMemo(() => 
-    groupedItems.reduce<(Command | SearchResult)[]>((acc, group) => [...acc, ...group.items], [])
+    groupedItems.reduce<CommandBarItem[]>((acc, group) => [...acc, ...group.items], [])
   , [groupedItems])
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -303,30 +390,42 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
       e.preventDefault()
       const selectedItem = allItems[selectedIndex]
       if (selectedItem) {
-        if ('command' in selectedItem) {
-          selectedItem.command()
-        } else {
-          // Navigate to the appropriate view based on result type
-          switch (selectedItem.type) {
-            case 'song':
-              navigate(`/song/${selectedItem.id}`)
-              break
-            case 'album':
-              navigate(`/album/${selectedItem.id}`)
-              break
-            case 'artist':
-              navigate(`/artist/${selectedItem.id}`)
-              break
-          }
-        }
-        handleClose()
+        handleItemSelect(selectedItem)
       }
     }
     if (e.key === 'Escape') {
       e.preventDefault()
       handleClose()
     }
-  }, [isOpen, allItems, selectedIndex, navigate])
+  }, [isOpen, allItems, selectedIndex])
+
+  const handleItemSelect = useCallback((item: CommandBarItem) => {
+    switch (item.type) {
+      case 'command':
+        item.command()
+        break
+      case 'navigation':
+        navigate(item.path)
+        break
+      case 'theme':
+        localStorage.setItem('theme', item.value)
+        document.documentElement.setAttribute('data-theme', item.value)
+        break
+      case 'peer':
+        // Handle peer selection
+        break
+      case 'song':
+        navigate(`/song/${item.id}`)
+        break
+      case 'album':
+        navigate(`/album/${item.id}`)
+        break
+      case 'artist':
+        navigate(`/artist/${item.id}`)
+        break
+    }
+    handleClose()
+  }, [navigate])
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown)
@@ -339,8 +438,18 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
     setSelectedIndex(0)
   }, [])
 
-  const getIconForType = useCallback((type: string): IconType => {
-    switch (type) {
+  const getIconForItem = useCallback((item: CommandBarItem): IconType => {
+    if (item.icon) return item.icon
+
+    switch (item.type) {
+      case 'command':
+        return 'faSearch'
+      case 'navigation':
+        return 'faStream'
+      case 'theme':
+        return 'faPalette'
+      case 'peer':
+        return item.status === 'online' ? 'faUser' : 'faUser'
       case 'artist':
         return 'faUser'
       case 'album':
@@ -410,64 +519,46 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
                   <Icon icon={group.icon} className="mr-2" />
                   {group.title}
                 </div>
-                {group.items.map((item, index) => {
-                  const isCommand = 'command' in item
+                {group.items.map((item: CommandBarItem, index: number) => {
                   const itemIndex = groupedItems
                     .slice(0, groupIndex)
                     .reduce((acc, g) => acc + g.items.length, 0) + index
 
                   return (
                     <button
-                      key={isCommand ? `command-${item.id}` : `result-${item.id}`}
+                      key={`${item.type}-${item.id}`}
                       className={`flex items-center p-4 w-full hover:bg-base-200 h-20 ${selectedIndex === itemIndex ? 'bg-base-200' : ''}`}
-                      onClick={() => {
-                        if (isCommand) {
-                          item.command()
-                        } else {
-                          // Navigate to the appropriate view based on result type
-                          switch (item.type) {
-                            case 'song':
-                              navigate(`/song/${item.id}`)
-                              break
-                            case 'album':
-                              navigate(`/album/${item.id}`)
-                              break
-                            case 'artist':
-                              navigate(`/artist/${item.id}`)
-                              break
-                          }
-                        }
-                        handleClose()
-                      }}
+                      onClick={() => handleItemSelect(item)}
                     >
                       <div className="w-14 h-14 mr-4 flex-shrink-0 bg-base-300 rounded overflow-hidden flex items-center justify-center">
-                        {isCommand ? (
-                          <Icon 
-                            icon={item.icon || 'faSearch'} 
-                            className="text-primary text-2xl" 
+                        {item.cover ? (
+                          <img 
+                            src={item.cover} 
+                            alt="" 
+                            className="w-full h-full object-cover"
                           />
                         ) : (
-                          <>
-                            {item.cover ? (
-                              <img 
-                                src={item.cover} 
-                                alt="" 
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <Icon 
-                                icon={getIconForType(item.type)} 
-                                className="text-primary text-2xl" 
-                              />
-                            )}
-                          </>
+                          <Icon 
+                            icon={getIconForItem(item)} 
+                            className="text-primary text-2xl" 
+                          />
                         )}
                       </div>
                       <div className="flex flex-col items-start justify-center min-w-0">
                         <span className="text-lg truncate w-full">{item.name}</span>
                         <span className="text-sm opacity-60">
-                          {isCommand ? item.category : item.type}
+                          {'category' in item ? item.category : item.type}
+                          {item.type === 'command' && item.shortcut && (
+                            <kbd className="ml-2 px-2 py-0.5 text-xs bg-base-200 rounded">
+                              {item.shortcut}
+                            </kbd>
+                          )}
                         </span>
+                        {item.description && (
+                          <span className="text-sm opacity-60 truncate w-full">
+                            {item.description}
+                          </span>
+                        )}
                       </div>
                     </button>
                   )
@@ -488,11 +579,13 @@ export default connect(
       if (!media) return null;
       return {
         id,
-        name: media.title || id,
-        type: 'song',
-        cover: media.cover?.thumbnailUrl
+        name: media.title,
+        type: 'song' as const,
+        cover: media.cover?.thumbnailUrl,
+        artist: media.artist?.name,
+        album: media.album?.name
       };
-    }).filter(Boolean) as SearchResult[],
+    }).filter(Boolean) as MediaItem[],
     loading: state.collection.loading,
     collection: state.collection
   }),

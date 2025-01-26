@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { BrowserRouter as Router } from 'react-router-dom'
-
+import { State as QueueState } from '../../reducers/queue'
+import { State as CollectionState } from '../../reducers/collection'
 import MusicTable, { Props } from './MusicTable'
 
 const setup = () => {
@@ -24,10 +25,27 @@ const setup = () => {
     tableIds: [],
     queue: {
       trackIds: [],
-      currentPlaying: {},
-    },
-    collection: {}
-  }
+      currentPlaying: null
+    } as unknown as QueueState,
+    collection: {
+      rows: {},
+      albums: {},
+      artists: {},
+      songsByArtist: {},
+      songsByAlbum: {},
+      albumsByArtist: {},
+      covers: {},
+      artistCovers: {},
+      albumCovers: {},
+      loading: false,
+      error: null,
+      lastUpdate: null,
+      lastScan: null,
+      scanInProgress: false,
+      scanErrors: [],
+      scanProgress: 0
+    } as unknown as CollectionState
+  } 
 
   render(<MusicTable {...props} />, { wrapper: Router })
 }
