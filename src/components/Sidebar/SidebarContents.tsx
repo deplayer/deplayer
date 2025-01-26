@@ -75,8 +75,8 @@ const DeplayerLogo = () => {
 
 const SidebarContents = (props: ContentProps) => {
   const location = useLocation()
-  const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
   const navigate = useNavigate()
+  const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
 
   return (
     <div className='flex flex-col h-full bg-base-100' onClick={() => props.onSetSidebarOpen(true)}>
