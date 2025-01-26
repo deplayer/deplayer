@@ -84,6 +84,8 @@ export default {
           "--player-control-bg": "#333333", // Slightly lighter background for controls
           "--player-btn-radius": "3px", // Square player buttons
           "--player-btn-border": "2px solid #404040", // Visible button borders
+          "--btn-text-case": "uppercase", // Uppercase text for buttons
+          "--btn-text-color": "#FFFFFF", // White text for all buttons
           "--rounded-box": "0", // Sharp corners like old IBM terminals
           "--rounded-btn": "0", // Sharp corners
           "--rounded-badge": "0", // Sharp corners
@@ -111,6 +113,8 @@ export default {
           "--player-control-bg": "#A6A6A6", // Darker gray for controls
           "--player-btn-radius": "3px", // Square player buttons
           "--player-btn-border": "1px solid #8C8C8C", // Visible button borders
+          "--btn-text-case": "uppercase", // Uppercase text for buttons
+          "--btn-text-color": "#FFFFFF", // White text for all buttons
           "--rounded-box": "0", // Sharp corners like old IBM terminals
           "--rounded-btn": "0", // Sharp corners
           "--rounded-badge": "0", // Sharp corners

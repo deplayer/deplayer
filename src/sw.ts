@@ -1,7 +1,7 @@
 import { clientsClaim } from "workbox-core";
 import { cleanupOutdatedCaches, precacheAndRoute } from "workbox-precaching";
 import { registerRoute } from "workbox-routing";
-import { CacheFirst } from "workbox-strategies";
+import { CacheFirst, StaleWhileRevalidate } from "workbox-strategies";
 import { CacheableResponsePlugin } from "workbox-cacheable-response";
 import { ExpirationPlugin } from "workbox-expiration";
 import listener from "./worker-server";
@@ -15,6 +15,19 @@ self.skipWaiting();
 clientsClaim();
 
 precacheAndRoute(self.__WB_MANIFEST);
+
+// Cache CSS with StaleWhileRevalidate strategy
+registerRoute(
+  ({ request }) => request.destination === "style",
+  new StaleWhileRevalidate({
+    cacheName: "styles-cache",
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+    ],
+  })
+);
 
 // Cache images with CacheFirst strategy
 registerRoute(
