@@ -134,6 +134,9 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const lastMediaSearch = useRef('')
+  const searchTimer = useRef<NodeJS.Timeout>()
+  const resultsContainerRef = useRef<HTMLDivElement>(null)
+  const selectedItemRef = useRef<HTMLButtonElement>(null)
 
   // Define available themes
   const themeItems: ThemeItem[] = THEMES.map(themeName => ({
@@ -286,38 +289,46 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
     })
   }, [])
 
-  // Update debounced value after 500ms of no changes and minimum length
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (search.length >= 3) {
-        setDebouncedSearch(search)
-      } else {
-        setDebouncedSearch('')
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setSearch(value)
+    setSelectedIndex(0)
+
+    // Clear previous timer
+    if (searchTimer.current) {
+      clearTimeout(searchTimer.current)
+    }
+
+    // Set new timer for debounced search
+    searchTimer.current = setTimeout(() => {
+      if (value.length >= 3) {
+        const localItems = filterItems([...commands, ...navigationItems, ...themeItems], value)
+        if (localItems.length === 0 && value !== lastMediaSearch.current) {
+          lastMediaSearch.current = value
+          dispatch(startSearch(value, 'all', true))
+        }
       }
     }, 500)
+  }, [commands, navigationItems, themeItems, filterItems, dispatch])
 
-    return () => clearTimeout(timer)
-  }, [search])
-
-  // Trigger search only when debounced value changes and is not empty
-  // AND there are no matching local items
+  // Cleanup timer on unmount or when modal closes
   useEffect(() => {
-    if (debouncedSearch && debouncedSearch !== lastMediaSearch.current) {
-      const localItems = filterItems([...commands, ...navigationItems, ...themeItems], debouncedSearch)
-      if (localItems.length === 0) {
-        lastMediaSearch.current = debouncedSearch
-        dispatch(startSearch(debouncedSearch, 'all', true))
+    return () => {
+      if (searchTimer.current) {
+        clearTimeout(searchTimer.current)
       }
     }
-  }, [debouncedSearch, dispatch, commands, navigationItems, themeItems, filterItems])
+  }, [])
 
   // Reset search state when modal closes
   useEffect(() => {
     if (!isOpen) {
       setSearch('')
-      setDebouncedSearch('')
       setSelectedIndex(0)
       lastMediaSearch.current = ''
+      if (searchTimer.current) {
+        clearTimeout(searchTimer.current)
+      }
     }
   }, [isOpen])
 
@@ -448,10 +459,24 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
     }
   }, [])
 
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value)
-    setSelectedIndex(0)
-  }, [])
+  // Add useEffect to handle scrolling when selectedIndex changes
+  useEffect(() => {
+    if (selectedItemRef.current && resultsContainerRef.current) {
+      const container = resultsContainerRef.current
+      const item = selectedItemRef.current
+      
+      const containerRect = container.getBoundingClientRect()
+      const itemRect = item.getBoundingClientRect()
+
+      if (itemRect.bottom > containerRect.bottom) {
+        // Scroll down if item is below viewport
+        item.scrollIntoView({ behavior: 'smooth', block: 'end' })
+      } else if (itemRect.top < containerRect.top) {
+        // Scroll up if item is above viewport
+        item.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }
+  }, [selectedIndex])
 
   return (
     <div className='px-6 py-4 text-xs w-full flex justify-center items-center'>
@@ -491,7 +516,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
             </div>
           </div>
 
-          <div className="max-h-[60vh] overflow-y-auto w-full">
+          <div className="max-h-[60vh] overflow-y-auto w-full" ref={resultsContainerRef}>
             {loading && search.length > 1 && (
               <div className="p-6 text-center text-lg">Searching...</div>
             )}
@@ -514,6 +539,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
                   return (
                     <button
                       key={`${item.type}-${item.id}`}
+                      ref={itemIndex === selectedIndex ? selectedItemRef : null}
                       className={`flex items-center p-4 w-full hover:bg-base-200 h-20 ${selectedIndex === itemIndex ? 'bg-base-200' : ''}`}
                       onClick={() => handleItemSelect(item)}
                     >
