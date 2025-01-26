@@ -1,5 +1,6 @@
 import LazyImage from '../LazyImage'
 import classNames from 'classnames'
+import React from 'react'
 
 type cover = {
   thumbnailUrl: string,
@@ -12,7 +13,8 @@ type Props = {
   size?: string,
   onClick?: () => void,
   useImage?: boolean,
-  albumName: string
+  albumName: string,
+  noFade?: boolean
 }
 
 interface ContentProps {
@@ -20,7 +22,9 @@ interface ContentProps {
   src?: string,
   noImage?: boolean,
   reflect?: boolean,
-  useImage?: boolean
+  useImage?: boolean,
+  isLoaded?: boolean,
+  noFade?: boolean
 }
 
 const Content = (props: ContentProps) => {
@@ -32,20 +36,38 @@ const Content = (props: ContentProps) => {
       <img
         src={imageUrl}
         alt={props.alt}
+        className={classNames(
+          "w-full h-full object-cover",
+          {
+            "transition-opacity duration-300": !props.noFade,
+            "opacity-0": !props.noFade && !props.isLoaded && !props.noImage,
+            "opacity-100": props.noFade || props.isLoaded || props.noImage
+          }
+        )}
+        draggable={false}
       />
     )
   }
 
-  const className = classNames({
-    'cover-image': true,
-    "reflected-image": props.reflect,
-  })
+  const className = classNames(
+    'cover-image',
+    {
+      'reflected-image': props.reflect,
+      'transition-opacity duration-300': !props.noFade,
+      'opacity-0': !props.noFade && !props.isLoaded && !props.noImage,
+      'opacity-100': props.noFade || props.isLoaded || props.noImage
+    }
+  )
 
   return (
     <div
       data-testid='cover-image'
       className={className}
-      style={{ backgroundImage: `url(${imageUrl})` }}
+      style={{ 
+        backgroundImage: imageUrl ? `url(${imageUrl})` : undefined,
+        backgroundColor: !imageUrl ? 'rgba(0,0,0,0.1)' : undefined,
+        backgroundSize: 'cover'
+      }}
       data-alt={props.alt}
     />
   )
@@ -57,7 +79,8 @@ type ImgProps = {
   noImage?: boolean,
   reflect?: boolean,
   onClick?: () => void,
-  useImage?: boolean
+  useImage?: boolean,
+  noFade?: boolean
 }
 
 const Img = (props: ImgProps) => {
@@ -66,8 +89,15 @@ const Img = (props: ImgProps) => {
       src={props.src}
       reflect={props.reflect}
       onClick={props.onClick}
+      noFade={props.noFade}
     >
-      <Content useImage={props.useImage} src={props.src} alt='' />
+      <Content 
+        useImage={props.useImage} 
+        src={props.src} 
+        alt={props.alt || ''} 
+        reflect={props.reflect}
+        noFade={props.noFade}
+      />
     </LazyImage>
   )
 }
@@ -80,9 +110,11 @@ const CoverImage = (props: Props) => {
         useImage={props.useImage}
         onClick={props.onClick}
         noImage
+        noFade={props.noFade}
       />
     )
   }
+
   const src = props.size === 'full' && props.cover.fullUrl ?
     props.cover.fullUrl : props.cover.thumbnailUrl
 
@@ -93,8 +125,9 @@ const CoverImage = (props: Props) => {
       onClick={props.onClick}
       alt={`${props.albumName} cover`}
       src={src}
+      noFade={props.noFade}
     />
   )
 }
 
-export default CoverImage
+export default React.memo(CoverImage)

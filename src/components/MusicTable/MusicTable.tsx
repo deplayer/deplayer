@@ -2,6 +2,7 @@ import { AutoSizer, List } from 'react-virtualized'
 import { useLocation } from 'react-router-dom'
 import * as React from 'react'
 import { Filter } from '../../reducers/collection'
+import classNames from 'classnames'
 
 import AddNewMediaButton from '../Buttons/AddNewMediaButton'
 import ClearQueueButton from '../Buttons/ClearQueueButton'
@@ -14,19 +15,64 @@ import ToggleMiniQueueButton from '../Buttons/ToggleMiniQueueButton'
 import * as types from '../../constants/ActionTypes'
 import { State as AppState } from '../../reducers/app'
 import FilterPanel from '../Collection/FilterPanel'
+import { State as CollectionState } from '../../reducers/collection'
+import { State as QueueState } from '../../reducers/queue'
+import { Dispatch } from 'redux'
 
 export type Props = {
   error?: string,
-  queue: any,
+  queue: QueueState,
   app: AppState,
   tableIds: Array<string>,
-  collection: any,
-  dispatch: (action: any) => any,
+  collection: CollectionState,
+  dispatch: Dispatch,
   disableCurrent?: boolean,
   disableCovers?: boolean,
   disableAddButton?: boolean,
   slim?: boolean,
 }
+
+const Toolbar = ({ isToolbarVisible, isToolbarHidden, handleTransitionEnd, tableIds, actions }: { isToolbarVisible: boolean, isToolbarHidden: boolean, handleTransitionEnd: () => void, tableIds: Array<string>, actions: React.ReactNode }) => {
+  return (
+      <div
+        className={`p-2 bg-base-200/50 toolbar flex justify-between items-center text-base-content top-15 right-0 z-10 transition-transform duration-100 ${
+          isToolbarVisible ? 'translate-y-0' : '-translate-y-full'
+        }`}
+        style={{ display: isToolbarHidden ? 'none' : 'flex' }}
+        onTransitionEnd={handleTransitionEnd}
+      >
+        <div className='p-2'>
+          #<b>{tableIds.length}</b>
+        </div>
+        <div className='flex'>
+          {actions}
+        </div>
+      </div>
+    )
+  }
+
+const LoadingRow = ({ style, slim }: { style: any, slim: boolean }) => (
+  <div 
+    style={style}
+    className={classNames(
+      'flex items-center px-4 animate-pulse bg-base-200/10',
+      {
+        'h-20': !slim,
+        'h-16': slim
+      }
+    )}
+  >
+    {!slim && <div className="w-12 h-12 bg-base-300 rounded mr-4" />} {/* Cover placeholder only if not slim */}
+    <div className="flex-1">
+      <div className="h-4 bg-base-300 rounded w-1/3 mb-2" /> {/* Title placeholder */}
+      <div className="h-3 bg-base-300/70 rounded w-1/4" /> {/* Subtitle placeholder */}
+    </div>
+    <div className="flex space-x-2">
+      <div className="w-8 h-8 bg-base-300 rounded" /> {/* Button placeholder */}
+      <div className="w-8 h-8 bg-base-300 rounded" /> {/* Button placeholder */}
+    </div>
+  </div>
+)
 
 const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disableCurrent, disableCovers, disableAddButton, slim }: Props) => {
   const [isToolbarVisible, setIsToolbarVisible] = React.useState(true)
@@ -57,7 +103,11 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
     const songId = tableIds[index]
     const song = collection.rows[songId]
 
-    if (!song || !song.id) {
+    if (!song) {
+      return <LoadingRow style={style} slim={slim} />
+    }
+
+    if (!song.id) {
       return null
     }
 
@@ -73,7 +123,7 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
           dispatch({ type: types.SET_CURRENT_PLAYING, songId: song.id })
         }}
         disableAddButton={disableAddButton}
-        disableCovers={disableCovers}
+        disableCovers={slim || disableCovers} // Force disable covers in slim mode
         slim={slim}
         dispatch={dispatch}
       />
@@ -81,7 +131,7 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
   }
 
   // Track the position of current playing to jump there
-  const currentIndex = !disableCurrent ? tableIds.indexOf(queue.currentPlaying) : 0
+  const currentIndex = !disableCurrent ? tableIds.indexOf(queue.currentPlaying || '') : 0
 
   const handleClearFilters = () => {
     dispatch({ type: types.CLEAR_COLLECTION_FILTERS })
@@ -162,21 +212,13 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
 
   return (
     <React.Fragment>
-      <div
-        className={`p-2 bg-base-200/50 toolbar flex justify-between items-center text-base-content top-15 right-0 z-10 transition-transform duration-100 ${
-          isToolbarVisible ? 'translate-y-0' : '-translate-y-full'
-        }`}
-        style={{ display: isToolbarHidden ? 'none' : 'flex' }}
-        onTransitionEnd={handleTransitionEnd}
-      >
-        <div className='p-2'>
-          #<b>{tableIds.length}</b>
-        </div>
-        <div className='flex'>
-          {actions}
-        </div>
-      </div>
-      
+      <Toolbar
+        isToolbarVisible={isToolbarVisible}
+        isToolbarHidden={isToolbarHidden}
+        handleTransitionEnd={handleTransitionEnd}
+        tableIds={tableIds}
+        actions={actions}
+      />
       <AutoSizer className='music-table'>
         {({ height, width }: { height: number, width: number }) => (
           <List
@@ -185,7 +227,7 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
             rowHeight={slim ? 80 : 100}
             rowRenderer={({ index, key, style }) => rowRenderer({ index, key, style, slim: !!slim })}
             width={width}
-            overscanRowCount={6}
+            overscanRowCount={50}
             scrollToIndex={currentIndex}
             recomputeRowHeights
             onScroll={handleScroll}

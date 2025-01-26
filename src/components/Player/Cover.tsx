@@ -47,6 +47,7 @@ const Cover = (props: Props) => {
           cover={props.song.cover}
           size='thumbnail'
           albumName={albumName}
+          noFade
         />
         
         {/* Hover Preview */}
@@ -67,6 +68,7 @@ const Cover = (props: Props) => {
               cover={props.song.cover}
               size='medium'
               albumName={albumName}
+              noFade
             />
           </div>
         )}
@@ -84,6 +86,7 @@ const Cover = (props: Props) => {
             cover={props.song.cover}
             size='large'
             albumName={albumName}
+            noFade
           />
         </div>
       </Modal>

@@ -6,7 +6,7 @@ import React from 'react'
 import { getDurationStr } from '../../../utils/timeFormatter'
 import ContextualMenu from './../ContextualMenu'
 import CoverImage from './../CoverImage'
-import Media from '../../../entities/Media'
+import Media, { Cover } from '../../../entities/Media'
 import Tag from '../../common/Tag'
 import ServiceIcon from '../../ServiceIcon'
 import { State as QueueState } from '../../../reducers/queue'
@@ -24,32 +24,46 @@ export type Props = {
   style: React.CSSProperties
 }
 
+const SongCover = React.memo(({ cover, onClick, albumName }: { cover: Cover, onClick: () => void, albumName: string }) => {
+  return (
+    <div
+      role='row'
+      className='media-thumb relative mr-3'
+      style={{ minWidth: '80px', height: '80px' }}
+      onClick={onClick}
+      tabIndex={0}
+    >
+      <CoverImage
+        cover={cover}
+        size='thumbnail'
+        albumName={albumName}
+      />
+    </div>
+  )
+})  
+
+const ProviderTags = ({ song }: { song: Media }) => {
+  return (
+    <div className='flex items-center min-w-fit'>
+      {Object.values(song.stream).map((provider) => {
+        return <Tag transparent key={provider.service}><ServiceIcon service={provider.service} /><p className='capitalize'>{provider.service}</p></Tag>
+      })}
+    </div>
+  )
+}
+
 const SongRow = (props: Props) => {
-  const { song, disableCovers } = props
+  const { song, disableCovers, slim, mqlMatch } = props
 
   const nonAvailable = <Translate value='song.row.na' />
 
   const onClick = () => {
-    if (props.slim) {
+    if (slim) {
       props.onClick()
     }
   }
 
-  const cover = (
-    <div
-      role='row'
-      className='media-thumb hidden md:block relative mr-3'
-      style={{ minWidth: '80px', height: '80px' }}
-      onClick={props.onClick}
-      tabIndex={0}
-    >
-      <CoverImage
-        cover={song.cover}
-        size='thumbnail'
-        albumName={song.albumName || song.album ? song.album.name : 'N/A'}
-      />
-    </div>
-  )
+  const shouldShowCover = !disableCovers && !slim && song.cover || mqlMatch
 
   return (
     <div
@@ -57,7 +71,13 @@ const SongRow = (props: Props) => {
       style={props.style}
       onClick={onClick}
     >
-      {disableCovers || cover}
+      {shouldShowCover && (
+        <SongCover 
+          cover={song.cover!} 
+          onClick={onClick} 
+          albumName={song.albumName || song.album ? song.album.name : 'N/A'} 
+        />
+      )}
       <div className='media-info truncate w-full whitespace-no-wrap'>
         <h4 className='text-lg -mt-1'>
           <Link to={`/song/${song.id}`} className="text-base-content hover:text-primary">
@@ -79,12 +99,7 @@ const SongRow = (props: Props) => {
       </div>
       <div className='flex items-center min-w-fit' tabIndex={0}>
         <div className='mx-4'>
-          {
-            !props.slim && props.mqlMatch &&
-            Object.values(song.stream).map((provider) => {
-              return <Tag transparent key={provider.service}><ServiceIcon service={provider.service} /><p className='capitalize'>{provider.service}</p></Tag>
-            })
-          }
+          { !props.slim && <ProviderTags song={song} /> }
           {props.slim && (
             <span className='text-primary'>{getDurationStr(song.duration)}</span>
           )}

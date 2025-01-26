@@ -1,64 +1,81 @@
 import classNames from 'classnames'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 
 type Props = {
   src?: string
   reflect?: boolean
   onClick?: () => void
   children: React.ReactNode
+  noFade?: boolean
 }
 
-const LazyImage: React.FC<Props> = ({ src, reflect, onClick, children }) => {
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+const LazyImage: React.FC<Props> = ({ src, reflect, onClick, children, noFade }) => {
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [hasError, setHasError] = useState(false)
+  const [showFallback, setShowFallback] = useState(false)
+  const fallbackTimer = useRef<number>()
 
   useEffect(() => {
-    let isMounted = true
+    setIsLoaded(false)
+    setHasError(false)
+    setShowFallback(false)
 
-    const image = new Image()
+    if (!src) return
 
-    const handleLoad = () => {
-      if (isMounted) {
-        setLoading(false)
+    // Clear any existing timer
+    if (fallbackTimer.current) {
+      clearTimeout(fallbackTimer.current)
+    }
+
+    // Set a timer to show fallback if loading takes too long
+    fallbackTimer.current = window.setTimeout(() => {
+      if (!isLoaded) {
+        setShowFallback(true)
+      }
+    }, 150) // Small delay to avoid flashing during fast scrolling
+
+    const img = new Image()
+    img.onload = () => {
+      setIsLoaded(true)
+      setShowFallback(false)
+      if (fallbackTimer.current) {
+        clearTimeout(fallbackTimer.current)
       }
     }
-
-    const handleError = () => {
-      if (isMounted) {
-        setError(`Failed to load ${src}`)
-        setLoading(false)
+    img.onerror = () => {
+      setHasError(true)
+      setShowFallback(true)
+      if (fallbackTimer.current) {
+        clearTimeout(fallbackTimer.current)
       }
     }
-
-    image.onload = handleLoad
-    image.onerror = handleError
-
-    if (src) {
-      image.src = src
-    }
-
-    setLoading(true)
+    img.src = src
 
     return () => {
-      isMounted = false
+      img.onload = null
+      img.onerror = null
+      if (fallbackTimer.current) {
+        clearTimeout(fallbackTimer.current)
+      }
     }
-  }, [src, setError, setLoading ])
+  }, [src])
 
   const childrenWithProps = React.Children.map(children, (child: any) =>
     React.cloneElement(child, {
-      noImage: error || loading
+      noImage: (showFallback && !isLoaded) || hasError,
+      src: isLoaded && !hasError ? src : undefined,
+      isLoaded,
+      noFade
     })
   )
 
   const className = classNames({
     "lazy-image": true,
-    "fade-in": true,
     "w-full": true,
     "bg-no-repeat": true,
     "bg-center": true,
     "cursor-pointer": true,
-    "reflected-image": reflect,
-    one: true
+    "reflected-image": reflect
   })
 
   return (
@@ -68,4 +85,4 @@ const LazyImage: React.FC<Props> = ({ src, reflect, onClick, children }) => {
   )
 }
 
-export default LazyImage
+export default React.memo(LazyImage)
