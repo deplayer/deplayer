@@ -4,6 +4,11 @@
 @tailwind responsive;
 @plugin "daisyui";
 
+root {
+  --player-btn-radius: 9999px;
+  --player-btn-border: 0px;
+}
+
 .markdown {
   @apply flex;
   @apply text-2xl;
@@ -65,3 +70,5 @@
 .markdown p {
   @apply pb-6;
 }
+
+

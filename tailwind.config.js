@@ -82,7 +82,7 @@ export default {
           "error": "#FF0033",        // Red for errors
           "--player-bg": "#262626",  // Solid background for player controls
           "--player-control-bg": "#333333", // Slightly lighter background for controls
-          "--player-btn-radius": "0", // Square player buttons
+          "--player-btn-radius": "3px", // Square player buttons
           "--player-btn-border": "2px solid #404040", // Visible button borders
           "--rounded-box": "0",      // Sharp corners like old IBM terminals
           "--rounded-btn": "0",      // Sharp corners
@@ -109,8 +109,8 @@ export default {
           "error": "#FF0033",        // Red for errors
           "--player-bg": "#BFBFBF",  // Solid medium gray for player
           "--player-control-bg": "#A6A6A6", // Darker gray for controls
-          "--player-btn-radius": "0", // Square player buttons
-          "--player-btn-border": "2px solid #8C8C8C", // Visible button borders
+          "--player-btn-radius": "3px", // Square player buttons
+          "--player-btn-border": "1px solid #8C8C8C", // Visible button borders
           "--rounded-box": "0",      // Sharp corners like old IBM terminals
           "--rounded-btn": "0",      // Sharp corners
           "--rounded-badge": "0",    // Sharp corners
@@ -128,12 +128,6 @@ export default {
       "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee",
       "winter", "dim", "nord", "sunset"
     ],
-    themes: {
-      extend: {
-        '--player-btn-radius': '9999px',  // Full rounded by default
-        '--player-btn-border': 'none'     // No border by default
-      }
-    }
   },
 }
 
