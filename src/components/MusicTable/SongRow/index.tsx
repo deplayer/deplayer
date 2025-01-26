@@ -68,6 +68,7 @@ const SongRow = (props: Props) => {
 
   return (
     <div
+      data-testid="song-row"
       className={`song-row p-2 flex justify-between ${props.isCurrent ? 'bg-base-200' : ''} hover:bg-base-200/50`}
       style={props.style}
       onClick={onClick}
