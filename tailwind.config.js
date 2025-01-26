@@ -33,6 +33,8 @@ export default {
           "--rounded-box": "0.25rem",
           "--rounded-btn": "0.25rem",
           "--rounded-badge": "0.25rem",
+          "--player-btn-radius": "9999px",  // Full rounded for player buttons
+          "--player-btn-border": "none",    // No border for player buttons
           "--animation-btn": "0.25s",
           "--animation-input": "0.2s",
           "--btn-focus-scale": "0.95",
@@ -56,6 +58,8 @@ export default {
           "--rounded-box": "0.25rem",
           "--rounded-btn": "0.25rem",
           "--rounded-badge": "0.25rem",
+          "--player-btn-radius": "9999px",  // Full rounded for player buttons
+          "--player-btn-border": "none",    // No border for player buttons
           "--animation-btn": "0.25s",
           "--animation-input": "0.2s",
           "--btn-focus-scale": "0.95",
@@ -67,47 +71,55 @@ export default {
           "primary": "#FF5B00",     // TE signature orange
           "secondary": "#FFDB00",    // TE yellow accent
           "accent": "#00C2FF",       // TE blue accent
-          "neutral": "#1A1A1A",      // Dark gray for neutral elements
-          "base-100": "#000000",     // Pure black background
-          "base-200": "#0D0D0D",     // Slightly lighter black
-          "base-300": "#1A1A1A",     // Dark gray for elevated elements
-          "base-content": "#FFFFFF", // White text
+          "neutral": "#262626",      // IBM-like dark gray
+          "base-100": "#1A1A1A",     // Dark charcoal background
+          "base-200": "#262626",     // IBM terminal gray
+          "base-300": "#404040",     // Classic computer gray
+          "base-content": "#E5E5E5", // Light gray text for contrast
           "info": "#00C2FF",         // Blue for info
           "success": "#00FF66",      // Bright green for success
           "warning": "#FFDB00",      // Yellow for warnings
           "error": "#FF0033",        // Red for errors
-          "--rounded-box": "0.125rem",    // Minimal rounded corners
-          "--rounded-btn": "0.125rem",    // Minimal rounded corners
-          "--rounded-badge": "0.125rem",  // Minimal rounded corners
+          "--player-bg": "#262626",  // Solid background for player controls
+          "--player-control-bg": "#333333", // Slightly lighter background for controls
+          "--player-btn-radius": "0", // Square player buttons
+          "--player-btn-border": "2px solid #404040", // Visible button borders
+          "--rounded-box": "0",      // Sharp corners like old IBM terminals
+          "--rounded-btn": "0",      // Sharp corners
+          "--rounded-badge": "0",    // Sharp corners
           "--animation-btn": "0.2s",
           "--animation-input": "0.2s",
           "--btn-focus-scale": "0.98",
-          "--border-btn": "1px",
-          "--tab-border": "1px",
-          "--tab-radius": "0.125rem"
+          "--border-btn": "2px",     // Thicker borders like old terminals
+          "--tab-border": "2px",     // Thicker borders
+          "--tab-radius": "0"        // Sharp corners
         },
         "teenage-engineering-light": {
           "primary": "#FF5B00",     // TE signature orange
           "secondary": "#FFDB00",    // TE yellow accent
           "accent": "#00C2FF",       // TE blue accent
-          "neutral": "#E5E5E5",      // Light gray for neutral elements
-          "base-100": "#FFFFFF",     // Pure white background
-          "base-200": "#F5F5F5",     // Very light gray
-          "base-300": "#E5E5E5",     // Light gray for elevated elements
-          "base-content": "#000000", // Black text
+          "neutral": "#808080",      // Classic IBM medium gray
+          "base-100": "#D4D4D4",     // Light IBM gray background
+          "base-200": "#BFBFBF",     // Medium-light terminal gray
+          "base-300": "#A6A6A6",     // Darker accent gray
+          "base-content": "#262626", // Dark gray text
           "info": "#00C2FF",         // Blue for info
-          "success": "#00D455",      // Slightly muted green for better contrast
+          "success": "#00D455",      // Slightly muted green
           "warning": "#FFDB00",      // Yellow for warnings
           "error": "#FF0033",        // Red for errors
-          "--rounded-box": "0.125rem",    // Minimal rounded corners
-          "--rounded-btn": "0.125rem",    // Minimal rounded corners
-          "--rounded-badge": "0.125rem",  // Minimal rounded corners
+          "--player-bg": "#BFBFBF",  // Solid medium gray for player
+          "--player-control-bg": "#A6A6A6", // Darker gray for controls
+          "--player-btn-radius": "0", // Square player buttons
+          "--player-btn-border": "2px solid #8C8C8C", // Visible button borders
+          "--rounded-box": "0",      // Sharp corners like old IBM terminals
+          "--rounded-btn": "0",      // Sharp corners
+          "--rounded-badge": "0",    // Sharp corners
           "--animation-btn": "0.2s",
           "--animation-input": "0.2s",
           "--btn-focus-scale": "0.98",
-          "--border-btn": "1px",
-          "--tab-border": "1px",
-          "--tab-radius": "0.125rem"
+          "--border-btn": "2px",     // Thicker borders like old terminals
+          "--tab-border": "2px",     // Thicker borders
+          "--tab-radius": "0"        // Sharp corners
         },
       },
       "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave",
@@ -116,6 +128,12 @@ export default {
       "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee",
       "winter", "dim", "nord", "sunset"
     ],
+    themes: {
+      extend: {
+        '--player-btn-radius': '9999px',  // Full rounded by default
+        '--player-btn-border': 'none'     // No border by default
+      }
+    }
   },
 }
 

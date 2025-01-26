@@ -28,12 +28,13 @@ const SongCover = React.memo(({ cover, onClick, albumName }: { cover: Cover, onC
   return (
     <div
       role='row'
-      className='media-thumb relative mr-3'
+      className='media-thumb relative mr-3 overflow-hidden'
       style={{ minWidth: '80px', height: '80px' }}
       onClick={onClick}
       tabIndex={0}
     >
       <CoverImage
+        useImage={true}
         cover={cover}
         size='thumbnail'
         albumName={albumName}
@@ -63,7 +64,7 @@ const SongRow = (props: Props) => {
     }
   }
 
-  const shouldShowCover = !disableCovers && !slim && song.cover || mqlMatch
+  const shouldShowCover = !disableCovers && !slim && song.cover && mqlMatch
 
   return (
     <div

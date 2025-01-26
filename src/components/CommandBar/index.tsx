@@ -579,6 +579,21 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
               </div>
             ))}
           </div>
+
+          <div className="border-t border-base-300 mt-2 p-4 text-sm text-base-content/70 flex items-center justify-center space-x-8">
+            <div className="flex items-center">
+              <kbd className="px-2 py-1 bg-base-200 rounded mr-2">↑↓</kbd>
+              <span>Navigate</span>
+            </div>
+            <div className="flex items-center">
+              <kbd className="px-2 py-1 bg-base-200 rounded mr-2">Enter</kbd>
+              <span>Select</span>
+            </div>
+            <div className="flex items-center">
+              <kbd className="px-2 py-1 bg-base-200 rounded mr-2">Esc</kbd>
+              <span>Close</span>
+            </div>
+          </div>
         </div>
       </Modal>
     </div>

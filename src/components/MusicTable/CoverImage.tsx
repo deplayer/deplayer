@@ -27,7 +27,7 @@ interface ContentProps {
   noFade?: boolean
 }
 
-const Content = (props: ContentProps) => {
+const Content = React.memo((props: ContentProps) => {
   const placeholderUrl = '/disc.svg'
   const imageUrl = props.noImage ? placeholderUrl : props.src
 
@@ -71,7 +71,18 @@ const Content = (props: ContentProps) => {
       data-alt={props.alt}
     />
   )
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison function for Content component
+  return (
+    prevProps.alt === nextProps.alt &&
+    prevProps.src === nextProps.src &&
+    prevProps.noImage === nextProps.noImage &&
+    prevProps.reflect === nextProps.reflect &&
+    prevProps.useImage === nextProps.useImage &&
+    prevProps.isLoaded === nextProps.isLoaded &&
+    prevProps.noFade === nextProps.noFade
+  )
+})
 
 type ImgProps = {
   src?: string,
@@ -83,7 +94,7 @@ type ImgProps = {
   noFade?: boolean
 }
 
-const Img = (props: ImgProps) => {
+const Img = React.memo((props: ImgProps) => {
   return (
     <LazyImage
       src={props.src}
@@ -100,7 +111,18 @@ const Img = (props: ImgProps) => {
       />
     </LazyImage>
   )
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison function for Img component
+  return (
+    prevProps.src === nextProps.src &&
+    prevProps.alt === nextProps.alt &&
+    prevProps.noImage === nextProps.noImage &&
+    prevProps.reflect === nextProps.reflect &&
+    prevProps.useImage === nextProps.useImage &&
+    prevProps.noFade === nextProps.noFade &&
+    prevProps.onClick === nextProps.onClick
+  )
+})
 
 const CoverImage = (props: Props) => {
   if (!props.cover) {

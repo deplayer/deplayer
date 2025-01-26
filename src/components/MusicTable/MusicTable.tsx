@@ -227,7 +227,7 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
             rowHeight={slim ? 80 : 100}
             rowRenderer={({ index, key, style }) => rowRenderer({ index, key, style, slim: !!slim })}
             width={width}
-            overscanRowCount={50}
+            overscanRowCount={10}
             scrollToIndex={currentIndex}
             recomputeRowHeights
             onScroll={handleScroll}

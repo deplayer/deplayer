@@ -13,10 +13,9 @@ const SkipButton = (props: Props) => {
       transparent
       size='2xl'
       roundedFull
+      className='text-secondary rounded-[var(--player-btn-radius)] border-[var(--player-btn-border)]'
       onClick={props.onClick}
-      className='text-primary'
     >
-
       {props.type === 'next' ? <Icon icon='faStepForward' /> : <Icon icon='faStepBackward' />}
     </Button>
   )
