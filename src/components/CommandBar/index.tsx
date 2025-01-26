@@ -25,6 +25,18 @@ interface SearchResult {
   cover?: string
 }
 
+interface SearchResultGroup {
+  title: string
+  items: (Command | SearchResult)[]
+  icon: IconType
+}
+
+interface GroupedItems {
+  title: string
+  items: (Command | SearchResult)[]
+  icon: IconType
+}
+
 interface Props {
   dispatch: Dispatch<StartSearchAction | { type: string; [key: string]: any }>
   searchResults: SearchResult[]
@@ -199,10 +211,76 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
     }
   }, [isOpen])
 
-  const allItems = useMemo(() => [
-    ...(!search ? commands : []),
-    ...searchResults
-  ], [search, commands, searchResults])
+  const groupedItems = useMemo((): GroupedItems[] => {
+    if (!search) {
+      // Group commands by category when not searching
+      const grouped = commands.reduce((acc: { [key: string]: Command[] }, command) => {
+        const category = command.category || 'Other'
+        if (!acc[category]) acc[category] = []
+        acc[category].push(command)
+        return acc
+      }, {})
+
+      return Object.entries(grouped).map(([category, items]) => ({
+        title: category,
+        items,
+        icon: items[0]?.icon || 'faEllipsisV'
+      }))
+    }
+
+    // Group search results by type when searching
+    const groups: GroupedItems[] = []
+    
+    // Commands that match the search
+    const matchingCommands = commands.filter(cmd => 
+      cmd.name.toLowerCase().includes(search.toLowerCase())
+    )
+    if (matchingCommands.length > 0) {
+      groups.push({
+        title: 'Commands',
+        items: matchingCommands,
+        icon: 'faSearch'
+      })
+    }
+
+    // Group search results by type
+    const resultsByType = searchResults.reduce((acc: { [key: string]: SearchResult[] }, item) => {
+      if (!acc[item.type]) acc[item.type] = []
+      acc[item.type].push(item)
+      return acc
+    }, {})
+
+    // Add each type group with appropriate icons
+    if (resultsByType.artist?.length) {
+      groups.push({
+        title: 'Artists',
+        items: resultsByType.artist,
+        icon: 'faMicrophoneAlt'
+      })
+    }
+
+    if (resultsByType.album?.length) {
+      groups.push({
+        title: 'Albums',
+        items: resultsByType.album,
+        icon: 'faCompactDisc'
+      })
+    }
+
+    if (resultsByType.song?.length) {
+      groups.push({
+        title: 'Songs',
+        items: resultsByType.song,
+        icon: 'faMusic'
+      })
+    }
+
+    return groups
+  }, [search, commands, searchResults])
+
+  const allItems = useMemo(() => 
+    groupedItems.reduce<(Command | SearchResult)[]>((acc, group) => [...acc, ...group.items], [])
+  , [groupedItems])
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
@@ -326,64 +404,76 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
               <div className="p-6 text-center text-lg">No results found</div>
             )}
 
-            {allItems.slice(0, 500).map((item, index) => {
-              const isCommand = 'command' in item
-              return (
-                <button
-                  key={isCommand ? `command-${item.id}` : `result-${item.id}`}
-                  className={`flex items-center p-4 w-full hover:bg-base-200 h-20 ${selectedIndex === index ? 'bg-base-200' : ''}`}
-                  onClick={() => {
-                    if (isCommand) {
-                      item.command()
-                    } else {
-                      // Navigate to the appropriate view based on result type
-                      switch (item.type) {
-                        case 'song':
-                          navigate(`/song/${item.id}`)
-                          break
-                        case 'album':
-                          navigate(`/album/${item.id}`)
-                          break
-                        case 'artist':
-                          navigate(`/artist/${item.id}`)
-                          break
-                      }
-                    }
-                    handleClose()
-                  }}
-                >
-                  <div className="w-14 h-14 mr-4 flex-shrink-0 bg-base-300 rounded overflow-hidden flex items-center justify-center">
-                    {isCommand ? (
-                      <Icon 
-                        icon={(item as Command).icon || 'faSearch'} 
-                        className="text-primary text-2xl" 
-                      />
-                    ) : (
-                      <>
-                        {item.cover ? (
-                          <img 
-                            src={item.cover} 
-                            alt="" 
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
+            {groupedItems.map((group, groupIndex) => (
+              <div key={group.title} className="mb-4">
+                <div className="px-4 py-2 text-sm font-semibold text-base-content/70 flex items-center">
+                  <Icon icon={group.icon} className="mr-2" />
+                  {group.title}
+                </div>
+                {group.items.map((item, index) => {
+                  const isCommand = 'command' in item
+                  const itemIndex = groupedItems
+                    .slice(0, groupIndex)
+                    .reduce((acc, g) => acc + g.items.length, 0) + index
+
+                  return (
+                    <button
+                      key={isCommand ? `command-${item.id}` : `result-${item.id}`}
+                      className={`flex items-center p-4 w-full hover:bg-base-200 h-20 ${selectedIndex === itemIndex ? 'bg-base-200' : ''}`}
+                      onClick={() => {
+                        if (isCommand) {
+                          item.command()
+                        } else {
+                          // Navigate to the appropriate view based on result type
+                          switch (item.type) {
+                            case 'song':
+                              navigate(`/song/${item.id}`)
+                              break
+                            case 'album':
+                              navigate(`/album/${item.id}`)
+                              break
+                            case 'artist':
+                              navigate(`/artist/${item.id}`)
+                              break
+                          }
+                        }
+                        handleClose()
+                      }}
+                    >
+                      <div className="w-14 h-14 mr-4 flex-shrink-0 bg-base-300 rounded overflow-hidden flex items-center justify-center">
+                        {isCommand ? (
                           <Icon 
-                            icon={getIconForType((item as SearchResult).type)} 
+                            icon={item.icon || 'faSearch'} 
                             className="text-primary text-2xl" 
                           />
+                        ) : (
+                          <>
+                            {item.cover ? (
+                              <img 
+                                src={item.cover} 
+                                alt="" 
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <Icon 
+                                icon={getIconForType(item.type)} 
+                                className="text-primary text-2xl" 
+                              />
+                            )}
+                          </>
                         )}
-                      </>
-                    )}
-                  </div>
-                  <div className="flex flex-col items-start justify-center min-w-0">
-                    <span className="text-lg truncate w-full">{isCommand ? item.name : item.name}</span>
-                    <span className="text-sm opacity-60">
-                      {isCommand ? item.category : (item as SearchResult).type}
-                    </span>
-                  </div>
-                </button>
-              )
-            })}
+                      </div>
+                      <div className="flex flex-col items-start justify-center min-w-0">
+                        <span className="text-lg truncate w-full">{item.name}</span>
+                        <span className="text-sm opacity-60">
+                          {isCommand ? item.category : item.type}
+                        </span>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            ))}
           </div>
         </div>
       </Modal>
