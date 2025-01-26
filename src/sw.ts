@@ -49,12 +49,21 @@ registerRoute(
 
 self.addEventListener("fetch", async (event) => {
   const url = new URL(event.request.url);
-  if (url.origin === self.origin && url.pathname.startsWith("/opfs-")) {
-    event.respondWith(handleOpfsRequest(url.pathname));
-  }
 
-  const res = listener(event);
-  if (res) event.respondWith(res);
+  // Only handle requests to our own origin
+  if (url.origin === self.origin) {
+    if (url.pathname.startsWith("/opfs-")) {
+      event.respondWith(handleOpfsRequest(url.pathname));
+      return;
+    }
+
+    const res = listener(event);
+    if (res) {
+      event.respondWith(res);
+      return;
+    }
+  }
+  // Let other requests (including CORS) pass through without interference
 });
 
 async function handleOpfsRequest(pathname: string) {
