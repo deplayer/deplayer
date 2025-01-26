@@ -47,8 +47,8 @@ const App = () => {
   const playerPortal = React.useMemo(() => portals.createHtmlPortalNode(), [])
 
   return (
-    <Provider store={store}>
-      <Router history={history}>
+    <Router history={history}>
+      <Provider store={store}>
         <LayoutContainer>
           <Routes>
             <Route path="/join/:id" element={<JoinRoom />} />
@@ -71,8 +71,8 @@ const App = () => {
         <PlayerContainer playerPortal={playerPortal} />
         <AddMediaModal />
         <GlobalKeyHandlers />
-      </Router>
-    </Provider >
+      </Provider >
+    </Router>
   )
 }
 

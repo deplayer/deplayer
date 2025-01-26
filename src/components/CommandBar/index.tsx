@@ -132,7 +132,6 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
-  const [debouncedSearch, setDebouncedSearch] = useState('')
   const lastMediaSearch = useRef('')
   const searchTimer = useRef<NodeJS.Timeout>()
   const resultsContainerRef = useRef<HTMLDivElement>(null)
