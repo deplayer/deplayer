@@ -127,19 +127,6 @@ const GROUP_CONFIGS: Record<string, GroupConfig> = {
   }
 }
 
-// Map titles to config keys
-const getConfigKey = (title: string): string => {
-  const key = title.toLowerCase()
-  switch (key) {
-    case 'actions':
-      return 'commands'
-    case 'friends':
-      return 'peers'
-    default:
-      return key
-  }
-}
-
 function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext, playPrev }: Props) {
   const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)

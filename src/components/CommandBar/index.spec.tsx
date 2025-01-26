@@ -4,7 +4,6 @@ import configureStore from 'redux-mock-store'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import CommandBar from './index'
 import { BrowserRouter } from 'react-router-dom'
-import { THEMES } from '../Sidebar/ThemeModal'
 
 const mockStore = configureStore([])
 
