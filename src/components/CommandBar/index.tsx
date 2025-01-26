@@ -186,7 +186,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
   // Trigger search only when debounced value changes and is not empty
   useEffect(() => {
     if (debouncedSearch) {
-      dispatch(startSearch(debouncedSearch))
+      dispatch(startSearch(debouncedSearch, 'all', true))
     }
   }, [debouncedSearch, dispatch])
 
