@@ -6,7 +6,6 @@ import Artist from '../../../entities/Artist'
 import Album from '../../../entities/Album'
 import SongRow from './index'
 import type { Props } from './index'
-import { mediaParams } from '../../../entities/Media.spec'
 
 const setup = () => {
   const props: Props = {
@@ -29,6 +28,7 @@ const setup = () => {
         thumbnailUrl: 'thumbnail'
       }),
       artistName: 'artistName',
+      albumName: 'album',
       type: 'audio',
       duration: 100,
       stream: {},
