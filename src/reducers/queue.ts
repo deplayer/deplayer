@@ -170,16 +170,33 @@ export default (state: State = defaultState, action: any = {}): State => {
     }
 
     case types.REMOVE_FROM_QUEUE: {
-      const trackIndex = state.trackIds.indexOf(action.song.id);
-      if (trackIndex === -1) return state;
+      const songToRemove = action.song || (Array.isArray(action.data) ? action.data[0] : action.data)
+      if (!songToRemove) {
+        return state
+      }
 
-      const newTrackIds = [...state.trackIds];
-      newTrackIds.splice(trackIndex, 1);
+      // Remove from trackIds
+      const newTrackIds = state.trackIds.filter(id => id !== songToRemove.id)
+      
+      // Remove from randomTrackIds only if in shuffle mode
+      const newRandomTrackIds = state.shuffle 
+        ? state.randomTrackIds.filter(id => id !== songToRemove.id)
+        : state.randomTrackIds
+
+      // Use the active queue based on shuffle state
+      const activeQueue = state.shuffle ? newRandomTrackIds : newTrackIds
+
+      // Update next and prev song IDs based on current playing song
+      const nextSongId = state.currentPlaying ? (getSiblingSong(activeQueue, state.currentPlaying, true) || null) : null
+      const prevSongId = state.currentPlaying ? (getSiblingSong(activeQueue, state.currentPlaying) || null) : null
 
       return {
         ...state,
         trackIds: newTrackIds,
-      };
+        randomTrackIds: newRandomTrackIds,
+        nextSongId,
+        prevSongId
+      }
     }
 
     case types.ADD_SONGS_TO_QUEUE_BY_ID:

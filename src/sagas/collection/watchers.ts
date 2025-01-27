@@ -38,19 +38,9 @@ export function* initializeWatcher(): Generator<any, void, any> {
     const collection = yield call(collectionService.getAll);
     const mappedData = collection.map((elem: any) => elem);
 
-    // If collection is empty, add default media
+    // If collection is empty, show empty state
     if (mappedData.length === 0) {
-      yield put({ type: types.ADD_TO_COLLECTION, data: [defaultMedia] });
-      yield take([
-        types.SAVE_COLLECTION_FULLFILLED,
-        types.SAVE_COLLECTION_FAILED,
-      ]);
-      yield put({ type: types.RECEIVE_COLLECTION, data: [defaultMedia] });
-      yield put({
-        type: types.SET_CURRENT_PLAYING,
-        songId: defaultMedia.id,
-        media: defaultMedia,
-      });
+      yield put({ type: types.RECEIVE_COLLECTION, data: [] });
     } else {
       yield put({ type: types.RECEIVE_COLLECTION, data: mappedData });
     }

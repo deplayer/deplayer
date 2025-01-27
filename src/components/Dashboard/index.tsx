@@ -9,6 +9,7 @@ import RecentAlbums from './RecentAlbums'
 import { State as CollectionState } from '../../reducers/collection'
 import * as types from '../../constants/ActionTypes'
 import Footer from '../Footer'
+import TryDemoButton from '../Buttons/TryDemoButton'
 
 import RecordPlayerSvg from './record-player.svg?react'
 import CasseteSvg from './cassete.svg?react'
@@ -20,6 +21,7 @@ import Auth from '../Auth'
 import Button from '../common/Button'
 import { Dispatch } from 'redux'
 import DeplayerTitle from '../DeplayerTitle'
+import { IMedia } from '../entities/media'
 
 type Props = {
   collection: CollectionState
@@ -47,7 +49,7 @@ const Image = () => {
   )
 }
 
-const WelcomeMessage = ({ dispatch }: { dispatch: Dispatch }) => {
+const WelcomeMessage = ({ dispatch, rows }: { dispatch: Dispatch, rows: Record<string, IMedia> }) => {
   const [showAuthModal, setShowAuthModal] = React.useState(false)
   const credentials = localStorage.getItem('credentials')
 
@@ -65,6 +67,11 @@ const WelcomeMessage = ({ dispatch }: { dispatch: Dispatch }) => {
           Access to you good ol' music library and enjoy it whenever you need it. <br />
           To start playing some content follow one of the steps below:
         </p>
+        { rows.length === 0 && (
+          <div className='mb-6'>
+            <TryDemoButton dispatch={dispatch} />
+          </div>
+        )}
         <ul>
           <li><Link to='/providers' className='text-primary hover:text-primary-focus'>Setup your media providers</Link>, (Subsonic API, mstream or ITunes)</li>
           <li>
@@ -87,12 +94,13 @@ const WelcomeMessage = ({ dispatch }: { dispatch: Dispatch }) => {
   )
 }
 
-
 const Dashboard = ({
   collection: { loading, rows, songsByNumberOfPlays, albums },
   dispatch
 }: Props) => {
   const MAX_LIST_ITEMS = 25
+  const RandomImage = pickImage()
+  const hasItems = Object.keys(rows).length > 0
 
   const mediaItems = songsByNumberOfPlays.map((songId: string) => {
     return rows[songId]
@@ -105,7 +113,7 @@ const Dashboard = ({
 
   return (
     <div className='z-10 w-full md:px-12 mb-12'>
-      <WelcomeMessage dispatch={dispatch} />
+      <WelcomeMessage dispatch={dispatch} rows={rows} />
       <RecentAlbums />
       {!!mediaItems.length &&
         <MediaSlider

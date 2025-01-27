@@ -161,6 +161,89 @@ describe('queue reducer', () => {
       expect(result.prevSongId).toBe('song1')
     })
   })
+
+  describe('REMOVE_FROM_QUEUE', () => {
+    const initialState = {
+      ...defaultState,
+      trackIds: ['song1', 'song2', 'song3'],
+      randomTrackIds: ['song2', 'song3', 'song1'],
+      currentPlaying: 'song2',
+      shuffle: true,
+      nextSongId: 'song3',
+      prevSongId: 'song1'
+    }
+
+    it('should handle removing song using song property', () => {
+      const result = reducer(initialState, {
+        type: types.REMOVE_FROM_QUEUE,
+        song: { id: 'song2' }
+      })
+
+      expect(result.trackIds).toEqual(['song1', 'song3'])
+      expect(result.randomTrackIds).toEqual(['song3', 'song1'])
+      expect(result.nextSongId).toBe('song3')
+      expect(result.prevSongId).toBe('song1')
+    })
+
+    it('should handle removing song using data array property', () => {
+      const result = reducer(initialState, {
+        type: types.REMOVE_FROM_QUEUE,
+        data: [{ id: 'song2' }]
+      })
+
+      expect(result.trackIds).toEqual(['song1', 'song3'])
+      expect(result.randomTrackIds).toEqual(['song3', 'song1'])
+      expect(result.nextSongId).toBe('song3')
+      expect(result.prevSongId).toBe('song1')
+    })
+
+    it('should handle removing song using data object property', () => {
+      const result = reducer(initialState, {
+        type: types.REMOVE_FROM_QUEUE,
+        data: { id: 'song2' }
+      })
+
+      expect(result.trackIds).toEqual(['song1', 'song3'])
+      expect(result.randomTrackIds).toEqual(['song3', 'song1'])
+      expect(result.nextSongId).toBe('song3')
+      expect(result.prevSongId).toBe('song1')
+    })
+
+    it('should handle invalid song id gracefully', () => {
+      const result = reducer(initialState, {
+        type: types.REMOVE_FROM_QUEUE,
+        song: { id: 'nonexistent' }
+      })
+
+      expect(result).toEqual(initialState)
+    })
+
+    it('should handle missing song data gracefully', () => {
+      const result = reducer(initialState, {
+        type: types.REMOVE_FROM_QUEUE,
+        data: []
+      })
+
+      expect(result).toEqual(initialState)
+    })
+
+    it('should update only normal queue when not in shuffle mode', () => {
+      const nonShuffleState = {
+        ...initialState,
+        shuffle: false
+      }
+
+      const result = reducer(nonShuffleState, {
+        type: types.REMOVE_FROM_QUEUE,
+        song: { id: 'song2' }
+      })
+
+      expect(result.trackIds).toEqual(['song1', 'song3'])
+      expect(result.randomTrackIds).toEqual(['song2', 'song3', 'song1']) // Unchanged
+      expect(result.nextSongId).toBe('song3')
+      expect(result.prevSongId).toBe('song1')
+    })
+  })
 })
 
 describe('Queue Reducer', () => {
