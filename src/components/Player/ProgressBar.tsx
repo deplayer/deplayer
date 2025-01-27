@@ -2,8 +2,6 @@ import { Dispatch } from 'redux'
 import Range from 'rc-slider'
 import 'rc-slider/assets/index.css'
 
-import { getDurationStr } from '../../utils/timeFormatter'
-
 type Props = {
   total: number, // Milliseconds
   dispatch: Dispatch,
@@ -68,9 +66,6 @@ const ProgressBar = (props: Props) => {
           background-color: rgb(var(--p)) !important;
         }
       `}</style>
-      <span className='absolute px-2 right-0 mr-0 -mt-4 text-xs text-base-content/70'>
-        {getDurationStr(props.current)} - {getDurationStr(props.total)}
-      </span>
     </div>
   )
 }

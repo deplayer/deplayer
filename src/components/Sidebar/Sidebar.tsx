@@ -45,6 +45,7 @@ function MSidebar({
       playlist={playlist}
       onSetSidebarOpen={onSetSidebarOpen}
       dispatch={dispatch}
+      className={queue.currentPlaying ? 'pb-20' : ''}
     />
   )
 

@@ -14,39 +14,30 @@ export const TYPES = {
   checkbox: 'checkbox'
 }
 
-const FormikToggle = ({
-  field,
-}: { field: any }) => {
-  useFormikContext()
-
-  return (
-    <Toggle
-      id={field.name}
-      name={field.name}
-      checked={field.value}
-      value={field.name}
-      onChange={field.onChange}
-    />
-  )
-}
-
 const FormField = (props: Props) => {
+  const fieldName = props.field.name || ''
+
   if (props.field.type === TYPES.checkbox) {
     return (
       <div className='w-full toggle-control flex justify-end'>
-        <Field
-          name={props.field.name}
-          component={FormikToggle}
-        />
+        <Field name={fieldName}>
+          {({ field }: any) => (
+            <Toggle
+              {...field}
+              id={field.name}
+              checked={field.value}
+            />
+          )}
+        </Field>
       </div>
     )
   }
 
   return (
     <Field
-      className="input input-bordered w-full"
-      name={props.field.name}
+      name={fieldName}
       type={props.field.type}
+      className="input input-bordered w-full"
     />
   )
 }

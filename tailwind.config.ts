@@ -143,7 +143,6 @@ export default {
       "lofi",
       "pastel",
       "fantasy",
-      "wireframe",
       "black",
       "luxury",
       "dracula",

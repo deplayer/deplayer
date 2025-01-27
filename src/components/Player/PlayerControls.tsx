@@ -1,5 +1,5 @@
 import { Dispatch } from 'redux'
-import { Link, Location } from 'react-router-dom'
+import { Location } from 'react-router-dom'
 import React from 'react'
 import ReactPlayer from 'react-player'
 import classNames from 'classnames'
@@ -17,6 +17,7 @@ import ProgressBar from './ProgressBar'
 import Visualizer from './../Visualizer'
 import WebtorrentPlayer from './CustomPlayers/WebtorrentPlayer'
 import PeerStreamPlayer from './CustomPlayers/PeerStreamPlayer'
+import DigitalScreen from './DigitalScreen'
 import * as types from '../../constants/ActionTypes'
 import PlayerRefService from '../../services/PlayerRefService'
 
@@ -218,7 +219,7 @@ class PlayerControls extends React.Component<Props> {
       'justify-between': true,
       'items-center': true,
       'flex-col': true,
-      'bg-base-200/70': true,
+      'bg-base-200': true,
       'backdrop-blur': this.props.player.fullscreen
     })
 
@@ -289,19 +290,14 @@ class PlayerControls extends React.Component<Props> {
                   <div className='flex flex-initial items-center justify-between min-w-0 max-w-full w-full' style={{ zIndex: 150 }}>
                     <Cover song={currentPlaying} />
                     <div className='flex justify-between items-center w-full'>
-                      <div className='mx-2 pr-2 md:text-center w-full truncate overflow-hidden'>
-                        <Link to={`/song/${currentPlaying.id}`} className='text-lg md:text-xl text-base-content block hover:text-primary'>
-                          <h5 className='truncate'>
-                            {currentPlaying.title}
-                          </h5>
-                        </Link>
-                        {currentPlaying.artist &&
-                          <Link to={`/artist/${currentPlaying.artist.id}`} className='block hover:text-primary'>
-                            <h6 className='truncate text-base-content/70'>
-                              {currentPlaying.artist.name}
-                            </h6>
-                          </Link>
-                        }
+                      <div className='flex flex-col w-full'>
+                        <DigitalScreen
+                          playedSeconds={playedSeconds}
+                          duration={duration}
+                          currentPlaying={currentPlaying}
+                          repeat={this.props.queue.repeat}
+                          shuffle={this.props.queue.shuffle}
+                        />
                       </div>
                       <div className='player-tools flex justify-center items-center'>
                         <Controls

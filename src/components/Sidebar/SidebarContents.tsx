@@ -30,7 +30,8 @@ type ContentProps = {
   queue: QueueState,
   app: AppState,
   playlist: PlaylistsState,
-  onSetSidebarOpen: Function
+  onSetSidebarOpen: Function,
+  className?: string
 }
 
 function getInitialTheme() {
@@ -79,7 +80,7 @@ const SidebarContents = (props: ContentProps) => {
   const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
 
   return (
-    <div className='flex flex-col h-full bg-base-100' onClick={() => props.onSetSidebarOpen(true)}>
+    <div className={`flex flex-col h-full bg-base-100 ${props.className || ''}`} onClick={() => props.onSetSidebarOpen(true)}>
       <div className="flex justify-between bg-base-200 border-b border-base-300 py-4">
         <DeplayerLogo />
         <h4 className="text-xl text-center text-primary tracking-wider select-none">

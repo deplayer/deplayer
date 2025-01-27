@@ -1,5 +1,5 @@
 import { Translate } from 'react-redux-i18n'
-
+import { useFormikContext } from 'formik'
 import FormField, { TYPES } from './FormField'
 import SyncButton from '../Buttons/SyncButton'
 import { FormField as FormFieldType } from '../../types/forms'
@@ -13,20 +13,22 @@ type Props = {
 const FormSchema = (props: Props) => {
   const { fields } = props.schema
 
-  const populatedFields = fields.map((field: FormFieldType, index: number) => {
+  const populatedFields = fields.map((field: FormFieldType) => {
     if (field.type === TYPES.title) {
       return (
-        <h3 className='text-2xl leading-loose py-2 uppercase tracking-wide pt-4 pb-2' key={index}><Translate value={field.title} /></h3>
+        <h3 className='text-2xl leading-loose py-2 uppercase tracking-wide pt-4 pb-2' key={`title-${field.title}`}>
+          <Translate value={field.title} />
+        </h3>
       )
     }
 
     if (field.type === "sync" && props.providerKey) {
-      return <SyncButton providerKey={props.providerKey} />;
+      return <SyncButton key={`sync-${props.providerKey}`} providerKey={props.providerKey} />;
     }
 
     return (
       <div
-        key={field.name}
+        key={`field-${field.name}`}
         className="my-3"
       >
         <div className='w-full flex items-center'>
