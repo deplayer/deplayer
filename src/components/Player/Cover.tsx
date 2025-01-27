@@ -51,6 +51,7 @@ const Cover = (props: Props) => {
       >
         <CoverImage
           useImage
+          glass
           cover={props.song.cover}
           size='thumbnail'
           albumName={albumName}
@@ -94,6 +95,7 @@ const Cover = (props: Props) => {
             size='large'
             albumName={albumName}
             noFade
+            glass
           />
         </div>
       </Modal>

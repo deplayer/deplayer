@@ -3,7 +3,7 @@ import Modal from '../common/Modal'
 const THEMES = [
   "deplayer", "deplayer-light", "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave",
   "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua",
-  "lofi", "pastel", "fantasy", "black", "luxury", "dracula",
+  "lofi", "fantasy", "black", "luxury", "dracula",
   "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee",
   "winter", "dim", "nord", "sunset", "teenage-engineering", "teenage-engineering-light"
 ] as const

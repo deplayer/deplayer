@@ -83,6 +83,7 @@ export default {
           "--player-bg": "#262626", // Solid background for player controls
           "--player-control-bg": "#333333", // Slightly lighter background for controls
           "--player-btn-radius": "3px", // Square player buttons
+          "--player-btn-inner-radius": "9999px", // Square player buttons
           "--player-btn-border": "2px solid #404040", // Visible button borders
           "--btn-text-case": "uppercase", // Uppercase text for buttons
           "--btn-text-color": "#FFFFFF", // White text for all buttons
@@ -141,7 +142,6 @@ export default {
       "forest",
       "aqua",
       "lofi",
-      "pastel",
       "fantasy",
       "black",
       "luxury",

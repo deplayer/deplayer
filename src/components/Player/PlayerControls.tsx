@@ -14,7 +14,7 @@ import { State as AppState } from '../../reducers/app'
 import Controls from './Controls'
 import Cover from './Cover'
 import ProgressBar from './ProgressBar'
-import Visualizer from './../Visualizer'
+import Visualizer from '../Visualizer'
 import WebtorrentPlayer from './CustomPlayers/WebtorrentPlayer'
 import PeerStreamPlayer from './CustomPlayers/PeerStreamPlayer'
 import DigitalScreen from './DigitalScreen'
@@ -201,14 +201,6 @@ class PlayerControls extends React.Component<Props> {
       }
     }
 
-    const visualizer = this.playerRef.current ? (
-      <Visualizer
-        playerRef={this.playerRef.current}
-        visualizerOnTop={this.props.player.fullscreen}
-      />
-    ) : null;
-
-
     if (currentPlaying.type === 'audio') {
       config.file.attributes['crossOrigin'] = 'anonymous'
     }
@@ -225,7 +217,7 @@ class PlayerControls extends React.Component<Props> {
 
     return (
       <React.Fragment>
-        {visualizer}
+        <Visualizer visualizerOnTop={this.props.player.fullscreen} />
         <div id="player" style={{ gridArea: 'player' }} className='before:content-[""] before:absolute before:inset-0 before:blur-sm before:bg-base-200/70'>
           <InPortal node={this.props.playerPortal}>
             <ReactPlayer

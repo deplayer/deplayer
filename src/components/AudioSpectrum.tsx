@@ -94,30 +94,112 @@ class AudioSpectrum extends React.Component<Props> {
   }
 
   initializeVisualizer = () => {
-    if (this.props.showVisuals) {
-      this.visualizer = butterchurn.createVisualizer(this.audioContext, this.visualsCanvas, {
-        width: this.props.width,
-        height: this.props.height
-      })
-      this.visualizer.connectAudio(this.analyser)
+    if (this.props.showVisuals && this.visualsCanvas && this.audioContext) {
+      try {
+        // Reset canvas to clean state
+        this.visualsCanvas.width = this.props.width
+        this.visualsCanvas.height = this.props.height
+
+        // Try WebGL2 first, then fallback to WebGL
+        let gl = this.visualsCanvas.getContext('webgl2', {
+          alpha: false,
+          antialias: true,
+          depth: true,
+          preserveDrawingBuffer: true,
+          stencil: true,
+          premultipliedAlpha: false,
+          powerPreference: 'high-performance'
+        })
+
+        if (!gl) {
+          gl = this.visualsCanvas.getContext('webgl', {
+            alpha: false,
+            antialias: true,
+            depth: true,
+            preserveDrawingBuffer: true,
+            stencil: true,
+            premultipliedAlpha: false,
+            powerPreference: 'high-performance'
+          })
+        }
+
+        if (!gl) {
+          console.error('WebGL not available')
+          return
+        }
+
+        // Clear any previous state
+        gl.viewport(0, 0, this.props.width, this.props.height)
+        gl.clear(gl.COLOR_BUFFER_BIT)
+
+        // Create visualizer with explicit context
+        this.visualizer = butterchurn.createVisualizer(this.audioContext, this.visualsCanvas, {
+          width: this.props.width,
+          height: this.props.height,
+          pixelRatio: window.devicePixelRatio || 1,
+          contextAttributes: {
+            alpha: false,
+            antialias: true,
+            depth: true,
+            preserveDrawingBuffer: true,
+            stencil: true,
+            premultipliedAlpha: false,
+            powerPreference: 'high-performance'
+          }
+        })
+
+        if (this.visualizer && this.analyser) {
+          this.visualizer.connectAudio(this.analyser)
+          this.drawVisuals()
+        }
+      } catch (err) {
+        console.error('Error setting up WebGL:', err)
+      }
     }
   }
 
   componentDidUpdate(prevProps: Props) {
-    if (prevProps.showSpectrum !== this.props.showSpectrum) {
-      this.prepareElements()
-      this.initializeVisualizer()
-      this.initAudioEvents(this.analyser)
-      if (this.props.showSpectrum) {
-        this.drawSpectrum(this.analyser)
+    if (prevProps.showSpectrum !== this.props.showSpectrum ||
+        prevProps.showVisuals !== this.props.showVisuals ||
+        prevProps.width !== this.props.width ||
+        prevProps.height !== this.props.height) {
+      
+      // First cleanup any existing visualizations
+      if (this.visualizer) {
+        try {
+          // Try to clean up old visualizer
+          this.visualizer = null
+        } catch (err) {
+          console.error('Error cleaning up old visualizer:', err)
+        }
       }
-    }
-    if (prevProps.showVisuals !== this.props.showVisuals) {
+
+      if (this.animationId) {
+        cancelAnimationFrame(this.animationId)
+        this.animationId = null
+      }
+
+      // Then prepare elements and reinitialize
       this.prepareElements()
-      this.initializeVisualizer()
-      this.initAudioEvents(this.analyser)
-      if (this.props.showVisuals) {
-        this.drawVisuals()
+      
+      // Only initialize if we have valid canvases
+      if ((this.props.showSpectrum && this.spectrumCanvas) || 
+          (this.props.showVisuals && this.visualsCanvas)) {
+        
+        if (!this.analyser && this.audioContext) {
+          this.analyser = this.setupAudioNode(this.props.playerRef)
+        }
+
+        if (this.props.showVisuals) {
+          this.initializeVisualizer()
+        }
+
+        if (this.props.showSpectrum && this.spectrumCanvas && this.analyser) {
+          this.initAudioEvents(this.analyser)
+          if (this.props.playerRef.paused === false) {
+            this.drawSpectrum(this.analyser)
+          }
+        }
       }
     }
   }
@@ -151,22 +233,34 @@ class AudioSpectrum extends React.Component<Props> {
   }
 
   drawVisuals = () => {
+    if (!this.visualizer || !this.props.showVisuals) return
+
     const startRender = () => {
-      this.visualizer.render()
-      requestAnimationFrame(() => startRender())
+      if (this.visualizer && this.props.showVisuals) {
+        try {
+          this.visualizer.render()
+          this.animationId = requestAnimationFrame(startRender)
+        } catch (err) {
+          console.error('Error in visualization render:', err)
+          this.visualizer = null
+          cancelAnimationFrame(this.animationId!)
+        }
+      }
     }
 
-    const presets = butterchurnPresets.getPresets()
-    const randomKey = Object.keys(presets)[Math.floor(Math.random() * Object.keys(presets).length)]
-    const preset = presets[randomKey]
+    try {
+      const presets = butterchurnPresets.getPresets()
+      const randomKey = Object.keys(presets)[Math.floor(Math.random() * Object.keys(presets).length)]
+      const preset = presets[randomKey]
 
-    if (this.visualizer) {
-      console.log('setting size of:', this.props.width, this.props.height)
       this.visualizer.setRendererSize(this.props.width, this.props.height)
-      this.visualizer.loadPreset(preset, 0.0) // 2nd argument is the number of seconds to blend presets
-    }
+      this.visualizer.loadPreset(preset, 0.0)
 
-    startRender()
+      startRender()
+    } catch (err) {
+      console.error('Error starting visualization:', err)
+      this.visualizer = null
+    }
   }
 
   drawSpectrum = (analyser: AnalyserNode) => {
@@ -262,10 +356,23 @@ class AudioSpectrum extends React.Component<Props> {
   }
 
   prepareElements = () => {
-    this.spectrumCanvas = document.getElementById(this.spectrumCanvasId)
-    console.log('spectrumCanvas', this.spectrumCanvas)
-    this.visualsCanvas = document.getElementById(this.visualsCanvasId)
-    console.log('visualsCanvas', this.visualsCanvas)
+    if (this.props.showSpectrum) {
+      this.spectrumCanvas = document.getElementById(this.spectrumCanvasId)
+      if (this.spectrumCanvas) {
+        this.spectrumCanvas.width = this.props.width
+        this.spectrumCanvas.height = this.props.height
+      }
+    }
+    
+    if (this.props.showVisuals) {
+      this.visualsCanvas = document.getElementById(this.visualsCanvasId)
+      if (this.visualsCanvas) {
+        // Remove any classes that might interfere with WebGL
+        this.visualsCanvas.className = 'fixed inset-0'
+        this.visualsCanvas.width = this.props.width
+        this.visualsCanvas.height = this.props.height
+      }
+    }
   }
 
   prepareAPIs = () => {
@@ -280,33 +387,20 @@ class AudioSpectrum extends React.Component<Props> {
   }
 
   render() {
-    const { showSpectrum, showVisuals } = this.props
-
-    const visualsClass = classnames({
-      fixed: true,
-      absolute: true,
-      'z-50': this.props.visualsOnTop,
-      'left-0': true,
-      'right-0': true,
-      'top-0': true,
-      'bottom-0': true,
-      'w-full': true,
-      'h-full': true
-    })
-
     return (
       <>
-        {showVisuals && (
+        {this.props.showVisuals && (
           <canvas
-            className={visualsClass}
+            className="fixed inset-0"
+            style={{ zIndex: this.props.visualsOnTop ? 50 : 1 }}
             id={this.visualsCanvasId}
             width={this.props.width}
             height={this.props.height}
           />
         )}
-        {showSpectrum && (
+        {this.props.showSpectrum && (
           <canvas
-            className='opacity-100'
+            className="opacity-100"
             style={{ zIndex: 101 }}
             id={this.spectrumCanvasId}
             width={this.props.width}

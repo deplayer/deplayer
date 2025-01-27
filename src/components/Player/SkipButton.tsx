@@ -8,15 +8,17 @@ type Props = {
 
 const SkipButton = (props: Props) => {
   return (
-    <Button
-      inverted
-      transparent
-      size='lg'
-      className='hover:bg-base hover:text-secondary text-primary bg-primary-content rounded-[var(--player-btn-radius)] border-[var(--player-btn-border)] w-12 h-10'
-      onClick={props.onClick}
-    >
-      {props.type === 'next' ? <Icon icon='faStepForward' /> : <Icon icon='faStepBackward' />}
-    </Button>
+    <div className='hover:border-primary p-1 bg-base-300 hover:bg-base-800 rounded-[var(--player-btn-radius)] border-[var(--player-btn-border)]'>
+      <Button
+        inverted
+        transparent
+        size='lg'
+        className='w-12 h-10 bg-base-content/40 hover:bg-base-content/80 rounded-full hover:text-secondary-focus text-secondary'
+        onClick={props.onClick}
+      >
+        {props.type === 'next' ? <Icon icon='faStepForward' /> : <Icon icon='faStepBackward' />}
+      </Button>
+    </div>
   )
 }
 

@@ -235,9 +235,10 @@ const ContextualMenu = (props: MenuProps) => {
           </Item>
         }
 
-        <Item>
-          <div className='flex justify-center w-full my-4'>
-            <Controls
+        {!props.player.showPlayer &&
+          <Item>
+            <div className='flex justify-center w-full my-4'>
+              <Controls
               showFullscreen={showFullscreen}
               toggleFullscreen={() => props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
               playPrev={() => props.dispatch({ type: types.PLAY_PREV })}
@@ -246,8 +247,9 @@ const ContextualMenu = (props: MenuProps) => {
               playPause={() => props.dispatch({ type: types.TOGGLE_PLAYING })}
               playNext={() => props.dispatch({ type: types.PLAY_NEXT })}
             />
-          </div>
-        </Item>
+            </div>
+          </Item>
+        }
       </Menu>
     </React.Fragment >
   )
