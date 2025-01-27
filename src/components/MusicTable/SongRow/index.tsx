@@ -25,13 +25,19 @@ export type Props = {
 }
 
 const SongCover = React.memo(({ cover, onClick, albumName }: { cover: Cover, onClick: () => void, albumName: string }) => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onClick()
+  }
+
   return (
     <div
       role='row'
       className='media-thumb relative mr-3 overflow-hidden'
       style={{ minWidth: '80px', height: '80px' }}
-      onClick={onClick}
+      onClick={handleClick}
       tabIndex={0}
+      data-testid="song-cover"
     >
       <CoverImage
         useImage={true}
@@ -59,9 +65,7 @@ const SongRow = (props: Props) => {
   const nonAvailable = <Translate value='song.row.na' />
 
   const onClick = () => {
-    if (slim) {
-      props.onClick()
-    }
+    props.onClick()
   }
 
   const shouldShowCover = !disableCovers && !slim && song.cover && mqlMatch
@@ -95,7 +99,7 @@ const SongRow = (props: Props) => {
             {song.artist ? song.artist.name : nonAvailable}
           </Link>
         </h6>
-        {props.slim || (
+        {props.slim && (
           <div className='inline-block text-base-content/60 text-sm'>{getDurationStr(song.duration)}</div>
         )}
       </div>

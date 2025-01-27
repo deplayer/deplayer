@@ -5,7 +5,8 @@ import Media from '../../entities/Media'
 
 type Props = {
   slim?: boolean,
-  song: Media
+  song: Media,
+  onClick?: () => void
 }
 
 const Cover = (props: Props) => {
@@ -30,6 +31,13 @@ const Cover = (props: Props) => {
     return null
   }
 
+  const handleClick = () => {
+    setIsModalOpen(true)
+    if (props.onClick) {
+      props.onClick()
+    }
+  }
+
   const albumName = props.song.album ? props.song.album.name : 'N/A'
 
   return (
@@ -37,7 +45,7 @@ const Cover = (props: Props) => {
       <div 
         className='show-cover relative text-lg hidden md:block h-full overflow-visible cursor-pointer' 
         style={{ width: '60px', height: '60px' }}
-        onClick={() => setIsModalOpen(true)}
+        onClick={handleClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         data-testid="cover-container"

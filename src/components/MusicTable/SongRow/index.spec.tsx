@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
 import { BrowserRouter as Router } from 'react-router-dom'
 import Media from '../../../entities/Media'
 import Artist from '../../../entities/Artist'
@@ -7,7 +7,8 @@ import Album from '../../../entities/Album'
 import SongRow from './index'
 import type { Props } from './index'
 
-const setup = () => {
+const setup = (overrideProps = {}) => {
+  const mockOnClick = vi.fn()
   const props: Props = {
     dispatch: (_action: any) => _action,
     song: new Media({
@@ -43,18 +44,31 @@ const setup = () => {
       nextSongId: null,
       prevSongId: null,
     },
-    onClick: () => { },
+    onClick: mockOnClick,
     isCurrent: false,
     style: {},
     disableAddButton: false,
+    disableCovers: false,
+    mqlMatch: true,
+    slim: false,
+    ...overrideProps
   }
 
-  render(<Router><SongRow {...props} /></Router>)
+  const utils = render(<Router><SongRow {...props} /></Router>)
+  return { ...utils, props, mockOnClick }
 }
 
 describe('SongRow', () => {
   it('should show render without errors', () => {
     setup()
     expect(screen.getByTestId('song-row')).toBeTruthy()
+  })
+
+  it('should trigger onClick when cover image is clicked', () => {
+    const { mockOnClick, container } = setup()
+    const coverElement = container.querySelector('[data-testid="song-cover"]')
+    expect(coverElement).toBeTruthy()
+    fireEvent.click(coverElement!)
+    expect(mockOnClick).toHaveBeenCalledTimes(1)
   })
 })
