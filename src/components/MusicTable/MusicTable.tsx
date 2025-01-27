@@ -177,7 +177,12 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
         return (
           <>
             <PlayAllButton dispatch={dispatch} />
-            {queue.currentPlaying && <PlayNextButton dispatch={dispatch} />}
+            {queue.currentPlaying && (
+              <PlayNextButton 
+                dispatch={dispatch} 
+                songs={tableIds.map(id => collection.rows[id]).filter(Boolean)} 
+              />
+            )}
           </>
         )
       default:

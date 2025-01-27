@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import { getSongs, getSongObjects } from './index'
+import { expectSaga } from 'redux-saga-test-plan'
+import { select } from 'redux-saga/effects'
+import * as types from '../../constants/ActionTypes'
+import { addToQueueNext } from './index'
 
 describe('Queue Saga', () => {
   const mockState = {
@@ -92,6 +96,46 @@ describe('Queue Saga', () => {
     it('should return empty array for empty input', () => {
       const result = getSongObjects(mockState, [])
       expect(result).toEqual([])
+    })
+  })
+
+  describe('addToQueueNext', () => {
+    it('should handle path-based queue next', () => {
+      const songIds = ['song1', 'song2']
+      const songs = [
+        { id: 'song1', title: 'Song 1' },
+        { id: 'song2', title: 'Song 2' }
+      ]
+
+      return expectSaga(addToQueueNext, { path: 'search-results' })
+        .provide([
+          [select(getSongs, { path: 'search-results' }), songIds],
+          [select(getSongObjects, songIds), songs]
+        ])
+        .put({ type: types.ADD_TO_QUEUE_NEXT, songs })
+        .run()
+    })
+
+    it('should not dispatch if no songs found', () => {
+      return expectSaga(addToQueueNext, { path: 'search-results' })
+        .provide([
+          [select(getSongs, { path: 'search-results' }), []],
+          [select(getSongObjects, []), []]
+        ])
+        .not.put.actionType(types.ADD_TO_QUEUE_NEXT)
+        .run()
+    })
+
+    it('should not process if songs are already provided', () => {
+      const songs = [
+        { id: 'song1', title: 'Song 1' },
+        { id: 'song2', title: 'Song 2' }
+      ]
+
+      return expectSaga(addToQueueNext, { songs })
+        .not.call.fn(getSongs)
+        .not.call.fn(getSongObjects)
+        .run()
     })
   })
 }) 

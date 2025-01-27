@@ -90,6 +90,77 @@ describe('queue reducer', () => {
     expect(reducer(props, { type: types.RECEIVE_QUEUE, queue: { ...props, trackIds: ['1234', '4321'] } }))
       .toEqual(props)
   })
+
+  describe('ADD_TO_QUEUE_NEXT', () => {
+    it('should do nothing if no current playing song', () => {
+      const initialState = {
+        ...defaultState,
+        trackIds: ['song1', 'song2']
+      }
+
+      const result = reducer(initialState, {
+        type: types.ADD_TO_QUEUE_NEXT,
+        songs: [{ id: 'song3' }]
+      })
+
+      expect(result).toEqual(initialState)
+    })
+
+    it('should add songs after current playing song in normal mode', () => {
+      const initialState = {
+        ...defaultState,
+        trackIds: ['song1', 'song2', 'song3'],
+        currentPlaying: 'song2'
+      }
+
+      const result = reducer(initialState, {
+        type: types.ADD_TO_QUEUE_NEXT,
+        songs: [{ id: 'song4' }, { id: 'song5' }]
+      })
+
+      expect(result.trackIds).toEqual(['song1', 'song2', 'song4', 'song5', 'song3'])
+      expect(result.nextSongId).toBe('song4')
+      expect(result.prevSongId).toBe('song1')
+    })
+
+    it('should add songs after current playing song in shuffle mode', () => {
+      const initialState = {
+        ...defaultState,
+        trackIds: ['song1', 'song2', 'song3'],
+        randomTrackIds: ['song2', 'song3', 'song1'],
+        currentPlaying: 'song2',
+        shuffle: true
+      }
+
+      const result = reducer(initialState, {
+        type: types.ADD_TO_QUEUE_NEXT,
+        songs: [{ id: 'song4' }, { id: 'song5' }]
+      })
+
+      // Check both normal and random queues
+      expect(result.trackIds).toEqual(['song1', 'song2', 'song4', 'song5', 'song3'])
+      expect(result.randomTrackIds).toEqual(['song2', 'song4', 'song5', 'song3', 'song1'])
+      expect(result.nextSongId).toBe('song4')
+      expect(result.prevSongId).toBe(undefined)
+    })
+
+    it('should handle duplicate songs', () => {
+      const initialState = {
+        ...defaultState,
+        trackIds: ['song1', 'song2', 'song3'],
+        currentPlaying: 'song2'
+      }
+
+      const result = reducer(initialState, {
+        type: types.ADD_TO_QUEUE_NEXT,
+        songs: [{ id: 'song2' }, { id: 'song4' }]
+      })
+
+      expect(result.trackIds).toEqual(['song1', 'song2', 'song4', 'song3'])
+      expect(result.nextSongId).toBe('song4')
+      expect(result.prevSongId).toBe('song1')
+    })
+  })
 })
 
 describe('Queue Reducer', () => {

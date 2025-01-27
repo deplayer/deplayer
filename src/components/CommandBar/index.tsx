@@ -557,7 +557,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
                         )}
                       </div>
                       <div className="flex flex-col items-start justify-center min-w-0">
-                        <span className="text-lg truncate w-full">{item.name}</span>
+                        <span className="text-lg truncate w-full text-left">{item.name}</span>
                         <span className="text-sm opacity-60">
                           {'category' in item ? item.category : item.type}
                           {item.type === 'command' && item.shortcut && (

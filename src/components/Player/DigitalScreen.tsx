@@ -33,8 +33,7 @@ const DigitalScreen = (props: DigitalScreenProps) => {
               </Link>
               {currentPlaying.artist && (
                 <Link to={`/artist/${currentPlaying.artist.id}`} 
-                      className='text-base-content/70 hover:text-primary-focus truncate digital-font pointer-events-auto
-                               [text-shadow:0_0_1px_theme(colors.base-content)]'>
+                      className='text-base-content/70 hover:text-primary-focus truncate digital-font pointer-events-auto uppercase'>
                   <span className='text-l tracking-widest'>{currentPlaying.artist.name}</span>
                 </Link>
               )}

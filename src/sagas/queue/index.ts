@@ -66,6 +66,21 @@ export function* playAll(action: any): any {
   }
 }
 
+// Handling addToQueueNext saga
+export function* addToQueueNext(action: any): any {
+  if (!action.songs && action.path) {
+    logger.log('queue-saga', 'addToQueueNext action:', action)
+    const songIds = yield select(getSongs, action)
+    logger.log('queue-saga', 'song ids to add next:', songIds)
+
+    if (songIds.length) {
+      const songs = yield select(getSongObjects, songIds)
+      logger.log('queue-saga', 'song objects to add next:', songs)
+      yield put({ type: types.ADD_TO_QUEUE_NEXT, songs })
+    }
+  }
+}
+
 const adapter = getAdapter()
 const queueService = new QueueService(adapter)
 
@@ -102,6 +117,7 @@ export default function* queueSaga(): any {
   yield takeLatest(types.INITIALIZED, initialize)
   yield takeLatest(types.ADD_ALBUM_TO_QUEUE, addAlbumToQueue)
   yield takeLatest(types.PLAY_ALL, playAll)
+  yield takeLatest(types.ADD_TO_QUEUE_NEXT, addToQueueNext)
   yield takeLatest([
     types.SHUFFLE,
     types.REPEAT,

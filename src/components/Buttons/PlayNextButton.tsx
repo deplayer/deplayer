@@ -21,7 +21,7 @@ const PlayNextButton = (props: Props) => {
   const { dispatch, songs, transparent = true, fullWidth = false, alignLeft = false, className = '' } = props
 
   const playNext = () => {
-    if (songs) {
+    if (songs && songs.length > 0) {
       // If songs are provided directly, use them
       dispatch({ type: ADD_TO_QUEUE_NEXT, songs })
     } else {
