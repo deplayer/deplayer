@@ -2,9 +2,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
 
-import { Repl } from '@electric-sql/pglite-repl'
-
-import { getClient } from '../../services/database/PgliteDatabase'
 import Button from '../common/Button'
 import Importer from '../Importer'
 import MainContainer from '../common/MainContainer'
@@ -44,15 +41,6 @@ const Settings: React.FC = () => {
 
   const settingsForm = settings.settingsForm
   const ImporterComp = showImporter ? <Importer onLoaded={importCollection} /> : null
-  const pg = getClient()
-
-  if (!pg) {
-    return (
-      <CenteredMessage>
-        <div>Loading...</div>
-      </CenteredMessage>
-    )
-  }
 
   return (
     <MainContainer centerContents>
@@ -64,13 +52,6 @@ const Settings: React.FC = () => {
             settings={settings}
             dispatch={dispatch}
           />
-          <div className='pt-10'>
-            <h2 className='text-2xl py-3 text-base-content'><Translate value="labels.pgliteRepl" /></h2>
-            <p className='text-base-content'>
-              <Translate value="labels.pgliteReplDescription" />
-            </p>
-            <Repl pg={pg} />
-          </div>
 
           <div className='my-12'>
             <h2 className='text-2xl py-3 text-base-content'><Translate value="labels.actions" /></h2>

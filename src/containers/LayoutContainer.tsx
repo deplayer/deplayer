@@ -11,15 +11,31 @@ import type { State } from '../reducers'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
 import RightPanelContainer from './RightPanelContainer'
+import ButterchurnVisualizer from '../components/ButterchurnVisualizer'
+import PlayerRefService from '../services/PlayerRefService'
+import type { State as PlayerState } from '../reducers/player'
 
 interface LayoutProps {
   backgroundImage: string,
   dispatch: Dispatch,
   app: AppState,
+  player: PlayerState,
   children: React.ReactNode
 }
 
 function Layout(props: LayoutProps) {
+  const getInternalPlayer = () => {
+    const playerRef = PlayerRefService.getInstance().getPlayerRef()
+    if (!playerRef?.current) return null
+    const internalPlayer = playerRef.current.getInternalPlayer()
+    if (internalPlayer instanceof HTMLAudioElement) {
+      return internalPlayer
+    }
+    return null
+  }
+
+  const internalPlayer = getInternalPlayer()
+
   const background = props.backgroundImage && (
     <>
       <div className='bg-handler before:bg-base-200/70'></div>
@@ -46,6 +62,15 @@ function Layout(props: LayoutProps) {
         <Placeholder mqlMatch={props.app.mqlMatch} />
       </SidebarContainer>
       <RightPanelContainer />
+      {internalPlayer && props.app.showVisuals && (
+        <ButterchurnVisualizer
+          playerRef={internalPlayer}
+          fullscreen={props.player.fullscreen}
+          width={window.innerWidth}
+          height={window.innerHeight}
+          dispatch={props.dispatch}
+        />
+      )}
     </>
   )
 }

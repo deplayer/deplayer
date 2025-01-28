@@ -7,12 +7,14 @@ import { State as CollectionState } from '../../reducers/collection'
 import { State as QueueState } from '../../reducers/queue'
 import { State as AppState } from '../../reducers/app'
 import { State as PlaylistState } from '../../reducers/playlist'
+import { State as PlayerState } from '../../reducers/player'
 
 type Props = {
   sidebarToggled: boolean,
   mqlMatch: boolean,
   collection: CollectionState,
   queue: QueueState,
+  player: PlayerState,
   app: AppState,
   playlist: PlaylistState,
   children: React.ReactNode,
@@ -23,6 +25,7 @@ function MSidebar({
   app,
   collection,
   queue,
+  player,
   playlist,
   sidebarToggled,
   mqlMatch,
@@ -45,7 +48,7 @@ function MSidebar({
       playlist={playlist}
       onSetSidebarOpen={onSetSidebarOpen}
       dispatch={dispatch}
-      className={queue.currentPlaying ? 'pb-20' : ''}
+      className={(player.playing && player.streamUri) ? 'pb-20' : ''}
     />
   )
 

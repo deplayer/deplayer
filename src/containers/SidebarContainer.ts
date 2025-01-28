@@ -11,6 +11,7 @@ export default connect((state: State) => {
     playlist: state.playlist,
     app: state.app,
     queue: state.queue,
+    player: state.player,
     sidebarToggled: state.app.sidebarToggled
   }
 })(Sidebar)

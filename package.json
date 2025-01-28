@@ -15,8 +15,9 @@
     "db:generate": "drizzle-kit generate && npx tsx ./bin/compile-migrations.ts"
   },
   "dependencies": {
-    "@electric-sql/pglite": "^0.2.8",
-    "@electric-sql/pglite-sync": "^0.2.13",
+    "@electric-sql/pglite": "^0.2.16",
+    "@electric-sql/pglite-repl": "^0.2.16",
+    "@electric-sql/pglite-sync": "^0.2.18",
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@happy-js/happy-opfs": "npm:@jsr/happy-js__happy-opfs@^1.8.4",
     "@jellyfin/sdk": "^0.11.0",
@@ -32,7 +33,6 @@
     "redux-first-history": "^5.2.0"
   },
   "devDependencies": {
-    "@electric-sql/pglite-repl": "^0.2.7",
     "@fortawesome/free-brands-svg-icons": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.1",

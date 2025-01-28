@@ -1,6 +1,7 @@
 import PlayPauseButton from './PlayPauseButton'
 import SkipButton from './SkipButton'
 import FullscreenButton from './FullscreenButton'
+import { useDispatch } from 'react-redux'
 
 type ControlProps = {
   playPrev: () => void,
@@ -13,6 +14,8 @@ type ControlProps = {
 }
 
 const Controls = (props: ControlProps) => {
+  const dispatch = useDispatch()
+
   return (
     <>
       {props.mqlMatch &&
@@ -31,6 +34,7 @@ const Controls = (props: ControlProps) => {
       />
       { props.showFullscreen &&
         <FullscreenButton
+          dispatch={dispatch}
           onClick={props.toggleFullscreen}
         />
       }

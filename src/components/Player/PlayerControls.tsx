@@ -5,7 +5,7 @@ import ReactPlayer from 'react-player'
 import classNames from 'classnames'
 import { CSSTransition } from 'react-transition-group'
 import { InPortal, OutPortal } from 'react-reverse-portal'
-
+import SpectrumVisualizer from '../SpectrumVisualizer'
 import { State as PlayerState } from '../../reducers/player'
 import { State as SettingsState } from '../../reducers/settings'
 import { State as CollectionState } from '../../reducers/collection'
@@ -14,7 +14,6 @@ import { State as AppState } from '../../reducers/app'
 import Controls from './Controls'
 import Cover from './Cover'
 import ProgressBar from './ProgressBar'
-import Visualizer from '../Visualizer'
 import WebtorrentPlayer from './CustomPlayers/WebtorrentPlayer'
 import PeerStreamPlayer from './CustomPlayers/PeerStreamPlayer'
 import DigitalScreen from './DigitalScreen'
@@ -154,6 +153,15 @@ class PlayerControls extends React.Component<Props> {
     }
   }
 
+  getInternalPlayer = (): HTMLAudioElement | null => {
+    if (!this.playerRef.current) return null
+    const internalPlayer = this.playerRef.current.getInternalPlayer()
+    if (internalPlayer instanceof HTMLAudioElement) {
+      return internalPlayer
+    }
+    return null
+  }
+
   render() {
     const {
       playedSeconds,
@@ -215,9 +223,10 @@ class PlayerControls extends React.Component<Props> {
       'backdrop-blur': this.props.player.fullscreen
     })
 
+    const internalPlayer = this.getInternalPlayer()
+
     return (
       <React.Fragment>
-        <Visualizer visualizerOnTop={this.props.player.fullscreen} />
         <div id="player" style={{ gridArea: 'player' }} className='before:content-[""] before:absolute before:inset-0 before:blur-sm before:bg-base-200/70'>
           <InPortal node={this.props.playerPortal}>
             <ReactPlayer
@@ -282,7 +291,7 @@ class PlayerControls extends React.Component<Props> {
                   <div className='flex flex-initial items-center justify-between min-w-0 max-w-full w-full' style={{ zIndex: 150 }}>
                     <Cover song={currentPlaying} />
                     <div className='flex justify-between items-center w-full'>
-                      <div className='flex flex-col w-full'>
+                      <div className='flex w-full'>
                         <DigitalScreen
                           playedSeconds={playedSeconds}
                           duration={duration}
@@ -290,6 +299,25 @@ class PlayerControls extends React.Component<Props> {
                           repeat={this.props.queue.repeat}
                           shuffle={this.props.queue.shuffle}
                         />
+                        {(internalPlayer && this.props.app.showSpectrum) && (
+                          <div className='mr-4 hidden md:block'>
+                            <SpectrumVisualizer
+                              width={100}
+                              height={40}
+                              capColor={'red'}
+                              capHeight={2}
+                              meterWidth={2}
+                              meterCount={40}
+                              playerRef={internalPlayer}
+                              meterColor={[
+                                { stop: 0, color: '#f00' },
+                                { stop: 0.5, color: '#0CD7FD' },
+                                { stop: 1, color: '#ecc94b' }
+                              ]}
+                              gap={1}
+                            />
+                          </div>
+                        )}
                       </div>
                       <div className='player-tools flex justify-center items-center'>
                         <Controls

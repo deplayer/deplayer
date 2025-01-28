@@ -191,8 +191,6 @@ export default (state: State = defaultState, action: any = {}): State => {
         ? state.randomTrackIds.filter(id => id !== songId)
         : state.randomTrackIds;
       
-      const activeQueue = state.shuffle ? newRandomTrackIds : newTrackIds;
-      
       // Only update current playing if we're removing the current song
       const isCurrentSong = state.currentPlaying === songId;
       const newCurrentPlaying = isCurrentSong ? null : state.currentPlaying;
