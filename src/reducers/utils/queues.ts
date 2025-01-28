@@ -1,16 +1,16 @@
 // Get sibling songs ids to know which is the next and prev song
-export const getSiblingSong = (trackIds: Array<string>, song: string, next = false): string | undefined => {
+export const getSiblingSong = (trackIds: Array<string>, song: string, next = false): string | null => {
   if (!trackIds || !song || trackIds.length === 0) {
-    return undefined;
+    return null;
   }
 
   const position = trackIds.indexOf(song);
   if (position === -1) {
-    return undefined;
+    return null;
   }
 
   const nextIndex = position + (next ? 1 : -1);
-  return trackIds[nextIndex];
+  return trackIds[nextIndex] || null;
 }
 
 export const extractField = (song: any, field: any) => {

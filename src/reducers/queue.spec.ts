@@ -52,7 +52,7 @@ describe('queue reducer', () => {
         ...props,
         trackIds,
         currentPlaying: '1234',
-        prevSongId: undefined,
+        prevSongId: null,
         nextSongId: '4321'
       })
   })
@@ -141,7 +141,7 @@ describe('queue reducer', () => {
       expect(result.trackIds).toEqual(['song1', 'song2', 'song4', 'song5', 'song3'])
       expect(result.randomTrackIds).toEqual(['song2', 'song4', 'song5', 'song3', 'song1'])
       expect(result.nextSongId).toBe('song4')
-      expect(result.prevSongId).toBe(undefined)
+      expect(result.prevSongId).toBe(null)
     })
 
     it('should handle duplicate songs', () => {
@@ -397,7 +397,7 @@ describe('Queue Reducer', () => {
 
       // Check next/prev are correct based on random queue
       expect(result.nextSongId).toBe('song1')
-      expect(result.prevSongId).toBe(undefined)
+      expect(result.prevSongId).toBe(null)
     })
 
     it('should handle duplicate songs', () => {
