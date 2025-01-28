@@ -17,14 +17,17 @@ export default class SettingsBuilder {
     const providerFields = Object.keys(providers).reduce(
       (accumulator: any, providerId: string) => {
         const providerType = providerId.replace(/[0-9]/g, "");
-        const providerNum = Object.keys(providers).indexOf(providerId) || 0;
 
         if (!providerBuilders[providerType]) {
           return accumulator;
         }
 
+        // Extract the numeric suffix if it exists
+        const numMatch = providerId.match(/\d+$/);
+        const providerNum = numMatch ? numMatch[0] : "";
+
         accumulator[providerId] = providerBuilders[providerType].getFormSchema(
-          providerNum.toString()
+          providerNum
         );
 
         return accumulator;

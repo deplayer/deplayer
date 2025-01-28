@@ -18,11 +18,24 @@ type Props = {
 
 const Providers = (props: Props) => {
   const handleSubmit = (values: any, actions: any) => {
-    props.dispatch({ type: types.SAVE_SETTINGS, settingsPayload: values })
+    const settingsPayload = {
+      ...props.settings.settings,
+      providers: values.providers
+    }
+    props.dispatch({ type: types.SAVE_SETTINGS, settingsPayload })
     actions.setSubmitting(false)
   }
 
-  const providers = Object.keys(props.settings.settingsForm.providers).map((providerKey) => {
+  // Get unique provider types (remove numeric suffixes)
+  const getProviderType = (key: string) => key.replace(/[0-9]+$/, '')
+  const uniqueProviders = Array.from(
+    new Set(
+      Object.keys(props.settings.settingsForm.providers)
+        .map(getProviderType)
+    )
+  )
+
+  const providers = uniqueProviders.map((providerKey) => {
     return (
       <ProviderForm
         key={providerKey}
@@ -52,31 +65,35 @@ const Providers = (props: Props) => {
           </div>
 
           <Formik
-            initialValues={props.settings.settings}
+            initialValues={{
+              providers: props.settings.settings.providers || {}
+            }}
             onSubmit={handleSubmit}
             enableReinitialize
-          >{({ isSubmitting }) => (
-            <Form
-              className='settings-form'
-            >
-              <div className='flex flex-wrap'>
-                {providers}
-              </div>
+          >
+            {({ isSubmitting }) => (
+              <Form
+                className='settings-form'
+              >
+                <div className='flex flex-wrap'>
+                  {providers}
+                </div>
 
-              <div className='w-full flex justify-end mt-12'>
-                {!!providers.length && (
-                  <div className='max-w-xs'>
-                    <Button
-                      {...settingsButton}
-                      disabled={isSubmitting}
-                      type='submit'
-                    >
-                      <Translate value="buttons.save" />
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </Form>)}
+                <div className='w-full flex justify-end mt-12'>
+                  {!!providers.length && (
+                    <div className='max-w-xs'>
+                      <Button
+                        {...settingsButton}
+                        disabled={isSubmitting}
+                        type='submit'
+                      >
+                        <Translate value="buttons.save" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </Form>
+            )}
           </Formik>
         </div>
       </CenteredMessage>

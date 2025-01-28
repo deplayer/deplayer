@@ -32,17 +32,33 @@ const ProviderForm = (props: ProviderFormProps) => {
     )
   }
 
-  return (
-    <div key={props.providerKey} className={`${settingsCard} w-full`}>
-      <div className='top-2 right-2 absolute'>
-        <RemoveProviderBtn
-          providerKey={props.providerKey}
-          dispatch={props.dispatch}
-        />
-      </div>
+  // Get all instances of this provider type from the actual settings
+  const providerInstances = Object.keys(props.settings.settings.providers)
+    .filter(key => key.startsWith(props.providerKey))
 
-      <FormSchema providerKey={props.providerKey} schema={props.settings.settingsForm.providers[props.providerKey]} />
-    </div>
+  // Only render forms for providers that exist in both settings and form schema
+  const validInstances = providerInstances.filter(
+    key => props.settings.settingsForm.providers[key]
+  )
+
+  return (
+    <>
+      {validInstances.map(instanceKey => (
+        <div key={instanceKey} className={`${settingsCard} w-full`}>
+          <div className='top-2 right-2 absolute'>
+            <RemoveProviderBtn
+              providerKey={instanceKey}
+              dispatch={props.dispatch}
+            />
+          </div>
+
+          <FormSchema 
+            providerKey={instanceKey} 
+            schema={props.settings.settingsForm.providers[instanceKey]} 
+          />
+        </div>
+      ))}
+    </>
   )
 }
 

@@ -32,21 +32,29 @@ export function* initialize(): Generator<any, void, any> {
   }
 }
 
-function* saveSettings(action: any): Generator<any, void, any> {
+export function* saveSettings(action: any): Generator<any, void, any> {
   const adapter = getAdapter();
   const settingsService = new SettingsService(adapter);
   try {
+    // Get previous settings to preserve app section if not provided
+    const prevSettings = yield select(getSettings);
+    const settingsToSave = {
+      ...prevSettings,
+      ...action.settingsPayload,
+      app: {
+        ...prevSettings.app,
+        ...(action.settingsPayload.app || {})
+      }
+    };
+
     const settings = yield call(
       settingsService.save,
       "settings",
-      action.settingsPayload
+      settingsToSave
     );
 
-    // Get previous settings to check if sync settings changed
-    const prevSettings = yield select(getSettings);
-    const prevSync = prevSettings.app.sync || {};
-
-    const newSync = action.settingsPayload.app.sync || {};
+    // Get sync settings
+    const newSync = settingsToSave.app.sync || {};
 
     // Store sync settings in localStorage
     if (newSync) {
@@ -62,8 +70,8 @@ function* saveSettings(action: any): Generator<any, void, any> {
 
     // If sync settings changed, reconnect the database
     if (
-      prevSync.enabled !== newSync.enabled ||
-      prevSync.serverUrl !== newSync.serverUrl
+      prevSettings.app?.sync?.enabled !== newSync.enabled ||
+      prevSettings.app?.sync?.serverUrl !== newSync.serverUrl
     ) {
       yield call(reconnect);
     }
