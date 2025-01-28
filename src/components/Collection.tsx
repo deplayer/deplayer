@@ -7,9 +7,6 @@ import { useLocation } from 'react-router'
 import { Location } from 'react-router'
 import CenteredMessage from './common/CenteredMessage'
 import TryDemoButton from './Buttons/TryDemoButton'
-import defaultMedia from '../constants/defaultMedia'
-import Button from './common/Button'
-import * as types from '../constants/ActionTypes'
 
 type Props = {
   app: any,
@@ -41,13 +38,6 @@ const Collection = (props: Props) => {
 
   const location = useLocation()
   const mediaItems = mediaForPath(location, props)
-
-  const handleTryDemo = () => {
-    // First update the collection state immediately
-    props.dispatch({ type: types.RECEIVE_COLLECTION, data: [defaultMedia] })
-    // Finally set it as current playing
-    props.dispatch({ type: types.SET_CURRENT_PLAYING, songId: defaultMedia.id, media: defaultMedia })
-  }
 
   return (
     <div className="collection z-10 flex">

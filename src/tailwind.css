@@ -7,6 +7,16 @@
 @tailwind utilities;
 @tailwind responsive;
 
+root {
+  --player-btn-radius: 9999px;
+  --player-btn-inner-radius: 9999px;
+  --player-btn-border: 0px;
+  --player-screen-bg: rgba(0, 0, 0, 0);
+  --player-screen-radius: 0px;
+  --player-screen-border: 0px;
+  --player-screen-shadow: none;
+}
+
 .digital-font {
   font-family: 'DSEG14 Classic', monospace;
   text-shadow: 0 0 1px rgba(255, 255, 255, 0.6);
@@ -20,16 +30,10 @@
 }
 
 .digital-screen {
-  @apply bg-base-300;
-  @apply shadow-inner;
-  @apply border border-base-content/20;
-  @apply rounded;
-}
-
-root {
-  --player-btn-radius: 9999px;
-  --player-btn-inner-radius: 9999px;
-  --player-btn-border: 0px;
+  background: var(--player-screen-bg);
+  border: var(--player-screen-border);
+  box-shadow: var(--player-screen-shadow);
+  border-radius: var(--player-screen-radius);
 }
 
 .markdown {

@@ -1,5 +1,4 @@
 import { Translate } from 'react-redux-i18n'
-import { useFormikContext } from 'formik'
 import FormField, { TYPES } from './FormField'
 import SyncButton from '../Buttons/SyncButton'
 import { FormField as FormFieldType } from '../../types/forms'

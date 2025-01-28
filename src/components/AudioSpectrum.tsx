@@ -5,7 +5,6 @@
 import * as React from 'react'
 import butterchurn from 'butterchurn'
 import butterchurnPresets from 'butterchurn-presets'
-import classnames from 'classnames'
 
 import logger from '../utils/logger'
 

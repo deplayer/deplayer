@@ -68,7 +68,7 @@ const WelcomeMessage = ({ dispatch, rows }: { dispatch: Dispatch, rows: Record<s
             To start playing some content follow one of the steps below:
           </p>
           { Object.keys(rows).length === 0 && (
-            <div className='mb-6'>
+            <div className='mb-6 flex justify-center'>
               <TryDemoButton dispatch={dispatch} />
             </div>
           )}

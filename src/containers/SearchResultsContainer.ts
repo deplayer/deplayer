@@ -8,6 +8,8 @@ export default connect(
     queue: state.queue,
     player: state.player,
     collection: state.collection,
-    visibleSongs: state.collection.searchResults
+    visibleSongs: state.collection.searchResults,
+    playlist: state.playlist,
+    filteredSongs: state.collection.searchResults
   })
 )(Collection)

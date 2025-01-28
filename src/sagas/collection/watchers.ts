@@ -5,7 +5,6 @@ import { getAdapter } from "../../services/database";
 import { initialize } from "../settings";
 import CollectionService from "../../services/CollectionService";
 import * as types from "../../constants/ActionTypes";
-import defaultMedia from "../../constants/defaultMedia";
 
 const adapter = getAdapter();
 const collectionService = new CollectionService(adapter);

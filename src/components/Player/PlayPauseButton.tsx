@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import Button from '../common/Button'
 import Icon from '../common/Icon'
 
@@ -10,7 +8,7 @@ type Props = {
 
 const PlayPauseButton = (props: Props) => {
   return (
-    <div className='hover:border-primary rounded-[var(--player-btn-radius)] border-[var(--player-btn-border)] mx-1'>
+    <div className='hover:border-primary rounded-[var(--player-btn-radius)] border-[var(--player-btn-border)]'>
       <Button
         transparent
         inverted

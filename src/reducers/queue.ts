@@ -61,13 +61,15 @@ const setCurrentPlaying = (state: State, action: { songId: string }) => {
       )
     : state.randomTrackIds;
 
+  const activeQueue = state.shuffle ? newRandomTrackIds : newTrackIds;
+
   return {
     ...state,
     trackIds: newTrackIds,
     randomTrackIds: newRandomTrackIds,
     currentPlaying: action.songId,
-    prevSongId: getSiblingSong(newTrackIds, action.songId),
-    nextSongId: getSiblingSong(newTrackIds, action.songId, true),
+    prevSongId: getSiblingSong(activeQueue, action.songId) || null,
+    nextSongId: getSiblingSong(activeQueue, action.songId, true) || null,
   };
 };
 
@@ -139,64 +141,75 @@ export default (state: State = defaultState, action: any = {}): State => {
       const newIds = action.songs.map((song: Media) => song.id);
 
       // Handle both normal and shuffle queues
-      const currPosition = state.shuffle 
+      const currPosition = currentTrackIds.indexOf(state.currentPlaying);
+      const currRandomPosition = state.shuffle 
         ? currentRandomTrackIds.indexOf(state.currentPlaying)
-        : currentTrackIds.indexOf(state.currentPlaying);
+        : -1;
 
       // Insert new songs after current playing song in both queues
       const newTrackIds = [...currentTrackIds];
-      const newRandomTrackIds = [...currentRandomTrackIds];
-
-      // Always update the normal queue
       newTrackIds.splice(currPosition + 1, 0, ...newIds);
       const deduplicatedTrackIds = Array.from(new Set(newTrackIds));
 
       // If shuffle is enabled, also update the random queue in the same way
+      let deduplicatedRandomTrackIds = currentRandomTrackIds;
       if (state.shuffle) {
-        newRandomTrackIds.splice(currPosition + 1, 0, ...newIds);
+        const newRandomTrackIds = [...currentRandomTrackIds];
+        newRandomTrackIds.splice(currRandomPosition + 1, 0, ...newIds);
+        deduplicatedRandomTrackIds = Array.from(new Set(newRandomTrackIds));
       }
 
-      const deduplicatedRandomTrackIds = Array.from(new Set(newRandomTrackIds));
       const activeQueue = state.shuffle ? deduplicatedRandomTrackIds : deduplicatedTrackIds;
 
       return {
         ...state,
         trackIds: deduplicatedTrackIds,
         randomTrackIds: deduplicatedRandomTrackIds,
-        currentPlaying: state.currentPlaying,
-        prevSongId: getSiblingSong(activeQueue, state.currentPlaying),
-        nextSongId: getSiblingSong(activeQueue, state.currentPlaying, true),
+        nextSongId: getSiblingSong(activeQueue, state.currentPlaying, true) || null,
+        prevSongId: getSiblingSong(activeQueue, state.currentPlaying) || null,
       };
     }
 
     case types.REMOVE_FROM_QUEUE: {
-      const songToRemove = action.song || (Array.isArray(action.data) ? action.data[0] : action.data)
-      if (!songToRemove) {
-        return state
+      const songToRemove = action.song || (Array.isArray(action.data) ? action.data[0] : action.data);
+      if (!songToRemove || !songToRemove.id) {
+        return state;
       }
 
       // Remove from trackIds
-      const newTrackIds = state.trackIds.filter(id => id !== songToRemove.id)
+      const newTrackIds = state.trackIds.filter(id => id !== songToRemove.id);
       
       // Remove from randomTrackIds only if in shuffle mode
       const newRandomTrackIds = state.shuffle 
         ? state.randomTrackIds.filter(id => id !== songToRemove.id)
-        : state.randomTrackIds
+        : state.randomTrackIds;
 
       // Use the active queue based on shuffle state
-      const activeQueue = state.shuffle ? newRandomTrackIds : newTrackIds
+      const activeQueue = state.shuffle ? newRandomTrackIds : newTrackIds;
 
-      // Update next and prev song IDs based on current playing song
-      const nextSongId = state.currentPlaying ? (getSiblingSong(activeQueue, state.currentPlaying, true) || null) : null
-      const prevSongId = state.currentPlaying ? (getSiblingSong(activeQueue, state.currentPlaying) || null) : null
+      // Only update current playing if we're removing the current song
+      const isCurrentSong = state.currentPlaying === songToRemove.id;
 
+      // If we're removing the current playing song, make the next song the current playing
+      if (isCurrentSong) {
+        return {
+          ...state,
+          trackIds: newTrackIds,
+          randomTrackIds: newRandomTrackIds,
+          currentPlaying: state.nextSongId,
+          nextSongId: state.nextSongId ? getSiblingSong(activeQueue, state.nextSongId, true) || null : null,
+          prevSongId: state.nextSongId ? getSiblingSong(activeQueue, state.nextSongId) || null : null,
+        };
+      }
+
+      // If we're not removing the current playing song, just update the next/prev based on the new queue
       return {
         ...state,
         trackIds: newTrackIds,
         randomTrackIds: newRandomTrackIds,
-        nextSongId,
-        prevSongId
-      }
+        nextSongId: state.currentPlaying ? getSiblingSong(activeQueue, state.currentPlaying, true) || null : null,
+        prevSongId: state.currentPlaying ? getSiblingSong(activeQueue, state.currentPlaying) || null : null,
+      };
     }
 
     case types.ADD_SONGS_TO_QUEUE_BY_ID:
@@ -214,15 +227,15 @@ export default (state: State = defaultState, action: any = {}): State => {
 
     case types.ADD_SONGS_TO_QUEUE:
       if (action.replace) {
-        const newTrackIds = action.songs.map((song: Media) => song.id)
+        const newTrackIds = action.songs.map((song: Media) => song.id);
         return {
           ...state,
           trackIds: newTrackIds,
           randomTrackIds: state.shuffle ? shuffleArray(newTrackIds) : [],
           currentPlaying: null,
           nextSongId: newTrackIds.length > 0 ? newTrackIds[0] : null,
-          prevSongId: null
-        }
+          prevSongId: null,
+        };
       }
 
       const updatedTrackIds = Array.from(
@@ -230,19 +243,19 @@ export default (state: State = defaultState, action: any = {}): State => {
           ...state.trackIds,
           ...action.songs.map((song: Media) => song.id),
         ])
-      )
+      );
 
       return {
         ...state,
         trackIds: updatedTrackIds,
         randomTrackIds: state.shuffle ? shuffleArray(updatedTrackIds) : state.randomTrackIds,
         nextSongId: state.currentPlaying 
-          ? getSiblingSong(updatedTrackIds, state.currentPlaying, true)
+          ? getSiblingSong(updatedTrackIds, state.currentPlaying, true) || null
           : updatedTrackIds[0],
         prevSongId: state.currentPlaying
-          ? getSiblingSong(updatedTrackIds, state.currentPlaying)
-          : null
-      }
+          ? getSiblingSong(updatedTrackIds, state.currentPlaying) || null
+          : null,
+      };
 
     case types.SET_CURRENT_PLAYING:
       return setCurrentPlaying(state, action);
@@ -254,7 +267,7 @@ export default (state: State = defaultState, action: any = {}): State => {
       return {
         ...state,
         shuffle: !state.shuffle,
-        randomTrackIds: shuffleArray(state.trackIds),
+        randomTrackIds: !state.shuffle ? shuffleArray(state.trackIds) : [],
       };
 
     case types.REPEAT:

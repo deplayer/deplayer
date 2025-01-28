@@ -35,6 +35,10 @@ export default {
           "--rounded-badge": "0.25rem",
           "--player-btn-radius": "9999px", // Full rounded for player buttons
           "--player-btn-border": "none", // No border for player buttons
+          "--player-screen-bg": "rgba(0, 0, 0, 0.2)",
+          "--player-screen-radius": "1px",
+          "--player-screen-border": "0px",
+          "--player-screen-shadow": "0 0 2px rgba(0, 0, 0, 0.5)",
           "--animation-btn": "0.25s",
           "--animation-input": "0.2s",
           "--btn-focus-scale": "0.95",
@@ -60,6 +64,10 @@ export default {
           "--rounded-badge": "0.25rem",
           "--player-btn-radius": "9999px", // Full rounded for player buttons
           "--player-btn-border": "none", // No border for player buttons
+          "--player-screen-bg": "rgba(0, 0, 0, 0.2)",
+          "--player-screen-radius": "10px",
+          "--player-screen-border": "0px",
+          "--player-screen-shadow": "0 0 10px rgba(0, 0, 0, 0.5)",
           "--animation-btn": "0.25s",
           "--animation-input": "0.2s",
           "--btn-focus-scale": "0.95",
@@ -85,6 +93,10 @@ export default {
           "--player-btn-radius": "3px", // Square player buttons
           "--player-btn-inner-radius": "9999px", // Square player buttons
           "--player-btn-border": "2px solid #404040", // Visible button borders
+          "--player-screen-bg": "rgba(0, 0, 0, 0.2)",
+          "--player-screen-radius": "2px",
+          "--player-screen-border": "0px",
+          "--player-screen-shadow": "0 0 2px rgba(0, 0, 0, 0.2)",
           "--btn-text-case": "uppercase", // Uppercase text for buttons
           "--btn-text-color": "#FFFFFF", // White text for all buttons
           "--rounded-box": "0", // Sharp corners like old IBM terminals
@@ -114,6 +126,10 @@ export default {
           "--player-control-bg": "#A6A6A6", // Darker gray for controls
           "--player-btn-radius": "3px", // Square player buttons
           "--player-btn-border": "1px solid #8C8C8C", // Visible button borders
+          "--player-screen-bg": "rgba(0, 0, 0, 0.5)",
+          "--player-screen-radius": "2px",
+          "--player-screen-border": "0px",
+          "--player-screen-shadow": "0 0 2px rgba(0, 0, 0, 0.2)",
           "--btn-text-case": "uppercase", // Uppercase text for buttons
           "--btn-text-color": "#FFFFFF", // White text for all buttons
           "--rounded-box": "0", // Sharp corners like old IBM terminals
