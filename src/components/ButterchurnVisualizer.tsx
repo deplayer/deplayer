@@ -5,6 +5,7 @@ import butterchurnPresets from 'butterchurn-presets'
 import AudioContextService from '../services/AudioContextService'
 import { Dispatch } from 'redux'
 import * as types from '../constants/ActionTypes'
+import screenfull from 'screenfull'
 
 type Props = {
   width?: number,
@@ -163,10 +164,12 @@ class ButterchurnVisualizer extends React.Component<Props> {
         this.props.dispatch({ type: types.SHOW_PLAYER })
     }
 
+    const fullscreen = screenfull.isEnabled && screenfull.isFullscreen
+
     const canvasClasses = classNames({
       'fixed inset-0': true,
-      'z-50': this.props.fullscreen,
-      'z-10': !this.props.fullscreen
+      'z-50': fullscreen,
+      'z-0': !fullscreen
     })
 
     return (

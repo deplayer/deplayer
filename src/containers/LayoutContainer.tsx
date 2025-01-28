@@ -60,17 +60,18 @@ function Layout(props: LayoutProps) {
           {props.children}
         </div>
         <Placeholder mqlMatch={props.app.mqlMatch} />
-      </SidebarContainer>
+
+        </SidebarContainer>
+        {internalPlayer && props.app.showVisuals && (
+          <ButterchurnVisualizer
+            playerRef={internalPlayer}
+            fullscreen={props.player.fullscreen}
+            width={window.innerWidth}
+            height={window.innerHeight}
+            dispatch={props.dispatch}
+          />
+        )}
       <RightPanelContainer />
-      {internalPlayer && props.app.showVisuals && (
-        <ButterchurnVisualizer
-          playerRef={internalPlayer}
-          fullscreen={props.player.fullscreen}
-          width={window.innerWidth}
-          height={window.innerHeight}
-          dispatch={props.dispatch}
-        />
-      )}
     </>
   )
 }
