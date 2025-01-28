@@ -67,11 +67,9 @@ const WelcomeMessage = ({ dispatch, rows }: { dispatch: Dispatch, rows: Record<s
             Access to you good ol' music library and enjoy it whenever you need it. <br />
             To start playing some content follow one of the steps below:
           </p>
-          { Object.keys(rows).length === 0 && (
-            <div className='mb-6 flex justify-center'>
-              <TryDemoButton dispatch={dispatch} />
-            </div>
-          )}
+          <div className='mb-6 flex justify-center'>
+            <TryDemoButton />
+          </div>
           <ul>
             <li><Link to='/providers' className='text-primary hover:text-primary-focus'>Setup your media providers</Link>, (Subsonic API, mstream or ITunes)</li>
             <li>

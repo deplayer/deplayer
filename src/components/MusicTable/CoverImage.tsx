@@ -8,7 +8,6 @@ type cover = {
 }
 
 type Props = {
-  glass?: boolean,
   cover?: cover,
   reflect?: boolean,
   size?: string,
@@ -19,7 +18,6 @@ type Props = {
 }
 
 interface ContentProps {
-  glass?: boolean,
   alt: string,
   src?: string,
   noImage?: boolean,
@@ -35,25 +33,26 @@ const Content = React.memo((props: ContentProps) => {
 
   if (props.useImage) {
     return (
-      <img
-        src={imageUrl}
-        alt={props.alt}
-        className={classNames(
-          "w-full h-full object-cover",
-          {
-            "transition-opacity duration-300": !props.noFade,
-            "opacity-0": !props.noFade && !props.isLoaded && !props.noImage,
-            "opacity-100": props.noFade || props.isLoaded || props.noImage,
-            "glass": props.glass
-          }
-        )}
-        draggable={false}
-      />
+      <div className="relative w-full h-full">
+        <img
+          src={imageUrl}
+          alt={props.alt}
+          className={classNames(
+            "w-full h-full object-cover",
+            {
+              "transition-opacity duration-300": !props.noFade,
+              "opacity-0": !props.noFade && !props.isLoaded && !props.noImage,
+              "opacity-100": props.noFade || props.isLoaded || props.noImage
+            }
+          )}
+          draggable={false}
+        />
+      </div>
     )
   }
 
   const className = classNames(
-    'cover-image',
+    'cover-image relative',
     {
       'reflected-image': props.reflect,
       'transition-opacity duration-300': !props.noFade,
@@ -94,8 +93,7 @@ type ImgProps = {
   reflect?: boolean,
   onClick?: () => void,
   useImage?: boolean,
-  noFade?: boolean,
-  glass?: boolean
+  noFade?: boolean
 }
 
 const Img = React.memo((props: ImgProps) => {
@@ -107,7 +105,6 @@ const Img = React.memo((props: ImgProps) => {
       noFade={props.noFade}
     >
       <Content 
-        glass={props.glass}
         useImage={props.useImage} 
         src={props.src} 
         alt={props.alt || ''} 
@@ -133,7 +130,6 @@ const CoverImage = (props: Props) => {
   if (!props.cover) {
     return (
       <Img
-        glass={props.glass}
         reflect={props.reflect}
         useImage={props.useImage}
         onClick={props.onClick}
@@ -148,7 +144,6 @@ const CoverImage = (props: Props) => {
 
   return (
     <Img
-      glass={props.glass}
       reflect={props.reflect}
       useImage={props.useImage}
       onClick={props.onClick}

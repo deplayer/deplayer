@@ -9,6 +9,7 @@ import MainContainer from '../common/MainContainer'
 import ProviderButton from './ProviderButton'
 import ProviderForm from '../Settings/ProviderForm'
 import CenteredMessage from '../common/CenteredMessage'
+import { settingsButton } from '../Settings/SettingsForm'
 
 type Props = {
   settings: SettingsStateType,
@@ -16,8 +17,9 @@ type Props = {
 }
 
 const Providers = (props: Props) => {
-  const saveSettings = (form: any): any => {
-    props.dispatch({ type: types.SAVE_SETTINGS, settingsPayload: form })
+  const handleSubmit = (values: any, actions: any) => {
+    props.dispatch({ type: types.SAVE_SETTINGS, settingsPayload: values })
+    actions.setSubmitting(false)
   }
 
   const providers = Object.keys(props.settings.settingsForm.providers).map((providerKey) => {
@@ -51,25 +53,27 @@ const Providers = (props: Props) => {
 
           <Formik
             initialValues={props.settings.settings}
-            onSubmit={(values, actions) => {
-              saveSettings(values)
-              actions.setSubmitting(false)
-            }}
+            onSubmit={handleSubmit}
             enableReinitialize
           >{({ isSubmitting }) => (
             <Form
               className='settings-form'
             >
-
               <div className='flex flex-wrap'>
                 {providers}
               </div>
 
-              <div className='right-0 pb-20 pr-10 flex justify-end'>
+              <div className='w-full flex justify-end mt-12'>
                 {!!providers.length && (
-                  <Button long uppercase disabled={isSubmitting} type='submit' size='2xl' >
-                    <Translate value="buttons.save" />
-                  </Button>
+                  <div className='max-w-xs'>
+                    <Button
+                      {...settingsButton}
+                      disabled={isSubmitting}
+                      type='submit'
+                    >
+                      <Translate value="buttons.save" />
+                    </Button>
+                  </div>
                 )}
               </div>
             </Form>)}

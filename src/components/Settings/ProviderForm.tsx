@@ -22,6 +22,8 @@ const ProviderForm = (props: ProviderFormProps) => {
     return (
       <Button
         transparent
+        size='lg'
+        className='hover:text-error'
         onClick={onClick}
         title={props.providerKey}
       >
@@ -32,7 +34,7 @@ const ProviderForm = (props: ProviderFormProps) => {
 
   return (
     <div key={props.providerKey} className={`${settingsCard} w-full`}>
-      <div className='top-0 right-0 absolute'>
+      <div className='top-2 right-2 absolute'>
         <RemoveProviderBtn
           providerKey={props.providerKey}
           dispatch={props.dispatch}

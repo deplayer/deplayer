@@ -43,20 +43,21 @@ const Cover = (props: Props) => {
   return (
     <>
       <div 
-        className='relative text-lg hidden md:block h-full overflow-visible cursor-pointer w-16 h-16' 
+        className='relative text-lg hidden md:block cursor-pointer w-16 aspect-square'
         onClick={handleClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         data-testid="cover-container"
       >
-        <CoverImage
-          useImage
-          glass
-          cover={props.song.cover}
-          size='thumbnail'
-          albumName={albumName}
-          noFade
-        />
+        <div className="w-full h-full">
+          <CoverImage
+            useImage
+            cover={props.song.cover}
+            size='thumbnail'
+            albumName={albumName}
+            noFade
+          />
+        </div>
         
         {/* Hover Preview */}
         {isImageLoaded && (
@@ -66,7 +67,7 @@ const Cover = (props: Props) => {
               bottom: 'calc(100% + 10px)',
               left: '0',
               width: '200px',
-              height: '200px',
+              aspectRatio: '1/1',
               pointerEvents: 'none'
             }}
             data-testid="hover-preview"
@@ -89,14 +90,15 @@ const Cover = (props: Props) => {
         title={albumName}
       >
         <div className="flex justify-center items-center">
-          <CoverImage
-            useImage
-            cover={props.song.cover}
-            size='large'
-            albumName={albumName}
-            noFade
-            glass
-          />
+          <div className="w-full max-w-2xl aspect-square">
+            <CoverImage
+              useImage
+              cover={props.song.cover}
+              size='large'
+              albumName={albumName}
+              noFade
+            />
+          </div>
         </div>
       </Modal>
     </>

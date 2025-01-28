@@ -1,14 +1,22 @@
 import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
+import { connect } from 'react-redux'
 import Button from '../common/Button'
 import defaultMedia from '../../constants/defaultMedia'
 import * as types from '../../constants/ActionTypes'
+import { State as CollectionState } from '../../reducers/collection'
 
 type Props = {
-  dispatch: Dispatch
+  dispatch: Dispatch,
+  collection: CollectionState
 }
 
-const TryDemoButton = ({ dispatch }: Props) => {
+const TryDemoButton = ({ dispatch, collection }: Props) => {
+  // Only show the button if the collection is completely empty
+  if (Object.keys(collection.rows).length > 0) {
+    return null
+  }
+
   const handleTryDemo = () => {
     // First update the collection state immediately
     dispatch({ type: types.RECEIVE_COLLECTION, data: [defaultMedia] })
@@ -23,4 +31,8 @@ const TryDemoButton = ({ dispatch }: Props) => {
   )
 }
 
-export default TryDemoButton 
+export default connect(
+  (state: { collection: CollectionState }) => ({
+    collection: state.collection
+  })
+)(TryDemoButton) 

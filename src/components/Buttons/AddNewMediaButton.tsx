@@ -8,6 +8,7 @@ import * as types from '../../constants/ActionTypes'
 
 type Props = {
   dispatch: Dispatch
+  fullWidth?: boolean
   label?: string
 }
 
@@ -20,6 +21,8 @@ const AddNewMediaButton = (props: Props) => {
     <Button
       transparent
       onClick={openModal}
+      alignLeft
+      fullWidth={props.fullWidth}
     >
       <Icon
         icon='faPlusCircle'

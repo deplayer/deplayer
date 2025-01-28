@@ -7,11 +7,12 @@ import { State as SettingsStateType } from '../../reducers/settings'
 import Button from '../common/Button'
 import FormSchema from './FormSchema'
 import * as types from '../../constants/ActionTypes'
+import { FormField } from '../../types/forms'
 
 type Props = {
   settings: SettingsStateType,
   dispatch: Dispatch,
-  schema: { fields: any[] }
+  schema: { fields: FormField[] }
 }
 
 export const settingsCard = classNames({
@@ -22,9 +23,24 @@ export const settingsCard = classNames({
   'rounded-lg': true
 })
 
+export const settingsButton = {
+  fullWidth: true,
+  size: '2xl' as const,
+  className: 'btn-primary'
+}
+
+export const settingsButtonContainer = classNames({
+  'w-full': true,
+  'flex': true,
+  'justify-center': true,
+  'mt-12': true,
+  'max-w-xs': true
+})
+
 const SettingsForm = (props: Props) => {
-  const saveSettings = (form: any): any => {
-    props.dispatch({ type: types.SAVE_SETTINGS, settingsPayload: form })
+  const handleSubmit = (values: any, actions: any) => {
+    props.dispatch({ type: types.SAVE_SETTINGS, settingsPayload: values })
+    actions.setSubmitting(false)
   }
 
   const { settings, schema } = props
@@ -32,10 +48,7 @@ const SettingsForm = (props: Props) => {
   return (
     <Formik
       initialValues={settings.settings}
-      onSubmit={(values, actions) => {
-        saveSettings(values)
-        actions.setSubmitting(false)
-      }}
+      onSubmit={handleSubmit}
       enableReinitialize
     >
       {({
@@ -50,13 +63,11 @@ const SettingsForm = (props: Props) => {
             <FormSchema schema={schema} />
 
             <div className='w-full flex justify-center mt-12'>
-              <div className='max-w-xs w-full'>
+              <div className={settingsButtonContainer}>
                 <Button
-                  fullWidth
-                  size='2xl'
+                  {...settingsButton}
                   disabled={isSubmitting}
                   type='submit'
-                  className='btn-primary'
                 >
                   <Translate value="buttons.save" />
                 </Button>

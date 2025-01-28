@@ -110,7 +110,7 @@ const ContextualMenu = (props: MenuProps) => {
           </>
         }
         <Item className={itemClasses}>
-          <AddNewMediaButton />
+          <AddNewMediaButton fullWidth />
         </Item>
         {showFullscreen &&
           <Item className={itemClasses}>
@@ -216,7 +216,7 @@ const ContextualMenu = (props: MenuProps) => {
             </Item>
           </>
         )}
-        {showStartPlaying &&
+        {(showStartPlaying && trackIds.length) &&
           <Item className={itemClasses}>
             <Button
               transparent
