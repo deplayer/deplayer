@@ -54,20 +54,37 @@ export function* fetchSongMetadata(action: any): any {
     return
   }
 
-  const storedLyrics = yield call([lyricsService, 'get'], song.id)
+  try {
+    // First try to get lyrics from database
+    const storedLyrics = yield call([lyricsService, 'get'], song.id)
 
-  if (!storedLyrics) {
+    if (storedLyrics) {
+      yield put({ type: types.LYRICS_FOUND, data: storedLyrics.lyrics })
+      return
+    }
+
+    // If not in database, try to fetch from API
     const mbProvider = new LyricsovhProvider()
     try {
       const response = yield call([mbProvider, 'searchLyrics'], song)
       const lyrics = response.data.lyrics
+      
+      // Save to database
       yield call([lyricsService, 'save'], song.id, lyrics)
       yield put({ type: types.LYRICS_FOUND, data: lyrics })
     } catch (apiError: any) {
-      yield put({ type: types.NO_LYRICS_FOUND, error: apiError.message || 'Failed to fetch lyrics' })
+      // Handle API-specific errors
+      yield put({ 
+        type: types.NO_LYRICS_FOUND, 
+        error: apiError.message || 'Failed to fetch lyrics from provider'
+      })
     }
-  } else {
-    yield put({ type: types.LYRICS_FOUND, data: storedLyrics.lyrics })
+  } catch (error: any) {
+    // Handle database errors
+    yield put({ 
+      type: types.NO_LYRICS_FOUND, 
+      error: `Database error: ${error.message}` 
+    })
   }
 }
 
