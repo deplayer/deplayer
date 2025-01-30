@@ -54,6 +54,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
         genres: song.genres.map((genre: { name: string }) => genre.name),
         duration: song.duration * 1000,
         track: song.track,
+        discNumber: song.discNumber,
         filePath: song.path,
         type: 'audio',
         stream: {

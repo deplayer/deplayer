@@ -43,7 +43,7 @@ const Cover = (props: Props) => {
   return (
     <>
       <div 
-        className='relative text-lg hidden md:block cursor-pointer w-16 aspect-square'
+        className='relative text-lg hidden md:block cursor-pointer w-16 h-16 aspect-square'
         onClick={handleClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}

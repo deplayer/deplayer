@@ -41,6 +41,8 @@ export default class ItunesApiProvider implements IMusicProvider {
       genres: [itSong.primaryGenreName],
       shareUrl: itSong.trackViewUrl,
       type: isAudio ? 'audio' : 'video',
+      track: itSong.trackNumber,
+      discNumber: itSong.discNumber,
       stream: {
         itunes: { service: this.providerKey, uris: [{ uri: itSong.previewUrl }] }
       }

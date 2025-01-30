@@ -22,6 +22,10 @@ export type State = {
         enabled: boolean;
         apikey: string;
       };
+      language: {
+        code: string;
+        useSystemLanguage: boolean;
+      };
     };
   };
   settingsForm: {
@@ -58,6 +62,10 @@ export const defaultState: State = {
       lastfm: {
         enabled: false,
         apikey: "",
+      },
+      language: {
+        code: 'en',
+        useSystemLanguage: true,
       },
     },
   },

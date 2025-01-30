@@ -77,6 +77,7 @@ export default class JellyfinProvider implements IMusicProvider {
           artist: { name: artistName },
         },
         track: item.IndexNumber || null,
+        discNumber: item.ParentIndexNumber || null,
         cover: {
           thumbnailUrl: `${this.baseUrl}/Items/${item.Id}/Images/Primary?maxHeight=250&api_key=${this.apiKey}`,
           fullUrl: `${this.baseUrl}/Items/${item.Id}/Images/Primary?api_key=${this.apiKey}`,

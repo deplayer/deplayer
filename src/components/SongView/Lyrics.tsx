@@ -15,9 +15,9 @@ type Props = {
 }
 
 const Lyrics = (props: Props) => {
-  // Clear and refetch lyrics when song changes
+  // Clear and refetch lyrics when song changes, but only if no lyrics are provided
   useEffect(() => {
-    if (props.isOpen) {
+    if (props.isOpen && !props.lyrics) {
       // Clear previous lyrics first
       props.dispatch({ type: types.CLEAR_LYRICS })
       // Then fetch new lyrics if we have a song ID
@@ -25,7 +25,7 @@ const Lyrics = (props: Props) => {
         props.dispatch({ type: types.FETCH_LYRICS, songId: props.songId })
       }
     }
-  }, [props.songId, props.isOpen])
+  }, [props.songId, props.isOpen, props.lyrics])
 
   // Clear lyrics when modal closes or component unmounts
   useEffect(() => {

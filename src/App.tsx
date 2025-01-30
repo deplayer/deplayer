@@ -29,6 +29,7 @@ import GlobalKeyHandlers from './components/GlobalKeyHandlers'
 // import JoinRoom from './pages/JoinRoom'
 import { store, history } from './store/configureStore'
 import JoinRoom from './pages/JoinRoom';
+import { useLanguage } from './hooks/useLanguage'
 
 interface SongProps {
   playerPortal: portals.HtmlPortalNode
@@ -43,35 +44,45 @@ const Song = ({ playerPortal }: SongProps) => {
   )
 }
 
+const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) => {
+  useLanguage()
+
+  return (
+    <>
+      <LayoutContainer>
+        <Routes>
+          <Route path="/join/:id" element={<JoinRoom />} />
+          <Route path="/" element={<DashboardContainer />} />
+          <Route path="/index.html" element={<DashboardContainer />} />
+          <Route path="/queue" element={<QueueContainer />} />
+          <Route path="/playlists" element={<PlaylistsContainer />} />
+          <Route path="/collection/*" element={<CollectionContainer />} />
+          <Route path="/search-results" element={<SearchResultsContainer />} />
+          <Route path="/song/:id" element={<Song playerPortal={playerPortal} />} />
+          <Route path="/album/:id" element={<AlbumContainer />} />
+          <Route path="/artist/:id" element={<ArtistContainer />} />
+          <Route path="/artists" element={<ArtistsContainer />} />
+          <Route path="/providers" element={<ProvidersContainer />} />
+          <Route path="/settings" element={<SettingsContainer />} />
+          <Route path="/wiki" element={<Wiki />} />
+        </Routes>
+      </LayoutContainer>
+      <ContextMenuContainer />
+      <PlayerContainer playerPortal={playerPortal} />
+      <AddMediaModal />
+      <GlobalKeyHandlers />
+    </>
+  )
+}
+
 const App = () => {
   const playerPortal = React.useMemo(() => portals.createHtmlPortalNode(), [])
 
   return (
     <Router history={history}>
       <Provider store={store}>
-        <LayoutContainer>
-          <Routes>
-            <Route path="/join/:id" element={<JoinRoom />} />
-            <Route path="/" element={<DashboardContainer />} />
-            <Route path="/index.html" element={<DashboardContainer />} />
-            <Route path="/queue" element={<QueueContainer />} />
-            <Route path="/playlists" element={<PlaylistsContainer />} />
-            <Route path="/collection/*" element={<CollectionContainer />} />
-            <Route path="/search-results" element={<SearchResultsContainer />} />
-            <Route path="/song/:id" element={<Song playerPortal={playerPortal} />} />
-            <Route path="/album/:id" element={<AlbumContainer />} />
-            <Route path="/artist/:id" element={<ArtistContainer />} />
-            <Route path="/artists" element={<ArtistsContainer />} />
-            <Route path="/providers" element={<ProvidersContainer />} />
-            <Route path="/settings" element={<SettingsContainer />} />
-            <Route path="/wiki" element={<Wiki />} />
-          </Routes>
-        </LayoutContainer>
-        <ContextMenuContainer />
-        <PlayerContainer playerPortal={playerPortal} />
-        <AddMediaModal />
-        <GlobalKeyHandlers />
-      </Provider >
+        <AppContent playerPortal={playerPortal} />
+      </Provider>
     </Router>
   )
 }

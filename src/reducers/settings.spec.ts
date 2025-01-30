@@ -71,6 +71,10 @@ describe('settings reducer', () => {
           lastfm: {
             enabled: false,
             apikey: ''
+          },
+          language: {
+            code: 'en',
+            useSystemLanguage: true
           }
         },
         providers: {

@@ -279,7 +279,7 @@ class PlayerControls extends React.Component<Props> {
                 exit={true}
               >
                 <div key='player-controls' className={playerControlsClassnames} style={{ zIndex: 103 }}>
-                  <div className='absolute w-full md:top-0 pointer-events-none' style={{ zIndex: 104 }}>
+                  <div className='absolute w-full md:top-0 pointer-events-none' style={{ zIndex: 151 }}>
                     <ProgressBar
                       dispatch={this.props.dispatch}
                       total={duration * 1000}

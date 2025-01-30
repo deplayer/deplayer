@@ -33,6 +33,7 @@ export const media = pgTable("media", {
   playCount: integer("playCount").notNull(),
   genres: json("genres"),
   track: integer("track"),
+  discNumber: integer("discNumber"),
   year: integer("year"),
   // Full-text search columns
   searchableText: text("searchable_text").notNull().default(""),

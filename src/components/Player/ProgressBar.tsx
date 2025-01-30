@@ -23,7 +23,7 @@ const ProgressBar = (props: Props) => {
         step={step}
         styles={{ 
           handle: { display: 'none' }, 
-          track: { backgroundColor: 'rgb(var(--bc) / 0.2)' }, 
+          track: { backgroundColor: 'rgb(var(--bc) / 0.2)', zIndex: 110 }, 
           rail: { backgroundColor: 'transparent' } 
         }}
         count={1}

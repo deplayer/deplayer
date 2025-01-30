@@ -27,24 +27,30 @@ const Album = (props: AlbumProps) => {
       return null
     }
 
-    return props.songs.map((songId) => {
-      const songRow = props.collection.rows[songId]
-      return (
-        <SongRow
-          mqlMatch={false}
-          disableCovers
-          style={{}}
-          key={songId}
-          dispatch={props.dispatch}
-          isCurrent={false}
-          slim={true}
-          onClick={() => {
-            props.dispatch({ type: types.ADD_ALBUM_TO_QUEUE, albumId })
-          }}
-          song={songRow}
-        />
-      )
-    })
+    return props.songs
+      .sort((a, b) => {
+        if (a < b) return -1;
+        if (a > b) return 1;
+        return 0;
+      })
+      .map((songId) => {
+        const songRow = props.collection.rows[songId]
+        return (
+          <SongRow
+            mqlMatch={false}
+            disableCovers
+            style={{}}
+            key={songId}
+            dispatch={props.dispatch}
+            isCurrent={false}
+            slim={true}
+            onClick={() => {
+              props.dispatch({ type: types.ADD_ALBUM_TO_QUEUE, albumId })
+            }}
+            song={songRow}
+          />
+        )
+      })
   }
 
   return (

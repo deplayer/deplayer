@@ -18,6 +18,8 @@
     "pgliteRepl": "PGLite Repl",
     "pgliteReplDescription": "Run arbitrary SQL queries against deplayer's database",
     "actions": "Actions",
+    "language": "Language",
+    "useSystemLanguage": "Use system language",
     "enableReactPlayer": "use react-player (beta)",
     "enableSpectrum": "player spectrum",
     "deleteCollection": "Delete collection",

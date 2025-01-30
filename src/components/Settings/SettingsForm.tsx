@@ -8,6 +8,7 @@ import Button from '../common/Button'
 import FormSchema from './FormSchema'
 import * as types from '../../constants/ActionTypes'
 import { FormField } from '../../types/forms'
+import LanguageDetector from '../../services/language/LanguageDetector'
 
 type Props = {
   settings: SettingsStateType,
@@ -52,7 +53,9 @@ const SettingsForm = (props: Props) => {
       enableReinitialize
     >
       {({
-        isSubmitting
+        isSubmitting,
+        values,
+        setFieldValue
       }) => (
         <Form
           className='settings-form'
@@ -60,6 +63,42 @@ const SettingsForm = (props: Props) => {
           <h2 className='text-2xl py-3 text-base-content'><Translate value="labels.generalSettings" /></h2>
 
           <div className={settingsCard}>
+            <div className="mb-8">
+              <h3 className="text-xl mb-4"><Translate value="labels.language" /></h3>
+              <div className="form-control">
+                <label className="label cursor-pointer">
+                  <span className="label-text"><Translate value="labels.useSystemLanguage" /></span>
+                  <input
+                    type="checkbox"
+                    className="toggle toggle-primary"
+                    checked={values.app?.language?.useSystemLanguage ?? true}
+                    onChange={(e) => {
+                      setFieldValue('app.language', {
+                        ...values.app?.language,
+                        useSystemLanguage: e.target.checked,
+                        code: e.target.checked ? LanguageDetector.getPreferredLanguage() : (values.app?.language?.code ?? 'en')
+                      })
+                    }}
+                  />
+                </label>
+              </div>
+              {!(values.app?.language?.useSystemLanguage ?? true) && (
+                <div className="form-control w-full max-w-xs">
+                  <select
+                    className="select select-bordered w-full"
+                    value={values.app?.language?.code ?? 'en'}
+                    onChange={(e) => setFieldValue('app.language', {
+                      ...values.app?.language,
+                      code: e.target.value
+                    })}
+                  >
+                    <option value="en">English</option>
+                    <option value="ca">Català</option>
+                  </select>
+                </div>
+              )}
+            </div>
+
             <FormSchema schema={schema} />
 
             <div className='w-full flex justify-center mt-12'>

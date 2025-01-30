@@ -10,7 +10,7 @@ export default class MediaId {
     if (media.forcedId) {
       this.id = media.forcedId
     } else {
-      this.id = media.artistName + '_' + media.albumName + '_' + zeroPad(media.track, 4) + '_' + media.title
+      this.id = media.artistName + '_' + media.albumName + '_' + zeroPad(media.discNumber, 2) + '_' + zeroPad(media.track, 4) + '_' + media.title
     }
   }
 

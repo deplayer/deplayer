@@ -35,6 +35,7 @@ export interface IMedia {
   filePath?: string
   forcedId?: string | null
   track?: number
+  discNumber?: number
   year?: number
 }
 
@@ -73,6 +74,7 @@ export default class Media implements IMedia {
   filePath?: string
   forcedId?: string | null
   track?: number
+  discNumber?: number
 
   constructor(songParams: IMedia) {
     this.title = songParams.title
@@ -84,6 +86,7 @@ export default class Media implements IMedia {
     this.filePath = songParams.filePath
     this.forcedId = songParams.forcedId
     this.type = songParams.type
+    this.discNumber = songParams.discNumber
 
     const artist = this.generateArtist(songParams.artistName, songParams.artistId)
     this.artist = artist
@@ -136,6 +139,7 @@ export default class Media implements IMedia {
       filePath: this.filePath,
       type: this.type,
       track: this.track,
+      discNumber: this.discNumber,
       duration: this.duration
     }
   }
