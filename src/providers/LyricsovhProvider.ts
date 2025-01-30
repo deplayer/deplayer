@@ -1,13 +1,17 @@
 import axios from 'axios'
+import { IMedia } from '../entities/Media'
 
 export default class LyricsovhProvider {
-  async searchLyrics(song: any): Promise<any> {
+  async searchLyrics(song: IMedia): Promise<any> {
     const baseUrl = 'https://api.lyrics.ovh/v1'
     const artist = encodeURIComponent(song.artist.name)
     const title = encodeURIComponent(song.title)
 
+    console.log('Fetching lyrics for:', { artist, title })
+
     try {
       const response = await axios.get(`${baseUrl}/${artist}/${title}`)
+      console.log('API Response:', response.data)
       
       // Validate response format
       if (!response.data || !response.data.lyrics) {
@@ -23,6 +27,7 @@ export default class LyricsovhProvider {
         }
         throw new Error(`API error: ${error.response.status}`)
       }
+      console.error('Error fetching lyrics:', error)
       throw error
     }
   }

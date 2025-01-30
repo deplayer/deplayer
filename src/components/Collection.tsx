@@ -48,7 +48,7 @@ const Collection = (props: Props) => {
               <Translate value='message.noCollectionItems' />
               <div className='flex space-x-4'>
                 <AddNewMediaButton />
-                <TryDemoButton dispatch={props.dispatch} />
+                <TryDemoButton />
               </div>
             </div>
           </CenteredMessage>

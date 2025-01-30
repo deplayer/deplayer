@@ -21,7 +21,7 @@ import Auth from '../Auth'
 import Button from '../common/Button'
 import { Dispatch } from 'redux'
 import DeplayerTitle from '../DeplayerTitle'
-import { IMedia } from '../../entities/Media'
+
 type Props = {
   collection: CollectionState
   dispatch: Dispatch
@@ -48,7 +48,7 @@ const Image = () => {
   )
 }
 
-const WelcomeMessage = ({ dispatch, rows }: { dispatch: Dispatch, rows: Record<string, IMedia> }) => {
+const WelcomeMessage = ({ dispatch }: { dispatch: Dispatch }) => {
   const [showAuthModal, setShowAuthModal] = React.useState(false)
   const credentials = localStorage.getItem('credentials')
 
@@ -110,7 +110,7 @@ const Dashboard = ({
 
   return (
     <div className='z-10 w-full md:px-12 mb-12'>
-      <WelcomeMessage dispatch={dispatch} rows={rows} />
+      <WelcomeMessage dispatch={dispatch} />
       <RecentAlbums />
       {!!mediaItems.length &&
         <MediaSlider

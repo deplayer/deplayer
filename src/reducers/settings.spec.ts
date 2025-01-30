@@ -63,23 +63,36 @@ describe('settings reducer', () => {
 
   it('should handle REMOVE_PROVIDER', () => {
     const initialState = {
-      ...defaultState,
       settings: {
-        app: {},
+        app: {
+          spectrum: {
+            enabled: false
+          },
+          lastfm: {
+            enabled: false,
+            apikey: ''
+          }
+        },
         providers: {
           subsonic: {
-            something: 'something'
+            something: 'test',
+            enabled: true
           }
         }
       },
       settingsForm: {
         providers: {
           subsonic: {
-            to: 'be removed'
+            fields: [{
+              title: 'Test Field',
+              type: 'text'
+            }]
           }
         },
         fields: {}
-      }
+      },
+      error: '',
+      saving: false
     }
     const result = reducer(initialState, {
       type: types.REMOVE_PROVIDER,
@@ -187,5 +200,44 @@ describe('settings reducer', () => {
       enabled: false
     })
     expect(state.settings.providers.musicbrainz0).toBeUndefined()
+  })
+
+  it('should handle adding fields to the settings form', () => {
+    let state = { ...defaultState }
+
+    // Add subsonic provider
+    state = reducer(state, { type: types.ADD_PROVIDER, providerKey: 'subsonic' })
+    expect(state.settingsForm.providers.subsonic0).toBeDefined()
+
+    // Add fields to the subsonic provider
+    const settings = {
+      ...state.settings,
+      providers: {
+        subsonic0: {
+          enabled: true,
+          baseUrl: 'http://localhost',
+          user: 'test',
+          password: 'test',
+          fields: [{
+            title: 'Test Field',
+            type: 'text'
+          }]
+        }
+      }
+    }
+
+    state = reducer(state, { type: types.SETTINGS_SAVED_SUCCESSFULLY, settings })
+
+    // Verify fields are added to the provider
+    expect(state.settings.providers.subsonic0).toEqual({
+      enabled: true,
+      baseUrl: 'http://localhost',
+      user: 'test',
+      password: 'test',
+      fields: [{
+        title: 'Test Field',
+        type: 'text'
+      }]
+    })
   })
 })

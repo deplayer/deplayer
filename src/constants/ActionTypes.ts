@@ -26,6 +26,7 @@ export const FILL_VISIBLE_SONG_FULLFILLED = "FILL_VISIBLE_SONG_FULLFILLED";
 export const FETCH_LYRICS = "FETCH_LYRICS";
 export const LYRICS_FOUND = "LYRICS_FOUND";
 export const NO_LYRICS_FOUND = "NO_LYRICS_FOUND";
+export const CLEAR_LYRICS = "CLEAR_LYRICS";
 
 // Player
 export const VOLUME_SET = "VOLUME_SET";

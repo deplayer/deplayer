@@ -4,18 +4,19 @@
 
 ## Open deplayer
 
-[Official application is deployed here](http://deplayer.surge.sh/) but you can
+[Official application is deployed here](https://deplayer.app/) but you can
 self-host your own.
 
 Since this is a local-first application, you can install it in your own device
 and use it without internet connection. All your database is safely stored in
-your browser, so you don't need to worry
+your browser, so you don't need to worry about your data being used by
+third-parties.
 
 ## What is deplayer?
 
 Play your music and videos entirely from your browser.
 Connect your providers and start playing.
-Deplayer aims to be a generic browser allowing you to manage your own
+Deplayer aims to be a generic media player allowing you to manage your own
 collection as you wish and play it from any device.
 
 ## Media providers
@@ -26,7 +27,6 @@ collection as you wish and play it from any device.
 - Webtorrent magnet links and .torrent files support. (Supports magnet links
   and .torrent files)
 - Subsonic API
-- mStream API
 - iTunes API (it has only samples, usefull for testing)
 - youtube-dl-server: Add youtube videos to your collection. You'll need to
   deploy your own server.
@@ -42,47 +42,41 @@ collection as you wish and play it from any device.
   API](https://developers.google.com/web/updates/2017/02/media-session)
   implemented, control your player from your keyboard media keys or show media
   controls in your mobile.
-- Offline first, sync with your remote [pouchdb](https://pouchdb.com/) /
-  [couchdb](https://couchdb.apache.org/) your database as a backup and share
-  your collection and session between devices and browsers!
+- Local first. Your data is stored in your browser using PGLite and you can sync it with
+  your remote database (Work in progress).
 - Multi provider, add your data sources and listen the music from there. Keep
   reading to see the list of available providers.
--  Awesome visuals thanks to [butterchurn](https://github.com/jberg/butterchurn)
+- Lyrics support, using https://api.lyrics.ovh/v1
+- Awesome visuals thanks to [butterchurn](https://github.com/jberg/butterchurn)
 - Spectum audio visual thanks to [react-audio-spectrum](https://github.com/hu-ke/react-audio-spectrum)
-
-## Implemented artists metadata providers
-
-- last.fm (not very usefull)
 
 ## Keyboard hotkeys
 
-| Command          | Hotkey               |
-| ---------------- | -------------------- |
-| Play/Pause:      | `space`              |
-| Next track:      | `Arrow right` or `j` |
-| Prev track:      | `Arrow left` or `k`  |
-| Focus on search: | `/`                  |
+| Command           | Hotkey               |
+| ----------------- | -------------------- |
+| Play/Pause        | `space`              |
+| Next track        | `Arrow right` or `j` |
+| Prev track        | `Arrow left` or `k`  |
+| Open command bar  | `Control + k`        |
 
 ## Installing
 
 ```bash
-yarn
+npm install
+```
+
+## Running dev mode
+
+```bash
+npm run dev
 ```
 
 ## Testing the app
 
 ```bash
-yarn test
+npm run test
 ```
 
-## Running dev environment
+## License
 
-```bash
-yarn start
-```
-
-## Run storybook
-
-```bash
-yarn storybook
-```
+MIT

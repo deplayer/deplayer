@@ -20,6 +20,10 @@ export default (state: State = defaultState, action: any): State => {
       return { lyrics: '', error: action.error || 'No lyrics found' }
     }
 
+    case types.CLEAR_LYRICS: {
+      return defaultState
+    }
+
     default:
       return state
   }

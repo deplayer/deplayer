@@ -57,22 +57,31 @@ export function* fetchSongMetadata(action: any): any {
   try {
     // First try to get lyrics from database
     const storedLyrics = yield call([lyricsService, 'get'], song.id)
+    console.log('Database response:', storedLyrics)
 
-    if (storedLyrics) {
+    // Check if we actually have lyrics in the database
+    if (storedLyrics && storedLyrics.lyrics) {
+      console.log('Found lyrics in database:', storedLyrics)
       yield put({ type: types.LYRICS_FOUND, data: storedLyrics.lyrics })
       return
     }
 
+    console.log('No lyrics in database, fetching from API for song:', song)
     // If not in database, try to fetch from API
     const mbProvider = new LyricsovhProvider()
     try {
       const response = yield call([mbProvider, 'searchLyrics'], song)
-      const lyrics = response.data.lyrics
+      console.log('API Response:', response)
       
+      if (!response || !response.lyrics) {
+        throw new Error('No lyrics found in API response')
+      }
+
       // Save to database
-      yield call([lyricsService, 'save'], song.id, lyrics)
-      yield put({ type: types.LYRICS_FOUND, data: lyrics })
+      yield call([lyricsService, 'save'], song.id, response.lyrics)
+      yield put({ type: types.LYRICS_FOUND, data: response.lyrics })
     } catch (apiError: any) {
+      console.error('API Error:', apiError)
       // Handle API-specific errors
       yield put({ 
         type: types.NO_LYRICS_FOUND, 
@@ -80,6 +89,7 @@ export function* fetchSongMetadata(action: any): any {
       })
     }
   } catch (error: any) {
+    console.error('Database Error:', error)
     // Handle database errors
     yield put({ 
       type: types.NO_LYRICS_FOUND, 

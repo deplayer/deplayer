@@ -7,17 +7,44 @@ import { Dispatch } from 'redux'
 type Props = {
   onClose: () => void
   lyrics: string,
+  error?: string,
   songId: string,
   dispatch: Dispatch<any>,
-  isOpen: boolean
+  isOpen: boolean,
+  currentPlayingSongId?: string
 }
 
 const Lyrics = (props: Props) => {
+  // Clear and refetch lyrics when song changes
   useEffect(() => {
-    if (props.lyrics) return
+    if (props.isOpen) {
+      // Clear previous lyrics first
+      props.dispatch({ type: types.CLEAR_LYRICS })
+      // Then fetch new lyrics if we have a song ID
+      if (props.songId) {
+        props.dispatch({ type: types.FETCH_LYRICS, songId: props.songId })
+      }
+    }
+  }, [props.songId, props.isOpen])
 
-    props.dispatch({ type: types.FETCH_LYRICS, songId: props.songId })
-  }, [props.songId, props.lyrics])
+  // Clear lyrics when modal closes or component unmounts
+  useEffect(() => {
+    if (!props.isOpen) {
+      props.dispatch({ type: types.CLEAR_LYRICS })
+    }
+
+    return () => {
+      props.dispatch({ type: types.CLEAR_LYRICS })
+    }
+  }, [props.isOpen])
+
+  // Clear lyrics if the currently playing song changes and it doesn't match our songId
+  useEffect(() => {
+    if (props.isOpen && props.currentPlayingSongId && props.currentPlayingSongId !== props.songId) {
+      props.dispatch({ type: types.CLEAR_LYRICS })
+      props.onClose()
+    }
+  }, [props.currentPlayingSongId])
 
   return (
     <Modal
@@ -28,9 +55,15 @@ const Lyrics = (props: Props) => {
     >
       <Header>Lyrics</Header>
       <div className='p-4 my-6'>
-        <pre className='overflow-y-auto'>
-          {props.lyrics}
-        </pre>
+        {props.error ? (
+          <div className='text-error text-center'>
+            {props.error}
+          </div>
+        ) : (
+          <pre className='overflow-y-auto w-full whitespace-pre-wrap'>
+            {props.lyrics}
+          </pre>
+        )}
       </div>
     </Modal>
   )

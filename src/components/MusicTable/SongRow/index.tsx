@@ -40,7 +40,6 @@ const SongCover = React.memo(({ cover, onClick, albumName }: { cover: Cover, onC
       data-testid="song-cover"
     >
       <CoverImage
-        glass={true}
         cover={cover}
         size='thumbnail'
         albumName={albumName}
