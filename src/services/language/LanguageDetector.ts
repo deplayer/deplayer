@@ -1,4 +1,4 @@
-const SUPPORTED_LANGUAGES = ['en', 'ca'] as const;
+const SUPPORTED_LANGUAGES = ['en', 'ca', 'es'] as const;
 type SupportedLanguage = typeof SUPPORTED_LANGUAGES[number];
 
 export class LanguageDetector {

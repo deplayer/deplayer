@@ -3,7 +3,10 @@
     "home": "Home",
     "search": "Search",
     "import": "Import",
-    "collection": "Collection"
+    "collection": "Collection",
+    "queue": "Queue",
+    "artists": "Artists",
+    "playlists": "Playlists"
   },
   "titles": {
     "albums": "Albums",
@@ -112,6 +115,44 @@
     "join": "Get in"
   },
   "dashboard": {
-    "recentlyAdded": "Recently Added Albums"
+    "recentlyAdded": "Recently Added Albums",
+    "welcome": {
+      "title": "Hi <i>audiophile</i>! Welcome to",
+      "description": "Access to you good ol' music library and enjoy it whenever you need it.",
+      "steps": "To start playing some content follow one of the steps below:",
+      "setupProviders": "Setup your media providers (Subsonic API, mstream or ITunes)",
+      "addMedia": "Add new media to your collection",
+      "addMediaDescription": "Webtorrent, Filesystem, IPFS or youtube-dl-server",
+      "goToCollection": "Or go to your collection",
+      "authenticated": "You are authenticated with your passkey",
+      "authNeeded": "Access social capabilities by authenticating with your passkey",
+      "authButton": "🔒 Auth"
+    }
+  },
+  "sidebar": {
+    "providers": "Providers",
+    "openSource": "is open source!",
+    "showCode": "Show me the code"
+  },
+  "commandBar": {
+    "placeholder": "Type a command or search...",
+    "categories": {
+      "commands": "Commands",
+      "songs": "Songs",
+      "albums": "Albums",
+      "artists": "Artists",
+      "playlists": "Playlists"
+    },
+    "commands": {
+      "goToArtists": "Go to Artists",
+      "goToAlbums": "Go to Albums",
+      "goToQueue": "Go to Queue",
+      "goToPlaylists": "Go to Playlists",
+      "goToSettings": "Go to Settings",
+      "goToExplore": "Go to Explore",
+      "togglePlaying": "Toggle Playing",
+      "playNext": "Play Next",
+      "playPrevious": "Play Previous"
+    }
   }
 }

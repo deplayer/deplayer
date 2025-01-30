@@ -1,0 +1,137 @@
+{
+  "menu": {
+    "home": "Inicio",
+    "search": "Buscar",
+    "import": "Importar",
+    "collection": "Colección",
+    "queue": "Cola",
+    "artists": "Artistas",
+    "playlists": "Listas"
+  },
+  "titles": {
+    "albums": "Álbumes",
+    "relatedAlbums": "Álbumes del mismo artista",
+    "mostPlayedSongs": "Canciones más reproducidas",
+    "sameGenreSongs": "Canciones del mismo género"
+  },
+  "labels": {
+    "sync": "Sincronizar",
+    "enableSync": "Activar sincronización",
+    "syncServerUrl": "URL del servidor de sincronización",
+    "pgliteRepl": "PGLite Repl",
+    "pgliteReplDescription": "Ejecutar consultas SQL arbitrarias en la base de datos de deplayer",
+    "actions": "Acciones",
+    "language": "Idioma",
+    "useSystemLanguage": "Usar idioma del sistema",
+    "enableReactPlayer": "usar react-player (beta)",
+    "enableSpectrum": "espectro del reproductor",
+    "deleteCollection": "Eliminar colección",
+    "exportCollection": "Exportar colección",
+    "importCollection": "Importar colección",
+    "deleteSettings": "Eliminar configuración",
+    "addProviders": "Añadir proveedores",
+    "providers": "Proveedores",
+    "lazyProviders": "Proveedores de búsqueda",
+    "generalSettings": "Configuración",
+    "jellyfin": "Jellyfin",
+    "jellyfin.baseUrl": "URL del servidor",
+    "jellyfin.username": "Nombre de usuario",
+    "jellyfin.apiKey": "Clave API",
+    "musicbrainz": "MusicBrainz",
+    "enabled": "Activado"
+  },
+  "song": {
+    "label": {
+      "song": "Canción",
+      "title": "Título",
+      "album": "Álbum",
+      "artist": "Artista",
+      "time": "Duración",
+      "genre": "Género",
+      "dateAdded": "Fecha añadido",
+      "price": "Precio",
+      "played": "Reproducido",
+      "times": "veces"
+    }
+  },
+  "placeholder": {
+    "search": "Escribe algún artista, canción o álbum..."
+  },
+  "notifications": {
+    "songPinned": "Canción fijada",
+    "songUnpinned": "Canción desfijada",
+    "search": {
+      "finished": "¡Búsqueda finalizada!"
+    },
+    "settings": {
+      "saved": "¡Configuración guardada!"
+    }
+  },
+  "buttons": {
+    "save": "Guardar",
+    "addNext": "Añadir siguiente",
+    "addNewMedia": "Añadir nuevo contenido",
+    "addProvider": "Configurar nuevo proveedor",
+    "playAll": "Reproducir esta lista",
+    "clearQueue": "limpiar cola",
+    "saveAsPlaylist": "guardar como lista de reproducción",
+    "addToQueue": "Añadir a la cola",
+    "removeFromCollection": "eliminar de la colección",
+    "removeFromQueue": "Eliminar de la cola",
+    "shuffle": "Aleatorio",
+    "hidePlayer": "Ocultar",
+    "repeat": "Repetir",
+    "fullScreen": "Pantalla completa",
+    "toggleMiniQueue": "Mostrar/ocultar cola",
+    "startPlaying": "Comenzar reproducción",
+    "toggleSpectrum": "Mostrar/ocultar espectro",
+    "toggleVisuals": "Mostrar/ocultar visuales",
+    "downloadMedia": "Descargar contenido",
+    "pinAlbum": "Fijar álbum",
+    "syncProvider": "Sincronizar toda la música"
+  },
+  "message": {
+    "noCollectionItems": "La colección está vacía, aquí verás todo el contenido descubierto por Deplayer.\nPara empezar a llenar tu colección necesitas añadir contenido o añadir un proveedor y comenzar a buscar.",
+    "noMostPlayed": "Aún no has reproducido ninguna canción",
+    "goToCollection": "¡Ve a la colección para reproducir algo!",
+    "tryDemoSong": "Probar canción de demostración"
+  },
+  "peer": {
+    "connectedPeers": "Pares conectados",
+    "joinRoom": "Unirse a la sala",
+    "shareRoom": "Compartir sala",
+    "listenAlong": "Escuchar juntos",
+    "enterRoomCode": "Introducir código de sala",
+    "enterUsername": "Introducir nombre de usuario",
+    "nowPlaying": "Reproduciendo ahora",
+    "notPlaying": "No reproduciendo",
+    "leaveRoom": "Salir de la sala",
+    "roomLink": "Enlace de la sala",
+    "createRoom": "Crear sala",
+    "request": "Descargar",
+    "streamRealtime": "Transmisión en directo",
+    "leave": "Salir de la sala",
+    "joinOrCreateRoom": "Unirse o crear una sala",
+    "join": "Entrar"
+  },
+  "dashboard": {
+    "recentlyAdded": "Álbumes añadidos recientemente",
+    "welcome": {
+      "title": "¡Hola <i>audiófilo</i>! Bienvenido a",
+      "description": "Accede a tu biblioteca de música y disfrútala cuando la necesites.",
+      "steps": "Para empezar a reproducir contenido, sigue uno de los siguientes pasos:",
+      "setupProviders": "Configura tus proveedores de medios (Subsonic API, mstream o ITunes)",
+      "addMedia": "Añade nuevos medios a tu colección",
+      "addMediaDescription": "Webtorrent, Sistema de archivos, IPFS o youtube-dl-server",
+      "goToCollection": "O ve a tu colección",
+      "authenticated": "Estás autenticado con tu clave de acceso",
+      "authNeeded": "Accede a las funcionalidades sociales autenticándote con tu clave de acceso",
+      "authButton": "🔒 Autenticación"
+    }
+  },
+  "sidebar": {
+    "providers": "Proveedores",
+    "openSource": "es código abierto!",
+    "showCode": "Muéstrame el código"
+  }
+} 

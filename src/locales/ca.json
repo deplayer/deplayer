@@ -3,7 +3,11 @@
     "home": "Inici",
     "search": "Cerca",
     "import": "Importa",
-    "collection": "Col·lecció"
+    "collection": "Col·lecció",
+    "queue": "Cua",
+    "artists": "Artistes",
+    "playlists": "Llistes",
+    "settings": "Configuració"
   },
   "titles": {
     "albums": "Àlbums",
@@ -29,7 +33,7 @@
     "addProviders": "Afegeix proveïdors",
     "providers": "Proveïdors",
     "lazyProviders": "Proveïdors de cerca",
-    "generalSettings": "Configuració general",
+    "generalSettings": "Configuració",
     "jellyfin": "Jellyfin",
     "jellyfin.baseUrl": "URL del servidor",
     "jellyfin.username": "Nom d'usuari",
@@ -112,6 +116,44 @@
     "join": "Entra"
   },
   "dashboard": {
-    "recentlyAdded": "Àlbums afegits recentment"
+    "recentlyAdded": "Àlbums afegits recentment",
+    "welcome": {
+      "title": "Hola <i>audiòfil</i>! Benvingut a",
+      "description": "Accedeix a la teva biblioteca de música i gaudeix-la quan la necessitis.",
+      "steps": "Per començar a reproduir contingut, segueix un dels passos següents:",
+      "setupProviders": "Configura els teus proveïdors de mitjans (Subsonic API, mstream o ITunes)",
+      "addMedia": "Afegeix nous mitjans a la teva col·lecció",
+      "addMediaDescription": "Webtorrent, Sistema de fitxers, IPFS o youtube-dl-server",
+      "goToCollection": "O ves a la teva col·lecció",
+      "authenticated": "Estàs autenticat amb la teva clau d'accés",
+      "authNeeded": "Accedeix a les funcionalitats socials autenticant-te amb la teva clau d'accés",
+      "authButton": "🔒 Autenticació"
+    }
+  },
+  "sidebar": {
+    "providers": "Proveïdors",
+    "openSource": "és codi obert!",
+    "showCode": "Mostra'm el codi"
+  },
+  "commandBar": {
+    "placeholder": "Escriu una ordre o cerca...",
+    "categories": {
+      "commands": "Ordres",
+      "songs": "Cançons",
+      "albums": "Àlbums",
+      "artists": "Artistes",
+      "playlists": "Llistes de reproducció"
+    },
+    "commands": {
+      "goToArtists": "Anar a Artistes",
+      "goToAlbums": "Anar a Àlbums",
+      "goToQueue": "Anar a la Cua",
+      "goToPlaylists": "Anar a Llistes de reproducció",
+      "goToSettings": "Anar a Configuració",
+      "goToExplore": "Anar a Explorar",
+      "togglePlaying": "Alternar Reproducció",
+      "playNext": "Reproduir Següent",
+      "playPrevious": "Reproduir Anterior"
+    }
   }
 } 

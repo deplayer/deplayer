@@ -12,9 +12,10 @@ const SearchMenuItem = ({ current = false, totalItems }: Props) => {
       current={current}
       totalItems={totalItems}
       url='/search-results'
-      title='search'
-      label='Search'
+      title="menu.search"
+      label="menu.search"
       icon={<Icon icon='faSearch' />}
+      translate={true}
     />
   )
 }

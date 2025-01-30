@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import classnames from 'classnames'
+import { Translate } from 'react-redux-i18n'
 
 type MenuItemProps = {
   current: boolean,
@@ -8,7 +9,8 @@ type MenuItemProps = {
   title: string,
   label: string,
   icon: React.ReactNode,
-  totalItems?: number
+  totalItems?: number,
+  translate?: boolean
 }
 
 const MenuItem = (props: MenuItemProps) => {
@@ -24,11 +26,13 @@ const MenuItem = (props: MenuItemProps) => {
     }
   )
 
+  const label = props.translate ? <Translate value={props.label} /> : props.label
+
   return (
     <li className={liClasses}>
       <Link to={props.url} className={linkClasses} title={props.title}>
         <span className='w-8'>{props.icon}</span>
-        <span className='flex-1'>{props.label}</span>
+        <span className='flex-1'>{label}</span>
         {props.totalItems !== undefined && (
           <span className='badge badge-sm'>{props.totalItems}</span>
         )}

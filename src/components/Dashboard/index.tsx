@@ -57,35 +57,53 @@ const WelcomeMessage = ({ dispatch }: { dispatch: Dispatch }) => {
       {showAuthModal && <Auth dispatch={dispatch} onClose={() => setShowAuthModal(false)} isOpen={showAuthModal} />}
       <div className='flex flex-col items-center min-w-1/2'>
         <h4 className="text-xl text-center py-4 p-4">
-          Hi <i>audiophile</i>! Welcome to <DeplayerTitle />
+          <Translate value="dashboard.welcome.title" dangerousHTML /> <DeplayerTitle />
         </h4>
         <Image />
       </div>
       <div className='bg-base-300 mt-4 mx-10 my-10 glass'>
         <div className='bg-base-200 p-4 px-6 md:py-8'>
           <p className='py-4 text-base-content'>
-            Access to you good ol' music library and enjoy it whenever you need it. <br />
-            To start playing some content follow one of the steps below:
+            <Translate value="dashboard.welcome.description" /> <br />
+            <Translate value="dashboard.welcome.steps" />
           </p>
           <div className='mb-6 flex justify-center'>
             <TryDemoButton />
           </div>
           <ul>
-            <li><Link to='/providers' className='text-primary hover:text-primary-focus'>Setup your media providers</Link>, (Subsonic API, mstream or ITunes)</li>
             <li>
-              <a onClick={() => dispatch({ type: types.SHOW_ADD_MEDIA_MODAL })} className='text-primary hover:text-primary-focus cursor-pointer'>Add new media to your collection</a> Webtorrent, Filesystem, IPFS or youtube-dl-server
+              <Link to='/providers' className='text-primary hover:text-primary-focus'>
+                <Translate value="dashboard.welcome.setupProviders" />
+              </Link>
             </li>
-            <li><Link to='/collection' className='text-primary hover:text-primary-focus'>Or go to your collection</Link></li>
+            <li>
+              <a onClick={() => dispatch({ type: types.SHOW_ADD_MEDIA_MODAL })} className='text-primary hover:text-primary-focus cursor-pointer'>
+                <Translate value="dashboard.welcome.addMedia" />
+              </a>{' '}
+              <Translate value="dashboard.welcome.addMediaDescription" />
+            </li>
+            <li>
+              <Link to='/collection' className='text-primary hover:text-primary-focus'>
+                <Translate value="dashboard.welcome.goToCollection" />
+              </Link>
+            </li>
           </ul>
           <div className='pt-6 flex flex-col items-center md:justify-start'>
-            {credentials && <p className='py-2 text-base-content'>You are authenticated with your passkey</p>}
+            {credentials && (
+              <p className='py-2 text-base-content'>
+                <Translate value="dashboard.welcome.authenticated" />
+              </p>
+            )}
             {!credentials && (
               <>
-                <p className='py-2 text-base-content'>Access social capabilities by authenticating with your passkey</p>
-                <Button long onClick={() => setShowAuthModal(true)}>🔒 Auth</Button>
+                <p className='py-2 text-base-content'>
+                  <Translate value="dashboard.welcome.authNeeded" />
+                </p>
+                <Button long onClick={() => setShowAuthModal(true)}>
+                  <Translate value="dashboard.welcome.authButton" />
+                </Button>
               </>
-            )
-            }
+            )}
           </div>
         </div>
       </div>

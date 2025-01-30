@@ -1,5 +1,5 @@
 import { Dispatch } from 'redux'
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef, ReactNode } from 'react'
 import { connect } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import Modal from '../common/Modal'
@@ -10,10 +10,12 @@ import { State as RootState } from '../../reducers'
 import { State as CollectionState } from '../../reducers/collection'
 import { startSearch, StartSearchAction } from '../../types/search'
 import { THEMES } from '../Sidebar/ThemeModal'
+import { Translate } from 'react-redux-i18n'
+import * as types from '../../constants/ActionTypes'
 
 interface BaseItem {
   id: string | number
-  name: string
+  name: string | ReactNode
   icon?: IconType
   description?: string
   cover?: string
@@ -84,52 +86,62 @@ interface Props {
 // Group configurations with priorities
 const GROUP_CONFIGS: Record<string, GroupConfig> = {
   commands: {
-    title: 'Actions',
+    title: 'commandBar.categories.commands',
     icon: 'faSearch',
     priority: 1,
     filter: items => items.filter(item => item.type === 'command')
   },
   navigation: {
-    title: 'Navigation',
+    title: 'commandBar.categories.navigation',
     icon: 'faStream',
     priority: 2,
     filter: items => items.filter(item => item.type === 'navigation')
   },
   themes: {
-    title: 'Themes',
+    title: 'commandBar.categories.themes',
     icon: 'faPalette',
     priority: 3,
     filter: items => items.filter(item => item.type === 'theme')
   },
   peers: {
-    title: 'Friends',
+    title: 'commandBar.categories.peers',
     icon: 'faUser',
     priority: 4,
     filter: items => items.filter(item => item.type === 'peer')
   },
   artists: {
-    title: 'Artists',
+    title: 'commandBar.categories.artists',
     icon: 'faMicrophoneAlt',
     priority: 5,
     filter: items => items.filter(item => item.type === 'artist')
   },
   albums: {
-    title: 'Albums',
+    title: 'commandBar.categories.albums',
     icon: 'faCompactDisc',
     priority: 6,
     filter: items => items.filter(item => item.type === 'album')
   },
   songs: {
-    title: 'Songs',
+    title: 'commandBar.categories.songs',
     icon: 'faMusic',
     priority: 7,
     filter: items => items.filter(item => item.type === 'song')
   }
 }
 
+type CommandItem = {
+  id: string;
+  type: 'command';
+  name: string | ReactNode;
+  shortcut?: string;
+  command: () => void;
+  category: string;
+  icon: IconType;
+}
+
 function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext, playPrev }: Props) {
   const navigate = useNavigate()
-  const [isOpen, setIsOpen] = useState(false)
+  const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
   const lastMediaSearch = useRef('')
@@ -148,76 +160,49 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
   }))
 
   // Define available commands
-  const commands: Command[] = [
+  const commands: CommandItem[] = [
     {
-      id: 1,
+      id: 'toggle-playing',
       type: 'command',
-      name: 'Play/Pause',
-      icon: 'faPlayCircle',
-      category: 'Playback',
+      name: <Translate value="commandBar.commands.togglePlaying" />,
+      shortcut: 'space',
       command: togglePlaying,
-      shortcut: 'Space'
+      category: 'commands',
+      icon: 'faPlay'
     },
     {
-      id: 2,
+      id: 'play-next',
       type: 'command',
-      name: 'Next Track',
-      icon: 'faStepForward',
-      category: 'Playback',
+      name: <Translate value="commandBar.commands.playNext" />,
+      shortcut: '→, j',
       command: playNext,
-      shortcut: '⌘→'
+      category: 'commands',
+      icon: 'faStepForward'
     },
     {
-      id: 3,
+      id: 'play-prev',
       type: 'command',
-      name: 'Previous Track',
-      icon: 'faStepBackward',
-      category: 'Playback',
+      name: <Translate value="commandBar.commands.playPrevious" />,
+      shortcut: '←, k',
       command: playPrev,
-      shortcut: '⌘←'
+      category: 'commands',
+      icon: 'faStepBackward'
     },
     {
-      id: 10,
+      id: 'toggle-shuffle',
       type: 'command',
-      name: 'Toggle Visuals',
-      icon: 'faBahai',
-      category: 'Player',
-      command: () => dispatch({ type: 'TOGGLE_VISUALS' })
+      name: <Translate value="buttons.shuffle" />,
+      command: () => dispatch({ type: types.SHUFFLE }),
+      category: 'commands',
+      icon: 'faRandom'
     },
     {
-      id: 11,
+      id: 'toggle-repeat',
       type: 'command',
-      name: 'Toggle Spectrum',
-      icon: 'faDeezer',
-      category: 'Player',
-      command: () => dispatch({ type: 'TOGGLE_SPECTRUM' })
-    },
-    {
-      id: 12,
-      type: 'command',
-      name: 'Shuffle Queue',
-      icon: 'faRandom',
-      category: 'Queue',
-      command: () => dispatch({ type: 'SHUFFLE' })
-    },
-    {
-      id: 13,
-      type: 'command',
-      name: 'Toggle Repeat',
-      icon: 'faRedo',
-      category: 'Queue',
-      command: () => dispatch({ type: 'REPEAT' })
-    },
-    {
-      id: 14,
-      type: 'command',
-      name: 'Add New Media',
-      icon: 'faPlusCircle',
-      category: 'Collection',
-      command: () => {
-        dispatch({ type: 'SHOW_ADD_MEDIA_MODAL' })
-        handleClose()
-      }
+      name: <Translate value="buttons.repeat" />,
+      command: () => dispatch({ type: types.REPEAT }),
+      category: 'commands',
+      icon: 'faRedo'
     }
   ]
 
@@ -226,7 +211,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
     {
       id: 'nav-artists',
       type: 'navigation',
-      name: 'Artists',
+      name: <Translate value="menu.artists" />,
       icon: 'faMicrophoneAlt',
       category: 'sidebar',
       path: '/artists'
@@ -234,7 +219,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
     {
       id: 'nav-albums',
       type: 'navigation',
-      name: 'Albums',
+      name: <Translate value="menu.albums" />,
       icon: 'faCompactDisc',
       category: 'sidebar',
       path: '/albums'
@@ -242,7 +227,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
     {
       id: 'nav-queue',
       type: 'navigation',
-      name: 'Queue',
+      name: <Translate value="menu.queue" />,
       icon: 'faMusic',
       category: 'sidebar',
       path: '/queue'
@@ -250,7 +235,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
     {
       id: 'nav-playlists',
       type: 'navigation',
-      name: 'Playlists',
+      name: <Translate value="menu.playlists" />,
       icon: 'faBookmark',
       category: 'sidebar',
       path: '/playlists'
@@ -258,7 +243,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
     {
       id: 'nav-settings',
       type: 'navigation',
-      name: 'Settings',
+      name: <Translate value="menu.settings" />,
       icon: 'faCogs',
       category: 'sidebar',
       path: '/settings'
@@ -266,7 +251,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
     {
       id: 'nav-explore',
       type: 'navigation',
-      name: 'Explore',
+      name: <Translate value="menu.home" />,
       icon: 'faGlobe',
       category: 'sidebar',
       path: '/explore'
@@ -278,7 +263,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
     const lowerSearch = searchTerm.toLowerCase()
     return items.filter(item => {
       const matches = [
-        item.name.toLowerCase().includes(lowerSearch),
+        typeof item.name === 'string' ? item.name.toLowerCase().includes(lowerSearch) : false,
         item.description?.toLowerCase().includes(lowerSearch),
         'category' in item && item.category.toLowerCase().includes(lowerSearch),
         'artist' in item && item.artist?.toLowerCase().includes(lowerSearch),
@@ -321,7 +306,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
 
   // Reset search state when modal closes
   useEffect(() => {
-    if (!isOpen) {
+    if (!open) {
       setSearch('')
       setSelectedIndex(0)
       lastMediaSearch.current = ''
@@ -329,7 +314,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
         clearTimeout(searchTimer.current)
       }
     }
-  }, [isOpen])
+  }, [open])
 
   const groupedItems = useMemo((): GroupedItems[] => {
     // Combine all available items
@@ -369,9 +354,9 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault()
-      setIsOpen(true)
+      setOpen(true)
     }
-    if (!isOpen) return
+    if (!open) return
 
     if (e.key === 'ArrowDown') {
       e.preventDefault()
@@ -394,7 +379,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
       e.preventDefault()
       handleClose()
     }
-  }, [isOpen, allItems, selectedIndex])
+  }, [open, allItems, selectedIndex])
 
   const handleItemSelect = useCallback((item: CommandBarItem) => {
     switch (item.type) {
@@ -430,7 +415,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
   }, [handleKeyDown])
 
   const handleClose = useCallback(() => {
-    setIsOpen(false)
+    setOpen(false)
     setSearch('')
     setSelectedIndex(0)
   }, [])
@@ -481,7 +466,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
     <div className='px-6 py-4 text-xs w-full flex justify-center items-center'>
       <Button
         transparent
-        onClick={() => setIsOpen(true)}
+        onClick={() => setOpen(true)}
         className="btn btn-ghost btn-sm"
       >
         <Icon icon="faSearch" className="mr-2" />
@@ -490,7 +475,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
       </Button>
 
       <Modal
-        isOpen={isOpen}
+        isOpen={open}
         onClose={handleClose}
         title="Search"
         className="w-[800px] max-w-[90vw]"
@@ -528,7 +513,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
               <div key={group.title} className="mb-4">
                 <div className="px-4 py-2 text-sm font-semibold text-base-content/70 flex items-center">
                   <Icon icon={group.icon} className="mr-2" />
-                  {group.title}
+                  <Translate value={group.title} />
                 </div>
                 {group.items.map((item: CommandBarItem, index: number) => {
                   const itemIndex = groupedItems

@@ -1,6 +1,7 @@
 import { Dispatch } from 'redux'
 import React from 'react'
 import { useNavigate } from 'react-router'
+import { Translate } from 'react-redux-i18n'
 
 import CommandBar from '../CommandBar'
 import CollectionMenuItem from './CollectionMenuItem'
@@ -113,9 +114,10 @@ const SidebarContents = (props: ContentProps) => {
         <MenuItem
           current={inSection(location, 'providers')}
           url='/providers'
-          title='Providers'
-          label='Providers'
+          title="sidebar.providers"
+          label="sidebar.providers"
           icon={<Icon icon='faPlug' />}
+          translate={true}
         />
         <SettingsMenuItem current={inSection(location, 'settings')} />
       </ul>
@@ -132,15 +134,15 @@ const SidebarContents = (props: ContentProps) => {
       </div>
 
       <section className='p-6 pt-8 text-sm text-center w-full text-base-content/70'>
-        <DeplayerTitle /> is 
+        <DeplayerTitle /> <Translate value="sidebar.openSource" />
         <a
           href={'https://gitlab.com/deplayer/deplayer'}
           rel="noreferrer"
-          title="Show me the code"
+          title="sidebar.showCode"
           target="_blank"
           className="link link-primary mx-1"
         >
-          open source!
+          <Translate value="sidebar.showCode" />
         </a>
         <Icon icon='faGitlab' className='ml-2' />
       </section>

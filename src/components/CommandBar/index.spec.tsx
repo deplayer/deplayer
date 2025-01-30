@@ -255,7 +255,7 @@ describe('CommandBar', () => {
     })
 
     // Check for theme section
-    expect(getByText('Themes')).toBeTruthy()
+    expect(getByText('themes')).toBeTruthy()
 
     // Check for some theme options
     expect(getByText('Deplayer')).toBeTruthy()

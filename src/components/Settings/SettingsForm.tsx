@@ -94,6 +94,7 @@ const SettingsForm = (props: Props) => {
                   >
                     <option value="en">English</option>
                     <option value="ca">Català</option>
+                    <option value="es">Español</option>
                   </select>
                 </div>
               )}

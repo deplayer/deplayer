@@ -11,9 +11,10 @@ const CollectionMenuItem = ({ current = false }: Props) => {
     <MenuItem
       current={current}
       url='/collection'
-      title='collection'
-      label='Collection'
+      title="menu.collection"
+      label="menu.collection"
       icon={<Icon icon='faDatabase' />}
+      translate={true}
     />
   )
 }

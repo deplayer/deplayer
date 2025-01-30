@@ -12,8 +12,9 @@ const QueueMenuItem = ({ current = false, totalItems }: Props) => {
       totalItems={totalItems}
       current={current}
       url='/queue'
-      title='now playing'
-      label='Now playing'
+      title='menu.queue'
+      label='menu.queue'
+      translate={true}
       icon={<Icon icon='faMusic' />}
     />
   )

@@ -12,8 +12,9 @@ const PlaylistsMenuItem = ({ current = false, totalItems = 0 }: Props) => {
       totalItems={totalItems}
       current={current}
       url='/playlists'
-      title='playlists'
-      label='Playlists'
+      title='menu.playlists'
+      label='menu.playlists'
+      translate={true}
       icon={<Icon icon='faBookmark' />}
     />
   )

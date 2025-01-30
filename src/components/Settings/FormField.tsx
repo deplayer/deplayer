@@ -1,8 +1,5 @@
 import { Field } from 'formik'
-import Toggle from 'react-toggle'
 import { FormField as FormFieldType } from '../../types/forms'
-
-import 'react-toggle/style.css'
 
 type Props = {
   field: FormFieldType
@@ -21,10 +18,12 @@ const FormField = (props: Props) => {
       <div className='w-full toggle-control flex justify-end'>
         <Field name={fieldName}>
           {({ field }: any) => (
-            <Toggle
+            <input
+              type="checkbox"
               {...field}
               id={field.name}
               checked={field.value}
+              className="toggle toggle-primary"
             />
           )}
         </Field>

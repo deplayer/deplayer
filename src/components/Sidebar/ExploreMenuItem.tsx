@@ -10,11 +10,11 @@ const ExploreMenuItem = ({ current = false }: Props) => {
     <MenuItem
       current={current}
       url='/'
-      title='explore'
-      label='Explore'
+      title="menu.home"
+      label="menu.home"
       icon={<Icon icon='faGlobe' />}
-    >
-    </MenuItem>
+      translate={true}
+    />
   )
 }
 

@@ -12,8 +12,9 @@ const ArtistsMenuItem = ({ totalItems, current = false }: Props) => {
       totalItems={totalItems}
       current={current}
       url='/artists'
-      title='artists'
-      label='Artists'
+      title='menu.artists'
+      label='menu.artists'
+      translate={true}
       icon={<Icon icon='faMicrophoneAlt' />}
     />
   )

@@ -10,9 +10,10 @@ const SettingsMenuItem = ({ current = false }: Props) => {
     <MenuItem
       current={current}
       url='/settings'
-      title='settings'
-      label='Settings'
+      title="labels.generalSettings"
+      label="labels.generalSettings"
       icon={<Icon icon='faCogs' />}
+      translate={true}
     />
   )
 }

@@ -145,8 +145,11 @@ const ContextualMenu = (props: MenuProps) => {
                 />
                 <Translate value='buttons.toggleVisuals' />
               </div>
-              <Icon
-                icon={props.app.showVisuals ? 'faCheckSquare' : 'faSquare'}
+              <input
+                type="checkbox"
+                checked={props.app.showVisuals}
+                readOnly
+                className="toggle toggle-primary toggle-sm"
               />
             </div>
           </Button>
@@ -166,8 +169,11 @@ const ContextualMenu = (props: MenuProps) => {
                 />
                 <Translate value='buttons.toggleSpectrum' />
               </div>
-              <Icon
-                icon={props.app.showSpectrum ? 'faCheckSquare' : 'faSquare'}
+              <input
+                type="checkbox"
+                checked={props.app.showSpectrum}
+                readOnly
+                className="toggle toggle-primary toggle-sm"
               />
             </div>
           </Button>
@@ -188,8 +194,11 @@ const ContextualMenu = (props: MenuProps) => {
                     <Icon icon='faRandom' className='mr-2' />
                     <Translate value='buttons.shuffle' />
                   </div>
-                  <Icon
-                    icon={props.queue.shuffle ? 'faCheckSquare' : 'faSquare'}
+                  <input
+                    type="checkbox"
+                    checked={props.queue.shuffle}
+                    readOnly
+                    className="toggle toggle-primary toggle-sm"
                   />
                 </div>
               </Button>
@@ -208,8 +217,11 @@ const ContextualMenu = (props: MenuProps) => {
                     <Icon icon='faRedo' className='mr-2' />
                     <Translate value='buttons.repeat' />
                   </div>
-                  <Icon
-                    icon={props.queue.repeat ? 'faCheckSquare' : 'faSquare'}
+                  <input
+                    type="checkbox"
+                    checked={props.queue.repeat}
+                    readOnly
+                    className="toggle toggle-primary toggle-sm"
                   />
                 </div>
               </Button>
