@@ -87,6 +87,19 @@ class PlayerControls extends React.Component<Props> {
     timeShown: 0,
   }
 
+  toggleFullscreen = () => {
+    const videoElement = this.playerRef.current?.getInternalPlayer()
+    if (videoElement && videoElement instanceof HTMLVideoElement) {
+      if (!document.fullscreenElement) {
+        videoElement.requestFullscreen().catch(err => {
+          console.error('Error attempting to enable fullscreen:', err)
+        })
+      } else {
+        document.exitFullscreen()
+      }
+    }
+  }
+
   playPause = () => {
     this.props.dispatch({ type: types.TOGGLE_PLAYING })
   }
@@ -327,7 +340,7 @@ class PlayerControls extends React.Component<Props> {
                           playPause={this.playPause}
                           playNext={this.playNext}
                           showFullscreen={showFullscreen}
-                          toggleFullscreen={() => this.props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
+                          toggleFullscreen={this.toggleFullscreen}
                         />
                         <div className='w-16'>
                         </div>

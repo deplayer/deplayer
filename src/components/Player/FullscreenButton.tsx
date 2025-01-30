@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
 import * as types from '../../constants/ActionTypes'
 import { Dispatch } from 'redux'
+
 type FullscreenButtonProps = {
   onClick: () => void,
   dispatch: Dispatch
@@ -11,9 +12,20 @@ type FullscreenButtonProps = {
 const FullscreenButton = ({ onClick, dispatch }: FullscreenButtonProps) => {
   const [isFullscreen, setIsFullscreen] = useState(false)
 
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const fullscreenState = !!document.fullscreenElement
+      setIsFullscreen(fullscreenState)
+      dispatch({ type: types.TOGGLE_FULL_SCREEN, payload: fullscreenState })
+    }
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange)
+    }
+  }, [dispatch])
+
   const handleClick = () => {
-    setIsFullscreen(!isFullscreen)
-    dispatch({ type: types.TOGGLE_FULL_SCREEN, payload: !isFullscreen })
     onClick()
   }
 

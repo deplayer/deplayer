@@ -13,17 +13,48 @@ export function* initialize(): Generator<any, void, any> {
   const settingsService = new SettingsService(adapter);
   yield call(settingsService.initialize);
 
+  const defaultSettings = {
+    providers: {
+      musicbrainz: {
+        enabled: true,
+      },
+    },
+    app: {
+      spectrum: {
+        enabled: false,
+      },
+      lastfm: {
+        enabled: false,
+        apikey: "",
+      },
+      language: {
+        code: "en",
+        useSystemLanguage: true,
+      },
+    },
+  };
+
   try {
     const settings = yield call(settingsService.get);
 
     if (!settings) {
-      yield put({
-        type: types.GET_SETTINGS_REJECTED,
-        error: "Settings not found",
-      });
+      // Save default settings
+      yield call(settingsService.save, "settings", defaultSettings);
+      yield put({ type: types.RECEIVE_SETTINGS, settings: defaultSettings });
     } else {
       const unserialized = JSON.parse(JSON.stringify(settings));
       const settingsObj = unserialized[0].settings;
+
+      // Ensure language settings exist
+      if (!settingsObj.app?.language) {
+        settingsObj.app = {
+          ...settingsObj.app,
+          language: defaultSettings.app.language,
+        };
+        // Save updated settings
+        yield call(settingsService.save, "settings", settingsObj);
+      }
+
       yield put({ type: types.RECEIVE_SETTINGS, settings: settingsObj });
     }
     yield put({ type: types.RECEIVE_SETTINGS_FINISHED });
@@ -43,8 +74,8 @@ export function* saveSettings(action: any): Generator<any, void, any> {
       ...action.settingsPayload,
       app: {
         ...prevSettings.app,
-        ...(action.settingsPayload.app || {})
-      }
+        ...(action.settingsPayload.app || {}),
+      },
     };
 
     const settings = yield call(
