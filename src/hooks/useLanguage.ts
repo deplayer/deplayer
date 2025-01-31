@@ -11,15 +11,18 @@ export const useLanguage = () => {
   const settings = useSelector((state: { settings: State }) => state.settings.settings)
   
   useEffect(() => {
-    const language = settings.app.language
-    const selectedLanguage = language.useSystemLanguage 
+    // Default to system language if settings structure is incomplete
+    const useSystemLanguage = settings?.app?.language?.useSystemLanguage ?? true
+    const languageCode = settings?.app?.language?.code ?? 'en'
+    
+    const selectedLanguage = useSystemLanguage 
       ? LanguageDetector.getPreferredLanguage()
-      : language.code
+      : languageCode
 
     dispatch(setLocale(selectedLanguage) as unknown as Action)
   }, [
-    settings.app.language.useSystemLanguage,
-    settings.app.language.code,
+    settings?.app?.language?.useSystemLanguage,
+    settings?.app?.language?.code,
     dispatch
   ])
 } 
