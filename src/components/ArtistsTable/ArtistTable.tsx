@@ -48,7 +48,7 @@ const ArtistTable = ({ collection: { artists, songsByArtist } }: Props) => {
     )
   }
 
-  const columnCount = Math.floor(window.innerWidth / 240)
+  const columnCount = Math.floor((window.innerWidth / 240) - 1)
   const columnWidth = 240
   const rowHeight = 280
   const rowCount = Math.ceil(tableIds.length / columnCount)
