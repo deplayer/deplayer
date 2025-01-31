@@ -18,8 +18,10 @@
     "sync": "Sincronizar",
     "enableSync": "Activar sincronización",
     "syncServerUrl": "URL del servidor de sincronización",
-    "pgliteRepl": "PGLite Repl",
-    "pgliteReplDescription": "Ejecutar consultas SQL arbitrarias en la base de datos de deplayer",
+    "syncDescription": "Sincroniza tus datos entre dispositivos usando una base de datos PostgreSQL.",
+    "syncServerInstructions": "Para configurar tu propio servidor de sincronización, sigue las instrucciones en nuestra documentación.",
+    "readDocs": "Leer la documentación",
+    "repl": "REPL",
     "actions": "Acciones",
     "language": "Idioma",
     "useSystemLanguage": "Usar idioma del sistema",
@@ -133,5 +135,11 @@
     "providers": "Proveedores",
     "openSource": "es código abierto!",
     "showCode": "Muéstrame el código"
+  },
+  "languages": {
+    "english": "Inglés",
+    "spanish": "Español",
+    "catalan": "Catalán",
+    "selectLanguage": "Seleccionar idioma"
   }
 } 

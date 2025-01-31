@@ -33,29 +33,31 @@ const DatabaseSyncForm = () => {
       onSubmit={handleSubmit}
       enableReinitialize
     >
-      {({ isSubmitting }) => (
+      {() => (
         <Form>
-          <h2 className='text-2xl py-3 text-base-content'>
-            <Translate value="labels.sync" />
-          </h2>
-
-          <div className={settingsCard}>
-            <FormSchema schema={schema} />
-
-            <div className='w-full flex justify-center mt-12'>
-              <div className='max-w-xs w-full'>
-                <Button
-                  fullWidth
-                  size='2xl'
-                  disabled={isSubmitting}
-                  type='submit'
-                  className='btn-primary'
-                >
-                  <Translate value="buttons.save" />
-                </Button>
+          <div className="mb-4 prose">
+            <p className="text-base-content opacity-80">
+              <Translate value="labels.syncDescription" />
+            </p>
+            <div className="alert alert-info mt-4">
+              <div>
+                <p>
+                  <Translate value="labels.syncServerInstructions" />
+                  {' '}
+                  <a 
+                    href="https://gitlab.com/deplayer/deplayer/-/blob/master/README.md#sync-server-setup" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="link link-primary-content"
+                  >
+                    <Translate value="labels.readDocs" />
+                  </a>
+                </p>
               </div>
             </div>
           </div>
+
+          <FormSchema schema={schema} />
         </Form>
       )}
     </Formik>

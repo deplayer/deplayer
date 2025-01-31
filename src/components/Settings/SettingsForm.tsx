@@ -16,27 +16,41 @@ type Props = {
   schema: { fields: FormField[] }
 }
 
-export const settingsCard = classNames({
-  'relative': true,
-  'bg-base-200': true,
-  'p-10': true,
-  'mb-4': true,
-  'rounded-lg': true
-})
+const formControlClass = classNames(
+  'form-control',
+  'w-full',
+  'mb-6',
+  'last:mb-0'
+)
 
-export const settingsButton = {
-  fullWidth: true,
-  size: '2xl' as const,
-  className: 'btn-primary'
-}
+const labelClass = classNames(
+  'w-full',
+  'label',
+  'cursor-pointer',
+  'justify-between',
+  'gap-4',
+  'py-2'
+)
 
-export const settingsButtonContainer = classNames({
-  'w-full': true,
-  'flex': true,
-  'justify-center': true,
-  'mt-12': true,
-  'max-w-xs': true
-})
+const labelTextClass = classNames(
+  'label-text',
+  'flex-1',
+  'leading-relaxed',
+  'text-base-content'
+)
+
+const selectClass = classNames(
+  'select',
+  'select-bordered',
+  'w-full',
+  'bg-base-100'
+)
+
+const AVAILABLE_LANGUAGES = [
+  { code: 'en', label: 'languages.english' },
+  { code: 'ca', label: 'languages.catalan' },
+  { code: 'es', label: 'languages.spanish' }
+] as const
 
 const SettingsForm = (props: Props) => {
   const handleSubmit = (values: any, actions: any) => {
@@ -57,63 +71,62 @@ const SettingsForm = (props: Props) => {
         values,
         setFieldValue
       }) => (
-        <Form
-          className='settings-form'
-        >
-          <h2 className='text-2xl py-3 text-base-content'><Translate value="labels.generalSettings" /></h2>
-
-          <div className={settingsCard}>
-            <div className="mb-8">
-              <h3 className="text-xl mb-4"><Translate value="labels.language" /></h3>
-              <div className="form-control">
-                <label className="label cursor-pointer">
-                  <span className="label-text"><Translate value="labels.useSystemLanguage" /></span>
-                  <input
-                    type="checkbox"
-                    className="toggle toggle-primary"
-                    checked={values.app?.language?.useSystemLanguage ?? true}
-                    onChange={(e) => {
-                      setFieldValue('app.language', {
-                        ...values.app?.language,
-                        useSystemLanguage: e.target.checked,
-                        code: e.target.checked ? LanguageDetector.getPreferredLanguage() : (values.app?.language?.code ?? 'en')
-                      })
-                    }}
-                  />
-                </label>
-              </div>
-              {!(values.app?.language?.useSystemLanguage ?? true) && (
-                <div className="form-control w-full max-w-xs">
-                  <select
-                    className="select select-bordered w-full"
-                    value={values.app?.language?.code ?? 'en'}
-                    onChange={(e) => setFieldValue('app.language', {
+        <Form>
+          <SettingsFormGroup
+            title="labels.language"
+            showSubmitButton={false}
+          >
+            <label className={labelClass}>
+              <span className={labelTextClass}>
+                <Translate value="labels.useSystemLanguage" />
+              </span>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  className="toggle toggle-primary"
+                  checked={values.app?.language?.useSystemLanguage ?? true}
+                  onChange={(e) => {
+                    setFieldValue('app.language', {
                       ...values.app?.language,
-                      code: e.target.value
-                    })}
-                  >
-                    <option value="en">English</option>
-                    <option value="ca">Català</option>
-                    <option value="es">Español</option>
-                  </select>
-                </div>
-              )}
-            </div>
-
-            <FormSchema schema={schema} />
-
-            <div className='w-full flex justify-center mt-12'>
-              <div className={settingsButtonContainer}>
-                <Button
-                  {...settingsButton}
-                  disabled={isSubmitting}
-                  type='submit'
-                >
-                  <Translate value="buttons.save" />
-                </Button>
+                      useSystemLanguage: e.target.checked,
+                      code: e.target.checked ? LanguageDetector.getPreferredLanguage() : (values.app?.language?.code ?? 'en')
+                    })
+                  }}
+                />
               </div>
-            </div>
-          </div>
+            </label>
+
+            {!(values.app?.language?.useSystemLanguage ?? true) && (
+              <div className={formControlClass}>
+                <label className={labelClass}>
+                  <span className={labelTextClass}>
+                    <Translate value="labels.selectLanguage" />
+                  </span>
+                </label>
+                <select
+                  className={selectClass}
+                  value={values.app?.language?.code ?? 'en'}
+                  onChange={(e) => setFieldValue('app.language', {
+                    ...values.app?.language,
+                    code: e.target.value
+                  })}
+                >
+                  {AVAILABLE_LANGUAGES.map(({ code, label }) => (
+                    <option key={code} value={code}>
+                      {I18n.t(label)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </SettingsFormGroup>
+
+          <SettingsFormGroup
+            title="labels.otherSettings"
+            isSubmitting={isSubmitting}
+          >
+            <FormSchema schema={schema} />
+          </SettingsFormGroup>
         </Form>
       )}
     </Formik>

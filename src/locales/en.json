@@ -18,8 +18,9 @@
     "sync": "Sync",
     "enableSync": "Enable sync",
     "syncServerUrl": "Sync server URL",
-    "pgliteRepl": "PGLite Repl",
-    "pgliteReplDescription": "Run arbitrary SQL queries against deplayer's database",
+    "syncDescription": "Sync your data across devices using a PostgreSQL database.",
+    "syncServerInstructions": "To set up your own sync server, follow the instructions in our documentation.",
+    "readDocs": "Read the docs",
     "actions": "Actions",
     "language": "Language",
     "useSystemLanguage": "Use system language",
@@ -32,13 +33,14 @@
     "addProviders": "Add providers",
     "providers": "Providers",
     "lazyProviders": "Search providers",
-    "generalSettings": "General settings",
+    "generalSettings": "Settings",
     "jellyfin": "Jellyfin",
     "jellyfin.baseUrl": "Server URL",
     "jellyfin.username": "Username",
     "jellyfin.apiKey": "API Key",
     "musicbrainz": "MusicBrainz",
-    "enabled": "Enabled"
+    "enabled": "Enabled",
+    "repl": "REPL"
   },
   "song": {
     "label": {
@@ -154,5 +156,11 @@
       "playNext": "Play Next",
       "playPrevious": "Play Previous"
     }
+  },
+  "languages": {
+    "english": "English",
+    "spanish": "Spanish",
+    "catalan": "Catalan",
+    "selectLanguage": "Select language"
   }
 }

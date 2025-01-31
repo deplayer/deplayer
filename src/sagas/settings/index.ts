@@ -35,28 +35,32 @@ export function* initialize(): Generator<any, void, any> {
   };
 
   try {
+    const adapter = getAdapter();
+    const settingsService = new SettingsService(adapter);
+    yield call(settingsService.initialize);
     const settings = yield call(settingsService.get);
 
     if (!settings) {
       // Save default settings
       yield call(settingsService.save, "settings", defaultSettings);
       yield put({ type: types.RECEIVE_SETTINGS, settings: defaultSettings });
-    } else {
-      const unserialized = JSON.parse(JSON.stringify(settings));
-      const settingsObj = unserialized[0].settings;
-
-      // Ensure language settings exist
-      if (!settingsObj.app?.language) {
-        settingsObj.app = {
-          ...settingsObj.app,
-          language: defaultSettings.app.language,
-        };
-        // Save updated settings
-        yield call(settingsService.save, "settings", settingsObj);
-      }
-
-      yield put({ type: types.RECEIVE_SETTINGS, settings: settingsObj });
+      yield put({ type: types.RECEIVE_SETTINGS_FINISHED });
+      return;
     }
+
+    const unserialized = JSON.parse(JSON.stringify(settings));
+
+    if (unserialized.length === 0) {
+      yield put({
+        type: types.RECEIVE_SETTINGS,
+        settings: defaultSettings,
+      });
+      yield put({ type: types.RECEIVE_SETTINGS_FINISHED });
+      return;
+    }
+
+    const settingsObj = unserialized[0].settings;
+    yield put({ type: types.RECEIVE_SETTINGS, settings: settingsObj });
     yield put({ type: types.RECEIVE_SETTINGS_FINISHED });
   } catch (error: any) {
     yield put({ type: types.GET_SETTINGS_REJECTED, error: error.message });

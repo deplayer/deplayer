@@ -27,14 +27,23 @@ type SyncConfig = {
   primaryKey: string[];
 };
 
+// Shape subscription types
+type ShapeRows = Record<string, any>[];
+
+type ShapeData =
+  | {
+      rows: ShapeRows;
+    }
+  | undefined;
+
+type ShapeSubscription = {
+  rows: Promise<ShapeRows>;
+  subscribe: (callback: (data: ShapeData) => void) => void;
+};
+
 type ExtendedPGlite = PGlite & {
   electric: {
-    syncShapeToTable: (config: SyncConfig) => {
-      subscribe: (handlers: {
-        next: (data: unknown) => void;
-        error: (error: unknown) => void;
-      }) => void;
-    };
+    syncShapeToTable: (config: SyncConfig) => ShapeSubscription;
   };
 };
 
@@ -62,41 +71,92 @@ async function setupSync(client: PGlite, settings: SyncSettings) {
   console.debug("setupSync settings", settings);
 
   if (settings.enabled && settings.serverUrl) {
+    // Define tables in order of their dependencies
     const tables = [
+      // Core tables first
+      { name: "settings", primaryKey: ["id"] },
+      { name: "room", primaryKey: ["id"] }, // room needs to be before peer
+
+      // Tables with foreign keys
+      { name: "peer", primaryKey: ["id"] },
       { name: "media", primaryKey: ["id"] },
       { name: "artist", primaryKey: ["id"] },
-      { name: "settings", primaryKey: ["id"] },
       { name: "queue", primaryKey: ["id"] },
       { name: "smart_playlist", primaryKey: ["id"] },
       { name: "playlist", primaryKey: ["id"] },
-      { name: "peer", primaryKey: ["id"] },
-      { name: "room", primaryKey: ["id"] },
       { name: "media_lyrics", primaryKey: ["id"] },
     ];
 
     console.debug("Preparing shapes for sync", tables);
 
+    // Sync tables sequentially to respect dependencies
     for (const table of tables) {
-      const shape = await (client as ExtendedPGlite).electric.syncShapeToTable({
-        shape: {
-          url: `${settings.serverUrl}/v1/shape`,
-          params: {
-            table: table.name,
-          },
-        },
-        table: table.name,
-        primaryKey: table.primaryKey,
-      });
+      try {
+        console.debug(`Setting up sync for table: ${table.name}`);
 
-      shape.subscribe({
-        next: (data) => {
-          console.debug("Sync shape to table", data);
-        },
-        error: (error) => {
-          console.error("Error syncing shape to table", error);
-        },
-      });
+        const shape = await (
+          client as ExtendedPGlite
+        ).electric.syncShapeToTable({
+          shape: {
+            url: `${settings.serverUrl}/v1/shape`,
+            params: {
+              table: table.name,
+            },
+          },
+          table: table.name,
+          primaryKey: table.primaryKey,
+        });
+
+        // Wait for initial data to ensure proper initialization
+        try {
+          const initialRows = await shape.rows;
+          console.debug(
+            `Initial data loaded for ${table.name}: ${
+              initialRows?.length ?? 0
+            } rows`
+          );
+        } catch (error) {
+          console.error(`Error loading initial data for ${table.name}:`, error);
+          if (table.name === "settings" || table.name === "room") {
+            throw error; // Critical tables should fail fast
+          }
+        }
+
+        // Set up subscription with error handling
+        shape.subscribe((data) => {
+          try {
+            if (!data) {
+              console.warn(
+                `Received undefined data in sync update for ${table.name}`
+              );
+              return;
+            }
+
+            const rows = data.rows;
+            if (!Array.isArray(rows)) {
+              console.warn(`Invalid rows data for ${table.name}:`, rows);
+              return;
+            }
+
+            console.debug(
+              `Received sync update for ${table.name}: ${rows.length} rows`
+            );
+          } catch (error) {
+            console.error(
+              `Error processing sync update for ${table.name}:`,
+              error
+            );
+          }
+        });
+      } catch (error) {
+        console.error(`Error setting up sync for table ${table.name}:`, error);
+        if (table.name === "settings" || table.name === "room") {
+          throw error; // Critical tables should fail fast
+        }
+      }
     }
+  } else {
+    console.debug("Sync is disabled or server URL not configured");
   }
 }
 
@@ -136,4 +196,24 @@ export const reconnect = async () => {
   dbPromise = null;
   currentClient = null;
   return get();
+};
+
+const SYNC_SETTINGS_KEY = "sync_settings";
+
+let db: any = null;
+
+export const getDb = () => {
+  return db;
+};
+
+export const runMigrations = async () => {
+  const db = await reconnect();
+  await migrate(db, { migrationsFolder: "drizzle" });
+  return db;
+};
+
+export default {
+  getDb,
+  reconnect,
+  runMigrations,
 };

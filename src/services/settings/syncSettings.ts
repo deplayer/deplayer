@@ -32,7 +32,6 @@ export const getSyncFormSchema = () => {
   const settings = getStoredSyncSettings();
   return {
     fields: [
-      { title: "labels.sync", type: "title" },
       {
         title: "labels.enableSync",
         name: "enabled",

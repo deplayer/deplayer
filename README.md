@@ -50,14 +50,44 @@ collection as you wish and play it from any device.
 - Awesome visuals thanks to [butterchurn](https://github.com/jberg/butterchurn)
 - Spectum audio visual thanks to [react-audio-spectrum](https://github.com/hu-ke/react-audio-spectrum)
 
+## Sync Server Setup
+
+Deplayer supports syncing your data across devices using a PostgreSQL database. To set up your own sync server:
+
+1. Navigate to the server directory:
+
+   ```bash
+   cd server
+   ```
+
+2. Create a `.env` file with your configuration:
+
+   ```env
+   POSTGRES_USER=deplayer
+   POSTGRES_PASSWORD=your_secure_password
+   POSTGRES_DB=deplayer
+   ```
+
+3. Start the sync server using Docker Compose:
+
+   ```bash
+   docker-compose up -d
+   ```
+
+4. In the Deplayer app settings:
+   - Enable sync
+   - Set the sync server URL to `http://your-server:5433`
+
+The sync server will handle automatic synchronization of your media collection, playlists, and settings across all your devices.
+
 ## Keyboard hotkeys
 
-| Command           | Hotkey               |
-| ----------------- | -------------------- |
-| Play/Pause        | `space`              |
-| Next track        | `Arrow right` or `j` |
-| Prev track        | `Arrow left` or `k`  |
-| Open command bar  | `Control + k`        |
+| Command          | Hotkey               |
+| ---------------- | -------------------- |
+| Play/Pause       | `space`              |
+| Next track       | `Arrow right` or `j` |
+| Prev track       | `Arrow left` or `k`  |
+| Open command bar | `Control + k`        |
 
 ## Installing
 

@@ -12,10 +12,12 @@ without needing any server.
 - Use Tailwind CSS for styling.
   - Custom styles should be placed in `src/styles/` directory.
   - Use SCSS for complex custom styles.
+- The project uses daisyUI for styling.
 
 # Development
 
 Try to perform as much TDD as possible. Tests command is `npm run test`
+If you're not sure what is wrong, if the test or the implementation. Ask for help.
 Use vitest for testing.
 
 - Don't import react from 'react' in the top level of the file.
@@ -43,3 +45,4 @@ Use vitest for testing.
 - Keep components small and focused on a single responsibility.
 - Use proper semantic HTML elements.
 - Ensure components are accessible (use ARIA attributes when needed).
+- Use classNames from 'classnames' for styling.

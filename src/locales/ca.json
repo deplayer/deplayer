@@ -19,8 +19,9 @@
     "sync": "Sincronitza",
     "enableSync": "Activa la sincronització",
     "syncServerUrl": "URL del servidor de sincronització",
-    "pgliteRepl": "PGLite Repl",
-    "pgliteReplDescription": "Executa consultes SQL arbitràries a la base de dades de deplayer",
+    "syncDescription": "Sincronitza les teves dades entre dispositius utilitzant una base de dades PostgreSQL.",
+    "syncServerInstructions": "Per configurar el teu propi servidor de sincronització, segueix les instruccions a la nostra documentació.",
+    "readDocs": "Llegeix la documentació",
     "actions": "Accions",
     "language": "Idioma",
     "useSystemLanguage": "Utilitza l'idioma del sistema",
@@ -39,7 +40,8 @@
     "jellyfin.username": "Nom d'usuari",
     "jellyfin.apiKey": "Clau API",
     "musicbrainz": "MusicBrainz",
-    "enabled": "Activat"
+    "enabled": "Activat",
+    "repl": "REPL"
   },
   "song": {
     "label": {
@@ -155,5 +157,11 @@
       "playNext": "Reproduir Següent",
       "playPrevious": "Reproduir Anterior"
     }
+  },
+  "languages": {
+    "english": "Anglès",
+    "spanish": "Espanyol",
+    "catalan": "Català",
+    "selectLanguage": "Seleccionar idioma"
   }
 } 
