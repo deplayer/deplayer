@@ -7,4 +7,5 @@ export default connect((state: AppState) => ({
   player: state.player,
   collection: state.collection,
   filteredSongs: state.collection.filteredSongs,
+  app: state.app
 }))(ArtistsTable);

@@ -1,4 +1,4 @@
-import { takeLatest, put, select, call, takeEvery } from "redux-saga/effects";
+import { takeLatest, put, select, call, takeEvery, delay } from "redux-saga/effects";
 import { DataPayload } from "trystero";
 import PeerService from "../../services/PeerService";
 import PeerStorageService from "../../services/PeerStorageService";
@@ -9,32 +9,68 @@ import { Store } from "redux";
 import { selfId } from "trystero/nostr";
 import { IMedia } from "../../entities/Media";
 import RoomStorageService from "../../services/RoomStorageService";
+import { isOpfsReady } from "../../services/OpfsService";
 
 const adapter = getAdapter();
 const peerStorageService = new PeerStorageService(adapter);
 const roomStorageService = new RoomStorageService(adapter);
 
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000; // 1 second
+
 function* initializePeers(store: any): any {
-  yield call(roomStorageService.initialize);
-  yield call(peerStorageService.initialize);
+  let retries = 0;
+  
+  while (retries < MAX_RETRIES) {
+    try {
+      // First ensure OPFS is ready
+      const opfsReady = yield call(isOpfsReady);
+      if (!opfsReady) {
+        throw new Error("OPFS not ready");
+      }
 
-  // Get rooms from storage
-  const rooms = yield call(roomStorageService.get);
-  if (rooms && rooms.length > 0) {
-    yield put({ type: types.SET_ROOMS, rooms });
+      // Initialize storage services
+      yield call(roomStorageService.initialize);
+      yield call(peerStorageService.initialize);
 
-    // Join each room
-    for (const room of rooms) {
-      const username = localStorage.getItem("username") || "Anonymous";
-      yield call(joinRoom, store, {
-        type: types.JOIN_PEER_ROOM,
-        roomCode: room.id,
-        username,
-      });
+      // Get rooms from storage
+      const rooms = yield call(roomStorageService.get);
+      if (rooms && rooms.length > 0) {
+        yield put({ type: types.SET_ROOMS, rooms });
+
+        // Join each room
+        for (const room of rooms) {
+          const username = localStorage.getItem("username") || "Anonymous";
+          yield call(joinRoom, store, {
+            type: types.JOIN_PEER_ROOM,
+            roomCode: room.id,
+            username,
+          });
+        }
+      }
+
+      yield put({ type: types.APP_READY });
+      return; // Success, exit the retry loop
+    } catch (error: any) {
+      retries++;
+      console.error(`Peer initialization failed (attempt ${retries}/${MAX_RETRIES}):`, error);
+      
+      if (retries === MAX_RETRIES) {
+        // Hard fail on max retries
+        yield put({
+          type: types.SEND_NOTIFICATION,
+          notification: `Failed to initialize peer system: ${error.message}`,
+          level: "error",
+          duration: 10000,
+        });
+        yield put({ type: types.PEER_INITIALIZATION_FAILED, error });
+        return;
+      }
+      
+      // Wait before retrying
+      yield delay(RETRY_DELAY);
     }
   }
-
-  yield put({ type: types.APP_READY });
 }
 
 interface JoinRoomAction {

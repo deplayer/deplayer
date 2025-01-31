@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { useMemo } from 'react'
 import Artist from '../../entities/Artist'
 import CoverImage from '../MusicTable/CoverImage'
 import Tag from '../common/Tag'
+import React from 'react'
+import { State as RootState } from '../../reducers'
+import IMedia from '../../entities/Media'
 
 type Props = {
   artist: Artist
@@ -10,32 +14,45 @@ type Props = {
   style?: React.CSSProperties
 }
 
+type ArtistRelation = {
+  type: string
+  url: {
+    resource: string
+  }
+}
+
 const ArtistGridItem = ({ artist, songs, style }: Props) => {
-  const collection = useSelector((state: any) => state.collection)
-  const artistMetadata = useSelector((state: any) => state.artist.artistMetadata)
+  // More specific selectors with proper typing
+  const albumsByArtist = useSelector((state: RootState) => state.collection.albumsByArtist[artist.id])
+  const songsByAlbum = useSelector((state: RootState) => state.collection.songsByAlbum)
+  const collectionRows = useSelector((state: RootState) => state.collection.rows)
+  const artistMetadata = useSelector((state: RootState) => 
+    state.artist.artistMetadata?.[artist.name]?.relations as ArtistRelation[] | undefined
+  )
 
-  // Try to get artist photo from metadata
-  const artistPhoto = artistMetadata?.[artist.name]?.relations?.find(
-    (rel: any) => rel.type === 'image' || rel.type === 'photo'
-  )?.url?.resource
+  // Memoize the artist photo
+  const artistPhoto = useMemo(() => {
+    return artistMetadata?.find(
+      (rel) => rel.type === 'image' || rel.type === 'photo'
+    )?.url?.resource
+  }, [artistMetadata])
 
-  // If no artist photo, get a random album cover
-  const getRandomAlbumCover = () => {
-    const albumIds = collection.albumsByArtist[artist.id] || []
-    if (albumIds.length === 0) return undefined
+  // Memoize the random album cover
+  const randomAlbumCover = useMemo(() => {
+    if (!albumsByArtist || albumsByArtist.length === 0) return undefined
 
-    const randomAlbumId = albumIds[Math.floor(Math.random() * albumIds.length)]
-    const albumSongs = collection.songsByAlbum[randomAlbumId] || []
+    const randomAlbumId = albumsByArtist[Math.floor(Math.random() * albumsByArtist.length)]
+    const albumSongs = songsByAlbum[randomAlbumId] || []
     if (albumSongs.length === 0) return undefined
 
-    const song = collection.rows[albumSongs[0]]
+    const song = collectionRows[albumSongs[0]] as IMedia
     return song?.cover
-  }
+  }, [albumsByArtist, songsByAlbum, collectionRows])
 
   const cover = artistPhoto ? {
     thumbnailUrl: artistPhoto,
     fullUrl: artistPhoto
-  } : getRandomAlbumCover()
+  } : randomAlbumCover
 
   return (
     <div 
@@ -68,4 +85,5 @@ const ArtistGridItem = ({ artist, songs, style }: Props) => {
   )
 }
 
-export default ArtistGridItem 
+// Memoize the entire component
+export default React.memo(ArtistGridItem) 

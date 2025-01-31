@@ -7,15 +7,24 @@ import ArtistRow from './ArtistRow'
 import ArtistGridItem from './ArtistGridItem'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
+import { State as AppState } from '../../reducers/app'
+import { State as QueueState } from '../../reducers/queue'
 
 export type Props = {
   error?: string,
-  queue: any,
+  queue: QueueState,
   collection: CollectionState,
-  dispatch: (action: any) => any
+  app: AppState
 }
 
-const ArtistTable = ({ collection: { artists, songsByArtist } }: Props) => {
+interface GridProps {
+  rowIndex: number
+  columnIndex: number
+  key: string
+  style: React.CSSProperties
+}
+
+const ArtistTable = ({ collection: { artists, songsByArtist }, app: { sidebarToggled, mqlMatch } }: Props) => {
   const [isGridView, setIsGridView] = useState(false)
   const tableIds = Object.keys(artists)
 
@@ -33,7 +42,7 @@ const ArtistTable = ({ collection: { artists, songsByArtist } }: Props) => {
     )
   }
 
-  const gridRenderer = (props: any): any => {
+  const gridRenderer = (props: GridProps): any => {
     const artistId = tableIds[props.rowIndex * 4 + props.columnIndex]
     if (!artistId) return null
     
@@ -48,7 +57,8 @@ const ArtistTable = ({ collection: { artists, songsByArtist } }: Props) => {
     )
   }
 
-  const columnCount = Math.floor((window.innerWidth / 240) - 1)
+  const correctSidebarWidth = (sidebarToggled && mqlMatch) ? 1 : 0
+  const columnCount = Math.floor((window.innerWidth / 240) - correctSidebarWidth)
   const columnWidth = 240
   const rowHeight = 280
   const rowCount = Math.ceil(tableIds.length / columnCount)
@@ -70,6 +80,7 @@ const ArtistTable = ({ collection: { artists, songsByArtist } }: Props) => {
         {({ height, width }: { height: number, width: number }) => (
           isGridView ? (
             <Grid
+              className='flex w-full justify-center'
               cellRenderer={gridRenderer}
               columnCount={columnCount}
               columnWidth={columnWidth}
