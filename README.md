@@ -52,7 +52,8 @@ collection as you wish and play it from any device.
 
 ## Sync Server Setup
 
-Deplayer supports syncing your data across devices using a PostgreSQL database. To set up your own sync server:
+Deplayer supports syncing your data across devices using a PostgreSQL database. To set up your own sync server.
+The sync server is a Electic.sql server to sync your data with. 
 
 1. Navigate to the server directory:
 

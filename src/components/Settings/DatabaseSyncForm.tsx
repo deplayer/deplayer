@@ -1,12 +1,11 @@
 import { Formik, Form } from 'formik';
 import { Translate } from 'react-redux-i18n';
 import { toast } from 'react-toastify';
+import classNames from 'classnames';
 
-import Button from '../common/Button';
 import FormSchema from './FormSchema';
 import { getSyncFormSchema, storeSyncSettings } from '../../services/settings/syncSettings';
 import { reconnect } from '../../services/database/PgliteDatabase';
-import { settingsCard } from './SettingsForm';
 
 const DatabaseSyncForm = () => {
   const schema = getSyncFormSchema();
@@ -35,7 +34,9 @@ const DatabaseSyncForm = () => {
     >
       {() => (
         <Form>
-          <div className="mb-4 prose">
+
+          <FormSchema schema={schema} />
+          <div className={classNames("mb-4 prose")}>
             <p className="text-base-content opacity-80">
               <Translate value="labels.syncDescription" />
             </p>
@@ -56,8 +57,6 @@ const DatabaseSyncForm = () => {
               </div>
             </div>
           </div>
-
-          <FormSchema schema={schema} />
         </Form>
       )}
     </Formik>

@@ -40,7 +40,8 @@
     "jellyfin.username": "Nombre de usuario",
     "jellyfin.apiKey": "Clave API",
     "musicbrainz": "MusicBrainz",
-    "enabled": "Activado"
+    "enabled": "Activado",
+    "settingsDescription": "Configura los ajustes y preferencias de tu reproductor multimedia"
   },
   "song": {
     "label": {
@@ -90,7 +91,8 @@
     "toggleVisuals": "Mostrar/ocultar visuales",
     "downloadMedia": "Descargar contenido",
     "pinAlbum": "Fijar álbum",
-    "syncProvider": "Sincronizar toda la música"
+    "syncProvider": "Sincronizar toda la música",
+    "saveSettings": "Guardar configuración"
   },
   "message": {
     "noCollectionItems": "La colección está vacía, aquí verás todo el contenido descubierto por Deplayer.\nPara empezar a llenar tu colección necesitas añadir contenido o añadir un proveedor y comenzar a buscar.",

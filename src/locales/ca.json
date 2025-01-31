@@ -41,7 +41,8 @@
     "jellyfin.apiKey": "Clau API",
     "musicbrainz": "MusicBrainz",
     "enabled": "Activat",
-    "repl": "REPL"
+    "repl": "REPL",
+    "settingsDescription": "Configura els ajustos i preferències del teu reproductor multimèdia"
   },
   "song": {
     "label": {
@@ -91,7 +92,8 @@
     "toggleVisuals": "Mostra/amaga visuals",
     "downloadMedia": "Descarrega contingut",
     "pinAlbum": "Fixa àlbum",
-    "syncProvider": "Sincronitza tota la música"
+    "syncProvider": "Sincronitza tota la música",
+    "saveSettings": "Desa la configuració"
   },
   "message": {
     "noCollectionItems": "La col·lecció està buida, aquí veuràs tot el contingut descobert per Deplayer.\nPer començar a omplir la teva col·lecció necessites afegir contingut o afegir un proveïdor i començar a cercar.",

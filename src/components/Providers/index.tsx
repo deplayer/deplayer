@@ -4,12 +4,9 @@ import { Translate } from 'react-redux-i18n'
 
 import * as types from '../../constants/ActionTypes'
 import { State as SettingsStateType } from '../../reducers/settings'
-import Button from '../common/Button'
 import MainContainer from '../common/MainContainer'
 import ProviderButton from './ProviderButton'
 import ProviderForm from '../Settings/ProviderForm'
-import CenteredMessage from '../common/CenteredMessage'
-import { settingsButton } from '../Settings/SettingsForm'
 
 type Props = {
   settings: SettingsStateType,
@@ -48,8 +45,7 @@ const Providers = (props: Props) => {
 
   return (
     <MainContainer centerContents>
-      <CenteredMessage>
-        <div className='md:px-20'>
+        <div className='w-full pb-24'>
           <div className='my-3 flex flex-col'>
             <h2 className='py-4 text-xl'><Translate value="labels.lazyProviders" /></h2>
 
@@ -71,7 +67,7 @@ const Providers = (props: Props) => {
             onSubmit={handleSubmit}
             enableReinitialize
           >
-            {({ isSubmitting }) => (
+            {() => (
               <Form
                 className='settings-form'
               >
@@ -81,14 +77,8 @@ const Providers = (props: Props) => {
 
                 <div className='w-full flex justify-end mt-12'>
                   {!!providers.length && (
-                    <div className='max-w-xs'>
-                      <Button
-                        {...settingsButton}
-                        disabled={isSubmitting}
-                        type='submit'
-                      >
-                        <Translate value="buttons.save" />
-                      </Button>
+                    <div className="flex justify-end">
+                      <button type="submit" className="btn btn-primary"><Translate value="buttons.saveSettings" /> </button>
                     </div>
                   )}
                 </div>
@@ -96,7 +86,6 @@ const Providers = (props: Props) => {
             )}
           </Formik>
         </div>
-      </CenteredMessage>
     </MainContainer>
   )
 }

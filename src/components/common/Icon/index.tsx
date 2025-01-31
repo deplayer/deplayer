@@ -58,7 +58,9 @@ import {
   faExpand,
   faExclamationTriangle,
   faShareAlt,
-  faPalette
+  faPalette,
+  faList,
+  faGrip
 } from "@fortawesome/free-solid-svg-icons"
 import { faGitlab, faDeezer } from "@fortawesome/free-brands-svg-icons"
 
@@ -123,7 +125,9 @@ const icons = {
   faExpand,
   faExclamationTriangle,
   faPalette,
-  faShareAlt
+  faShareAlt,
+  faList,
+  faGrip
 }
 
 export type IconType = keyof typeof icons

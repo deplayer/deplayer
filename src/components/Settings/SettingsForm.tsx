@@ -1,14 +1,14 @@
 import { Dispatch } from 'redux'
 import { Formik, Form } from 'formik'
-import { Translate } from 'react-redux-i18n'
+import { I18n, Translate } from 'react-redux-i18n'
 import classNames from 'classnames'
 
 import { State as SettingsStateType } from '../../reducers/settings'
-import Button from '../common/Button'
 import FormSchema from './FormSchema'
 import * as types from '../../constants/ActionTypes'
 import { FormField } from '../../types/forms'
 import LanguageDetector from '../../services/language/LanguageDetector'
+import DatabaseSyncForm from './DatabaseSyncForm'
 
 type Props = {
   settings: SettingsStateType,
@@ -21,6 +21,25 @@ const formControlClass = classNames(
   'w-full',
   'mb-6',
   'last:mb-0'
+)
+
+export const settingsCard = classNames(
+  'card',
+  'bg-base-600',
+  'shadow-xl',
+  'p-6',
+  'relative',
+  'bg-base-200',
+  'p-8',
+  'mb-6',
+  'rounded-lg',
+  'shadow-sm'
+)
+
+export const settingsButton = classNames(
+  'card-title',
+  'text-xl',
+  'font-bold'
 )
 
 const labelClass = classNames(
@@ -67,19 +86,13 @@ const SettingsForm = (props: Props) => {
       enableReinitialize
     >
       {({
-        isSubmitting,
         values,
         setFieldValue
       }) => (
-        <Form>
-          <SettingsFormGroup
-            title="labels.language"
-            showSubmitButton={false}
-          >
+        <>
+          <div className={settingsCard}>
             <label className={labelClass}>
-              <span className={labelTextClass}>
-                <Translate value="labels.useSystemLanguage" />
-              </span>
+              <Translate value="labels.useSystemLanguage" />
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -119,15 +132,23 @@ const SettingsForm = (props: Props) => {
                 </select>
               </div>
             )}
-          </SettingsFormGroup>
+            </div>
 
-          <SettingsFormGroup
-            title="labels.otherSettings"
-            isSubmitting={isSubmitting}
-          >
-            <FormSchema schema={schema} />
-          </SettingsFormGroup>
-        </Form>
+          <Form>
+
+            <div className={settingsCard}>
+              <DatabaseSyncForm />
+            </div>
+
+            <div className={settingsCard}>
+              <FormSchema schema={schema} />
+            </div>
+
+            <div className='w-full flex justify-end mt-12'>
+              <button type="submit" className="btn btn-primary"><Translate value="buttons.saveSettings" /> </button>
+            </div>
+          </Form>
+        </>
       )}
     </Formik>
   )

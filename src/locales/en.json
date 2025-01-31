@@ -40,7 +40,8 @@
     "jellyfin.apiKey": "API Key",
     "musicbrainz": "MusicBrainz",
     "enabled": "Enabled",
-    "repl": "REPL"
+    "repl": "REPL",
+    "settingsDescription": "Configure your media player settings and preferences"
   },
   "song": {
     "label": {
@@ -90,7 +91,10 @@
     "toggleVisuals": "Toggle visuals",
     "downloadMedia": "Download media",
     "pinAlbum": "Pin album",
-    "syncProvider": "Sync All Music"
+    "syncProvider": "Sync All Music",
+    "gridView": "Grid view",
+    "listView": "List view",
+    "saveSettings": "Save settings"
   },
   "message": {
     "noCollectionItems": "Collection is empty, here you will see all discovered media by Deplayer.\nIn order to start filling your collection you need to either Add media or Add a provider and start searching.",

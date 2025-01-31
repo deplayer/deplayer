@@ -198,8 +198,6 @@ export const reconnect = async () => {
   return get();
 };
 
-const SYNC_SETTINGS_KEY = "sync_settings";
-
 let db: any = null;
 
 export const getDb = () => {
@@ -208,7 +206,7 @@ export const getDb = () => {
 
 export const runMigrations = async () => {
   const db = await reconnect();
-  await migrate(db, { migrationsFolder: "drizzle" });
+  await migrate(db);
   return db;
 };
 

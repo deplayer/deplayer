@@ -6,7 +6,6 @@ import Button from '../common/Button'
 import Importer from '../Importer'
 import MainContainer from '../common/MainContainer'
 import SettingsForm from './SettingsForm'
-import DatabaseSyncForm from './DatabaseSyncForm'
 import * as types from '../../constants/ActionTypes'
 import { State as SettingsState } from '../../reducers/settings'
 import CenteredMessage from '../common/CenteredMessage'
@@ -45,8 +44,11 @@ const Settings: React.FC = () => {
   return (
     <MainContainer centerContents>
       <CenteredMessage>
-        <div className='flex flex-col'>
-          <DatabaseSyncForm />
+        <div className='flex flex-col pt-12'>
+          <h2 className='text-2xl py-3 text-base-content'>
+            <Translate value="labels.settingsDescription" />
+          </h2>
+
           <SettingsForm
             schema={settingsForm}
             settings={settings}

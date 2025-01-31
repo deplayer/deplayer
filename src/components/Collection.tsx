@@ -41,12 +41,12 @@ const Collection = (props: Props) => {
 
   return (
     <div className="collection z-10 flex">
-      <div className="flex-1">
+      <div className="flex-1 w-full">
         {!mediaItems.length ? (
           <CenteredMessage>
-            <div className='flex flex-col space-y-4'>
+            <div className='flex flex-col space-y-4 w-full text-center'>
               <Translate value='message.noCollectionItems' />
-              <div className='flex space-x-4'>
+              <div className='flex space-x-4 items-center justify-center'>
                 <AddNewMediaButton />
                 <TryDemoButton />
               </div>

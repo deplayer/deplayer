@@ -19,10 +19,9 @@ const AddNewMediaButton = (props: Props) => {
 
   return (
     <Button
-      transparent
       onClick={openModal}
-      alignLeft
       fullWidth={props.fullWidth}
+      className='btn btn-secondary'
     >
       <Icon
         icon='faPlusCircle'

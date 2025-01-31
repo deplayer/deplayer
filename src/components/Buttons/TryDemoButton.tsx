@@ -25,7 +25,7 @@ const TryDemoButton = ({ dispatch, collection }: Props) => {
   }
 
   return (
-    <Button onClick={handleTryDemo} className="btn-secondary">
+    <Button onClick={handleTryDemo} className="btn-primary">
       <Translate value='message.tryDemoSong' />
     </Button>
   )
