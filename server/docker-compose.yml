@@ -22,7 +22,26 @@ services:
     image: electricsql/electric
     environment:
       DATABASE_URL: postgresql://postgres:password@postgres:5432/electric?sslmode=disable
+      AUTH_MODE: secure
+      ELECTRIC_SIGNING_KEY: "your-signing-key-here" # Change this in production
     ports:
       - "3000:3000"
     depends_on:
       - postgres
+
+  gatekeeper:
+    image: node:18-alpine
+    working_dir: /app
+    volumes:
+      - ./gatekeeper:/app
+    environment:
+      PORT: 8080
+      ELECTRIC_URL: http://electric:3000
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_KEY: ${SUPABASE_KEY}
+      JWT_SECRET: "your-jwt-secret-here" # Change this in production
+    ports:
+      - "8080:8080"
+    depends_on:
+      - electric
+    command: sh -c "npm install && npm start"

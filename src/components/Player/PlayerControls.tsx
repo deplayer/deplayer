@@ -94,9 +94,11 @@ class PlayerControls extends React.Component<Props> {
         videoElement.requestFullscreen().catch(err => {
           console.error('Error attempting to enable fullscreen:', err)
         })
+        this.props.dispatch({ type: types.TOGGLE_FULL_SCREEN, value: true })
       } else {
         document.exitFullscreen()
-      }
+        this.props.dispatch({ type: types.TOGGLE_FULL_SCREEN, value: false })
+      }}
     }
   }
 
