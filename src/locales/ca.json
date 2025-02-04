@@ -42,7 +42,8 @@
     "musicbrainz": "MusicBrainz",
     "enabled": "Activat",
     "repl": "REPL",
-    "settingsDescription": "Configura els ajustos i preferències del teu reproductor multimèdia"
+    "settingsDescription": "Configura els ajustos i preferències del teu reproductor multimèdia",
+    "storyBehind": "Història Darrere"
   },
   "song": {
     "label": {
@@ -146,7 +147,10 @@
       "songs": "Cançons",
       "albums": "Àlbums",
       "artists": "Artistes",
-      "playlists": "Llistes de reproducció"
+      "playlists": "Llistes de reproducció",
+      "navigation": "Navegació",
+      "themes": "Temes",
+      "peers": "Parells"
     },
     "commands": {
       "goToArtists": "Anar a Artistes",

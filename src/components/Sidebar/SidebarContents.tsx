@@ -144,7 +144,8 @@ const SidebarContents = (props: ContentProps) => {
         >
           <Translate value="sidebar.showCode" />
         </a>
-        <Icon icon='faGitlab' className='ml-2' />
+        <Icon icon='faGitlab' className='mx-2' />
+        <a href="https://path-to-localfirst.deplayer.app" target="_blank" className="link link-primary"><Translate value="labels.storyBehind" /></a> 
       </section>
     </div>
   )

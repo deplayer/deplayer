@@ -37,6 +37,10 @@ type Props = {
   match: any,
 }
 
+interface State {
+  timeShown: number;
+}
+
 /**
  * PlayerControls is a comprehensive media player interface component that manages audio/video playback
  * and provides user controls. It combines several key features:
@@ -67,27 +71,26 @@ type Props = {
  * This is particularly useful for fullscreen and picture-in-picture modes.
  */
 
-class PlayerControls extends React.Component<Props> {
+class PlayerControls extends React.Component<Props, State> {
   private playerRef: React.RefObject<ReactPlayer>;
+  public state: State = {
+    timeShown: 0,
+  };
 
   constructor(props: Props) {
     super(props);
     this.playerRef = React.createRef();
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     PlayerRefService.getInstance().setPlayerRef(this.playerRef)
   }
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
     PlayerRefService.getInstance().setPlayerRef(null)
   }
 
-  state = {
-    timeShown: 0,
-  }
-
-  toggleFullscreen = () => {
+  toggleFullscreen = (): void => {
     const videoElement = this.playerRef.current?.getInternalPlayer()
     if (videoElement && videoElement instanceof HTMLVideoElement) {
       if (!document.fullscreenElement) {
@@ -98,26 +101,27 @@ class PlayerControls extends React.Component<Props> {
       } else {
         document.exitFullscreen()
         this.props.dispatch({ type: types.TOGGLE_FULL_SCREEN, value: false })
-      }}
+      }
     }
   }
 
-  playPause = () => {
+  playPause = (): void => {
     this.props.dispatch({ type: types.TOGGLE_PLAYING })
   }
 
-  onPlay = () => {
+  onPlay = (): void => {
     this.props.dispatch({ type: types.START_PLAYING })
   }
 
-  onSeekChange = (value: any) => {
-    this.props.dispatch({ type: types.SET_PLAYER_PLAYED_SECONDS, value: value / 1000 })
+  onSeekChange = (value: number | number[]): void => {
+    const seekValue = Array.isArray(value) ? value[0] : value;
+    this.props.dispatch({ type: types.SET_PLAYER_PLAYED_SECONDS, value: seekValue / 1000 })
     if (this.playerRef.current) {
-      this.playerRef.current.seekTo(value / 1000)
+      this.playerRef.current.seekTo(seekValue / 1000)
     }
   }
 
-  onProgress = (state: any) => {
+  onProgress = (state: any): void => {
     if (this.props.player.fullscreen && this.state.timeShown > 2) {
       this.props.player.showPlayer && this.props.dispatch({ type: types.HIDE_PLAYER })
       this.setState({ timeShown: 0 })
@@ -134,35 +138,35 @@ class PlayerControls extends React.Component<Props> {
     this.props.dispatch({ type: types.SET_PLAYER_PROGRESS, value: state })
   }
 
-  onDuration = (duration: number) => {
+  onDuration = (duration: number): void => {
     this.props.dispatch({ type: types.SET_PLAYER_DURATION, value: duration })
   }
 
   // Play prev song of the player list
-  playPrev = () => {
+  playPrev = (): void => {
     this.props.dispatch({ type: types.PLAY_PREV })
   }
 
   // Play next song of the player list
-  playNext = () => {
+  playNext = (): void => {
     // Force player playing refresh
     this.props.dispatch({ type: types.PLAY_NEXT })
   }
 
-  resetPlayedSeconds = () => {
+  resetPlayedSeconds = (): void => {
     this.props.dispatch({ type: types.SET_PLAYER_PLAYED_SECONDS, value: 0 })
   }
 
-  saveTrackPlayed = (songId: string) => {
+  saveTrackPlayed = (songId: string): void => {
     this.props.dispatch({ type: types.SONG_PLAYED, songId })
   }
 
-  onError = (e: Error) => {
+  onError = (e: Error): void => {
     console.error(e)
     this.props.dispatch({ type: types.PLAY_ERROR, error: e.message })
   }
 
-  showPlayer = () => {
+  showPlayer = (): void => {
     if (!this.props.player.showPlayer) {
       this.props.dispatch({ type: types.SHOW_PLAYER })
     }
@@ -177,7 +181,7 @@ class PlayerControls extends React.Component<Props> {
     return null
   }
 
-  render() {
+  render(): React.ReactNode {
     const {
       playedSeconds,
       playing,
@@ -197,7 +201,7 @@ class PlayerControls extends React.Component<Props> {
     const { streamUri } = this.props.player
 
     if (!this.props.itemCount || !streamUri || !currentPlaying) {
-      return
+      return null
     }
 
     const playerClassnames = classNames({

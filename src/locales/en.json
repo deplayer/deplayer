@@ -41,7 +41,8 @@
     "musicbrainz": "MusicBrainz",
     "enabled": "Enabled",
     "repl": "REPL",
-    "settingsDescription": "Configure your media player settings and preferences"
+    "settingsDescription": "Configure your media player settings and preferences",
+    "storyBehind": "Story Behind"
   },
   "song": {
     "label": {
@@ -147,7 +148,10 @@
       "songs": "Songs",
       "albums": "Albums",
       "artists": "Artists",
-      "playlists": "Playlists"
+      "playlists": "Playlists",
+      "navigation": "Navigation",
+      "themes": "Themes",
+      "peers": "Peers"
     },
     "commands": {
       "goToArtists": "Go to Artists",

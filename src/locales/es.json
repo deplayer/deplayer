@@ -41,7 +41,8 @@
     "jellyfin.apiKey": "Clave API",
     "musicbrainz": "MusicBrainz",
     "enabled": "Activado",
-    "settingsDescription": "Configura los ajustes y preferencias de tu reproductor multimedia"
+    "settingsDescription": "Configura los ajustes y preferencias de tu reproductor multimedia",
+    "storyBehind": "Historia Detrás"
   },
   "song": {
     "label": {
@@ -137,6 +138,30 @@
     "providers": "Proveedores",
     "openSource": "es código abierto!",
     "showCode": "Muéstrame el código"
+  },
+  "commandBar": {
+    "placeholder": "Escribe una orden o busca...",
+    "categories": {
+      "commands": "Órdenes",
+      "songs": "Canciones",
+      "albums": "Álbumes",
+      "artists": "Artistas",
+      "playlists": "Listas de reproducción",
+      "navigation": "Navegación",
+      "themes": "Temas",
+      "peers": "Pares"
+    },
+    "commands": {
+      "goToArtists": "Ir a Artistas",
+      "goToAlbums": "Ir a Álbumes",
+      "goToQueue": "Ir a la Cola",
+      "goToPlaylists": "Ir a Listas de reproducción",
+      "goToSettings": "Ir a Configuración",
+      "goToExplore": "Ir a Explorar",
+      "togglePlaying": "Alternar Reproducción",
+      "playNext": "Reproducir Siguiente",
+      "playPrevious": "Reproducir Anterior"
+    }
   },
   "languages": {
     "english": "Inglés",
