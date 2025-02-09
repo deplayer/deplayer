@@ -2,6 +2,12 @@
   "menu": {
     "home": "Inici",
     "search": "Cerca",
+    "searchPlaceholder": "Cerca artistes, àlbums, cançons o ordres...",
+    "searching": "Cercant...",
+    "noResults": "No s'han trobat resultats",
+    "navigate": "Navega",
+    "select": "Selecciona",
+    "close": "Tanca",
     "import": "Importa",
     "collection": "Col·lecció",
     "queue": "Cua",

@@ -10,7 +10,7 @@ import { State as RootState } from '../../reducers'
 import { State as CollectionState } from '../../reducers/collection'
 import { startSearch, StartSearchAction } from '../../types/search'
 import { THEMES } from '../Sidebar/ThemeModal'
-import { Translate } from 'react-redux-i18n'
+import { I18n, Translate } from 'react-redux-i18n'
 import * as types from '../../constants/ActionTypes'
 
 interface BaseItem {
@@ -477,7 +477,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
       <Modal
         isOpen={open}
         onClose={handleClose}
-        title="Search"
+        title={I18n.t('menu.search')}
         className="w-[800px] max-w-[90vw]"
       >
         <div className="flex flex-col">
@@ -487,7 +487,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
               autoFocus
               value={search}
               onChange={handleSearchChange}
-              placeholder="Search for artists, albums, songs, or commands..."
+              placeholder={I18n.t('menu.searchPlaceholder')}
               className="w-full p-4 bg-transparent text-2xl font-sans focus:outline-none focus:ring-0 focus:border-none action"
               data-testid="command-search-input"
             />
@@ -502,11 +502,11 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
 
           <div className="max-h-[60vh] overflow-y-auto w-full" ref={resultsContainerRef}>
             {loading && search.length > 1 && (
-              <div className="p-6 text-center text-lg">Searching...</div>
+              <div className="p-6 text-center text-lg">{I18n.t('menu.searching')}</div>
             )}
             
             {!loading && allItems.length === 0 && search.length > 1 && (
-              <div className="p-6 text-center text-lg">No results found</div>
+              <div className="p-6 text-center text-lg">{I18n.t('menu.noResults')}</div>
             )}
 
             {groupedItems.map((group, groupIndex) => (
@@ -567,15 +567,15 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
           <div className="border-t border-base-300 mt-2 p-4 text-sm text-base-content/70 flex items-center justify-center space-x-8">
             <div className="flex items-center">
               <kbd className="px-2 py-1 bg-base-200 rounded mr-2">↑↓</kbd>
-              <span>Navigate</span>
+              <span>{I18n.t('menu.navigate')}</span>
             </div>
             <div className="flex items-center">
               <kbd className="px-2 py-1 bg-base-200 rounded mr-2">Enter</kbd>
-              <span>Select</span>
+              <span>{I18n.t('menu.select')}</span>
             </div>
             <div className="flex items-center">
               <kbd className="px-2 py-1 bg-base-200 rounded mr-2">Esc</kbd>
-              <span>Close</span>
+              <span>{I18n.t('menu.close')}</span>
             </div>
           </div>
         </div>

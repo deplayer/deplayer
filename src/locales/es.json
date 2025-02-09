@@ -2,6 +2,12 @@
   "menu": {
     "home": "Inicio",
     "search": "Buscar",
+    "searchPlaceholder": "Busca artistas, álbumes, canciones o comandos...",
+    "searching": "Buscando...",
+    "noResults": "No se encontraron resultados",
+    "navigate": "Navegar",
+    "select": "Seleccionar",
+    "close": "Cerrar",
     "import": "Importar",
     "collection": "Colección",
     "queue": "Cola",

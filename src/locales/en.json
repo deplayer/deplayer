@@ -2,6 +2,12 @@
   "menu": {
     "home": "Home",
     "search": "Search",
+    "searchPlaceholder": "Search for artists, albums, songs, or commands...",
+    "searching": "Searching...",
+    "noResults": "No results found",
+    "navigate": "Navigate",
+    "select": "Select",
+    "close": "Close",
     "import": "Import",
     "collection": "Collection",
     "queue": "Queue",
