@@ -35,7 +35,7 @@ const AlbumCover = ({ album }: { album: any }) => {
   )
 }
 
-const AlbumMediaSlider = ({ mediaItems, loading, title }: { mediaItems: any[], loading: boolean, title: React.ReactNode }) => {
+const AlbumMediaSlider = ({ mediaItems, title }: { mediaItems: any[], title: React.ReactNode }) => {
   if (!mediaItems.length) {
     return null
   }
@@ -64,7 +64,6 @@ const RecentAlbums = () => {
 
   return (
     <AlbumMediaSlider
-      loading={false}
       title={<Translate value="dashboard.recentlyAdded" />}
       mediaItems={recentAlbums}
     />

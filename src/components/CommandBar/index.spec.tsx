@@ -1,27 +1,94 @@
 import { render, fireEvent, cleanup, act } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import configureStore from 'redux-mock-store'
+import { configureStore } from '@reduxjs/toolkit'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import CommandBar from './index'
 import { BrowserRouter } from 'react-router-dom'
+import { I18n } from 'react-redux-i18n'
+import { AnyAction } from 'redux'
+import { ThunkDispatch } from 'redux-thunk'
 
-const mockStore = configureStore([])
+interface StoreState {
+  collection: {
+    searchResults: string[]
+    loading: boolean
+    rows: Record<string, any>
+  }
+  settings: Record<string, any>
+  search: Record<string, any>
+}
+
+type AppDispatch = ThunkDispatch<StoreState, undefined, AnyAction>
+
+// Mock translations
+vi.mock('react-redux-i18n', () => ({
+  I18n: {
+    t: (key: string) => {
+      const translations: { [key: string]: string } = {
+        'menu.searching': 'searching...',
+        'menu.noResults': 'No results found',
+        'menu.searchPlaceholder': 'Search...',
+        'menu.search': 'Search',
+        'commandBar.categories.themes': 'themes',
+        'commandBar.categories.commands': 'commands',
+        'menu.navigate': 'Navigate',
+        'menu.select': 'Select',
+        'menu.close': 'Close'
+      }
+      return translations[key] || key
+    }
+  },
+  Translate: ({ value }: { value: string }) => I18n.t(value)
+}))
+
+const createMockStore = (initialState: Partial<StoreState> = {}) => {
+  const defaultState: StoreState = {
+    collection: {
+      searchResults: [],
+      loading: false,
+      rows: {}
+    },
+    settings: {},
+    search: {}
+  }
+
+  return configureStore({
+    reducer: {
+      collection: (state = defaultState.collection, _action: AnyAction) => state,
+      settings: (state = defaultState.settings, _action: AnyAction) => state,
+      search: (state = defaultState.search, _action: AnyAction) => state,
+    },
+    preloadedState: { ...defaultState, ...initialState },
+  })
+}
+
+const renderWithRedux = (component: React.ReactNode, initialState: Partial<StoreState> = {}) => {
+  const store = createMockStore(initialState)
+  return {
+    ...render(
+      <Provider store={store}>
+        <BrowserRouter>
+          {component}
+        </BrowserRouter>
+      </Provider>
+    ),
+    store,
+  }
+}
 
 describe('CommandBar', () => {
-  let store: any
+  let store: ReturnType<typeof createMockStore>
 
   beforeEach(() => {
     vi.useFakeTimers()
-    store = mockStore({
+    store = createMockStore({
       collection: {
         searchResults: [],
         loading: false,
-        artists: {},
-        albums: {},
         rows: {}
       }
     })
-    store.dispatch = vi.fn()
+    store.dispatch = vi.fn() as unknown as AppDispatch
   })
 
   afterEach(() => {
@@ -96,47 +163,74 @@ describe('CommandBar', () => {
     }))
   })
 
-  it('shows loading state while searching', () => {
-    store = mockStore({
+  it("shows loading state while searching", () => {
+    const initialState = {
       collection: {
         searchResults: [],
         loading: true,
-        artists: {},
-        albums: {},
         rows: {}
-      }
-    })
+      },
+    };
 
-    const { getByTestId, getByText } = renderComponent()
+    const { getByText, getByTestId } = renderWithRedux(
+      <CommandBar 
+        navigateToArtists={() => {}}
+        navigateToAlbums={() => {}}
+        navigateToQueue={() => {}}
+        navigateToPlaylists={() => {}}
+        navigateToSettings={() => {}}
+        navigateToExplore={() => {}}
+      />, 
+      initialState
+    );
     
     // Open modal
-    fireEvent.keyDown(window, { key: 'k', metaKey: true })
+    fireEvent.keyDown(window, { key: 'k', metaKey: true });
     
-    // Type in search
-    fireEvent.change(getByTestId('command-search-input'), { target: { value: 'test' } })
+    // Type search text to trigger loading state
+    fireEvent.change(getByTestId('command-search-input'), { target: { value: 'test search' } });
     
-    expect(getByText('Searching...')).toBeTruthy()
-  })
+    // Now we can check for the loading state
+    expect(getByText("searching...")).toBeTruthy();
+  });
 
-  it('shows no results message when search returns empty', () => {
-    const { getByTestId, getByText } = renderComponent()
+  it("shows no results message when search returns empty", () => {
+    const initialState = {
+      collection: {
+        searchResults: [],
+        loading: false,
+        rows: {}
+      },
+    };
+
+    const { getByText, getByTestId } = renderWithRedux(
+      <CommandBar 
+        navigateToArtists={() => {}}
+        navigateToAlbums={() => {}}
+        navigateToQueue={() => {}}
+        navigateToPlaylists={() => {}}
+        navigateToSettings={() => {}}
+        navigateToExplore={() => {}}
+      />, 
+      initialState
+    );
     
     // Open modal
-    fireEvent.keyDown(window, { key: 'k', metaKey: true })
+    fireEvent.keyDown(window, { key: 'k', metaKey: true });
     
-    // Type in search
-    fireEvent.change(getByTestId('command-search-input'), { target: { value: 'test' } })
+    // Type search text to trigger no results state
+    fireEvent.change(getByTestId('command-search-input'), { target: { value: 'test search' } });
     
-    // Fast-forward timers
+    // Wait for search to complete
     act(() => {
-      vi.advanceTimersByTime(500)
-    })
+      vi.advanceTimersByTime(500);
+    });
     
-    expect(getByText('No results found')).toBeTruthy()
-  })
+    expect(getByText("No results found")).toBeTruthy();
+  });
 
   it('displays search results with correct types', () => {
-    store = mockStore({
+    store = createMockStore({
       collection: {
         searchResults: ['song1'],
         loading: false,
@@ -169,7 +263,7 @@ describe('CommandBar', () => {
   })
 
   it('dispatches view action on result selection', () => {
-    store = mockStore({
+    store = createMockStore({
       collection: {
         searchResults: ['song1'],
         loading: false,

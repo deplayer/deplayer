@@ -14,7 +14,7 @@ import {
   trackSongPlayed,
 } from "./workers";
 
-function* fetchRecentAlbums(): Generator<any, void, any> {
+export function* fetchRecentAlbums(): Generator<any, void, any> {
   try {
     const settings = yield select(
       (state: RootState) => state.settings.settings
