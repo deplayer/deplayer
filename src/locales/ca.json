@@ -106,7 +106,9 @@
     "noCollectionItems": "La col·lecció està buida, aquí veuràs tot el contingut descobert per Deplayer.\nPer començar a omplir la teva col·lecció necessites afegir contingut o afegir un proveïdor i començar a cercar.",
     "noMostPlayed": "Encara no has reproduït cap cançó",
     "goToCollection": "Ves a la col·lecció per reproduir alguna cosa!",
-    "tryDemoSong": "Prova la cançó de demostració"
+    "tryDemoSong": "Prova la cançó de demostració",
+    "addSongsFromCollection": "Afegeix cançons des de la col·lecció o cerca'n de noves",
+    "jumpToCollection": "Anar a la col·lecció"
   },
   "peer": {
     "connectedPeers": "Parells connectats",

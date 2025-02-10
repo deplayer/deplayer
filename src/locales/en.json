@@ -107,7 +107,9 @@
     "noCollectionItems": "Collection is empty, here you will see all discovered media by Deplayer.\nIn order to start filling your collection you need to either Add media or Add a provider and start searching.",
     "noMostPlayed": "You didn't played any song yet",
     "goToCollection": "Jump to collection to play something!",
-    "tryDemoSong": "Try Demo Song"
+    "tryDemoSong": "Try Demo Song",
+    "addSongsFromCollection": "Add songs from the collection or search for new ones",
+    "jumpToCollection": "Jump to collection"
   },
   "peer": {
     "connectedPeers": "Connected peers",

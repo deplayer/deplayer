@@ -105,7 +105,9 @@
     "noCollectionItems": "La colección está vacía, aquí verás todo el contenido descubierto por Deplayer.\nPara empezar a llenar tu colección necesitas añadir contenido o añadir un proveedor y comenzar a buscar.",
     "noMostPlayed": "Aún no has reproducido ninguna canción",
     "goToCollection": "¡Ve a la colección para reproducir algo!",
-    "tryDemoSong": "Probar canción de demostración"
+    "tryDemoSong": "Probar canción de demostración",
+    "addSongsFromCollection": "Añade canciones desde la colección o busca nuevas",
+    "jumpToCollection": "Ir a la colección"
   },
   "peer": {
     "connectedPeers": "Pares conectados",

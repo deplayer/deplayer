@@ -1,9 +1,14 @@
 import { Formik, Form, Field } from 'formik'
 import { set, get } from 'idb-keyval'
+import { toast } from 'react-toastify'
+import { Translate } from 'react-redux-i18n'
+import classNames from 'classnames'
 
 import Button from '../common/Button'
 import Modal from '../common/Modal'
 import { Dispatch } from 'redux'
+import { storeSyncSettings, getSyncFormSchema } from '../../services/settings/syncSettings'
+import { reconnect } from '../../services/database/PgliteDatabase'
 
 const REGISTER_TIMEOUT = 600
 
@@ -86,36 +91,139 @@ const startAuth = async (dispatch: Dispatch) => {
   dispatch({ type: 'SET_CREDENTIAL', payload: assertion })
 }
 
+interface AuthFormValues {
+  username: string
+  displayName: string
+  serverUrl?: string
+  enabled?: boolean
+}
+
 interface Props {
   onClose: Function,
   dispatch: Dispatch,
   isOpen: boolean
 }
 
+const formControlClass = classNames(
+  'form-control',
+  'w-full',
+  'mb-6'
+)
+
+const inputClass = classNames(
+  'input',
+  'input-bordered',
+  'w-full',
+  'bg-base-100'
+)
+
 export default function Auth({ onClose, dispatch, isOpen }: Props) {
+  const syncSchema = getSyncFormSchema()
+  const initialSyncValues = syncSchema.fields.reduce((acc: any, field: any) => {
+    if (field.name) {
+      acc[field.name] = field.value
+    }
+    return acc
+  }, {})
+
+  const handleSubmit = async (values: AuthFormValues) => {
+    try {
+      // Register with passkey
+      await startRegister(values.username, values.displayName, dispatch)
+
+      // Store sync settings if provided
+      if (values.serverUrl) {
+        await storeSyncSettings({
+          serverUrl: values.serverUrl,
+          enabled: true
+        })
+        await reconnect()
+        toast.success('Sync settings saved')
+      }
+
+      onClose()
+    } catch (error) {
+      console.error('Error during registration:', error)
+      toast.error('Error during registration')
+    }
+  }
+
   return (
     <Modal title='Authentication' onClose={() => onClose()} isOpen={isOpen}>
-      <div className='flex'>
-        <div className='p-4'>
-          <Formik
-            initialValues={{ username: '', displayName: '' }}
-            onSubmit={(values) => {
-              startRegister(values.username, values.displayName, dispatch)
-            }}
-          >
-            {({ isSubmitting }) => (
-              <Form className='flex flex-col'>
-                <Field className='px-4 py-2 my-2' type='text' name='username' placeholder='Username' />
-                <Field className='px-4 py-2 my-2' type='text' name='displayName' placeholder='Display name' />
-                <Button type='submit' disabled={isSubmitting}>Register with your passkey</Button>
-                <p className='py-2 text-sm'>This passkey will be only stored in this device</p>
-              </Form>
-            )}
-          </Formik>
-        </div>
-        <div className='p-4 flex flex-col items-center justify-center'>
-          <Button inverted onClick={() => startAuth(dispatch)}>Authenticate!</Button>
-        </div>
+      <div className='p-4'>
+        <Formik
+          initialValues={{
+            username: '',
+            displayName: '',
+            ...initialSyncValues
+          }}
+          onSubmit={handleSubmit}
+        >
+          {({ isSubmitting }) => (
+            <Form className='flex flex-col'>
+              <div className={formControlClass}>
+                <label className='label'>
+                  <span className='label-text'><Translate value="labels.username" /></span>
+                </label>
+                <Field
+                  className={inputClass}
+                  type='text'
+                  name='username'
+                  placeholder='Username'
+                />
+              </div>
+
+              <div className={formControlClass}>
+                <label className='label'>
+                  <span className='label-text'><Translate value="labels.displayName" /></span>
+                </label>
+                <Field
+                  className={inputClass}
+                  type='text'
+                  name='displayName'
+                  placeholder='Display name'
+                />
+              </div>
+
+              <div className={formControlClass}>
+                <label className='label'>
+                  <span className='label-text'><Translate value="labels.syncServerUrl" /></span>
+                </label>
+                <Field
+                  className={inputClass}
+                  type='text'
+                  name='serverUrl'
+                  placeholder='https://your-sync-server.com'
+                />
+              </div>
+
+              <div className="alert alert-info mt-4 mb-4">
+                <p>
+                  <Translate value="labels.syncServerInstructions" />
+                  {' '}
+                  <a 
+                    href="https://gitlab.com/deplayer/deplayer/-/blob/master/README.md#sync-server-setup" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="link link-primary-content"
+                  >
+                    <Translate value="labels.readDocs" />
+                  </a>
+                </p>
+              </div>
+
+              <Button type='submit' disabled={isSubmitting}>
+                <Translate value="buttons.register" />
+              </Button>
+
+              <div className='divider'>OR</div>
+
+              <Button inverted onClick={() => startAuth(dispatch)}>
+                <Translate value="buttons.authenticate" />
+              </Button>
+            </Form>
+          )}
+        </Formik>
       </div>
     </Modal>
   )

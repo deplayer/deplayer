@@ -4,6 +4,9 @@ import { State as CollectionState } from '../reducers/collection'
 import MusicTable from './MusicTable/MusicTable'
 import Spinner from './Spinner'
 import CenteredMessage from './common/CenteredMessage'
+import { Translate } from 'react-redux-i18n'
+import classNames from 'classnames'
+import Icon from './common/Icon/index';
 
 type Props = {
   queue: any,
@@ -16,24 +19,26 @@ type Props = {
 }
 
 const Queue = (props: Props) => {
-  const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
+  const { queue, app, slim, className } = props
+  const trackIds = queue.shuffle ? queue.randomTrackIds : queue.trackIds
+
   // Is disabled for small screens
-  if (props.slim && !props.app.mqlMatch) {
+  if (slim && !app.mqlMatch) {
     return null
   }
 
   // Disabled if theres no songs on queue
-  if (props.slim && !trackIds.length) {
+  if (slim && !trackIds.length) {
     return null
   }
 
-  if (props.slim && !props.app.displayMiniQueue) {
+  if (slim && !app.displayMiniQueue) {
     return null
   }
 
-  if (props.app.loading) {
+  if (app.loading) {
     return (
-      <div className={`queue`}>
+      <div className="queue">
         <CenteredMessage>
           <Spinner />
         </CenteredMessage>
@@ -43,17 +48,18 @@ const Queue = (props: Props) => {
 
   if (!trackIds.length) {
     return (
-      <div className={`queue z-10 no-results ${props.className || ''}`}>
+      <div className={classNames('queue z-10 no-results', className)}>
         <CenteredMessage>
-          <div className='flex flex-col'>
-            Add songs from the collection or search for new ones
+          <div className="flex flex-col items-center gap-2">
+            <Translate value="message.addSongsFromCollection" />
 
             <Link
               to="/collection"
-              title="collection"
+              className="flex items-center hover:text-primary"
+              aria-label="Go to collection"
             >
-              Jump to collection <br />
-              <i className='icon database outline'></i>
+              <Translate value="message.jumpToCollection" />
+              <Icon icon="faDatabase" className="ml-2" />
             </Link>
           </div>
         </CenteredMessage>
@@ -62,12 +68,12 @@ const Queue = (props: Props) => {
   }
 
   return (
-    <div className={`queue z-10 resize-x ${props.className || ''}`}>
+    <div className={classNames('queue z-10 resize-x', className)}>
       <MusicTable
         tableIds={trackIds}
-        disableCovers={props.slim}
+        disableCovers={slim}
         disableAddButton
-        slim={props.slim}
+        slim={slim}
         {...props}
       />
     </div>
