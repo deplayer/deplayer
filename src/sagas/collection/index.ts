@@ -16,26 +16,45 @@ import {
 
 function* fetchRecentAlbums(): Generator<any, void, any> {
   try {
-    const settings = yield select((state: RootState) => state.settings.settings)
+    const settings = yield select(
+      (state: RootState) => state.settings.settings
+    );
     if (!settings?.providers) {
-      console.warn('No providers configured')
-      return
+      console.warn("No providers configured");
+      return;
     }
 
-    const providersService = new ProvidersService(settings)
-    const activeProvider = Object.values(providersService.providers)[0]
-    
-    if (!activeProvider?.getRecentMedia) {
-      console.warn('Current provider does not support fetching recent media')
-      return
+    const providersService = new ProvidersService(settings);
+    const enabledProviders = Object.values(providersService.providers).filter(
+      (provider) => provider.getRecentMedia
+    );
+
+    if (enabledProviders.length === 0) {
+      console.warn("No providers support fetching recent media");
+      return;
     }
 
-    // Get recent media items
-    const recentMedia: IMedia[] = yield call([activeProvider, activeProvider.getRecentMedia])
-    
+    // Get recent media from all enabled providers
+    const allRecentMedia: IMedia[] = [];
+    for (const provider of enabledProviders) {
+      try {
+        const providerMedia: IMedia[] = yield call([
+          provider,
+          provider.getRecentMedia,
+        ]);
+        console.log("providerMedia", providerMedia);
+        allRecentMedia.push(...providerMedia);
+      } catch (error) {
+        console.error(
+          `Error fetching recent media from provider ${provider.name}:`,
+          error
+        );
+      }
+    }
+
     // Extract unique albums from media items
-    const uniqueAlbums = new Map()
-    recentMedia.forEach((media: IMedia) => {
+    const uniqueAlbums = new Map();
+    allRecentMedia.forEach((media: IMedia) => {
       if (!uniqueAlbums.has(media.album.id)) {
         uniqueAlbums.set(media.album.id, {
           id: media.album.id,
@@ -45,20 +64,22 @@ function* fetchRecentAlbums(): Generator<any, void, any> {
           artistName: media.album.artist.name,
           album: media.album,
           cover: media.cover,
-          type: 'audio',
+          type: "audio",
           genres: [],
-          stream: media.stream
-        })
+          stream: media.stream,
+        });
       }
-    })
+    });
 
-    yield put({ 
-      type: types.FETCH_RECENT_ALBUMS_SUCCESS, 
-      albums: Array.from(uniqueAlbums.values()) 
-    })
+    console.log("uniqueAlbums", uniqueAlbums);
+
+    yield put({
+      type: types.FETCH_RECENT_ALBUMS_SUCCESS,
+      albums: Array.from(uniqueAlbums.values()),
+    });
   } catch (error) {
-    console.error('Error fetching recent albums:', error)
-    yield put({ type: types.FETCH_RECENT_ALBUMS_ERROR, error })
+    console.error("Error fetching recent albums:", error);
+    yield put({ type: types.FETCH_RECENT_ALBUMS_ERROR, error });
   }
 }
 
