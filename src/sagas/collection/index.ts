@@ -42,7 +42,6 @@ function* fetchRecentAlbums(): Generator<any, void, any> {
           provider,
           provider.getRecentMedia,
         ]);
-        console.log("providerMedia", providerMedia);
         allRecentMedia.push(...providerMedia);
       } catch (error) {
         console.error(
@@ -51,6 +50,12 @@ function* fetchRecentAlbums(): Generator<any, void, any> {
         );
       }
     }
+
+    // First persist all media items to the collection
+    yield put({
+      type: types.RECEIVE_COLLECTION,
+      data: allRecentMedia,
+    });
 
     // Extract unique albums from media items
     const uniqueAlbums = new Map();
@@ -70,8 +75,6 @@ function* fetchRecentAlbums(): Generator<any, void, any> {
         });
       }
     });
-
-    console.log("uniqueAlbums", uniqueAlbums);
 
     yield put({
       type: types.FETCH_RECENT_ALBUMS_SUCCESS,
