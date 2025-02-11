@@ -236,7 +236,6 @@ function* notifyCurrentPlayingToRoom(store: Store, action: any): any {
 
 // Binding actions to sagas
 function* peerSaga(store: Store): Generator {
-  yield call(initializePeers, store);
   yield takeLatest(types.REQUEST_REALTIME_STREAM, requestRealtimeStream, store);
   yield takeEvery(types.JOIN_PEER_ROOM, joinRoom, store);
   yield takeLatest(types.REMOVE_ROOM, removeRoom, store);
@@ -247,6 +246,8 @@ function* peerSaga(store: Store): Generator {
     store
   );
   yield call(watchPlayerChanges, store);
+  // Initialize peers last, after all watchers are set up
+  yield call(initializePeers, store);
 }
 
 export default peerSaga;
