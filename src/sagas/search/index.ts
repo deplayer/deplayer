@@ -14,10 +14,17 @@ import ProvidersService from "../../services/ProvidersService";
 import { getSettings } from "./../selectors";
 import { getAdapter } from "../../services/database";
 import CollectionService from "../../services/CollectionService";
+import { SearchService } from "../../services/SearchService";
 import logger from "../../utils/logger";
 
 const adapter = getAdapter();
 const collectionService = new CollectionService(adapter);
+
+// Create search service instance
+export const createSearchService = (settings: any) => {
+  const providersService = new ProvidersService(settings);
+  return new SearchService(collectionService, providersService);
+};
 
 // Going to search results page
 export function* goToSearchResults(): any {
@@ -31,10 +38,10 @@ function* performSingleSearch(
 ): Generator<any, void, any> {
   try {
     logger.debug("Starting search for provider:", { searchTerm, provider });
-    
+
     const settings = yield select(getSettings);
     const providerService = new ProvidersService(settings);
-    
+
     logger.debug("Searching in provider service");
     const searchResults = yield call(
       providerService.searchForProvider,
@@ -61,7 +68,7 @@ function* performSingleSearch(
       message: err.message,
       stack: err.stack,
       searchTerm,
-      provider
+      provider,
     });
 
     yield put({ type: types.SEARCH_REJECTED, message: err.message });
@@ -80,39 +87,40 @@ type SearchAction = {
 
 // Handling search saga
 export function* search(action: SearchAction): any {
-  const settings = yield select(getSettings);
-  const providersService = new ProvidersService(settings);
-  const redirect = !action.noRedirect;
-  const hasProviders = Object.keys(providersService.providers).length;
+  try {
+    const settings = yield select(getSettings);
+    const searchService = createSearchService(settings);
 
-  // First perform local search and show results immediately
-  const localResults = yield call(collectionService.search, action.searchTerm);
-  yield put({ type: types.SET_SEARCH_RESULTS, searchResults: localResults });
-
-  // Redirect early to show local results
-  if (redirect) {
-    yield call(goToSearchResults);
-  }
-
-  // Then search in providers if any
-  if (hasProviders) {
-    const searchPromises = Object.keys(providersService.providers).map(
-      (provider) => {
-        return fork(performSingleSearch, action.searchTerm, provider);
+    // Perform search
+    const searchResults = yield call(
+      searchService.searchAll.bind(searchService),
+      action.searchTerm,
+      {
+        noRedirect: action.noRedirect,
+        providers: settings.providers,
       }
     );
-    yield all(searchPromises);
-    yield take([types.ADD_TO_COLLECTION, types.SEARCH_REJECTED]);
+
+    // Update search results
+    yield put({ type: types.SET_SEARCH_RESULTS, searchResults });
+
+    // Redirect if needed
+    if (!action.noRedirect) {
+      yield call(goToSearchResults);
+    }
+
+    yield put({
+      type: types.SEARCH_FINISHED,
+      searchTerm: action.searchTerm,
+    });
+  } catch (error: any) {
+    logger.error("Search saga error:", error);
+    yield put({ type: types.SEARCH_REJECTED, message: error.message });
+    yield put({
+      type: types.SEND_NOTIFICATION,
+      notification: "notifications.search.failed",
+    });
   }
-
-  // First perform local search and show results immediately
-  const newResults = yield call(collectionService.search, action.searchTerm);
-  yield put({ type: types.SET_SEARCH_RESULTS, searchResults: newResults });
-
-  yield put({
-    type: types.SEARCH_FINISHED,
-    searchTerm: action.searchTerm,
-  });
 }
 
 // Binding actions to sagas

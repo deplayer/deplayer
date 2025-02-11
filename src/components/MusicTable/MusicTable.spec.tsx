@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest'
-import { screen, within } from '@testing-library/react'
+import { describe, it, expect, vi, afterEach } from 'vitest'
+import { screen, within, cleanup } from '@testing-library/react'
 import MusicTable from './MusicTable'
 import { renderWithProviders } from '../../test-utils/render'
 import { createTestMediaList } from '../../test-utils/factories'
@@ -16,6 +16,11 @@ vi.mock('react-virtualized', async () => {
 })
 
 describe('MusicTable', () => {
+  afterEach(() => {
+    cleanup()
+    vi.clearAllMocks()
+  })
+
   const setup = (customProps = {}) => {
     const defaultState = createDefaultState()
     const mediaList = createTestMediaList(2)
@@ -58,7 +63,7 @@ describe('MusicTable', () => {
     }
   }
 
-  it('renders a table with songs', async () => {
+  it('renders a table with songs', () => {
     const { mediaList } = setup()
     
     // Since we're using react-virtualized, we need to check for grid
@@ -72,9 +77,10 @@ describe('MusicTable', () => {
     // Check each row has the correct content
     rows.forEach((row, index) => {
       const media = mediaList[index]
-      expect(within(row).getByText(media.title)).toBeInTheDocument()
-      expect(within(row).getByText(media.artist.name)).toBeInTheDocument()
-      expect(within(row).getByText(media.album.name)).toBeInTheDocument()
+      const withinRow = within(row)
+      expect(withinRow.getByText(media.title)).toBeInTheDocument()
+      expect(withinRow.getByText(media.artist.name)).toBeInTheDocument()
+      expect(withinRow.getByText(media.album.name)).toBeInTheDocument()
     })
   })
 
