@@ -1,48 +1,124 @@
-This is a local-first media player which is multi provider and runs entirely in the browser
-without needing any server.
+version: "1.0"
 
-# Framework
+environment:
+  node:
+    required: true
+    version: ">=18"
+    message: "Node.js version 18 or higher is required"
 
-- Use redux for state management.
-  - Use redux-sagas for async actions.
-- Use Drizzle for the database.
-  - Run `npm run db:generate` to generate the database schema.
-- Use Vite as the build tool and development server.
-- Use TypeScript for type safety.
-- Use Tailwind CSS for styling.
-  - Custom styles should be placed in `src/styles/` directory.
-  - Use SCSS for complex custom styles.
-- The project uses daisyUI for styling.
+applications:
+  deplayer:
+    frontend:
+      framework: "react"
+      css_framework: "tailwindcss"
+      build_tool: "vite"
+      state_management: "redux"
 
-# Development
+rules:
+  structure:
+    - name: "Components Structure"
+      pattern: "src/components/**/*.tsx"
+      required: true
+      message: "Components must be in src/components directory"
 
-Try to perform as much TDD as possible. Tests command is `npm run test`
-If you're not sure what is wrong, if the test or the implementation. Ask for help.
-Use vitest for testing.
+    - name: "Common Components"
+      pattern: "src/components/common/**/*.tsx"
+      required: true
+      message: "Common/reusable components must be in src/components/common"
 
-- Don't import react from 'react' in the top level of the file.
-- Avoid mocking as much as possible and use dependency injection when possible.
-- Don't leave any unused imports.
-- Don't couple component matchers to translatable text or labels.
-- Don't use `getByTitle` in tests.
-- Don't create **tests** folders. Put tests next to implementation files (ex: foo.tsx and foo.spec.tsx)
+    - name: "Redux Containers"
+      pattern: "src/containers/**/*.tsx"
+      required: true
+      message: "Redux containers must be in src/containers directory"
 
-# Project Structure
+    - name: "Redux Sagas"
+      pattern: "src/sagas/**/*.ts"
+      required: true
+      message: "Redux sagas must be in src/sagas directory"
 
-- Place components in `src/components/`
-  - Common/reusable components go in `src/components/common/`
-- Place Redux containers in `src/containers/`
-- Place Redux sagas in `src/sagas/`
-- Place database schema and migrations in `drizzle/` directory
+    - name: "Database Schema"
+      pattern: "drizzle/**/*.ts"
+      required: true
+      message: "Database schema and migrations must be in drizzle directory"
 
-# Application Style
+  testing:
+    - name: "Test Files Location"
+      pattern: "src/**/*.spec.tsx"
+      required: true
+      message: "Test files must be next to implementation files with .spec.tsx extension"
 
-- Use the `Translate` component to translate text.
-- Translations should be placed in `en.json` file.
-- Follow TypeScript strict mode guidelines.
-- Use functional components with hooks.
-- Don't refactor class components to functional ones if not asked
-- Keep components small and focused on a single responsibility.
-- Use proper semantic HTML elements.
-- Ensure components are accessible (use ARIA attributes when needed).
-- Use classNames from 'classnames' for styling.
+    - name: "Test Matchers"
+      pattern: "src/**/*.spec.tsx"
+      content_pattern: "getByTitle"
+      forbidden: true
+      message: "Don't use getByTitle in tests"
+
+  typescript:
+    - name: "Strict Mode"
+      pattern: "tsconfig.json"
+      content_pattern: '"strict": true'
+      required: true
+      message: "TypeScript strict mode must be enabled"
+
+    - name: "React Imports"
+      pattern: "src/**/*.tsx"
+      content_pattern: "import React from 'react'"
+      forbidden: true
+      message: "Don't import React from 'react' in the top level"
+
+  styling:
+    - name: "Custom Styles Location"
+      pattern: "src/styles/**/*.scss"
+      required: true
+      message: "Custom styles must be in src/styles directory"
+
+    - name: "Tailwind Config"
+      pattern: "tailwind.config.js"
+      required: true
+      message: "Tailwind configuration file must exist"
+
+  translations:
+    - name: "Translation Files"
+      pattern: "src/locales/*.json"
+      required: true
+      message: "Translation files must be in src/locales directory"
+
+    - name: "Translation Component Usage"
+      pattern: "src/components/**/*.tsx"
+      content_pattern: "<Translate"
+      required: true
+      message: "Use Translate component for text translations"
+
+ignore_patterns:
+  - "node_modules/**"
+  - "dist/**"
+  - "coverage/**"
+  - "*.log"
+  - ".env*"
+
+constraints:
+  files:
+    max_size: "500KB"
+    max_line_length: 120
+    required:
+      - "README.md"
+      - ".gitignore"
+      - "tsconfig.json"
+      - "vite.config.ts"
+      - "package.json"
+
+naming_conventions:
+  - scope: "components"
+    case: "PascalCase"
+  - scope: "functions"
+    case: "camelCase"
+  - scope: "variables"
+    case: "camelCase"
+  - scope: "constants"
+    case: "SCREAMING_SNAKE_CASE"
+  - scope: "files"
+    case: "PascalCase"
+    pattern: "src/components/**/*.tsx"
+  - scope: "test_files"
+    case: "PascalCase"
+    pattern: "src/**/*.spec.tsx"

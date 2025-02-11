@@ -6,6 +6,9 @@ import { State as CollectionState } from "../reducers/collection";
 import { MediaFileService } from "./MediaFileService";
 import { writeFile } from "@happy-js/happy-opfs";
 import PlayerRefService from "./PlayerRefService";
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger({ namespace: "PeerService" });
 
 // Interfaces
 export interface PeerStatus {
@@ -89,11 +92,11 @@ export default class PeerService {
     roomCode: string,
     streamData: DataPayload
   ) => {
-    console.log("Handling media download request", streamData);
+    logger.info("Handling media download request", streamData);
     const mediaId = (streamData as any).mediaId;
     const media = this.collection?.rows[mediaId];
     if (!media) {
-      console.error("Media not found", mediaId);
+      logger.error("Media not found", mediaId);
       return;
     }
 
@@ -163,7 +166,7 @@ export default class PeerService {
     const roomState = this.rooms.get(roomCode);
 
     if (!roomState || !mediaElement?.captureStream) {
-      console.warn(
+      logger.warn(
         "Cannot capture stream: Media element or captureStream not supported",
         mediaElement
       );
@@ -176,14 +179,14 @@ export default class PeerService {
         PlayerRefService.getInstance().getCurrentPlayingId();
 
       if (!currentPlayingId) {
-        console.warn("No media currently playing in host");
+        logger.warn("No media currently playing in host");
         return;
       }
 
       const hostMedia = this.collection?.rows[currentPlayingId];
 
       if (!hostMedia) {
-        console.warn("No media currently playing in host");
+        logger.warn("No media currently playing in host");
         return;
       }
 
@@ -203,7 +206,7 @@ export default class PeerService {
 
       // Listen for media element changes to update stream
       const onMediaChange = () => {
-        console.log("Media element changed, updating stream");
+        logger.info("Media element changed, updating stream");
         if (!mediaElement.captureStream) return;
 
         // Get the updated current playing media
@@ -211,18 +214,18 @@ export default class PeerService {
           PlayerRefService.getInstance().getCurrentPlayingId();
 
         if (!updatedPlayingId) {
-          console.warn("No media currently playing in host after change");
+          logger.warn("No media currently playing in host after change");
           return;
         }
 
         const updatedMedia = this.collection?.rows[updatedPlayingId];
 
         if (!updatedMedia) {
-          console.warn("No media currently playing in host after change");
+          logger.warn("No media currently playing in host after change");
           return;
         }
 
-        console.log("Creating new stream for updated media");
+        logger.info("Creating new stream for updated media");
         // Create new stream
         const newStream = mediaElement.captureStream(30);
 
@@ -249,7 +252,7 @@ export default class PeerService {
       // Add new listener
       mediaElement.element.addEventListener("loadedmetadata", onMediaChange);
     } catch (error) {
-      console.error("Error capturing media stream:", error);
+      logger.error("Error capturing media stream:", error);
     }
   };
 
@@ -335,7 +338,7 @@ export default class PeerService {
       _peerId: string,
       metadata: JsonValue
     ) => {
-      console.log("Received peer stream with metadata", metadata);
+      logger.info("Received peer stream with metadata", metadata);
 
       // Update the peer stream reference
       PlayerRefService.getInstance().setPeerStream(stream);
@@ -383,7 +386,7 @@ export default class PeerService {
     const roomState = this.rooms.get(roomCode);
 
     if (!mediaFile || !roomState) {
-      console.error("Could not process media request", {
+      logger.error("Could not process media request", {
         mediaFile,
         roomState,
       });
@@ -394,7 +397,7 @@ export default class PeerService {
       updatedAt: string;
     };
 
-    console.log("Sending stream", mediaFile, fixedMedia);
+    logger.info("Sending stream", mediaFile, fixedMedia);
 
     roomState.sendMediaFile(mediaFile, null, {
       media: fixedMedia,

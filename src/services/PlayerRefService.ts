@@ -1,5 +1,6 @@
 import ReactPlayer from "react-player";
 import { store } from "../store/configureStore";
+import { createLogger } from "../utils/logger";
 
 declare global {
   interface HTMLMediaElement {
@@ -7,6 +8,8 @@ declare global {
     mozCaptureStream?(fps?: number): MediaStream;
   }
 }
+
+const logger = createLogger({ namespace: "PlayerRefService" });
 
 class PlayerRefService {
   private static instance: PlayerRefService;
@@ -62,7 +65,7 @@ class PlayerRefService {
           };
         }
       } catch (e) {
-        console.warn("Could not access iframe content:", e);
+        logger.warn("Could not access iframe content:", e);
       }
     }
 

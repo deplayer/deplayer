@@ -1,7 +1,14 @@
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger({ namespace: "AudioContextService" });
+
 class AudioContextService {
   private static instance: AudioContextService;
   private audioContext: AudioContext | null = null;
-  private audioSources = new WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>();
+  private audioSources = new WeakMap<
+    HTMLAudioElement,
+    MediaElementAudioSourceNode
+  >();
   private analyzers = new WeakMap<HTMLAudioElement, AnalyserNode>();
 
   private constructor() {}
@@ -17,8 +24,8 @@ class AudioContextService {
     if (!this.audioContext) {
       try {
         this.audioContext = new AudioContext();
-      } catch (e) {
-        console.error('!Your browser does not support AudioContext');
+      } catch (error) {
+        logger.error("Error creating audio context:", error);
         return null;
       }
     }
@@ -46,8 +53,8 @@ class AudioContextService {
       try {
         source = ctx.createMediaElementSource(audioElement);
         this.audioSources.set(audioElement, source);
-      } catch (e) {
-        console.error('Error creating media element source:', e);
+      } catch (error) {
+        logger.error("Error creating audio source:", error);
         return null;
       }
     }
@@ -72,11 +79,11 @@ class AudioContextService {
         // Ignore close errors
       }
     }
-    
+
     // Create new WeakMaps to clear old references
     this.analyzers = new WeakMap();
     this.audioSources = new WeakMap();
   }
 }
 
-export default AudioContextService; 
+export default AudioContextService;

@@ -12,7 +12,9 @@ import {
   room,
   mediaLyrics,
 } from "../../schema";
-import logger from "../../utils/logger";
+import { createLogger } from "../../utils/logger";
+
+const logger = createLogger({ namespace: "PgliteAdapter" });
 
 export default class Pglite implements IAdapter {
   initialize = async () => {};
@@ -97,7 +99,7 @@ export default class Pglite implements IAdapter {
           });
         break;
       default:
-        console.log(`Model ${model} is not implemented for save method`);
+        logger.warn(`Model ${model} is not implemented for save method`);
         new Error(`Model ${model} not supported for save method`);
     }
 
@@ -119,7 +121,7 @@ export default class Pglite implements IAdapter {
   async removeMany(model: Models, payload: Array<string>): Promise<any> {
     const instance = await db.get();
 
-    console.log("payload:", payload);
+    logger.debug("payload:", payload);
 
     switch (model) {
       case "media":
@@ -137,11 +139,11 @@ export default class Pglite implements IAdapter {
         await instance.delete(peer).where(inArray(peer.id, payload));
         break;
       case "room":
-        console.log("Removing rooms:", payload);
+        logger.info("Removing rooms:", payload);
         await instance.delete(room).where(inArray(room.id, payload));
         break;
       default:
-        console.log(`Model ${model} is not implemented for removeMany method`);
+        logger.warn(`Model ${model} is not implemented for removeMany method`);
         throw new Error(`Model ${model} not supported for removeMany method`);
     }
   }
@@ -172,9 +174,12 @@ export default class Pglite implements IAdapter {
       case "room":
         return instance.select().from(room).where(eq(room.id, id));
       case "media_lyrics":
-        return instance.select().from(mediaLyrics).where(eq(mediaLyrics.id, id));
+        return instance
+          .select()
+          .from(mediaLyrics)
+          .where(eq(mediaLyrics.id, id));
       default:
-        console.log(`Model ${model} is not implemented for getDocObj method`);
+        logger.warn(`Model ${model} is not implemented for getDocObj method`);
         throw new Error("Model not supported");
     }
   };
@@ -204,7 +209,7 @@ export default class Pglite implements IAdapter {
         const rooms = await instance.select().from(room);
         return rooms || [];
       default:
-        console.log(`Model ${model} is not implemented for getAll method`);
+        logger.warn(`Model ${model} is not implemented for getAll method`);
         throw new Error(`Model ${model} not supported for getAll method`);
     }
   };
@@ -230,7 +235,7 @@ export default class Pglite implements IAdapter {
       const terms = searchTerm
         .trim()
         .split(/\s+/)
-        .map(term => term.replace(/[^\w\s]/g, '')) // Remove special characters
+        .map((term) => term.replace(/[^\w\s]/g, "")) // Remove special characters
         .filter(Boolean);
 
       if (terms.length === 0) {
@@ -238,7 +243,7 @@ export default class Pglite implements IAdapter {
       }
 
       // Build the tsquery string
-      const tsqueryStr = terms.map(term => `${term}:*`).join(' & ');
+      const tsqueryStr = terms.map((term) => `${term}:*`).join(" & ");
       logger.debug("Generated tsquery:", tsqueryStr);
 
       // Search across title, artist name, and album name using to_tsvector
@@ -270,7 +275,7 @@ export default class Pglite implements IAdapter {
       logger.debug("Error details:", {
         name: err.name,
         message: err.message,
-        stack: err.stack
+        stack: err.stack,
       });
       return [];
     }

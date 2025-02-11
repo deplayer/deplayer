@@ -8,11 +8,14 @@ import {
 
 import type { MigrationConfig } from "drizzle-orm/migrator";
 import migrations from "./migrations.json";
+import { createLogger } from "../../utils/logger";
 
 let dbPromise: Promise<PgliteDatabase> | null = null;
 let currentClient: PGlite | null = null;
 
 const debugLevel = 0;
+
+const logger = createLogger({ namespace: "PgliteDatabase" });
 
 type SyncShape = {
   url: string;
@@ -68,7 +71,7 @@ async function migrate(db: any) {
 }
 
 async function setupSync(client: PGlite, settings: SyncSettings) {
-  console.debug("setupSync settings", settings);
+  logger.debug("setupSync settings", settings);
 
   if (settings.enabled && settings.serverUrl) {
     // Define tables in order of their dependencies
@@ -87,12 +90,12 @@ async function setupSync(client: PGlite, settings: SyncSettings) {
       { name: "media_lyrics", primaryKey: ["id"] },
     ];
 
-    console.debug("Preparing shapes for sync", tables);
+    logger.debug("Preparing shapes for sync", tables);
 
     // Sync tables sequentially to respect dependencies
     for (const table of tables) {
       try {
-        console.debug(`Setting up sync for table: ${table.name}`);
+        logger.debug(`Setting up sync for table: ${table.name}`);
 
         const shape = await (
           client as ExtendedPGlite
@@ -110,13 +113,11 @@ async function setupSync(client: PGlite, settings: SyncSettings) {
         // Wait for initial data to ensure proper initialization
         try {
           const initialRows = await shape.rows;
-          console.debug(
-            `Initial data loaded for ${table.name}: ${
-              initialRows?.length ?? 0
-            } rows`
+          logger.debug(
+            `Loaded ${initialRows?.length ?? 0} rows for ${table.name}`
           );
         } catch (error) {
-          console.error(`Error loading initial data for ${table.name}:`, error);
+          logger.error(`Error loading initial data for ${table.name}:`, error);
           if (table.name === "settings" || table.name === "room") {
             throw error; // Critical tables should fail fast
           }
@@ -126,37 +127,30 @@ async function setupSync(client: PGlite, settings: SyncSettings) {
         shape.subscribe((data) => {
           try {
             if (!data) {
-              console.warn(
-                `Received undefined data in sync update for ${table.name}`
-              );
+              logger.warn(`No rows found for ${table.name}`);
               return;
             }
 
             const rows = data.rows;
             if (!Array.isArray(rows)) {
-              console.warn(`Invalid rows data for ${table.name}:`, rows);
+              logger.warn(`Invalid rows data for ${table.name}:`, rows);
               return;
             }
 
-            console.debug(
-              `Received sync update for ${table.name}: ${rows.length} rows`
-            );
+            logger.debug(`Loaded ${rows.length} rows for ${table.name}`);
           } catch (error) {
-            console.error(
-              `Error processing sync update for ${table.name}:`,
-              error
-            );
+            logger.error("Error during sync:", error);
           }
         });
       } catch (error) {
-        console.error(`Error setting up sync for table ${table.name}:`, error);
+        logger.error(`Error setting up sync for table ${table.name}:`, error);
         if (table.name === "settings" || table.name === "room") {
           throw error; // Critical tables should fail fast
         }
       }
     }
   } else {
-    console.debug("Sync is disabled or server URL not configured");
+    logger.debug("Sync is disabled or server URL not configured");
   }
 }
 
@@ -164,7 +158,7 @@ const _create = async (): Promise<PgliteDatabase> => {
   const client = getClient();
   const db: PgliteDatabase = drizzle(client);
 
-  console.log("pglite object:", db);
+  logger.info("pglite object:", db);
 
   await migrate(db);
 
@@ -188,7 +182,7 @@ export const reconnect = async () => {
     try {
       await (currentClient as any).close?.();
     } catch (e) {
-      console.warn("Error closing existing connection:", e);
+      logger.warn("Error closing existing connection:", e);
     }
   }
 

@@ -1,10 +1,14 @@
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger({ namespace: "OpfsService" });
+
 /**
  * Service to handle Origin Private File System (OPFS) operations
  */
 export const isOpfsReady = async (): Promise<boolean> => {
   try {
     // Check if OPFS is supported
-    if (!('storage' in navigator && 'getDirectory' in navigator.storage)) {
+    if (!("storage" in navigator && "getDirectory" in navigator.storage)) {
       console.warn('OPFS is not supported in this browser');
       return false;
     }
@@ -24,7 +28,7 @@ export const isOpfsReady = async (): Promise<boolean> => {
 
     return true;
   } catch (error) {
-    console.error('OPFS initialization failed:', error);
+    logger.error("OPFS not ready:", error);
     return false;
   }
-}; 
+};

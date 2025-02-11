@@ -1,4 +1,4 @@
-import { Formik, Form } from 'formik';
+import { Formik } from 'formik';
 import { Translate } from 'react-redux-i18n';
 import { toast } from 'react-toastify';
 import classNames from 'classnames';
@@ -33,8 +33,7 @@ const DatabaseSyncForm = () => {
       enableReinitialize
     >
       {() => (
-        <Form>
-
+        <div>
           <FormSchema schema={schema} />
           <div className={classNames("mb-4 prose")}>
             <p className="text-base-content opacity-80">
@@ -57,7 +56,7 @@ const DatabaseSyncForm = () => {
               </div>
             </div>
           </div>
-        </Form>
+        </div>
       )}
     </Formik>
   );

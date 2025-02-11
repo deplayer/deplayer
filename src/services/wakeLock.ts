@@ -1,48 +1,48 @@
-let wakeLockController: AbortController | null = null
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger({ namespace: "WakeLock" });
+
+let wakeLockController: AbortController | null = null;
 
 export const requestWakeLock = async () => {
-  if ('WakeLock' in window && 'request' in window.WakeLock) {
+  try {
+    if ("wakeLock" in navigator) {
+      const wakeLock = await navigator.wakeLock.request("screen");
+      wakeLock.addEventListener("release", () => {
+        logger.info("Wake Lock was released");
+      });
 
-    const controller = new AbortController() as any
-    (window.WakeLock.request as any)('screen', { signal: controller.signal })
-      .catch((e: any) => {
-        if (e.name === 'AbortError') {
-          console.log('Wake Lock was aborted')
-        } else {
-          console.error(`${e.name}, ${e.message}`)
+      // Add event listener for page visibility change
+      document.addEventListener("visibilitychange", async () => {
+        if (document.visibilityState === "visible") {
+          try {
+            await requestWakeLock();
+            logger.info("Wake Lock is active");
+          } catch (e) {
+            logger.error(`${e.name}, ${e.message}`);
+          }
         }
-      })
-    console.log('Wake Lock is active')
-    wakeLockController = controller
+      });
 
-  } else if ('wakeLock' in navigator && 'request' in navigator.wakeLock) {
-    let wakeLock = null
-
-    try {
-      wakeLock = await navigator.wakeLock.request('screen')
-      wakeLock.addEventListener('release', (e) => {
-        console.log(e)
-        console.log('Wake Lock was released')
-      })
-      console.log('Wake Lock is active')
-    } catch (e: any) {
-      console.error(`${e.name}, ${e.message}`)
+      logger.info("Wake Lock is active");
+    } else {
+      logger.warn("Wake Lock API not supported.");
     }
-  } else {
-    console.error('Wake Lock API not supported.')
+  } catch (e) {
+    logger.error(`${e.name}, ${e.message}`);
   }
-}
+};
 
 export const releaseWakeLock = () => {
   if (wakeLockController) {
     if (wakeLockController.abort) {
-      wakeLockController.abort()
+      wakeLockController.abort();
     }
 
-    if ('release' in wakeLockController && wakeLockController.release) {
-      (wakeLockController as any).release()
+    if ("release" in wakeLockController && wakeLockController.release) {
+      (wakeLockController as any).release();
     }
 
-    wakeLockController = null
+    wakeLockController = null;
   }
-}
+};

@@ -1,7 +1,10 @@
 import * as musicMetadata from "music-metadata";
 import { writeFile } from "@happy-js/happy-opfs";
+import { createLogger } from "../../utils/logger";
 
 import Media, { IMedia, Cover } from "../../entities/Media";
+
+const logger = createLogger({ namespace: "ID3TagService" });
 
 function generateHexHash(length: number = 16): string {
   let hash = "";
@@ -29,16 +32,18 @@ export const readFileMetadata = async (file: any) => {
   // Check if file type is supported
   if (!normFile.type || !SUPPORTED_MIME_TYPES.includes(normFile.type)) {
     throw new Error(
-      `Unsupported file type: ${normFile.type || "unknown"
+      `Unsupported file type: ${
+        normFile.type || "unknown"
       }. Supported types are: ${SUPPORTED_MIME_TYPES.join(", ")}`
     );
   }
 
-  console.log("reading metadata from file: ", normFile);
+  logger.debug("Reading metadata from file:", normFile);
 
   try {
     const metadata = await musicMetadata.parseBlob(normFile);
-    console.log("file metadata: ", metadata);
+    logger.debug("File metadata:", metadata);
+    logger.debug("Metadata genre:", metadata.common.genre);
     return metadata;
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Unknown error";
@@ -53,7 +58,7 @@ export async function metadataToSong(
 ): Promise<Media> {
   const cover = metadata.common.picture ? metadata.common.picture[0] : null;
 
-  console.log("metadata.common.genre: ", metadata.common.genre);
+  logger.debug("metadata.common.genre: ", metadata.common.genre);
 
   let mediaProps: IMedia = {
     title: metadata.common.title || fileUri,

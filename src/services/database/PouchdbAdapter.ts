@@ -1,8 +1,10 @@
 import { IAdapter, Models } from "./IAdapter";
 import * as db from "./PouchdbDatabase";
-import logger from "../../utils/logger";
+import { createLogger } from "../../utils/logger";
 
 const cb = (_err: any) => {};
+
+const logger = createLogger({ namespace: "PouchdbAdapter" });
 
 export default class PouchdbAdapter implements IAdapter {
   initialize = async () => {};
@@ -76,7 +78,7 @@ export default class PouchdbAdapter implements IAdapter {
       );
 
       if (result) {
-        console.log("getAll result: ", result);
+        logger.debug("getAll result: ", result);
 
         // FIXME: This elem.key should be elem.value maybe?
         resolve(result.rows.map((elem: any) => elem.doc));

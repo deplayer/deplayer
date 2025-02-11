@@ -1,5 +1,6 @@
 import { IStorageService } from "./IStorageService";
 import { IAdapter } from "./database/IAdapter";
+import { createLogger } from "../utils/logger";
 
 interface Room {
   id: string;
@@ -8,6 +9,8 @@ interface Room {
 }
 
 const MODEL = "room";
+
+const logger = createLogger({ namespace: "RoomStorageService" });
 
 export default class RoomStorageService implements IStorageService {
   storageAdapter: IAdapter;
@@ -28,12 +31,12 @@ export default class RoomStorageService implements IStorageService {
     return await this.storageAdapter.save(MODEL, id, {
       id,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     });
   };
 
   remove = async (id: string): Promise<void> => {
-    console.log("Removing room:", id);
+    logger.info("Removing room:", id);
 
     await this.storageAdapter.removeMany(MODEL, [id]);
   };
@@ -41,4 +44,4 @@ export default class RoomStorageService implements IStorageService {
   removeAll = async (): Promise<any> => {
     return await this.storageAdapter.removeCollection(MODEL);
   };
-} 
+}

@@ -4,6 +4,9 @@ import { getItemsApi } from "@jellyfin/sdk/lib/utils/api/items-api";
 import { getUserApi } from "@jellyfin/sdk/lib/utils/api/user-api";
 import Media from "../entities/Media";
 import { IMusicProvider } from "./IMusicProvider";
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger({ namespace: "JellyfinProvider" });
 
 export default class JellyfinProvider implements IMusicProvider {
   private api: Api;
@@ -51,7 +54,7 @@ export default class JellyfinProvider implements IMusicProvider {
       this.userId =
         users.data.find((user) => user.Name === this.username)?.Id || null;
     } catch (error) {
-      console.error("Jellyfin authentication error:", error);
+      logger.error("Jellyfin authentication error:", error);
       throw new Error("Failed to authenticate with Jellyfin server");
     }
   }
@@ -113,7 +116,7 @@ export default class JellyfinProvider implements IMusicProvider {
       let allItems: any[] = [];
       let startIndex = 0;
       const limit = 100;
-      
+
       while (true) {
         const results = await getItemsApi(this.api).getItems({
           userId: this.userId,
@@ -150,7 +153,7 @@ export default class JellyfinProvider implements IMusicProvider {
 
       return this.mapSongs(allItems);
     } catch (error) {
-      console.error("Jellyfin search error:", error);
+      logger.error("Jellyfin search error:", error);
       throw new Error("Failed to search Jellyfin server");
     }
   }
@@ -178,7 +181,7 @@ export default class JellyfinProvider implements IMusicProvider {
 
       return this.mapSongs(results.data.Items || []);
     } catch (error) {
-      console.error("Jellyfin sync error:", error);
+      logger.error("Jellyfin sync error:", error);
       throw error;
     }
   }

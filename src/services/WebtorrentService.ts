@@ -1,4 +1,7 @@
 import WebTorrent from "webtorrent";
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger({ namespace: "WebtorrentService" });
 
 class WebtorrentService {
   private static instance: WebtorrentService;
@@ -28,7 +31,7 @@ class WebtorrentService {
     if (!this.serverInitialized && registration?.active) {
       this.client.createServer({ controller: registration });
       this.serverInitialized = true;
-      console.log("WebTorrent server initialized successfully");
+      logger.info("WebTorrent server initialized successfully");
     }
   }
 }

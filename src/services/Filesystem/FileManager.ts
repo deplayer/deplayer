@@ -1,58 +1,64 @@
-import Filesystem from './index'
-import { set } from 'idb-keyval'
+import Filesystem from "./index";
+import { set } from "idb-keyval";
+import { createLogger } from "../../utils/logger";
 
+const logger = createLogger({ namespace: "FileManager" });
 
 const FileManager = () => {
-  let directoryHandler: any
-  const fileHandlers: Array<any> = []
+  let directoryHandler: any;
+  const fileHandlers: Array<any> = [];
 
   const openDialog = async (): Promise<any> => {
-    directoryHandler = await Filesystem.openDialog()
-    set('directoryHandler', directoryHandler)
-    const values = (directoryHandler.values && directoryHandler.values()) || directoryHandler
+    directoryHandler = await Filesystem.openDialog();
+    set("directoryHandler", directoryHandler);
+    const values =
+      (directoryHandler.values && directoryHandler.values()) ||
+      directoryHandler;
 
-    console.log('directoryHandler: ', directoryHandler)
+    logger.debug("directoryHandler: ", directoryHandler);
 
-    const files: Array<any> = []
+    const files: Array<any> = [];
 
     for await (const entry of values) {
-      fileHandlers.push(entry)
+      fileHandlers.push(entry);
 
-      const file = await processSelectedFile(entry)
-      files.push(file)
+      const file = await processSelectedFile(entry);
+      files.push(file);
     }
 
-    return files
-  }
+    return files;
+  };
 
-  const processSelectedFile = async (entry: FileSystemHandle): Promise<{
-    file: any,
-    handler: any
+  const processSelectedFile = async (
+    entry: FileSystemHandle
+  ): Promise<{
+    file: any;
+    handler: any;
   }> => {
-    let file: any
+    let file: any;
 
-    console.log(`saving handler ${entry.name} for later use`)
+    logger.debug(`saving handler ${entry.name} for later use`);
 
-    if (entry.kind === 'file' && entry instanceof FileSystemFileHandle) {
-      await set(entry.name, entry)
-      file = await entry.getFile()
+    if (entry.kind === "file" && entry instanceof FileSystemFileHandle) {
+      await set(entry.name, entry);
+      file = await entry.getFile();
     } else {
-      file = entry
-      await set(file.name, file)
+      file = entry;
+      await set(file.name, file);
     }
 
     return {
       file: file,
-      handler: entry
-    }
-  }
+      handler: entry,
+    };
+  };
 
   return {
     openDialog,
-    processSelectedFile
-  }
-}
+    processSelectedFile,
+  };
+};
 
-const fileManager = FileManager()
+const fileManager = FileManager();
 
-export default fileManager
+export default fileManager;

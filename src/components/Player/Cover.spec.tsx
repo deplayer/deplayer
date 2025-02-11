@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, cleanup } from '@testing-library/react'
+import { render, screen, fireEvent, cleanup, act } from '@testing-library/react'
 import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
 import Cover from './Cover'
 import Media from '../../entities/Media'
@@ -66,55 +66,74 @@ describe('Cover', () => {
     expect(coverElement).toBeTruthy()
     
     if (coverElement) {
-      // Simulate image load
-      mockImage.onload()
+      await act(async () => {
+        // Simulate image load
+        mockImage.onload()
+      })
       
-      fireEvent.mouseEnter(coverElement)
+      await act(async () => {
+        fireEvent.mouseEnter(coverElement)
+      })
+      
       const preview = container.querySelector('[data-testid="hover-preview"]')
       expect(preview).toHaveClass('opacity-100 visible')
     }
   })
 
-  it('should hide hover preview on mouse leave', () => {
+  it('should hide hover preview on mouse leave', async () => {
     const { container } = render(<Cover song={mockSong} />)
     const coverElement = container.querySelector('[data-testid="cover-container"]')
     expect(coverElement).toBeTruthy()
     
     if (coverElement) {
-      // Simulate image load
-      mockImage.onload()
+      await act(async () => {
+        // Simulate image load
+        mockImage.onload()
+      })
       
       // Show preview
-      fireEvent.mouseEnter(coverElement)
+      await act(async () => {
+        fireEvent.mouseEnter(coverElement)
+      })
+      
       const preview = container.querySelector('[data-testid="hover-preview"]')
       expect(preview).toHaveClass('opacity-100 visible')
       
       // Hide preview
-      fireEvent.mouseLeave(coverElement)
+      await act(async () => {
+        fireEvent.mouseLeave(coverElement)
+      })
+      
       expect(preview).toHaveClass('opacity-0 invisible')
     }
   })
 
-  it('should open modal on click', () => {
+  it('should open modal on click', async () => {
     const { container } = render(<Cover song={mockSong} />)
     const coverElement = container.querySelector('[data-testid="cover-container"]')
     expect(coverElement).toBeTruthy()
     
     if (coverElement) {
-      fireEvent.click(coverElement)
+      await act(async () => {
+        fireEvent.click(coverElement)
+      })
       expect(screen.getByText('Test Album')).toBeInTheDocument()
     }
   })
 
-  it('should close modal when clicking close button', () => {
+  it('should close modal when clicking close button', async () => {
     render(<Cover song={mockSong} slim={false} />)
 
     // Open modal
-    fireEvent.click(screen.getByTestId('cover-container'))
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('cover-container'))
+    })
     expect(screen.getByText('Test Album')).toBeInTheDocument()
     
     // Close modal
-    fireEvent.click(screen.getByRole('button', { name: '' }))
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: '' }))
+    })
     expect(screen.queryByText('Test Album')).not.toBeInTheDocument()
   })
 }) 

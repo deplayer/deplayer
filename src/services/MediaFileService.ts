@@ -1,8 +1,11 @@
-import axios from 'axios';
-import { readFile } from '@happy-js/happy-opfs';
-import { get } from 'idb-keyval';
-import { IMedia, hasAnyProviderOf } from '../entities/Media';
-import { verifyPermission } from './FileSystemService'
+import axios from "axios";
+import { readFile } from "@happy-js/happy-opfs";
+import { get } from "idb-keyval";
+import { IMedia, hasAnyProviderOf } from "../entities/Media";
+import { verifyPermission } from "./FileSystemService";
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger({ namespace: "MediaFileService" });
 
 export class MediaFileService {
   /**
@@ -26,12 +29,14 @@ export class MediaFileService {
       const file = await readFile(songFsUri);
       return new Blob([file.unwrap()]);
     } catch (error) {
-      console.error('Error reading from OPFS:', error);
+      logger.error("Error reading from OPFS:", error);
       return null;
     }
   }
 
-  private static async handleFilesystemMedia(media: IMedia): Promise<File | null> {
+  private static async handleFilesystemMedia(
+    media: IMedia
+  ): Promise<File | null> {
     const streamUri = Object.values(media.stream)[0].uris[0].uri;
     try {
       const handler = await get(streamUri);
@@ -47,7 +52,7 @@ export class MediaFileService {
       await verifyPermission(handler);
       return await handler.getFile();
     } catch (error) {
-      console.error('Error reading from filesystem:', error);
+      logger.error("Error reading from filesystem:", error);
       return null;
     }
   }
@@ -55,16 +60,16 @@ export class MediaFileService {
   private static async handleRemoteMedia(media: IMedia): Promise<Blob | null> {
     const streamUrl = Object.values(media.stream)[0].uris[0].uri;
     if (!streamUrl) {
-      console.error('No stream URL found for media', media);
+      logger.error("No stream URL found for media", media);
       return null;
     }
 
     try {
-      const response = await axios.get(streamUrl, { responseType: 'blob' });
+      const response = await axios.get(streamUrl, { responseType: "blob" });
       return response.data;
     } catch (error) {
-      console.error('Error fetching remote media:', error);
+      logger.error("Error fetching remote media:", error);
       return null;
     }
   }
-} 
+}

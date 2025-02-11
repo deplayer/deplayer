@@ -1,7 +1,10 @@
 import axios from "axios";
+import { createLogger } from "../utils/logger";
 
 import Media, { IMedia } from "../entities/Media";
 import { IMusicProvider } from "./IMusicProvider";
+
+const logger = createLogger({ namespace: "SubsonicApiProvider" });
 
 /**
  * Implement the Subsonic API
@@ -107,7 +110,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
 
       return allSongs;
     } catch (error) {
-      console.error("Error during full sync:", error);
+      logger.error("Error during full sync:", error);
       throw error;
     }
   }
@@ -134,7 +137,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
           const mappedSongs = this.mapSongs(songs, [album]);
           allSongs.push(...mappedSongs);
         } catch (error) {
-          console.error(`Error fetching songs for album ${album.id}:`, error);
+          logger.error(`Error fetching songs for album ${album.id}:`, error);
           // Continue with next album even if one fails
           continue;
         }
@@ -142,7 +145,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
 
       return allSongs;
     } catch (error) {
-      console.error("Error fetching recent media:", error);
+      logger.error("Error fetching recent media:", error);
       return [];
     }
   }
