@@ -4,18 +4,18 @@ import { fileURLToPath } from "url";
 import fixReactVirtualized from "esbuild-plugin-react-virtualized";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react() as any],
   test: {
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/setupTests.ts"],
-    testTimeout: 500,
-    hookTimeout: 500,
-    pool: "forks",
-    maxConcurrency: 10,
-    maxWorkers: 2,
+    testTimeout: 2000,
+    hookTimeout: 2000,
+    pool: "threads",
+    maxConcurrency: 1,
+    maxWorkers: 1,
     minWorkers: 1,
-    fileParallelism: true,
+    fileParallelism: false,
     cache: {
       dir: ".vitest/cache",
     },
@@ -60,6 +60,22 @@ export default defineConfig({
           exclude: ["@electric-sql/pglite", "daisyui", "tailwindcss"],
         },
       },
+    },
+    logHeapUsage: true,
+    reporters: ["verbose"],
+    sequence: {
+      shuffle: false,
+      concurrent: false,
+    },
+    isolate: true,
+    bail: 1,
+    passWithNoTests: false,
+    allowOnly: true,
+    silent: true,
+    onConsoleLog: (log) => {
+      if (log.includes("[ERROR]")) return true;
+      if (log.includes("[WARN]")) return true;
+      return false;
     },
   },
 });

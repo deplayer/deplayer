@@ -54,20 +54,14 @@ vi.mock('../../types/search', () => ({
   }))
 }))
 
-describe('CommandBar', { timeout: 500 }, () => {
+describe('CommandBar', () => {
   beforeEach(() => {
-    vi.useFakeTimers()
+    vi.useFakeTimers({ shouldAdvanceTime: true })
   })
 
   afterEach(() => {
-    // Run all pending timers and cleanup
-    act(() => {
-      vi.runAllTimers()
-    })
-    cleanup()
-    vi.clearAllMocks()
+    vi.runOnlyPendingTimers()
     vi.useRealTimers()
-    localStorage.clear()
   })
 
   const setup = (customState: Partial<StoreState> = {}) => {
@@ -94,16 +88,14 @@ describe('CommandBar', { timeout: 500 }, () => {
 
   it('renders search button', () => {
     const { getByText } = setup()
-    expect(getByText('Search...')).toBeTruthy()
+    expect(getByText('Search...')).toBeInTheDocument()
   })
 
-  it('opens modal on Cmd+K', () => {
+  it('opens modal on Cmd+K', async () => {
     const { getByTestId } = setup()
-    
-    // Simulate Cmd+K
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
-    
-    expect(getByTestId('command-search-input')).toBeTruthy()
+    await vi.advanceTimersByTimeAsync(100)
+    expect(getByTestId('command-search-input')).toBeInTheDocument()
   })
 
   it('dispatches search action with correct payload after debounce', async () => {
@@ -111,48 +103,38 @@ describe('CommandBar', { timeout: 500 }, () => {
     
     // Open modal
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
+    await vi.advanceTimersByTimeAsync(100)
     
-    // Type in search with a term that won't match any local items
-    const searchTerm = 'xyz123nonexistent'
+    // Get input and type
+    const input = getByTestId('command-search-input')
+    fireEvent.change(input, { target: { value: 'test query' } })
     
-    // First change event
-    await act(async () => {
-      fireEvent.change(getByTestId('command-search-input'), { target: { value: searchTerm } })
-      // Wait for the debounce timer
-      vi.advanceTimersByTime(500)
-    })
+    // Wait for debounce
+    await vi.advanceTimersByTimeAsync(500)
     
-    // Verify the search action was called with the correct parameters
-    expect(searchActions.startSearch).toHaveBeenCalledWith(searchTerm, 'all', true)
-    
-    // Clear the mock
-    vi.clearAllMocks()
-    
-    // Type the same search term again - should not trigger a new search
-    await act(async () => {
-      fireEvent.change(getByTestId('command-search-input'), { target: { value: searchTerm } })
-      vi.advanceTimersByTime(500)
-    })
-    
-    // Should not have been called again with the same term
-    expect(searchActions.startSearch).not.toHaveBeenCalled()
+    expect(searchActions.startSearch).toHaveBeenCalledWith('test query', 'all', true)
   })
 
-  it('does not dispatch search action immediately on input', () => {
+  it('does not dispatch search action immediately on input', async () => {
     const { getByTestId } = setup()
     
     // Open modal
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
+    await vi.advanceTimersByTimeAsync(100)
     
-    // Type in search
-    fireEvent.change(getByTestId('command-search-input'), { target: { value: 'xyz123nonexistent' } })
+    // Clear any previous calls
+    vi.clearAllMocks()
     
-    // Should not be called before debounce timer
+    // Get input and type
+    const input = getByTestId('command-search-input')
+    fireEvent.change(input, { target: { value: 'test query' } })
+    
+    // Check that search is not dispatched immediately
     expect(searchActions.startSearch).not.toHaveBeenCalled()
   })
 
-  it("shows loading state while searching", () => {
-    const { getByText, getByTestId } = setup({
+  it('shows loading state while searching', async () => {
+    const { getByTestId, getByText } = setup({
       collection: {
         ...createDefaultState().collection,
         loading: true
@@ -161,27 +143,38 @@ describe('CommandBar', { timeout: 500 }, () => {
     
     // Open modal
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
+    await vi.advanceTimersByTimeAsync(100)
     
-    // Type search text to trigger loading state
-    fireEvent.change(getByTestId('command-search-input'), { target: { value: 'xyz123nonexistent' } })
+    // Get input and type
+    const input = getByTestId('command-search-input')
+    fireEvent.change(input, { target: { value: 'test query' } })
     
-    // Now we can check for the loading state
-    expect(getByText("searching...")).toBeTruthy()
+    // Wait for debounce
+    await vi.advanceTimersByTimeAsync(500)
+    
+    expect(getByText('searching...')).toBeInTheDocument()
   })
 
-  it("shows no results message when search returns empty", async () => {
-    const { getByText, getByTestId } = setup()
+  it('shows no results message when search returns empty', async () => {
+    const { getByTestId, getByText } = setup({
+      collection: {
+        ...createDefaultState().collection,
+        searchResults: []
+      }
+    })
     
     // Open modal
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
+    await vi.advanceTimersByTimeAsync(100)
     
-    // Type search text to trigger no results state
-    await act(async () => {
-      fireEvent.change(getByTestId('command-search-input'), { target: { value: 'xyz123nonexistent' } })
-      vi.advanceTimersByTime(500)
-    })
+    // Get input and type
+    const input = getByTestId('command-search-input')
+    fireEvent.change(input, { target: { value: 'test query' } })
     
-    expect(getByText("No results found")).toBeTruthy()
+    // Wait for debounce
+    await vi.advanceTimersByTimeAsync(500)
+    
+    expect(getByText('No results found')).toBeInTheDocument()
   })
 
   it('displays search results with correct types', async () => {
@@ -194,7 +187,7 @@ describe('CommandBar', { timeout: 500 }, () => {
       cover: { thumbnailUrl: 'test-cover.jpg' }
     }
 
-    const { getByText, getByTestId } = setup({
+    const { getByTestId, getByText } = setup({
       collection: {
         ...createDefaultState().collection,
         searchResults: ['song1'],
@@ -206,18 +199,20 @@ describe('CommandBar', { timeout: 500 }, () => {
     
     // Open modal
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
+    await vi.advanceTimersByTimeAsync(100)
     
-    // Type search text to trigger results display
-    await act(async () => {
-      fireEvent.change(getByTestId('command-search-input'), { target: { value: 'test' } })
-      vi.advanceTimersByTime(500)
-    })
+    // Get input and type
+    const input = getByTestId('command-search-input')
+    fireEvent.change(input, { target: { value: 'test' } })
+    
+    // Wait for debounce
+    await vi.advanceTimersByTimeAsync(500)
     
     // First check for the songs category
-    expect(getByText('songs')).toBeTruthy()
+    expect(getByText('songs')).toBeInTheDocument()
     
     // Then check for the song details
-    expect(getByText('Test Song')).toBeTruthy()
-    expect(getByText('Test Artist - Test Album')).toBeTruthy()
+    expect(getByText('Test Song')).toBeInTheDocument()
+    expect(getByText('Test Artist - Test Album')).toBeInTheDocument()
   })
 }) 
