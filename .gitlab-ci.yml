@@ -11,7 +11,7 @@ test:
   image: node:20
   before_script:
     - apt-get update
-    - apt-get install -y libvips-dev
+    - apt-get install -y libvips-dev build-essential libglib2.0-dev
   script:
     - npm install
     - npm run coverage
@@ -24,7 +24,7 @@ deploy:
   image: node:20
   before_script:
     - apt-get update
-    - apt-get install -y libvips-dev
+    - apt-get install -y libvips-dev build-essential libglib2.0-dev
   script:
     - npm install
     - npm run build
