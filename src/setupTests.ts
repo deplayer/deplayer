@@ -75,23 +75,15 @@ vi.mock('./services/ID3Tag/ID3TagService', () => {
 })
 
 // Mock fflate module
-vi.mock('fflate', () => {
+vi.mock('./utils/fflate-wrapper', () => {
   const mockFn = vi.fn()
   return {
-    default: {
-      unzipSync: mockFn,
-      strFromU8: mockFn,
-      zlibSync: mockFn,
-      gzipSync: mockFn,
-      strToU8: mockFn,
-      deflateSync: mockFn
-    },
-    unzipSync: mockFn,
-    strFromU8: mockFn,
-    zlibSync: mockFn,
-    gzipSync: mockFn,
+    deflate: mockFn,
+    inflate: mockFn,
+    gzip: mockFn,
+    ungzip: mockFn,
     strToU8: mockFn,
-    deflateSync: mockFn
+    strFromU8: mockFn
   }
 })
 

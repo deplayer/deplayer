@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, act } from '@testing-library/react'
 import { describe, it, expect, beforeAll, vi } from 'vitest'
 import SongView from './index'
 import Media from '../../entities/Media'
@@ -19,11 +19,32 @@ beforeAll(() => {
 
 const setup = (customProps: any) => {
   const defaultProps = {
-    song: new Media(mediaParams),
+    song: new Media({
+      ...mediaParams,
+      stream: {
+        subsonic: {
+          service: 'subsonic',
+          uris: [{ uri: 'http://example.com/stream' }]
+        }
+      }
+    }),
     match: {
       params: {}
     },
-    collection: collectionDefaultState,
+    collection: {
+      ...collectionDefaultState,
+      rows: {
+        [mediaParams.id as string]: {
+          ...mediaParams,
+          stream: {
+            subsonic: {
+              service: 'subsonic',
+              uris: [{ uri: 'http://example.com/stream' }]
+            }
+          }
+        }
+      }
+    },
     settings: {
       settings: {
         app: {
@@ -41,10 +62,12 @@ const setup = (customProps: any) => {
 }
 
 describe('SongView', () => {
-  it('spinner if app loading', () => {
+  it('spinner if app loading', async () => {
     const props = setup({ loading: true })
 
-    render(<BrowserRouter><SongView {...props} /></BrowserRouter>)
+    await act(async () => {
+      render(<BrowserRouter><SongView {...props} /></BrowserRouter>)
+    })
     expect(screen.getByTestId('spinner')).toBeTruthy()
   })
 

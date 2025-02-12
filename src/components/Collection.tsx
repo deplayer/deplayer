@@ -20,10 +20,6 @@ type Props = {
 
 const mediaForPath = (location: Location, props: Props) => {
   switch (location.pathname) {
-    case '/collection/audio':
-      return props.collection.mediaByType['audio']
-    case '/collection/video':
-      return props.collection.mediaByType['video']
     case '/search-results':
       return props.collection.searchResults
     default:

@@ -68,6 +68,8 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
   const [streamUrls, setStreamUrls] = React.useState<StreamUrl[]>([])
 
   React.useEffect(() => {
+    if (!song) return
+
     const loadStreamUrls = async () => {
       const urls = await Promise.all(
         Object.values(song.stream || {}).map(async (value: any, index: number) => {
