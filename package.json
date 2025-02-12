@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc && vite build",
-    "test": "vitest --watch=false",
-    "test:watch": "vitest --watch",
-    "coverage": "vitest run --coverage",
+    "test": "vitest --config vitest.config.ts --watch=false",
+    "test:watch": "vitest --config vitest.config.ts --watch",
+    "coverage": "vitest run --config vitest.config.ts --coverage",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "generate-pwa-assets": "pwa-assets-generator",
     "preview": "vite preview",

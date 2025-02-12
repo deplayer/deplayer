@@ -54,7 +54,7 @@ vi.mock('../../types/search', () => ({
   }))
 }))
 
-describe('CommandBar', () => {
+describe('CommandBar', { timeout: 500 }, () => {
   beforeEach(() => {
     vi.useFakeTimers()
   })
@@ -114,12 +114,28 @@ describe('CommandBar', () => {
     
     // Type in search with a term that won't match any local items
     const searchTerm = 'xyz123nonexistent'
+    
+    // First change event
+    await act(async () => {
+      fireEvent.change(getByTestId('command-search-input'), { target: { value: searchTerm } })
+      // Wait for the debounce timer
+      vi.advanceTimersByTime(500)
+    })
+    
+    // Verify the search action was called with the correct parameters
+    expect(searchActions.startSearch).toHaveBeenCalledWith(searchTerm, 'all', true)
+    
+    // Clear the mock
+    vi.clearAllMocks()
+    
+    // Type the same search term again - should not trigger a new search
     await act(async () => {
       fireEvent.change(getByTestId('command-search-input'), { target: { value: searchTerm } })
       vi.advanceTimersByTime(500)
     })
     
-    expect(searchActions.startSearch).toHaveBeenCalledWith(searchTerm, 'all', true)
+    // Should not have been called again with the same term
+    expect(searchActions.startSearch).not.toHaveBeenCalled()
   })
 
   it('does not dispatch search action immediately on input', () => {
@@ -129,8 +145,9 @@ describe('CommandBar', () => {
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
     
     // Type in search
-    fireEvent.change(getByTestId('command-search-input'), { target: { value: 'test' } })
+    fireEvent.change(getByTestId('command-search-input'), { target: { value: 'xyz123nonexistent' } })
     
+    // Should not be called before debounce timer
     expect(searchActions.startSearch).not.toHaveBeenCalled()
   })
 
@@ -146,7 +163,7 @@ describe('CommandBar', () => {
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
     
     // Type search text to trigger loading state
-    fireEvent.change(getByTestId('command-search-input'), { target: { value: 'test search' } })
+    fireEvent.change(getByTestId('command-search-input'), { target: { value: 'xyz123nonexistent' } })
     
     // Now we can check for the loading state
     expect(getByText("searching...")).toBeTruthy()
@@ -160,7 +177,7 @@ describe('CommandBar', () => {
     
     // Type search text to trigger no results state
     await act(async () => {
-      fireEvent.change(getByTestId('command-search-input'), { target: { value: 'test search' } })
+      fireEvent.change(getByTestId('command-search-input'), { target: { value: 'xyz123nonexistent' } })
       vi.advanceTimersByTime(500)
     })
     

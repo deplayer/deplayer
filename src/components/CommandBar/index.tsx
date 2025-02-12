@@ -281,28 +281,32 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
     // Clear previous timer
     if (searchTimer.current) {
       clearTimeout(searchTimer.current)
+      searchTimer.current = undefined
     }
 
     // Set new timer for debounced search
-    searchTimer.current = setTimeout(() => {
-      if (value.length >= 3) {
+    if (value.length >= 3) {
+      searchTimer.current = setTimeout(() => {
         const localItems = filterItems([...commands, ...navigationItems, ...themeItems], value)
+        // Only dispatch search if we have no local matches and haven't searched for this term yet
         if (localItems.length === 0 && value !== lastMediaSearch.current) {
           lastMediaSearch.current = value
           dispatch(startSearch(value, 'all', true))
         }
-      }
-    }, 500)
+        searchTimer.current = undefined
+      }, 500)
+    }
   }, [commands, navigationItems, themeItems, filterItems, dispatch])
 
-  // Cleanup timer on unmount or when modal closes
+  // Cleanup timer on unmount or when dependencies change
   useEffect(() => {
     return () => {
       if (searchTimer.current) {
         clearTimeout(searchTimer.current)
+        searchTimer.current = undefined
       }
     }
-  }, [])
+  }, [])  // Remove dependencies to prevent unnecessary cleanup
 
   // Reset search state when modal closes
   useEffect(() => {
@@ -312,11 +316,16 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
       lastMediaSearch.current = ''
       if (searchTimer.current) {
         clearTimeout(searchTimer.current)
+        searchTimer.current = undefined
       }
     }
   }, [open])
 
   const groupedItems = useMemo((): GroupedItems[] => {
+    if (!search && searchResults.length === 0) {
+      return []
+    }
+
     // Combine all available items
     const allAvailableItems: CommandBarItem[] = [
       ...commands,
@@ -359,35 +368,11 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
     groupedItems.reduce<CommandBarItem[]>((acc, group) => [...acc, ...group.items], [])
   , [groupedItems])
 
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-      e.preventDefault()
-      setOpen(true)
-    }
-    if (!open) return
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      setSelectedIndex(prev => 
-        prev < allItems.length - 1 ? prev + 1 : prev
-      )
-    }
-    if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      setSelectedIndex(prev => prev > 0 ? prev - 1 : prev)
-    }
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      const selectedItem = allItems[selectedIndex]
-      if (selectedItem) {
-        handleItemSelect(selectedItem)
-      }
-    }
-    if (e.key === 'Escape') {
-      e.preventDefault()
-      handleClose()
-    }
-  }, [open, allItems, selectedIndex])
+  const handleClose = useCallback(() => {
+    setOpen(false)
+    setSearch('')
+    setSelectedIndex(0)
+  }, [])
 
   const handleItemSelect = useCallback((item: CommandBarItem) => {
     switch (item.type) {
@@ -415,18 +400,44 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
         break
     }
     handleClose()
-  }, [navigate])
+  }, [navigate, handleClose])
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault()
+      setOpen(true)
+      return
+    }
+    
+    if (!open) return
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault()
+        setSelectedIndex(prev => prev < allItems.length - 1 ? prev + 1 : prev)
+        break
+      case 'ArrowUp':
+        e.preventDefault()
+        setSelectedIndex(prev => prev > 0 ? prev - 1 : prev)
+        break
+      case 'Enter':
+        e.preventDefault()
+        const selectedItem = allItems[selectedIndex]
+        if (selectedItem) {
+          handleItemSelect(selectedItem)
+        }
+        break
+      case 'Escape':
+        e.preventDefault()
+        handleClose()
+        break
+    }
+  }, [open, allItems, selectedIndex, handleItemSelect, handleClose])
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleKeyDown])
-
-  const handleClose = useCallback(() => {
-    setOpen(false)
-    setSearch('')
-    setSelectedIndex(0)
-  }, [])
 
   const getIconForItem = useCallback((item: CommandBarItem): IconType => {
     if (item.icon) return item.icon
