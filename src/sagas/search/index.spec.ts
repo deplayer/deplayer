@@ -49,7 +49,7 @@ describe("search saga", () => {
       ])
       .put({ type: types.SET_SEARCH_RESULTS, searchResults: mockResults })
       .put(push("/search-results"))
-      .put({ type: types.SEARCH_FINISHED, searchTerm })
+      .put({ type: types.SEARCH_FINISHED, searchTerm, data: mockResults })
       .run();
   });
 
@@ -78,7 +78,7 @@ describe("search saga", () => {
       ])
       .put({ type: types.SET_SEARCH_RESULTS, searchResults: mockResults })
       .not.put(push("/search-results"))
-      .put({ type: types.SEARCH_FINISHED, searchTerm })
+      .put({ type: types.SEARCH_FINISHED, searchTerm, data: mockResults })
       .run();
   });
 

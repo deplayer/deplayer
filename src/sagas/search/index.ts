@@ -54,6 +54,7 @@ export function* search(action: SearchAction): any {
     yield put({
       type: types.SEARCH_FINISHED,
       searchTerm: action.searchTerm,
+      data: searchResults
     });
   } catch (error: any) {
     logger.error("Search saga error:", error);
