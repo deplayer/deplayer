@@ -6,6 +6,7 @@ import { createDefaultState } from '../../test-utils/store'
 import { I18n } from 'react-redux-i18n'
 import { AnyAction } from 'redux'
 import { ThunkDispatch } from 'redux-thunk'
+import * as searchActions from '../../types/search'
 
 // Define minimal types for store state
 interface StoreState {
@@ -32,6 +33,7 @@ vi.mock('react-redux-i18n', () => ({
         'menu.search': 'Search',
         'commandBar.categories.themes': 'themes',
         'commandBar.categories.commands': 'commands',
+        'commandBar.categories.songs': 'songs',
         'menu.navigate': 'Navigate',
         'menu.select': 'Select',
         'menu.close': 'Close'
@@ -42,12 +44,26 @@ vi.mock('react-redux-i18n', () => ({
   Translate: ({ value }: { value: string }) => I18n.t(value)
 }))
 
+// Mock search actions
+vi.mock('../../types/search', () => ({
+  startSearch: vi.fn((searchTerm: string, provider: string, noRedirect: boolean) => ({
+    type: 'START_SEARCH',
+    searchTerm,
+    provider,
+    noRedirect
+  }))
+}))
+
 describe('CommandBar', () => {
   beforeEach(() => {
     vi.useFakeTimers()
   })
 
   afterEach(() => {
+    // Run all pending timers and cleanup
+    act(() => {
+      vi.runAllTimers()
+    })
     cleanup()
     vi.clearAllMocks()
     vi.useRealTimers()
@@ -73,9 +89,6 @@ describe('CommandBar', () => {
       { initialState }
     )
 
-    // Mock dispatch
-    result.store.dispatch = vi.fn() as unknown as AppDispatch
-
     return result
   }
 
@@ -94,27 +107,23 @@ describe('CommandBar', () => {
   })
 
   it('dispatches search action with correct payload after debounce', async () => {
-    const { getByTestId, store } = setup()
+    const { getByTestId } = setup()
     
     // Open modal
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
     
-    // Type in search
-    fireEvent.change(getByTestId('command-search-input'), { target: { value: 'test' } })
-    
-    // Fast-forward timers
+    // Type in search with a term that won't match any local items
+    const searchTerm = 'xyz123nonexistent'
     await act(async () => {
+      fireEvent.change(getByTestId('command-search-input'), { target: { value: searchTerm } })
       vi.advanceTimersByTime(500)
     })
     
-    expect(store.dispatch).toHaveBeenCalledWith(expect.objectContaining({
-      type: 'START_SEARCH',
-      searchTerm: 'test'
-    }))
+    expect(searchActions.startSearch).toHaveBeenCalledWith(searchTerm, 'all', true)
   })
 
   it('does not dispatch search action immediately on input', () => {
-    const { getByTestId, store } = setup()
+    const { getByTestId } = setup()
     
     // Open modal
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
@@ -122,9 +131,7 @@ describe('CommandBar', () => {
     // Type in search
     fireEvent.change(getByTestId('command-search-input'), { target: { value: 'test' } })
     
-    expect(store.dispatch).not.toHaveBeenCalledWith(expect.objectContaining({
-      type: 'START_SEARCH'
-    }))
+    expect(searchActions.startSearch).not.toHaveBeenCalled()
   })
 
   it("shows loading state while searching", () => {
@@ -145,36 +152,37 @@ describe('CommandBar', () => {
     expect(getByText("searching...")).toBeTruthy()
   })
 
-  it("shows no results message when search returns empty", () => {
+  it("shows no results message when search returns empty", async () => {
     const { getByText, getByTestId } = setup()
     
     // Open modal
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
     
     // Type search text to trigger no results state
-    fireEvent.change(getByTestId('command-search-input'), { target: { value: 'test search' } })
-    
-    // Wait for search to complete
-    act(() => {
+    await act(async () => {
+      fireEvent.change(getByTestId('command-search-input'), { target: { value: 'test search' } })
       vi.advanceTimersByTime(500)
     })
     
     expect(getByText("No results found")).toBeTruthy()
   })
 
-  it('displays search results with correct types', () => {
+  it('displays search results with correct types', async () => {
+    const mockSong = {
+      id: 'song1',
+      title: 'Test Song',
+      type: 'song',
+      artist: { name: 'Test Artist' },
+      album: { name: 'Test Album' },
+      cover: { thumbnailUrl: 'test-cover.jpg' }
+    }
+
     const { getByText, getByTestId } = setup({
       collection: {
         ...createDefaultState().collection,
         searchResults: ['song1'],
         rows: {
-          song1: { 
-            id: 'song1', 
-            title: 'Test Song',
-            type: 'song',
-            artist: { id: 'artist1', name: 'Test Artist' },
-            album: { id: 'album1', name: 'Test Album' }
-          }
+          song1: mockSong
         }
       }
     })
@@ -182,8 +190,17 @@ describe('CommandBar', () => {
     // Open modal
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
     
+    // Type search text to trigger results display
+    await act(async () => {
+      fireEvent.change(getByTestId('command-search-input'), { target: { value: 'test' } })
+      vi.advanceTimersByTime(500)
+    })
+    
+    // First check for the songs category
+    expect(getByText('songs')).toBeTruthy()
+    
+    // Then check for the song details
     expect(getByText('Test Song')).toBeTruthy()
-    expect(getByText('Test Artist')).toBeTruthy()
-    expect(getByText('Test Album')).toBeTruthy()
+    expect(getByText('Test Artist - Test Album')).toBeTruthy()
   })
 }) 

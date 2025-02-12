@@ -322,7 +322,15 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
       ...commands,
       ...navigationItems,
       ...themeItems,
-      ...searchResults
+      // Transform search results into CommandBarItems
+      ...searchResults.map(result => ({
+        id: result.id,
+        type: result.type,
+        name: result.name,
+        artist: result.artist,
+        album: result.album,
+        description: `${result.artist} - ${result.album}`
+      }))
     ]
 
     // Filter items based on search
