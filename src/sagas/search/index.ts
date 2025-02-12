@@ -43,6 +43,11 @@ export function* search(action: SearchAction): any {
     // Perform search
     const searchResults = yield call([searchService, searchService.searchAll], action.searchTerm);
 
+    // If we have provider results, dispatch them to update the collection state
+    if (searchResults && searchResults.length > 0) {
+      yield put({ type: types.RECEIVE_COLLECTION, data: searchResults });
+    }
+
     // Update search results
     yield put({ type: types.SET_SEARCH_RESULTS, searchResults });
 

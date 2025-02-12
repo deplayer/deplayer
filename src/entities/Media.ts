@@ -80,19 +80,29 @@ export default class Media implements IMedia {
     this.title = songParams.title
     this.playCount = songParams.playCount ?? 0
     this.duration = songParams.duration ?? 0
-    this.genres = songParams.genres
+    this.genres = songParams.genres || []
     this.shareUrl = songParams.shareUrl
     this.albumName = songParams.albumName
     this.filePath = songParams.filePath
     this.forcedId = songParams.forcedId
-    this.type = songParams.type
+    this.type = songParams.type || 'audio'
     this.discNumber = songParams.discNumber
 
-    const artist = this.generateArtist(songParams.artistName, songParams.artistId)
+    // Ensure we have valid artist data
+    const artistName = songParams.artistName || 'Unknown Artist'
+    const artistId = songParams.artistId || undefined
+    const artist = this.generateArtist(artistName, artistId)
     this.artist = artist
-
     this.artistName = artist.name
-    const albumProps = { ...songParams.album, thumbnailUrl: songParams.cover?.thumbnailUrl }
+
+    // Ensure we have valid album data
+    const albumProps: IAlbum = {
+      ...songParams.album,
+      thumbnailUrl: songParams.cover?.thumbnailUrl || songParams.album?.thumbnailUrl,
+      // Only set these if they don't exist in album
+      name: songParams.album?.name || songParams.albumName || 'Unknown Album',
+      artist: songParams.album?.artist || { name: artistName, id: artistId }
+    }
     this.album = new Album(albumProps)
 
     this.stream = songParams.stream || {}

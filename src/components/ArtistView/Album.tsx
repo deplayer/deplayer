@@ -4,6 +4,7 @@ import { Translate } from 'react-redux-i18n'
 import Icon from '../common/Icon'
 import SongRow from '../MusicTable/SongRow'
 import CoverImage from '../MusicTable/CoverImage'
+import { State as CollectionState } from '../../reducers/collection'
 
 interface Album {
   id: string
@@ -15,7 +16,7 @@ type AlbumProps = {
   album: Album,
   queue: any,
   songs: Array<string>,
-  collection: any,
+  collection: CollectionState,
   dispatch: any
 }
 
@@ -27,30 +28,86 @@ const Album = (props: AlbumProps) => {
       return null
     }
 
-    return props.songs
-      .sort((a, b) => {
-        if (a < b) return -1;
-        if (a > b) return 1;
-        return 0;
-      })
-      .map((songId) => {
-        const songRow = props.collection.rows[songId]
-        return (
-          <SongRow
-            mqlMatch={false}
-            disableCovers
-            style={{}}
-            key={songId}
-            dispatch={props.dispatch}
-            isCurrent={false}
-            slim={true}
-            onClick={() => {
-              props.dispatch({ type: types.ADD_ALBUM_TO_QUEUE, albumId })
-            }}
-            song={songRow}
-          />
-        )
-      })
+    // Create a Set of unique song IDs
+    const uniqueSongsSet = new Set(props.songs)
+
+    // Log any duplicates that were removed
+    if (uniqueSongsSet.size !== props.songs.length) {
+      const duplicates = props.songs.filter(songId => 
+        props.songs.indexOf(songId) !== props.songs.lastIndexOf(songId)
+      )
+      console.warn(`Removed ${props.songs.length - uniqueSongsSet.size} duplicate songs from album ${props.album.name} (${albumId}):`, 
+        [...new Set(duplicates)])
+    }
+
+    // Group songs by disc number using Map to ensure unique entries per disc
+    const songsByDiscMap = new Map<number, Set<string>>()
+    
+    for (const songId of uniqueSongsSet) {
+      const song = props.collection.rows[songId]
+      if (!song) {
+        console.warn(`Song ${songId} not found in collection for album ${props.album.name}`)
+        continue
+      }
+      
+      const discNumber = song.discNumber || 1
+      if (!songsByDiscMap.has(discNumber)) {
+        songsByDiscMap.set(discNumber, new Set())
+      }
+      songsByDiscMap.get(discNumber)?.add(songId)
+    }
+
+    // Convert Map of Sets to sorted array structure
+    const sortedDiscs = Array.from(songsByDiscMap.keys()).sort((a, b) => a - b)
+
+    return sortedDiscs.map(discNumber => {
+      const discSongsSet = songsByDiscMap.get(discNumber) || new Set<string>()
+      const discSongs = Array.from(discSongsSet)
+        .sort((a, b) => {
+          const songA = props.collection.rows[a]
+          const songB = props.collection.rows[b]
+          // Sort by track number if available, otherwise by title
+          if (songA.track && songB.track) {
+            return songA.track - songB.track
+          }
+          if (songA.title < songB.title) return -1
+          if (songA.title > songB.title) return 1
+          return 0
+        })
+        .map((songId) => {
+          const songRow = props.collection.rows[songId]
+          return (
+            <SongRow
+              mqlMatch={false}
+              disableCovers
+              style={{}}
+              key={songId}
+              dispatch={props.dispatch}
+              isCurrent={false}
+              slim={true}
+              onClick={() => {
+                props.dispatch({ type: types.ADD_ALBUM_TO_QUEUE, albumId })
+              }}
+              song={songRow}
+            />
+          )
+        })
+
+      // Only show disc header if there are multiple discs
+      const showDiscHeader = songsByDiscMap.size > 1
+
+      return (
+        <div key={discNumber} className="mb-4">
+          {showDiscHeader && (
+            <h4 className="text-lg font-medium mb-2 px-4">
+              <Icon icon="faCompactDisc" className="mr-2" />
+              <Translate value="album.disc" /> {discNumber}
+            </h4>
+          )}
+          {discSongs}
+        </div>
+      )
+    })
   }
 
   return (
@@ -67,7 +124,7 @@ const Album = (props: AlbumProps) => {
         >
           <CoverImage
             cover={
-              props.collection.rows[props.songs[0]].cover
+              props.collection.rows[Array.from(new Set(props.songs))[0]]?.cover
             }
             size='thumbnail'
             albumName={props.album.name}
@@ -93,7 +150,9 @@ const Album = (props: AlbumProps) => {
             <Button
               transparent
               onClick={() => {
-                const songs = props.songs.map(songId => props.collection.rows[songId]);
+                // Ensure unique songs when adding to queue
+                const uniqueSongIds = Array.from(new Set(props.songs))
+                const songs = uniqueSongIds.map(songId => props.collection.rows[songId])
                 props.dispatch({ type: types.ADD_TO_QUEUE_NEXT, songs })
               }}
             >
@@ -125,4 +184,5 @@ const Album = (props: AlbumProps) => {
     </div>
   )
 }
+
 export default Album

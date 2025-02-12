@@ -47,6 +47,7 @@ describe("search saga", () => {
           mockResults,
         ],
       ])
+      .put({ type: types.RECEIVE_COLLECTION, data: mockResults })
       .put({ type: types.SET_SEARCH_RESULTS, searchResults: mockResults })
       .put(push("/search-results"))
       .put({ type: types.SEARCH_FINISHED, searchTerm, data: mockResults })
@@ -76,6 +77,7 @@ describe("search saga", () => {
           mockResults,
         ],
       ])
+      .put({ type: types.RECEIVE_COLLECTION, data: mockResults })
       .put({ type: types.SET_SEARCH_RESULTS, searchResults: mockResults })
       .not.put(push("/search-results"))
       .put({ type: types.SEARCH_FINISHED, searchTerm, data: mockResults })
@@ -96,6 +98,35 @@ describe("search saga", () => {
         type: types.SEND_NOTIFICATION,
         notification: "notifications.search.failed",
       })
+      .run();
+  });
+
+  it("handles empty search results without updating collection", () => {
+    const searchTerm = "test";
+    const mockSettings = { providers: { itunes: true } };
+    const emptyResults: any[] = [];
+
+    mockSearchService.searchAll.mockResolvedValue(emptyResults);
+
+    return expectSaga(search, { type: types.START_SEARCH, searchTerm })
+      .provide([
+        [select(getSettings), mockSettings],
+        [
+          call(
+            mockSearchService.searchAll.bind(mockSearchService),
+            searchTerm,
+            {
+              noRedirect: undefined,
+              providers: mockSettings.providers,
+            }
+          ),
+          emptyResults,
+        ],
+      ])
+      .not.put({ type: types.RECEIVE_COLLECTION, data: emptyResults })
+      .put({ type: types.SET_SEARCH_RESULTS, searchResults: emptyResults })
+      .put(push("/search-results"))
+      .put({ type: types.SEARCH_FINISHED, searchTerm, data: emptyResults })
       .run();
   });
 });
