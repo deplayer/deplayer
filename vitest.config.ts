@@ -60,21 +60,23 @@ export default defineConfig({
           exclude: ["@electric-sql/pglite", "daisyui", "tailwindcss"],
         },
       },
+      inline: ["fflate"]
     },
     logHeapUsage: true,
     reporters: ["verbose"],
     sequence: {
       shuffle: false,
-      concurrent: false,
+      concurrent: false
     },
     isolate: true,
     bail: 1,
     passWithNoTests: false,
     allowOnly: true,
-    silent: true,
+    silent: false,
     onConsoleLog: (log) => {
       if (log.includes("[ERROR]")) return true;
       if (log.includes("[WARN]")) return true;
+      if (log.includes("heap")) return true;
       return false;
     },
   },

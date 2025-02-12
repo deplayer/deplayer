@@ -13,7 +13,11 @@ test:
     - apt-get update
     - apt-get install -y libvips-dev build-essential libglib2.0-dev
   script:
+    - export NODE_ENV=test
+    - export DEBUG=vitest:*
     - npm install
+    - npm run test src/sagas/player/index.spec.ts
+    - npm run test src/components/SongView/index.spec.tsx
     - npm run coverage
   artifacts:
     paths:

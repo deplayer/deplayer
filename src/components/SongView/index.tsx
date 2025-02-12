@@ -59,21 +59,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
   const isSongPinned = songObj?.hasAnyProviderOf(['opfs']) || false
 
   const [pinned, setPinnedSong] = React.useState(isSongPinned)
-  const [downloadUrls, setDownloadUrls] = React.useState([])
   const [showLyrics, setShowLyrics] = React.useState(false)
-
-  React.useEffect(() => {
-    const retrieveUrls = async () => {
-      const urls: any = []
-      if (!song) return
-
-      for (let i = 0; i < Object.values(song.stream || {}).length; i++) {
-        urls.push(await getStreamUri(song, i))
-      }
-      setDownloadUrls(urls)
-    }
-    retrieveUrls()
-  }, [song, settings])
 
   if (loading) {
     return (
@@ -239,22 +225,24 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
               </Button>
 
               {
-                downloadUrls.map((url) => {
-                  return (
-                    <a
-                      key={url}
-                      className='p-4'
-                      target="_blank"
-                      href={url}
-                    >
-                      <Icon
-                        icon='faDownload'
-                        className='mr-2'
-                      />
-                      <Translate value="buttons.downloadMedia" />
-                    </a>
-                  )
-                })
+                Object.values(song.stream || {}).map((value: any, index: number) => (
+                  <Button
+                    key={`download_${value.service}_${index}`}
+                    transparent
+                    onClick={async () => {
+                      const url = await getStreamUri(song, index)
+                      if (typeof url === 'string') {
+                        window.location.href = url
+                      }
+                    }}
+                  >
+                    <Icon
+                      icon='faDownload'
+                      className='mr-2'
+                    />
+                    <Translate value="buttons.downloadMedia" />
+                  </Button>
+                ))
               }
             </div>
           </div>
