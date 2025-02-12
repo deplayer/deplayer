@@ -47,12 +47,12 @@ const createIndex = async (db: PouchDB.Database) => {
 };
 
 const _create = async (): Promise<PouchDB.Database> => {
-  logger.log("DatabaseService", "creating database..");
+  logger.info("DatabaseService", "creating database..");
   const db = createDB();
 
   logger.debug("pouch object:", db);
 
-  logger.log("DatabaseService", "created database");
+  logger.info("DatabaseService", "created database");
 
   await createIndex(db);
 

@@ -1,27 +1,12 @@
-import { cleanup, act, fireEvent } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import CommandBar from './index'
 import { renderWithProviders } from '../../test-utils/render'
 import { createDefaultState } from '../../test-utils/store'
 import { I18n } from 'react-redux-i18n'
-import { AnyAction } from 'redux'
-import { ThunkDispatch } from 'redux-thunk'
 import * as searchActions from '../../types/search'
-
-// Define minimal types for store state
-interface StoreState {
-  collection: {
-    searchResults: string[]
-    loading: boolean
-    rows: Record<string, any>
-  }
-  settings: Record<string, any>
-  search: Record<string, any>
-  [key: string]: any
-}
-
-type AppDispatch = ThunkDispatch<StoreState, undefined, AnyAction>
-
+import { State as RootState } from '../../reducers'
+import Media from '../../entities/Media'
 // Mock translations
 vi.mock('react-redux-i18n', () => ({
   I18n: {
@@ -57,6 +42,7 @@ vi.mock('../../types/search', () => ({
 describe('CommandBar', () => {
   beforeEach(() => {
     vi.useFakeTimers({ shouldAdvanceTime: true })
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
@@ -64,7 +50,7 @@ describe('CommandBar', () => {
     vi.useRealTimers()
   })
 
-  const setup = (customState: Partial<StoreState> = {}) => {
+  const setup = (customState: Partial<RootState> = {}) => {
     const defaultState = createDefaultState()
     const initialState = {
       ...defaultState,
@@ -104,14 +90,14 @@ describe('CommandBar', () => {
     // Open modal
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
     await vi.advanceTimersByTimeAsync(100)
-    
-    // Get input and type
+
+    // Type search query
     const input = getByTestId('command-search-input')
     fireEvent.change(input, { target: { value: 'test query' } })
-    
+
     // Wait for debounce
     await vi.advanceTimersByTimeAsync(500)
-    
+
     expect(searchActions.startSearch).toHaveBeenCalledWith('test query', 'all', true)
   })
 
@@ -192,7 +178,7 @@ describe('CommandBar', () => {
         ...createDefaultState().collection,
         searchResults: ['song1'],
         rows: {
-          song1: mockSong
+          song1: mockSong as Media
         }
       }
     })

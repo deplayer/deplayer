@@ -56,7 +56,7 @@ export default defineConfig({
     deps: {
       optimizer: {
         web: {
-          include: ["@testing-library/react"],
+          include: ["@testing-library/react", "fflate"],
           exclude: ["@electric-sql/pglite", "daisyui", "tailwindcss"],
         },
       },

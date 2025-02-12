@@ -1,12 +1,12 @@
 import { render as rtlRender } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
-import { StoreState } from '../reducers/types'
+import { State as RootState } from '../reducers'
 import { createTestStore } from './store'
 import userEvent from '@testing-library/user-event'
 
 interface RenderOptions {
-  initialState?: Partial<StoreState>
+  initialState?: Partial<RootState>
   route?: string
 }
 

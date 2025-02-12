@@ -11,7 +11,7 @@ test:
   image: node:20
   before_script:
     - apt-get update
-    - apt-get install -y libvips-dev build-essential libglib2.0-dev
+    - apt-get install -y libvips-dev build-essential libglib2.0-dev cmake
   script:
     - export NODE_ENV=test
     - export DEBUG=vitest:*
@@ -28,7 +28,7 @@ deploy:
   image: node:20
   before_script:
     - apt-get update
-    - apt-get install -y libvips-dev build-essential libglib2.0-dev
+    - apt-get install -y libvips-dev build-essential libglib2.0-dev cmake
   script:
     - npm install
     - npm run build

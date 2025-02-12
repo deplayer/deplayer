@@ -2,13 +2,14 @@ import { createLogger } from "../utils/logger";
 
 const logger = createLogger({ namespace: "WakeLock" });
 
-let wakeLockController: AbortController | null = null;
+export class WakeLock {
+  private wakeLock: any = null;
 
-export const requestWakeLock = async () => {
-  try {
-    if ("wakeLock" in navigator) {
-      const wakeLock = await navigator.wakeLock.request("screen");
-      wakeLock.addEventListener("release", () => {
+  async requestWakeLock() {
+    try {
+      // @ts-ignore
+      this.wakeLock = await navigator.wakeLock.request("screen");
+      this.wakeLock.addEventListener("release", () => {
         logger.info("Wake Lock was released");
       });
 
@@ -16,33 +17,28 @@ export const requestWakeLock = async () => {
       document.addEventListener("visibilitychange", async () => {
         if (document.visibilityState === "visible") {
           try {
-            await requestWakeLock();
+            await this.requestWakeLock();
             logger.info("Wake Lock is active");
-          } catch (e) {
+          } catch (e: any) {
             logger.error(`${e.name}, ${e.message}`);
           }
         }
       });
 
       logger.info("Wake Lock is active");
-    } else {
-      logger.warn("Wake Lock API not supported.");
+    } catch (error) {
+      logger.error("Failed to request wake lock:", error instanceof Error ? error.message : String(error));
     }
-  } catch (e) {
-    logger.error(`${e.name}, ${e.message}`);
   }
-};
 
-export const releaseWakeLock = () => {
-  if (wakeLockController) {
-    if (wakeLockController.abort) {
-      wakeLockController.abort();
+  async releaseWakeLock() {
+    try {
+      await this.wakeLock.release();
+      this.wakeLock = null;
+    } catch (error) {
+      logger.error("Failed to release wake lock:", error instanceof Error ? error.message : String(error));
     }
-
-    if ("release" in wakeLockController && wakeLockController.release) {
-      (wakeLockController as any).release();
-    }
-
-    wakeLockController = null;
   }
-};
+}
+
+export default new WakeLock();

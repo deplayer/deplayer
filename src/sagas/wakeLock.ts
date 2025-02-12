@@ -1,6 +1,6 @@
 import { takeLatest, call, select } from 'redux-saga/effects'
 
-import { requestWakeLock, releaseWakeLock } from '../services/wakeLock'
+import WakeLock from '../services/wakeLock'
 import logger from '../utils/logger'
 import * as types from '../constants/ActionTypes'
 import { getPlayer } from './selectors'
@@ -12,7 +12,7 @@ export function* startWakeLock(_dispatch: Dispatch): any {
 
   if (player.playing) {
     try {
-      yield call(requestWakeLock)
+      yield call(WakeLock.requestWakeLock)
     } catch (e) {
       logger.log('error setting WakeLock', e)
     }
@@ -25,7 +25,7 @@ export function* stopWakeLock(_dispatch: Dispatch): any {
 
   if (!player.playing) {
     try {
-      yield call(releaseWakeLock)
+      yield call(WakeLock.releaseWakeLock)
     } catch (e) {
       logger.log('error disabling WakeLock', e)
     }

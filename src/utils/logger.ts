@@ -38,7 +38,6 @@ class Logger {
   private formatMessage(
     level: LogLevel,
     message: string,
-    ...args: any[]
   ): string {
     const timestamp = new Date().toISOString();
     return `[${timestamp}] [${level.toUpperCase()}] [${

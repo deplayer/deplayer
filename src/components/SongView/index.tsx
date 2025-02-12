@@ -24,7 +24,6 @@ import Media from '../../entities/Media'
 import { State as QueueState } from '../../reducers/queue'
 import { State as CollectionState } from '../../reducers/collection'
 import { State as PlayerState } from '../../reducers/player'
-import { State as SettingsState } from '../../reducers/settings'
 import { State as LyricsState } from '../../reducers/lyrics'
 
 const MAX_LIST_ITEMS = 25
@@ -33,7 +32,6 @@ type Props = {
   playerPortal: any,
   location: Location,
   player: PlayerState,
-  settings: SettingsState,
   lyrics: LyricsState,
   collection: CollectionState,
   queue: QueueState,
@@ -48,7 +46,14 @@ async function changeCurrentPlaying(song: any, index: number, dispatch: Dispatch
   dispatch({ type: types.SET_CURRENT_PLAYING_URL, url: streamUri })
 }
 
-const SongView = ({ songId, loading, className = '', dispatch, playerPortal, player, lyrics, queue, settings, collection }: Props) => {
+type StreamUrl = {
+  url: string;
+  isBlob: boolean;
+  format: string | undefined;
+  service: string;
+}
+
+const SongView = ({ songId, loading, className = '', dispatch, playerPortal, player, lyrics, queue, collection }: Props) => {
   const navigate = useNavigate()
   const { trackIds, currentPlaying } = queue
 
@@ -60,6 +65,37 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
 
   const [pinned, setPinnedSong] = React.useState(isSongPinned)
   const [showLyrics, setShowLyrics] = React.useState(false)
+  const [streamUrls, setStreamUrls] = React.useState<StreamUrl[]>([])
+
+  React.useEffect(() => {
+    const loadStreamUrls = async () => {
+      const urls = await Promise.all(
+        Object.values(song.stream || {}).map(async (value: any, index: number) => {
+          const url = await getStreamUri(song, index)
+          if (url instanceof Blob) {
+            const blobUrl = URL.createObjectURL(url)
+            return {
+              url: blobUrl,
+              isBlob: true,
+              format: value.format || undefined,
+              service: value.service
+            } as StreamUrl
+          } else if (typeof url === 'string') {
+            return {
+              url,
+              isBlob: false,
+              format: value.format || undefined,
+              service: value.service
+            } as StreamUrl
+          }
+          return null
+        })
+      )
+      setStreamUrls(urls.filter((url): url is StreamUrl => url !== null))
+    }
+
+    loadStreamUrls()
+  }, [song])
 
   if (loading) {
     return (
@@ -225,23 +261,23 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
               </Button>
 
               {
-                Object.values(song.stream || {}).map((value: any, index: number) => (
-                  <Button
-                    key={`download_${value.service}_${index}`}
-                    transparent
-                    onClick={async () => {
-                      const url = await getStreamUri(song, index)
-                      if (typeof url === 'string') {
-                        window.location.href = url
+                streamUrls.map((streamUrl, index) => (
+                  <a
+                    key={`download_${streamUrl.service}_${index}`}
+                    className='p-4'
+                    href={streamUrl.url}
+                    download={streamUrl.isBlob ? `${song.title}.${streamUrl.format || 'mp3'}` : undefined}
+                    target={streamUrl.isBlob ? undefined : "_blank"}
+                    rel={streamUrl.isBlob ? undefined : "noopener noreferrer"}
+                    onClick={() => {
+                      if (streamUrl.isBlob) {
+                        URL.revokeObjectURL(streamUrl.url)
                       }
                     }}
                   >
-                    <Icon
-                      icon='faDownload'
-                      className='mr-2'
-                    />
+                    <Icon icon='faDownload' className='mr-2' />
                     <Translate value="buttons.downloadMedia" />
-                  </Button>
+                  </a>
                 ))
               }
             </div>

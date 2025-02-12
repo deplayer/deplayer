@@ -1,4 +1,3 @@
-import { IAdapter } from "./database/IAdapter";
 import CollectionService from "./CollectionService";
 import ProvidersService from "./ProvidersService";
 import Media from "../entities/Media";
@@ -23,7 +22,6 @@ export class SearchService {
 
   async searchAll(
     searchTerm: string,
-    options: SearchOptions = {}
   ): Promise<Media[]> {
     logger.debug("Starting search with term:", searchTerm);
 

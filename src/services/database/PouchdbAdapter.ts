@@ -1,12 +1,28 @@
 import { IAdapter, Models } from "./IAdapter";
 import * as db from "./PouchdbDatabase";
 import { createLogger } from "../../utils/logger";
+import PouchDB from "pouchdb";
+import PouchDBFind from "pouchdb-find";
+import PouchDBMemoryAdapter from "pouchdb-adapter-memory";
+
+PouchDB.plugin(PouchDBFind);
+PouchDB.plugin(PouchDBMemoryAdapter);
 
 const cb = (_err: any) => {};
 
-const logger = createLogger({ namespace: "PouchdbAdapter" });
+const logger = createLogger({ namespace: "PouchDB" });
 
+/**
+ * PouchdbAdapter is a class that implements the IAdapter interface.
+ * It is used to save, add, remove, and get documents from the database.
+ */
 export default class PouchdbAdapter implements IAdapter {
+  private db: PouchDB.Database;
+
+  constructor(name: string, options: PouchDB.Configuration.DatabaseConfiguration = {}) {
+    this.db = new PouchDB(name, options);
+  }
+
   initialize = async () => {};
 
   save = async (model: string, id: string, payload: any): Promise<any> => {
@@ -68,7 +84,7 @@ export default class PouchdbAdapter implements IAdapter {
     return new Promise(async (resolve, _reject) => {
       const instance = await db.get();
 
-      logger.log("PouchDB", "Querying all database");
+      logger.info("Querying all database");
       const result = await instance.query(
         "deplayer/by_type",
         { key: model, include_docs: true },
@@ -82,9 +98,9 @@ export default class PouchdbAdapter implements IAdapter {
 
         // FIXME: This elem.key should be elem.value maybe?
         resolve(result.rows.map((elem: any) => elem.doc));
+      } else {
+        resolve([]);
       }
-
-      resolve(null);
     });
   };
 
@@ -104,5 +120,19 @@ export default class PouchdbAdapter implements IAdapter {
 
   async search(_model: Models, _searchTerm: string): Promise<Array<any>> {
     return Promise.resolve([]);
+  }
+
+  async queryAll() {
+    try {
+      logger.info("Querying all database");
+      const result = await this.db.allDocs({
+        include_docs: true,
+        attachments: true
+      });
+      return result.rows;
+    } catch (error) {
+      logger.error("Error querying all documents:", error);
+      throw error;
+    }
   }
 }

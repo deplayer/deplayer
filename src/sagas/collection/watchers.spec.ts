@@ -7,7 +7,6 @@ import { addToCollectionWatcher } from "./watchers";
 import * as types from "../../constants/ActionTypes";
 import { saveToDbWorker } from "./workers";
 import Media from "../../entities/Media";
-import * as database from "../../services/database";
 import CollectionService from "../../services/CollectionService";
 
 // Mock database adapter
@@ -40,7 +39,6 @@ describe("addToCollectionWatcher", () => {
 
   it("handles collection updates correctly", async () => {
     const testData: Media[] = [];
-    const mockCollectionService = new CollectionService({} as any);
 
     await expectSaga(addToCollectionWatcher)
       .withState({ collection: { rows: {} } })

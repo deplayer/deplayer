@@ -3,7 +3,7 @@ import { expectSaga } from "redux-saga-test-plan";
 import { push } from "redux-first-history";
 import { call, select } from "redux-saga/effects";
 
-import { search, createSearchService } from "./index";
+import { search } from "./index";
 import * as types from "../../constants/ActionTypes";
 import { getSettings } from "../selectors";
 import { SearchService } from "../../services/SearchService";
