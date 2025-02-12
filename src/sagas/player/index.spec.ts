@@ -1,6 +1,5 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import { describe, it, vi } from 'vitest'
-
 import {
   setCurrentPlaying
 } from './index'
@@ -14,7 +13,6 @@ const IdbKevalMock = vi.fn(() => ({
 }))
 
 vi.stubGlobal('idb-keyval', IdbKevalMock)
-
 
 describe('setCurrentPlaying', async () => {
   it('works', () => {

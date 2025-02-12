@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 import fixReactVirtualized from "esbuild-plugin-react-virtualized";
 
 export default defineConfig({
-  plugins: [react() as any],
+  plugins: [react() as any, fixReactVirtualized],
   test: {
     environment: "jsdom",
     globals: true,
@@ -16,9 +16,6 @@ export default defineConfig({
     maxWorkers: 1,
     minWorkers: 1,
     fileParallelism: false,
-    cache: {
-      dir: ".vitest/cache",
-    },
     exclude: [
       "**/node_modules/**",
       "**/dist/**",
@@ -46,7 +43,7 @@ export default defineConfig({
       ],
     },
     alias: {
-      webtorrent: fileURLToPath(
+      'webtorrent': fileURLToPath(
         new URL(
           "./node_modules/webtorrent/dist/webtorrent.min.js",
           import.meta.url
@@ -56,11 +53,19 @@ export default defineConfig({
     deps: {
       optimizer: {
         web: {
-          include: ["@testing-library/react", "fflate"],
           exclude: ["@electric-sql/pglite", "daisyui", "tailwindcss"],
         },
       },
-      inline: ["fflate"]
+      interopDefault: true,
+    },
+    server: {
+      deps: {
+        inline: ["fflate"]
+      }
+    },
+    testTransformMode: {
+      web: ["**/*.{js,jsx,ts,tsx}"],
+      ssr: ["**/*.{mjs,cjs,js,jsx,ts,tsx}"]
     },
     logHeapUsage: true,
     reporters: ["verbose"],

@@ -4,7 +4,6 @@ import SongView from './index'
 import Media from '../../entities/Media'
 import { defaultState as collectionDefaultState } from '../../reducers/collection'
 import { BrowserRouter } from 'react-router-dom'
-
 import { mediaParams } from '../../entities/Media.spec'
 
 // Mock IntersectionObserver

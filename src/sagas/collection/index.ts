@@ -92,7 +92,7 @@ function* collectionSaga(): any {
   yield takeLatest(types.EXPORT_COLLECTION, exportCollectionWorker);
   yield takeLatest(types.IMPORT_COLLECTION, importCollectionWorker);
   yield takeLatest(types.SONG_PLAYED, trackSongPlayed);
-  yield takeLatest(types.APP_READY, fetchRecentAlbums);
+  yield takeLatest(types.INITIALIZED, fetchRecentAlbums);
   yield fork(initializeWatcher);
   yield fork(addToCollectionWatcher);
 }

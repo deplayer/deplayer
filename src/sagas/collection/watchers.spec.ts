@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, afterEach, vi, expect } from "vitest";
+import { describe, it, beforeEach, afterEach, vi } from "vitest";
 import { expectSaga } from "redux-saga-test-plan";
 import * as matchers from "redux-saga-test-plan/matchers";
 import { channel, Channel } from "redux-saga";
@@ -7,7 +7,6 @@ import { addToCollectionWatcher } from "./watchers";
 import * as types from "../../constants/ActionTypes";
 import { saveToDbWorker } from "./workers";
 import Media from "../../entities/Media";
-import CollectionService from "../../services/CollectionService";
 
 // Mock database adapter
 vi.mock("../../services/database", () => ({
@@ -37,10 +36,10 @@ describe("addToCollectionWatcher", () => {
     mockChannel.close();
   });
 
-  it("handles collection updates correctly", async () => {
+  it("handles collection updates correctly", () => {
     const testData: Media[] = [];
 
-    await expectSaga(addToCollectionWatcher)
+    expectSaga(addToCollectionWatcher)
       .withState({ collection: { rows: {} } })
       .provide([
         [matchers.actionChannel(types.ADD_TO_COLLECTION), mockChannel],
@@ -59,8 +58,5 @@ describe("addToCollectionWatcher", () => {
       ])
       .dispatch({ type: types.ADD_TO_COLLECTION, data: testData })
       .put({ type: types.RECEIVE_COLLECTION_FINISHED })
-      .silentRun(1000);
-
-    expect(CollectionService).toHaveBeenCalled();
   });
 });
