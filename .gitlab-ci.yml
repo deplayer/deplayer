@@ -9,6 +9,9 @@ stages:
 test:
   stage: test
   image: node:20
+  before_script:
+    - apt-get update
+    - apt-get install -y libvips-dev
   script:
     - npm install
     - npm run coverage
@@ -19,6 +22,9 @@ test:
 deploy:
   stage: deploy
   image: node:20
+  before_script:
+    - apt-get update
+    - apt-get install -y libvips-dev
   script:
     - npm install
     - npm run build
