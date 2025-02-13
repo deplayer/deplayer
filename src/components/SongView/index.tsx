@@ -261,27 +261,6 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
                 />
                 {pinned ? <Translate value="media.unpin" /> : <Translate value="media.pin" />}
               </Button>
-
-              {
-                streamUrls.map((streamUrl, index) => (
-                  <a
-                    key={`download_${streamUrl.service}_${index}`}
-                    className='p-4'
-                    href={streamUrl.url}
-                    download={streamUrl.isBlob ? `${song.title}.${streamUrl.format || 'mp3'}` : undefined}
-                    target={streamUrl.isBlob ? undefined : "_blank"}
-                    rel={streamUrl.isBlob ? undefined : "noopener noreferrer"}
-                    onClick={() => {
-                      if (streamUrl.isBlob) {
-                        URL.revokeObjectURL(streamUrl.url)
-                      }
-                    }}
-                  >
-                    <Icon icon='faDownload' className='mr-2' />
-                    <Translate value="buttons.downloadMedia" />
-                  </a>
-                ))
-              }
             </div>
           </div>
         </div>
@@ -332,24 +311,52 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
             <div className='mt-2'>
               <Translate value='song.label.played' /> {song.playCount ?? 0} <Translate value='song.label.times' />
             </div>
-            <div className='mt-2 flex items-center'>
-              <label><Translate className='mr-2' value='labels.providers' /></label>
-              {
-                Object.values(song.stream).map((value: any, index: number) => {
-                  return (
-                    <Button
-                      onClick={() => changeCurrentPlaying(song, index, dispatch)}
-                      key={`${value.service}_${index}`}
-                      inverted
-                      transparent
-                      className='mr-2'
-                    >
-                      <ServiceIcon service={value.service} />
-                      <p className='capitalize'>{value.service}</p>
-                    </Button>
-                  )
-                })
-              }
+            <div className='mt-2 flex flex-col gap-2'>
+              <label className='text-base-content'><Translate value='labels.providers' /></label>
+              <div className='flex flex-wrap gap-2'>
+                {
+                  Object.values(song.stream).map((value: any, index: number) => {
+                    const streamUrl = streamUrls.find(url => url.service === value.service)
+                    return (
+                      <div
+                        key={`${value.service}_${index}`}
+                        className='flex items-center w-full sm:w-auto bg-base-300 rounded-lg overflow-hidden'
+                      >
+                        <div className='flex items-center gap-2 px-3 py-2 bg-base-200'>
+                          <div className='w-5 h-5 flex items-center justify-center'>
+                            <ServiceIcon service={value.service} />
+                          </div>
+                          <p className='capitalize font-medium'>{value.service}</p>
+                        </div>
+                        <div className='flex-1 flex gap-2 px-3 py-1'>
+                          <Button
+                            onClick={() => changeCurrentPlaying(song, index, dispatch)}
+                            className='btn-sm bg-primary hover:bg-primary-focus text-primary-content border-0 min-w-[2.5rem]'
+                          >
+                            <Icon icon='faPlay' className='text-lg' />
+                          </Button>
+                          {streamUrl && (
+                            <a
+                              className='btn btn-sm btn-outline min-w-[2.5rem]'
+                              href={streamUrl.url}
+                              download={streamUrl.isBlob ? `${song.title}.${streamUrl.format || 'mp3'}` : undefined}
+                              target={streamUrl.isBlob ? undefined : "_blank"}
+                              rel={streamUrl.isBlob ? undefined : "noopener noreferrer"}
+                              onClick={() => {
+                                if (streamUrl.isBlob) {
+                                  URL.revokeObjectURL(streamUrl.url)
+                                }
+                              }}
+                            >
+                              <Icon icon='faDownload' className='text-lg' />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })
+                }
+              </div>
             </div>
           </div>
           {
