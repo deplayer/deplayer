@@ -6,11 +6,19 @@ import { fetchRecentAlbums } from "./index";
 import Media from "../../entities/Media";
 import { mediaParams } from "../../entities/Media.spec";
 import ProvidersService from "../../services/ProvidersService";
+import { getAdapter } from "../../services/database";
 
 // Mock ProvidersService
 vi.mock("../../services/ProvidersService", () => {
   return {
     default: vi.fn(),
+  };
+});
+
+// Mock database adapter
+vi.mock("../../services/database", () => {
+  return {
+    getAdapter: vi.fn(),
   };
 });
 
@@ -53,6 +61,20 @@ describe("collection saga", () => {
         },
       };
 
+      // Mock the database adapter
+      const mockDb = {
+        select: vi.fn().mockReturnThis(),
+        from: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue([mockSong]),
+      };
+
+      const mockAdapter = {
+        getDb: vi.fn().mockResolvedValue(mockDb),
+      };
+
+      (getAdapter as ReturnType<typeof vi.fn>).mockReturnValue(mockAdapter);
+
       // Mock the constructor to return our mock service
       (
         ProvidersService as unknown as ReturnType<typeof vi.fn>
@@ -71,10 +93,6 @@ describe("collection saga", () => {
           ],
         ])
         .put({
-          type: types.RECEIVE_COLLECTION,
-          data: [mockSong],
-        })
-        .put({
           type: types.FETCH_RECENT_ALBUMS_SUCCESS,
           albums: [
             {
@@ -91,10 +109,28 @@ describe("collection saga", () => {
             },
           ],
         })
+        .put({
+          type: types.RECEIVE_COLLECTION,
+          data: [mockSong],
+        })
         .run(100); // Add timeout of 100ms
     });
 
     it("should handle no providers configured", () => {
+      // Mock empty database result
+      const mockDb = {
+        select: vi.fn().mockReturnThis(),
+        from: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue([]),
+      };
+
+      const mockAdapter = {
+        getDb: vi.fn().mockResolvedValue(mockDb),
+      };
+
+      (getAdapter as ReturnType<typeof vi.fn>).mockReturnValue(mockAdapter);
+
       return expectSaga(fetchRecentAlbums)
         .withState({
           settings: {

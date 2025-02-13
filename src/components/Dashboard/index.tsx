@@ -1,5 +1,5 @@
 import { Translate } from 'react-redux-i18n'
-import { FunctionComponent, SVGProps } from 'react'
+import { FunctionComponent, SVGProps, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import React from 'react'
 
@@ -112,29 +112,34 @@ const WelcomeMessage = ({ dispatch }: { dispatch: Dispatch }) => {
 }
 
 const Dashboard = ({
-  collection: { loading, rows, songsByNumberOfPlays, albums },
+  collection: { loading, rows, albums },
   dispatch
 }: Props) => {
   const MAX_LIST_ITEMS = 25
 
-  const mediaItems = songsByNumberOfPlays.map((songId: string) => {
-    return rows[songId]
-  })
+  const mostPlayedSongs = useMemo(() => {
+    return Object.values(rows)
+      .filter(song => song.playCount > 0)
+      .sort((a, b) => (b.playCount || 0) - (a.playCount || 0))
+      .slice(0, MAX_LIST_ITEMS);
+  }, [rows]);
 
-  const slicedAlbums = Object
-    .keys(albums)
-    .slice(0, MAX_LIST_ITEMS)
-    .map((albumId) => albums[albumId])
+  const slicedAlbums = useMemo(() => {
+    return Object
+      .keys(albums)
+      .slice(0, MAX_LIST_ITEMS)
+      .map((albumId) => albums[albumId]);
+  }, [albums]);
 
   return (
-    <div className='z-10 w-full md:px-12 mb-12'>
+    <div className='z-10 w-full md:px-12 mb-12 flex flex-col gap-4 md:gap-10'>
       <WelcomeMessage dispatch={dispatch} />
       <RecentAlbums />
-      {!!mediaItems.length &&
+      {mostPlayedSongs.length > 0 &&
         <MediaSlider
           loading={loading}
           title={<Translate value='titles.mostPlayedSongs' />}
-          mediaItems={mediaItems.slice(0, MAX_LIST_ITEMS)}
+          mediaItems={mostPlayedSongs}
         />}
       {!!slicedAlbums.length && <RelatedAlbums albums={slicedAlbums} />}
       <Footer />

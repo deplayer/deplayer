@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS "media_created_at_idx" ON "media" ("createdAt" DESC); 

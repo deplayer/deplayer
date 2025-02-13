@@ -19,7 +19,6 @@ export type State = {
   albumsByArtist: { [key: string]: string[] };
   songsByAlbum: { [key: string]: string[] };
   mediaByType: { [key: string]: string[] };
-  songsByNumberOfPlays: string[];
   searchTerm: string;
   searchResults: string[];
   enabledProviders: string[];
@@ -39,7 +38,6 @@ export const defaultState: State = {
   songsByAlbum: {},
   mediaByType: {},
   albumsByArtist: {},
-  songsByNumberOfPlays: [],
   searchTerm: "",
   searchResults: [],
   enabledProviders: [],
@@ -154,20 +152,6 @@ const populateFromAction = (
   };
 };
 
-export const sortByPlayCount = (
-  songId1: string,
-  songId2: string,
-  rows: any
-) => {
-  const song1 = rows[songId1];
-  const song2 = rows[songId2];
-
-  if (song1.playCount < song2.playCount) return 1;
-  if (song1.playCount > song2.playCount) return -1;
-
-  return 0;
-};
-
 export default (state: State = defaultState, action: any = {}) => {
   switch (action.type) {
     case types.SET_SEARCH_TERM:
@@ -221,20 +205,6 @@ export default (state: State = defaultState, action: any = {}) => {
         searchResults: [],
         totalRows: 0,
         loading: false,
-      };
-
-    case types.APPLY_MOST_PLAYED_SORT:
-      const songsByNumberOfPlays = Object.keys(state.rows)
-        .filter((songId) => {
-          return state.rows[songId].playCount > 0;
-        })
-        .sort((songId1, songId2) =>
-          sortByPlayCount(songId1, songId2, state.rows)
-        );
-
-      return {
-        ...state,
-        songsByNumberOfPlays,
       };
 
     case types.REMOVE_FROM_COLLECTION_FULFILLED:

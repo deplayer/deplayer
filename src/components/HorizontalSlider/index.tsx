@@ -1,99 +1,6 @@
 import React from 'react'
-import { ScrollMenu, VisibilityContext, type publicApiType } from 'react-horizontal-scrolling-menu'
-import 'react-horizontal-scrolling-menu/dist/styles.css'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
-
-function onWheel(apiObj: publicApiType, ev: React.WheelEvent): void {
-  // NOTE: no good standart way to distinguish touchpad scrolling gestures
-  // but can assume that gesture will affect X axis, mouse scroll only Y axis
-  // of if deltaY too small probably is it touchpad
-  const isThouchpad = Math.abs(ev.deltaX) !== 0 || Math.abs(ev.deltaY) < 15;
-
-  if (isThouchpad) {
-    ev.stopPropagation();
-    return;
-  }
-
-  if (ev.deltaY < 0) {
-    apiObj.scrollPrev();
-  } else {
-    apiObj.scrollNext();
-  }
-}
-
-class DragDealer {
-  clicked: boolean;
-  dragging: boolean;
-  position: number;
-
-  constructor() {
-    this.clicked = false;
-    this.dragging = false;
-    this.position = 0;
-  }
-
-  public dragStart = (ev: React.MouseEvent) => {
-    this.position = ev.clientX;
-    this.clicked = true;
-  };
-
-  public dragStop = () => {
-    window.requestAnimationFrame(() => {
-      this.dragging = false;
-      this.clicked = false;
-    });
-  };
-
-  public dragMove = (ev: React.MouseEvent, cb: (posDiff: number) => void) => {
-    const newDiff = this.position - ev.clientX;
-
-    const movedEnough = Math.abs(newDiff) > 5;
-
-    if (this.clicked && movedEnough) {
-      this.dragging = true;
-    }
-
-    if (this.dragging && movedEnough) {
-      this.position = ev.clientX;
-      cb(newDiff);
-    }
-  };
-}
-
-const ArrowLeft = () => {
-  const visibility = React.useContext<publicApiType>(VisibilityContext);
-  const isFirstItemVisible = visibility.useIsVisible('first', true);
-
-  if (isFirstItemVisible) {
-    return null
-  }
-
-  return (
-    <div className='text-4xl z-10 absolute inset-y-0 flex items-center left-0 bg-gradient-to-l from-transparent to-base-200/20'>
-      <Button onClick={() => visibility.scrollPrev()} transparent>
-        <Icon icon='faArrowCircleLeft' className='arrow-prev text-primary hover:text-primary-focus' />
-      </Button>
-    </div>
-  )
-}
-
-const ArrowRight = () => {
-  const visibility = React.useContext<publicApiType>(VisibilityContext);
-  const isLastItemVisible = visibility.useIsVisible('last', false);
-
-  if (isLastItemVisible) {
-    return null;
-  }
-
-  return (
-    <div className='text-4xl z-10 absolute inset-y-0 flex items-center right-0 bg-gradient-to-r from-transparent to-base-200/20'>
-      <Button onClick={() => visibility.scrollNext()} transparent>
-        <Icon icon='faArrowCircleRight' className='arrow-prev text-primary hover:text-primary-focus' />
-      </Button>
-    </div>
-  )
-}
 
 type Props = {
   items: React.ReactNode[],
@@ -101,46 +8,146 @@ type Props = {
 }
 
 const HorizontalSlider = (props: Props) => {
-  // NOTE: for drag by mouse
-  const dragState = React.useRef(new DragDealer());
+  const [showLeftArrow, setShowLeftArrow] = React.useState(false);
+  const [showRightArrow, setShowRightArrow] = React.useState(true);
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+  const isDraggingRef = React.useRef(false);
+  const startXRef = React.useRef(0);
+  const scrollLeftRef = React.useRef(0);
+  const dragDistanceRef = React.useRef(0);
 
-  const handleDrag = ({ scrollContainer }: publicApiType) =>
-    (ev: React.MouseEvent) =>
-      dragState.current.dragMove(ev, (posDiff) => {
-        if (scrollContainer.current) {
-          scrollContainer.current.scrollLeft += posDiff;
-        }
-      })
+  const checkArrows = React.useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
 
-  const onMouseDown = React.useCallback(
-    () => dragState.current.dragStart,
-    [dragState],
-  )
-  const onMouseUp = React.useCallback(
-    () => dragState.current.dragStop,
-    [dragState],
-  )
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    setShowLeftArrow(scrollLeft > 0);
+    setShowRightArrow(Math.ceil(scrollLeft) < scrollWidth - clientWidth);
+  }, []);
+
+  React.useEffect(() => {
+    checkArrows();
+    window.addEventListener('resize', checkArrows);
+    return () => window.removeEventListener('resize', checkArrows);
+  }, [checkArrows]);
+
+  const handleDragStart = React.useCallback((e: React.PointerEvent) => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    isDraggingRef.current = true;
+    dragDistanceRef.current = 0;
+    startXRef.current = e.clientX;
+    scrollLeftRef.current = container.scrollLeft;
+    container.style.cursor = 'grabbing';
+    container.setPointerCapture(e.pointerId);
+  }, []);
+
+  const handleDragMove = React.useCallback((e: React.PointerEvent) => {
+    if (!isDraggingRef.current || !scrollContainerRef.current) return;
+
+    const dx = e.clientX - startXRef.current;
+    dragDistanceRef.current = Math.abs(dx);
+    scrollContainerRef.current.scrollLeft = scrollLeftRef.current - dx;
+  }, []);
+
+  const handleDragEnd = React.useCallback((e: React.PointerEvent) => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    // If we dragged more than 5px, prevent the next click
+    if (dragDistanceRef.current > 5) {
+      const preventClick = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+        document.removeEventListener('click', preventClick, true);
+      };
+      // Use capture phase to catch the click before it reaches any elements
+      document.addEventListener('click', preventClick, true);
+    }
+
+    isDraggingRef.current = false;
+    container.style.cursor = 'grab';
+    container.releasePointerCapture(e.pointerId);
+  }, []);
+
+  const scroll = (direction: 'left' | 'right') => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const scrollAmount = container.clientWidth * 0.8;
+    container.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth'
+    });
+  };
 
   return (
-    <div className='w-full overflow-hidden' onMouseLeave={dragState.current.dragStop}>
-      <h2 className='my-4 px-4 text-xl text-base-content'>{props.title}</h2>
-      <ScrollMenu
-        LeftArrow={ArrowLeft}
-        RightArrow={ArrowRight}
-        transitionBehavior="smooth"
-        wrapperClassName='relative'
-        scrollContainerClassName='overflow-x-hidden'
-        onMouseDown={onMouseDown}
-        onMouseUp={onMouseUp}
-        onMouseMove={handleDrag}
-        onWheel={onWheel}
-      >
-        {props.items.map((item: React.ReactNode, index: number) => {
-          return <div key={index} itemID={`${index}`}>{item}</div>
-        })}
-      </ScrollMenu>
+    <div className='w-full'>
+      <h2 className='mb-4 px-4 text-xl text-base-content truncate'>{props.title}</h2>
+      <div className='relative group h-52'>
+        {showLeftArrow && (
+          <div className='absolute left-0 top-0 bottom-0 flex items-center bg-gradient-to-r from-base-200/80 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity'>
+            <Button onClick={() => scroll('left')} transparent className='ml-2'>
+              <Icon icon='faArrowCircleLeft' className='text-primary hover:text-primary-focus w-8 h-8' />
+            </Button>
+          </div>
+        )}
+        
+        <div
+          ref={scrollContainerRef}
+          className='overflow-x-auto overflow-y-hidden scrollbar-hide scroll-smooth h-full'
+          onScroll={checkArrows}
+          onPointerDown={handleDragStart}
+          onPointerMove={handleDragMove}
+          onPointerUp={handleDragEnd}
+          onPointerLeave={handleDragEnd}
+          style={{ cursor: 'grab', touchAction: 'pan-x' }}
+        >
+          <div className='flex gap-6 px-4 select-none h-full'>
+            {props.items.map((item, index) => (
+              <div 
+                key={index}
+                className='flex-none h-full'
+                draggable={false}
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {showRightArrow && (
+          <div className='absolute right-0 top-0 bottom-0 flex items-center bg-gradient-to-l from-base-200/80 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity'>
+            <Button onClick={() => scroll('right')} transparent className='mr-2'>
+              <Icon icon='faArrowCircleRight' className='text-primary hover:text-primary-focus w-8 h-8' />
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
-  )
-}
+  );
+};
 
 export default HorizontalSlider
+
+// Add this to your global styles
+const styles = `
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+` as any;
+
+const styleSheet = document.createElement("style");
+styleSheet.innerText = styles;
+document.head.appendChild(styleSheet);
