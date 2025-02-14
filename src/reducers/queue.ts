@@ -171,18 +171,24 @@ export default (state: State = defaultState, action: any = {}): State => {
     }
 
     case types.REMOVE_FROM_QUEUE: {
+      console.log('Queue reducer: REMOVE_FROM_QUEUE action received:', action)
       const songToRemove = action.song || (Array.isArray(action.data) ? action.data[0] : action.data);
+      console.log('Queue reducer: songToRemove:', songToRemove)
       if (!songToRemove || (Array.isArray(songToRemove) && songToRemove.length === 0)) {
+        console.log('Queue reducer: No song to remove')
         return state;
       }
 
       const songId = Array.isArray(songToRemove) ? songToRemove[0].id : songToRemove.id;
+      console.log('Queue reducer: songId to remove:', songId)
       if (!songId) {
+        console.log('Queue reducer: No songId found')
         return state;
       }
 
       // If the song doesn't exist in the queue, return current state
       if (!state.trackIds.includes(songId)) {
+        console.log('Queue reducer: Song not found in queue')
         return state;
       }
 
@@ -199,6 +205,7 @@ export default (state: State = defaultState, action: any = {}): State => {
       const nextSongId = state.nextSongId === songId ? null : state.nextSongId;
       const prevSongId = state.prevSongId === songId ? null : state.prevSongId;
       
+      console.log('Queue reducer: Returning new state with song removed')
       return {
         ...state,
         trackIds: newTrackIds,

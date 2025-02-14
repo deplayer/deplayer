@@ -75,8 +75,12 @@ const ContextualMenu = (props: MenuProps) => {
   }
 
   const removeFromQueue = () => {
+    console.log('Removing song from queue:', props.song)
     props.dispatch({ type: types.REMOVE_FROM_QUEUE, data: [props.song] })
+    console.log('Dispatched remove action')
     activeMenuId = null
+    // Force a re-render to close the menu
+    setPosition({ ...position })
   }
 
   const removeFromDatabase = () => {
@@ -94,10 +98,13 @@ const ContextualMenu = (props: MenuProps) => {
     activeMenuId = null
   }
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = (e: React.MouseEvent | React.KeyboardEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    const rect = e.currentTarget.getBoundingClientRect()
+    
+    // Get the target element
+    const target = e.currentTarget
+    const rect = target.getBoundingClientRect()
     const newPosition = getAdjustedPosition(rect)
     
     // If this menu is already open, close it
@@ -137,6 +144,17 @@ const ContextualMenu = (props: MenuProps) => {
     <>
       <div 
         onClick={handleClick}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            handleClick(e)
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label="Open menu"
+        aria-expanded={isOpen}
+        aria-haspopup="true"
         className='cursor-pointer p-2 menu-trigger'
       >
         <Icon icon='faEllipsisV' className='text-blue-400' />
@@ -147,6 +165,10 @@ const ContextualMenu = (props: MenuProps) => {
           style={{
             left: `${position.x}px`,
             top: `${position.y}px`
+          }}
+          onClick={(e: React.MouseEvent) => {
+            e.preventDefault()
+            e.stopPropagation()
           }}
         >
           <Button
@@ -192,7 +214,7 @@ const ContextualMenu = (props: MenuProps) => {
             </Button>
           )}
 
-          {disableAddButton && (
+          {props.queue && props.queue.trackIds.includes(song.id) && (
             <Button
               fullWidth
               transparent
