@@ -65,8 +65,8 @@ const populateFromAction = (
     })
     .reduce(
       (acc: State, songDocument: IMedia) => {
-        // Deduplicate genres
-        const uniqueGenres = [...new Set(songDocument.genres || [])];
+        // Use Set for genre deduplication
+        const uniqueGenres = Array.from(new Set(songDocument.genres || []));
         const processedSong = {
           ...songDocument,
           genres: uniqueGenres,
@@ -77,53 +77,32 @@ const populateFromAction = (
         acc.albums[processedSong.album.id] = processedSong.album;
         acc.artists[processedSong.artist.id] = processedSong.artist;
 
-        // Initialize arrays if they don't exist
-        acc.songsByArtist[processedSong.artist.id] =
-          acc.songsByArtist[processedSong.artist.id] || [];
-        acc.albumsByArtist[processedSong.artist.id] =
-          acc.albumsByArtist[processedSong.artist.id] || [];
-        acc.songsByAlbum[processedSong.album.id] =
-          acc.songsByAlbum[processedSong.album.id] || [];
+        // Use Sets for efficient tracking of songs and albums
+        const artistSongsSet = new Set(acc.songsByArtist[processedSong.artist.id] || []);
+        const artistAlbumsSet = new Set(acc.albumsByArtist[processedSong.artist.id] || []);
+        const albumSongsSet = new Set(acc.songsByAlbum[processedSong.album.id] || []);
 
-        // Add song to artist's songs if not already present
-        if (
-          !acc.songsByArtist[processedSong.artist.id].includes(processedSong.id)
-        ) {
-          acc.songsByArtist[processedSong.artist.id].push(processedSong.id);
-        }
+        // Add items to Sets (automatic deduplication)
+        artistSongsSet.add(processedSong.id);
+        artistAlbumsSet.add(processedSong.album.id);
+        albumSongsSet.add(processedSong.id);
 
-        // Add album to artist's albums if not already present
-        if (
-          !acc.albumsByArtist[processedSong.artist.id].includes(
-            processedSong.album.id
-          )
-        ) {
-          acc.albumsByArtist[processedSong.artist.id].push(
-            processedSong.album.id
-          );
-        }
+        // Convert Sets back to arrays for Redux state
+        acc.songsByArtist[processedSong.artist.id] = Array.from(artistSongsSet);
+        acc.albumsByArtist[processedSong.artist.id] = Array.from(artistAlbumsSet);
+        acc.songsByAlbum[processedSong.album.id] = Array.from(albumSongsSet);
 
-        // Add song to album's songs if not already present
-        if (
-          !acc.songsByAlbum[processedSong.album.id].includes(processedSong.id)
-        ) {
-          acc.songsByAlbum[processedSong.album.id].push(processedSong.id);
-        }
-
-        // Handle genres
+        // Handle genres with Sets
         uniqueGenres.forEach((genre) => {
-          acc.songsByGenre[genre] = acc.songsByGenre[genre] || [];
-          if (!acc.songsByGenre[genre].includes(processedSong.id)) {
-            acc.songsByGenre[genre].push(processedSong.id);
-          }
+          const genreSongsSet = new Set(acc.songsByGenre[genre] || []);
+          genreSongsSet.add(processedSong.id);
+          acc.songsByGenre[genre] = Array.from(genreSongsSet);
         });
 
-        // Handle media type
-        acc.mediaByType[processedSong.type] =
-          acc.mediaByType[processedSong.type] || [];
-        if (!acc.mediaByType[processedSong.type].includes(processedSong.id)) {
-          acc.mediaByType[processedSong.type].push(processedSong.id);
-        }
+        // Handle media type with Sets
+        const mediaTypeSet = new Set(acc.mediaByType[processedSong.type] || []);
+        mediaTypeSet.add(processedSong.id);
+        acc.mediaByType[processedSong.type] = Array.from(mediaTypeSet);
 
         return acc;
       },
@@ -141,12 +120,13 @@ const populateFromAction = (
       }
     );
 
-  const filteredSongs = applyFilters(aggregation.rows, state.activeFilters);
+  // Use Set for filtered songs deduplication
+  const filteredSongsSet = new Set(applyFilters(aggregation.rows, state.activeFilters));
 
   return {
     ...aggregation,
     searchResults: state.searchResults, // Keep existing search results
-    filteredSongs,
+    filteredSongs: Array.from(filteredSongsSet),
     totalRows: Object.keys(aggregation.rows).length,
     loading: false,
   };
@@ -172,7 +152,7 @@ export default (state: State = defaultState, action: any = {}) => {
         ...state,
         loading: false,
         searchResults: action.data
-          ? action.data.map((item: IMedia) => item.id)
+          ? Array.from(new Set(action.data.map((item: IMedia) => item.id)))
           : [],
       };
 
@@ -181,10 +161,12 @@ export default (state: State = defaultState, action: any = {}) => {
       return populateFromAction(state, action);
 
     case types.RECEIVE_SETTINGS:
-      const enabledProviders = Object.keys(action.settings.providers).filter(
-        (key) => {
-          return action.settings.providers[key].enabled;
-        }
+      const enabledProviders = Array.from(
+        new Set(
+          Object.keys(action.settings.providers).filter(
+            (key) => action.settings.providers[key].enabled
+          )
+        )
       );
 
       return {
@@ -208,7 +190,7 @@ export default (state: State = defaultState, action: any = {}) => {
       };
 
     case types.REMOVE_FROM_COLLECTION_FULFILLED:
-      const songIds = action.data.map((media: IMedia) => media.id);
+      const songIds = new Set<string>(action.data.map((media: IMedia) => media.id));
       const newRows = { ...state.rows };
       songIds.forEach((songId: string) => {
         delete newRows[songId];
@@ -231,16 +213,14 @@ export default (state: State = defaultState, action: any = {}) => {
         [action.filterType]: action.values,
       };
 
-      const filteredSongs = applyFilters(
-        state.rows,
-        newFilters,
-        Object.keys(state.rows)
+      const filteredSongsSet = new Set(
+        applyFilters(state.rows, newFilters, Object.keys(state.rows))
       );
 
       return {
         ...state,
         activeFilters: newFilters,
-        filteredSongs,
+        filteredSongs: Array.from(filteredSongsSet),
       };
 
     case types.CLEAR_COLLECTION_FILTERS:
@@ -254,7 +234,7 @@ export default (state: State = defaultState, action: any = {}) => {
       const searchResults = action.searchResults || [];
       return {
         ...state,
-        searchResults: searchResults.map((media: IMedia) => media.id),
+        searchResults: Array.from(new Set(searchResults.map((media: IMedia) => media.id))),
       };
 
     case types.FETCH_RECENT_ALBUMS_SUCCESS:

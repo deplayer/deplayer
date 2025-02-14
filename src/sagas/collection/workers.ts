@@ -79,8 +79,15 @@ export function* trackSongPlayed(action: {
   songId: string;
 }): any {
   yield call(collectionService.initialize);
-  const songRow = yield call(collectionService.get, action.songId);
-  const song = rowToSong(songRow[0]);
+  const songRows = yield call(collectionService.get, action.songId);
+  
+  // Handle case where no song is found
+  if (!songRows || !songRows.length) {
+    logger.warn(`Song with id ${action.songId} not found in database`);
+    return;
+  }
+
+  const song = rowToSong(songRows[0]);
   const prevCount = song.playCount || 0;
   song.playCount = prevCount + 1;
   const songDocument = song.toDocument();

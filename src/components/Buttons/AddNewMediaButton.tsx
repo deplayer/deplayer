@@ -10,6 +10,7 @@ type Props = {
   dispatch: Dispatch
   fullWidth?: boolean
   label?: string
+  className?: string
 }
 
 const AddNewMediaButton = (props: Props) => {
@@ -21,7 +22,7 @@ const AddNewMediaButton = (props: Props) => {
     <Button
       onClick={openModal}
       fullWidth={props.fullWidth}
-      className='btn btn-secondary'
+      className={`btn btn-secondary ${props.className || ''}`}
     >
       <Icon
         icon='faPlusCircle'

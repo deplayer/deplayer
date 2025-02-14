@@ -32,19 +32,54 @@ export type Props = {
   slim?: boolean,
 }
 
-const Toolbar = ({ isToolbarVisible, isToolbarHidden, handleTransitionEnd, tableIds, actions }: { isToolbarVisible: boolean, isToolbarHidden: boolean, handleTransitionEnd: () => void, tableIds: Array<string>, actions: React.ReactNode }) => {
+const Toolbar = ({ 
+  isToolbarVisible, 
+  isToolbarHidden, 
+  handleTransitionEnd, 
+  tableIds, 
+  actions,
+  dispatch,
+  collection,
+  handleFilterChange,
+  handleClearFilters
+}: { 
+  isToolbarVisible: boolean, 
+  isToolbarHidden: boolean, 
+  handleTransitionEnd: () => void, 
+  tableIds: Array<string>, 
+  actions: React.ReactNode,
+  dispatch: Dispatch,
+  collection: CollectionState,
+  handleFilterChange: (filterType: keyof Filter, values: string[]) => void,
+  handleClearFilters: () => void
+}) => {
+  const location = useLocation()
+  
   return (
       <div
-        className={`p-2 bg-base-200/50 toolbar flex justify-between items-center text-base-content top-15 right-0 z-10 transition-transform duration-100 ${
+        className={`h-14 p-2 bg-base-200/50 toolbar flex justify-between items-center text-base-content top-15 right-0 z-10 transition-transform duration-100 ${
           isToolbarVisible ? 'translate-y-0' : '-translate-y-full'
         }`}
         style={{ display: isToolbarHidden ? 'none' : 'flex' }}
         onTransitionEnd={handleTransitionEnd}
       >
-        <div className='p-2'>
-          #<b>{tableIds.length}</b>
+        <div className='flex items-center gap-4 flex-1'>
+          <div className='p-2'>
+            #<b>{tableIds.length}</b>
+          </div>
+          {location.pathname === '/collection' && (
+            <div className='flex-1 max-w-xl'>
+              <FilterPanel
+                dispatch={dispatch}
+                collection={collection}
+                activeFilters={collection.activeFilters}
+                onFilterChange={handleFilterChange}
+                onClearFilters={handleClearFilters}
+              />
+            </div>
+          )}
         </div>
-        <div className='flex'>
+        <div className='flex gap-1'>
           {actions}
         </div>
       </div>
@@ -153,32 +188,26 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
       case '/queue':
         return (
           <>
-            <ClearQueueButton />
-            <SaveQueueButton />
-            <PlayAllButton dispatch={dispatch} />
+            <ClearQueueButton className='btn-sm' />
+            <SaveQueueButton className='btn-sm' />
+            <PlayAllButton className='btn-sm' dispatch={dispatch} />
           </>
         )
       case '/collection':
         return (
         <>
-          <FilterPanel
-            dispatch={dispatch}
-            collection={collection}
-            activeFilters={collection.activeFilters}
-            onFilterChange={handleFilterChange}
-            onClearFilters={handleClearFilters}
-          />
-          <AddNewMediaButton />
-          <PlayAllButton dispatch={dispatch} />
-          {queue.currentPlaying && <PlayNextButton dispatch={dispatch} />}
+          <AddNewMediaButton className='btn-sm' />
+          <PlayAllButton className='btn-sm' dispatch={dispatch} />
+          {queue.currentPlaying && <PlayNextButton className='btn-sm' dispatch={dispatch} />}
         </>
       )
       case '/search-results':
         return (
           <>
-            <PlayAllButton dispatch={dispatch} />
+            <PlayAllButton className='btn-sm' dispatch={dispatch} />
             {queue.currentPlaying && (
               <PlayNextButton 
+                className='btn-sm'
                 dispatch={dispatch} 
                 songs={tableIds.map(id => collection.rows[id]).filter(Boolean)} 
               />
@@ -223,6 +252,10 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
         handleTransitionEnd={handleTransitionEnd}
         tableIds={tableIds}
         actions={actions}
+        dispatch={dispatch}
+        collection={collection}
+        handleFilterChange={handleFilterChange}
+        handleClearFilters={handleClearFilters}
       />
       <AutoSizer className='music-table'>
         {({ height, width }: { height: number, width: number }) => (

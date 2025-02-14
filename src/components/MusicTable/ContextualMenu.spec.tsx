@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import ContextualMenu from './ContextualMenu'
 import Media, { IMedia } from '../../entities/Media'
-import { defaultState as queueDefaultState, State as QueueState } from '../../reducers/queue'
+import { State as QueueState } from '../../reducers/queue'
 
 describe('ContextualMenu', () => {
   const mockSong = new Media({
@@ -59,33 +59,35 @@ describe('ContextualMenu', () => {
   }
 
   it('should open menu when clicking the trigger button', () => {
-    const { getByRole } = setup()
+    setup()
+    // Click the menu trigger using aria-label
+    const menuButton = screen.getByRole('button', { name: /open menu/i })
+    fireEvent.click(menuButton)
     
-    // Click the menu trigger
-    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }))
-    
-    // Menu should be visible
-    expect(screen.getByText('play')).toBeInTheDocument()
+    // Menu should be visible with play button
+    expect(screen.getByRole('button', { name: /^play$/i })).toBeInTheDocument()
   })
 
   it('should show remove button when song is in queue', () => {
-    const { getByRole } = setup()
-    
+    setup()
     // Click the menu trigger
-    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }))
+    const menuButton = screen.getByRole('button', { name: /open menu/i })
+    fireEvent.click(menuButton)
     
-    // Remove button should be visible
-    expect(screen.getByText('remove')).toBeInTheDocument()
+    // Remove button should be visible (using exact text match)
+    expect(screen.getByRole('button', { name: /^remove$/i })).toBeInTheDocument()
   })
 
   it('should dispatch REMOVE_FROM_QUEUE action when clicking remove button', () => {
     const { dispatch } = setup()
     
     // Click the menu trigger
-    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }))
+    const menuButton = screen.getByRole('button', { name: /open menu/i })
+    fireEvent.click(menuButton)
     
-    // Click the remove button
-    fireEvent.click(screen.getByText('remove'))
+    // Click the remove button (using exact text match)
+    const removeButton = screen.getByRole('button', { name: /^remove$/i })
+    fireEvent.click(removeButton)
     
     // Check if correct action was dispatched
     expect(dispatch).toHaveBeenCalledWith({
@@ -98,25 +100,28 @@ describe('ContextualMenu', () => {
     const { onClick } = setup()
     
     // Click the menu trigger
-    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }))
+    const menuButton = screen.getByRole('button', { name: /open menu/i })
+    fireEvent.click(menuButton)
     
-    // Click the remove button
-    fireEvent.click(screen.getByText('remove'))
+    // Click the remove button (using exact text match)
+    const removeButton = screen.getByRole('button', { name: /^remove$/i })
+    fireEvent.click(removeButton)
     
     // onClick should not have been called
     expect(onClick).not.toHaveBeenCalled()
   })
 
   it('should close menu after clicking remove button', () => {
-    const { getByRole } = setup()
-    
+    setup()
     // Click the menu trigger
-    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }))
+    const menuButton = screen.getByRole('button', { name: /open menu/i })
+    fireEvent.click(menuButton)
     
-    // Click the remove button
-    fireEvent.click(screen.getByText('remove'))
+    // Click the remove button (using exact text match)
+    const removeButton = screen.getByRole('button', { name: /^remove$/i })
+    fireEvent.click(removeButton)
     
-    // Menu should be closed
-    expect(screen.queryByText('remove')).not.toBeInTheDocument()
+    // Menu should be closed (remove button should not be visible)
+    expect(screen.queryByRole('button', { name: /^remove$/i })).not.toBeInTheDocument()
   })
 }) 

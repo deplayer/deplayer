@@ -8,6 +8,7 @@ import Icon from '../common/Icon'
 
 type Props = {
   dispatch: Dispatch,
+  className?: string
 }
 
 const PlayAllButton = (props: Props) => {
@@ -24,7 +25,7 @@ const PlayAllButton = (props: Props) => {
   return (
     <Button
       transparent
-      className='playall-button button'
+      className={`playall-button button ${props.className || ''}`}
       onClick={playAll}
     >
       <Icon icon='faCaretRight' className='mr-2' />

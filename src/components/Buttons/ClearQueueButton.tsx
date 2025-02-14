@@ -8,7 +8,8 @@ import Button from '../common/Button'
 
 type Props = {
   dispatch: Dispatch,
-  queue: any
+  queue: any,
+  className?: string
 }
 
 const ClearQueueButton = (props: Props) => {
@@ -24,7 +25,7 @@ const ClearQueueButton = (props: Props) => {
   return (
     <Button
       transparent
-      className='clearqueue-button button'
+      className={`clearqueue-button button ${props.className || ''}`}
       onClick={clearQueue}
     >
       <Icon icon='faTrash' className='mr-2' />

@@ -206,7 +206,7 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
   }
 
   const filterContent = (
-    <div className='flex'>
+    <div className='flex w-full items-center'>
       <Select
         isMulti
         options={groupedOptions}
@@ -223,7 +223,7 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
           })
         }}
         styles={customStyles}
-        className="react-select-container"
+        className="react-select-container flex-1"
         classNamePrefix="react-select"
         menuPortalTarget={document.body}
         menuPosition="fixed"
@@ -237,7 +237,7 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
           inverted
           transparent
           title="Save as smart playlist"
-          className='cursor-pointer'
+          className='cursor-pointer ml-2'
         >
           <Icon icon="faSave" className='px-1' />
         </Button>
@@ -268,44 +268,8 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
           >
             <div className="p-4 flex flex-col gap-4">
               <div className="relative w-full">
-                <Select
-                  isMulti
-                  options={groupedOptions}
-                  value={selectedValues}
-                  placeholder='Filter by...'
-                  onChange={(selected) => {
-                    const selectedItems = selected || []
-                    const filterTypes = ['genre', 'type', 'artist', 'provider'] as const
-                    filterTypes.forEach(type => {
-                      const values = selectedItems
-                        .filter(item => item.value.startsWith(`${type}:`))
-                        .map(item => item.value.replace(`${type}:`, ''))
-                      onFilterChange(`${type}s` as keyof Filter, values)
-                    })
-                  }}
-                  styles={customStyles}
-                  className="react-select-container"
-                  classNamePrefix="react-select"
-                  menuPortalTarget={document.body}
-                  menuPosition="fixed"
-                  menuPlacement="auto"
-                />
+                {filterContent}
               </div>
-              {Object.values(activeFilters).some(arr => arr.length > 0) && (
-                <div className="flex justify-end">
-                  <Button
-                    size='xs'
-                    onClick={handleSaveSmartPlaylist}
-                    disabled={!Object.values(activeFilters).some(arr => arr.length > 0)}
-                    inverted
-                    transparent
-                    title="Save as smart playlist"
-                    className='cursor-pointer'
-                  >
-                    <Icon icon="faSave" className='px-1' />
-                  </Button>
-                </div>
-              )}
             </div>
           </Modal>
         )}
@@ -314,7 +278,7 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
   }
 
   return (
-    <div className="filter-panel hidden md:flex items-center space-x-2">
+    <div className="filter-panel hidden md:flex items-center w-full">
       {filterContent}
       <div className="vertical-divider border-l border-gray-500 mx-2" />
     </div>

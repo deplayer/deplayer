@@ -22,6 +22,16 @@ export const defaultState = {
   prevSongId: null,
 };
 
+// Helper function to clean track IDs
+const cleanTrackIds = (ids: Array<any>): Array<string> => {
+  if (!Array.isArray(ids)) return [];
+  // Use a Set to efficiently deduplicate and filter invalid values in one pass
+  const validIds = new Set(
+    ids.filter((id): id is string => typeof id === 'string' && id !== null && id !== '')
+  );
+  return Array.from(validIds);
+};
+
 const shuffleArray = (array: Array<any>) => {
   const newArray = [...array];
 
@@ -38,10 +48,10 @@ const shuffleArray = (array: Array<any>) => {
 const setCurrentPlaying = (state: State, action: { songId: string }) => {
   const sourceIds = getCurrentQueue(state);
 
-  // Ensure we're working with arrays
-  const currentIds = Array.isArray(sourceIds) ? sourceIds : [];
+  // Ensure we're working with arrays and clean IDs
+  const currentIds = cleanTrackIds(sourceIds);
 
-  // Create new trackIds array, ensuring no duplicates
+  // Create new trackIds array, ensuring no duplicates and no nulls
   const newTrackIds = Array.from(
     new Set(
       currentIds.includes(action.songId)
@@ -55,8 +65,8 @@ const setCurrentPlaying = (state: State, action: { songId: string }) => {
     ? Array.from(
         new Set(
           state.randomTrackIds.includes(action.songId)
-            ? state.randomTrackIds
-            : [...state.randomTrackIds, action.songId]
+            ? cleanTrackIds(state.randomTrackIds)
+            : [...cleanTrackIds(state.randomTrackIds), action.songId]
         )
       )
     : state.randomTrackIds;
@@ -75,10 +85,9 @@ const setCurrentPlaying = (state: State, action: { songId: string }) => {
 
 const getCurrentQueue = (state: State): Array<string> => {
   if (state.shuffle) {
-    return state.randomTrackIds;
+    return cleanTrackIds(state.randomTrackIds);
   }
-
-  return state.trackIds;
+  return cleanTrackIds(state.trackIds);
 };
 
 export default (state: State = defaultState, action: any = {}): State => {
@@ -86,42 +95,41 @@ export default (state: State = defaultState, action: any = {}): State => {
     case types.RECEIVE_QUEUE: {
       const queue = action.queue;
 
-      // Convert trackIds and randomTrackIds to arrays if they're objects
-      const trackIds = Array.isArray(queue.trackIds) ? queue.trackIds : [];
-      const randomTrackIds = Array.isArray(queue.randomTrackIds)
-        ? queue.randomTrackIds
-        : [];
+      // Clean and validate trackIds and randomTrackIds using Sets
+      const trackIds = new Set<string>(cleanTrackIds(queue.trackIds));
+      const randomTrackIds = new Set<string>(cleanTrackIds(queue.randomTrackIds));
 
       return {
         ...state,
         ...queue,
-        trackIds,
-        randomTrackIds,
+        trackIds: Array.from(trackIds),
+        randomTrackIds: Array.from(randomTrackIds),
       };
     }
 
     case types.ADD_TO_QUEUE: {
-      // Ensure we're working with arrays
-      const currentTrackIds = Array.isArray(state.trackIds)
-        ? state.trackIds
-        : [];
-      const currentRandomTrackIds = Array.isArray(state.randomTrackIds)
-        ? state.randomTrackIds
-        : [];
+      // Get new valid track IDs using Set for efficiency
+      const newIds = new Set<string>(
+        action.songs
+          .filter((song: Media) => song && song.id)
+          .map((song: Media) => song.id)
+      );
 
-      // Get new track IDs to add
-      const newIds = action.songs.map((song: Media) => song.id);
+      // Merge with existing cleaned IDs using Set operations
+      const mergedIds = new Set<string>([
+        ...cleanTrackIds(state.trackIds),
+        ...newIds
+      ]);
 
-      // Create new arrays with no duplicates
-      const newTrackIds = Array.from(new Set([...currentTrackIds, ...newIds]));
-      const newRandomTrackIds = state.shuffle
-        ? Array.from(new Set([...currentRandomTrackIds, ...newIds]))
-        : currentRandomTrackIds;
+      // If shuffle is enabled, update random queue
+      const mergedRandomIds = state.shuffle
+        ? new Set<string>([...cleanTrackIds(state.randomTrackIds), ...newIds])
+        : new Set<string>(state.randomTrackIds);
 
       return {
         ...state,
-        trackIds: newTrackIds,
-        randomTrackIds: newRandomTrackIds,
+        trackIds: Array.from(mergedIds),
+        randomTrackIds: Array.from(mergedRandomIds)
       };
     }
 
@@ -276,6 +284,11 @@ export default (state: State = defaultState, action: any = {}): State => {
       };
 
     default:
-      return state;
+      // Clean up any existing null values in the state
+      return {
+        ...state,
+        trackIds: cleanTrackIds(state.trackIds),
+        randomTrackIds: cleanTrackIds(state.randomTrackIds)
+      };
   }
 };
