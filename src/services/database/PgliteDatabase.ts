@@ -1,5 +1,5 @@
 import { PGlite } from "@electric-sql/pglite";
-import { electricSync } from "@electric-sql/pglite-sync";
+import { PGliteWorker } from "@electric-sql/pglite/worker";
 import { drizzle, PgliteDatabase } from "drizzle-orm/pglite";
 import {
   getStoredSyncSettings,
@@ -11,9 +11,8 @@ import migrations from "./migrations.json";
 import { createLogger } from "../../utils/logger";
 
 let dbPromise: Promise<PgliteDatabase> | null = null;
-let currentClient: PGlite | null = null;
-
-const debugLevel = 0;
+let currentClient: PGlite | PGliteWorker | null = null;
+let currentWorker: Worker | null = null;
 
 const logger = createLogger({ namespace: "PgliteDatabase" });
 
@@ -50,14 +49,16 @@ type ExtendedPGlite = PGlite & {
   };
 };
 
-export function getClient(): PGlite {
+export function getClient(): PGlite | PGliteWorker {
   if (process.env.NODE_ENV === "test") {
     return new PGlite();
   } else {
-    const client = new PGlite("idb://deplayer-pglite", {
-      debug: debugLevel,
-      extensions: { electric: electricSync() },
-    });
+    const worker = new Worker(
+      new URL("./pglite.worker.ts", import.meta.url),
+      { type: "module" }
+    );
+    currentWorker = worker;
+    const client = new PGliteWorker(worker);
     currentClient = client;
     return client;
   }
@@ -70,7 +71,7 @@ async function migrate(db: any) {
   } satisfies Omit<MigrationConfig, "migrationsFolder">);
 }
 
-async function setupSync(client: PGlite, settings: SyncSettings) {
+async function setupSync(client: PGlite | PGliteWorker, settings: SyncSettings) {
   logger.debug("setupSync settings", settings);
 
   if (settings.enabled && settings.serverUrl) {
@@ -97,9 +98,8 @@ async function setupSync(client: PGlite, settings: SyncSettings) {
       try {
         logger.debug(`Setting up sync for table: ${table.name}`);
 
-        const shape = await (
-          client as ExtendedPGlite
-        ).electric.syncShapeToTable({
+        // @ts-ignore - Both PGlite and PGliteWorker support electric sync
+        const shape = await (client as ExtendedPGlite).electric.syncShapeToTable({
           shape: {
             url: `${settings.serverUrl}/v1/shape`,
             params: {
@@ -156,6 +156,7 @@ async function setupSync(client: PGlite, settings: SyncSettings) {
 
 const _create = async (): Promise<PgliteDatabase> => {
   const client = getClient();
+  // @ts-ignore - PGliteWorker is compatible with PGlite for drizzle
   const db: PgliteDatabase = drizzle(client);
 
   logger.info("pglite object:", db);
@@ -180,7 +181,12 @@ export const reconnect = async () => {
   if (currentClient) {
     // Close existing connection if possible
     try {
-      await (currentClient as any).close?.();
+      if (currentWorker) {
+        currentWorker.terminate();
+        currentWorker = null;
+      } else if (currentClient instanceof PGlite) {
+        await (currentClient as any).close?.();
+      }
     } catch (e) {
       logger.warn("Error closing existing connection:", e);
     }
