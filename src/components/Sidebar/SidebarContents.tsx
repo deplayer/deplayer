@@ -79,6 +79,14 @@ const SidebarContents = (props: ContentProps) => {
   const location = useLocation()
   const navigate = useNavigate()
   const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
+  const hasCollectionItems = Object.keys(props.collection.rows).length > 0
+
+  // Redirect to collection if trying to access queue with empty collection
+  React.useEffect(() => {
+    if (!hasCollectionItems && location.pathname === '/queue') {
+      navigate('/collection')
+    }
+  }, [hasCollectionItems, location.pathname, navigate])
 
   return (
     <div className={`flex flex-col h-full bg-base-100 ${props.className || ''}`} onClick={() => props.onSetSidebarOpen(true)}>
@@ -91,10 +99,12 @@ const SidebarContents = (props: ContentProps) => {
       </div>
       <ul className='menu menu-lg w-full flex-1 overflow-y-auto'>
         <ExploreMenuItem current={inSection(location, '$')} />
-        <QueueMenuItem
-          current={inSection(location, 'queue')}
-          totalItems={trackIds.length}
-        />
+        {hasCollectionItems && (
+          <QueueMenuItem
+            current={inSection(location, 'queue')}
+            totalItems={trackIds.length}
+          />
+        )}
         <SearchMenuItem
           current={inSection(location, 'search-results')}
           totalItems={props.collection.searchResults.length}
@@ -107,10 +117,12 @@ const SidebarContents = (props: ContentProps) => {
           current={inSection(location, '(collection.*)')}
           totalItems={props.collection.totalRows}
         />
-        <ArtistsMenuItem
-          current={inSection(location, 'artists')}
-          totalItems={Object.keys(props.collection.artists).length}
-        />
+        {hasCollectionItems && (
+          <ArtistsMenuItem
+            current={inSection(location, 'artists')}
+            totalItems={Object.keys(props.collection.artists).length}
+          />
+        )}
         <MenuItem
           current={inSection(location, 'providers')}
           url='/providers'
@@ -124,9 +136,9 @@ const SidebarContents = (props: ContentProps) => {
 
       <div className='w-full'>  
         <CommandBar 
-          navigateToArtists={() => navigate('/artists')}
+          navigateToArtists={() => hasCollectionItems ? navigate('/artists') : navigate('/collection')}
           navigateToAlbums={() => navigate('/albums')}
-          navigateToQueue={() => navigate('/queue')}
+          navigateToQueue={() => hasCollectionItems ? navigate('/queue') : navigate('/collection')}
           navigateToPlaylists={() => navigate('/playlists')}
           navigateToSettings={() => navigate('/settings')}
           navigateToExplore={() => navigate('/explore')}

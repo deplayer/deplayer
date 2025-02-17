@@ -19,7 +19,8 @@
     "albums": "Àlbums",
     "relatedAlbums": "Àlbums del mateix artista",
     "mostPlayedSongs": "Cançons més reproduïdes",
-    "sameGenreSongs": "Cançons del mateix gènere"
+    "sameGenreSongs": "Cançons del mateix gènere",
+    "genrePlaylists": "Llistes per Gènere"
   },
   "labels": {
     "sync": "Sincronitza",
@@ -104,11 +105,20 @@
   },
   "message": {
     "noCollectionItems": "La col·lecció està buida, aquí veuràs tot el contingut descobert per Deplayer.\nPer començar a omplir la teva col·lecció necessites afegir contingut o afegir un proveïdor i començar a cercar.",
+    "queueEmpty": "La cua està buida. Afegeix algunes cançons per començar a reproduir!",
     "noMostPlayed": "Encara no has reproduït cap cançó",
     "goToCollection": "Ves a la col·lecció per reproduir alguna cosa!",
     "tryDemoSong": "Prova la cançó de demostració",
     "addSongsFromCollection": "Afegeix cançons des de la col·lecció o cerca'n de noves",
-    "jumpToCollection": "Anar a la col·lecció"
+    "jumpToCollection": "Anar a la col·lecció",
+    "noPlaylists": "Encara no hi ha llistes",
+    "createPlaylistHint": "Crea la teva primera llista afegint cançons a la cua i desant-la",
+    "addSongsToQueue": "Afegeix cançons a la cua per crear la teva primera llista",
+    "goToQueue": "Anar a la Cua",
+    "startSearch": "Començar a Cercar",
+    "addProvider": "Afegir Proveïdor",
+    "startSearchingForMusic": "Comença a cercar música per afegir a la col·lecció",
+    "addSearchableProvider": "Afegeix un proveïdor de cerca per començar a descobrir música"
   },
   "peer": {
     "connectedPeers": "Parells connectats",

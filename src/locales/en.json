@@ -18,7 +18,8 @@
     "albums": "Albums",
     "relatedAlbums": "Same artist albums",
     "mostPlayedSongs": "Most played songs",
-    "sameGenreSongs": "Songs of the same genre"
+    "sameGenreSongs": "Songs of the same genre",
+    "genrePlaylists": "Genre Playlists"
   },
   "labels": {
     "sync": "Sync",
@@ -101,15 +102,27 @@
     "syncProvider": "Sync All Music",
     "gridView": "Grid view",
     "listView": "List view",
-    "saveSettings": "Save settings"
+    "saveSettings": "Save settings",
+    "showSongs": "Show songs",
+    "applyFilters": "Apply filters",
+    "delete": "Delete"
   },
   "message": {
     "noCollectionItems": "Collection is empty, here you will see all discovered media by Deplayer.\nIn order to start filling your collection you need to either Add media or Add a provider and start searching.",
+    "queueEmpty": "Queue is empty. Add some songs to start playing!",
     "noMostPlayed": "You didn't played any song yet",
     "goToCollection": "Jump to collection to play something!",
     "tryDemoSong": "Try Demo Song",
     "addSongsFromCollection": "Add songs from the collection or search for new ones",
-    "jumpToCollection": "Jump to collection"
+    "jumpToCollection": "Jump to collection",
+    "noPlaylists": "No playlists yet",
+    "createPlaylistHint": "Create your first playlist by adding songs to the queue and saving it",
+    "addSongsToQueue": "Add songs to the queue to create your first playlist",
+    "goToQueue": "Go to Queue",
+    "startSearch": "Start Searching",
+    "addProvider": "Add Provider",
+    "startSearchingForMusic": "Start searching for music to add to your collection",
+    "addSearchableProvider": "Add a searchable provider to start discovering music"
   },
   "peer": {
     "connectedPeers": "Connected peers",

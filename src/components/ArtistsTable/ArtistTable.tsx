@@ -1,12 +1,15 @@
 import { AutoSizer, List, Grid } from 'react-virtualized'
 import { useState } from 'react'
 import { Translate } from 'react-redux-i18n'
+import { Link } from 'react-router-dom'
 
 import { State as CollectionState } from '../../reducers/collection'
+import { State as SettingsState } from '../../reducers/settings'
 import ArtistRow from './ArtistRow'
 import ArtistGridItem from './ArtistGridItem'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
+import EmptyState from '../common/EmptyState/index'
 import { State as AppState } from '../../reducers/app'
 import { State as QueueState } from '../../reducers/queue'
 
@@ -14,6 +17,7 @@ export type Props = {
   error?: string,
   queue: QueueState,
   collection: CollectionState,
+  settings?: SettingsState,
   app: AppState
 }
 
@@ -24,9 +28,45 @@ interface GridProps {
   style: React.CSSProperties
 }
 
-const ArtistTable = ({ collection: { artists, songsByArtist }, app: { sidebarToggled, mqlMatch } }: Props) => {
+const ArtistTable = ({ collection: { artists, songsByArtist, rows }, app: { sidebarToggled, mqlMatch }, settings }: Props) => {
   const [isGridView, setIsGridView] = useState(false)
   const tableIds = Object.keys(artists)
+  const hasCollectionItems = Object.keys(rows).length > 0
+  const hasSearchableProviders = settings?.settings?.providers ? 
+    Object.values(settings.settings.providers).some(provider => provider.enabled) : 
+    false
+
+  if (!tableIds.length) {
+    let emptyStateProps = {
+      icon: "faUser" as const,
+      title: "message.noArtists",
+      description: "message.addSongsToSeeArtists",
+      action: hasCollectionItems ? (
+        <Link to="/collection" className="btn btn-primary">
+          <Icon icon="faMusic" className="mr-2" />
+          <Translate value="message.jumpToCollection" />
+        </Link>
+      ) : hasSearchableProviders ? (
+        <Link to="/search" className="btn btn-primary">
+          <Icon icon="faSearch" className="mr-2" />
+          <Translate value="message.startSearch" />
+        </Link>
+      ) : (
+        <Link to="/settings" className="btn btn-primary">
+          <Icon icon="faPlug" className="mr-2" />
+          <Translate value="message.addProvider" />
+        </Link>
+      )
+    }
+
+    if (hasSearchableProviders) {
+      emptyStateProps.description = "message.startSearchingForMusic"
+    } else if (!hasCollectionItems) {
+      emptyStateProps.description = "message.addSearchableProvider"
+    }
+
+    return <EmptyState {...emptyStateProps} />
+  }
 
   const rowRenderer = (props: any): any => {
     const artistId = tableIds[props.index]

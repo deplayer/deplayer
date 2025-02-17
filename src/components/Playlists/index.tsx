@@ -1,56 +1,159 @@
 import Playlist from './Playlist'
-import CenteredMessage from '../common/CenteredMessage'
+import EmptyState from '../common/EmptyState/index'
 import { State as CollectionState } from '../../reducers/collection'
 import { State as PlaylistState } from '../../reducers/playlist'
+import { State as QueueState } from '../../reducers/queue'
+import { State as SettingsState } from '../../reducers/settings'
+import { Link } from 'react-router-dom'
+import Icon from '../common/Icon'
+import { Translate } from 'react-redux-i18n'
 
 type Props = {
   playlist: PlaylistState,
   collection: CollectionState,
+  queue: QueueState,
+  settings?: SettingsState,
   dispatch: any
 }
 
-const Playlists = (props: Props) => {
-  const { collection } = props
-  const { playlists, smartPlaylists } = props.playlist
+type EmptyStateProps = {
+  icon: "faCompactDisc" | "faMusic" | "faSearch" | "faPlug";
+  title: string;
+  description: string;
+  action: React.ReactNode;
+}
 
-  if (!playlists.length && !smartPlaylists.length) {
-    return (
-      <CenteredMessage>
-        <div className='text-center'>
-          You don't have any playlist yet.
-          <br />
-          Add some songs to now playing and save it as playlist
-        </div>
-      </CenteredMessage>
-    )
-  }
+type PlaylistType = {
+  _id: string;
+  trackIds: Array<string>;
+  filters?: Record<string, string[]>;
+  id?: string;
+  name?: string;
+}
 
-  const playlistsComps = playlists.map((playlist: any) => {
-    return (
-      <Playlist
-        dispatch={props.dispatch}
-        key={playlist._id}
-        collection={collection}
-        playlist={playlist}
-      />
-    )
-  })
-
-  const smartPlaylistsComps = smartPlaylists.map((playlist: any) => {
-    return (
-      <Playlist
-        dispatch={props.dispatch}
-        key={playlist._id}
-        collection={collection}
-        playlist={playlist}
-      />
-    )
-  })
+const PlaylistSection = ({ title, playlists, collection, dispatch }: { 
+  title?: string, 
+  playlists: PlaylistType[], 
+  collection: CollectionState,
+  dispatch: any 
+}) => {
+  if (!playlists.length) return null;
 
   return (
-    <div className='playlists z-10 flex flex-col w-full overflow-y-auto h-full'>
-      {playlistsComps}
-      {smartPlaylistsComps}
+    <div className="mb-8">
+      {title && (
+        <h2 className="text-xl font-semibold mb-6 px-4">
+          <Icon icon="faMusic" className="mr-2" />
+          <Translate value={title} />
+        </h2>
+      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4">
+        {playlists.map((playlist) => (
+          <Playlist
+            dispatch={dispatch}
+            key={playlist.id || playlist._id}
+            collection={collection}
+            playlist={playlist}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const Playlists = (props: Props) => {
+  const { collection, queue, settings } = props
+  const { playlists, smartPlaylists } = props.playlist
+  const hasQueueItems = queue.trackIds.length > 0
+  const hasCollectionItems = Object.keys(collection.rows).length > 0
+  const hasSearchableProviders = settings?.settings?.providers ? 
+    Object.values(settings.settings.providers).some(provider => provider.enabled) : 
+    false
+
+  // Generate genre playlists
+  const genrePlaylists: PlaylistType[] = Object.keys(collection.songsByGenre || {}).map(genre => ({
+    _id: `genre-${genre}`,
+    id: `genre-${genre}`,
+    name: genre,
+    trackIds: collection.songsByGenre[genre] || [],
+    filters: {
+      genres: [genre],
+      types: [],
+      artists: [],
+      providers: []
+    }
+  }));
+
+  if (!playlists.length && !smartPlaylists.length && !genrePlaylists.length) {
+    let emptyStateProps: EmptyStateProps = {
+      icon: "faCompactDisc",
+      title: "message.noPlaylists",
+      description: "message.createPlaylistHint",
+      action: null
+    }
+
+    if (hasQueueItems) {
+      emptyStateProps.action = (
+        <Link to="/queue" className="btn btn-primary">
+          <Icon icon="faMusic" className="mr-2" />
+          <Translate value="message.goToQueue" />
+        </Link>
+      )
+    } else if (hasCollectionItems) {
+      emptyStateProps.description = "message.addSongsToQueue"
+      emptyStateProps.action = (
+        <Link to="/collection" className="btn btn-primary">
+          <Icon icon="faDatabase" className="mr-2" />
+          <Translate value="message.jumpToCollection" />
+        </Link>
+      )
+    } else if (hasSearchableProviders) {
+      emptyStateProps.description = "message.startSearchingForMusic"
+      emptyStateProps.action = (
+        <Link to="/search" className="btn btn-primary">
+          <Icon icon="faSearch" className="mr-2" />
+          <Translate value="message.startSearch" />
+        </Link>
+      )
+    } else {
+      emptyStateProps.description = "message.addSearchableProvider"
+      emptyStateProps.action = (
+        <Link to="/settings" className="btn btn-primary">
+          <Icon icon="faPlug" className="mr-2" />
+          <Translate value="message.addProvider" />
+        </Link>
+      )
+    }
+
+    return <EmptyState {...emptyStateProps} />
+  }
+
+  return (
+    <div className='playlists z-10 flex flex-col w-full overflow-y-auto h-full py-6'>
+      <PlaylistSection 
+        playlists={playlists} 
+        collection={collection} 
+        dispatch={props.dispatch}
+      />
+      <PlaylistSection 
+        playlists={smartPlaylists.map(playlist => ({
+          _id: playlist.id,
+          id: playlist.id,
+          name: playlist.name,
+          trackIds: collection.songsByGenre[playlist.filters.genres[0]] || [],
+          filters: playlist.filters
+        }))} 
+        collection={collection} 
+        dispatch={props.dispatch}
+      />
+      {genrePlaylists.length > 0 && (
+        <PlaylistSection 
+          title="titles.genrePlaylists"
+          playlists={genrePlaylists} 
+          collection={collection} 
+          dispatch={props.dispatch}
+        />
+      )}
     </div>
   )
 }

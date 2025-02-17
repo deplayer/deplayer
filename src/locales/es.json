@@ -18,7 +18,8 @@
     "albums": "Álbumes",
     "relatedAlbums": "Álbumes del mismo artista",
     "mostPlayedSongs": "Canciones más reproducidas",
-    "sameGenreSongs": "Canciones del mismo género"
+    "sameGenreSongs": "Canciones del mismo género",
+    "genrePlaylists": "Listas por Género"
   },
   "labels": {
     "sync": "Sincronizar",
@@ -103,11 +104,20 @@
   },
   "message": {
     "noCollectionItems": "La colección está vacía, aquí verás todo el contenido descubierto por Deplayer.\nPara empezar a llenar tu colección necesitas añadir contenido o añadir un proveedor y comenzar a buscar.",
+    "queueEmpty": "La cola está vacía. ¡Añade algunas canciones para empezar a reproducir!",
     "noMostPlayed": "Aún no has reproducido ninguna canción",
     "goToCollection": "¡Ve a la colección para reproducir algo!",
     "tryDemoSong": "Probar canción de demostración",
     "addSongsFromCollection": "Añade canciones desde la colección o busca nuevas",
-    "jumpToCollection": "Ir a la colección"
+    "jumpToCollection": "Ir a la colección",
+    "noPlaylists": "No hay listas de reproducción",
+    "createPlaylistHint": "Crea tu primera lista añadiendo canciones a la cola y guardándola",
+    "addSongsToQueue": "Añade canciones a la cola para crear tu primera lista",
+    "goToQueue": "Ir a la Cola",
+    "startSearch": "Empezar a Buscar",
+    "addProvider": "Añadir Proveedor",
+    "startSearchingForMusic": "Empieza a buscar música para añadir a tu colección",
+    "addSearchableProvider": "Añade un proveedor de búsqueda para empezar a descubrir música"
   },
   "peer": {
     "connectedPeers": "Pares conectados",

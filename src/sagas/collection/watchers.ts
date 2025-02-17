@@ -5,9 +5,11 @@ import { getAdapter } from "../../services/database";
 import { initialize } from "../settings";
 import CollectionService from "../../services/CollectionService";
 import * as types from "../../constants/ActionTypes";
+import { createLogger } from "../../utils/logger";
 
 const adapter = getAdapter();
 const collectionService = new CollectionService(adapter);
+const logger = createLogger({ namespace: "collection-watchers" });
 
 export function* addToCollectionWatcher(): any {
   const handleChannel = yield actionChannel(types.ADD_TO_COLLECTION);
@@ -32,19 +34,37 @@ export function* addToCollectionWatcher(): any {
 export function* initializeWatcher(): Generator<any, void, any> {
   while (true) {
     yield take(types.INITIALIZE);
-    yield call(initialize);
-    yield call(collectionService.initialize);
-    const collection = yield call(collectionService.getAll);
-    const mappedData = collection.map((elem: any) => elem);
+    
+    try {
+      // Ensure database is ready
+      logger.debug("Waiting for database initialization...");
+      yield call(adapter.getDb);
+      logger.debug("Database initialized successfully");
 
-    // If collection is empty, show empty state
-    if (mappedData.length === 0) {
-      yield put({ type: types.RECEIVE_COLLECTION, data: [] });
-    } else {
-      yield put({ type: types.RECEIVE_COLLECTION, data: mappedData });
+      // Initialize settings and collection
+      yield call(initialize);
+      yield call(collectionService.initialize);
+      
+      const collection = yield call(collectionService.getAll);
+      const mappedData = collection.map((elem: any) => elem);
+
+      // If collection is empty, show empty state
+      if (mappedData.length === 0) {
+        yield put({ type: types.RECEIVE_COLLECTION, data: [] });
+      } else {
+        yield put({ type: types.RECEIVE_COLLECTION, data: mappedData });
+      }
+
+      yield put({ type: types.INITIALIZED });
+      yield put({ type: types.APPLY_MOST_PLAYED_SORT });
+    } catch (error: any) {
+      logger.error("Initialization failed:", error);
+      yield put({ 
+        type: types.SEND_NOTIFICATION, 
+        notification: `Failed to initialize: ${error?.message || 'Unknown error'}`,
+        level: "error",
+        duration: 10000
+      });
     }
-
-    yield put({ type: types.INITIALIZED });
-    yield put({ type: types.APPLY_MOST_PLAYED_SORT });
   }
 }

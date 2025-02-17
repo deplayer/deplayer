@@ -5,9 +5,10 @@ import 'rc-slider/assets/index.css';
 import './tailwind.css'
 
 import * as portals from 'react-reverse-portal'
-import { Provider } from 'react-redux'
 import { Route, Routes } from 'react-router-dom'
 import { HistoryRouter as Router } from "redux-first-history/rr6";
+import { Provider } from 'react-redux'
+import { store, history } from './store/configureStore'
 
 import LayoutContainer from './containers/LayoutContainer'
 import AddMediaModal from './components/AddMediaModal'
@@ -26,8 +27,6 @@ import SettingsContainer from './containers/SettingsContainer'
 import SongContainer from './containers/SongContainer'
 import Wiki from './components/Wiki'
 import GlobalKeyHandlers from './components/GlobalKeyHandlers'
-// import JoinRoom from './pages/JoinRoom'
-import { store, history } from './store/configureStore'
 import JoinRoom from './pages/JoinRoom';
 import { useLanguage } from './hooks/useLanguage'
 
@@ -79,11 +78,11 @@ const App = () => {
   const playerPortal = React.useMemo(() => portals.createHtmlPortalNode(), [])
 
   return (
-    <Router history={history}>
-      <Provider store={store}>
+    <Provider store={store}>
+      <Router history={history}>
         <AppContent playerPortal={playerPortal} />
-      </Provider>
-    </Router>
+      </Router>
+    </Provider>
   )
 }
 
