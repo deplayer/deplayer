@@ -266,8 +266,8 @@ class PlayerControls extends React.Component<Props, State> {
               onPlay={this.onPlay}
               onEnded={() => {
                 this.resetPlayedSeconds()
-                this.saveTrackPlayed(currentPlayingId)
                 this.playNext()
+                this.saveTrackPlayed(currentPlayingId)
               }}
               config={config}
               onError={this.onError}

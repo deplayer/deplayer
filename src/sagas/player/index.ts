@@ -81,9 +81,17 @@ export function* handlePlayNext(): any {
   const trackIds = queue.shuffle ? queue.randomTrackIds : queue.trackIds
   const songId = queue.nextSongId
 
-  if (queue.repeat && !songId && trackIds[0]) {
-    yield put({ type: types.SET_CURRENT_PLAYING, songId: trackIds[0] })
+  if (queue.repeat) {
+    // If there's a next song, play it
+    if (songId) {
+      yield put({ type: types.SET_CURRENT_PLAYING, songId })
+    } 
+    // If there's no next song but we have tracks, play the first one (loop back)
+    else if (trackIds.length > 0) {
+      yield put({ type: types.SET_CURRENT_PLAYING, songId: trackIds[0] })
+    }
   } else if (songId) {
+    // Not repeating, only play next if there is one
     yield put({ type: types.SET_CURRENT_PLAYING, songId })
   }
 }
