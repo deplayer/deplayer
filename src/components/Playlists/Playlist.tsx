@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Translate } from 'react-redux-i18n'
+import { AutoSizer, List } from 'react-virtualized'
 import Icon from '../common/Icon'
 import Button from '../common/Button'
 import Modal from '../common/Modal'
@@ -7,8 +8,8 @@ import SongRow from '../MusicTable/SongRow'
 import * as types from '../../constants/ActionTypes'
 import { State as CollectionState } from '../../reducers/collection'
 import { IMedia } from '../../entities/Media'
-import { useNavigate } from 'react-router-dom'
 import { applyFilters } from '../../utils/apply-filters'
+import { useNavigate } from 'react-router-dom'
 
 type Props = {
   playlist: {
@@ -153,8 +154,31 @@ const Playlist = ({ playlist, collection, dispatch }: Props) => {
       .filter(Boolean)
   ).size
 
-  return (
-    <div className="card bg-base-200 shadow-xl hover:shadow-2xl transition-shadow duration-200">
+  // Add row renderer for virtualized list
+  const rowRenderer = ({ key, index, style }: { key: string, index: number, style: React.CSSProperties }) => {
+    const songId = songIds[index]
+    const song = collection.rows[songId]
+    if (!song) return null
+
+    return (
+      <SongRow
+        key={key}
+        mqlMatch={false}
+        disableCovers
+        style={style}
+        dispatch={dispatch}
+        isCurrent={false}
+        slim={true}
+        onClick={() => {
+          dispatch({ type: types.SET_CURRENT_PLAYING, songId: song.id })
+        }}
+        song={song}
+      />
+    )
+  }
+
+  const PlaylistCard = ({ style }: { style?: React.CSSProperties }) => (
+    <div className="card bg-base-200 shadow-xl hover:shadow-2xl transition-shadow duration-200" style={style}>
       <figure className="relative aspect-square w-full overflow-hidden bg-base-300">
         {tracksWithCovers.length > 0 ? (
           <div className="grid grid-cols-2 w-full h-full">
@@ -172,7 +196,6 @@ const Playlist = ({ playlist, collection, dispatch }: Props) => {
                 )}
               </div>
             ))}
-            {/* Fill empty slots with placeholder */}
             {Array.from({ length: Math.max(0, 4 - tracksWithCovers.length) }).map((_, i) => (
               <div key={`empty-${i}`} className="bg-base-300 flex items-center justify-center">
                 <Icon icon="faMusic" className="text-4xl text-base-content/30" />
@@ -259,36 +282,34 @@ const Playlist = ({ playlist, collection, dispatch }: Props) => {
           </div>
         </div>
       </div>
+    </div>
+  )
+
+  return (
+    <>
+      <PlaylistCard />
 
       <Modal
         title={playlist.name || (playlist.filters?.genres?.[0] || 'Untitled Playlist')}
         onClose={() => setShowSongs(false)}
         isOpen={showSongs}
       >
-        <div className="max-h-[70vh] overflow-y-auto">
-          {songIds.map((songId: string) => {
-            const song = collection.rows[songId]
-            if (!song) return null
-
-            return (
-              <SongRow
-                key={song.id}
-                mqlMatch={false}
-                disableCovers
-                style={{}}
-                dispatch={dispatch}
-                isCurrent={false}
-                slim={true}
-                onClick={() => {
-                  dispatch({ type: types.SET_CURRENT_PLAYING, songId: song.id })
-                }}
-                song={song}
+        <div className="h-[70vh] w-full">
+          <AutoSizer>
+            {({ height, width }: { height: number, width: number }) => (
+              <List
+                height={height}
+                rowCount={songIds.length}
+                rowHeight={100}
+                rowRenderer={rowRenderer}
+                width={width}
+                overscanRowCount={6}
               />
-            )
-          })}
+            )}
+          </AutoSizer>
         </div>
       </Modal>
-    </div>
+    </>
   )
 }
 
