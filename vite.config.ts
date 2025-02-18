@@ -65,11 +65,11 @@ export default defineConfig({
       ]
     }
   })],
+  worker: {
+    format: 'es'
+  },
   optimizeDeps: {
-    exclude: ['@electric-sql/pglite'],
-    esbuildOptions: {
-      plugins: [fixReactVirtualized],
-    },
+    exclude: ['@electric-sql/pglite']
   },
   resolve: {
     alias: {
