@@ -1,8 +1,7 @@
 /// <reference types="jest" />
 
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom'
-import type { jest } from '@jest/globals'
-
 import React from 'react'
 import { render, fireEvent, screen } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
@@ -11,18 +10,22 @@ import * as types from '../../constants/ActionTypes'
 import { State as CollectionState } from '../../reducers/collection'
 
 // Mock translations
-jest.mock('react-redux-i18n', () => ({
+vi.mock('react-redux-i18n', () => ({
   Translate: ({ value }: { value: string }) => value
 }))
 
-// Mock useNavigate
-const mockNavigate = jest.fn()
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate
-}))
+// Mock useNavigate and BrowserRouter
+const mockNavigate = vi.fn()
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+    BrowserRouter: ({ children }: { children: React.ReactNode }) => <>{children}</>
+  }
+})
 
-const mockDispatch = jest.fn()
+const mockDispatch = vi.fn()
 
 describe('Playlist', () => {
   const mockCollectionState: CollectionState = {
@@ -157,7 +160,80 @@ describe('Playlist', () => {
 
     expect(mockDispatch).toHaveBeenCalledWith({
       type: types.ADD_SONGS_TO_QUEUE_BY_ID,
-      songs: ['song-1', 'song-2']
+      trackIds: defaultProps.playlist.trackIds
+    })
+  })
+
+  it('dispatches ADD_SONGS_TO_QUEUE_BY_ID with filtered songs for smart playlist', () => {
+    render(
+      <BrowserRouter>
+        <Playlist {...smartPlaylistProps} />
+      </BrowserRouter>
+    )
+
+    // Open dropdown menu
+    fireEvent.click(screen.getByRole('button', { name: '' })) // Ellipsis button
+    fireEvent.click(screen.getByText('buttons.addToQueue'))
+
+    // Should only include songs with Rock genre
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: types.ADD_SONGS_TO_QUEUE_BY_ID,
+      trackIds: ['song-1', 'song-3'] // Only the songs with Rock genre
+    })
+  })
+
+  it('handles empty playlist gracefully', () => {
+    const emptyPlaylistProps = {
+      ...defaultProps,
+      playlist: {
+        ...defaultProps.playlist,
+        trackIds: []
+      }
+    }
+
+    render(
+      <BrowserRouter>
+        <Playlist {...emptyPlaylistProps} />
+      </BrowserRouter>
+    )
+
+    // Open dropdown menu
+    fireEvent.click(screen.getByRole('button', { name: '' })) // Ellipsis button
+    fireEvent.click(screen.getByText('buttons.addToQueue'))
+
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: types.ADD_SONGS_TO_QUEUE_BY_ID,
+      trackIds: []
+    })
+  })
+
+  it('handles empty smart playlist filters gracefully', () => {
+    const emptyFiltersProps = {
+      ...smartPlaylistProps,
+      playlist: {
+        ...smartPlaylistProps.playlist,
+        filters: {
+          genres: [],
+          types: [],
+          artists: [],
+          providers: []
+        }
+      }
+    }
+
+    render(
+      <BrowserRouter>
+        <Playlist {...emptyFiltersProps} />
+      </BrowserRouter>
+    )
+
+    // Open dropdown menu
+    fireEvent.click(screen.getByRole('button', { name: '' })) // Ellipsis button
+    fireEvent.click(screen.getByText('buttons.addToQueue'))
+
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: types.ADD_SONGS_TO_QUEUE_BY_ID,
+      trackIds: expect.any(Array)
     })
   })
 

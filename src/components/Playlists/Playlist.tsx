@@ -58,10 +58,23 @@ const Playlist = ({ playlist, collection, dispatch }: Props) => {
   }
 
   const handleAddToQueue = () => {
-    dispatch({
-      type: types.ADD_SONGS_TO_QUEUE_BY_ID,
-      songs: playlist.trackIds
-    })
+    if (isSmartPlaylist) {
+      const filteredSongIds = applyFilters(collection.rows, {
+        genres: playlist.filters?.genres || [],
+        types: playlist.filters?.types || [],
+        artists: playlist.filters?.artists || [],
+        providers: playlist.filters?.providers || []
+      });
+      dispatch({
+        type: types.ADD_SONGS_TO_QUEUE_BY_ID,
+        trackIds: filteredSongIds
+      });
+    } else {
+      dispatch({
+        type: types.ADD_SONGS_TO_QUEUE_BY_ID,
+        trackIds: playlist.trackIds
+      });
+    }
   }
 
   const handleApplyFilters = () => {
