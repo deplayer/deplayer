@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback, useMemo, memo } from 'react'
 import { Translate } from 'react-redux-i18n'
 import { AutoSizer, List } from 'react-virtualized'
 import Icon from '../common/Icon'
@@ -23,12 +23,12 @@ type Props = {
   dispatch: any
 }
 
-const Playlist = ({ playlist, collection, dispatch }: Props) => {
+const Playlist = memo(({ playlist, collection, dispatch }: Props) => {
   const [showSongs, setShowSongs] = useState(false)
   const navigate = useNavigate()
   const isSmartPlaylist = 'filters' in playlist
 
-  const handlePlayAll = () => {
+  const handlePlayAll = useCallback(() => {
     if (isSmartPlaylist) {
       const filteredSongIds = applyFilters(collection.rows, {
         genres: playlist.filters?.genres || [],
@@ -56,9 +56,9 @@ const Playlist = ({ playlist, collection, dispatch }: Props) => {
         path: `/playlists/${playlist._id}`
       });
     }
-  }
+  }, [isSmartPlaylist, playlist, collection.rows, dispatch])
 
-  const handleAddToQueue = () => {
+  const handleAddToQueue = useCallback(() => {
     if (isSmartPlaylist) {
       const filteredSongIds = applyFilters(collection.rows, {
         genres: playlist.filters?.genres || [],
@@ -76,13 +76,10 @@ const Playlist = ({ playlist, collection, dispatch }: Props) => {
         trackIds: playlist.trackIds
       });
     }
-  }
+  }, [isSmartPlaylist, playlist, collection.rows, dispatch])
 
-  const handleApplyFilters = () => {
-    // Reset all filters first
+  const handleApplyFilters = useCallback(() => {
     dispatch({ type: types.CLEAR_COLLECTION_FILTERS })
-    
-    // Apply all available filters
     Object.entries(playlist.filters || {}).forEach(([filterType, values]) => {
       if (values.length) {
         dispatch({
@@ -92,20 +89,17 @@ const Playlist = ({ playlist, collection, dispatch }: Props) => {
         })
       }
     })
-    
-    // Navigate to collection view
     navigate('/collection')
-  }
+  }, [playlist.filters, dispatch, navigate])
 
-  const handleDeletePlaylist = () => {
+  const handleDeletePlaylist = useCallback(() => {
     dispatch({
       type: types.DELETE_SMART_PLAYLIST,
       id: playlist.id
     })
-  }
+  }, [playlist.id, dispatch])
 
-  // Get up to 4 unique album covers
-  const getUniqueCoverTracks = () => {
+  const tracksWithCovers = useMemo(() => {
     const tracks = playlist.trackIds.map(id => collection.rows[id])
     const uniqueAlbumTracks = new Map()
     
@@ -113,49 +107,41 @@ const Playlist = ({ playlist, collection, dispatch }: Props) => {
       if (!track?.cover?.thumbnailUrl) return
       if (!track.album?.id) return
       
-      // Only store the first track from each album
       if (!uniqueAlbumTracks.has(track.album.id)) {
         uniqueAlbumTracks.set(track.album.id, track)
       }
     })
 
     return Array.from(uniqueAlbumTracks.values()).slice(0, 4)
-  }
+  }, [playlist.trackIds, collection.rows])
 
-  const tracksWithCovers = getUniqueCoverTracks()
+  const totalDuration = useMemo(() => 
+    playlist.trackIds.reduce((acc, id) => {
+      const track = collection.rows[id] as IMedia
+      return acc + (track?.duration || 0)
+    }, 0)
+  , [playlist.trackIds, collection.rows])
 
-  // Get total duration
-  const totalDuration = playlist.trackIds.reduce((acc, id) => {
-    const track = collection.rows[id] as IMedia
-    return acc + (track?.duration || 0)
-  }, 0)
+  const songIds = useMemo(() => 
+    isSmartPlaylist 
+      ? applyFilters(collection.rows, {
+          genres: playlist.filters?.genres || [],
+          types: playlist.filters?.types || [],
+          artists: playlist.filters?.artists || [],
+          providers: playlist.filters?.providers || []
+        })
+      : playlist.trackIds
+  , [isSmartPlaylist, playlist, collection.rows])
 
-  // Format duration to MM:SS
-  const formatDuration = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60)
-    const remainingSeconds = Math.floor(seconds % 60)
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
-  }
+  const uniqueAlbumCount = useMemo(() => 
+    new Set(
+      playlist.trackIds
+        .map(id => collection.rows[id]?.album?.id)
+        .filter(Boolean)
+    ).size
+  , [playlist.trackIds, collection.rows])
 
-  // Get songs for modal
-  const songIds = isSmartPlaylist 
-    ? applyFilters(collection.rows, {
-        genres: playlist.filters?.genres || [],
-        types: playlist.filters?.types || [],
-        artists: playlist.filters?.artists || [],
-        providers: playlist.filters?.providers || []
-      })
-    : playlist.trackIds
-
-  // Count unique albums
-  const uniqueAlbumCount = new Set(
-    playlist.trackIds
-      .map(id => collection.rows[id]?.album?.id)
-      .filter(Boolean)
-  ).size
-
-  // Add row renderer for virtualized list
-  const rowRenderer = ({ key, index, style }: { key: string, index: number, style: React.CSSProperties }) => {
+  const rowRenderer = useCallback(({ key, index, style }: { key: string, index: number, style: React.CSSProperties }) => {
     const songId = songIds[index]
     const song = collection.rows[songId]
     if (!song) return null
@@ -175,9 +161,15 @@ const Playlist = ({ playlist, collection, dispatch }: Props) => {
         song={song}
       />
     )
+  }, [songIds, collection.rows, dispatch])
+
+  const formatDuration = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = Math.floor(seconds % 60)
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
   }
 
-  const PlaylistCard = ({ style }: { style?: React.CSSProperties }) => (
+  const PlaylistCard = useMemo(() => ({ style }: { style?: React.CSSProperties }) => (
     <div className="card bg-base-200 shadow-xl hover:shadow-2xl transition-shadow duration-200" style={style}>
       <figure className="relative aspect-square w-full overflow-hidden bg-base-300">
         {tracksWithCovers.length > 0 ? (
@@ -283,7 +275,7 @@ const Playlist = ({ playlist, collection, dispatch }: Props) => {
         </div>
       </div>
     </div>
-  )
+  ), [playlist.name, tracksWithCovers, uniqueAlbumCount, totalDuration, handlePlayAll, handleAddToQueue, handleApplyFilters, handleDeletePlaylist])
 
   return (
     <>
@@ -311,6 +303,6 @@ const Playlist = ({ playlist, collection, dispatch }: Props) => {
       </Modal>
     </>
   )
-}
+})
 
 export default Playlist

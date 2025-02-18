@@ -7,6 +7,7 @@ import { State as SettingsState } from '../../reducers/settings'
 import { Link } from 'react-router-dom'
 import Icon from '../common/Icon'
 import { Translate } from 'react-redux-i18n'
+import { memo, useMemo } from 'react'
 
 type Props = {
   playlist: PlaylistState,
@@ -31,13 +32,24 @@ type PlaylistType = {
   name?: string;
 }
 
-const PlaylistSection = ({ title, playlists, collection, dispatch }: { 
+const PlaylistSection = memo(({ title, playlists, collection, dispatch }: { 
   title?: string, 
   playlists: PlaylistType[], 
   collection: CollectionState,
   dispatch: any 
 }) => {
   if (!playlists.length) return null;
+
+  const memoizedPlaylists = useMemo(() => 
+    playlists.map((playlist) => (
+      <Playlist
+        dispatch={dispatch}
+        key={playlist.id || playlist._id}
+        collection={collection}
+        playlist={playlist}
+      />
+    ))
+  , [playlists, collection, dispatch]);
 
   return (
     <div className="mb-8">
@@ -48,20 +60,13 @@ const PlaylistSection = ({ title, playlists, collection, dispatch }: {
         </h2>
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4">
-        {playlists.map((playlist) => (
-          <Playlist
-            dispatch={dispatch}
-            key={playlist.id || playlist._id}
-            collection={collection}
-            playlist={playlist}
-          />
-        ))}
+        {memoizedPlaylists}
       </div>
     </div>
   );
-};
+});
 
-const Playlists = (props: Props) => {
+const Playlists = memo((props: Props) => {
   const { collection, queue, settings } = props
   const { playlists, smartPlaylists } = props.playlist
   const hasQueueItems = queue.trackIds.length > 0
@@ -70,19 +75,32 @@ const Playlists = (props: Props) => {
     Object.values(settings.settings.providers).some(provider => provider.enabled) : 
     false
 
-  // Generate genre playlists
-  const genrePlaylists: PlaylistType[] = Object.keys(collection.songsByGenre || {}).map(genre => ({
-    _id: `genre-${genre}`,
-    id: `genre-${genre}`,
-    name: genre,
-    trackIds: collection.songsByGenre[genre] || [],
-    filters: {
-      genres: [genre],
-      types: [],
-      artists: [],
-      providers: []
-    }
-  }));
+  // Memoize genre playlists generation
+  const genrePlaylists: PlaylistType[] = useMemo(() => 
+    Object.keys(collection.songsByGenre || {}).map(genre => ({
+      _id: `genre-${genre}`,
+      id: `genre-${genre}`,
+      name: genre,
+      trackIds: collection.songsByGenre[genre] || [],
+      filters: {
+        genres: [genre],
+        types: [],
+        artists: [],
+        providers: []
+      }
+    }))
+  , [collection.songsByGenre]);
+
+  // Memoize smart playlists transformation
+  const transformedSmartPlaylists = useMemo(() => 
+    smartPlaylists.map(playlist => ({
+      _id: playlist.id,
+      id: playlist.id,
+      name: playlist.name,
+      trackIds: collection.songsByGenre[playlist.filters.genres[0]] || [],
+      filters: playlist.filters
+    }))
+  , [smartPlaylists, collection.songsByGenre]);
 
   if (!playlists.length && !smartPlaylists.length && !genrePlaylists.length) {
     let emptyStateProps: EmptyStateProps = {
@@ -136,13 +154,7 @@ const Playlists = (props: Props) => {
         dispatch={props.dispatch}
       />
       <PlaylistSection 
-        playlists={smartPlaylists.map(playlist => ({
-          _id: playlist.id,
-          id: playlist.id,
-          name: playlist.name,
-          trackIds: collection.songsByGenre[playlist.filters.genres[0]] || [],
-          filters: playlist.filters
-        }))} 
+        playlists={transformedSmartPlaylists} 
         collection={collection} 
         dispatch={props.dispatch}
       />
@@ -156,6 +168,6 @@ const Playlists = (props: Props) => {
       )}
     </div>
   )
-}
+});
 
 export default Playlists
