@@ -13,6 +13,7 @@ const HorizontalSlider = (props: Props) => {
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   const isDraggingRef = React.useRef(false);
   const startXRef = React.useRef(0);
+  const startTimeRef = React.useRef(0);
   const scrollLeftRef = React.useRef(0);
   const dragDistanceRef = React.useRef(0);
 
@@ -38,6 +39,7 @@ const HorizontalSlider = (props: Props) => {
     isDraggingRef.current = true;
     dragDistanceRef.current = 0;
     startXRef.current = e.clientX;
+    startTimeRef.current = Date.now();
     scrollLeftRef.current = container.scrollLeft;
     container.style.cursor = 'grabbing';
     container.setPointerCapture(e.pointerId);
@@ -55,14 +57,16 @@ const HorizontalSlider = (props: Props) => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    // If we dragged more than 5px, prevent the next click
-    if (dragDistanceRef.current > 5) {
+    // Only prevent click if:
+    // 1. We dragged more than 5px
+    // 2. The drag lasted more than 200ms
+    const dragDuration = Date.now() - startTimeRef.current;
+    if (dragDistanceRef.current > 5 && dragDuration > 200) {
       const preventClick = (e: Event) => {
         e.preventDefault();
         e.stopPropagation();
         document.removeEventListener('click', preventClick, true);
       };
-      // Use capture phase to catch the click before it reaches any elements
       document.addEventListener('click', preventClick, true);
     }
 
