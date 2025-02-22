@@ -12,7 +12,8 @@
     "collection": "Colección",
     "queue": "Cola",
     "artists": "Artistas",
-    "playlists": "Listas"
+    "playlists": "Listas",
+    "favorites": "Favoritos"
   },
   "titles": {
     "albums": "Álbumes",
@@ -186,5 +187,12 @@
     "spanish": "Español",
     "catalan": "Catalán",
     "selectLanguage": "Seleccionar idioma"
+  },
+  "favorites": {
+    "title": "Canciones Favoritas",
+    "empty": "Aún no hay canciones favoritas",
+    "empty.description": "Haz clic en el icono de corazón en cualquier canción para añadirla a tus favoritos",
+    "addToFavorites": "Añadir a favoritos",
+    "removeFromFavorites": "Eliminar de favoritos"
   }
 } 

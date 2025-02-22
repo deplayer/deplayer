@@ -13,7 +13,8 @@
     "queue": "Cua",
     "artists": "Artistes",
     "playlists": "Llistes",
-    "settings": "Configuració"
+    "settings": "Configuració",
+    "favorites": "Preferits"
   },
   "titles": {
     "albums": "Àlbums",
@@ -187,5 +188,12 @@
     "spanish": "Espanyol",
     "catalan": "Català",
     "selectLanguage": "Seleccionar idioma"
+  },
+  "favorites": {
+    "title": "Cançons Preferides",
+    "empty": "Encara no hi ha cançons preferides",
+    "empty.description": "Fes clic a la icona de cor a qualsevol cançó per afegir-la als preferits",
+    "addToFavorites": "Afegir als preferits",
+    "removeFromFavorites": "Eliminar dels preferits"
   }
 } 

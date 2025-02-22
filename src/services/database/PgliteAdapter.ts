@@ -11,6 +11,7 @@ import {
   peer,
   room,
   mediaLyrics,
+  favorites,
 } from "../../schema";
 import { createLogger } from "../../utils/logger";
 
@@ -98,6 +99,15 @@ export default class Pglite implements IAdapter {
             set: payload,
           });
         break;
+      case "favorites":
+        await instance
+          .insert(favorites)
+          .values({ ...prev, ...fixedPayload })
+          .onConflictDoUpdate({
+            target: favorites.id,
+            set: payload,
+          });
+        break;
       default:
         logger.warn(`Model ${model} is not implemented for save method`);
         new Error(`Model ${model} not supported for save method`);
@@ -178,6 +188,8 @@ export default class Pglite implements IAdapter {
           .select()
           .from(mediaLyrics)
           .where(eq(mediaLyrics.id, id));
+      case "favorites":
+        return instance.select().from(favorites).where(eq(favorites.id, id));
       default:
         logger.warn(`Model ${model} is not implemented for getDocObj method`);
         throw new Error("Model not supported");
@@ -208,6 +220,9 @@ export default class Pglite implements IAdapter {
       case "room":
         const rooms = await instance.select().from(room);
         return rooms || [];
+      case "favorites":
+        const favs = await instance.select().from(favorites);
+        return favs || [];
       default:
         logger.warn(`Model ${model} is not implemented for getAll method`);
         throw new Error(`Model ${model} not supported for getAll method`);

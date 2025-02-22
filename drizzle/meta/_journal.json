@@ -148,6 +148,13 @@
       "when": 1738254009316,
       "tag": "0020_abandoned_baron_zemo",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1740189613909,
+      "tag": "0021_closed_shinobi_shaw",
+      "breakpoints": true
     }
   ]
 }

@@ -89,6 +89,7 @@ async function setupSync(client: PGlite | PGliteWorker, settings: SyncSettings) 
       { name: "smart_playlist", primaryKey: ["id"] },
       { name: "playlist", primaryKey: ["id"] },
       { name: "media_lyrics", primaryKey: ["id"] },
+      { name: "favorites", primaryKey: ["id"] },
     ];
 
     logger.debug("Preparing shapes for sync", tables);

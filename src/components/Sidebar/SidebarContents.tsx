@@ -2,6 +2,7 @@ import { Dispatch } from 'redux'
 import React from 'react'
 import { useNavigate } from 'react-router'
 import { Translate } from 'react-redux-i18n'
+import { useSelector } from 'react-redux'
 
 import CommandBar from '../CommandBar'
 import CollectionMenuItem from './CollectionMenuItem'
@@ -78,15 +79,8 @@ const DeplayerLogo = () => {
 const SidebarContents = (props: ContentProps) => {
   const location = useLocation()
   const navigate = useNavigate()
-  const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
-  const hasCollectionItems = Object.keys(props.collection.rows).length > 0
-
-  // Redirect to collection if trying to access queue with empty collection
-  React.useEffect(() => {
-    if (!hasCollectionItems && location.pathname === '/queue') {
-      navigate('/collection')
-    }
-  }, [hasCollectionItems, location.pathname, navigate])
+  const favorites = useSelector((state: any) => state.favorites)
+  const favoritesCount = favorites.favoriteIds.size
 
   return (
     <div className={`flex flex-col h-full bg-base-100 ${props.className || ''}`} onClick={() => props.onSetSidebarOpen(true)}>
@@ -99,10 +93,10 @@ const SidebarContents = (props: ContentProps) => {
       </div>
       <ul className='menu menu-lg w-full flex-1 overflow-y-auto'>
         <ExploreMenuItem current={inSection(location, '$')} />
-        {hasCollectionItems && (
+        {props.queue.trackIds.length > 0 && (
           <QueueMenuItem
             current={inSection(location, 'queue')}
-            totalItems={trackIds.length}
+            totalItems={props.queue.trackIds.length}
           />
         )}
         <SearchMenuItem
@@ -114,10 +108,10 @@ const SidebarContents = (props: ContentProps) => {
           totalItems={props.playlist.playlists.length} 
         />
         <CollectionMenuItem
-          current={inSection(location, '(collection.*)')}
+          current={inSection(location, 'collection')}
           totalItems={props.collection.totalRows}
         />
-        {hasCollectionItems && (
+        {Object.keys(props.collection.artists).length > 0 && (
           <ArtistsMenuItem
             current={inSection(location, 'artists')}
             totalItems={Object.keys(props.collection.artists).length}
@@ -136,9 +130,9 @@ const SidebarContents = (props: ContentProps) => {
 
       <div className='w-full'>  
         <CommandBar 
-          navigateToArtists={() => hasCollectionItems ? navigate('/artists') : navigate('/collection')}
+          navigateToArtists={() => Object.keys(props.collection.artists).length > 0 ? navigate('/artists') : navigate('/collection')}
           navigateToAlbums={() => navigate('/albums')}
-          navigateToQueue={() => hasCollectionItems ? navigate('/queue') : navigate('/collection')}
+          navigateToQueue={() => props.queue.trackIds.length > 0 ? navigate('/queue') : navigate('/collection')}
           navigateToPlaylists={() => navigate('/playlists')}
           navigateToSettings={() => navigate('/settings')}
           navigateToExplore={() => navigate('/explore')}

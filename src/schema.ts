@@ -107,3 +107,12 @@ export const mediaLyrics = pgTable("media_lyrics", {
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
+
+export const favorites = pgTable("favorites", {
+  id: text("id").primaryKey(),
+  mediaId: text("mediaId")
+    .notNull()
+    .references(() => media.id, { onDelete: "cascade" }),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});

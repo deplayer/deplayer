@@ -1,10 +1,12 @@
 import { Filter } from "../reducers/collection";
 import type Media from "../entities/Media";
+import { State } from "../reducers";
 
 export const applyFilters = (
   rows: { [key: string]: Media },
   filters: Filter,
-  initialIds?: string[]
+  initialIds?: string[],
+  state?: State
 ): string[] => {
   const idsToFilter = initialIds || Object.keys(rows);
   return idsToFilter.filter((id) => {
@@ -15,7 +17,8 @@ export const applyFilters = (
       filters.genres.length === 0 &&
       filters.types.length === 0 &&
       filters.artists.length === 0 &&
-      filters.providers.length === 0
+      filters.providers.length === 0 &&
+      !filters.favorites
     ) {
       return true;
     }
@@ -49,6 +52,12 @@ export const applyFilters = (
     if (filters.providers.length > 0) {
       const mediaProviders = media.stream ? Object.keys(media.stream) : [];
       if (filters.providers.some((p) => mediaProviders.includes(p))) {
+        hasMatches = true;
+      }
+    }
+
+    if (filters.favorites) {
+      if (state?.favorites.favoriteIds.has(id)) {
         hasMatches = true;
       }
     }

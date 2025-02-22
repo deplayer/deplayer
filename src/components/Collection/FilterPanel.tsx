@@ -6,6 +6,8 @@ import * as actionTypes from '../../constants/ActionTypes'
 import Icon from '../common/Icon'
 import Modal from '../common/Modal'
 import { useState, useEffect } from 'react'
+import { State } from '../../reducers'
+import { useSelector } from 'react-redux'
 
 interface MediaItem {
   genres?: string[];
@@ -34,6 +36,7 @@ type Props = {
 const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Props) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  const state = useSelector((state: State) => state)
 
   useEffect(() => {
     const handleResize = () => {
@@ -205,6 +208,22 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
     }
   }
 
+  const handleFilterChange = (filterType: keyof Filter, values: string[]) => {
+    dispatch({
+      type: actionTypes.SET_COLLECTION_FILTER,
+      filterType,
+      values,
+      state
+    })
+  }
+
+  const hasActiveFilters = Object.entries(activeFilters).some(([key, value]) => {
+    if (key === 'favorites') {
+      return value === true;
+    }
+    return Array.isArray(value) && value.length > 0;
+  });
+
   const filterContent = (
     <div className='flex w-full items-center'>
       <Select
@@ -219,7 +238,7 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
             const values = selectedItems
               .filter(item => item.value.startsWith(`${type}:`))
               .map(item => item.value.replace(`${type}:`, ''))
-            onFilterChange(`${type}s` as keyof Filter, values)
+            handleFilterChange(`${type}s` as keyof Filter, values)
           })
         }}
         styles={customStyles}
@@ -229,11 +248,20 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
         menuPosition="fixed"
         menuPlacement="auto"
       />
-      {Object.values(activeFilters).some(arr => arr.length > 0) && (
+      <Button
+        size='xs'
+        onClick={() => handleFilterChange('favorites', activeFilters.favorites ? [] : ['true'])}
+        className={`ml-2 ${activeFilters.favorites ? 'text-red-500' : 'text-base-content/70'}`}
+        transparent
+        title={activeFilters.favorites ? "Remove favorites filter" : "Show favorites only"}
+      >
+        <Icon icon="faHeart" className='px-1' />
+      </Button>
+      {hasActiveFilters && (
         <Button
           size='xs'
           onClick={handleSaveSmartPlaylist}
-          disabled={!Object.values(activeFilters).some(arr => arr.length > 0)}
+          disabled={!hasActiveFilters}
           inverted
           transparent
           title="Save as smart playlist"

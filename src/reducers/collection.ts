@@ -8,6 +8,7 @@ export type Filter = {
   types: string[];
   artists: string[];
   providers: string[];
+  favorites: boolean;
 };
 
 export type State = {
@@ -48,6 +49,7 @@ export const defaultState: State = {
     types: [],
     artists: [],
     providers: [],
+    favorites: false,
   },
   filteredSongs: [],
   recentAlbums: [],
@@ -210,11 +212,13 @@ export default (state: State = defaultState, action: any = {}) => {
     case types.SET_COLLECTION_FILTER:
       const newFilters = {
         ...state.activeFilters,
-        [action.filterType]: action.values,
+        [action.filterType]: action.filterType === 'favorites' 
+          ? action.values.length > 0 
+          : action.values,
       };
 
       const filteredSongsSet = new Set(
-        applyFilters(state.rows, newFilters, Object.keys(state.rows))
+        applyFilters(state.rows, newFilters, Object.keys(state.rows), action.state)
       );
 
       return {

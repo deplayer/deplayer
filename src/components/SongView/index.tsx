@@ -25,6 +25,7 @@ import { State as QueueState } from '../../reducers/queue'
 import { State as CollectionState } from '../../reducers/collection'
 import { State as PlayerState } from '../../reducers/player'
 import { State as LyricsState } from '../../reducers/lyrics'
+import FavoriteButton from '../common/FavoriteButton'
 
 const MAX_LIST_ITEMS = 25
 
@@ -261,6 +262,8 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
                 />
                 {pinned ? <Translate value="media.unpin" /> : <Translate value="media.pin" />}
               </Button>
+
+              <FavoriteButton songId={song.id} className="ml-2" />
             </div>
           </div>
         </div>

@@ -12,7 +12,8 @@
     "collection": "Collection",
     "queue": "Queue",
     "artists": "Artists",
-    "playlists": "Playlists"
+    "playlists": "Playlists",
+    "favorites": "Favorites"
   },
   "titles": {
     "albums": "Albums",
@@ -191,5 +192,12 @@
     "spanish": "Spanish",
     "catalan": "Catalan",
     "selectLanguage": "Select language"
+  },
+  "favorites": {
+    "title": "Favorite Songs",
+    "empty": "No favorite songs yet",
+    "empty.description": "Click the heart icon on any song to add it to your favorites",
+    "addToFavorites": "Add to favorites",
+    "removeFromFavorites": "Remove from favorites"
   }
 }

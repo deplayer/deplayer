@@ -10,6 +10,7 @@ import Media, { Cover } from '../../../entities/Media'
 import Tag from '../../common/Tag'
 import ServiceIcon from '../../ServiceIcon'
 import { State as QueueState } from '../../../reducers/queue'
+import FavoriteButton from '../../common/FavoriteButton'
 
 export type Props = {
   song: Media,
@@ -123,6 +124,7 @@ const SongRow = (props: Props) => {
         )}
       </div>
       <div className='flex items-center min-w-fit' tabIndex={0}>
+        <FavoriteButton songId={song.id} className="mr-2" />
         <div className='mx-4'>
           { !props.slim && song.stream && <ProviderTags song={song} /> }
           {props.slim && (
