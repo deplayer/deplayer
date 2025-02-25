@@ -80,77 +80,76 @@ const SettingsForm = (props: Props) => {
   const { settings, schema } = props
 
   return (
-    <Formik
-      initialValues={settings.settings}
-      onSubmit={handleSubmit}
-      enableReinitialize
-    >
-      {({
-        values,
-        setFieldValue
-      }) => (
-        <>
-          <div className={settingsCard}>
-            <label className={labelClass}>
-              <Translate value="labels.useSystemLanguage" />
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  className="toggle toggle-primary"
-                  checked={values.app?.language?.useSystemLanguage ?? true}
-                  onChange={(e) => {
-                    setFieldValue('app.language', {
+    <div className={settingsCard}>
+      <div className={settingsCard}>
+        <DatabaseSyncForm />
+      </div>
+
+      <Formik
+        initialValues={settings.settings}
+        onSubmit={handleSubmit}
+        enableReinitialize
+      >
+        {({
+          values,
+          setFieldValue
+        }) => (
+          <>
+              <label className={labelClass}>
+                <Translate value="labels.useSystemLanguage" />
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    className="toggle toggle-primary"
+                    checked={values.app?.language?.useSystemLanguage ?? true}
+                    onChange={(e) => {
+                      setFieldValue('app.language', {
+                        ...values.app?.language,
+                        useSystemLanguage: e.target.checked,
+                        code: e.target.checked ? LanguageDetector.getPreferredLanguage() : (values.app?.language?.code ?? 'en')
+                      })
+                    }}
+                  />
+                </div>
+              </label>
+
+              {!(values.app?.language?.useSystemLanguage ?? true) && (
+                <div className={formControlClass}>
+                  <label className={labelClass}>
+                    <span className={labelTextClass}>
+                      <Translate value="labels.selectLanguage" />
+                    </span>
+                  </label>
+                  <select
+                    className={selectClass}
+                    value={values.app?.language?.code ?? 'en'}
+                    onChange={(e) => setFieldValue('app.language', {
                       ...values.app?.language,
-                      useSystemLanguage: e.target.checked,
-                      code: e.target.checked ? LanguageDetector.getPreferredLanguage() : (values.app?.language?.code ?? 'en')
-                    })
-                  }}
-                />
+                      code: e.target.value
+                    })}
+                  >
+                    {AVAILABLE_LANGUAGES.map(({ code, label }) => (
+                      <option key={code} value={code}>
+                        {I18n.t(label)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+            <Form>
+              <div className={settingsCard}>
+                <FormSchema schema={schema} />
               </div>
-            </label>
 
-            {!(values.app?.language?.useSystemLanguage ?? true) && (
-              <div className={formControlClass}>
-                <label className={labelClass}>
-                  <span className={labelTextClass}>
-                    <Translate value="labels.selectLanguage" />
-                  </span>
-                </label>
-                <select
-                  className={selectClass}
-                  value={values.app?.language?.code ?? 'en'}
-                  onChange={(e) => setFieldValue('app.language', {
-                    ...values.app?.language,
-                    code: e.target.value
-                  })}
-                >
-                  {AVAILABLE_LANGUAGES.map(({ code, label }) => (
-                    <option key={code} value={code}>
-                      {I18n.t(label)}
-                    </option>
-                  ))}
-                </select>
+              <div className='w-full flex justify-end mt-12'>
+                <button type="submit" className="btn btn-primary"><Translate value="buttons.saveSettings" /> </button>
               </div>
-            )}
-            </div>
-
-          <Form>
-
-            <div className={settingsCard}>
-              <DatabaseSyncForm />
-            </div>
-
-            <div className={settingsCard}>
-              <FormSchema schema={schema} />
-            </div>
-
-            <div className='w-full flex justify-end mt-12'>
-              <button type="submit" className="btn btn-primary"><Translate value="buttons.saveSettings" /> </button>
-            </div>
-          </Form>
-        </>
-      )}
-    </Formik>
+            </Form>
+          </>
+        )}
+      </Formik>
+    </div>
   )
 }
 

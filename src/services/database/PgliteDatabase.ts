@@ -1,5 +1,6 @@
 import { PGlite } from "@electric-sql/pglite";
 import { PGliteWorker } from "@electric-sql/pglite/worker";
+import { electricSync } from "@electric-sql/pglite-sync";
 import { drizzle, PgliteDatabase } from "drizzle-orm/pglite";
 import {
   getStoredSyncSettings,
@@ -58,7 +59,11 @@ export function getClient(): PGlite | PGliteWorker {
       { type: "module" }
     );
     currentWorker = worker;
-    const client = new PGliteWorker(worker);
+    const client = new PGliteWorker(worker, {
+      extensions: {
+        electric: electricSync()
+      }
+    });
     currentClient = client;
     return client;
   }

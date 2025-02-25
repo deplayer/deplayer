@@ -17,13 +17,13 @@ export function* initialize(): Generator<any, void, any> {
     const db = yield call(adapter.getDb);
     
     // Get all favorites from the database
-    const favorites = yield call(async () => {
-      return await db.query.favorites.findMany();
+    const favoritesData = yield call(async () => {
+      return await db.select().from(favorites);
     });
 
-    if (favorites && favorites.length > 0) {
+    if (favoritesData && favoritesData.length > 0) {
       // Extract media IDs from favorites
-      const favoriteIds = favorites.map((favorite: Favorite) => favorite.mediaId);
+      const favoriteIds = favoritesData.map((favorite: Favorite) => favorite.mediaId);
       yield put({ type: types.LOAD_FAVORITES_SUCCESS, favoriteIds });
     } else {
       // No favorites found, initialize with empty array

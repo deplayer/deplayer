@@ -13,7 +13,15 @@ export const defaultState: State = {
   error: null
 }
 
-export default (state: State = defaultState, action: any): State => {
+type FavoritesAction = 
+  | { type: typeof types.TOGGLE_FAVORITE; songId: string }
+  | { type: typeof types.ADD_TO_FAVORITES; songId: string }
+  | { type: typeof types.REMOVE_FROM_FAVORITES; songId: string }
+  | { type: typeof types.LOAD_FAVORITES_START }
+  | { type: typeof types.LOAD_FAVORITES_SUCCESS; favoriteIds: string[] }
+  | { type: typeof types.LOAD_FAVORITES_ERROR; error: string }
+
+export default (state: State = defaultState, action: FavoritesAction): State => {
   switch (action.type) {
     case types.TOGGLE_FAVORITE:
       const newFavorites = new Set(state.favoriteIds)
@@ -60,7 +68,7 @@ export default (state: State = defaultState, action: any): State => {
       return {
         ...state,
         loading: false,
-        favoriteIds: new Set(action.favorites.map((fav: any) => fav.mediaId))
+        favoriteIds: new Set(action.favoriteIds)
       }
 
     case types.LOAD_FAVORITES_ERROR:

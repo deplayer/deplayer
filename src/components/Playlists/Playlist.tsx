@@ -10,6 +10,7 @@ import { State as CollectionState } from '../../reducers/collection'
 import { IMedia } from '../../entities/Media'
 import { applyFilters } from '../../utils/apply-filters'
 import { useNavigate } from 'react-router-dom'
+import { Dispatch } from 'redux'
 
 type Props = {
   playlist: {
@@ -20,7 +21,7 @@ type Props = {
     name?: string
   }
   collection: CollectionState
-  dispatch: any
+  dispatch: Dispatch
 }
 
 const Playlist = memo(({ playlist, collection, dispatch }: Props) => {
@@ -34,7 +35,8 @@ const Playlist = memo(({ playlist, collection, dispatch }: Props) => {
         genres: playlist.filters?.genres || [],
         types: playlist.filters?.types || [],
         artists: playlist.filters?.artists || [],
-        providers: playlist.filters?.providers || []
+        providers: playlist.filters?.providers || [],
+        favorites: Boolean(playlist.filters?.favorites?.[0] === 'true')
       });
       const filteredSongs = filteredSongIds.map(id => collection.rows[id]).filter(Boolean);
       dispatch({
@@ -64,7 +66,8 @@ const Playlist = memo(({ playlist, collection, dispatch }: Props) => {
         genres: playlist.filters?.genres || [],
         types: playlist.filters?.types || [],
         artists: playlist.filters?.artists || [],
-        providers: playlist.filters?.providers || []
+        providers: playlist.filters?.providers || [],
+        favorites: Boolean(playlist.filters?.favorites?.[0] === 'true')
       });
       dispatch({
         type: types.ADD_SONGS_TO_QUEUE_BY_ID,
@@ -128,7 +131,8 @@ const Playlist = memo(({ playlist, collection, dispatch }: Props) => {
           genres: playlist.filters?.genres || [],
           types: playlist.filters?.types || [],
           artists: playlist.filters?.artists || [],
-          providers: playlist.filters?.providers || []
+          providers: playlist.filters?.providers || [],
+          favorites: Boolean(playlist.filters?.favorites?.[0] === 'true')
         })
       : playlist.trackIds
   , [isSmartPlaylist, playlist, collection.rows])

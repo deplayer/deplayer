@@ -5,6 +5,8 @@ import Icon from '../common/Icon'
 import SongRow from '../MusicTable/SongRow'
 import CoverImage from '../MusicTable/CoverImage'
 import { State as CollectionState } from '../../reducers/collection'
+import { State as QueueState } from '../../reducers/queue'
+import { Dispatch } from 'redux'
 
 interface Album {
   id: string
@@ -14,10 +16,10 @@ interface Album {
 
 type AlbumProps = {
   album: Album,
-  queue: any,
+  queue: QueueState,
   songs: Array<string>,
   collection: CollectionState,
-  dispatch: any
+  dispatch: Dispatch
 }
 
 const Album = (props: AlbumProps) => {

@@ -1,12 +1,30 @@
 import { takeLatest, put, select, call } from 'redux-saga/effects'
 
 import { getAdapter } from '../../services/database'
-import { getAlbumSongs, getQueue } from '../selectors'
+import { getQueue } from '../selectors'
 import QueueService from '../../services/QueueService'
 import logger from '../../utils/logger'
 import * as types from '../../constants/ActionTypes'
 
 import { initialize } from './workers'
+
+// Import IMedia type
+import { IMedia } from '../../entities/Media';
+
+// Define interfaces for state and actions
+interface CollectionState {
+  rows: { [key: string]: IMedia };
+  songsByAlbum: { [key: string]: string[] };
+}
+
+interface AppState {
+  collection: CollectionState;
+}
+
+interface AddAlbumToQueueAction {
+  type: string;
+  albumId: string;
+}
 
 // Extract songs from collection state
 export const getSongs = (state: any, action: { path: string }): Array<string> => {
@@ -104,12 +122,19 @@ export function* clearQueue(): any {
   yield call(queueService.save, 'queue', {})
 }
 
-export function* addAlbumToQueue(action: any): any {
-  const songsByAlbum = yield select(getAlbumSongs)
-  logger.log('queue-saga', songsByAlbum)
-  yield put({ type: types.ADD_SONGS_TO_QUEUE, songs: songsByAlbum[action.albumId], replace: false })
-  yield put({ type: types.SET_CURRENT_PLAYING, songId: songsByAlbum[action.albumId][0] })
-  yield put({ type: types.START_PLAYING })
+export function* addAlbumToQueue(action: AddAlbumToQueueAction): any {
+  const songsByAlbum: { [key: string]: string[] } = yield select((state: AppState) => state.collection.songsByAlbum);
+  const collection: { [key: string]: IMedia } = yield select((state: AppState) => state.collection.rows);
+  logger.log('queue-saga', songsByAlbum);
+  
+  // Convert song IDs to song objects
+  const songObjects = songsByAlbum[action.albumId]
+    .map((songId: string) => collection[songId])
+    .filter(Boolean); // Remove any null/undefined entries
+    
+  yield put({ type: types.ADD_SONGS_TO_QUEUE, songs: songObjects, replace: false });
+  yield put({ type: types.SET_CURRENT_PLAYING, songId: songsByAlbum[action.albumId][0] });
+  yield put({ type: types.START_PLAYING });
 }
 
 // Binding actions to sagas

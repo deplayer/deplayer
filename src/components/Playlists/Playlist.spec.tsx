@@ -69,7 +69,8 @@ describe('Playlist', () => {
       genres: [],
       types: [],
       artists: [],
-      providers: []
+      providers: [],
+      favorites: false
     },
     filteredSongs: [],
     recentAlbums: []
@@ -95,7 +96,8 @@ describe('Playlist', () => {
         genres: ['Rock'],
         types: [],
         artists: [],
-        providers: []
+        providers: [],
+        favorites: []
       }
     },
     collection: {
@@ -216,7 +218,8 @@ describe('Playlist', () => {
           genres: [],
           types: [],
           artists: [],
-          providers: []
+          providers: [],
+          favorites: []
         }
       }
     }

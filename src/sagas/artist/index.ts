@@ -6,10 +6,14 @@ import ArtistService from '../../services/ArtistService'
 import LyricsService from '../../services/LyricsService'
 import LyricsovhProvider from '../../providers/LyricsovhProvider'
 import { getAdapter } from '../../services/database'
+import { media } from '../../schema'
+import { eq } from 'drizzle-orm'
+import { createLogger } from '../../utils/logger'
 
 const artistService = new ArtistService()
 const adapter = getAdapter()
 const lyricsService = new LyricsService(adapter)
+const logger = createLogger({ namespace: 'artist-saga' })
 
 export function* loadMoreArtistSongsFromProvider(action: any): any {
   // Clear existing artist metadata first
@@ -55,23 +59,51 @@ export function* fetchSongMetadata(action: any): any {
   }
 
   try {
-    // First try to get lyrics from database
+    // First ensure the song exists in the database
+    const db = yield call(adapter.getDb)
+    const existingSong = yield call(async () => {
+      return await db.select().from(media).where(eq(media.id, song.id))
+    })
+
+    if (!existingSong || existingSong.length === 0) {
+      logger.debug('Song not in database, saving it first...')
+      yield call(async () => {
+        await db.insert(media).values({
+          id: song.id,
+          title: song.title,
+          artist: song.artist,
+          type: song.type,
+          album: song.album,
+          cover: song.cover || null,
+          stream: song.stream,
+          duration: song.duration,
+          playCount: 0,
+          genres: song.genres || [],
+          track: song.track || null,
+          discNumber: song.discNumber || null,
+          year: song.year || null,
+          searchableText: `${song.title} ${song.artist.name} ${song.album.name}`,
+        })
+      })
+    }
+
+    // Now try to get lyrics from database
     const storedLyrics = yield call([lyricsService, 'get'], song.id)
-    console.log('Database response:', storedLyrics)
+    logger.debug('Database response:', storedLyrics)
 
     // Check if we actually have lyrics in the database
     if (storedLyrics && storedLyrics.lyrics) {
-      console.log('Found lyrics in database:', storedLyrics)
+      logger.debug('Found lyrics in database:', storedLyrics)
       yield put({ type: types.LYRICS_FOUND, data: storedLyrics.lyrics })
       return
     }
 
-    console.log('No lyrics in database, fetching from API for song:', song)
+    logger.debug('No lyrics in database, fetching from API for song:', song)
     // If not in database, try to fetch from API
     const mbProvider = new LyricsovhProvider()
     try {
       const response = yield call([mbProvider, 'searchLyrics'], song)
-      console.log('API Response:', response)
+      logger.debug('API Response:', response)
       
       if (!response || !response.lyrics) {
         throw new Error('No lyrics found in API response')
@@ -81,7 +113,7 @@ export function* fetchSongMetadata(action: any): any {
       yield call([lyricsService, 'save'], song.id, response.lyrics)
       yield put({ type: types.LYRICS_FOUND, data: response.lyrics })
     } catch (apiError: any) {
-      console.error('API Error:', apiError)
+      logger.error('API Error:', apiError)
       // Handle API-specific errors
       yield put({ 
         type: types.NO_LYRICS_FOUND, 
@@ -89,7 +121,7 @@ export function* fetchSongMetadata(action: any): any {
       })
     }
   } catch (error: any) {
-    console.error('Database Error:', error)
+    logger.error('Database Error:', error)
     // Handle database errors
     yield put({ 
       type: types.NO_LYRICS_FOUND, 

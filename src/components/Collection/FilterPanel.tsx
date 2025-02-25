@@ -28,12 +28,10 @@ interface Collection {
 type Props = {
   collection: Collection;
   activeFilters: Filter;
-  onFilterChange: (filterType: keyof Filter, values: string[]) => void;
-  onClearFilters: () => void;
   dispatch: Dispatch;
 }
 
-const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Props) => {
+const FilterPanel = ({ collection, activeFilters, dispatch }: Props) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   const state = useSelector((state: State) => state)
@@ -282,9 +280,9 @@ const FilterPanel = ({ collection, activeFilters, onFilterChange, dispatch }: Pr
           className="md:hidden"
         >
           <Icon icon="faFilter" className='px-1' />
-          {Object.values(activeFilters).some(arr => arr.length > 0) && (
+          {Object.values(activeFilters).some(arr => Array.isArray(arr) && arr.length > 0) && (
             <span className="ml-1 text-xs bg-blue-500 text-white rounded-full px-2">
-              {Object.values(activeFilters).reduce((acc, arr) => acc + arr.length, 0)}
+              {Object.values(activeFilters).reduce((acc, arr) => acc + (Array.isArray(arr) ? arr.length : 0), 0)}
             </span>
           )}
         </Button>
