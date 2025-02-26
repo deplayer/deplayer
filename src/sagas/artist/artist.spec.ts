@@ -6,10 +6,7 @@ import * as types from "../../constants/ActionTypes";
 import LyricsovhProvider from "../../providers/LyricsovhProvider";
 import { IMedia } from "../../entities/Media";
 import { IArtist } from "../../entities/Artist";
-import { createTestLogger } from "../../test-utils/testLogger";
 import { ILyricsRepository } from "./index";
-
-const logger = createTestLogger("ArtistSagaTest");
 
 // Test implementation of the repository
 class TestLyricsRepository implements ILyricsRepository {

@@ -1,11 +1,20 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { BrowserRouter as Router } from 'react-router-dom'
+import { Provider } from 'react-redux'
+import { configureStore } from '@reduxjs/toolkit'
 import Media from '../../../entities/Media'
 import Artist from '../../../entities/Artist'
 import Album from '../../../entities/Album'
 import SongRow from './index'
 import type { Props } from './index'
+
+// Create a mock store
+const createMockStore = () => configureStore({
+  reducer: {
+    favorites: (state = { favoriteIds: new Set() }) => state,
+  }
+})
 
 const setup = (overrideProps = {}) => {
   const mockOnClick = vi.fn()
@@ -54,7 +63,15 @@ const setup = (overrideProps = {}) => {
     ...overrideProps
   }
 
-  const utils = render(<Router><SongRow {...props} /></Router>)
+  const store = createMockStore()
+
+  const utils = render(
+    <Provider store={store}>
+      <Router>
+        <SongRow {...props} />
+      </Router>
+    </Provider>
+  )
   return { ...utils, props, mockOnClick }
 }
 

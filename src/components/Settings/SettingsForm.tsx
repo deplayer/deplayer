@@ -143,7 +143,13 @@ const SettingsForm = (props: Props) => {
               </div>
 
               <div className='w-full flex justify-end mt-12'>
-                <button type="submit" className="btn btn-primary"><Translate value="buttons.saveSettings" /> </button>
+                <button 
+                  type="submit" 
+                  className="btn btn-primary"
+                  data-testid="settings-submit"
+                >
+                  <Translate value="buttons.saveSettings" /> 
+                </button>
               </div>
             </Form>
           </>

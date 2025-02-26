@@ -55,6 +55,9 @@ const setup = (customProps: any) => {
 describe('SettingsForm', () => {
   it('renders without crashing', () => {
     setup({})
-    expect(screen.getByRole('button', { name: /save settings/i })).toBeTruthy()
+    // Find the submit button using a data-testid attribute
+    const submitButton = screen.getByTestId('settings-submit')
+    expect(submitButton).toBeTruthy()
+    expect(submitButton).toHaveClass('btn', 'btn-primary')
   })
 })

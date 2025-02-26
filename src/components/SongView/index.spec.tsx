@@ -1,10 +1,29 @@
-import { render, screen, act } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { describe, it, expect, beforeAll, vi } from 'vitest'
 import SongView from './index'
 import Media from '../../entities/Media'
-import { defaultState as collectionDefaultState } from '../../reducers/collection'
-import { BrowserRouter } from 'react-router-dom'
 import { mediaParams } from '../../entities/Media.spec'
+import Artist from '../../entities/Artist'
+import Album from '../../entities/Album'
+import { renderWithProviders, defaultTestState, TestState } from '../../utils/test-utils'
+import { State as QueueState } from '../../reducers/queue'
+import { State as CollectionState } from '../../reducers/collection'
+import { State as PlayerState } from '../../reducers/player'
+import { State as LyricsState } from '../../reducers/lyrics'
+import { Dispatch } from 'redux'
+
+interface Props {
+  playerPortal: any
+  location: Location
+  player: PlayerState
+  lyrics: LyricsState
+  collection: CollectionState
+  queue: QueueState
+  songId: string
+  dispatch: Dispatch
+  loading: boolean
+  className?: string | null
+}
 
 // Mock IntersectionObserver
 beforeAll(() => {
@@ -17,76 +36,129 @@ beforeAll(() => {
   window.IntersectionObserver = mockIntersectionObserver
 })
 
-const setup = (customProps: any) => {
-  const defaultProps = {
-    song: new Media({
-      ...mediaParams,
-      stream: {
-        subsonic: {
-          service: 'subsonic',
-          uris: [{ uri: 'http://example.com/stream' }]
-        }
-      }
-    }),
-    match: {
-      params: {}
+const createTestSong = () => {
+  const mockArtist = new Artist({
+    id: 'artist-1',
+    name: 'Pink Floyd'
+  })
+
+  const mockAlbum = new Album({
+    id: 'album-1',
+    name: 'The Wall',
+    artist: mockArtist
+  })
+
+  return new Media({
+    ...mediaParams,
+    id: 'test-song-1',
+    title: 'Comfortably Numb',
+    artist: mockArtist,
+    album: mockAlbum,
+    artistName: "Pink Floyd",
+    albumName: "The Wall",
+    type: 'audio',
+    duration: 383,
+    cover: {
+      thumbnailUrl: 'http://example.com/thumbnail.jpg',
+      fullUrl: 'http://example.com/full.jpg'
     },
+    stream: {
+      subsonic: {
+        service: 'subsonic',
+        uris: [{ uri: 'http://example.com/stream' }]
+      }
+    },
+    genres: ['Rock', 'Progressive Rock'],
+    playCount: 0
+  })
+}
+
+interface TestSetup {
+  props: Props
+  song: Media
+}
+
+const createTestProps = (customProps: Partial<Props> = {}): TestSetup => {
+  const song = createTestSong()
+
+  const defaultProps: Props = {
+    songId: song.id,
+    dispatch: vi.fn(),
+    playerPortal: document.createElement('div'),
+    loading: false,
+    className: '',
     collection: {
-      ...collectionDefaultState,
+      ...defaultTestState.collection!,
       rows: {
-        [mediaParams.id as string]: {
-          ...mediaParams,
-          stream: {
-            subsonic: {
-              service: 'subsonic',
-              uris: [{ uri: 'http://example.com/stream' }]
-            }
-          }
-        }
-      }
-    },
-    settings: {
-      settings: {
-        app: {
-          ipfs: {}
-        }
+        [song.id]: song
+      },
+      albums: {
+        [song.album.id]: song.album
+      },
+      albumsByArtist: {
+        [song.artist.id]: [song.album.id]
+      },
+      songsByGenre: {
+        'Rock': [song.id],
+        'Progressive Rock': [song.id]
+      },
+      songsByAlbum: {
+        [song.album.id]: [song.id]
       }
     },
     queue: {
-      currentPlaying: null,
-      trackIds: []
-    }
+      ...defaultTestState.queue!,
+      trackIds: [],
+      currentPlaying: null
+    },
+    player: {
+      ...defaultTestState.player!,
+      playing: false,
+      currentTime: 0,
+      duration: song.duration
+    },
+    lyrics: {
+      ...defaultTestState.lyrics!,
+      lyrics: undefined,
+      error: undefined
+    },
+    location: window.location
   }
 
-  return { ...defaultProps, ...customProps }
+  return { 
+    props: { ...defaultProps, ...customProps },
+    song
+  }
 }
+
+const createTestState = (setup: TestSetup): Partial<TestState> => ({
+  ...defaultTestState,
+  collection: setup.props.collection,
+  queue: setup.props.queue,
+  player: setup.props.player,
+  lyrics: setup.props.lyrics
+})
 
 describe('SongView', () => {
   it('spinner if app loading', async () => {
-    const props = setup({ loading: true })
-
-    await act(async () => {
-      render(<BrowserRouter><SongView {...props} /></BrowserRouter>)
-    })
+    const { props, song } = createTestProps({ loading: true })
+    const state = createTestState({ props, song })
+    renderWithProviders(
+      <SongView {...props} />, 
+      { initialState: state }
+    )
     expect(screen.getByTestId('spinner')).toBeTruthy()
   })
 
   it('render song without crash', () => {
-    const song = new Media({ ...mediaParams, artistName: "Pink Floyd" })
-    const rows = { [song.id]: song }
-    const collection = { rows: rows, songsByGenre: [] }
-    const props = setup({
-      song,
-      songId: song.id,
-      collection,
-      match: {
-        params: {
-          id: song.id
-        }
-      }
-    })
+    const { props, song } = createTestProps()
+    const state = createTestState({ props, song })
+    renderWithProviders(
+      <SongView {...props} />, 
+      { initialState: state }
+    )
 
-    render(<SongView {...props} />, { wrapper: BrowserRouter })
     expect(screen.getByTestId('song-view')).toBeTruthy()
   })
 })
+
