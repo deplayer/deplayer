@@ -487,6 +487,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
         transparent
         onClick={() => setOpen(true)}
         className="btn btn-ghost btn-sm"
+        data-testid="search-button"
       >
         <Icon icon="faSearch" className="mr-2" />
         <span>Search...</span>
@@ -521,15 +522,15 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
 
           <div className="max-h-[60vh] overflow-y-auto w-full" ref={resultsContainerRef}>
             {loading && search.length > 1 && (
-              <div className="p-6 text-center text-lg">{I18n.t('menu.searching')}</div>
+              <div className="p-6 text-center text-lg" data-testid="search-loading">{I18n.t('menu.searching')}</div>
             )}
             
             {!loading && allItems.length === 0 && search.length > 1 && (
-              <div className="p-6 text-center text-lg">{I18n.t('menu.noResults')}</div>
+              <div className="p-6 text-center text-lg" data-testid="search-no-results">{I18n.t('menu.noResults')}</div>
             )}
 
             {groupedItems.map((group, groupIndex) => (
-              <div key={group.title} className="mb-4">
+              <div key={group.title} className="mb-4" data-testid={`search-group-${group.title.split('.').pop()}`}>
                 <div className="px-4 py-2 text-sm font-semibold text-base-content/70 flex items-center">
                   <Icon icon={group.icon} className="mr-2" />
                   <Translate value={group.title} />

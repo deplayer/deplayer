@@ -83,7 +83,6 @@ async function setupSync(client: PGlite | PGliteWorker, settings: SyncSettings) 
     // Define tables in order of their dependencies
     const tables = [
       // Core tables first
-      { name: "settings", primaryKey: ["id"] },
       { name: "room", primaryKey: ["id"] }, // room needs to be before peer
 
       // Tables with foreign keys
@@ -94,7 +93,7 @@ async function setupSync(client: PGlite | PGliteWorker, settings: SyncSettings) 
       { name: "smart_playlist", primaryKey: ["id"] },
       { name: "playlist", primaryKey: ["id"] },
       { name: "media_lyrics", primaryKey: ["id"] },
-      { name: "favorites", primaryKey: ["id"] },
+      // { name: "favorites", primaryKey: ["id"] },
     ];
 
     logger.debug("Preparing shapes for sync", tables);
@@ -131,6 +130,7 @@ async function setupSync(client: PGlite | PGliteWorker, settings: SyncSettings) 
 
         // Set up subscription with error handling
         shape.subscribe((data) => {
+          logger.debug("shape.subscribe", data);
           try {
             if (!data) {
               logger.warn(`No rows found for ${table.name}`);

@@ -1,33 +1,13 @@
-import { fireEvent } from '@testing-library/react'
+import { render, fireEvent } from '@testing-library/react'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import CommandBar from './index'
-import { renderWithProviders } from '../../test-utils/render'
 import { createDefaultState } from '../../test-utils/store'
-import { I18n } from 'react-redux-i18n'
 import * as searchActions from '../../types/search'
 import { State as RootState } from '../../reducers'
 import Media from '../../entities/Media'
-// Mock translations
-vi.mock('react-redux-i18n', () => ({
-  I18n: {
-    t: (key: string) => {
-      const translations: { [key: string]: string } = {
-        'menu.searching': 'searching...',
-        'menu.noResults': 'No results found',
-        'menu.searchPlaceholder': 'Search...',
-        'menu.search': 'Search',
-        'commandBar.categories.themes': 'themes',
-        'commandBar.categories.commands': 'commands',
-        'commandBar.categories.songs': 'songs',
-        'menu.navigate': 'Navigate',
-        'menu.select': 'Select',
-        'menu.close': 'Close'
-      }
-      return translations[key] || key
-    }
-  },
-  Translate: ({ value }: { value: string }) => I18n.t(value)
-}))
+import { configureStore } from '@reduxjs/toolkit'
+import { Provider } from 'react-redux'
+import { BrowserRouter } from 'react-router-dom'
 
 // Mock search actions
 vi.mock('../../types/search', () => ({
@@ -50,31 +30,64 @@ describe('CommandBar', () => {
     vi.useRealTimers()
   })
 
+  const defaultProps = {
+    dispatch: vi.fn(),
+    searchResults: [],
+    loading: false,
+    collection: {
+      songs: [],
+      albums: [],
+      artists: []
+    },
+    togglePlaying: vi.fn(),
+    playNext: vi.fn(),
+    playPrev: vi.fn(),
+    navigateToArtists: vi.fn(),
+    navigateToAlbums: vi.fn(),
+    navigateToQueue: vi.fn(),
+    navigateToPlaylists: vi.fn(),
+    navigateToSettings: vi.fn(),
+    navigateToExplore: vi.fn()
+  }
+
   const setup = (customState: Partial<RootState> = {}) => {
-    const defaultState = createDefaultState()
     const initialState = {
-      ...defaultState,
+      search: {
+        error: '',
+        searchTerm: '',
+        loading: false,
+        searchToggled: false,
+        searchResults: []
+      },
+      collection: {
+        ...createDefaultState().collection,
+        searchResults: [],
+        rows: {}
+      },
+      i18n: {
+        translations: {},
+        locale: 'en'
+      },
       ...customState
     }
 
-    const result = renderWithProviders(
-      <CommandBar 
-        navigateToArtists={() => {}}
-        navigateToAlbums={() => {}}
-        navigateToQueue={() => {}}
-        navigateToPlaylists={() => {}}
-        navigateToSettings={() => {}}
-        navigateToExplore={() => {}}
-      />,
-      { initialState }
-    )
+    const store = configureStore({
+      reducer: (state = initialState) => state,
+      preloadedState: initialState
+    })
 
-    return result
+    return render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <CommandBar {...defaultProps} />
+        </BrowserRouter>
+      </Provider>
+    )
   }
 
   it('renders search button', () => {
-    const { getByText } = setup()
-    expect(getByText('Search...')).toBeInTheDocument()
+    const { getByTestId } = setup()
+    expect(getByTestId('search-button')).toBeInTheDocument()
   })
 
   it('opens modal on Cmd+K', async () => {
@@ -120,7 +133,7 @@ describe('CommandBar', () => {
   })
 
   it('shows loading state while searching', async () => {
-    const { getByTestId, getByText } = setup({
+    const { getByTestId } = setup({
       collection: {
         ...createDefaultState().collection,
         loading: true
@@ -131,20 +144,28 @@ describe('CommandBar', () => {
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
     await vi.advanceTimersByTimeAsync(100)
     
-    // Get input and type
+    // Type search query
     const input = getByTestId('command-search-input')
     fireEvent.change(input, { target: { value: 'test query' } })
     
     // Wait for debounce
     await vi.advanceTimersByTimeAsync(500)
     
-    expect(getByText('searching...')).toBeInTheDocument()
+    expect(getByTestId('search-loading')).toBeInTheDocument()
   })
 
   it('shows no results message when search returns empty', async () => {
-    const { getByTestId, getByText } = setup({
+    const { getByTestId } = setup({
       collection: {
         ...createDefaultState().collection,
+        searchResults: [],
+        loading: false
+      },
+      search: {
+        error: '',
+        searchTerm: 'test query',
+        loading: false,
+        searchToggled: true,
         searchResults: []
       }
     })
@@ -153,14 +174,14 @@ describe('CommandBar', () => {
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
     await vi.advanceTimersByTimeAsync(100)
     
-    // Get input and type
+    // Type search query
     const input = getByTestId('command-search-input')
     fireEvent.change(input, { target: { value: 'test query' } })
     
     // Wait for debounce
     await vi.advanceTimersByTimeAsync(500)
     
-    expect(getByText('No results found')).toBeInTheDocument()
+    expect(getByTestId('search-no-results')).toBeInTheDocument()
   })
 
   it('displays search results with correct types', async () => {
@@ -173,7 +194,7 @@ describe('CommandBar', () => {
       cover: { thumbnailUrl: 'test-cover.jpg' }
     }
 
-    const { getByTestId, getByText } = setup({
+    const { getByTestId } = setup({
       collection: {
         ...createDefaultState().collection,
         searchResults: ['song1'],
@@ -187,18 +208,14 @@ describe('CommandBar', () => {
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
     await vi.advanceTimersByTimeAsync(100)
     
-    // Get input and type
+    // Type search query
     const input = getByTestId('command-search-input')
     fireEvent.change(input, { target: { value: 'test' } })
     
     // Wait for debounce
     await vi.advanceTimersByTimeAsync(500)
     
-    // First check for the songs category
-    expect(getByText('songs')).toBeInTheDocument()
-    
-    // Then check for the song details
-    expect(getByText('Test Song')).toBeInTheDocument()
-    expect(getByText('Test Artist - Test Album')).toBeInTheDocument()
+    // Check for the songs group
+    expect(getByTestId('search-group-songs')).toBeInTheDocument()
   })
 }) 

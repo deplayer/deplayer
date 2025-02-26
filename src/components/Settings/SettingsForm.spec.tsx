@@ -1,7 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { Provider } from 'react-redux'
+import configureStore from 'redux-mock-store'
 
 import SettingsForm from './SettingsForm'
+
+const mockStore = configureStore([])
 
 const setup = (customProps: any) => {
   const schema = {
@@ -18,20 +22,39 @@ const setup = (customProps: any) => {
     settings: {
       settingsForm: schema,
       settings: {
-        providers: {}
+        providers: {},
+        app: {
+          language: {
+            useSystemLanguage: true,
+            code: 'en'
+          }
+        }
       },
     },
     onSubmit: () => Promise.resolve()
   }
 
   const props = { ...defaultProps, ...customProps }
+  const store = mockStore({
+    i18n: {
+      translations: {
+        buttons: {
+          saveSettings: 'Save Settings'
+        }
+      }
+    }
+  })
 
-  render(<SettingsForm {...props} schema={schema} />)
+  render(
+    <Provider store={store}>
+      <SettingsForm {...props} schema={schema} dispatch={() => {}} />
+    </Provider>
+  )
 }
 
 describe('SettingsForm', () => {
   it('renders without crashing', () => {
     setup({})
-    expect(screen.getByRole('button')).toBeTruthy()
+    expect(screen.getByRole('button', { name: /save settings/i })).toBeTruthy()
   })
 })

@@ -15,7 +15,8 @@ type Props = {
   fullWidth?: boolean,
   type?: 'submit' | 'button',
   roundedFull?: boolean,
-  className?: string
+  className?: string,
+  'data-testid'?: string
 }
 
 const Button = (props: Props) => {
@@ -49,6 +50,7 @@ const Button = (props: Props) => {
       className={classNames}
       title={props.title}
       onClick={props.onClick}
+      data-testid={props['data-testid']}
     >
       {props.children}
     </button>

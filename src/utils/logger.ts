@@ -1,14 +1,3 @@
-/**
-import logger from 'bragi-browser'
-
-if (process.env.NODE_ENV !== 'development') {
-  logger.transports.empty()
-}
-
-logger.transports.get('console').property('showMeta', false)
-logger.transports.get('console').property('showColors', false)
-*/
-
 type LogLevel = "debug" | "info" | "warn" | "error";
 
 interface LoggerOptions {
@@ -17,22 +6,27 @@ interface LoggerOptions {
   level?: LogLevel;
 }
 
+const LOG_LEVELS: Record<LogLevel, number> = {
+  debug: 0,
+  info: 1,
+  warn: 2,
+  error: 3
+};
+
 class Logger {
   private namespace: string;
   private enabled: boolean;
   private level: LogLevel;
 
-  constructor({ namespace, enabled = true, level = "info" }: LoggerOptions) {
+  constructor({ namespace, enabled = true, level }: LoggerOptions) {
     this.namespace = namespace;
     this.enabled = enabled;
-    this.level = level;
+    this.level = level || (process.env.NODE_ENV === 'production' ? 'error' : 'debug');
   }
 
   private shouldLog(level: LogLevel): boolean {
     if (!this.enabled) return false;
-
-    const levels: LogLevel[] = ["debug", "info", "warn", "error"];
-    return levels.indexOf(level) >= levels.indexOf(this.level);
+    return LOG_LEVELS[level] >= LOG_LEVELS[this.level];
   }
 
   private formatMessage(
@@ -78,7 +72,7 @@ export const createLogger = (options: LoggerOptions): Logger => {
 export const createTestLogger = (namespace: string): Logger => {
   return new Logger({
     namespace,
-    enabled: process.env.NODE_ENV === "test",
+    enabled: true,
     level: "debug",
   });
 };
