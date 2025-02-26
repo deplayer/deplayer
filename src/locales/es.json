@@ -156,7 +156,9 @@
   "sidebar": {
     "providers": "Proveedores",
     "openSource": "es código abierto!",
-    "showCode": "Muéstrame el código"
+    "showCode": "Muéstrame el código",
+    "buyMeACoffee": "Invítame a un café",
+    "supportProject": "Apoya este proyecto"
   },
   "commandBar": {
     "placeholder": "Escribe una orden o busca...",

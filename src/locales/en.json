@@ -161,7 +161,9 @@
   "sidebar": {
     "providers": "Providers",
     "openSource": "is open source!",
-    "showCode": "Show me the code"
+    "showCode": "Show me the code",
+    "buyMeACoffee": "Buy me a coffee",
+    "supportProject": "Support this project"
   },
   "commandBar": {
     "placeholder": "Type a command or search...",

@@ -1,7 +1,7 @@
 import { Dispatch } from 'redux'
 import React from 'react'
 import { useNavigate } from 'react-router'
-import { Translate } from 'react-redux-i18n'
+import { Translate, I18n } from 'react-redux-i18n'
 
 import CommandBar from '../CommandBar'
 import CollectionMenuItem from './CollectionMenuItem'
@@ -154,10 +154,11 @@ const SidebarContents = (props: ContentProps) => {
             href="https://buymeacoffee.com/gtrias"
             rel="noreferrer"
             target="_blank"
+            title={I18n.t('sidebar.supportProject')}
             className="btn btn-sm btn-ghost gap-2 hover:bg-yellow-500/10"
           >
             <Icon icon='faCoffee' className="text-yellow-500" />
-            <span>Buy me a coffee</span>
+            <span><Translate value="sidebar.buyMeACoffee" /></span>
           </a>
         </div>
       </section>
