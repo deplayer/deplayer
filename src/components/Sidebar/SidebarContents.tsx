@@ -149,6 +149,17 @@ const SidebarContents = (props: ContentProps) => {
         </a>
         <Icon icon='faGitlab' className='mx-2' />
         <a href="https://path-to-localfirst.deplayer.app" target="_blank" className="link link-primary"><Translate value="labels.storyBehind" /></a> 
+        <div className="mt-4">
+          <a
+            href="https://buymeacoffee.com/gtrias"
+            rel="noreferrer"
+            target="_blank"
+            className="btn btn-sm btn-ghost gap-2 hover:bg-yellow-500/10"
+          >
+            <Icon icon='faCoffee' className="text-yellow-500" />
+            <span>Buy me a coffee</span>
+          </a>
+        </div>
       </section>
     </div>
   )

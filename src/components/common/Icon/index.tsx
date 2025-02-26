@@ -61,7 +61,8 @@ import {
   faPalette,
   faList,
   faGrip,
-  faHeart
+  faHeart,
+  faCoffee
 } from "@fortawesome/free-solid-svg-icons"
 import { faGitlab, faDeezer } from "@fortawesome/free-brands-svg-icons"
 
@@ -129,7 +130,8 @@ const icons = {
   faShareAlt,
   faList,
   faGrip,
-  faHeart
+  faHeart,
+  faCoffee
 }
 
 export type IconType = keyof typeof icons
