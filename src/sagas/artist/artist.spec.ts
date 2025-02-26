@@ -1,20 +1,40 @@
 import { expectSaga } from "redux-saga-test-plan";
 import { call } from "redux-saga/effects";
-import { describe, it } from "vitest";
+import { describe, it, beforeEach } from "vitest";
 import { fetchSongMetadata } from "./index";
 import * as types from "../../constants/ActionTypes";
 import LyricsovhProvider from "../../providers/LyricsovhProvider";
-import LyricsService from "../../services/LyricsService";
-import { getAdapter } from "../../services/database";
 import { IMedia } from "../../entities/Media";
 import { IArtist } from "../../entities/Artist";
 import { createTestLogger } from "../../test-utils/testLogger";
+import { ILyricsRepository } from "./index";
 
 const logger = createTestLogger("ArtistSagaTest");
 
+// Test implementation of the repository
+class TestLyricsRepository implements ILyricsRepository {
+  private storedLyrics: { [key: string]: string } = {};
+
+  async getLyrics(songId: string) {
+    const lyrics = this.storedLyrics[songId];
+    return lyrics ? { lyrics } : null;
+  }
+
+  async saveLyrics(songId: string, lyrics: string) {
+    this.storedLyrics[songId] = lyrics;
+  }
+
+  async ensureSongExists(_song: any) {
+    // No-op for testing
+  }
+
+  // Helper method for testing
+  setStoredLyrics(songId: string, lyrics: string) {
+    this.storedLyrics[songId] = lyrics;
+  }
+}
+
 describe("artist saga", () => {
-  const adapter = getAdapter();
-  const lyricsService = new LyricsService(adapter);
   const mockArtist: IArtist = {
     name: "Test Artist",
     id: "artist-123",
@@ -44,55 +64,41 @@ describe("artist saga", () => {
   };
 
   describe("fetchSongMetadata", () => {
+    let lyricsRepo: TestLyricsRepository;
+
+    beforeEach(() => {
+      lyricsRepo = new TestLyricsRepository();
+    });
+
     it("should fetch lyrics from local storage if available", async () => {
-      const storedLyrics = { lyrics: "Stored lyrics" };
-      logger.info("Database response:", storedLyrics);
-      logger.info("Found lyrics in database:", storedLyrics);
+      lyricsRepo.setStoredLyrics("123", "Stored lyrics");
 
       return expectSaga(fetchSongMetadata, {
         type: types.FETCH_LYRICS,
         songId: "123",
-      })
+      }, lyricsRepo)
         .withState(mockState)
-        .provide([[call([lyricsService, "get"], "123"), storedLyrics]])
-        .put({ type: types.LYRICS_FOUND, data: storedLyrics.lyrics })
+        .call([lyricsRepo, "getLyrics"], "123")
+        .put({ type: types.LYRICS_FOUND, data: "Stored lyrics" })
         .run();
     });
 
     it("should handle empty database response correctly", async () => {
-      const song = {
-        id: "123",
-        title: "Test Song",
-        artist: { name: "Test Artist", id: "artist-123" },
-        album: {
-          name: "Test Album",
-          id: "album-123",
-          artist: { name: "Test Artist", id: "artist-123" },
-        },
-        artistName: "Test Artist",
-        type: "audio",
-        stream: {},
-        genres: [],
-        albumName: "Test Album",
-      };
-
-      logger.info("Database response:", []);
-      logger.info("No lyrics in database, fetching from API for song:", song);
-      logger.info("API Response:", { lyrics: "API lyrics" });
-
       const mbProvider = new LyricsovhProvider();
       const apiResponse = { lyrics: "API lyrics" };
 
       return expectSaga(fetchSongMetadata, {
         type: types.FETCH_LYRICS,
         songId: "123",
-      })
+      }, lyricsRepo)
         .withState(mockState)
+        .call([lyricsRepo, "getLyrics"], "123")
+        .call([mbProvider, "searchLyrics"], mockSong)
+        .call([lyricsRepo, "saveLyrics"], "123", apiResponse.lyrics)
+        .put({ type: types.LYRICS_FOUND, data: apiResponse.lyrics })
         .provide([
-          [call([lyricsService, "get"], "123"), []],
           [call([mbProvider, "searchLyrics"], mockSong), apiResponse],
         ])
-        .put({ type: types.LYRICS_FOUND, data: apiResponse.lyrics })
         .run();
     });
 
@@ -103,13 +109,15 @@ describe("artist saga", () => {
       return expectSaga(fetchSongMetadata, {
         type: types.FETCH_LYRICS,
         songId: "123",
-      })
+      }, lyricsRepo)
         .withState(mockState)
+        .call([lyricsRepo, "getLyrics"], "123")
+        .call([mbProvider, "searchLyrics"], mockSong)
+        .call([lyricsRepo, "saveLyrics"], "123", apiResponse.lyrics)
+        .put({ type: types.LYRICS_FOUND, data: apiResponse.lyrics })
         .provide([
-          [call([lyricsService, "get"], "123"), null],
           [call([mbProvider, "searchLyrics"], mockSong), apiResponse],
         ])
-        .put({ type: types.LYRICS_FOUND, data: apiResponse.lyrics })
         .run();
     });
 
@@ -120,14 +128,15 @@ describe("artist saga", () => {
       return expectSaga(fetchSongMetadata, {
         type: types.FETCH_LYRICS,
         songId: "123",
-      })
+      }, lyricsRepo)
         .withState(mockState)
-        .provide([
-          [call([lyricsService, "get"], "123"), null],
-          [call([mbProvider, "searchLyrics"], mockSong), apiResponse],
-          [call([lyricsService, "save"], "123", apiResponse.lyrics), null],
-        ])
+        .call([lyricsRepo, "getLyrics"], "123")
+        .call([mbProvider, "searchLyrics"], mockSong)
+        .call([lyricsRepo, "saveLyrics"], "123", apiResponse.lyrics)
         .put({ type: types.LYRICS_FOUND, data: apiResponse.lyrics })
+        .provide([
+          [call([mbProvider, "searchLyrics"], mockSong), apiResponse],
+        ])
         .run();
     });
 
@@ -141,7 +150,7 @@ describe("artist saga", () => {
       return expectSaga(fetchSongMetadata, {
         type: types.FETCH_LYRICS,
         songId: "123",
-      })
+      }, lyricsRepo)
         .withState(emptyState)
         .put({ type: types.NO_LYRICS_FOUND, error: "Song not found" })
         .run();
@@ -154,13 +163,14 @@ describe("artist saga", () => {
       return expectSaga(fetchSongMetadata, {
         type: types.FETCH_LYRICS,
         songId: "123",
-      })
+      }, lyricsRepo)
         .withState(mockState)
+        .call([lyricsRepo, "getLyrics"], "123")
+        .call([mbProvider, "searchLyrics"], mockSong)
+        .put({ type: types.NO_LYRICS_FOUND, error: error.message })
         .provide([
-          [call([lyricsService, "get"], "123"), null],
           [call([mbProvider, "searchLyrics"], mockSong), Promise.reject(error)],
         ])
-        .put({ type: types.NO_LYRICS_FOUND, error: error.message })
         .run();
     });
   });

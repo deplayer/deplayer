@@ -10,12 +10,78 @@ import { media } from '../../schema'
 import { eq } from 'drizzle-orm'
 import { createLogger } from '../../utils/logger'
 
-const artistService = new ArtistService()
-const adapter = getAdapter()
-const lyricsService = new LyricsService(adapter)
 const logger = createLogger({ namespace: 'artist-saga' })
 
-export function* loadMoreArtistSongsFromProvider(action: any): any {
+// Service interfaces for better testability
+export interface ILyricsRepository {
+  getLyrics(songId: string): Promise<{ lyrics: string } | null>
+  saveLyrics(songId: string, lyrics: string): Promise<void>
+  ensureSongExists(song: any): Promise<void>
+}
+
+export interface IArtistRepository {
+  getMetadata(artistName: string): Promise<any>
+  saveMetadata(artistName: string, metadata: any): Promise<void>
+}
+
+// Default implementations (can be imported from separate files)
+export class DefaultLyricsRepository implements ILyricsRepository {
+  constructor(private adapter: any, private lyricsService: any) {}
+
+  async getLyrics(songId: string) {
+    return this.lyricsService.get(songId)
+  }
+
+  async saveLyrics(songId: string, lyrics: string) {
+    return this.lyricsService.save(songId, lyrics)
+  }
+
+  async ensureSongExists(song: any) {
+    const db = await this.adapter.getDb()
+    const existingSong = await db.select().from(media).where(eq(media.id, song.id))
+
+    if (!existingSong || existingSong.length === 0) {
+      logger.debug('Song not in database, saving it first...')
+      await db.insert(media).values({
+        id: song.id,
+        title: song.title,
+        artist: song.artist,
+        type: song.type,
+        album: song.album,
+        cover: song.cover || null,
+        stream: song.stream,
+        duration: song.duration,
+        playCount: 0,
+        genres: song.genres || [],
+        track: song.track || null,
+        discNumber: song.discNumber || null,
+        year: song.year || null,
+        searchableText: `${song.title} ${song.artist.name} ${song.album.name}`,
+      })
+    }
+  }
+}
+
+export class DefaultArtistRepository implements IArtistRepository {
+  constructor(private artistService: any) {}
+
+  async getMetadata(artistName: string) {
+    return this.artistService.get(artistName)
+  }
+
+  async saveMetadata(artistName: string, metadata: any) {
+    return this.artistService.save(artistName, metadata)
+  }
+}
+
+// Create default instances
+const artistService = new ArtistService()
+const defaultArtistRepo = new DefaultArtistRepository(artistService)
+
+export function* loadMoreArtistSongsFromProvider(
+  action: any,
+  artistRepo: IArtistRepository = defaultArtistRepo
+): any {
   // Clear existing artist metadata first
   yield put({ type: types.CLEAR_ARTIST_METADATA })
 
@@ -28,7 +94,7 @@ export function* loadMoreArtistSongsFromProvider(action: any): any {
 
   try {
     // Try to get metadata from database first
-    const storedMetadata = yield call([artistService, 'get'], artistName)
+    const storedMetadata = yield call([artistRepo, 'getMetadata'], artistName)
     
     if (storedMetadata) {
       yield put({ type: types.RECEIVE_ARTIST_METADATA, data: storedMetadata })
@@ -42,7 +108,7 @@ export function* loadMoreArtistSongsFromProvider(action: any): any {
       
       if (artistMetadata) {
         // Save metadata to database
-        yield call([artistService, 'save'], artistName, artistMetadata)
+        yield call([artistRepo, 'saveMetadata'], artistName, artistMetadata)
         yield put({ type: types.RECEIVE_ARTIST_METADATA, data: artistMetadata })
       }
     }
@@ -51,7 +117,10 @@ export function* loadMoreArtistSongsFromProvider(action: any): any {
   }
 }
 
-export function* fetchSongMetadata(action: any): any {
+export function* fetchSongMetadata(
+  action: any,
+  lyricsRepo: ILyricsRepository = new DefaultLyricsRepository(getAdapter(), new LyricsService(getAdapter()))
+): any {
   const song = yield select(getSongById, action.songId)
   if (!song) {
     yield put({ type: types.NO_LYRICS_FOUND, error: 'Song not found' })
@@ -60,35 +129,10 @@ export function* fetchSongMetadata(action: any): any {
 
   try {
     // First ensure the song exists in the database
-    const db = yield call(adapter.getDb)
-    const existingSong = yield call(async () => {
-      return await db.select().from(media).where(eq(media.id, song.id))
-    })
-
-    if (!existingSong || existingSong.length === 0) {
-      logger.debug('Song not in database, saving it first...')
-      yield call(async () => {
-        await db.insert(media).values({
-          id: song.id,
-          title: song.title,
-          artist: song.artist,
-          type: song.type,
-          album: song.album,
-          cover: song.cover || null,
-          stream: song.stream,
-          duration: song.duration,
-          playCount: 0,
-          genres: song.genres || [],
-          track: song.track || null,
-          discNumber: song.discNumber || null,
-          year: song.year || null,
-          searchableText: `${song.title} ${song.artist.name} ${song.album.name}`,
-        })
-      })
-    }
+    yield call([lyricsRepo, 'ensureSongExists'], song)
 
     // Now try to get lyrics from database
-    const storedLyrics = yield call([lyricsService, 'get'], song.id)
+    const storedLyrics = yield call([lyricsRepo, 'getLyrics'], song.id)
     logger.debug('Database response:', storedLyrics)
 
     // Check if we actually have lyrics in the database
@@ -110,7 +154,7 @@ export function* fetchSongMetadata(action: any): any {
       }
 
       // Save to database
-      yield call([lyricsService, 'save'], song.id, response.lyrics)
+      yield call([lyricsRepo, 'saveLyrics'], song.id, response.lyrics)
       yield put({ type: types.LYRICS_FOUND, data: response.lyrics })
     } catch (apiError: any) {
       logger.error('API Error:', apiError)
