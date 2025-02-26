@@ -2,7 +2,6 @@ import { Dispatch } from 'redux'
 import React from 'react'
 import { useNavigate } from 'react-router'
 import { Translate } from 'react-redux-i18n'
-import { useSelector } from 'react-redux'
 
 import CommandBar from '../CommandBar'
 import CollectionMenuItem from './CollectionMenuItem'
@@ -79,8 +78,6 @@ const DeplayerLogo = () => {
 const SidebarContents = (props: ContentProps) => {
   const location = useLocation()
   const navigate = useNavigate()
-  const favorites = useSelector((state: any) => state.favorites)
-  const favoritesCount = favorites.favoriteIds.size
 
   return (
     <div className={`flex flex-col h-full bg-base-100 ${props.className || ''}`} onClick={() => props.onSetSidebarOpen(true)}>

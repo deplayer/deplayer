@@ -1,7 +1,6 @@
 import { AutoSizer, List } from 'react-virtualized'
 import { useLocation } from 'react-router-dom'
 import * as React from 'react'
-import { Filter } from '../../reducers/collection'
 import classNames from 'classnames'
 
 import AddNewMediaButton from '../Buttons/AddNewMediaButton'
@@ -40,8 +39,6 @@ const Toolbar = ({
   actions,
   dispatch,
   collection,
-  handleFilterChange,
-  handleClearFilters
 }: { 
   isToolbarVisible: boolean, 
   isToolbarHidden: boolean, 
@@ -50,8 +47,6 @@ const Toolbar = ({
   actions: React.ReactNode,
   dispatch: Dispatch,
   collection: CollectionState,
-  handleFilterChange: (filterType: keyof Filter, values: string[]) => void,
-  handleClearFilters: () => void
 }) => {
   const location = useLocation()
   
@@ -73,8 +68,6 @@ const Toolbar = ({
                 dispatch={dispatch}
                 collection={collection}
                 activeFilters={collection.activeFilters}
-                onFilterChange={handleFilterChange}
-                onClearFilters={handleClearFilters}
               />
             </div>
           )}
@@ -168,17 +161,6 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
   // Track the position of current playing to jump there
   const currentIndex = !disableCurrent ? tableIds.indexOf(queue.currentPlaying || '') : 0
 
-  const handleClearFilters = () => {
-    dispatch({ type: types.CLEAR_COLLECTION_FILTERS })
-  }
-  const handleFilterChange = (filterType: keyof Filter, values: string[]) => {
-    dispatch({
-      type: types.SET_COLLECTION_FILTER,
-      filterType,
-      values
-    })
-  }
-
   const getActions = () => {
     if (location.pathname.match(/\/song\/.*/)) {
       return <ToggleMiniQueueButton />
@@ -254,8 +236,6 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
         actions={actions}
         dispatch={dispatch}
         collection={collection}
-        handleFilterChange={handleFilterChange}
-        handleClearFilters={handleClearFilters}
       />
       <AutoSizer className='music-table'>
         {({ height, width }: { height: number, width: number }) => (

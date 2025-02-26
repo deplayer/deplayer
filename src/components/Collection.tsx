@@ -10,13 +10,18 @@ import EmptyState from './common/EmptyState/index'
 import TryDemoButton from './Buttons/TryDemoButton'
 import Icon from './common/Icon'
 import { State as SettingsState } from '../reducers/settings'
+import { State as AppState } from '../reducers/app'
+import { State as PlaylistState } from '../reducers/playlist'
+import { State as QueueState } from '../reducers/queue'
+import { State as PlayerState } from '../reducers/player'
+import { State as CollectionState } from '../reducers/collection'
 
 type Props = {
-  app: any,
-  playlist: any,
-  queue: any,
-  player: any,
-  collection: any,
+  app: AppState,
+  playlist: PlaylistState,
+  queue: QueueState,
+  player: PlayerState,
+  collection: CollectionState,
   settings?: SettingsState,
   filteredSongs: Array<string>,
   dispatch: Dispatch
