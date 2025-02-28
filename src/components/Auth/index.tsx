@@ -7,8 +7,12 @@ import classNames from 'classnames'
 import Button from '../common/Button'
 import Modal from '../common/Modal'
 import { Dispatch } from 'redux'
-import { storeSyncSettings, getSyncFormSchema } from '../../services/settings/syncSettings'
-import { reconnect } from '../../services/database/PgliteDatabase'
+import { 
+  storeSyncSettings, 
+  getSyncFormSchema, 
+  storeAuthToken 
+} from '../../services/settings/syncSettings'
+import { updateSyncSettings } from '../../services/database/PgliteDatabase'
 
 const REGISTER_TIMEOUT = 600
 
@@ -131,14 +135,26 @@ export default function Auth({ onClose, dispatch, isOpen }: Props) {
       // Register with passkey
       await startRegister(values.username, values.displayName, dispatch)
 
-      // Store sync settings if provided
-      if (values.serverUrl) {
-        await storeSyncSettings({
-          serverUrl: values.serverUrl,
-          enabled: true
-        })
-        await reconnect()
-        toast.success('Sync settings saved')
+      // Store sync settings
+      if (values.serverUrl && values.enabled !== undefined) {
+        const newSettings = {
+          enabled: values.enabled,
+          serverUrl: values.serverUrl
+        }
+        
+        storeSyncSettings(newSettings)
+        
+        // Get the authentication token (in a real app, this would be returned from the auth server)
+        // For now we simulate a token
+        const authToken = `token_${values.username}_${Date.now()}`
+        
+        // Store the auth token
+        storeAuthToken(authToken)
+        
+        // Update the sync settings and start syncing
+        await updateSyncSettings(newSettings, authToken)
+        
+        toast.success(<Translate value="messages.syncSettingsSaved" />)
       }
 
       onClose()

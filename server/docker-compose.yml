@@ -30,18 +30,27 @@ services:
       - postgres
 
   gatekeeper:
-    image: node:18-alpine
-    working_dir: /app
-    volumes:
-      - ./gatekeeper:/app
+    build:
+      context: ./gatekeeper
+      dockerfile: Dockerfile
     environment:
+      NODE_ENV: production
       PORT: 8080
+      RP_ID: localhost
+      ORIGIN: http://localhost:5173
       ELECTRIC_URL: http://electric:3000
+      ELECTRIC_SIGNING_KEY: "your-signing-key-here" # Change this in production
       SUPABASE_URL: ${SUPABASE_URL}
       SUPABASE_KEY: ${SUPABASE_KEY}
       JWT_SECRET: "your-jwt-secret-here" # Change this in production
+      JWT_EXPIRY: 7d
     ports:
       - "8080:8080"
     depends_on:
       - electric
-    command: sh -c "npm install && npm start"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

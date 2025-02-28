@@ -1,216 +1,106 @@
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import { createClient } from "@supabase/supabase-js";
-import jwt from "jsonwebtoken";
-import {
-  generateRegistrationOptions,
-  verifyRegistrationResponse,
-  generateAuthenticationOptions,
-  verifyAuthenticationResponse,
-} from "@simplewebauthn/server";
+import { serve } from '@hono/node-server';
+import { Hono } from 'hono';
+import { logger } from 'hono/logger';
+import { cors } from 'hono/cors';
+import { prettyJSON } from 'hono/pretty-json';
+import { secureHeaders } from 'hono/secure-headers';
+import dotenv from 'dotenv';
+import { createClient } from '@supabase/supabase-js';
 
+import { authRoutes } from './routes/auth.js';
+import { syncRoutes } from './routes/sync.js';
+import { errorHandler } from './middleware/error-handler.js';
+import { rateLimiter } from './middleware/rate-limiter.js';
+import { AppContext, Env, AppData } from './types/index.js';
+
+// Load environment variables
 dotenv.config();
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+// Initialize environment
+const env: Env = {
+  PORT: parseInt(process.env.PORT || '8080'),
+  RP_ID: process.env.RP_ID || 'localhost',
+  ORIGIN: process.env.ORIGIN || `http://localhost:5173`,
+  ELECTRIC_URL: process.env.ELECTRIC_URL || 'http://localhost:5133',
+  ELECTRIC_SIGNING_KEY: process.env.ELECTRIC_SIGNING_KEY || '',
+  SUPABASE_URL: process.env.SUPABASE_URL || '',
+  SUPABASE_KEY: process.env.SUPABASE_KEY || '',
+  JWT_SECRET: process.env.JWT_SECRET || 'deplayer-jwt-secret',
+};
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_KEY!
-);
+// Validate required environment variables
+if (!env.SUPABASE_URL || !env.SUPABASE_KEY) {
+  console.error('SUPABASE_URL and SUPABASE_KEY are required');
+  process.exit(1);
+}
 
-const rpName = "Deplayer";
-const rpID = process.env.RP_ID || "localhost";
-const origin = process.env.ORIGIN || `http://${rpID}:5173`;
+if (!env.ELECTRIC_URL || !env.ELECTRIC_SIGNING_KEY) {
+  console.error('ELECTRIC_URL and ELECTRIC_SIGNING_KEY are required');
+  process.exit(1);
+}
 
-// Store challenges temporarily (should use Redis in production)
+// Initialize Supabase client
+const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_KEY);
+
+// In-memory challenge store (use Redis in production)
 const challengeStore = new Map<string, string>();
 
-// Proxy middleware to Electric
-app.use("/electric", async (req, res) => {
-  const token = req.headers.authorization?.split(" ")[1];
+// Create Hono app with app context
+const app = new Hono<AppContext>();
 
-  if (!token) {
-    return res.status(401).json({ error: "No token provided" });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-
-    // Forward the request to Electric
-    const response = await fetch(`${process.env.ELECTRIC_URL}${req.url}`, {
-      method: req.method,
-      headers: {
-        ...req.headers,
-        Authorization: `Bearer ${process.env.ELECTRIC_SIGNING_KEY}`,
-      },
-      body: req.method !== "GET" ? JSON.stringify(req.body) : undefined,
-    });
-
-    const data = await response.json();
-    res.status(response.status).json(data);
-  } catch (error) {
-    res.status(401).json({ error: "Invalid token" });
-  }
+// Set bindings
+app.use('*', async (c, next) => {
+  c.set('env', {
+    env,
+    supabase,
+    challengeStore
+  });
+  await next();
 });
 
-// Registration endpoint
-app.post("/register", async (req, res) => {
-  const { username, displayName } = req.body;
+// Middleware
+app.use('*', logger());
+app.use('*', cors());
+app.use('*', secureHeaders());
+app.use('*', prettyJSON());
+app.use('*', rateLimiter);
+app.use('*', errorHandler);
 
-  try {
-    const options = await generateRegistrationOptions({
-      rpName,
-      rpID,
-      userID: username,
-      userName: username,
-      userDisplayName: displayName,
-      attestationType: "none",
-    });
+// Routes
+app.route('/', authRoutes);
+app.route('/v1', syncRoutes);
 
-    challengeStore.set(username, options.challenge);
-
-    res.json(options);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to generate registration options" });
-  }
+// Not found handler
+app.notFound((c) => {
+  return c.json({ success: false, message: 'Not Found' }, 404);
 });
 
-// Registration verification endpoint
-app.post("/register/verify", async (req, res) => {
-  const { username, credential } = req.body;
-  const challenge = challengeStore.get(username);
-
-  if (!challenge) {
-    return res.status(400).json({ error: "Challenge not found" });
-  }
-
-  try {
-    const verification = await verifyRegistrationResponse({
-      response: credential,
-      expectedChallenge: challenge,
-      expectedOrigin: origin,
-      expectedRPID: rpID,
-    });
-
-    if (verification.verified) {
-      // Store the credential in Supabase
-      const { error } = await supabase.from("credentials").insert({
-        user_id: username,
-        credential_id:
-          verification.registrationInfo?.credentialID.toString("base64"),
-        public_key:
-          verification.registrationInfo?.credentialPublicKey.toString("base64"),
-        counter: verification.registrationInfo?.counter,
-      });
-
-      if (error) throw error;
-
-      const token = jwt.sign({ username }, process.env.JWT_SECRET!);
-      res.json({ token });
-    } else {
-      res.status(400).json({ error: "Verification failed" });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Verification failed" });
-  } finally {
-    challengeStore.delete(username);
-  }
+// Error handler
+app.onError((err, c) => {
+  console.error('Unhandled error:', err);
+  return c.json({ 
+    success: false, 
+    message: 'Internal Server Error',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+  }, 500);
 });
 
-// Authentication endpoint
-app.post("/auth", async (req, res) => {
-  const { username } = req.body;
+// Start server
+console.log(`Starting server on port ${env.PORT}...`);
+console.log(`RP_ID: ${env.RP_ID}`);
+console.log(`ORIGIN: ${env.ORIGIN}`);
+console.log(`NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
 
-  try {
-    const { data: credentials } = await supabase
-      .from("credentials")
-      .select()
-      .eq("user_id", username)
-      .single();
-
-    if (!credentials) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    const options = await generateAuthenticationOptions({
-      rpID,
-      allowCredentials: [
-        {
-          id: Buffer.from(credentials.credential_id, "base64"),
-          type: "public-key",
-        },
-      ],
-    });
-
-    challengeStore.set(username, options.challenge);
-
-    res.json(options);
-  } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ error: "Failed to generate authentication options" });
-  }
+serve({
+  fetch: app.fetch,
+  port: env.PORT
 });
 
-// Authentication verification endpoint
-app.post("/auth/verify", async (req, res) => {
-  const { username, credential } = req.body;
-  const challenge = challengeStore.get(username);
+// Handle graceful shutdown
+const shutdown = () => {
+  console.log('Shutting down server');
+  process.exit(0);
+};
 
-  if (!challenge) {
-    return res.status(400).json({ error: "Challenge not found" });
-  }
-
-  try {
-    const { data: credentials } = await supabase
-      .from("credentials")
-      .select()
-      .eq("user_id", username)
-      .single();
-
-    if (!credentials) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    const verification = await verifyAuthenticationResponse({
-      response: credential,
-      expectedChallenge: challenge,
-      expectedOrigin: origin,
-      expectedRPID: rpID,
-      authenticator: {
-        credentialPublicKey: Buffer.from(credentials.public_key, "base64"),
-        credentialID: Buffer.from(credentials.credential_id, "base64"),
-        counter: credentials.counter,
-      },
-    });
-
-    if (verification.verified) {
-      // Update the counter
-      await supabase
-        .from("credentials")
-        .update({ counter: verification.authenticationInfo.newCounter })
-        .eq("user_id", username);
-
-      const token = jwt.sign({ username }, process.env.JWT_SECRET!);
-      res.json({ token });
-    } else {
-      res.status(400).json({ error: "Verification failed" });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Verification failed" });
-  } finally {
-    challengeStore.delete(username);
-  }
-});
-
-const port = process.env.PORT || 8080;
-app.listen(port, () => {
-  console.log(`Gatekeeper service running on port ${port}`);
-});
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);

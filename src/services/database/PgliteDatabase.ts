@@ -4,51 +4,23 @@ import { electricSync } from "@electric-sql/pglite-sync";
 import { drizzle, PgliteDatabase } from "drizzle-orm/pglite";
 import {
   getStoredSyncSettings,
+  getAuthToken,
   type SyncSettings,
 } from "../settings/syncSettings";
 
 import type { MigrationConfig } from "drizzle-orm/migrator";
 import migrations from "./migrations.json";
 import { createLogger } from "../../utils/logger";
+import { createSyncManager, getSyncManager, setSyncManager, SyncManager } from "../sync";
+import { initializeChangeLogSync } from "../sync/setupLocalSync";
+import { ChangeLogSynchronizer } from "../sync/ChangeLogSynchronizer";
 
 let dbPromise: Promise<PgliteDatabase> | null = null;
 let currentClient: PGlite | PGliteWorker | null = null;
 let currentWorker: Worker | null = null;
+let changeLogSynchronizer: ChangeLogSynchronizer | null = null;
 
 const logger = createLogger({ namespace: "PgliteDatabase" });
-
-type SyncShape = {
-  url: string;
-  params: {
-    table: string;
-  };
-};
-
-type SyncConfig = {
-  shape: SyncShape;
-  table: string;
-  primaryKey: string[];
-};
-
-// Shape subscription types
-type ShapeRows = Record<string, any>[];
-
-type ShapeData =
-  | {
-      rows: ShapeRows;
-    }
-  | undefined;
-
-type ShapeSubscription = {
-  rows: Promise<ShapeRows>;
-  subscribe: (callback: (data: ShapeData) => void) => void;
-};
-
-type ExtendedPGlite = PGlite & {
-  electric: {
-    syncShapeToTable: (config: SyncConfig) => ShapeSubscription;
-  };
-};
 
 export function getClient(): PGlite | PGliteWorker {
   if (process.env.NODE_ENV === "test") {
@@ -76,88 +48,33 @@ async function migrate(db: any) {
   } satisfies Omit<MigrationConfig, "migrationsFolder">);
 }
 
-async function setupSync(client: PGlite | PGliteWorker, settings: SyncSettings) {
-  logger.debug("setupSync settings", settings);
+/**
+ * Initialize the sync manager with the given client and settings
+ */
+async function initializeSyncManager(
+  client: PGlite | PGliteWorker, 
+  settings: SyncSettings,
+  authToken?: string
+): Promise<SyncManager> {
+  logger.debug("Initializing SyncManager with settings:", {
+    enabled: settings.enabled,
+    serverUrl: settings.serverUrl,
+    hasAuthToken: !!authToken,
+  });
 
-  if (settings.enabled && settings.serverUrl) {
-    // Define tables in order of their dependencies
-    const tables = [
-      // Core tables first
-      { name: "room", primaryKey: ["id"] }, // room needs to be before peer
+  const syncManager = createSyncManager({
+    client,
+    settings,
+    authToken,
+  });
 
-      // Tables with foreign keys
-      { name: "peer", primaryKey: ["id"] },
-      { name: "media", primaryKey: ["id"] },
-      { name: "artist", primaryKey: ["id"] },
-      { name: "queue", primaryKey: ["id"] },
-      { name: "smart_playlist", primaryKey: ["id"] },
-      { name: "playlist", primaryKey: ["id"] },
-      { name: "media_lyrics", primaryKey: ["id"] },
-      // { name: "favorites", primaryKey: ["id"] },
-    ];
+  // Store the sync manager globally for easy access
+  setSyncManager(syncManager);
 
-    logger.debug("Preparing shapes for sync", tables);
+  // Start the sync process
+  await syncManager.start();
 
-    // Sync tables sequentially to respect dependencies
-    for (const table of tables) {
-      try {
-        logger.debug(`Setting up sync for table: ${table.name}`);
-
-        // @ts-ignore - Both PGlite and PGliteWorker support electric sync
-        const shape = await (client as ExtendedPGlite).electric.syncShapeToTable({
-          shape: {
-            url: `${settings.serverUrl}/v1/shape`,
-            params: {
-              table: table.name,
-            },
-          },
-          table: table.name,
-          primaryKey: table.primaryKey,
-        });
-
-        // Wait for initial data to ensure proper initialization
-        try {
-          const initialRows = await shape.rows;
-          logger.debug(
-            `Loaded ${initialRows?.length ?? 0} rows for ${table.name}`
-          );
-        } catch (error) {
-          logger.error(`Error loading initial data for ${table.name}:`, error);
-          if (table.name === "settings" || table.name === "room") {
-            throw error; // Critical tables should fail fast
-          }
-        }
-
-        // Set up subscription with error handling
-        shape.subscribe((data) => {
-          logger.debug("shape.subscribe", data);
-          try {
-            if (!data) {
-              logger.warn(`No rows found for ${table.name}`);
-              return;
-            }
-
-            const rows = data.rows;
-            if (!Array.isArray(rows)) {
-              logger.warn(`Invalid rows data for ${table.name}:`, rows);
-              return;
-            }
-
-            logger.debug(`Loaded ${rows.length} rows for ${table.name}`);
-          } catch (error) {
-            logger.error("Error during sync:", error);
-          }
-        });
-      } catch (error) {
-        logger.error(`Error setting up sync for table ${table.name}:`, error);
-        if (table.name === "settings" || table.name === "room") {
-          throw error; // Critical tables should fail fast
-        }
-      }
-    }
-  } else {
-    logger.debug("Sync is disabled or server URL not configured");
-  }
+  return syncManager;
 }
 
 const _create = async (): Promise<PgliteDatabase> => {
@@ -169,8 +86,26 @@ const _create = async (): Promise<PgliteDatabase> => {
 
   await migrate(db);
 
+  // Initialize sync with stored settings
   const syncSettings = getStoredSyncSettings();
-  await setupSync(client, syncSettings);
+  
+  // Get auth token from settings
+  const authToken = getAuthToken();
+  
+  // Initialize the read-path sync manager
+  await initializeSyncManager(client, syncSettings, authToken);
+  
+  // Initialize the write-path sync (change log synchronizer)
+  if (syncSettings.enabled && syncSettings.serverUrl) {
+    try {
+      logger.info("Initializing write-path sync");
+      changeLogSynchronizer = await initializeChangeLogSync(client);
+      logger.info("Write-path sync initialized successfully");
+    } catch (error) {
+      logger.error("Error initializing write-path sync:", error);
+      // We don't throw here because the app can still function with read-only sync
+    }
+  }
 
   return db;
 };
@@ -187,6 +122,19 @@ export const reconnect = async () => {
   if (currentClient) {
     // Close existing connection if possible
     try {
+      // Stop the sync manager first
+      const syncManager = getSyncManager();
+      if (syncManager) {
+        await syncManager.stop();
+      }
+      
+      // Stop the change log synchronizer if running
+      if (changeLogSynchronizer) {
+        logger.info("Stopping change log synchronizer");
+        await changeLogSynchronizer.stop();
+        changeLogSynchronizer = null;
+      }
+      
       if (currentWorker) {
         currentWorker.terminate();
         currentWorker = null;
@@ -202,6 +150,59 @@ export const reconnect = async () => {
   dbPromise = null;
   currentClient = null;
   return get();
+};
+
+/**
+ * Update sync settings and reconnect if necessary
+ */
+export const updateSyncSettings = async (settings: SyncSettings, authToken?: string): Promise<void> => {
+  const syncManager = getSyncManager();
+  
+  if (syncManager) {
+    // Update the sync manager configuration
+    await syncManager.updateConfig({
+      serverUrl: settings.serverUrl,
+      enabled: settings.enabled,
+      authToken,
+    });
+    
+    // If we have a client but no change log synchronizer and sync is now enabled,
+    // initialize the change log synchronizer
+    if (settings.enabled && currentClient && !changeLogSynchronizer) {
+      try {
+        logger.info("Initializing write-path sync after settings update");
+        changeLogSynchronizer = await initializeChangeLogSync(currentClient);
+      } catch (error) {
+        logger.error("Error initializing write-path sync after settings update:", error);
+      }
+    } else if (!settings.enabled && changeLogSynchronizer) {
+      // If sync is disabled but we have a change log synchronizer, stop it
+      logger.info("Stopping change log synchronizer due to disabled sync");
+      await changeLogSynchronizer.stop();
+      changeLogSynchronizer = null;
+    }
+  } else if (settings.enabled) {
+    // If there's no sync manager but sync is enabled, reconnect to create one
+    await reconnect();
+  }
+};
+
+/**
+ * Get the change log synchronizer
+ */
+export const getChangeLogSynchronizer = (): ChangeLogSynchronizer | null => {
+  return changeLogSynchronizer;
+};
+
+/**
+ * Manually trigger sync for a specific row (useful for critical data)
+ */
+export const syncRow = async (tableName: string, rowId: string): Promise<boolean> => {
+  if (!changeLogSynchronizer) {
+    return false;
+  }
+  
+  return changeLogSynchronizer.syncRow(tableName, rowId);
 };
 
 let db: any = null;
@@ -220,4 +221,7 @@ export default {
   getDb,
   reconnect,
   runMigrations,
+  updateSyncSettings,
+  syncRow,
+  getChangeLogSynchronizer,
 };
