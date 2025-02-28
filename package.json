@@ -24,6 +24,7 @@
     "@types/pouchdb": "^6.4.2",
     "@types/react-redux-i18n": "^0.0.16",
     "@types/react-router-dom": "^5.3.3",
+    "@types/react-slick": "^0.23.13",
     "drizzle-orm": "^0.33.0",
     "music-metadata": "^10.5.1",
     "pako": "^2.1.0",
@@ -31,8 +32,10 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-select": "^5.8.3",
+    "react-slick": "^0.30.3",
     "react-toastify": "^10.0.5",
-    "redux-first-history": "^5.2.0"
+    "redux-first-history": "^5.2.0",
+    "slick-carousel": "^1.8.1"
   },
   "devDependencies": {
     "@fortawesome/free-brands-svg-icons": "^6.5.2",
@@ -89,7 +92,6 @@
     "pouchdb-adapter-memory": "^8.0.1",
     "rc-slider": "^10.6.2",
     "react-contexify": "^6.0.0",
-    "react-horizontal-scrolling-menu": "^7.0.0",
     "react-modal": "^3.16.1",
     "react-player": "^2.16.0",
     "react-redux": "^9.1.2",
