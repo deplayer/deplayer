@@ -14,6 +14,8 @@ RUN npm run build
 
 # Set environment variables
 ENV NODE_ENV=production
+# Add support for ES modules
+ENV NODE_OPTIONS="--experimental-specifier-resolution=node"
 
 # Expose the service port
 EXPOSE 8080

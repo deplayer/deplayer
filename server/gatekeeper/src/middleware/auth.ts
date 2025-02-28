@@ -1,5 +1,5 @@
 import { MiddlewareHandler } from 'hono';
-import { verify } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { AuthUser } from '../types/index.js';
 
 /**
@@ -28,7 +28,7 @@ export const auth: MiddlewareHandler = async (c, next) => {
   try {
     // Verify token and extract user data
     const { env } = c.get('env');
-    const user = verify(token, env.JWT_SECRET) as AuthUser;
+    const user = jwt.verify(token, env.JWT_SECRET) as AuthUser;
     
     // Set user in context
     c.set('user', user);
