@@ -1,0 +1,36 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+  "entry": [
+    "src/main.tsx",
+    "src/**/*.spec.tsx",
+    "vite.config.ts"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}"
+  ],
+  "ignore": [
+    "dist/**",
+    "node_modules/**",
+    "coverage/**",
+    ".vitest/**"
+  ],
+  "ignoreDependencies": [
+    "vitest",
+    "@testing-library/react",
+    "@testing-library/jest-dom",
+    "postcss",
+    "autoprefixer"
+  ],
+  "ignoreBinaries": [
+    "vite"
+  ],
+  "rules": {
+    "classMembers": "error",
+    "enumMembers": "error",
+    "exports": "error",
+    "files": "error",
+    "nsExports": "error",
+    "types": "error",
+    "duplicates": "error"
+  }
+} 
