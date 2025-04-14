@@ -95,7 +95,7 @@ export default class JellyfinProvider implements IMusicProvider {
               {
                 uri:
                   type === "video"
-                    ? `${this.baseUrl}/Videos/${item.Id}/stream?static=true&api_key=${this.apiKey}&userId=${this.userId}`
+                    ? `${this.baseUrl}/Videos/${item.Id}/stream?static=true&api_key=${this.apiKey}&userId=${this.userId}&audioCodec=aac&audioBitrate=192000&audioSampleRate=44100`
                     : `${this.baseUrl}/Audio/${item.Id}/stream?static=true&api_key=${this.apiKey}&userId=${this.userId}`,
               },
             ],
