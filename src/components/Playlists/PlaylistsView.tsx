@@ -43,15 +43,19 @@ const PlaylistsView = ({ collection, playlist }: Props) => {
           onClick={() => setShowGenres(!showGenres)}
           className="flex items-center"
         >
-          <Icon icon={showGenres ? 'faList' : 'faBookmark'} className="mr-2" />
+          <Icon icon={showGenres ? 'faList' : 'faFilter'} className="mr-2" />
           <Translate value={showGenres ? 'buttons.showPlaylists' : 'buttons.showGenres'} />
         </Button>
       </div>
 
       <div className="container mx-auto px-4">
-        {/* Content */}
         {showGenres ? (
-          <GenreTagCloud collection={collection} dispatch={dispatch} />
+          <div className="card bg-base-200 shadow-xl p-6">
+            <h2 className="text-xl font-bold mb-4">
+              <Translate value="titles.genres" />
+            </h2>
+            <GenreTagCloud collection={collection} dispatch={dispatch} />
+          </div>
         ) : (
           <>
             {/* Smart Playlists */}

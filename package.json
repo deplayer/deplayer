@@ -14,7 +14,8 @@
     "preview": "vite preview",
     "db:generate": "drizzle-kit generate && npx tsx ./bin/compile-migrations.ts",
     "knip": "knip",
-    "knip:production": "knip --production"
+    "knip:production": "knip --production",
+    "roomba": "knip --fix"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.2.16",
