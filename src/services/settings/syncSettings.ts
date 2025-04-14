@@ -23,7 +23,7 @@ export const storeSyncSettings = (settings: SyncSettings) => {
   localStorage.setItem(SYNC_SETTINGS_KEY, JSON.stringify(settings));
 };
 
-export const resetSyncSettings = () => {
+const resetSyncSettings = () => {
   storeSyncSettings(defaultSettings);
   return defaultSettings;
 };
@@ -46,7 +46,7 @@ export const getAuthToken = (): string | undefined => {
 /**
  * Clear the authentication token
  */
-export const clearAuthToken = (): void => {
+const clearAuthToken = (): void => {
   localStorage.removeItem(AUTH_TOKEN_KEY);
 };
 

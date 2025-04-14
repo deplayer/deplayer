@@ -120,7 +120,7 @@ export function* saveSettings(action: any): Generator<any, void, any> {
   }
 }
 
-export function* deleteSettings(): any {
+function* deleteSettings(): any {
   try {
     const adapter = getAdapter();
     const settingsService = new SettingsService(adapter);

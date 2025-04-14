@@ -1,6 +1,6 @@
 import * as types from '../constants/ActionTypes'
 
-export type SearchType = 'all' | 'artist' | 'album' | 'song'
+type SearchType = 'all' | 'artist' | 'album' | 'song'
 
 export interface StartSearchAction {
   type: typeof types.START_SEARCH

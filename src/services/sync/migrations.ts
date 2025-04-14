@@ -6,7 +6,7 @@ import { sql } from "drizzle-orm";
  * This exports a migration that can be used with Drizzle's migration system.
  * Import this in your migration file when you want to add change tracking.
  */
-export const changeLogMigration = {
+const changeLogMigration = {
   up: async (db: any) => {
     // Create the change log table
     await db.execute(sql`

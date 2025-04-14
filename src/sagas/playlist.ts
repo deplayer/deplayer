@@ -34,7 +34,7 @@ function* initialize(): Generator<any, void, any> {
   }
 }
 
-export function* savePlaylist(action: any): any {
+function* savePlaylist(action: any): any {
   logger.log("playlist-saga", "saving playlist");
   const queue = yield select(getQueue);
   const playlist = {

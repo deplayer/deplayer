@@ -18,13 +18,13 @@ const adapter = getAdapter();
 const collectionService = new CollectionService(adapter);
 
 // Create search service instance
-export const createSearchService = (settings: any) => {
+const createSearchService = (settings: any) => {
   const providersService = new ProvidersService(settings);
   return new SearchService(collectionService, providersService);
 };
 
 // Going to search results page
-export function* goToSearchResults(): any {
+function* goToSearchResults(): any {
   yield put(push("/search-results"));
 }
 

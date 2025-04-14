@@ -14,35 +14,35 @@ export const defaultState: State = {
   rooms: [],
 };
 
-export type JoinPeerRoomAction = {
+type JoinPeerRoomAction = {
   type: typeof types.JOIN_PEER_ROOM;
   roomCode: string;
   username: string;
 };
 
-export type RemoveRoomAction = {
+type RemoveRoomAction = {
   type: typeof types.REMOVE_ROOM;
   room: string;
 };
 
-export type SetRoomsAction = {
+type SetRoomsAction = {
   type: typeof types.SET_ROOMS;
   rooms: Room[];
 };
 
-export type AddRoomAction = {
+type AddRoomAction = {
   type: typeof types.ADD_ROOM;
   room: Room;
 };
 
-export type JoinRoomSuccessAction = {
+type JoinRoomSuccessAction = {
   type: typeof types.JOIN_ROOM_SUCCESS;
   payload: {
     roomCode: string;
   };
 };
 
-export type Action =
+type Action =
   | JoinPeerRoomAction
   | RemoveRoomAction
   | SetRoomsAction

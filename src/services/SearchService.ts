@@ -3,7 +3,7 @@ import ProvidersService from "./ProvidersService";
 import Media from "../entities/Media";
 import logger from "../utils/logger";
 
-export interface SearchOptions {
+interface SearchOptions {
   noRedirect?: boolean;
   providers?: Record<string, boolean>;
 }

@@ -17,7 +17,7 @@ import { PGliteWorker } from '@electric-sql/pglite/worker';
  * Factory function to create both a SyncManager and ChangeLogSynchronizer
  * This is the main entry point for setting up synchronization in an application
  */
-export async function createSyncInfrastructure(
+async function createSyncInfrastructure(
   db: PGlite | PGliteWorker,
   config: SyncConfig
 ) {
@@ -39,17 +39,9 @@ export async function createSyncInfrastructure(
 }
 
 // Export factory functions
-export { createSyncManager, createAndStartSyncManager } from './createSyncManager';
-export type { CreateSyncManagerOptions } from './createSyncManager';
+export { createSyncManager,  } from './createSyncManager';;
 
-// Export types from SyncManager
-export type {
-  SyncEvent,
-  SyncEventCallback,
-  TableSync,
-  SyncConfig,
-  ExtendedPGlite
-} from './SyncManager';
+// Export types from SyncManager;
 
 // Global sync manager instance
 let globalSyncManager: SyncManager | null = null;
@@ -73,6 +65,6 @@ export function setSyncManager(syncManager: SyncManager): void {
 /**
  * Clear the global SyncManager instance
  */
-export function clearSyncManager(): void {
+function clearSyncManager(): void {
   globalSyncManager = null;
 } 

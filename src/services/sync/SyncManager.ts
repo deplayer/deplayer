@@ -3,7 +3,7 @@ import { PGliteWorker } from "@electric-sql/pglite/worker";
 import { createLogger } from "../../utils/logger";
 
 // Define the event types for the sync manager
-export type SyncEvent = 
+type SyncEvent = 
   | 'error'
   | 'connected'
   | 'disconnected'
@@ -11,15 +11,15 @@ export type SyncEvent =
   | 'authenticated'
   | 'authenticationFailed';
 
-export type SyncEventCallback = (data: unknown) => void;
+type SyncEventCallback = (data: unknown) => void;
 
-export type ShapeRows = Record<string, any>[];
+type ShapeRows = Record<string, any>[];
 
-export type ShapeData = {
+type ShapeData = {
   rows: ShapeRows;
 } | undefined;
 
-export type ShapeSubscription = {
+type ShapeSubscription = {
   rows: Promise<ShapeRows>;
   subscribe: (callback: (data: ShapeData) => void) => void;
 };

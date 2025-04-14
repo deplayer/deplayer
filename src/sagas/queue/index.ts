@@ -69,7 +69,7 @@ export const getSongObjects = (state: any, songIds: Array<string>) => {
 }
 
 // Handling playAll saga
-export function* playAll(action: any): any {
+function* playAll(action: any): any {
   logger.log('queue-saga', 'playAll action:', action)
   const songIds = yield select(getSongs, action)
   logger.log('queue-saga', 'song ids to play:', songIds)
@@ -102,7 +102,7 @@ export function* addToQueueNext(action: any): any {
 const adapter = getAdapter()
 const queueService = new QueueService(adapter)
 
-export function* saveQueue(): any {
+function* saveQueue(): any {
   const queue = yield select(getQueue)
   logger.log('queue-saga', 'saving queue', queue)
 
@@ -117,12 +117,12 @@ export function* saveQueue(): any {
   })
 }
 
-export function* clearQueue(): any {
+function* clearQueue(): any {
   logger.log('queue-saga', 'removing queue')
   yield call(queueService.save, 'queue', {})
 }
 
-export function* addAlbumToQueue(action: AddAlbumToQueueAction): any {
+function* addAlbumToQueue(action: AddAlbumToQueueAction): any {
   const songsByAlbum: { [key: string]: string[] } = yield select((state: AppState) => state.collection.songsByAlbum);
   const collection: { [key: string]: IMedia } = yield select((state: AppState) => state.collection.rows);
   logger.log('queue-saga', songsByAlbum);

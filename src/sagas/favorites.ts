@@ -11,7 +11,7 @@ const logger = createLogger({ namespace: "favorites-saga" });
 type Favorite = InferModel<typeof favorites>;
 
 // Application initialization routines
-export function* initialize(): Generator<any, void, any> {
+function* initialize(): Generator<any, void, any> {
   try {
     logger.debug("Initializing favorites...");
     const db = yield call(adapter.getDb);

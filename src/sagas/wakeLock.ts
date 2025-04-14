@@ -7,7 +7,7 @@ import { getPlayer } from './selectors'
 import { Dispatch } from 'redux'
 
 // Handling START_PLAYING saga
-export function* startWakeLock(_dispatch: Dispatch): any {
+function* startWakeLock(_dispatch: Dispatch): any {
   const player = yield select(getPlayer)
 
   if (player.playing) {
@@ -20,7 +20,7 @@ export function* startWakeLock(_dispatch: Dispatch): any {
 }
 
 // Handling START_PLAYING saga
-export function* stopWakeLock(_dispatch: Dispatch): any {
+function* stopWakeLock(_dispatch: Dispatch): any {
   const player = yield select(getPlayer)
 
   if (!player.playing) {

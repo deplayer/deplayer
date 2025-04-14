@@ -14,13 +14,13 @@ const getCurrentSong = (state: any) => {
 }
 
 // Handling START_PLAYING saga
-export function* sendCurrentPlayingNotification(): any {
+function* sendCurrentPlayingNotification(): any {
   const notificationService = new NotificatoinService()
   const currentSong = yield select(getCurrentSong)
   yield call(notificationService.sendNotification, currentSong)
 }
 
-export function* setupNotifications(): any {
+function* setupNotifications(): any {
   const notificationService = new NotificatoinService()
   yield call(notificationService.requestPermission)
 }

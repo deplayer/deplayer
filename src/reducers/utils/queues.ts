@@ -13,7 +13,7 @@ export const getSiblingSong = (trackIds: Array<string>, song: string, next = fal
   return trackIds[nextIndex] || null;
 }
 
-export const extractField = (song: any, field: any) => {
+const extractField = (song: any, field: any) => {
   return field.split('.').reduce((obj: any, i: number): any => {
     return obj[i] ? obj[i]: '0'
   }, song)

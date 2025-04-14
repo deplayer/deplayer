@@ -19,13 +19,13 @@ export interface ILyricsRepository {
   ensureSongExists(song: any): Promise<void>
 }
 
-export interface IArtistRepository {
+interface IArtistRepository {
   getMetadata(artistName: string): Promise<any>
   saveMetadata(artistName: string, metadata: any): Promise<void>
 }
 
 // Default implementations (can be imported from separate files)
-export class DefaultLyricsRepository implements ILyricsRepository {
+class DefaultLyricsRepository implements ILyricsRepository {
   constructor(private adapter: any, private lyricsService: any) {}
 
   async getLyrics(songId: string) {
@@ -62,7 +62,7 @@ export class DefaultLyricsRepository implements ILyricsRepository {
   }
 }
 
-export class DefaultArtistRepository implements IArtistRepository {
+class DefaultArtistRepository implements IArtistRepository {
   constructor(private artistService: any) {}
 
   async getMetadata(artistName: string) {
@@ -78,7 +78,7 @@ export class DefaultArtistRepository implements IArtistRepository {
 const artistService = new ArtistService()
 const defaultArtistRepo = new DefaultArtistRepository(artistService)
 
-export function* loadMoreArtistSongsFromProvider(
+function* loadMoreArtistSongsFromProvider(
   action: any,
   artistRepo: IArtistRepository = defaultArtistRepo
 ): any {

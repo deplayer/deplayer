@@ -6,7 +6,7 @@ import logger from '../utils/logger'
 import * as types from '../constants/ActionTypes'
 
 // Handling START_PLAYING saga
-export function* setCurrentPlayingMeta (dispatch: any): any {
+function* setCurrentPlayingMeta (dispatch: any): any {
   const mediaSessionService = new MediaSessionService()
   const currentSong = yield select(getCurrentSong)
   try {

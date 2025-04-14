@@ -29,7 +29,7 @@ const MediaCoverWrapper = ({ media }: MediaCoverProps) => {
 
 // All items component
 // Important! add unique key
-export const MediaItems = (list: Array<any>) => {
+const MediaItems = (list: Array<any>) => {
   return list.map((media) => {
     return (
       <MediaCoverWrapper

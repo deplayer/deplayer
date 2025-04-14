@@ -14,7 +14,7 @@ const logger = createLogger({ namespace: 'setupLocalSync' });
  * @param db The PGlite or PGliteWorker instance
  * @returns A promise that resolves when setup is complete
  */
-export async function setupLocalSyncSchema(db: PGlite | PGliteWorker): Promise<void> {
+async function setupLocalSyncSchema(db: PGlite | PGliteWorker): Promise<void> {
   logger.info('Setting up local sync schema...');
   
   try {
@@ -79,4 +79,4 @@ export async function initializeChangeLogSync(
 /**
  * Export the tables from local-schema.sql.ts for migrations
  */
-export { electricChangeLog } from "./local-schema.sql"; 
+; 

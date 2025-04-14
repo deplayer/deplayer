@@ -22,7 +22,7 @@ let changeLogSynchronizer: ChangeLogSynchronizer | null = null;
 
 const logger = createLogger({ namespace: "PgliteDatabase" });
 
-export function getClient(): PGlite | PGliteWorker {
+function getClient(): PGlite | PGliteWorker {
   if (process.env.NODE_ENV === "test") {
     return new PGlite();
   } else {
@@ -190,14 +190,14 @@ export const updateSyncSettings = async (settings: SyncSettings, authToken?: str
 /**
  * Get the change log synchronizer
  */
-export const getChangeLogSynchronizer = (): ChangeLogSynchronizer | null => {
+const getChangeLogSynchronizer = (): ChangeLogSynchronizer | null => {
   return changeLogSynchronizer;
 };
 
 /**
  * Manually trigger sync for a specific row (useful for critical data)
  */
-export const syncRow = async (tableName: string, rowId: string): Promise<boolean> => {
+const syncRow = async (tableName: string, rowId: string): Promise<boolean> => {
   if (!changeLogSynchronizer) {
     return false;
   }
@@ -207,21 +207,13 @@ export const syncRow = async (tableName: string, rowId: string): Promise<boolean
 
 let db: any = null;
 
-export const getDb = () => {
+const getDb = () => {
   return db;
 };
 
-export const runMigrations = async () => {
+const runMigrations = async () => {
   const db = await reconnect();
   await migrate(db);
   return db;
 };
 
-export default {
-  getDb,
-  reconnect,
-  runMigrations,
-  updateSyncSettings,
-  syncRow,
-  getChangeLogSynchronizer,
-};

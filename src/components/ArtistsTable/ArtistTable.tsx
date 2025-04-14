@@ -13,7 +13,7 @@ import EmptyState from '../common/EmptyState/index'
 import { State as AppState } from '../../reducers/app'
 import { State as QueueState } from '../../reducers/queue'
 
-export type Props = {
+type Props = {
   error?: string,
   queue: QueueState,
   collection: CollectionState,

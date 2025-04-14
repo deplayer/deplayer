@@ -2,7 +2,7 @@ import * as types from "../constants/ActionTypes";
 import SettingsBuilder from "../services/settings/SettingsBuilder";
 import providerBuilders from "../services/settings/providers";
 
-export type ProviderSettings = {
+type ProviderSettings = {
   enabled: boolean;
   [key: string]: any;
 };

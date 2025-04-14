@@ -21,7 +21,7 @@ const defaultTables: TableSync[] = [
   { name: "media_lyrics", primaryKey: ["id"] },
 ];
 
-export interface CreateSyncManagerOptions {
+interface CreateSyncManagerOptions {
   /**
    * PGlite client
    */
@@ -81,7 +81,7 @@ export function createSyncManager(options: CreateSyncManagerOptions): SyncManage
 /**
  * Helper function to create and automatically start a SyncManager
  */
-export async function createAndStartSyncManager(options: CreateSyncManagerOptions): Promise<SyncManager> {
+async function createAndStartSyncManager(options: CreateSyncManagerOptions): Promise<SyncManager> {
   const syncManager = createSyncManager(options);
   await syncManager.start();
   return syncManager;

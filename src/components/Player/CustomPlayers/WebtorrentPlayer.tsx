@@ -10,7 +10,7 @@ function canEnablePIP() {
   return false
 }
 
-export class TorrentPlayer extends React.Component<ReactPlayerProps> {
+class TorrentPlayer extends React.Component<ReactPlayerProps> {
   static displayName = 'TorrentPlayer'
   static canPlay = canPlay
   static canEnablePIP = canEnablePIP

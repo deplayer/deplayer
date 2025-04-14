@@ -67,7 +67,7 @@ export function* setCurrentPlaying(action: SetCurrentPlayingAction): any {
   yield call(setCurrentPlayingStream, action.songId, 0, action.media)
 }
 
-export function* handleError(): any {
+function* handleError(): any {
   yield put({ type: types.REGISTER_PLAYER_ERROR })
 
   const queue = yield select(getQueue)
@@ -76,7 +76,7 @@ export function* handleError(): any {
   yield call(setCurrentPlayingStream, queue.currentPlaying, player.errorCount)
 }
 
-export function* handlePlayNext(): any {
+function* handlePlayNext(): any {
   const queue = yield select(getQueue)
   const trackIds = queue.shuffle ? queue.randomTrackIds : queue.trackIds
   const songId = queue.nextSongId
@@ -96,7 +96,7 @@ export function* handlePlayNext(): any {
   }
 }
 
-export function* handlePlayPrev(): any {
+function* handlePlayPrev(): any {
   const queue = yield select(getQueue)
   const trackIds = queue.shuffle ? queue.randomTrackIds : queue.trackIds
   const songId = queue.prevSongId

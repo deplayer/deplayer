@@ -35,7 +35,7 @@ export const defaultTestState: TestState = {
   translations: {}
 }
 
-export const createTestStore = (initialState: Partial<TestState> = {}) => {
+const createTestStore = (initialState: Partial<TestState> = {}) => {
   const mergedState = {
     ...defaultTestState,
     ...initialState
@@ -60,7 +60,7 @@ interface TestWrapperProps {
   initialState?: Partial<TestState>
 }
 
-export const TestWrapper = ({ children, initialState = {} }: TestWrapperProps) => {
+const TestWrapper = ({ children, initialState = {} }: TestWrapperProps) => {
   const store = createTestStore(initialState)
 
   return (

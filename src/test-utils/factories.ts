@@ -14,14 +14,14 @@ interface MediaOverrides extends Partial<IMedia> {
   [key: string]: any;
 }
 
-export const createTestArtist = (overrides: ArtistOverrides = {}): Artist => {
+const createTestArtist = (overrides: ArtistOverrides = {}): Artist => {
   return new Artist({
     name: "Test Artist",
     ...overrides,
   });
 };
 
-export const createTestAlbum = (overrides: AlbumOverrides = {}): Album => {
+const createTestAlbum = (overrides: AlbumOverrides = {}): Album => {
   const artist = overrides.artist || createTestArtist();
   return new Album({
     name: "Test Album",
@@ -30,7 +30,7 @@ export const createTestAlbum = (overrides: AlbumOverrides = {}): Album => {
   });
 };
 
-export const createTestMedia = (overrides: MediaOverrides = {}): Media => {
+const createTestMedia = (overrides: MediaOverrides = {}): Media => {
   const artist = overrides.artist || createTestArtist();
   const album = overrides.album || createTestAlbum({ artist });
 

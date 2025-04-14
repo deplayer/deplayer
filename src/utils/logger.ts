@@ -69,7 +69,7 @@ export const createLogger = (options: LoggerOptions): Logger => {
 };
 
 // For testing environments
-export const createTestLogger = (namespace: string): Logger => {
+const createTestLogger = (namespace: string): Logger => {
   return new Logger({
     namespace,
     enabled: true,

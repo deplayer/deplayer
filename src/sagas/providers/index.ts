@@ -15,7 +15,7 @@ import providers from "../../providers";
 const validExtensions = ["mp3", "mp4", "flac"];
 
 // Watcher should enque tasks to avoid concurrency
-export function* startProvidersScan(): any {
+function* startProvidersScan(): any {
   const settings = yield select(getSettings);
 
   const providerKeys = Object.keys(settings.providers).filter((key: string) => {
@@ -81,7 +81,7 @@ function* getFilesRecursively(
 }
 
 // Handle filesystem adding
-export function* startFilesystemProcess(action: any): any {
+function* startFilesystemProcess(action: any): any {
   console.log("processing filesystem files: ", action.files);
 
   for (const file of action.files) {
