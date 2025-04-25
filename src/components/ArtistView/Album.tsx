@@ -132,7 +132,7 @@ const Album = (props: AlbumProps) => {
             albumName={props.album.name}
           />
         </div>
-        <div>
+        <div className='flex flex-col items-center justify-center gap-2'>
           <h3 className='text-lg p-4 w-56'>{props.album.name}</h3>
             { props.album.year && <h4 className='text-md p-4 w-56'>{props.album.year}</h4>}
           <Button

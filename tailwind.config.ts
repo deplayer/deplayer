@@ -17,6 +17,12 @@ export default {
   daisyui: {
     themes: [
       {
+        // Default theme variables that all themes inherit
+        light: {
+          "--menu-padding": "0.75rem 1rem", // Default menu padding
+          "--menu-radius": "0.25rem", // Default menu radius
+          "--menu-badge-padding": "0.25rem 0.5rem", // Default badge padding
+        },
         "deplayer-light": {
           primary: "#0284c7",
           secondary: "#fef08a",
@@ -45,6 +51,9 @@ export default {
           "--border-btn": "1px",
           "--tab-border": "1px",
           "--tab-radius": "0.25rem",
+          "--menu-padding": "0.75rem 1rem", // Default menu padding
+          "--menu-radius": "0.25rem", // Default menu radius
+          "--menu-badge-padding": "0.25rem 0.5rem", // Default badge padding
         },
         deplayer: {
           primary: "#0ea5e9",
@@ -74,6 +83,9 @@ export default {
           "--border-btn": "1px",
           "--tab-border": "1px",
           "--tab-radius": "0.25rem",
+          "--menu-padding": "0.75rem 1rem", // Default menu padding
+          "--menu-radius": "0.25rem", // Default menu radius
+          "--menu-badge-padding": "0.25rem 0.5rem", // Default badge padding
         },
         "teenage-engineering": {
           primary: "#FF5B00", // TE signature orange
@@ -175,6 +187,60 @@ export default {
           "--border-btn": "1px", // Thin borders
           "--tab-border": "1px", // Thin tab borders
           "--tab-radius": "4px", // Slightly rounded tabs
+          "--btn-shadow": "0 2px 4px rgba(0, 0, 0, 0.2)", // Subtle button shadow
+          "--btn-hover-shadow": "0 4px 8px rgba(0, 0, 0, 0.3)", // Hover shadow
+          "--btn-active-shadow": "0 1px 2px rgba(0, 0, 0, 0.2)", // Active shadow
+          "--btn-glow": "0 0 8px rgba(255, 61, 0, 0.4)", // Orange glow for primary buttons
+          "--btn-hover-glow": "0 0 12px rgba(255, 61, 0, 0.6)", // Stronger glow on hover
+          "--btn-disabled-opacity": "0.5", // Disabled button opacity
+          "--btn-disabled-glow": "none", // No glow for disabled buttons
+          "--btn-transition": "all 0.2s ease-in-out", // Smooth transitions
+          "--btn-font-family": "monospace", // Monospace font for buttons
+          "--btn-letter-spacing": "0.05em", // Slightly spaced letters
+          "--btn-text-shadow": "0 1px 2px rgba(0, 0, 0, 0.3)", // Text shadow for better readability
+          "--btn-gradient": "linear-gradient(45deg, var(--primary) 0%, var(--secondary) 100%)", // Button gradient
+          "--btn-hover-gradient": "linear-gradient(45deg, var(--primary-focus) 0%, var(--secondary-focus) 100%)", // Hover gradient
+          "--btn-active-gradient": "linear-gradient(45deg, var(--primary-focus) 0%, var(--secondary-focus) 100%)", // Active gradient
+          "--btn-border-color": "var(--primary)", // Button border color
+          "--btn-hover-border-color": "var(--primary-focus)", // Hover border color
+          "--btn-active-border-color": "var(--primary-focus)", // Active border color
+          "--btn-bg-opacity": "0.9", // Button background opacity
+          "--btn-hover-bg-opacity": "1", // Hover background opacity
+          "--btn-active-bg-opacity": "0.95", // Active background opacity
+          "--btn-glow-color": "var(--primary)", // Button glow color
+          "--btn-hover-glow-color": "var(--primary-focus)", // Hover glow color
+          "--btn-active-glow-color": "var(--primary-focus)", // Active glow color
+          "--btn-glow-opacity": "0.4", // Button glow opacity
+          "--btn-hover-glow-opacity": "0.6", // Hover glow opacity
+          "--btn-active-glow-opacity": "0.5", // Active glow opacity
+          "--btn-glow-blur": "8px", // Button glow blur
+          "--btn-hover-glow-blur": "12px", // Hover glow blur
+          "--btn-active-glow-blur": "4px", // Active glow blur
+          "--btn-glow-spread": "2px", // Button glow spread
+          "--btn-hover-glow-spread": "4px", // Hover glow spread
+          "--btn-active-glow-spread": "1px", // Active glow spread
+          "--menu-bg": "var(--base-100)", // Menu background
+          "--menu-hover-bg": "var(--base-200)", // Menu hover background
+          "--menu-active-bg": "var(--base-300)", // Menu active background
+          "--menu-text": "var(--base-content)", // Menu text color
+          "--menu-active-text": "var(--primary)", // Menu active text color
+          "--menu-border": "1px solid var(--base-300)", // Menu border
+          "--menu-radius": "4px", // Menu border radius
+          "--menu-padding": "0.5rem 1rem", // Menu padding
+          "--menu-transition": "all 0.2s ease-in-out", // Menu transition
+          "--menu-shadow": "0 2px 4px rgba(0, 0, 0, 0.2)", // Menu shadow
+          "--menu-hover-shadow": "0 4px 8px rgba(0, 0, 0, 0.3)", // Menu hover shadow
+          "--menu-active-shadow": "0 1px 2px rgba(0, 0, 0, 0.2)", // Menu active shadow
+          "--menu-glow": "0 0 8px rgba(255, 61, 0, 0.2)", // Menu glow
+          "--menu-hover-glow": "0 0 12px rgba(255, 61, 0, 0.3)", // Menu hover glow
+          "--menu-active-glow": "0 0 4px rgba(255, 61, 0, 0.4)", // Menu active glow
+          "--menu-badge-bg": "var(--primary)", // Menu badge background
+          "--menu-badge-text": "var(--primary-content)", // Menu badge text
+          "--menu-badge-radius": "9999px", // Menu badge border radius
+          "--menu-badge-padding": "0.25rem 0.5rem", // Menu badge padding
+          "--menu-badge-font": "var(--btn-font-family)", // Menu badge font
+          "--menu-badge-shadow": "0 1px 2px rgba(0, 0, 0, 0.2)", // Menu badge shadow
+          "--menu-badge-glow": "0 0 4px rgba(255, 61, 0, 0.3)", // Menu badge glow
         },
       },
       "light",
