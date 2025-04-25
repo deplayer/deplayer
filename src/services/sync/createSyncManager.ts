@@ -77,12 +77,3 @@ export function createSyncManager(options: CreateSyncManagerOptions): SyncManage
   
   return new SyncManager(options.client as ExtendedPGlite, config);
 }
-
-/**
- * Helper function to create and automatically start a SyncManager
- */
-async function createAndStartSyncManager(options: CreateSyncManagerOptions): Promise<SyncManager> {
-  const syncManager = createSyncManager(options);
-  await syncManager.start();
-  return syncManager;
-} 

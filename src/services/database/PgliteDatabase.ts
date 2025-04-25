@@ -11,9 +11,10 @@ import {
 import type { MigrationConfig } from "drizzle-orm/migrator";
 import migrations from "./migrations.json";
 import { createLogger } from "../../utils/logger";
-import { createSyncManager, getSyncManager, setSyncManager, SyncManager } from "../sync";
+import { getSyncManager, setSyncManager, SyncManager } from "../sync";
 import { initializeChangeLogSync } from "../sync/setupLocalSync";
 import { ChangeLogSynchronizer } from "../sync/ChangeLogSynchronizer";
+import { createSyncManager } from "../sync/createSyncManager";
 
 let dbPromise: Promise<PgliteDatabase> | null = null;
 let currentClient: PGlite | PGliteWorker | null = null;
@@ -186,34 +187,3 @@ export const updateSyncSettings = async (settings: SyncSettings, authToken?: str
     await reconnect();
   }
 };
-
-/**
- * Get the change log synchronizer
- */
-const getChangeLogSynchronizer = (): ChangeLogSynchronizer | null => {
-  return changeLogSynchronizer;
-};
-
-/**
- * Manually trigger sync for a specific row (useful for critical data)
- */
-const syncRow = async (tableName: string, rowId: string): Promise<boolean> => {
-  if (!changeLogSynchronizer) {
-    return false;
-  }
-  
-  return changeLogSynchronizer.syncRow(tableName, rowId);
-};
-
-let db: any = null;
-
-const getDb = () => {
-  return db;
-};
-
-const runMigrations = async () => {
-  const db = await reconnect();
-  await migrate(db);
-  return db;
-};
-

@@ -23,11 +23,6 @@ export const storeSyncSettings = (settings: SyncSettings) => {
   localStorage.setItem(SYNC_SETTINGS_KEY, JSON.stringify(settings));
 };
 
-const resetSyncSettings = () => {
-  storeSyncSettings(defaultSettings);
-  return defaultSettings;
-};
-
 /**
  * Store the authentication token
  */
@@ -41,13 +36,6 @@ export const storeAuthToken = (token: string): void => {
 export const getAuthToken = (): string | undefined => {
   const token = localStorage.getItem(AUTH_TOKEN_KEY);
   return token || undefined;
-};
-
-/**
- * Clear the authentication token
- */
-const clearAuthToken = (): void => {
-  localStorage.removeItem(AUTH_TOKEN_KEY);
 };
 
 // Form schema for sync settings

@@ -142,6 +142,40 @@ export default {
           "--tab-border": "2px", // Thicker borders
           "--tab-radius": "0", // Sharp corners
         },
+        "cassette-futurism": {
+          primary: "#FF3D00", // Vibrant orange like cassette player buttons
+          secondary: "#00E5FF", // Cyan like LED displays
+          accent: "#FFD600", // Yellow like cassette tape
+          neutral: "#1A1A1A", // Dark background
+          "base-100": "#2D2D2D", // Slightly lighter background
+          "base-200": "#3D3D3D", // Control panel background
+          "base-300": "#4D4D4D", // Button background
+          "base-content": "#E0E0E0", // Light text for contrast
+          info: "#00E5FF", // Cyan for info
+          success: "#00FF00", // Bright green for success
+          warning: "#FFD600", // Yellow for warnings
+          error: "#FF0000", // Red for errors
+          "--player-bg": "#1A1A1A", // Dark background for player
+          "--player-control-bg": "#2D2D2D", // Control panel background
+          "--player-btn-radius": "4px", // Slightly rounded buttons
+          "--player-btn-inner-radius": "2px", // Inner button radius
+          "--player-btn-border": "1px solid #4D4D4D", // Subtle button borders
+          "--player-screen-bg": "rgba(0, 0, 0, 0.8)", // Dark screen background
+          "--player-screen-radius": "4px", // Slightly rounded screen
+          "--player-screen-border": "1px solid #4D4D4D", // Subtle screen border
+          "--player-screen-shadow": "0 0 10px rgba(0, 229, 255, 0.2)", // Cyan glow
+          "--btn-text-case": "uppercase", // Uppercase text for buttons
+          "--btn-text-color": "#FFFFFF", // White text for buttons
+          "--rounded-box": "4px", // Slightly rounded corners
+          "--rounded-btn": "4px", // Slightly rounded buttons
+          "--rounded-badge": "4px", // Slightly rounded badges
+          "--animation-btn": "0.2s", // Quick button animations
+          "--animation-input": "0.2s", // Quick input animations
+          "--btn-focus-scale": "0.98", // Subtle button press effect
+          "--border-btn": "1px", // Thin borders
+          "--tab-border": "1px", // Thin tab borders
+          "--tab-radius": "4px", // Slightly rounded tabs
+        },
       },
       "light",
       "dark",

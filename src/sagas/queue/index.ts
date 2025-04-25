@@ -117,11 +117,6 @@ function* saveQueue(): any {
   })
 }
 
-function* clearQueue(): any {
-  logger.log('queue-saga', 'removing queue')
-  yield call(queueService.save, 'queue', {})
-}
-
 function* addAlbumToQueue(action: AddAlbumToQueueAction): any {
   const songsByAlbum: { [key: string]: string[] } = yield select((state: AppState) => state.collection.songsByAlbum);
   const collection: { [key: string]: IMedia } = yield select((state: AppState) => state.collection.rows);

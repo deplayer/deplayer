@@ -68,13 +68,5 @@ export const createLogger = (options: LoggerOptions): Logger => {
   return new Logger(options);
 };
 
-// For testing environments
-const createTestLogger = (namespace: string): Logger => {
-  return new Logger({
-    namespace,
-    enabled: true,
-    level: "debug",
-  });
-};
 
 export default console;

@@ -3,11 +3,6 @@ import ProvidersService from "./ProvidersService";
 import Media from "../entities/Media";
 import logger from "../utils/logger";
 
-interface SearchOptions {
-  noRedirect?: boolean;
-  providers?: Record<string, boolean>;
-}
-
 export class SearchService {
   private collectionService: CollectionService;
   private providersService: ProvidersService;

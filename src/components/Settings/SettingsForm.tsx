@@ -36,12 +36,6 @@ export const settingsCard = classNames(
   'shadow-sm'
 )
 
-const settingsButton = classNames(
-  'card-title',
-  'text-xl',
-  'font-bold'
-)
-
 const labelClass = classNames(
   'w-full',
   'label',

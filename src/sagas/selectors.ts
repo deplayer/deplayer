@@ -11,20 +11,8 @@ export const getQueue = (state: any): any => {
   return state ? state.queue : {}
 }
 
-const getSmartPlaylists = (state: any): any => {
-  return state ? state.playlist.smartPlaylists : {}
-}
-
 export const getCollection = (state: any): any => {
   return state ? state.collection : {}
-}
-
-const getAlbumSongs = (state: any): any => {
-  return state ? state.collection.songsByAlbum : {}
-}
-
-const getApp = (state: any): any => {
-  return state ? state.app : {}
 }
 
 export const getPlayer = (state: any): any => {

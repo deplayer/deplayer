@@ -9,13 +9,3 @@ export const getAlbum = (match: PathMatch, collection: CollectionState) => {
 
   return null
 }
-
-const getSongsByAlbum = (match: PathMatch, collection: CollectionState) => {
-  const albumId = match.params.id || ''
-  if (collection.songsByAlbum[albumId]) {
-    return collection.songsByAlbum[albumId]
-  }
-
-  return null
-}
-

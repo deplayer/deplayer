@@ -15,7 +15,8 @@
     "db:generate": "drizzle-kit generate && npx tsx ./bin/compile-migrations.ts",
     "knip": "knip",
     "knip:production": "knip --production",
-    "roomba": "knip --fix"
+    "roomba": "knip --fix",
+    "deploy": "npm run test && npm run build && cp dist/index.html dist/200.html && wrangler pages deploy ./dist --project-name=deplayer --branch=main"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.2.16",

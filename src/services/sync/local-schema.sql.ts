@@ -1,14 +1,4 @@
 // Re-export the electric change log schema from drizzle-schemas
-;
-
-/**
- * SQL for creating indices for the change log table
- */
-const changeLogIndices = `
--- Create indices for faster querying
-CREATE INDEX IF NOT EXISTS idx_change_log_synced ON _electric_change_log (synced);
-CREATE INDEX IF NOT EXISTS idx_change_log_table_row ON _electric_change_log (table_name, row_id);
-`;
 
 /**
  * SQL for creating the trigger function to track table changes
@@ -64,12 +54,3 @@ export const syncedTables = [
   "media_lyrics",
   "favorites"
 ];
-
-/**
- * Full SQL script for setting up the change log infrastructure
- */
-const changeLogSetupSQL = `
-${createTriggerFunctionSQL}
-
-${changeLogIndices}
-`; 
