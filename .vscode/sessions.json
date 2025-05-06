@@ -1,0 +1,25 @@
+{
+  "$schema": "https://cdn.statically.io/gh/nguyenngoclongdev/cdn/main/schema/v10/terminal-keeper.json",
+  "theme": "tribe",
+  "active": "default",
+  "activateOnStartup": true,
+  "keepExistingTerminals": false,
+  "sessions": {
+    "default": [
+      {
+        "name": "dev",
+        "autoExecuteCommands": true,
+        "icon": "browser",
+        "color": "terminal.ansiBlue",
+        "commands": ["npm run dev"]
+      },
+      {
+        "name": "test",
+        "autoExecuteCommands": true,
+        "icon": "server",
+        "color": "terminal.ansiGreen",
+        "commands": ["npm run test:watch"]
+      }
+    ]
+  }
+}
