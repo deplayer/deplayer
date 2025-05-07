@@ -1,6 +1,6 @@
 # Task ID: 4
 # Title: Implement Media Database and Library Management
-# Status: pending
+# Status: done
 # Dependencies: 1, 3
 # Priority: high
 # Description: Create a local database structure using PGLite to store and manage the user's media library, playlists, and application settings.

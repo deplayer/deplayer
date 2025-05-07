@@ -50,7 +50,13 @@
     "enabled": "Enabled",
     "repl": "REPL",
     "settingsDescription": "Configure your media player settings and preferences",
-    "storyBehind": "Story Behind"
+    "storyBehind": "Story Behind",
+    "notifications": "Notifications",
+    "enableNotifications": "Enable Notifications",
+    "showTrackChangeNotifications": "Show Track Change Notifications",
+    "showErrorNotifications": "Show Error Notifications",
+    "selectLanguage": "Select Language",
+    "save": "Save"
   },
   "song": {
     "label": {
@@ -76,7 +82,14 @@
       "finished": "Search finished!"
     },
     "settings": {
-      "saved": "Settings saved!"
+      "saved": "Settings saved successfully",
+      "error_saving": "Error saving settings",
+      "deleted": "Settings deleted successfully",
+      "deleted_failed": "Failed to delete settings"
+    },
+    "player": {
+      "track_changed": "Now playing: %{title}",
+      "error": "Playback error: %{message}"
     }
   },
   "buttons": {

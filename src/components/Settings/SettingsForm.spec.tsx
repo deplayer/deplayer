@@ -2,12 +2,38 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
+import type { State as SettingsStateType } from '../../reducers/settings'
+import type { UnknownAction } from 'redux'
 
-import SettingsForm from './SettingsForm'
+import { SettingsForm } from './SettingsForm'
 
 const mockStore = configureStore([])
 
-const setup = (customProps: any) => {
+interface SetupProps {
+  schema?: {
+    providers: Record<string, unknown>;
+    fields: Array<{
+      title: string;
+      name?: string;
+      type: string;
+    }>;
+  };
+  settings?: {
+    settingsForm: {
+      providers: Record<string, unknown>;
+      fields: Array<{
+        title: string;
+        name?: string;
+        type: string;
+      }>;
+    };
+    settings: SettingsStateType['settings'];
+  };
+  onSubmit?: () => Promise<void>;
+  dispatch?: (action: UnknownAction) => UnknownAction;
+}
+
+const setup = (customProps: Partial<SetupProps> = {}) => {
   const schema = {
     providers: {},
     fields: [
@@ -27,6 +53,11 @@ const setup = (customProps: any) => {
           language: {
             useSystemLanguage: true,
             code: 'en'
+          },
+          notifications: {
+            enabled: true,
+            showTrackChanges: true,
+            showErrors: true
           }
         }
       },
@@ -38,8 +69,14 @@ const setup = (customProps: any) => {
   const store = mockStore({
     i18n: {
       translations: {
-        buttons: {
-          saveSettings: 'Save Settings'
+        labels: {
+          save: 'Save',
+          language: 'Language',
+          useSystemLanguage: 'Use system language',
+          notifications: 'Notifications',
+          enableNotifications: 'Enable Notifications',
+          showTrackChanges: 'Show Track Changes',
+          showErrors: 'Show Errors'
         }
       }
     }
@@ -47,7 +84,7 @@ const setup = (customProps: any) => {
 
   render(
     <Provider store={store}>
-      <SettingsForm {...props} schema={schema} dispatch={() => {}} />
+      <SettingsForm {...props} schema={schema} dispatch={(action: UnknownAction) => action} />
     </Provider>
   )
 }
@@ -55,9 +92,22 @@ const setup = (customProps: any) => {
 describe('SettingsForm', () => {
   it('renders without crashing', () => {
     setup({})
-    // Find the submit button using a data-testid attribute
     const submitButton = screen.getByTestId('settings-submit')
     expect(submitButton).toBeTruthy()
     expect(submitButton).toHaveClass('btn', 'btn-primary')
+  })
+
+  it('renders language settings', () => {
+    setup({})
+    expect(screen.getByText('language')).toBeTruthy()
+    expect(screen.getByText('useSystemLanguage')).toBeTruthy()
+  })
+
+  it('renders notification settings', () => {
+    setup({})
+    expect(screen.getByText('notifications')).toBeTruthy()
+    expect(screen.getByText('enableNotifications')).toBeTruthy()
+    expect(screen.getByText('showTrackChanges')).toBeTruthy()
+    expect(screen.getByText('showErrors')).toBeTruthy()
   })
 })

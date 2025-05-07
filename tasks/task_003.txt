@@ -1,6 +1,6 @@
 # Task ID: 3
 # Title: Implement Local File System Access
-# Status: pending
+# Status: done
 # Dependencies: 1, 2
 # Priority: high
 # Description: Enable users to add and play media from their local file system using the File System Access API with fallback mechanisms for unsupported browsers.

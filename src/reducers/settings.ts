@@ -26,6 +26,11 @@ export type State = {
         code: string;
         useSystemLanguage: boolean;
       };
+      notifications: {
+        enabled: boolean;
+        showTrackChanges: boolean;
+        showErrors: boolean;
+      };
     };
   };
   settingsForm: {
@@ -66,6 +71,11 @@ export const defaultState: State = {
       language: {
         code: 'en',
         useSystemLanguage: true,
+      },
+      notifications: {
+        enabled: true,
+        showTrackChanges: true,
+        showErrors: true,
       },
     },
   },

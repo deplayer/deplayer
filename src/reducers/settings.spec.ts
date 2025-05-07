@@ -75,6 +75,11 @@ describe('settings reducer', () => {
           language: {
             code: 'en',
             useSystemLanguage: true
+          },
+          notifications: {
+            enabled: true,
+            showTrackChanges: true,
+            showErrors: true
           }
         },
         providers: {

@@ -1,6 +1,6 @@
 # Task ID: 1
 # Title: Setup Project Structure and Core Dependencies
-# Status: pending
+# Status: done
 # Dependencies: None
 # Priority: high
 # Description: Initialize the project repository with React/TypeScript and set up the core dependencies needed for the deplayer application.

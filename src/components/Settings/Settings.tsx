@@ -5,10 +5,14 @@ import * as React from 'react'
 import Button from '../common/Button'
 import Importer from '../Importer'
 import MainContainer from '../common/MainContainer'
-import SettingsForm from './SettingsForm'
+import { SettingsForm } from './SettingsForm'
 import * as types from '../../constants/ActionTypes'
 import { State as SettingsState } from '../../reducers/settings'
 import CenteredMessage from '../common/CenteredMessage'
+
+interface CollectionData {
+  [key: string]: unknown;
+}
 
 const Settings: React.FC = () => {
   const dispatch = useDispatch()
@@ -23,12 +27,13 @@ const Settings: React.FC = () => {
     dispatch({ type: types.EXPORT_COLLECTION })
   }
 
-  const importCollection = (data: any) => {
+  const importCollection = (data: string) => {
     try {
-      const collectionImport = JSON.parse(data)
+      const collectionImport = JSON.parse(data) as CollectionData
       dispatch({ type: types.IMPORT_COLLECTION, data: collectionImport })
-    } catch (e: any) {
-      dispatch({ type: types.IMPORT_COLLECTION_REJECTED, error: e.message })
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      dispatch({ type: types.IMPORT_COLLECTION_REJECTED, error: errorMessage })
     }
   }
 

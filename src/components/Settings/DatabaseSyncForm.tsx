@@ -1,89 +1,86 @@
-import { Formik, Form, FormikErrors } from 'formik';
 import { Translate } from 'react-redux-i18n';
-import { toast } from 'react-toastify';
 import classNames from 'classnames';
 
-import FormSchema from './FormSchema';
-import { getSyncFormSchema, storeSyncSettings, type SyncSettings } from '../../services/settings/syncSettings';
-import { reconnect } from '../../services/database/PgliteDatabase';
+import { type SyncSettings } from '../../services/settings/syncSettings';
 
-const validateForm = (values: SyncSettings): FormikErrors<SyncSettings> => {
-  const errors: FormikErrors<SyncSettings> = {};
-  const urlPattern = /^https?:\/\/.+/i;
-
-  if (values.enabled && !values.serverUrl) {
-    errors.serverUrl = 'Server URL is required when sync is enabled';
-  } else if (values.serverUrl && !urlPattern.test(values.serverUrl)) {
-    errors.serverUrl = 'Invalid URL format';
-  }
-
-  return errors;
+type Props = {
+  values: {
+    app: {
+      sync?: SyncSettings;
+    };
+  };
+  setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
 };
 
-const DatabaseSyncForm = () => {
-  const schema = getSyncFormSchema();
-  const initialValues: SyncSettings = {
-    enabled: schema.fields[0].value as boolean,
-    serverUrl: schema.fields[1].value as string,
-  };
-
-  const handleSubmit = async (values: SyncSettings) => {
-    try {
-      storeSyncSettings(values);
-      await reconnect();
-      toast.success('Sync settings saved');
-    } catch (error) {
-      console.error('Error saving sync settings:', error);
-      toast.error('Error saving sync settings');
-    }
-  };
+const DatabaseSyncForm = ({ values, setFieldValue }: Props) => {
 
   return (
-    <Formik
-      initialValues={initialValues}
-      validate={validateForm}
-      onSubmit={handleSubmit}
-      enableReinitialize
-    >
-      {({ errors, touched }) => (
-        <Form>
-          <div>
-            <FormSchema schema={schema} />
-            <div className={classNames("mb-4 prose")}>
-              <p className="text-base-content opacity-80">
-                <Translate value="labels.syncDescription" />
-              </p>
-              <div className="alert alert-info mt-4">
-                <div>
-                  <p>
-                    <Translate value="labels.syncServerInstructions" />
-                    {' '}
-                    <a 
-                      href="https://gitlab.com/deplayer/deplayer/-/blob/master/README.md#sync-server-setup" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="link link-primary-content"
-                    >
-                      <Translate value="labels.readDocs" />
-                    </a>
-                  </p>
-                </div>
-              </div>
-              {errors.serverUrl && touched.serverUrl && (
-                <div className="alert alert-error mt-4">
-                  <div>{errors.serverUrl}</div>
-                </div>
-              )}
-            </div>
-            <div className="flex justify-end mt-4">
-              <button type="submit" className="btn btn-primary">
-                <Translate value="buttons.save" />
-              </button>
-            </div>
+    <div>
+      <div className="my-3">
+        <div className="w-full flex items-center">
+          <label className="w-40 capitalize text-xl">
+            <Translate value="labels.enableSync" />
+          </label>
+          <div className="w-full toggle-control flex justify-end">
+            <input
+              type="checkbox"
+              id="enabled"
+              name="enabled"
+              className="toggle toggle-primary"
+              checked={values.app?.sync?.enabled ?? false}
+              onChange={(e) => {
+                setFieldValue('app.sync', {
+                  ...values.app?.sync,
+                  enabled: e.target.checked
+                });
+              }}
+            />
           </div>
-        </Form>
-      )}
-    </Formik>
+        </div>
+      </div>
+
+      <div className="my-3">
+        <div className="w-full flex items-center">
+          <label className="w-40 capitalize text-xl">
+            <Translate value="labels.syncServerUrl" />
+          </label>
+          <input
+            type="url"
+            name="serverUrl"
+            className="input input-bordered w-full"
+            value={values.app?.sync?.serverUrl ?? 'http://localhost:3000'}
+            onChange={(e) => {
+              setFieldValue('app.sync', {
+                ...values.app?.sync,
+                serverUrl: e.target.value
+              });
+            }}
+          />
+        </div>
+      </div>
+
+      <div className={classNames("mb-4 prose")}>
+        <p className="text-base-content opacity-80">
+          <Translate value="labels.syncDescription" />
+        </p>
+        <div className="alert alert-info mt-4">
+          <div>
+            <p>
+              <Translate value="labels.syncServerInstructions" />
+              {' '}
+              <a 
+                href="https://gitlab.com/deplayer/deplayer/-/blob/master/README.md#sync-server-setup" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="link link-primary-content"
+              >
+                <Translate value="labels.readDocs" />
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

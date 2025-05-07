@@ -1,6 +1,6 @@
 # Task ID: 2
 # Title: Implement Core Playback Engine
-# Status: pending
+# Status: done
 # Dependencies: 1
 # Priority: high
 # Description: Develop the core media playback functionality that supports both audio and video formats with standard playback controls.

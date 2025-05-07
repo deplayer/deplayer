@@ -4,7 +4,7 @@ import React from 'react'
 import ReactPlayer from 'react-player'
 import classNames from 'classnames'
 import { CSSTransition } from 'react-transition-group'
-import { InPortal, OutPortal } from 'react-reverse-portal'
+import { InPortal, OutPortal, createHtmlPortalNode } from 'react-reverse-portal'
 import SpectrumVisualizer from '../SpectrumVisualizer'
 import { State as PlayerState } from '../../reducers/player'
 import { State as SettingsState } from '../../reducers/settings'
@@ -19,26 +19,37 @@ import PeerStreamPlayer from './CustomPlayers/PeerStreamPlayer'
 import DigitalScreen from './DigitalScreen'
 import * as types from '../../constants/ActionTypes'
 import PlayerRefService from '../../services/PlayerRefService'
+import type Media from '../../entities/Media'
 
-ReactPlayer.addCustomPlayer((WebtorrentPlayer as any))
-ReactPlayer.addCustomPlayer(PeerStreamPlayer as any)
+// Add custom players to ReactPlayer with proper type casting
+ReactPlayer.addCustomPlayer(WebtorrentPlayer as unknown as ReactPlayer)
+ReactPlayer.addCustomPlayer(PeerStreamPlayer as unknown as ReactPlayer)
 
-type Props = {
-  app: AppState,
-  queue: QueueState,
-  location: Location,
-  slim: boolean,
-  player: PlayerState,
-  settings: SettingsState,
-  itemCount: number,
-  collection: CollectionState,
-  dispatch: Dispatch,
-  playerPortal: any,
-  match: any,
+interface Props {
+  app: AppState
+  queue: QueueState
+  location: Location
+  slim: boolean
+  player: PlayerState
+  settings: SettingsState
+  itemCount: number
+  collection: CollectionState
+  dispatch: Dispatch
+  playerPortal: ReturnType<typeof createHtmlPortalNode>
+  match: {
+    params: {
+      [key: string]: string
+    }
+  }
+  progress: number
+  duration: number
+  playing: boolean
+  onPlayPause: () => void
+  onSeek: (value: number) => void
 }
 
 interface State {
-  timeShown: number;
+  timeShown: number
 }
 
 /**
@@ -86,8 +97,69 @@ class PlayerControls extends React.Component<Props, State> {
     PlayerRefService.getInstance().setPlayerRef(this.playerRef)
   }
 
+  componentDidUpdate(prevProps: Props): void {
+    const { queue, collection, settings } = this.props
+    const { currentPlaying } = queue
+
+    // Show notification for track changes if enabled
+    if (prevProps.queue.currentPlaying !== currentPlaying && currentPlaying) {
+      const currentTrack = collection.rows[currentPlaying]
+      if (currentTrack && settings.settings.app.notifications?.enabled && 
+          settings.settings.app.notifications?.showTrackChanges) {
+        this.showTrackNotification(currentTrack)
+      }
+    }
+  }
+
   componentWillUnmount(): void {
     PlayerRefService.getInstance().setPlayerRef(null)
+  }
+
+  showTrackNotification = (track: Media): void => {
+    if (!('Notification' in window) || Notification.permission !== 'granted') {
+      return
+    }
+
+    const options: NotificationOptions = {
+      body: `${track.artistName || 'Unknown Artist'} - ${track.albumName || 'Unknown Album'}`,
+      icon: track.cover?.thumbnailUrl || track.cover?.fullUrl,
+      silent: true,
+      tag: 'now-playing',
+      requireInteraction: false
+    }
+
+    new Notification(track.title || 'Unknown Title', options)
+  }
+
+  showErrorNotification = (error: string): void => {
+    const { settings } = this.props
+    if (!('Notification' in window) || Notification.permission !== 'granted' || 
+        !settings.settings.app.notifications?.enabled || 
+        !settings.settings.app.notifications?.showErrors) {
+      return
+    }
+
+    const options: NotificationOptions = {
+      body: error,
+      icon: '/icons/error.png',
+      tag: 'player-error',
+      requireInteraction: true
+    }
+
+    new Notification('Playback Error', options)
+  }
+
+  handleError = (error: Error): void => {
+    const { dispatch } = this.props
+    const errorMessage = error.message || 'An error occurred during playback'
+    
+    this.showErrorNotification(errorMessage)
+    
+    dispatch({
+      type: types.SEND_NOTIFICATION,
+      notification: 'notifications.player.error',
+      error: errorMessage
+    })
   }
 
   toggleFullscreen = (): void => {
@@ -121,7 +193,7 @@ class PlayerControls extends React.Component<Props, State> {
     }
   }
 
-  onProgress = (state: any): void => {
+  onProgress = (state: { played: number; loaded: number; playedSeconds: number; loadedSeconds: number }): void => {
     if (this.props.player.fullscreen && this.state.timeShown > 2) {
       this.props.player.showPlayer && this.props.dispatch({ type: types.HIDE_PLAYER })
       this.setState({ timeShown: 0 })
@@ -270,7 +342,7 @@ class PlayerControls extends React.Component<Props, State> {
                 this.saveTrackPlayed(currentPlayingId)
               }}
               config={config}
-              onError={this.onError}
+              onError={this.handleError}
               onProgress={this.onProgress}
               onDuration={this.onDuration}
               progressInterval={1000}

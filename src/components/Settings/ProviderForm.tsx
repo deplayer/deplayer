@@ -1,21 +1,40 @@
 import { Dispatch } from 'redux'
+import classNames from 'classnames'
 
 import { State as SettingsStateType } from '../../reducers/settings'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
 import FormSchema from './FormSchema'
 import * as types from '../../constants/ActionTypes'
-import { settingsCard } from './SettingsForm'
+
+const settingsCard = classNames(
+  'card',
+  'bg-base-600',
+  'shadow-xl',
+  'p-6',
+  'relative',
+  'bg-base-200',
+  'p-8',
+  'mb-6',
+  'rounded-lg',
+  'shadow-sm'
+)
+
 type ProviderFormProps = {
   providerKey: string,
   settings: SettingsStateType,
   dispatch: Dispatch
 }
 
+interface RemoveProviderBtnProps {
+  providerKey: string;
+  dispatch: Dispatch;
+}
+
 const ProviderForm = (props: ProviderFormProps) => {
-  const RemoveProviderBtn = (props: any) => {
+  const RemoveProviderBtn = ({ providerKey, dispatch }: RemoveProviderBtnProps) => {
     const onClick = () => {
-      props.dispatch({ type: types.REMOVE_PROVIDER, providerKey: props.providerKey })
+      dispatch({ type: types.REMOVE_PROVIDER, providerKey })
     }
 
     return (
@@ -24,7 +43,7 @@ const ProviderForm = (props: ProviderFormProps) => {
         size='lg'
         className='hover:text-error'
         onClick={onClick}
-        title={props.providerKey}
+        title={providerKey}
       >
         <Icon icon='faTrash' />
       </Button>

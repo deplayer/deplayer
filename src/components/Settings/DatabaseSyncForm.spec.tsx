@@ -1,59 +1,72 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { toast } from 'react-toastify'
-import { Field } from 'formik'
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { Provider } from 'react-redux'
+import configureStore from 'redux-mock-store'
 import DatabaseSyncForm from './DatabaseSyncForm'
-import { storeSyncSettings } from '../../services/settings/syncSettings'
-import { reconnect } from '../../services/database/PgliteDatabase'
 
-// Mock only the toast functions we use
-vi.mock('react-toastify', () => ({
-  toast: {
-    success: vi.fn(),
-    error: vi.fn()
+const mockStore = configureStore([])
+
+// Mock the store with translations
+const store = mockStore({
+  i18n: {
+    translations: {
+      labels: {
+        enableSync: 'Enable Sync',
+        syncServerUrl: 'Server URL',
+        syncDescription: 'Sync Description',
+        syncServerInstructions: 'Server Instructions',
+        readDocs: 'Read Docs'
+      }
+    }
   }
-}))
+})
 
-// Mock only the settings functions we use
+// Mock getSyncFormSchema
 vi.mock('../../services/settings/syncSettings', () => ({
-  storeSyncSettings: vi.fn(),
   getSyncFormSchema: vi.fn(() => ({
     fields: [
       { name: "enabled", type: "checkbox", value: false },
       { name: "serverUrl", type: "url", value: "http://localhost:3000" }
-    ],
+    ]
   }))
 }))
 
-vi.mock('../../services/database/PgliteDatabase', () => ({
-  reconnect: vi.fn()
-}))
-
-// Simplified FormSchema mock that just renders the fields we need to test
-vi.mock('./FormSchema', () => ({
-  default: () => (
-    <>
-      <Field type="checkbox" name="enabled" />
-      <Field type="text" name="serverUrl" />
-    </>
-  )
-}))
-
 describe('DatabaseSyncForm', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
+  const defaultProps = {
+    values: {
+      app: {
+        sync: {
+          enabled: false,
+          serverUrl: 'http://localhost:3000'
+        }
+      }
+    },
+    setFieldValue: vi.fn()
+  }
 
   it('renders with default values', () => {
-    render(<DatabaseSyncForm />)
+    render(
+      <Provider store={store}>
+        <DatabaseSyncForm {...defaultProps} />
+      </Provider>
+    )
     
     // Check if form fields are rendered
-    expect(screen.getByRole('checkbox')).toBeTruthy()
-    expect(screen.getByRole('textbox')).toBeTruthy()
+    const enabledCheckbox = screen.getByRole('checkbox')
+    const serverUrlInput = screen.getByRole('textbox')
+
+    expect(enabledCheckbox).toBeTruthy()
+    expect(serverUrlInput).toBeTruthy()
+    expect(enabledCheckbox).not.toBeChecked()
+    expect(serverUrlInput).toHaveValue('http://localhost:3000')
   })
 
-  it('handles form submission successfully', async () => {
-    render(<DatabaseSyncForm />)
+  it('handles form field changes', async () => {
+    render(
+      <Provider store={store}>
+        <DatabaseSyncForm {...defaultProps} />
+      </Provider>
+    )
     
     // Get form elements
     const enabledCheckbox = screen.getByRole('checkbox')
@@ -61,34 +74,31 @@ describe('DatabaseSyncForm', () => {
 
     // Change form values
     fireEvent.click(enabledCheckbox)
+    expect(defaultProps.setFieldValue).toHaveBeenCalledWith('app.sync', {
+      enabled: true,
+      serverUrl: 'http://localhost:3000'
+    })
+
     fireEvent.change(serverUrlInput, { target: { value: 'http://test-server:3000' } })
-
-    // Submit form
-    const submitButton = screen.getByRole('button', { name: /save/i })
-    fireEvent.click(submitButton)
-
-    await waitFor(() => {
-      expect(storeSyncSettings).toHaveBeenCalledWith({
-        enabled: true,
-        serverUrl: 'http://test-server:3000'
-      })
-      expect(reconnect).toHaveBeenCalled()
-      expect(toast.success).toHaveBeenCalledWith('Sync settings saved')
+    expect(defaultProps.setFieldValue).toHaveBeenCalledWith('app.sync', {
+      enabled: false,
+      serverUrl: 'http://test-server:3000'
     })
   })
 
-  it('handles form submission error', async () => {
-    const error = new Error('Test error')
-    vi.mocked(reconnect).mockRejectedValueOnce(error)
+  it('renders sync instructions', () => {
+    render(
+      <Provider store={store}>
+        <DatabaseSyncForm {...defaultProps} />
+      </Provider>
+    )
 
-    render(<DatabaseSyncForm />)
-    
-    // Submit form
-    const submitButton = screen.getByRole('button', { name: /save/i })
-    fireEvent.click(submitButton)
-
-    await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith('Error saving sync settings')
-    })
+    expect(screen.getByText('syncDescription')).toBeTruthy()
+    expect(screen.getByText('syncServerInstructions')).toBeTruthy()
+    expect(screen.getByText('readDocs')).toBeTruthy()
+    expect(screen.getByRole('link')).toHaveAttribute(
+      'href',
+      'https://gitlab.com/deplayer/deplayer/-/blob/master/README.md#sync-server-setup'
+    )
   })
 }) 

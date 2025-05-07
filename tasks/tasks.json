@@ -8,7 +8,7 @@
       "testStrategy": "1. Verify project builds without errors\n2. Confirm TypeScript configuration is working correctly\n3. Test that PGLite can be initialized\n4. Verify PWA manifest and service worker registration\n5. Create simple smoke tests for the application shell rendering",
       "priority": "high",
       "dependencies": [],
-      "status": "pending",
+      "status": "done",
       "subtasks": []
     },
     {
@@ -21,7 +21,7 @@
       "dependencies": [
         1
       ],
-      "status": "pending",
+      "status": "done",
       "subtasks": []
     },
     {
@@ -35,7 +35,7 @@
         1,
         2
       ],
-      "status": "pending",
+      "status": "done",
       "subtasks": []
     },
     {
@@ -49,7 +49,7 @@
         1,
         3
       ],
-      "status": "pending",
+      "status": "done",
       "subtasks": []
     },
     {
@@ -105,7 +105,60 @@
         2
       ],
       "status": "pending",
-      "subtasks": []
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Integrate Media Session API for OS Media Controls",
+          "description": "Implement the Media Session API to enable OS-level media controls, including setting up metadata and action handlers for play, pause, previous, next, and seek actions.",
+          "dependencies": [],
+          "details": "Use the MediaSession and MediaMetadata interfaces to provide rich metadata (title, artist, album, artwork) and register action handlers for media key events, allowing users to control playback from device controls and lock screens.",
+          "status": "pending",
+          "testStrategy": "Verify that media controls (play, pause, next, previous, seek) work from OS-level interfaces and that metadata displays correctly on lock screens and notification areas."
+        },
+        {
+          "id": 2,
+          "title": "Update Media Session Metadata on Track Changes",
+          "description": "Ensure that Media Session metadata is dynamically updated whenever the current track changes.",
+          "dependencies": [
+            1
+          ],
+          "details": "Listen for track change events and update the MediaSession.metadata property with the new track's information, including artwork, to keep OS and browser notifications in sync with playback.",
+          "status": "pending",
+          "testStrategy": "Change tracks during playback and confirm that OS-level media notifications and controls reflect the new track's metadata."
+        },
+        {
+          "id": 3,
+          "title": "Implement Browser Notifications for Track Changes and Events",
+          "description": "Create browser notifications that inform users of track changes and relevant playback events, including displaying track artwork.",
+          "dependencies": [],
+          "details": "Use the Notification API to display notifications with track title, artist, and artwork when a track changes or when specific events (e.g., errors, playback started) occur.",
+          "status": "pending",
+          "testStrategy": "Trigger track changes and playback events, then verify that notifications appear with correct information and artwork."
+        },
+        {
+          "id": 4,
+          "title": "Implement Error and Event Notifications",
+          "description": "Display browser notifications for errors and significant playback events to keep users informed.",
+          "dependencies": [
+            3
+          ],
+          "details": "Detect playback errors and other key events, then use the Notification API to alert users with descriptive messages and relevant context.",
+          "status": "pending",
+          "testStrategy": "Simulate errors and events, ensuring notifications are shown with accurate and helpful information."
+        },
+        {
+          "id": 5,
+          "title": "Add Notification Preferences to Settings",
+          "description": "Provide user-configurable settings to enable or disable different types of browser notifications related to media playback.",
+          "dependencies": [
+            3,
+            4
+          ],
+          "details": "Integrate notification preferences into the application's settings UI, allowing users to control which notifications they receive (e.g., track changes, errors, events).",
+          "status": "pending",
+          "testStrategy": "Change notification settings and verify that only the selected types of notifications are shown during playback and events."
+        }
+      ]
     },
     {
       "id": 9,
