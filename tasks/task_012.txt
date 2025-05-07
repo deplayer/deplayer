@@ -1,0 +1,89 @@
+# Task ID: 12
+# Title: Implement Optional Cross-Device Sync
+# Status: pending
+# Dependencies: 4
+# Priority: low
+# Description: Enable optional synchronization of user data across devices using ElectricSQL and PostgreSQL.
+# Details:
+1. Install ElectricSQL client:
+   ```bash
+   npm install electric-sql
+   ```
+2. Create sync configuration:
+   ```typescript
+   import { ElectricDatabase, electrify } from 'electric-sql/wa-sqlite';
+   
+   async function setupSync(dbName: string, syncServerUrl: string) {
+     // Initialize the database
+     const conn = await ElectricDatabase.init(dbName);
+     
+     // Define the shape of your database
+     const schema = {
+       version: 1,
+       tables: {
+         media: {
+           columns: {
+             id: { type: 'TEXT', primaryKey: true },
+             title: { type: 'TEXT' },
+             artist: { type: 'TEXT' },
+             album: { type: 'TEXT' },
+             duration: { type: 'INTEGER' },
+             path: { type: 'TEXT' },
+             type: { type: 'TEXT' },
+             provider: { type: 'TEXT' },
+             thumbnail: { type: 'TEXT' },
+             added_date: { type: 'INTEGER' }
+           }
+         },
+         playlists: {
+           columns: {
+             id: { type: 'TEXT', primaryKey: true },
+             name: { type: 'TEXT' },
+             description: { type: 'TEXT' },
+             created_date: { type: 'INTEGER' }
+           }
+         },
+         playlist_items: {
+           columns: {
+             playlist_id: { type: 'TEXT' },
+             media_id: { type: 'TEXT' },
+             position: { type: 'INTEGER' }
+           },
+           primaryKey: ['playlist_id', 'media_id']
+         },
+         settings: {
+           columns: {
+             key: { type: 'TEXT', primaryKey: true },
+             value: { type: 'TEXT' }
+           }
+         }
+       }
+     };
+     
+     // Electrify the database
+     const electric = await electrify(conn, schema);
+     
+     // Connect to the sync server
+     await electric.connect(syncServerUrl, {
+       auth: { token: 'auth-token' } // Implement proper auth
+     });
+     
+     return electric;
+   }
+   ```
+3. Create sync settings UI for server URL and enable/disable toggle
+4. Implement conflict resolution strategies
+5. Add sync status indicators
+6. Create data migration utilities for initial sync
+7. Implement selective sync for specific data types
+8. Add error handling and retry mechanisms for sync failures
+
+# Test Strategy:
+1. Test connection to ElectricSQL server
+2. Verify data synchronization between devices
+3. Test conflict resolution with simultaneous edits
+4. Verify sync works after connection loss and reconnection
+5. Test selective sync functionality
+6. Verify large dataset synchronization performance
+7. Test error handling and recovery
+8. Verify security of synchronized data

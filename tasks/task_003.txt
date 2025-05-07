@@ -1,0 +1,40 @@
+# Task ID: 3
+# Title: Implement Local File System Access
+# Status: pending
+# Dependencies: 1, 2
+# Priority: high
+# Description: Enable users to add and play media from their local file system using the File System Access API with fallback mechanisms for unsupported browsers.
+# Details:
+1. Create a FileSystemProvider component that implements the File System Access API:
+   ```typescript
+   async function requestLocalMediaAccess() {
+     try {
+       // Check if File System Access API is supported
+       if ('showDirectoryPicker' in window) {
+         const dirHandle = await window.showDirectoryPicker();
+         return processDirectoryHandle(dirHandle);
+       } else {
+         // Fallback to standard file input
+         return useStandardFileInput();
+       }
+     } catch (error) {
+       console.error('Error accessing file system:', error);
+     }
+   }
+   ```
+2. Implement directory traversal to scan for media files
+3. Create file type detection for audio and video formats
+4. Extract metadata from media files (artist, album, title, etc.)
+5. Store file references and metadata in PGLite database
+6. Implement fallback using standard file input for browsers without File System Access API
+7. Create UI for browsing and selecting local media files
+8. Add drag-and-drop support for adding files
+
+# Test Strategy:
+1. Test File System Access API with various directory structures
+2. Verify fallback mechanism works in browsers without API support
+3. Test with different media file formats to ensure proper detection
+4. Verify metadata extraction from various file types
+5. Test database storage and retrieval of file references
+6. Verify drag-and-drop functionality
+7. Test performance with large media libraries

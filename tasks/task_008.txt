@@ -1,0 +1,62 @@
+# Task ID: 8
+# Title: Implement Media Session API and Notifications
+# Status: pending
+# Dependencies: 2
+# Priority: medium
+# Description: Integrate with the Media Session API for OS media controls and implement browser notifications for track changes and events.
+# Details:
+1. Implement Media Session API integration:
+   ```typescript
+   function useMediaSession(mediaPlayer) {
+     useEffect(() => {
+       if ('mediaSession' in navigator) {
+         navigator.mediaSession.metadata = new MediaMetadata({
+           title: mediaPlayer.currentTrack?.title || 'Unknown Title',
+           artist: mediaPlayer.currentTrack?.artist || 'Unknown Artist',
+           album: mediaPlayer.currentTrack?.album || 'Unknown Album',
+           artwork: [
+             { src: mediaPlayer.currentTrack?.thumbnail || '/default-artwork.jpg', sizes: '512x512', type: 'image/jpeg' }
+           ]
+         });
+         
+         navigator.mediaSession.setActionHandler('play', () => mediaPlayer.play());
+         navigator.mediaSession.setActionHandler('pause', () => mediaPlayer.pause());
+         navigator.mediaSession.setActionHandler('previoustrack', () => mediaPlayer.previous());
+         navigator.mediaSession.setActionHandler('nexttrack', () => mediaPlayer.next());
+         navigator.mediaSession.setActionHandler('seekto', (details) => {
+           if (details.seekTime) mediaPlayer.seek(details.seekTime);
+         });
+       }
+     }, [mediaPlayer.currentTrack]);
+   }
+   ```
+2. Implement browser notifications:
+   ```typescript
+   function showNotification(title, options) {
+     if (!('Notification' in window)) return;
+     
+     if (Notification.permission === 'granted') {
+       new Notification(title, options);
+     } else if (Notification.permission !== 'denied') {
+       Notification.requestPermission().then(permission => {
+         if (permission === 'granted') {
+           new Notification(title, options);
+         }
+       });
+     }
+   }
+   ```
+3. Create track change notifications with artwork
+4. Implement error and event notifications
+5. Add notification preferences in settings
+6. Update Media Session metadata on track changes
+7. Handle media key events from keyboard and headphone controls
+
+# Test Strategy:
+1. Test Media Session API integration on different operating systems
+2. Verify media controls work with system UI (lock screen, notification area)
+3. Test notifications appear correctly for track changes
+4. Verify notification permission handling
+5. Test media key handling from keyboard and headphones
+6. Verify artwork displays correctly in system UI
+7. Test with different browsers to ensure compatibility
