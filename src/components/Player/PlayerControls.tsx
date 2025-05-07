@@ -41,15 +41,14 @@ interface Props {
       [key: string]: string
     }
   }
-  progress: number
-  duration: number
-  playing: boolean
-  onPlayPause: () => void
-  onSeek: (value: number) => void
 }
 
 interface State {
-  timeShown: number
+  timeShown: number;
+  played: number;
+  loaded: number;
+  playedSeconds: number;
+  loadedSeconds: number;
 }
 
 /**
@@ -86,6 +85,10 @@ class PlayerControls extends React.Component<Props, State> {
   private playerRef: React.RefObject<ReactPlayer>;
   public state: State = {
     timeShown: 0,
+    played: 0,
+    loaded: 0,
+    playedSeconds: 0,
+    loadedSeconds: 0
   };
 
   constructor(props: Props) {
@@ -187,10 +190,25 @@ class PlayerControls extends React.Component<Props, State> {
 
   onSeekChange = (value: number | number[]): void => {
     const seekValue = Array.isArray(value) ? value[0] : value;
-    this.props.dispatch({ type: types.SET_PLAYER_PLAYED_SECONDS, value: seekValue / 1000 })
-    if (this.playerRef.current) {
-      this.playerRef.current.seekTo(seekValue / 1000)
-    }
+    // seekValue is in milliseconds, convert to seconds for the player
+    const seekSeconds = seekValue / 1000;
+    
+    this.setState({ 
+      playedSeconds: seekSeconds,
+      played: seekSeconds / this.props.player.duration
+    }, () => {
+      console.log('Seek state updated:', {
+        seekValueMs: seekValue,
+        seekSeconds,
+        playedSeconds: this.state.playedSeconds,
+        played: this.state.played,
+        duration: this.props.player.duration
+      });
+      
+      if (this.playerRef.current) {
+        this.playerRef.current.seekTo(seekSeconds);
+      }
+    });
   }
 
   onProgress = (state: { played: number; loaded: number; playedSeconds: number; loadedSeconds: number }): void => {
@@ -206,8 +224,21 @@ class PlayerControls extends React.Component<Props, State> {
     if (this.props.player.errorCount) {
       this.props.dispatch({ type: types.CLEAR_PLAYER_ERRORS })
     }
-    // We only want to update time slider if we are not currently
-    this.props.dispatch({ type: types.SET_PLAYER_PROGRESS, value: state })
+
+    // Update local state with progress information
+    this.setState({
+      played: state.played,
+      loaded: state.loaded,
+      playedSeconds: state.playedSeconds,
+      loadedSeconds: state.loadedSeconds
+    }, () => {
+      console.log('Progress state updated:', {
+        played: this.state.played,
+        loaded: this.state.loaded,
+        playedSeconds: this.state.playedSeconds,
+        loadedSeconds: this.state.loadedSeconds
+      });
+    });
   }
 
   onDuration = (duration: number): void => {
@@ -253,14 +284,23 @@ class PlayerControls extends React.Component<Props, State> {
     return null
   }
 
+  onSeekMouseUp = (value: number | number[]): void => {
+    if (typeof value === 'number') {
+      this.playerRef.current?.seekTo(value / 1000);
+    }
+  }
+
   render(): React.ReactNode {
     const {
-      playedSeconds,
       playing,
       duration,
-      loadedSeconds,
       volume
     } = this.props.player
+
+    const {
+      playedSeconds,
+      loadedSeconds
+    } = this.state
 
     const currentPlayingId = this.props.queue.currentPlaying
     if (!currentPlayingId) {
@@ -372,11 +412,12 @@ class PlayerControls extends React.Component<Props, State> {
                 <div key='player-controls' className={playerControlsClassnames} style={{ zIndex: 103 }}>
                   <div className='absolute w-full md:top-0 pointer-events-none' style={{ zIndex: 151 }}>
                     <ProgressBar
-                      dispatch={this.props.dispatch}
                       total={duration * 1000}
-                      buffered={loadedSeconds * 1000}
                       current={playedSeconds * 1000}
+                      buffered={loadedSeconds * 1000}
+                      dispatch={this.props.dispatch}
                       onChange={this.onSeekChange}
+                      onAfterChange={this.onSeekMouseUp}
                     />
                   </div>
                   <div className='flex flex-initial items-center justify-between min-w-0 max-w-full w-full' style={{ zIndex: 150 }}>

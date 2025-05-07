@@ -1,6 +1,6 @@
 # Task ID: 7
 # Title: Implement youtube-dl-server Integration
-# Status: pending
+# Status: done
 # Dependencies: 2, 4
 # Priority: medium
 # Description: Enable users to add YouTube videos and other supported sites to their collection by connecting to a self-hosted youtube-dl-server instance.

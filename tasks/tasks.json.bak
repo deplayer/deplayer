@@ -218,54 +218,10 @@
       "description": "Refactor the player progress tracking mechanism by removing Redux action SET_PLAYER_PROGRESS and implementing a local state solution in the PlayerControls component to reduce unnecessary re-renders and improve application performance.",
       "details": "This task involves a significant refactoring of the player progress tracking mechanism to improve performance:\n\n1. Remove the SET_PLAYER_PROGRESS Redux action:\n   - Delete the action creator in the player actions file\n   - Remove the corresponding reducer case in the player reducer\n   - Update any tests that rely on this action\n\n2. Implement local state in PlayerControls component:\n   - Add React useState hooks for tracking progress metrics (played, loaded, playedSeconds, loadedSeconds)\n   - Update the onProgress handler to update local state instead of dispatching Redux actions\n   - Ensure the component correctly manages this state throughout its lifecycle\n\n3. Update related components:\n   - Modify the ProgressBar component to receive progress values directly as props from PlayerControls\n   - Update the time display component to receive playedSeconds/duration from local state\n   - Ensure any other components that previously consumed progress from Redux are updated\n\n4. Maintain Redux for playback control only:\n   - Keep play/pause, next/previous track, and seeking functionality in Redux\n   - Update the seeking mechanism to work with the new local state approach\n   - Ensure volume control and other player settings remain functional\n\n5. Performance monitoring:\n   - Before implementation, add performance metrics using React DevTools Profiler or a similar tool\n   - Record baseline metrics for player progress updates (frequency of renders, component update times)\n   - After implementation, run the same performance tests to quantify improvements\n   - Document the performance gains in comments and the PR\n\n6. Code organization:\n   - Update PropTypes and TypeScript types if applicable\n   - Ensure clean separation between local state and Redux state\n   - Add comments explaining the performance optimization approach",
       "testStrategy": "Testing for this optimization should be comprehensive to ensure functionality is maintained while performance is improved:\n\n1. Performance testing:\n   - Use React DevTools Profiler to record and compare render counts before and after the change\n   - Implement performance marks/measures using the Performance API to quantify improvements\n   - Create a test script that plays a song for 30 seconds and measures render frequency\n   - Document performance metrics in a before/after comparison table\n\n2. Functional testing:\n   - Verify all player controls still work correctly (play, pause, next, previous)\n   - Test seeking functionality by clicking different positions on the progress bar\n   - Ensure the time display updates correctly as the song progresses\n   - Verify that loaded progress (buffering) is still displayed properly\n\n3. Integration testing:\n   - Test that player state is correctly maintained when navigating between different app routes\n   - Verify that any components that previously relied on progress from Redux still function\n   - Test edge cases like seeking near the end of a track or rapid seeking\n\n4. Regression testing:\n   - Create a checklist of all player features and verify each one works after the refactoring\n   - Test on different browsers and devices to ensure consistent behavior\n   - Verify that volume control and other player settings are unaffected\n\n5. Code review:\n   - Ensure all Redux references to SET_PLAYER_PROGRESS are removed\n   - Verify that the PlayerControls component properly manages its local state\n   - Check for any memory leaks or performance issues in the implementation\n\n6. User testing:\n   - Have team members use the player with the new implementation to verify smooth operation\n   - Compare subjective smoothness of the player experience before and after",
-      "status": "done",
+      "status": "pending",
       "dependencies": [],
       "priority": "high",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Remove Redux SET_PLAYER_PROGRESS Action and Update Reducer",
-          "description": "Delete the SET_PLAYER_PROGRESS action creator, remove the corresponding reducer case, and update affected tests.",
-          "dependencies": [],
-          "details": "Delete the SET_PLAYER_PROGRESS action creator in the player actions file. Remove the corresponding case in the player reducer that handles this action. Update any unit tests that rely on this action to prevent test failures. Document the removal in code comments for future reference.",
-          "status": "done",
-          "testStrategy": "Run existing test suite to identify failing tests. Update tests to reflect the new architecture. Verify Redux store no longer contains player progress data."
-        },
-        {
-          "id": 2,
-          "title": "Implement Local State in PlayerControls Component",
-          "description": "Add React useState hooks to track progress metrics locally within the PlayerControls component.",
-          "dependencies": [
-            1
-          ],
-          "details": "Implement useState hooks for tracking played, loaded, playedSeconds, and loadedSeconds metrics. Update the onProgress handler to update local state instead of dispatching Redux actions. Ensure component correctly manages state throughout its lifecycle, including cleanup on unmount. Add appropriate PropTypes or TypeScript types for the local state variables.",
-          "status": "done",
-          "testStrategy": "Create unit tests for the PlayerControls component to verify local state updates correctly when onProgress is called. Test component lifecycle methods to ensure proper state management."
-        },
-        {
-          "id": 3,
-          "title": "Update Related Components to Use Local State",
-          "description": "Modify ProgressBar, time display, and other components to receive progress values directly from PlayerControls instead of Redux.",
-          "dependencies": [
-            2
-          ],
-          "details": "Update the ProgressBar component to receive progress values as props from PlayerControls instead of connecting to Redux. Modify the time display component to receive playedSeconds/duration from local state. Identify and update any other components that previously consumed progress data from Redux. Ensure proper prop drilling or context usage for components that need access to the progress data.",
-          "status": "done",
-          "testStrategy": "Test the integration between PlayerControls and dependent components. Verify that progress updates are correctly propagated to child components. Check for any rendering issues or prop type errors."
-        },
-        {
-          "id": 4,
-          "title": "Maintain Redux for Playback Control",
-          "description": "Ensure play/pause, track navigation, seeking, and volume control remain functional with Redux while progress uses local state.",
-          "dependencies": [
-            2,
-            3
-          ],
-          "details": "Keep play/pause, next/previous track functionality in Redux. Update the seeking mechanism to work with the new local state approach, ensuring seeking dispatches Redux actions but updates local progress state appropriately. Verify volume control and other player settings remain functional. Create clear separation between local state (progress) and Redux state (playback control).",
-          "status": "done",
-          "testStrategy": "Test all playback controls to ensure they still function correctly. Verify seeking works properly with the new implementation. Test edge cases like seeking while paused or rapid seeking."
-        }
-      ]
+      "subtasks": []
     }
   ]
 }

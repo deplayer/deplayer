@@ -1,6 +1,6 @@
 # Task ID: 5
 # Title: Implement Webtorrent Support
-# Status: pending
+# Status: done
 # Dependencies: 2, 4
 # Priority: medium
 # Description: Enable users to play media directly from magnet links and .torrent files using Webtorrent.

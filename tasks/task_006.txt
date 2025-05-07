@@ -1,6 +1,6 @@
 # Task ID: 6
 # Title: Implement Subsonic API Integration
-# Status: pending
+# Status: done
 # Dependencies: 2, 4
 # Priority: medium
 # Description: Allow users to connect to and stream media from their Subsonic server by implementing the Subsonic API client.

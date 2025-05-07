@@ -12,7 +12,24 @@ type Props = {
 }
 
 const ProgressBar = (props: Props) => {
-  const step = 100 / props.total
+  // Calculate step as 1ms since we're working with millisecond precision
+  const step = 1;
+
+  // Add debug logging
+  console.log('ProgressBar props:', {
+    totalMs: props.total,
+    currentMs: props.current,
+    bufferedMs: props.buffered,
+    totalSec: props.total / 1000,
+    currentSec: props.current / 1000,
+    bufferedSec: props.buffered / 1000,
+    step
+  });
+
+  if (!props.total || props.total <= 0) {
+    console.warn('Invalid total duration:', props.total);
+    return null;
+  }
 
   return (
     <div className='player-progress h-8'>
@@ -58,7 +75,7 @@ const ProgressBar = (props: Props) => {
             width: '16px' 
           }
         }}
-        onChangeComplete={props.onChange}
+        onChangeComplete={props.onAfterChange}
       />
       <style>{`
         .player-progress:hover .rc-slider-handle {

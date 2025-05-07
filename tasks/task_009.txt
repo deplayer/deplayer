@@ -1,6 +1,6 @@
 # Task ID: 9
 # Title: Implement Lyrics and Visualizations
-# Status: pending
+# Status: done
 # Dependencies: 2
 # Priority: low
 # Description: Add lyrics display using the lyrics.ovh API and implement audio visualizations using butterchurn and react-audio-spectrum.

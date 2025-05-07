@@ -4,12 +4,13 @@ import { describe, it, expect } from 'vitest'
 import {
   START_PLAYING,
   VOLUME_SET,
-  SET_CURRENT_TIME
+  SET_CURRENT_TIME,
+  STOP_PLAYING
 } from '../constants/ActionTypes'
 
 describe('collection reducer', () => {
   it('should return the initial state', () => {
-    expect(reducer(undefined, { type: '' }))
+    expect(reducer(undefined, { type: STOP_PLAYING }))
       .toEqual(defaultState)
   })
 

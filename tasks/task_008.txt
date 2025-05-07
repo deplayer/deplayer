@@ -1,6 +1,6 @@
 # Task ID: 8
 # Title: Implement Media Session API and Notifications
-# Status: pending
+# Status: done
 # Dependencies: 2
 # Priority: medium
 # Description: Integrate with the Media Session API for OS media controls and implement browser notifications for track changes and events.
@@ -62,31 +62,31 @@
 7. Test with different browsers to ensure compatibility
 
 # Subtasks:
-## 1. Integrate Media Session API for OS Media Controls [pending]
+## 1. Integrate Media Session API for OS Media Controls [done]
 ### Dependencies: None
 ### Description: Implement the Media Session API to enable OS-level media controls, including setting up metadata and action handlers for play, pause, previous, next, and seek actions.
 ### Details:
 Use the MediaSession and MediaMetadata interfaces to provide rich metadata (title, artist, album, artwork) and register action handlers for media key events, allowing users to control playback from device controls and lock screens.
 
-## 2. Update Media Session Metadata on Track Changes [pending]
+## 2. Update Media Session Metadata on Track Changes [done]
 ### Dependencies: 8.1
 ### Description: Ensure that Media Session metadata is dynamically updated whenever the current track changes.
 ### Details:
 Listen for track change events and update the MediaSession.metadata property with the new track's information, including artwork, to keep OS and browser notifications in sync with playback.
 
-## 3. Implement Browser Notifications for Track Changes and Events [pending]
+## 3. Implement Browser Notifications for Track Changes and Events [done]
 ### Dependencies: None
 ### Description: Create browser notifications that inform users of track changes and relevant playback events, including displaying track artwork.
 ### Details:
 Use the Notification API to display notifications with track title, artist, and artwork when a track changes or when specific events (e.g., errors, playback started) occur.
 
-## 4. Implement Error and Event Notifications [pending]
+## 4. Implement Error and Event Notifications [done]
 ### Dependencies: 8.3
 ### Description: Display browser notifications for errors and significant playback events to keep users informed.
 ### Details:
 Detect playback errors and other key events, then use the Notification API to alert users with descriptive messages and relevant context.
 
-## 5. Add Notification Preferences to Settings [pending]
+## 5. Add Notification Preferences to Settings [done]
 ### Dependencies: 8.3, 8.4
 ### Description: Provide user-configurable settings to enable or disable different types of browser notifications related to media playback.
 ### Details:

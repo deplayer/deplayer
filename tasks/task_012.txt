@@ -1,6 +1,6 @@
 # Task ID: 12
 # Title: Implement Optional Cross-Device Sync
-# Status: pending
+# Status: done
 # Dependencies: 4
 # Priority: low
 # Description: Enable optional synchronization of user data across devices using ElectricSQL and PostgreSQL.
