@@ -10,6 +10,7 @@ import { useMemo, useState } from 'react'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
 import { Translate } from 'react-redux-i18n'
+import { AutoSizer, Grid } from 'react-virtualized'
 
 type Props = {
   collection: CollectionState
@@ -62,16 +63,39 @@ const PlaylistsView = ({ collection, playlist }: Props) => {
             {transformedSmartPlaylists.length > 0 && (
               <div className="mb-8">
                 <h2 className="text-2xl font-bold mb-4">Smart Playlists</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {transformedSmartPlaylists.map(playlist => (
-                    <Playlist
-                      key={playlist.id}
-                      playlist={playlist}
-                      collection={collection}
-                      dispatch={dispatch}
-                    />
-                  ))}
-                </div>
+                <AutoSizer disableHeight>
+                  {({ width }) => {
+                    const columnCount = 4
+                    const columnWidth = Math.floor(width / columnCount)
+                    const rowHeight = 220 // Adjust to match Playlist card height
+                    const rowCount = Math.ceil(transformedSmartPlaylists.length / columnCount)
+                    return (
+                      <Grid
+                        cellRenderer={({ columnIndex, rowIndex, key, style }) => {
+                          const idx = rowIndex * columnCount + columnIndex
+                          if (idx >= transformedSmartPlaylists.length) return null
+                          const playlist = transformedSmartPlaylists[idx]
+                          return (
+                            <div key={key} style={style}>
+                              <Playlist
+                                playlist={playlist}
+                                collection={collection}
+                                dispatch={dispatch}
+                              />
+                            </div>
+                          )
+                        }}
+                        columnCount={columnCount}
+                        columnWidth={columnWidth}
+                        height={rowHeight * Math.min(rowCount, 2)} // Show at least 2 rows, adjust as needed
+                        rowCount={rowCount}
+                        rowHeight={rowHeight}
+                        width={width}
+                        overscanRowCount={2}
+                      />
+                    )
+                  }}
+                </AutoSizer>
               </div>
             )}
 
@@ -79,16 +103,39 @@ const PlaylistsView = ({ collection, playlist }: Props) => {
             {playlist.playlists.length > 0 && (
               <div>
                 <h2 className="text-2xl font-bold mb-4">Playlists</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {playlist.playlists.map(playlist => (
-                    <Playlist
-                      key={playlist._id}
-                      playlist={playlist}
-                      collection={collection}
-                      dispatch={dispatch}
-                    />
-                  ))}
-                </div>
+                <AutoSizer disableHeight>
+                  {({ width }) => {
+                    const columnCount = 4
+                    const columnWidth = Math.floor(width / columnCount)
+                    const rowHeight = 220 // Adjust to match Playlist card height
+                    const rowCount = Math.ceil(playlist.playlists.length / columnCount)
+                    return (
+                      <Grid
+                        cellRenderer={({ columnIndex, rowIndex, key, style }) => {
+                          const idx = rowIndex * columnCount + columnIndex
+                          if (idx >= playlist.playlists.length) return null
+                          const playlistItem = playlist.playlists[idx]
+                          return (
+                            <div key={key} style={style}>
+                              <Playlist
+                                playlist={playlistItem}
+                                collection={collection}
+                                dispatch={dispatch}
+                              />
+                            </div>
+                          )
+                        }}
+                        columnCount={columnCount}
+                        columnWidth={columnWidth}
+                        height={rowHeight * Math.min(rowCount, 2)} // Show at least 2 rows, adjust as needed
+                        rowCount={rowCount}
+                        rowHeight={rowHeight}
+                        width={width}
+                        overscanRowCount={2}
+                      />
+                    )
+                  }}
+                </AutoSizer>
               </div>
             )}
           </>
