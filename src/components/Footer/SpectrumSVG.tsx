@@ -10,8 +10,10 @@ const SpectrumSVG = () => {
 
   return (
     <svg 
-      width={totalWidth} 
-      height={MAX_HEIGHT} 
+      width="100%"
+      height={MAX_HEIGHT}
+      viewBox={`0 0 ${totalWidth} ${MAX_HEIGHT}`}
+      preserveAspectRatio="none"
       className="opacity-20"
       aria-hidden="true"
     >
