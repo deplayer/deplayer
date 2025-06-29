@@ -1,271 +1,278 @@
 {
-  "tasks": [
-    {
-      "id": 1,
-      "title": "Setup Project Structure and Core Dependencies",
-      "description": "Initialize the project repository with React/TypeScript and set up the core dependencies needed for the deplayer application.",
-      "details": "1. Initialize a new React TypeScript project using Create React App or Vite\n2. Configure PWA capabilities with service workers\n3. Set up PGLite (SQLite Wasm build) for local data storage\n4. Configure project structure with directories for:\n   - Components\n   - Providers (for media sources)\n   - Hooks\n   - Utils\n   - Types\n   - Assets\n5. Set up ESLint and Prettier for code quality\n6. Configure basic routing with React Router\n7. Install core dependencies:\n   ```bash\n   npm install pglite react-router-dom @types/react @types/react-dom typescript\n   ```\n8. Create initial application shell with header, main content area, and player controls footer",
-      "testStrategy": "1. Verify project builds without errors\n2. Confirm TypeScript configuration is working correctly\n3. Test that PGLite can be initialized\n4. Verify PWA manifest and service worker registration\n5. Create simple smoke tests for the application shell rendering",
-      "priority": "high",
-      "dependencies": [],
-      "status": "done",
-      "subtasks": []
-    },
-    {
-      "id": 2,
-      "title": "Implement Core Playback Engine",
-      "description": "Develop the core media playback functionality that supports both audio and video formats with standard playback controls.",
-      "details": "1. Create a MediaPlayer component using HTML5 audio/video elements\n2. Implement playback controls:\n   - Play/Pause toggle\n   - Stop functionality\n   - Next/Previous track navigation\n   - Volume control with mute option\n   - Seek bar with current time/duration display\n3. Create custom hooks for media playback:\n   ```typescript\n   function useMediaPlayer(mediaType: 'audio' | 'video') {\n     const [isPlaying, setIsPlaying] = useState(false);\n     const [currentTime, setCurrentTime] = useState(0);\n     const [duration, setDuration] = useState(0);\n     const [volume, setVolume] = useState(1);\n     const mediaRef = useRef<HTMLAudioElement | HTMLVideoElement>(null);\n     \n     // Implement play, pause, seek, volume methods\n     \n     return {\n       isPlaying,\n       currentTime,\n       duration,\n       volume,\n       mediaRef,\n       play,\n       pause,\n       seek,\n       setVolume,\n       // other control methods\n     };\n   }\n   ```\n4. Implement keyboard hotkeys:\n   - Space: Play/Pause\n   - Arrow right or j: Next track\n   - Arrow left or k: Previous track\n   - Control + k: Open command bar\n5. Create a playlist queue manager to handle track sequencing",
-      "testStrategy": "1. Unit test the media player hooks with mock audio/video elements\n2. Test playback controls with different media formats (MP3, MP4, etc.)\n3. Verify keyboard shortcuts work as expected\n4. Test edge cases like seeking beyond media duration\n5. Verify volume control and mute functionality\n6. Test playlist navigation (next/previous)",
-      "priority": "high",
-      "dependencies": [
-        1
-      ],
-      "status": "done",
-      "subtasks": []
-    },
-    {
-      "id": 3,
-      "title": "Implement Local File System Access",
-      "description": "Enable users to add and play media from their local file system using the File System Access API with fallback mechanisms for unsupported browsers.",
-      "details": "1. Create a FileSystemProvider component that implements the File System Access API:\n   ```typescript\n   async function requestLocalMediaAccess() {\n     try {\n       // Check if File System Access API is supported\n       if ('showDirectoryPicker' in window) {\n         const dirHandle = await window.showDirectoryPicker();\n         return processDirectoryHandle(dirHandle);\n       } else {\n         // Fallback to standard file input\n         return useStandardFileInput();\n       }\n     } catch (error) {\n       console.error('Error accessing file system:', error);\n     }\n   }\n   ```\n2. Implement directory traversal to scan for media files\n3. Create file type detection for audio and video formats\n4. Extract metadata from media files (artist, album, title, etc.)\n5. Store file references and metadata in PGLite database\n6. Implement fallback using standard file input for browsers without File System Access API\n7. Create UI for browsing and selecting local media files\n8. Add drag-and-drop support for adding files",
-      "testStrategy": "1. Test File System Access API with various directory structures\n2. Verify fallback mechanism works in browsers without API support\n3. Test with different media file formats to ensure proper detection\n4. Verify metadata extraction from various file types\n5. Test database storage and retrieval of file references\n6. Verify drag-and-drop functionality\n7. Test performance with large media libraries",
-      "priority": "high",
-      "dependencies": [
-        1,
-        2
-      ],
-      "status": "done",
-      "subtasks": []
-    },
-    {
-      "id": 4,
-      "title": "Implement Media Database and Library Management",
-      "description": "Create a local database structure using PGLite to store and manage the user's media library, playlists, and application settings.",
-      "details": "1. Design and implement database schema for media library:\n   ```typescript\n   // Database schema\n   const mediaSchema = `\n     CREATE TABLE IF NOT EXISTS media (\n       id TEXT PRIMARY KEY,\n       title TEXT,\n       artist TEXT,\n       album TEXT,\n       duration INTEGER,\n       path TEXT,\n       type TEXT,\n       provider TEXT,\n       thumbnail TEXT,\n       added_date INTEGER\n     );\n     \n     CREATE TABLE IF NOT EXISTS playlists (\n       id TEXT PRIMARY KEY,\n       name TEXT,\n       description TEXT,\n       created_date INTEGER\n     );\n     \n     CREATE TABLE IF NOT EXISTS playlist_items (\n       playlist_id TEXT,\n       media_id TEXT,\n       position INTEGER,\n       PRIMARY KEY (playlist_id, media_id),\n       FOREIGN KEY (playlist_id) REFERENCES playlists(id),\n       FOREIGN KEY (media_id) REFERENCES media(id)\n     );\n     \n     CREATE TABLE IF NOT EXISTS settings (\n       key TEXT PRIMARY KEY,\n       value TEXT\n     );\n   `;\n   ```\n2. Create data access layer for CRUD operations on media items\n3. Implement playlist management functionality\n4. Create settings storage and retrieval\n5. Implement search and filtering capabilities\n6. Create library views (by artist, album, recently added, etc.)\n7. Add sorting and organization options\n8. Implement database migrations for future updates",
-      "testStrategy": "1. Unit test database operations (create, read, update, delete)\n2. Test with mock data to verify schema integrity\n3. Verify search and filtering functionality\n4. Test playlist creation and management\n5. Verify settings storage and retrieval\n6. Test performance with large datasets\n7. Verify database migrations work correctly",
-      "priority": "high",
-      "dependencies": [
-        1,
-        3
-      ],
-      "status": "done",
-      "subtasks": []
-    },
-    {
-      "id": 5,
-      "title": "Implement Webtorrent Support",
-      "description": "Enable users to play media directly from magnet links and .torrent files using Webtorrent.",
-      "details": "1. Install and integrate Webtorrent library:\n   ```bash\n   npm install webtorrent @types/webtorrent\n   ```\n2. Create a TorrentProvider component:\n   ```typescript\n   import WebTorrent from 'webtorrent';\n   \n   function useTorrentProvider() {\n     const [client, setClient] = useState<WebTorrent.Instance | null>(null);\n     const [torrents, setTorrents] = useState<WebTorrent.Torrent[]>([]);\n     \n     useEffect(() => {\n       const webTorrentClient = new WebTorrent();\n       setClient(webTorrentClient);\n       \n       return () => {\n         webTorrentClient.destroy();\n       };\n     }, []);\n     \n     const addTorrent = useCallback((torrentId: string) => {\n       if (!client) return;\n       \n       client.add(torrentId, (torrent) => {\n         // Process torrent files and add to library\n         const mediaFiles = torrent.files.filter(file => {\n           const ext = file.name.split('.').pop()?.toLowerCase();\n           return ['mp3', 'mp4', 'wav', 'ogg', 'webm'].includes(ext || '');\n         });\n         \n         // Add media files to database\n       });\n     }, [client]);\n     \n     return { addTorrent, torrents };\n   }\n   ```\n3. Implement UI for adding magnet links and .torrent files\n4. Create torrent file parser for extracting media information\n5. Implement streaming from torrent to media player\n6. Add download progress indicators\n7. Implement seeding options for downloaded content\n8. Create storage management for cached torrent data",
-      "testStrategy": "1. Test with various magnet links and .torrent files\n2. Verify streaming works without full download completion\n3. Test download progress tracking\n4. Verify media metadata extraction from torrents\n5. Test with different media formats within torrents\n6. Verify seeding functionality\n7. Test performance and resource usage during torrent streaming",
-      "priority": "medium",
-      "dependencies": [
-        2,
-        4
-      ],
-      "status": "done",
-      "subtasks": []
-    },
-    {
-      "id": 6,
-      "title": "Implement Subsonic API Integration",
-      "description": "Allow users to connect to and stream media from their Subsonic server by implementing the Subsonic API client.",
-      "details": "1. Create a SubsonicProvider component:\n   ```typescript\n   function useSubsonicProvider() {\n     const [server, setServer] = useState('');\n     const [username, setUsername] = useState('');\n     const [password, setPassword] = useState('');\n     const [isConnected, setIsConnected] = useState(false);\n     \n     const connect = async () => {\n       try {\n         // Generate authentication parameters\n         const salt = generateRandomString(10);\n         const token = md5(password + salt);\n         \n         // Test connection\n         const response = await fetch(\n           `${server}/rest/ping.view?v=1.13.0&c=deplayer&f=json&u=${username}&s=${salt}&t=${token}`\n         );\n         \n         const data = await response.json();\n         if (data['subsonic-response'].status === 'ok') {\n           setIsConnected(true);\n           // Save connection details to settings\n           return true;\n         }\n         return false;\n       } catch (error) {\n         console.error('Subsonic connection error:', error);\n         return false;\n       }\n     };\n     \n     const fetchLibrary = async () => {\n       // Implement fetching library from Subsonic server\n     };\n     \n     const getStreamUrl = (id: string) => {\n       // Generate streaming URL for a specific track\n       const salt = generateRandomString(10);\n       const token = md5(password + salt);\n       return `${server}/rest/stream.view?id=${id}&v=1.13.0&c=deplayer&f=json&u=${username}&s=${salt}&t=${token}`;\n     };\n     \n     return {\n       connect,\n       fetchLibrary,\n       getStreamUrl,\n       isConnected,\n       setServer,\n       setUsername,\n       setPassword\n     };\n   }\n   ```\n2. Implement Subsonic authentication (using MD5 hashing)\n3. Create API methods for browsing music library\n4. Implement streaming from Subsonic server\n5. Add album art and metadata retrieval\n6. Create UI for server connection settings\n7. Implement caching of frequently accessed content\n8. Add playlist synchronization with Subsonic server",
-      "testStrategy": "1. Test connection to various Subsonic server implementations\n2. Verify authentication works correctly\n3. Test library browsing and navigation\n4. Verify streaming of different media formats\n5. Test album art and metadata retrieval\n6. Verify playlist synchronization\n7. Test with large Subsonic libraries\n8. Verify error handling for connection issues",
-      "priority": "medium",
-      "dependencies": [
-        2,
-        4
-      ],
-      "status": "done",
-      "subtasks": []
-    },
-    {
-      "id": 7,
-      "title": "Implement youtube-dl-server Integration",
-      "description": "Enable users to add YouTube videos and other supported sites to their collection by connecting to a self-hosted youtube-dl-server instance.",
-      "details": "1. Create a YoutubeDLProvider component:\n   ```typescript\n   function useYoutubeDLProvider() {\n     const [serverUrl, setServerUrl] = useState('');\n     const [isConnected, setIsConnected] = useState(false);\n     \n     const testConnection = async () => {\n       try {\n         const response = await fetch(`${serverUrl}/api/version`);\n         const data = await response.json();\n         if (data.version) {\n           setIsConnected(true);\n           return true;\n         }\n         return false;\n       } catch (error) {\n         console.error('youtube-dl-server connection error:', error);\n         return false;\n       }\n     };\n     \n     const fetchVideoInfo = async (url: string) => {\n       try {\n         const response = await fetch(`${serverUrl}/api/info?url=${encodeURIComponent(url)}`);\n         return await response.json();\n       } catch (error) {\n         console.error('Error fetching video info:', error);\n         return null;\n       }\n     };\n     \n     const downloadVideo = async (url: string, format: string = 'best') => {\n       try {\n         const response = await fetch(`${serverUrl}/api/download`, {\n           method: 'POST',\n           headers: {\n             'Content-Type': 'application/json'\n           },\n           body: JSON.stringify({ url, format })\n         });\n         return await response.json();\n       } catch (error) {\n         console.error('Error downloading video:', error);\n         return null;\n       }\n     };\n     \n     return {\n       testConnection,\n       fetchVideoInfo,\n       downloadVideo,\n       setServerUrl,\n       isConnected\n     };\n   }\n   ```\n2. Implement UI for entering youtube-dl-server URL\n3. Create video URL input field with validation\n4. Implement format selection for downloads\n5. Add progress tracking for downloads\n6. Create metadata extraction from downloaded videos\n7. Implement caching of downloaded content\n8. Add support for playlists and channels",
-      "testStrategy": "1. Test connection to youtube-dl-server\n2. Verify video information retrieval\n3. Test downloading with different format options\n4. Verify progress tracking during downloads\n5. Test with various supported sites (YouTube, Vimeo, etc.)\n6. Verify metadata extraction and storage\n7. Test playlist and channel handling\n8. Verify error handling for unavailable videos",
-      "priority": "medium",
-      "dependencies": [
-        2,
-        4
-      ],
-      "status": "done",
-      "subtasks": []
-    },
-    {
-      "id": 8,
-      "title": "Implement Media Session API and Notifications",
-      "description": "Integrate with the Media Session API for OS media controls and implement browser notifications for track changes and events.",
-      "details": "1. Implement Media Session API integration:\n   ```typescript\n   function useMediaSession(mediaPlayer) {\n     useEffect(() => {\n       if ('mediaSession' in navigator) {\n         navigator.mediaSession.metadata = new MediaMetadata({\n           title: mediaPlayer.currentTrack?.title || 'Unknown Title',\n           artist: mediaPlayer.currentTrack?.artist || 'Unknown Artist',\n           album: mediaPlayer.currentTrack?.album || 'Unknown Album',\n           artwork: [\n             { src: mediaPlayer.currentTrack?.thumbnail || '/default-artwork.jpg', sizes: '512x512', type: 'image/jpeg' }\n           ]\n         });\n         \n         navigator.mediaSession.setActionHandler('play', () => mediaPlayer.play());\n         navigator.mediaSession.setActionHandler('pause', () => mediaPlayer.pause());\n         navigator.mediaSession.setActionHandler('previoustrack', () => mediaPlayer.previous());\n         navigator.mediaSession.setActionHandler('nexttrack', () => mediaPlayer.next());\n         navigator.mediaSession.setActionHandler('seekto', (details) => {\n           if (details.seekTime) mediaPlayer.seek(details.seekTime);\n         });\n       }\n     }, [mediaPlayer.currentTrack]);\n   }\n   ```\n2. Implement browser notifications:\n   ```typescript\n   function showNotification(title, options) {\n     if (!('Notification' in window)) return;\n     \n     if (Notification.permission === 'granted') {\n       new Notification(title, options);\n     } else if (Notification.permission !== 'denied') {\n       Notification.requestPermission().then(permission => {\n         if (permission === 'granted') {\n           new Notification(title, options);\n         }\n       });\n     }\n   }\n   ```\n3. Create track change notifications with artwork\n4. Implement error and event notifications\n5. Add notification preferences in settings\n6. Update Media Session metadata on track changes\n7. Handle media key events from keyboard and headphone controls",
-      "testStrategy": "1. Test Media Session API integration on different operating systems\n2. Verify media controls work with system UI (lock screen, notification area)\n3. Test notifications appear correctly for track changes\n4. Verify notification permission handling\n5. Test media key handling from keyboard and headphones\n6. Verify artwork displays correctly in system UI\n7. Test with different browsers to ensure compatibility",
-      "priority": "medium",
-      "dependencies": [
-        2
-      ],
-      "status": "done",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Integrate Media Session API for OS Media Controls",
-          "description": "Implement the Media Session API to enable OS-level media controls, including setting up metadata and action handlers for play, pause, previous, next, and seek actions.",
-          "dependencies": [],
-          "details": "Use the MediaSession and MediaMetadata interfaces to provide rich metadata (title, artist, album, artwork) and register action handlers for media key events, allowing users to control playback from device controls and lock screens.",
-          "status": "done",
-          "testStrategy": "Verify that media controls (play, pause, next, previous, seek) work from OS-level interfaces and that metadata displays correctly on lock screens and notification areas."
-        },
-        {
-          "id": 2,
-          "title": "Update Media Session Metadata on Track Changes",
-          "description": "Ensure that Media Session metadata is dynamically updated whenever the current track changes.",
-          "dependencies": [
-            1
-          ],
-          "details": "Listen for track change events and update the MediaSession.metadata property with the new track's information, including artwork, to keep OS and browser notifications in sync with playback.",
-          "status": "done",
-          "testStrategy": "Change tracks during playback and confirm that OS-level media notifications and controls reflect the new track's metadata."
-        },
-        {
-          "id": 3,
-          "title": "Implement Browser Notifications for Track Changes and Events",
-          "description": "Create browser notifications that inform users of track changes and relevant playback events, including displaying track artwork.",
-          "dependencies": [],
-          "details": "Use the Notification API to display notifications with track title, artist, and artwork when a track changes or when specific events (e.g., errors, playback started) occur.",
-          "status": "done",
-          "testStrategy": "Trigger track changes and playback events, then verify that notifications appear with correct information and artwork."
-        },
-        {
-          "id": 4,
-          "title": "Implement Error and Event Notifications",
-          "description": "Display browser notifications for errors and significant playback events to keep users informed.",
-          "dependencies": [
-            3
-          ],
-          "details": "Detect playback errors and other key events, then use the Notification API to alert users with descriptive messages and relevant context.",
-          "status": "done",
-          "testStrategy": "Simulate errors and events, ensuring notifications are shown with accurate and helpful information."
-        },
-        {
-          "id": 5,
-          "title": "Add Notification Preferences to Settings",
-          "description": "Provide user-configurable settings to enable or disable different types of browser notifications related to media playback.",
-          "dependencies": [
-            3,
-            4
-          ],
-          "details": "Integrate notification preferences into the application's settings UI, allowing users to control which notifications they receive (e.g., track changes, errors, events).",
-          "status": "done",
-          "testStrategy": "Change notification settings and verify that only the selected types of notifications are shown during playback and events."
-        }
-      ]
-    },
-    {
-      "id": 9,
-      "title": "Implement Lyrics and Visualizations",
-      "description": "Add lyrics display using the lyrics.ovh API and implement audio visualizations using butterchurn and react-audio-spectrum.",
-      "details": "1. Install visualization dependencies:\n   ```bash\n   npm install butterchurn butterchurn-presets react-audio-spectrum\n   ```\n2. Implement lyrics fetching:\n   ```typescript\n   async function fetchLyrics(artist: string, title: string) {\n     try {\n       const response = await fetch(`https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`);\n       const data = await response.json();\n       return data.lyrics;\n     } catch (error) {\n       console.error('Error fetching lyrics:', error);\n       return null;\n     }\n   }\n   ```\n3. Create a LyricsDisplay component that fetches and displays lyrics\n4. Implement MilkDrop visualizations with butterchurn:\n   ```typescript\n   import butterchurn from 'butterchurn';\n   import butterchurnPresets from 'butterchurn-presets';\n   \n   function ButterchurnVisualizer({ audioElement }) {\n     const canvasRef = useRef<HTMLCanvasElement>(null);\n     const [visualizer, setVisualizer] = useState(null);\n     \n     useEffect(() => {\n       if (!canvasRef.current || !audioElement) return;\n       \n       const canvas = canvasRef.current;\n       const context = canvas.getContext('webgl');\n       \n       if (!context) return;\n       \n       const viz = butterchurn.createVisualizer(context, {\n         width: canvas.width,\n         height: canvas.height\n       });\n       \n       const presets = butterchurnPresets.getPresets();\n       const preset = presets[Object.keys(presets)[0]];\n       viz.loadPreset(preset, 0.0);\n       \n       const audioContext = new (window.AudioContext || window.webkitAudioContext)();\n       const audioSource = audioContext.createMediaElementSource(audioElement);\n       audioSource.connect(audioContext.destination);\n       \n       viz.connectAudio(audioSource);\n       viz.render();\n       \n       setVisualizer(viz);\n       \n       return () => {\n         audioContext.close();\n       };\n     }, [audioElement]);\n     \n     return <canvas ref={canvasRef} width=\"800\" height=\"600\" />;\n   }\n   ```\n5. Implement spectrum visualization with react-audio-spectrum\n6. Create visualization selector UI\n7. Add visualization settings (size, quality, preset selection)\n8. Implement lyrics synchronization with playback (if timestamp data available)",
-      "testStrategy": "1. Test lyrics fetching with various artists and titles\n2. Verify fallback handling when lyrics aren't found\n3. Test visualizations with different audio inputs\n4. Verify performance of visualizations on various devices\n5. Test visualization settings and presets\n6. Verify visualizations respond correctly to audio\n7. Test lyrics display formatting and scrolling",
-      "priority": "low",
-      "dependencies": [
-        2
-      ],
-      "status": "done",
-      "subtasks": []
-    },
-    {
-      "id": 10,
-      "title": "Implement PWA Features and Multi-Theme Support",
-      "description": "Configure the application as a Progressive Web App (PWA) with offline capabilities and implement multiple visual themes.",
-      "details": "1. Configure PWA manifest:\n   ```json\n   {\n     \"name\": \"deplayer\",\n     \"short_name\": \"deplayer\",\n     \"start_url\": \".\",\n     \"display\": \"standalone\",\n     \"background_color\": \"#ffffff\",\n     \"theme_color\": \"#000000\",\n     \"description\": \"Local-first browser-based media player\",\n     \"icons\": [\n       {\n         \"src\": \"favicon.ico\",\n         \"sizes\": \"64x64\",\n         \"type\": \"image/x-icon\"\n       },\n       {\n         \"src\": \"logo192.png\",\n         \"type\": \"image/png\",\n         \"sizes\": \"192x192\"\n       },\n       {\n         \"src\": \"logo512.png\",\n         \"type\": \"image/png\",\n         \"sizes\": \"512x512\"\n       }\n     ]\n   }\n   ```\n2. Implement service worker for offline capabilities:\n   ```javascript\n   // service-worker.js\n   self.addEventListener('install', (event) => {\n     event.waitUntil(\n       caches.open('deplayer-v1').then((cache) => {\n         return cache.addAll([\n           '/',\n           '/index.html',\n           '/static/js/main.chunk.js',\n           '/static/js/0.chunk.js',\n           '/static/js/bundle.js',\n           '/manifest.json',\n           '/favicon.ico',\n           '/logo192.png',\n           '/logo512.png',\n           // Add other static assets\n         ]);\n       })\n     );\n   });\n   \n   self.addEventListener('fetch', (event) => {\n     event.respondWith(\n       caches.match(event.request).then((response) => {\n         return response || fetch(event.request);\n       })\n     );\n   });\n   ```\n3. Create theme system with CSS variables:\n   ```css\n   :root {\n     --primary-color: #1a73e8;\n     --secondary-color: #f1f3f4;\n     --background-color: #ffffff;\n     --text-color: #202124;\n     --accent-color: #d93025;\n   }\n   \n   [data-theme=\"dark\"] {\n     --primary-color: #8ab4f8;\n     --secondary-color: #303134;\n     --background-color: #202124;\n     --text-color: #e8eaed;\n     --accent-color: #f28b82;\n   }\n   ```\n4. Implement theme selector in settings\n5. Add theme toggle component\n6. Create custom themes with user-defined colors\n7. Implement system theme detection and auto-switching\n8. Add offline indicator and functionality",
-      "testStrategy": "1. Test PWA installation on various devices\n2. Verify offline functionality works as expected\n3. Test theme switching between light and dark modes\n4. Verify system theme detection\n5. Test custom theme creation and application\n6. Verify service worker caching and updates\n7. Test PWA on different browsers and devices",
-      "priority": "medium",
-      "dependencies": [
-        1
-      ],
-      "status": "done",
-      "subtasks": []
-    },
-    {
-      "id": 11,
-      "title": "Implement Command Bar and Keyboard Shortcuts",
-      "description": "Create a command bar (Ctrl+K) for quick access to app functions and implement comprehensive keyboard shortcuts.",
-      "details": "1. Create a CommandBar component:\n   ```typescript\n   function CommandBar({ isOpen, onClose, onExecute }) {\n     const [query, setQuery] = useState('');\n     const [commands, setCommands] = useState([]);\n     const [selectedIndex, setSelectedIndex] = useState(0);\n     const inputRef = useRef<HTMLInputElement>(null);\n     \n     // Define available commands\n     const availableCommands = [\n       { id: 'play', name: 'Play/Pause', action: () => { /* play/pause logic */ } },\n       { id: 'next', name: 'Next Track', action: () => { /* next track logic */ } },\n       { id: 'prev', name: 'Previous Track', action: () => { /* previous track logic */ } },\n       { id: 'shuffle', name: 'Toggle Shuffle', action: () => { /* shuffle logic */ } },\n       { id: 'repeat', name: 'Toggle Repeat', action: () => { /* repeat logic */ } },\n       // Add more commands\n     ];\n     \n     // Filter commands based on query\n     useEffect(() => {\n       if (!query) {\n         setCommands(availableCommands);\n       } else {\n         const filtered = availableCommands.filter(cmd =>\n           cmd.name.toLowerCase().includes(query.toLowerCase())\n         );\n         setCommands(filtered);\n       }\n       setSelectedIndex(0);\n     }, [query]);\n     \n     // Focus input when opened\n     useEffect(() => {\n       if (isOpen && inputRef.current) {\n         inputRef.current.focus();\n       }\n     }, [isOpen]);\n     \n     // Handle keyboard navigation\n     const handleKeyDown = (e) => {\n       switch (e.key) {\n         case 'ArrowDown':\n           e.preventDefault();\n           setSelectedIndex(prev => (prev + 1) % commands.length);\n           break;\n         case 'ArrowUp':\n           e.preventDefault();\n           setSelectedIndex(prev => (prev - 1 + commands.length) % commands.length);\n           break;\n         case 'Enter':\n           if (commands[selectedIndex]) {\n             commands[selectedIndex].action();\n             onExecute(commands[selectedIndex]);\n           }\n           break;\n         case 'Escape':\n           onClose();\n           break;\n       }\n     };\n     \n     if (!isOpen) return null;\n     \n     return (\n       <div className=\"command-bar-overlay\">\n         <div className=\"command-bar\">\n           <input\n             ref={inputRef}\n             type=\"text\"\n             value={query}\n             onChange={(e) => setQuery(e.target.value)}\n             onKeyDown={handleKeyDown}\n             placeholder=\"Type a command...\"\n           />\n           <div className=\"command-list\">\n             {commands.map((cmd, index) => (\n               <div\n                 key={cmd.id}\n                 className={`command-item ${index === selectedIndex ? 'selected' : ''}`}\n                 onClick={() => {\n                   cmd.action();\n                   onExecute(cmd);\n                 }}\n               >\n                 {cmd.name}\n               </div>\n             ))}\n           </div>\n         </div>\n       </div>\n     );\n   }\n   ```\n2. Implement global keyboard shortcut handler:\n   ```typescript\n   function useKeyboardShortcuts(handlers) {\n     useEffect(() => {\n       const handleKeyDown = (e) => {\n         // Command bar shortcut (Ctrl+K)\n         if (e.ctrlKey && e.key === 'k') {\n           e.preventDefault();\n           handlers.openCommandBar();\n           return;\n         }\n         \n         // Media shortcuts\n         if (e.key === ' ' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {\n           e.preventDefault();\n           handlers.togglePlayPause();\n         } else if (e.key === 'ArrowRight' || e.key === 'j') {\n           handlers.nextTrack();\n         } else if (e.key === 'ArrowLeft' || e.key === 'k') {\n           handlers.previousTrack();\n         }\n         \n         // Add more shortcuts as needed\n       };\n       \n       window.addEventListener('keydown', handleKeyDown);\n       return () => window.removeEventListener('keydown', handleKeyDown);\n     }, [handlers]);\n   }\n   ```\n3. Create command registry for registering commands from different parts of the app\n4. Implement command search and filtering\n5. Add keyboard navigation within command bar\n6. Create visual keyboard shortcut helper/cheatsheet\n7. Implement user-configurable keyboard shortcuts in settings",
-      "testStrategy": "1. Test command bar opening with Ctrl+K\n2. Verify command filtering works correctly\n3. Test keyboard navigation within command bar\n4. Verify all keyboard shortcuts function as expected\n5. Test command execution\n6. Verify shortcuts work in different contexts (playing, paused, etc.)\n7. Test custom shortcut configuration",
-      "priority": "medium",
-      "dependencies": [
-        1
-      ],
-      "status": "done",
-      "subtasks": []
-    },
-    {
-      "id": 12,
-      "title": "Implement Optional Cross-Device Sync",
-      "description": "Enable optional synchronization of user data across devices using ElectricSQL and PostgreSQL.",
-      "details": "1. Install ElectricSQL client:\n   ```bash\n   npm install electric-sql\n   ```\n2. Create sync configuration:\n   ```typescript\n   import { ElectricDatabase, electrify } from 'electric-sql/wa-sqlite';\n   \n   async function setupSync(dbName: string, syncServerUrl: string) {\n     // Initialize the database\n     const conn = await ElectricDatabase.init(dbName);\n     \n     // Define the shape of your database\n     const schema = {\n       version: 1,\n       tables: {\n         media: {\n           columns: {\n             id: { type: 'TEXT', primaryKey: true },\n             title: { type: 'TEXT' },\n             artist: { type: 'TEXT' },\n             album: { type: 'TEXT' },\n             duration: { type: 'INTEGER' },\n             path: { type: 'TEXT' },\n             type: { type: 'TEXT' },\n             provider: { type: 'TEXT' },\n             thumbnail: { type: 'TEXT' },\n             added_date: { type: 'INTEGER' }\n           }\n         },\n         playlists: {\n           columns: {\n             id: { type: 'TEXT', primaryKey: true },\n             name: { type: 'TEXT' },\n             description: { type: 'TEXT' },\n             created_date: { type: 'INTEGER' }\n           }\n         },\n         playlist_items: {\n           columns: {\n             playlist_id: { type: 'TEXT' },\n             media_id: { type: 'TEXT' },\n             position: { type: 'INTEGER' }\n           },\n           primaryKey: ['playlist_id', 'media_id']\n         },\n         settings: {\n           columns: {\n             key: { type: 'TEXT', primaryKey: true },\n             value: { type: 'TEXT' }\n           }\n         }\n       }\n     };\n     \n     // Electrify the database\n     const electric = await electrify(conn, schema);\n     \n     // Connect to the sync server\n     await electric.connect(syncServerUrl, {\n       auth: { token: 'auth-token' } // Implement proper auth\n     });\n     \n     return electric;\n   }\n   ```\n3. Create sync settings UI for server URL and enable/disable toggle\n4. Implement conflict resolution strategies\n5. Add sync status indicators\n6. Create data migration utilities for initial sync\n7. Implement selective sync for specific data types\n8. Add error handling and retry mechanisms for sync failures",
-      "testStrategy": "1. Test connection to ElectricSQL server\n2. Verify data synchronization between devices\n3. Test conflict resolution with simultaneous edits\n4. Verify sync works after connection loss and reconnection\n5. Test selective sync functionality\n6. Verify large dataset synchronization performance\n7. Test error handling and recovery\n8. Verify security of synchronized data",
-      "priority": "low",
-      "dependencies": [
-        4
-      ],
-      "status": "done",
-      "subtasks": []
-    },
-    {
-      "id": 13,
-      "title": "Optimize Player Progress Updates with Local State",
-      "description": "Refactor the player progress tracking mechanism by removing Redux action SET_PLAYER_PROGRESS and implementing a local state solution in the PlayerControls component to reduce unnecessary re-renders and improve application performance.",
-      "details": "This task involves a significant refactoring of the player progress tracking mechanism to improve performance:\n\n1. Remove the SET_PLAYER_PROGRESS Redux action:\n   - Delete the action creator in the player actions file\n   - Remove the corresponding reducer case in the player reducer\n   - Update any tests that rely on this action\n\n2. Implement local state in PlayerControls component:\n   - Add React useState hooks for tracking progress metrics (played, loaded, playedSeconds, loadedSeconds)\n   - Update the onProgress handler to update local state instead of dispatching Redux actions\n   - Ensure the component correctly manages this state throughout its lifecycle\n\n3. Update related components:\n   - Modify the ProgressBar component to receive progress values directly as props from PlayerControls\n   - Update the time display component to receive playedSeconds/duration from local state\n   - Ensure any other components that previously consumed progress from Redux are updated\n\n4. Maintain Redux for playback control only:\n   - Keep play/pause, next/previous track, and seeking functionality in Redux\n   - Update the seeking mechanism to work with the new local state approach\n   - Ensure volume control and other player settings remain functional\n\n5. Performance monitoring:\n   - Before implementation, add performance metrics using React DevTools Profiler or a similar tool\n   - Record baseline metrics for player progress updates (frequency of renders, component update times)\n   - After implementation, run the same performance tests to quantify improvements\n   - Document the performance gains in comments and the PR\n\n6. Code organization:\n   - Update PropTypes and TypeScript types if applicable\n   - Ensure clean separation between local state and Redux state\n   - Add comments explaining the performance optimization approach",
-      "testStrategy": "Testing for this optimization should be comprehensive to ensure functionality is maintained while performance is improved:\n\n1. Performance testing:\n   - Use React DevTools Profiler to record and compare render counts before and after the change\n   - Implement performance marks/measures using the Performance API to quantify improvements\n   - Create a test script that plays a song for 30 seconds and measures render frequency\n   - Document performance metrics in a before/after comparison table\n\n2. Functional testing:\n   - Verify all player controls still work correctly (play, pause, next, previous)\n   - Test seeking functionality by clicking different positions on the progress bar\n   - Ensure the time display updates correctly as the song progresses\n   - Verify that loaded progress (buffering) is still displayed properly\n\n3. Integration testing:\n   - Test that player state is correctly maintained when navigating between different app routes\n   - Verify that any components that previously relied on progress from Redux still function\n   - Test edge cases like seeking near the end of a track or rapid seeking\n\n4. Regression testing:\n   - Create a checklist of all player features and verify each one works after the refactoring\n   - Test on different browsers and devices to ensure consistent behavior\n   - Verify that volume control and other player settings are unaffected\n\n5. Code review:\n   - Ensure all Redux references to SET_PLAYER_PROGRESS are removed\n   - Verify that the PlayerControls component properly manages its local state\n   - Check for any memory leaks or performance issues in the implementation\n\n6. User testing:\n   - Have team members use the player with the new implementation to verify smooth operation\n   - Compare subjective smoothness of the player experience before and after",
-      "status": "done",
-      "dependencies": [],
-      "priority": "high",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Remove Redux SET_PLAYER_PROGRESS Action and Update Reducer",
-          "description": "Delete the SET_PLAYER_PROGRESS action creator, remove the corresponding reducer case, and update affected tests.",
-          "dependencies": [],
-          "details": "Delete the SET_PLAYER_PROGRESS action creator in the player actions file. Remove the corresponding case in the player reducer that handles this action. Update any unit tests that rely on this action to prevent test failures. Document the removal in code comments for future reference.",
-          "status": "done",
-          "testStrategy": "Run existing test suite to identify failing tests. Update tests to reflect the new architecture. Verify Redux store no longer contains player progress data."
-        },
-        {
-          "id": 2,
-          "title": "Implement Local State in PlayerControls Component",
-          "description": "Add React useState hooks to track progress metrics locally within the PlayerControls component.",
-          "dependencies": [
-            1
-          ],
-          "details": "Implement useState hooks for tracking played, loaded, playedSeconds, and loadedSeconds metrics. Update the onProgress handler to update local state instead of dispatching Redux actions. Ensure component correctly manages state throughout its lifecycle, including cleanup on unmount. Add appropriate PropTypes or TypeScript types for the local state variables.",
-          "status": "done",
-          "testStrategy": "Create unit tests for the PlayerControls component to verify local state updates correctly when onProgress is called. Test component lifecycle methods to ensure proper state management."
-        },
-        {
-          "id": 3,
-          "title": "Update Related Components to Use Local State",
-          "description": "Modify ProgressBar, time display, and other components to receive progress values directly from PlayerControls instead of Redux.",
-          "dependencies": [
-            2
-          ],
-          "details": "Update the ProgressBar component to receive progress values as props from PlayerControls instead of connecting to Redux. Modify the time display component to receive playedSeconds/duration from local state. Identify and update any other components that previously consumed progress data from Redux. Ensure proper prop drilling or context usage for components that need access to the progress data.",
-          "status": "done",
-          "testStrategy": "Test the integration between PlayerControls and dependent components. Verify that progress updates are correctly propagated to child components. Check for any rendering issues or prop type errors."
-        },
-        {
-          "id": 4,
-          "title": "Maintain Redux for Playback Control",
-          "description": "Ensure play/pause, track navigation, seeking, and volume control remain functional with Redux while progress uses local state.",
-          "dependencies": [
-            2,
-            3
-          ],
-          "details": "Keep play/pause, next/previous track functionality in Redux. Update the seeking mechanism to work with the new local state approach, ensuring seeking dispatches Redux actions but updates local progress state appropriately. Verify volume control and other player settings remain functional. Create clear separation between local state (progress) and Redux state (playback control).",
-          "status": "done",
-          "testStrategy": "Test all playback controls to ensure they still function correctly. Verify seeking works properly with the new implementation. Test edge cases like seeking while paused or rapid seeking."
-        }
-      ]
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Setup Project Structure and Core Dependencies",
+        "description": "Initialize the project repository with React/TypeScript and set up the core dependencies needed for the deplayer application.",
+        "details": "1. Initialize a new React TypeScript project using Create React App or Vite\n2. Configure PWA capabilities with service workers\n3. Set up PGLite (SQLite Wasm build) for local data storage\n4. Configure project structure with directories for:\n   - Components\n   - Providers (for media sources)\n   - Hooks\n   - Utils\n   - Types\n   - Assets\n5. Set up ESLint and Prettier for code quality\n6. Configure basic routing with React Router\n7. Install core dependencies:\n   ```bash\n   npm install pglite react-router-dom @types/react @types/react-dom typescript\n   ```\n8. Create initial application shell with header, main content area, and player controls footer",
+        "testStrategy": "1. Verify project builds without errors\n2. Confirm TypeScript configuration is working correctly\n3. Test that PGLite can be initialized\n4. Verify PWA manifest and service worker registration\n5. Create simple smoke tests for the application shell rendering",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Implement Core Playback Engine",
+        "description": "Develop the core media playback functionality that supports both audio and video formats with standard playback controls.",
+        "details": "1. Create a MediaPlayer component using HTML5 audio/video elements\n2. Implement playback controls:\n   - Play/Pause toggle\n   - Stop functionality\n   - Next/Previous track navigation\n   - Volume control with mute option\n   - Seek bar with current time/duration display\n3. Create custom hooks for media playback:\n   ```typescript\n   function useMediaPlayer(mediaType: 'audio' | 'video') {\n     const [isPlaying, setIsPlaying] = useState(false);\n     const [currentTime, setCurrentTime] = useState(0);\n     const [duration, setDuration] = useState(0);\n     const [volume, setVolume] = useState(1);\n     const mediaRef = useRef<HTMLAudioElement | HTMLVideoElement>(null);\n     \n     // Implement play, pause, seek, volume methods\n     \n     return {\n       isPlaying,\n       currentTime,\n       duration,\n       volume,\n       mediaRef,\n       play,\n       pause,\n       seek,\n       setVolume,\n       // other control methods\n     };\n   }\n   ```\n4. Implement keyboard hotkeys:\n   - Space: Play/Pause\n   - Arrow right or j: Next track\n   - Arrow left or k: Previous track\n   - Control + k: Open command bar\n5. Create a playlist queue manager to handle track sequencing",
+        "testStrategy": "1. Unit test the media player hooks with mock audio/video elements\n2. Test playback controls with different media formats (MP3, MP4, etc.)\n3. Verify keyboard shortcuts work as expected\n4. Test edge cases like seeking beyond media duration\n5. Verify volume control and mute functionality\n6. Test playlist navigation (next/previous)",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Implement Local File System Access",
+        "description": "Enable users to add and play media from their local file system using the File System Access API with fallback mechanisms for unsupported browsers.",
+        "details": "1. Create a FileSystemProvider component that implements the File System Access API:\n   ```typescript\n   async function requestLocalMediaAccess() {\n     try {\n       // Check if File System Access API is supported\n       if ('showDirectoryPicker' in window) {\n         const dirHandle = await window.showDirectoryPicker();\n         return processDirectoryHandle(dirHandle);\n       } else {\n         // Fallback to standard file input\n         return useStandardFileInput();\n       }\n     } catch (error) {\n       console.error('Error accessing file system:', error);\n     }\n   }\n   ```\n2. Implement directory traversal to scan for media files\n3. Create file type detection for audio and video formats\n4. Extract metadata from media files (artist, album, title, etc.)\n5. Store file references and metadata in PGLite database\n6. Implement fallback using standard file input for browsers without File System Access API\n7. Create UI for browsing and selecting local media files\n8. Add drag-and-drop support for adding files",
+        "testStrategy": "1. Test File System Access API with various directory structures\n2. Verify fallback mechanism works in browsers without API support\n3. Test with different media file formats to ensure proper detection\n4. Verify metadata extraction from various file types\n5. Test database storage and retrieval of file references\n6. Verify drag-and-drop functionality\n7. Test performance with large media libraries",
+        "priority": "high",
+        "dependencies": [
+          1,
+          2
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Implement Media Database and Library Management",
+        "description": "Create a local database structure using PGLite to store and manage the user's media library, playlists, and application settings.",
+        "details": "1. Design and implement database schema for media library:\n   ```typescript\n   // Database schema\n   const mediaSchema = `\n     CREATE TABLE IF NOT EXISTS media (\n       id TEXT PRIMARY KEY,\n       title TEXT,\n       artist TEXT,\n       album TEXT,\n       duration INTEGER,\n       path TEXT,\n       type TEXT,\n       provider TEXT,\n       thumbnail TEXT,\n       added_date INTEGER\n     );\n     \n     CREATE TABLE IF NOT EXISTS playlists (\n       id TEXT PRIMARY KEY,\n       name TEXT,\n       description TEXT,\n       created_date INTEGER\n     );\n     \n     CREATE TABLE IF NOT EXISTS playlist_items (\n       playlist_id TEXT,\n       media_id TEXT,\n       position INTEGER,\n       PRIMARY KEY (playlist_id, media_id),\n       FOREIGN KEY (playlist_id) REFERENCES playlists(id),\n       FOREIGN KEY (media_id) REFERENCES media(id)\n     );\n     \n     CREATE TABLE IF NOT EXISTS settings (\n       key TEXT PRIMARY KEY,\n       value TEXT\n     );\n   `;\n   ```\n2. Create data access layer for CRUD operations on media items\n3. Implement playlist management functionality\n4. Create settings storage and retrieval\n5. Implement search and filtering capabilities\n6. Create library views (by artist, album, recently added, etc.)\n7. Add sorting and organization options\n8. Implement database migrations for future updates",
+        "testStrategy": "1. Unit test database operations (create, read, update, delete)\n2. Test with mock data to verify schema integrity\n3. Verify search and filtering functionality\n4. Test playlist creation and management\n5. Verify settings storage and retrieval\n6. Test performance with large datasets\n7. Verify database migrations work correctly",
+        "priority": "high",
+        "dependencies": [
+          1,
+          3
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Implement Webtorrent Support",
+        "description": "Enable users to play media directly from magnet links and .torrent files using Webtorrent.",
+        "details": "1. Install and integrate Webtorrent library:\n   ```bash\n   npm install webtorrent @types/webtorrent\n   ```\n2. Create a TorrentProvider component:\n   ```typescript\n   import WebTorrent from 'webtorrent';\n   \n   function useTorrentProvider() {\n     const [client, setClient] = useState<WebTorrent.Instance | null>(null);\n     const [torrents, setTorrents] = useState<WebTorrent.Torrent[]>([]);\n     \n     useEffect(() => {\n       const webTorrentClient = new WebTorrent();\n       setClient(webTorrentClient);\n       \n       return () => {\n         webTorrentClient.destroy();\n       };\n     }, []);\n     \n     const addTorrent = useCallback((torrentId: string) => {\n       if (!client) return;\n       \n       client.add(torrentId, (torrent) => {\n         // Process torrent files and add to library\n         const mediaFiles = torrent.files.filter(file => {\n           const ext = file.name.split('.').pop()?.toLowerCase();\n           return ['mp3', 'mp4', 'wav', 'ogg', 'webm'].includes(ext || '');\n         });\n         \n         // Add media files to database\n       });\n     }, [client]);\n     \n     return { addTorrent, torrents };\n   }\n   ```\n3. Implement UI for adding magnet links and .torrent files\n4. Create torrent file parser for extracting media information\n5. Implement streaming from torrent to media player\n6. Add download progress indicators\n7. Implement seeding options for downloaded content\n8. Create storage management for cached torrent data",
+        "testStrategy": "1. Test with various magnet links and .torrent files\n2. Verify streaming works without full download completion\n3. Test download progress tracking\n4. Verify media metadata extraction from torrents\n5. Test with different media formats within torrents\n6. Verify seeding functionality\n7. Test performance and resource usage during torrent streaming",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          4
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Implement Subsonic API Integration",
+        "description": "Allow users to connect to and stream media from their Subsonic server by implementing the Subsonic API client.",
+        "details": "1. Create a SubsonicProvider component:\n   ```typescript\n   function useSubsonicProvider() {\n     const [server, setServer] = useState('');\n     const [username, setUsername] = useState('');\n     const [password, setPassword] = useState('');\n     const [isConnected, setIsConnected] = useState(false);\n     \n     const connect = async () => {\n       try {\n         // Generate authentication parameters\n         const salt = generateRandomString(10);\n         const token = md5(password + salt);\n         \n         // Test connection\n         const response = await fetch(\n           `${server}/rest/ping.view?v=1.13.0&c=deplayer&f=json&u=${username}&s=${salt}&t=${token}`\n         );\n         \n         const data = await response.json();\n         if (data['subsonic-response'].status === 'ok') {\n           setIsConnected(true);\n           // Save connection details to settings\n           return true;\n         }\n         return false;\n       } catch (error) {\n         console.error('Subsonic connection error:', error);\n         return false;\n       }\n     };\n     \n     const fetchLibrary = async () => {\n       // Implement fetching library from Subsonic server\n     };\n     \n     const getStreamUrl = (id: string) => {\n       // Generate streaming URL for a specific track\n       const salt = generateRandomString(10);\n       const token = md5(password + salt);\n       return `${server}/rest/stream.view?id=${id}&v=1.13.0&c=deplayer&f=json&u=${username}&s=${salt}&t=${token}`;\n     };\n     \n     return {\n       connect,\n       fetchLibrary,\n       getStreamUrl,\n       isConnected,\n       setServer,\n       setUsername,\n       setPassword\n     };\n   }\n   ```\n2. Implement Subsonic authentication (using MD5 hashing)\n3. Create API methods for browsing music library\n4. Implement streaming from Subsonic server\n5. Add album art and metadata retrieval\n6. Create UI for server connection settings\n7. Implement caching of frequently accessed content\n8. Add playlist synchronization with Subsonic server",
+        "testStrategy": "1. Test connection to various Subsonic server implementations\n2. Verify authentication works correctly\n3. Test library browsing and navigation\n4. Verify streaming of different media formats\n5. Test album art and metadata retrieval\n6. Verify playlist synchronization\n7. Test with large Subsonic libraries\n8. Verify error handling for connection issues",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          4
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Implement youtube-dl-server Integration",
+        "description": "Enable users to add YouTube videos and other supported sites to their collection by connecting to a self-hosted youtube-dl-server instance.",
+        "details": "1. Create a YoutubeDLProvider component:\n   ```typescript\n   function useYoutubeDLProvider() {\n     const [serverUrl, setServerUrl] = useState('');\n     const [isConnected, setIsConnected] = useState(false);\n     \n     const testConnection = async () => {\n       try {\n         const response = await fetch(`${serverUrl}/api/version`);\n         const data = await response.json();\n         if (data.version) {\n           setIsConnected(true);\n           return true;\n         }\n         return false;\n       } catch (error) {\n         console.error('youtube-dl-server connection error:', error);\n         return false;\n       }\n     };\n     \n     const fetchVideoInfo = async (url: string) => {\n       try {\n         const response = await fetch(`${serverUrl}/api/info?url=${encodeURIComponent(url)}`);\n         return await response.json();\n       } catch (error) {\n         console.error('Error fetching video info:', error);\n         return null;\n       }\n     };\n     \n     const downloadVideo = async (url: string, format: string = 'best') => {\n       try {\n         const response = await fetch(`${serverUrl}/api/download`, {\n           method: 'POST',\n           headers: {\n             'Content-Type': 'application/json'\n           },\n           body: JSON.stringify({ url, format })\n         });\n         return await response.json();\n       } catch (error) {\n         console.error('Error downloading video:', error);\n         return null;\n       }\n     };\n     \n     return {\n       testConnection,\n       fetchVideoInfo,\n       downloadVideo,\n       setServerUrl,\n       isConnected\n     };\n   }\n   ```\n2. Implement UI for entering youtube-dl-server URL\n3. Create video URL input field with validation\n4. Implement format selection for downloads\n5. Add progress tracking for downloads\n6. Create metadata extraction from downloaded videos\n7. Implement caching of downloaded content\n8. Add support for playlists and channels",
+        "testStrategy": "1. Test connection to youtube-dl-server\n2. Verify video information retrieval\n3. Test downloading with different format options\n4. Verify progress tracking during downloads\n5. Test with various supported sites (YouTube, Vimeo, etc.)\n6. Verify metadata extraction and storage\n7. Test playlist and channel handling\n8. Verify error handling for unavailable videos",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          4
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Implement Media Session API and Notifications",
+        "description": "Integrate with the Media Session API for OS media controls and implement browser notifications for track changes and events.",
+        "details": "1. Implement Media Session API integration:\n   ```typescript\n   function useMediaSession(mediaPlayer) {\n     useEffect(() => {\n       if ('mediaSession' in navigator) {\n         navigator.mediaSession.metadata = new MediaMetadata({\n           title: mediaPlayer.currentTrack?.title || 'Unknown Title',\n           artist: mediaPlayer.currentTrack?.artist || 'Unknown Artist',\n           album: mediaPlayer.currentTrack?.album || 'Unknown Album',\n           artwork: [\n             { src: mediaPlayer.currentTrack?.thumbnail || '/default-artwork.jpg', sizes: '512x512', type: 'image/jpeg' }\n           ]\n         });\n         \n         navigator.mediaSession.setActionHandler('play', () => mediaPlayer.play());\n         navigator.mediaSession.setActionHandler('pause', () => mediaPlayer.pause());\n         navigator.mediaSession.setActionHandler('previoustrack', () => mediaPlayer.previous());\n         navigator.mediaSession.setActionHandler('nexttrack', () => mediaPlayer.next());\n         navigator.mediaSession.setActionHandler('seekto', (details) => {\n           if (details.seekTime) mediaPlayer.seek(details.seekTime);\n         });\n       }\n     }, [mediaPlayer.currentTrack]);\n   }\n   ```\n2. Implement browser notifications:\n   ```typescript\n   function showNotification(title, options) {\n     if (!('Notification' in window)) return;\n     \n     if (Notification.permission === 'granted') {\n       new Notification(title, options);\n     } else if (Notification.permission !== 'denied') {\n       Notification.requestPermission().then(permission => {\n         if (permission === 'granted') {\n           new Notification(title, options);\n         }\n       });\n     }\n   }\n   ```\n3. Create track change notifications with artwork\n4. Implement error and event notifications\n5. Add notification preferences in settings\n6. Update Media Session metadata on track changes\n7. Handle media key events from keyboard and headphone controls",
+        "testStrategy": "1. Test Media Session API integration on different operating systems\n2. Verify media controls work with system UI (lock screen, notification area)\n3. Test notifications appear correctly for track changes\n4. Verify notification permission handling\n5. Test media key handling from keyboard and headphones\n6. Verify artwork displays correctly in system UI\n7. Test with different browsers to ensure compatibility",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Integrate Media Session API for OS Media Controls",
+            "description": "Implement the Media Session API to enable OS-level media controls, including setting up metadata and action handlers for play, pause, previous, next, and seek actions.",
+            "dependencies": [],
+            "details": "Use the MediaSession and MediaMetadata interfaces to provide rich metadata (title, artist, album, artwork) and register action handlers for media key events, allowing users to control playback from device controls and lock screens.",
+            "status": "done",
+            "testStrategy": "Verify that media controls (play, pause, next, previous, seek) work from OS-level interfaces and that metadata displays correctly on lock screens and notification areas."
+          },
+          {
+            "id": 2,
+            "title": "Update Media Session Metadata on Track Changes",
+            "description": "Ensure that Media Session metadata is dynamically updated whenever the current track changes.",
+            "dependencies": [
+              1
+            ],
+            "details": "Listen for track change events and update the MediaSession.metadata property with the new track's information, including artwork, to keep OS and browser notifications in sync with playback.",
+            "status": "done",
+            "testStrategy": "Change tracks during playback and confirm that OS-level media notifications and controls reflect the new track's metadata."
+          },
+          {
+            "id": 3,
+            "title": "Implement Browser Notifications for Track Changes and Events",
+            "description": "Create browser notifications that inform users of track changes and relevant playback events, including displaying track artwork.",
+            "dependencies": [],
+            "details": "Use the Notification API to display notifications with track title, artist, and artwork when a track changes or when specific events (e.g., errors, playback started) occur.",
+            "status": "done",
+            "testStrategy": "Trigger track changes and playback events, then verify that notifications appear with correct information and artwork."
+          },
+          {
+            "id": 4,
+            "title": "Implement Error and Event Notifications",
+            "description": "Display browser notifications for errors and significant playback events to keep users informed.",
+            "dependencies": [
+              3
+            ],
+            "details": "Detect playback errors and other key events, then use the Notification API to alert users with descriptive messages and relevant context.",
+            "status": "done",
+            "testStrategy": "Simulate errors and events, ensuring notifications are shown with accurate and helpful information."
+          },
+          {
+            "id": 5,
+            "title": "Add Notification Preferences to Settings",
+            "description": "Provide user-configurable settings to enable or disable different types of browser notifications related to media playback.",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Integrate notification preferences into the application's settings UI, allowing users to control which notifications they receive (e.g., track changes, errors, events).",
+            "status": "done",
+            "testStrategy": "Change notification settings and verify that only the selected types of notifications are shown during playback and events."
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Implement Lyrics and Visualizations",
+        "description": "Add lyrics display using the lyrics.ovh API and implement audio visualizations using butterchurn and react-audio-spectrum.",
+        "details": "1. Install visualization dependencies:\n   ```bash\n   npm install butterchurn butterchurn-presets react-audio-spectrum\n   ```\n2. Implement lyrics fetching:\n   ```typescript\n   async function fetchLyrics(artist: string, title: string) {\n     try {\n       const response = await fetch(`https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`);\n       const data = await response.json();\n       return data.lyrics;\n     } catch (error) {\n       console.error('Error fetching lyrics:', error);\n       return null;\n     }\n   }\n   ```\n3. Create a LyricsDisplay component that fetches and displays lyrics\n4. Implement MilkDrop visualizations with butterchurn:\n   ```typescript\n   import butterchurn from 'butterchurn';\n   import butterchurnPresets from 'butterchurn-presets';\n   \n   function ButterchurnVisualizer({ audioElement }) {\n     const canvasRef = useRef<HTMLCanvasElement>(null);\n     const [visualizer, setVisualizer] = useState(null);\n     \n     useEffect(() => {\n       if (!canvasRef.current || !audioElement) return;\n       \n       const canvas = canvasRef.current;\n       const context = canvas.getContext('webgl');\n       \n       if (!context) return;\n       \n       const viz = butterchurn.createVisualizer(context, {\n         width: canvas.width,\n         height: canvas.height\n       });\n       \n       const presets = butterchurnPresets.getPresets();\n       const preset = presets[Object.keys(presets)[0]];\n       viz.loadPreset(preset, 0.0);\n       \n       const audioContext = new (window.AudioContext || window.webkitAudioContext)();\n       const audioSource = audioContext.createMediaElementSource(audioElement);\n       audioSource.connect(audioContext.destination);\n       \n       viz.connectAudio(audioSource);\n       viz.render();\n       \n       setVisualizer(viz);\n       \n       return () => {\n         audioContext.close();\n       };\n     }, [audioElement]);\n     \n     return <canvas ref={canvasRef} width=\"800\" height=\"600\" />;\n   }\n   ```\n5. Implement spectrum visualization with react-audio-spectrum\n6. Create visualization selector UI\n7. Add visualization settings (size, quality, preset selection)\n8. Implement lyrics synchronization with playback (if timestamp data available)",
+        "testStrategy": "1. Test lyrics fetching with various artists and titles\n2. Verify fallback handling when lyrics aren't found\n3. Test visualizations with different audio inputs\n4. Verify performance of visualizations on various devices\n5. Test visualization settings and presets\n6. Verify visualizations respond correctly to audio\n7. Test lyrics display formatting and scrolling",
+        "priority": "low",
+        "dependencies": [
+          2
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Implement PWA Features and Multi-Theme Support",
+        "description": "Configure the application as a Progressive Web App (PWA) with offline capabilities and implement multiple visual themes.",
+        "details": "1. Configure PWA manifest:\n   ```json\n   {\n     \"name\": \"deplayer\",\n     \"short_name\": \"deplayer\",\n     \"start_url\": \".\",\n     \"display\": \"standalone\",\n     \"background_color\": \"#ffffff\",\n     \"theme_color\": \"#000000\",\n     \"description\": \"Local-first browser-based media player\",\n     \"icons\": [\n       {\n         \"src\": \"favicon.ico\",\n         \"sizes\": \"64x64\",\n         \"type\": \"image/x-icon\"\n       },\n       {\n         \"src\": \"logo192.png\",\n         \"type\": \"image/png\",\n         \"sizes\": \"192x192\"\n       },\n       {\n         \"src\": \"logo512.png\",\n         \"type\": \"image/png\",\n         \"sizes\": \"512x512\"\n       }\n     ]\n   }\n   ```\n2. Implement service worker for offline capabilities:\n   ```javascript\n   // service-worker.js\n   self.addEventListener('install', (event) => {\n     event.waitUntil(\n       caches.open('deplayer-v1').then((cache) => {\n         return cache.addAll([\n           '/',\n           '/index.html',\n           '/static/js/main.chunk.js',\n           '/static/js/0.chunk.js',\n           '/static/js/bundle.js',\n           '/manifest.json',\n           '/favicon.ico',\n           '/logo192.png',\n           '/logo512.png',\n           // Add other static assets\n         ]);\n       })\n     );\n   });\n   \n   self.addEventListener('fetch', (event) => {\n     event.respondWith(\n       caches.match(event.request).then((response) => {\n         return response || fetch(event.request);\n       })\n     );\n   });\n   ```\n3. Create theme system with CSS variables:\n   ```css\n   :root {\n     --primary-color: #1a73e8;\n     --secondary-color: #f1f3f4;\n     --background-color: #ffffff;\n     --text-color: #202124;\n     --accent-color: #d93025;\n   }\n   \n   [data-theme=\"dark\"] {\n     --primary-color: #8ab4f8;\n     --secondary-color: #303134;\n     --background-color: #202124;\n     --text-color: #e8eaed;\n     --accent-color: #f28b82;\n   }\n   ```\n4. Implement theme selector in settings\n5. Add theme toggle component\n6. Create custom themes with user-defined colors\n7. Implement system theme detection and auto-switching\n8. Add offline indicator and functionality",
+        "testStrategy": "1. Test PWA installation on various devices\n2. Verify offline functionality works as expected\n3. Test theme switching between light and dark modes\n4. Verify system theme detection\n5. Test custom theme creation and application\n6. Verify service worker caching and updates\n7. Test PWA on different browsers and devices",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Implement Command Bar and Keyboard Shortcuts",
+        "description": "Create a command bar (Ctrl+K) for quick access to app functions and implement comprehensive keyboard shortcuts.",
+        "details": "1. Create a CommandBar component:\n   ```typescript\n   function CommandBar({ isOpen, onClose, onExecute }) {\n     const [query, setQuery] = useState('');\n     const [commands, setCommands] = useState([]);\n     const [selectedIndex, setSelectedIndex] = useState(0);\n     const inputRef = useRef<HTMLInputElement>(null);\n     \n     // Define available commands\n     const availableCommands = [\n       { id: 'play', name: 'Play/Pause', action: () => { /* play/pause logic */ } },\n       { id: 'next', name: 'Next Track', action: () => { /* next track logic */ } },\n       { id: 'prev', name: 'Previous Track', action: () => { /* previous track logic */ } },\n       { id: 'shuffle', name: 'Toggle Shuffle', action: () => { /* shuffle logic */ } },\n       { id: 'repeat', name: 'Toggle Repeat', action: () => { /* repeat logic */ } },\n       // Add more commands\n     ];\n     \n     // Filter commands based on query\n     useEffect(() => {\n       if (!query) {\n         setCommands(availableCommands);\n       } else {\n         const filtered = availableCommands.filter(cmd =>\n           cmd.name.toLowerCase().includes(query.toLowerCase())\n         );\n         setCommands(filtered);\n       }\n       setSelectedIndex(0);\n     }, [query]);\n     \n     // Focus input when opened\n     useEffect(() => {\n       if (isOpen && inputRef.current) {\n         inputRef.current.focus();\n       }\n     }, [isOpen]);\n     \n     // Handle keyboard navigation\n     const handleKeyDown = (e) => {\n       switch (e.key) {\n         case 'ArrowDown':\n           e.preventDefault();\n           setSelectedIndex(prev => (prev + 1) % commands.length);\n           break;\n         case 'ArrowUp':\n           e.preventDefault();\n           setSelectedIndex(prev => (prev - 1 + commands.length) % commands.length);\n           break;\n         case 'Enter':\n           if (commands[selectedIndex]) {\n             commands[selectedIndex].action();\n             onExecute(commands[selectedIndex]);\n           }\n           break;\n         case 'Escape':\n           onClose();\n           break;\n       }\n     };\n     \n     if (!isOpen) return null;\n     \n     return (\n       <div className=\"command-bar-overlay\">\n         <div className=\"command-bar\">\n           <input\n             ref={inputRef}\n             type=\"text\"\n             value={query}\n             onChange={(e) => setQuery(e.target.value)}\n             onKeyDown={handleKeyDown}\n             placeholder=\"Type a command...\"\n           />\n           <div className=\"command-list\">\n             {commands.map((cmd, index) => (\n               <div\n                 key={cmd.id}\n                 className={`command-item ${index === selectedIndex ? 'selected' : ''}`}\n                 onClick={() => {\n                   cmd.action();\n                   onExecute(cmd);\n                 }}\n               >\n                 {cmd.name}\n               </div>\n             ))}\n           </div>\n         </div>\n       </div>\n     );\n   }\n   ```\n2. Implement global keyboard shortcut handler:\n   ```typescript\n   function useKeyboardShortcuts(handlers) {\n     useEffect(() => {\n       const handleKeyDown = (e) => {\n         // Command bar shortcut (Ctrl+K)\n         if (e.ctrlKey && e.key === 'k') {\n           e.preventDefault();\n           handlers.openCommandBar();\n           return;\n         }\n         \n         // Media shortcuts\n         if (e.key === ' ' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {\n           e.preventDefault();\n           handlers.togglePlayPause();\n         } else if (e.key === 'ArrowRight' || e.key === 'j') {\n           handlers.nextTrack();\n         } else if (e.key === 'ArrowLeft' || e.key === 'k') {\n           handlers.previousTrack();\n         }\n         \n         // Add more shortcuts as needed\n       };\n       \n       window.addEventListener('keydown', handleKeyDown);\n       return () => window.removeEventListener('keydown', handleKeyDown);\n     }, [handlers]);\n   }\n   ```\n3. Create command registry for registering commands from different parts of the app\n4. Implement command search and filtering\n5. Add keyboard navigation within command bar\n6. Create visual keyboard shortcut helper/cheatsheet\n7. Implement user-configurable keyboard shortcuts in settings",
+        "testStrategy": "1. Test command bar opening with Ctrl+K\n2. Verify command filtering works correctly\n3. Test keyboard navigation within command bar\n4. Verify all keyboard shortcuts function as expected\n5. Test command execution\n6. Verify shortcuts work in different contexts (playing, paused, etc.)\n7. Test custom shortcut configuration",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Implement Optional Cross-Device Sync",
+        "description": "Enable optional synchronization of user data across devices using ElectricSQL and PostgreSQL.",
+        "details": "1. Install ElectricSQL client:\n   ```bash\n   npm install electric-sql\n   ```\n2. Create sync configuration:\n   ```typescript\n   import { ElectricDatabase, electrify } from 'electric-sql/wa-sqlite';\n   \n   async function setupSync(dbName: string, syncServerUrl: string) {\n     // Initialize the database\n     const conn = await ElectricDatabase.init(dbName);\n     \n     // Define the shape of your database\n     const schema = {\n       version: 1,\n       tables: {\n         media: {\n           columns: {\n             id: { type: 'TEXT', primaryKey: true },\n             title: { type: 'TEXT' },\n             artist: { type: 'TEXT' },\n             album: { type: 'TEXT' },\n             duration: { type: 'INTEGER' },\n             path: { type: 'TEXT' },\n             type: { type: 'TEXT' },\n             provider: { type: 'TEXT' },\n             thumbnail: { type: 'TEXT' },\n             added_date: { type: 'INTEGER' }\n           }\n         },\n         playlists: {\n           columns: {\n             id: { type: 'TEXT', primaryKey: true },\n             name: { type: 'TEXT' },\n             description: { type: 'TEXT' },\n             created_date: { type: 'INTEGER' }\n           }\n         },\n         playlist_items: {\n           columns: {\n             playlist_id: { type: 'TEXT' },\n             media_id: { type: 'TEXT' },\n             position: { type: 'INTEGER' }\n           },\n           primaryKey: ['playlist_id', 'media_id']\n         },\n         settings: {\n           columns: {\n             key: { type: 'TEXT', primaryKey: true },\n             value: { type: 'TEXT' }\n           }\n         }\n       }\n     };\n     \n     // Electrify the database\n     const electric = await electrify(conn, schema);\n     \n     // Connect to the sync server\n     await electric.connect(syncServerUrl, {\n       auth: { token: 'auth-token' } // Implement proper auth\n     });\n     \n     return electric;\n   }\n   ```\n3. Create sync settings UI for server URL and enable/disable toggle\n4. Implement conflict resolution strategies\n5. Add sync status indicators\n6. Create data migration utilities for initial sync\n7. Implement selective sync for specific data types\n8. Add error handling and retry mechanisms for sync failures",
+        "testStrategy": "1. Test connection to ElectricSQL server\n2. Verify data synchronization between devices\n3. Test conflict resolution with simultaneous edits\n4. Verify sync works after connection loss and reconnection\n5. Test selective sync functionality\n6. Verify large dataset synchronization performance\n7. Test error handling and recovery\n8. Verify security of synchronized data",
+        "priority": "low",
+        "dependencies": [
+          4
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "Optimize Player Progress Updates with Local State",
+        "description": "Refactor the player progress tracking mechanism by removing Redux action SET_PLAYER_PROGRESS and implementing a local state solution in the PlayerControls component to reduce unnecessary re-renders and improve application performance.",
+        "details": "This task involves a significant refactoring of the player progress tracking mechanism to improve performance:\n\n1. Remove the SET_PLAYER_PROGRESS Redux action:\n   - Delete the action creator in the player actions file\n   - Remove the corresponding reducer case in the player reducer\n   - Update any tests that rely on this action\n\n2. Implement local state in PlayerControls component:\n   - Add React useState hooks for tracking progress metrics (played, loaded, playedSeconds, loadedSeconds)\n   - Update the onProgress handler to update local state instead of dispatching Redux actions\n   - Ensure the component correctly manages this state throughout its lifecycle\n\n3. Update related components:\n   - Modify the ProgressBar component to receive progress values directly as props from PlayerControls\n   - Update the time display component to receive playedSeconds/duration from local state\n   - Ensure any other components that previously consumed progress from Redux are updated\n\n4. Maintain Redux for playback control only:\n   - Keep play/pause, next/previous track, and seeking functionality in Redux\n   - Update the seeking mechanism to work with the new local state approach\n   - Ensure volume control and other player settings remain functional\n\n5. Performance monitoring:\n   - Before implementation, add performance metrics using React DevTools Profiler or a similar tool\n   - Record baseline metrics for player progress updates (frequency of renders, component update times)\n   - After implementation, run the same performance tests to quantify improvements\n   - Document the performance gains in comments and the PR\n\n6. Code organization:\n   - Update PropTypes and TypeScript types if applicable\n   - Ensure clean separation between local state and Redux state\n   - Add comments explaining the performance optimization approach",
+        "testStrategy": "Testing for this optimization should be comprehensive to ensure functionality is maintained while performance is improved:\n\n1. Performance testing:\n   - Use React DevTools Profiler to record and compare render counts before and after the change\n   - Implement performance marks/measures using the Performance API to quantify improvements\n   - Create a test script that plays a song for 30 seconds and measures render frequency\n   - Document performance metrics in a before/after comparison table\n\n2. Functional testing:\n   - Verify all player controls still work correctly (play, pause, next, previous)\n   - Test seeking functionality by clicking different positions on the progress bar\n   - Ensure the time display updates correctly as the song progresses\n   - Verify that loaded progress (buffering) is still displayed properly\n\n3. Integration testing:\n   - Test that player state is correctly maintained when navigating between different app routes\n   - Verify that any components that previously relied on progress from Redux still function\n   - Test edge cases like seeking near the end of a track or rapid seeking\n\n4. Regression testing:\n   - Create a checklist of all player features and verify each one works after the refactoring\n   - Test on different browsers and devices to ensure consistent behavior\n   - Verify that volume control and other player settings are unaffected\n\n5. Code review:\n   - Ensure all Redux references to SET_PLAYER_PROGRESS are removed\n   - Verify that the PlayerControls component properly manages its local state\n   - Check for any memory leaks or performance issues in the implementation\n\n6. User testing:\n   - Have team members use the player with the new implementation to verify smooth operation\n   - Compare subjective smoothness of the player experience before and after",
+        "status": "done",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Remove Redux SET_PLAYER_PROGRESS Action and Update Reducer",
+            "description": "Delete the SET_PLAYER_PROGRESS action creator, remove the corresponding reducer case, and update affected tests.",
+            "dependencies": [],
+            "details": "Delete the SET_PLAYER_PROGRESS action creator in the player actions file. Remove the corresponding case in the player reducer that handles this action. Update any unit tests that rely on this action to prevent test failures. Document the removal in code comments for future reference.",
+            "status": "done",
+            "testStrategy": "Run existing test suite to identify failing tests. Update tests to reflect the new architecture. Verify Redux store no longer contains player progress data."
+          },
+          {
+            "id": 2,
+            "title": "Implement Local State in PlayerControls Component",
+            "description": "Add React useState hooks to track progress metrics locally within the PlayerControls component.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement useState hooks for tracking played, loaded, playedSeconds, and loadedSeconds metrics. Update the onProgress handler to update local state instead of dispatching Redux actions. Ensure component correctly manages state throughout its lifecycle, including cleanup on unmount. Add appropriate PropTypes or TypeScript types for the local state variables.",
+            "status": "done",
+            "testStrategy": "Create unit tests for the PlayerControls component to verify local state updates correctly when onProgress is called. Test component lifecycle methods to ensure proper state management."
+          },
+          {
+            "id": 3,
+            "title": "Update Related Components to Use Local State",
+            "description": "Modify ProgressBar, time display, and other components to receive progress values directly from PlayerControls instead of Redux.",
+            "dependencies": [
+              2
+            ],
+            "details": "Update the ProgressBar component to receive progress values as props from PlayerControls instead of connecting to Redux. Modify the time display component to receive playedSeconds/duration from local state. Identify and update any other components that previously consumed progress data from Redux. Ensure proper prop drilling or context usage for components that need access to the progress data.",
+            "status": "done",
+            "testStrategy": "Test the integration between PlayerControls and dependent components. Verify that progress updates are correctly propagated to child components. Check for any rendering issues or prop type errors."
+          },
+          {
+            "id": 4,
+            "title": "Maintain Redux for Playback Control",
+            "description": "Ensure play/pause, track navigation, seeking, and volume control remain functional with Redux while progress uses local state.",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Keep play/pause, next/previous track functionality in Redux. Update the seeking mechanism to work with the new local state approach, ensuring seeking dispatches Redux actions but updates local progress state appropriately. Verify volume control and other player settings remain functional. Create clear separation between local state (progress) and Redux state (playback control).",
+            "status": "done",
+            "testStrategy": "Test all playback controls to ensure they still function correctly. Verify seeking works properly with the new implementation. Test edge cases like seeking while paused or rapid seeking."
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-06-29T22:47:52.735Z",
+      "updated": "2025-06-29T22:47:52.735Z",
+      "description": "Tasks for master context"
     }
-  ]
+  }
 }
