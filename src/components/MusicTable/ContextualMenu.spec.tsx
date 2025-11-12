@@ -12,7 +12,7 @@ vi.mock('react-dom', async () => {
   const actual = await vi.importActual('react-dom')
   return {
     ...actual,
-    createPortal: (element) => element
+    createPortal: (element: React.ReactNode) => element
   }
 })
 
@@ -185,7 +185,7 @@ describe('ContextualMenu', () => {
 
   describe('Menu Actions', () => {
     it('should dispatch play action when clicking play button', async () => {
-      const { onClick, dispatch } = setup()
+      const { onClick } = setup()
       const trigger = screen.getByRole('button', { name: /open context menu/i })
       
       await user.click(trigger)

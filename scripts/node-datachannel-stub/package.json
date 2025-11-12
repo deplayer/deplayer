@@ -1,0 +1,12 @@
+{
+  "name": "node-datachannel-stub",
+  "version": "1.0.0",
+  "description": "Stub package for node-datachannel - not needed in browser environments",
+  "main": "index.js",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./polyfill": "./index.js"
+  }
+}
+

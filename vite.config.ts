@@ -69,7 +69,7 @@ export default defineConfig({
     format: 'es'
   },
   optimizeDeps: {
-    exclude: ['@electric-sql/pglite'],
+    exclude: ['@electric-sql/pglite', 'node-datachannel'],
     esbuildOptions: {
       plugins: [fixReactVirtualized as any],
     },
