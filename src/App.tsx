@@ -58,9 +58,11 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
   React.useEffect(() => {
     if (!liveStore) return
     
-    setupFts5(liveStore).catch(error => {
+    try {
+      setupFts5(liveStore)
+    } catch (error) {
       console.error('[App] Failed to setup FTS5:', error)
-    })
+    }
   }, [liveStore])
 
   return (

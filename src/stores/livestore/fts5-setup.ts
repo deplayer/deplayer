@@ -153,16 +153,39 @@ export const allFtsSetup = [
  * 
  * @example
  * ```typescript
- * import { allFtsSetup } from './fts5-setup'
+ * import { setupFts5 } from './fts5-setup'
+ * import { useStore } from '@livestore/react'
  * 
- * // After store initialization
- * await store.exec(allFtsSetup)
+ * const store = useStore()
+ * useEffect(() => {
+ *   if (!store) return
+ *   setupFts5(store)
+ * }, [store])
  * ```
  */
-export const setupFts5 = async (store: any) => {
+export const setupFts5 = (store: any) => {
   try {
-    // Execute all FTS5 setup queries
-    await store.exec(allFtsSetup)
+    // Execute each FTS5 setup block separately
+    // SQLite may not support executing multiple statements at once
+    const setupStatements = [
+      mediaFtsSetup,
+      artistFtsSetup,
+      albumFtsSetup,
+      playlistFtsSetup,
+    ]
+    
+    for (const setupSql of setupStatements) {
+      // Split into individual statements (CREATE TABLE, CREATE TRIGGER, etc.)
+      const statements = setupSql
+        .split(';')
+        .map(s => s.trim())
+        .filter(s => s.length > 0)
+      
+      for (const statement of statements) {
+        store.sqliteDbWrapper.execute(statement + ';')
+      }
+    }
+    
     console.log('[LiveStore] FTS5 search tables initialized')
   } catch (error) {
     console.error('[LiveStore] Failed to initialize FTS5:', error)
