@@ -1,4 +1,15 @@
-import { Events, makeSchema, Schema, State } from '@livestore/livestore'
+import { makeSchema, State } from '@livestore/livestore'
+// Import event definitions
+import { mediaEvents } from './events/media'
+import { playlistEvents } from './events/playlist'
+import { queueEvents } from './events/queue'
+import { favoriteEvents } from './events/favorites'
+import { lyricsEvents } from './events/lyrics'
+import { settingsEvents } from './events/settings'
+
+// ============================================================================
+// TYPE DEFINITIONS
+// ============================================================================
 
 // Settings structure types
 type ProviderSettings = {
@@ -37,8 +48,12 @@ type SettingsData = {
   app: AppSettings;
 };
 
-// SQLite table for settings
+// ============================================================================
+// SQLITE TABLES
+// ============================================================================
+
 export const tables = {
+  // Settings table
   settings: State.SQLite.table({
     name: 'settings',
     columns: {
@@ -48,28 +63,128 @@ export const tables = {
       updatedAt: State.SQLite.integer({}),
     },
   }),
+
+  // Artists table (normalized)
+  artists: State.SQLite.table({
+    name: 'artists',
+    columns: {
+      id: State.SQLite.text({ primaryKey: true }),
+      name: State.SQLite.text({}),
+      createdAt: State.SQLite.integer({}),
+      updatedAt: State.SQLite.integer({}),
+    },
+  }),
+
+  // Albums table (normalized)
+  albums: State.SQLite.table({
+    name: 'albums',
+    columns: {
+      id: State.SQLite.text({ primaryKey: true }),
+      name: State.SQLite.text({}),
+      artistId: State.SQLite.text({}),
+      thumbnailUrl: State.SQLite.text({ nullable: true }),
+      year: State.SQLite.integer({ nullable: true }),
+      createdAt: State.SQLite.integer({}),
+      updatedAt: State.SQLite.integer({}),
+    },
+  }),
+
+  // Media table (tracks)
+  media: State.SQLite.table({
+    name: 'media',
+    columns: {
+      id: State.SQLite.text({ primaryKey: true }),
+      title: State.SQLite.text({}),
+      artistId: State.SQLite.text({}),
+      albumId: State.SQLite.text({}),
+      type: State.SQLite.text({}), // 'audio' | 'video'
+      duration: State.SQLite.integer({ nullable: true }),
+      playCount: State.SQLite.integer({ default: 0 }),
+      track: State.SQLite.integer({ nullable: true }),
+      discNumber: State.SQLite.integer({ nullable: true }),
+      stream: State.SQLite.json({}),
+      cover: State.SQLite.json({ nullable: true }),
+      genres: State.SQLite.json({}),
+      externalId: State.SQLite.text({ nullable: true }),
+      shareUrl: State.SQLite.text({ nullable: true }),
+      filePath: State.SQLite.text({ nullable: true }),
+      createdAt: State.SQLite.integer({}),
+      updatedAt: State.SQLite.integer({}),
+    },
+  }),
+
+  // Playlists table
+  playlists: State.SQLite.table({
+    name: 'playlists',
+    columns: {
+      id: State.SQLite.text({ primaryKey: true }),
+      name: State.SQLite.text({}),
+      trackIds: State.SQLite.json({ default: [] }),
+      shuffle: State.SQLite.boolean({ default: false }),
+      repeat: State.SQLite.boolean({ default: false }),
+      currentPlaying: State.SQLite.integer({ nullable: true }),
+      createdAt: State.SQLite.integer({}),
+      updatedAt: State.SQLite.integer({}),
+    },
+  }),
+
+  // Queue table
+  queue: State.SQLite.table({
+    name: 'queue',
+    columns: {
+      id: State.SQLite.text({ primaryKey: true }),
+      trackIds: State.SQLite.json({ default: [] }),
+      randomTrackIds: State.SQLite.json({ default: [] }),
+      currentPlaying: State.SQLite.integer({ nullable: true }),
+      shuffle: State.SQLite.boolean({ default: false }),
+      repeat: State.SQLite.boolean({ default: false }),
+      updatedAt: State.SQLite.integer({}),
+    },
+  }),
+
+  // Favorites table
+  favorites: State.SQLite.table({
+    name: 'favorites',
+    columns: {
+      id: State.SQLite.text({ primaryKey: true }),
+      mediaId: State.SQLite.text({}),
+      createdAt: State.SQLite.integer({}),
+    },
+  }),
+
+  // Lyrics table
+  lyrics: State.SQLite.table({
+    name: 'media_lyrics',
+    columns: {
+      id: State.SQLite.text({ primaryKey: true }),
+      mediaId: State.SQLite.text({}),
+      lyricsText: State.SQLite.text({}),
+      source: State.SQLite.text({ nullable: true }),
+      createdAt: State.SQLite.integer({}),
+      updatedAt: State.SQLite.integer({}),
+    },
+  }),
 }
 
-// Events for settings changes
+// ============================================================================
+// EVENTS - Combining all domain events
+// ============================================================================
+
 export const events = {
-  settingsUpdated: Events.synced({
-    name: 'v1.SettingsUpdated',
-    schema: Schema.Struct({
-      id: Schema.String,
-      settings: Schema.Unknown,
-    }),
-  }),
-  settingsInitialized: Events.synced({
-    name: 'v1.SettingsInitialized',
-    schema: Schema.Struct({
-      id: Schema.String,
-      settings: Schema.Unknown,
-    }),
-  }),
+  ...settingsEvents,
+  ...mediaEvents,
+  ...playlistEvents,
+  ...queueEvents,
+  ...favoriteEvents,
+  ...lyricsEvents,
 }
 
-// Materializers map events to state
+// ============================================================================
+// MATERIALIZERS - Map events to SQLite operations
+// ============================================================================
+
 const materializers = State.SQLite.materializers(events, {
+  // Settings materializers
   'v1.SettingsUpdated': ({ id, settings }: { id: string; settings: any }) => {
     const now = Date.now()
     return tables.settings
@@ -83,9 +198,333 @@ const materializers = State.SQLite.materializers(events, {
       .insert({ id, settings, createdAt: now, updatedAt: now })
       .onConflict('id', 'update', { settings, updatedAt: now })
   },
+
+  // Media materializers
+  'v1.MediaAdded': (event: any) => {
+    const now = Date.now()
+    const { id, title, artist, album, type, duration, track, discNumber, stream, cover, genres, externalId, shareUrl, filePath } = event
+    
+    // Return array of operations: insert artist, insert album, insert media
+    return [
+      // Insert artist if not exists
+      tables.artists
+        .insert({
+          id: artist.id,
+          name: artist.name,
+          createdAt: now,
+          updatedAt: now,
+        })
+        .onConflict('id', 'ignore'),
+      
+      // Insert album if not exists
+      tables.albums
+        .insert({
+          id: album.id,
+          name: album.name,
+          artistId: album.artistId,
+          thumbnailUrl: album.thumbnailUrl ?? null,
+          year: album.year ?? null,
+          createdAt: now,
+          updatedAt: now,
+        })
+        .onConflict('id', 'ignore'),
+      
+      // Insert media
+      tables.media
+        .insert({
+          id,
+          title,
+          artistId: artist.id,
+          albumId: album.id,
+          type,
+          duration: duration ?? null,
+          playCount: 0,
+          track: track ?? null,
+          discNumber: discNumber ?? null,
+          stream,
+          cover: cover ?? null,
+          genres,
+          externalId: externalId ?? null,
+          shareUrl: shareUrl ?? null,
+          filePath: filePath ?? null,
+          createdAt: now,
+          updatedAt: now,
+        })
+        .onConflict('id', 'ignore'),
+    ]
+  },
+
+  'v1.MediaUpdated': ({ id, title, duration, stream, cover, genres }: any) => {
+    const now = Date.now()
+    const updates: any = { updatedAt: now }
+    if (title !== undefined) updates.title = title
+    if (duration !== undefined) updates.duration = duration
+    if (stream !== undefined) updates.stream = stream
+    if (cover !== undefined) updates.cover = cover
+    if (genres !== undefined) updates.genres = genres
+
+    return tables.media.update(updates).where('id', '=', id)
+  },
+
+  'v1.MediaPlayed': ({ id }: { id: string }) => {
+    // For now, we'll handle playCount increment at the query layer or with a follow-up read
+    // TODO: Implement SQL expression for incrementing
+    return tables.media
+      .update({ updatedAt: Date.now() })
+      .where('id', '=', id)
+  },
+
+  'v1.MediaBulkAdded': (event: any) => {
+    const now = Date.now()
+    const operations: any[] = []
+    
+    for (const item of event.media) {
+      // Insert artist
+      operations.push(
+        tables.artists
+          .insert({
+            id: item.artist.id,
+            name: item.artist.name,
+            createdAt: now,
+            updatedAt: now,
+          })
+          .onConflict('id', 'ignore')
+      )
+      
+      // Insert album
+      operations.push(
+        tables.albums
+          .insert({
+            id: item.album.id,
+            name: item.album.name,
+            artistId: item.album.artistId,
+            thumbnailUrl: item.album.thumbnailUrl ?? null,
+            year: item.album.year ?? null,
+            createdAt: now,
+            updatedAt: now,
+          })
+          .onConflict('id', 'ignore')
+      )
+      
+      // Insert media
+      operations.push(
+        tables.media
+          .insert({
+            id: item.id,
+            title: item.title,
+            artistId: item.artist.id,
+            albumId: item.album.id,
+            type: item.type,
+            duration: item.duration ?? null,
+            playCount: 0,
+            track: item.track ?? null,
+            discNumber: item.discNumber ?? null,
+            stream: item.stream,
+            cover: item.cover ?? null,
+            genres: item.genres,
+            externalId: item.externalId ?? null,
+            shareUrl: item.shareUrl ?? null,
+            filePath: item.filePath ?? null,
+            createdAt: now,
+            updatedAt: now,
+          })
+          .onConflict('id', 'ignore')
+      )
+    }
+    
+    return operations
+  },
+
+  'v1.MediaBulkRemoved': (event: any) => {
+    return event.mediaIds.map((id: string) => 
+      tables.media.delete().where('id', '=', id)
+    )
+  },
+
+  'v1.MediaRemoved': ({ id }: { id: string }) => {
+    return tables.media.delete().where('id', '=', id)
+  },
+
+  // Playlist materializers
+  'v1.PlaylistCreated': ({ id, name }: { id: string; name: string }) => {
+    const now = Date.now()
+    return tables.playlists
+      .insert({
+        id,
+        name,
+        trackIds: [],
+        shuffle: false,
+        repeat: false,
+        currentPlaying: null,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .onConflict('id', 'ignore')
+  },
+
+  'v1.PlaylistRenamed': ({ playlistId, name }: any) => {
+    const now = Date.now()
+    return tables.playlists
+      .update({ name, updatedAt: now })
+      .where('id', '=', playlistId)
+  },
+
+  'v1.PlaylistTrackAdded': ({ playlistId }: any) => {
+    const now = Date.now()
+    // TODO: Implement JSON array append - for now just update timestamp
+    // Will need to handle in query layer or with custom SQL
+    return tables.playlists
+      .update({ updatedAt: now })
+      .where('id', '=', playlistId)
+  },
+
+  'v1.PlaylistTrackRemoved': ({ playlistId }: any) => {
+    const now = Date.now()
+    // TODO: Implement JSON array removal
+    return tables.playlists
+      .update({ updatedAt: now })
+      .where('id', '=', playlistId)
+  },
+
+  'v1.PlaylistReordered': ({ playlistId, trackIds }: any) => {
+    const now = Date.now()
+    return tables.playlists
+      .update({ trackIds, updatedAt: now })
+      .where('id', '=', playlistId)
+  },
+
+  'v1.PlaylistDeleted': ({ playlistId }: { playlistId: string }) => {
+    return tables.playlists.delete().where('id', '=', playlistId)
+  },
+
+  'v1.PlaylistShuffleToggled': ({ playlistId, shuffle }: any) => {
+    const now = Date.now()
+    return tables.playlists
+      .update({ shuffle, updatedAt: now })
+      .where('id', '=', playlistId)
+  },
+
+  'v1.PlaylistRepeatToggled': ({ playlistId, repeat }: any) => {
+    const now = Date.now()
+    return tables.playlists
+      .update({ repeat, updatedAt: now })
+      .where('id', '=', playlistId)
+  },
+
+  // Queue materializers
+  'v1.QueueUpdated': ({ id, trackIds, currentPlaying, shuffle, repeat }: any) => {
+    const now = Date.now()
+    return tables.queue
+      .insert({
+        id,
+        trackIds,
+        randomTrackIds: [],
+        currentPlaying: currentPlaying ?? null,
+        shuffle,
+        repeat,
+        updatedAt: now,
+      })
+      .onConflict('id', 'update', {
+        trackIds,
+        currentPlaying: currentPlaying ?? null,
+        shuffle,
+        repeat,
+        updatedAt: now,
+      })
+  },
+
+  'v1.QueueTrackAdded': ({ queueId }: any) => {
+    const now = Date.now()
+    // TODO: Implement JSON array append
+    return tables.queue
+      .update({ updatedAt: now })
+      .where('id', '=', queueId)
+  },
+
+  'v1.QueueTrackRemoved': ({ queueId }: any) => {
+    const now = Date.now()
+    // TODO: Implement JSON array removal
+    return tables.queue
+      .update({ updatedAt: now })
+      .where('id', '=', queueId)
+  },
+
+  'v1.QueueCleared': ({ queueId }: { queueId: string }) => {
+    const now = Date.now()
+    return tables.queue
+      .update({
+        trackIds: [],
+        randomTrackIds: [],
+        currentPlaying: null,
+        updatedAt: now,
+      })
+      .where('id', '=', queueId)
+  },
+
+  'v1.QueueShuffleToggled': ({ queueId, shuffle }: any) => {
+    const now = Date.now()
+    return tables.queue
+      .update({ shuffle, updatedAt: now })
+      .where('id', '=', queueId)
+  },
+
+  'v1.QueueRepeatToggled': ({ queueId, repeat }: any) => {
+    const now = Date.now()
+    return tables.queue
+      .update({ repeat, updatedAt: now })
+      .where('id', '=', queueId)
+  },
+
+  'v1.QueuePositionChanged': ({ queueId, position }: any) => {
+    const now = Date.now()
+    return tables.queue
+      .update({ currentPlaying: position, updatedAt: now })
+      .where('id', '=', queueId)
+  },
+
+  // Favorites materializers
+  'v1.MediaFavorited': ({ id, mediaId }: { id: string; mediaId: string }) => {
+    const now = Date.now()
+    return tables.favorites
+      .insert({
+        id,
+        mediaId,
+        createdAt: now,
+      })
+      .onConflict('id', 'ignore')
+  },
+
+  'v1.MediaUnfavorited': ({ mediaId }: { mediaId: string }) => {
+    return tables.favorites.delete().where('mediaId', '=', mediaId)
+  },
+
+  // Lyrics materializers
+  'v1.LyricsAdded': ({ id, mediaId, lyricsText, source }: any) => {
+    const now = Date.now()
+    return tables.lyrics
+      .insert({
+        id,
+        mediaId,
+        lyricsText,
+        source: source ?? null,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .onConflict('id', 'ignore')
+  },
+
+  'v1.LyricsUpdated': ({ mediaId, lyricsText }: any) => {
+    const now = Date.now()
+    return tables.lyrics
+      .update({ lyricsText, updatedAt: now })
+      .where('mediaId', '=', mediaId)
+  },
+
+  'v1.LyricsRemoved': ({ mediaId }: { mediaId: string }) => {
+    return tables.lyrics.delete().where('mediaId', '=', mediaId)
+  },
 })
 
 const state = State.SQLite.makeState({ tables, materializers })
 
 export const schema = makeSchema({ events, state })
-
