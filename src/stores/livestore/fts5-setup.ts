@@ -156,14 +156,22 @@ export const allFtsSetup = [
  * import { setupFts5 } from './fts5-setup'
  * import { useStore } from '@livestore/react'
  * 
- * const store = useStore()
+ * const { store } = useStore()
  * useEffect(() => {
- *   if (!store) return
+ *   if (!store?.sqliteDbWrapper) return
  *   setupFts5(store)
  * }, [store])
  * ```
  */
 export const setupFts5 = (store: any) => {
+  if (!store) {
+    throw new Error('Store is not initialized')
+  }
+  
+  if (!store.sqliteDbWrapper) {
+    throw new Error('Store.sqliteDbWrapper is not available')
+  }
+  
   try {
     // Execute each FTS5 setup block separately
     // SQLite may not support executing multiple statements at once

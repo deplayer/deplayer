@@ -52,11 +52,11 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
   useLanguage()
   
   // Get LiveStore instance
-  const liveStore = useStore()
+  const { store: liveStore } = useStore()
   
   // Initialize FTS5 full-text search on mount
   React.useEffect(() => {
-    if (!liveStore) return
+    if (!liveStore?.sqliteDbWrapper) return
     
     try {
       setupFts5(liveStore)
