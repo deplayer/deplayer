@@ -178,6 +178,11 @@ src/
   type MediaType = 'audio' | 'video'
   ```
 
+### LiveStore Guidelines
+This project is migrating to LiveStore. When working with LiveStore:
+- **Documentation lookup**: When you need to look up information about LiveStore, always use the `docs` directory shipped with `@livestore/livestore` package in `node_modules/@livestore/livestore/docs`
+- LiveStore documentation is available locally in the node_modules directory
+
 ### Additional Cursor Rules
 This project includes Cursor IDE rules in `.cursor/rules/`:
 - **Taskmaster integration** - Task management workflow
