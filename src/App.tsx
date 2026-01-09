@@ -1,4 +1,5 @@
 import React from 'react'
+import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
 
 import './styles/App.scss'
 import 'rc-slider/assets/index.css';
@@ -9,6 +10,8 @@ import { Route, Routes } from 'react-router-dom'
 import { HistoryRouter as Router } from "redux-first-history/rr6";
 import { Provider } from 'react-redux'
 import { store, history } from './store/configureStore'
+import { LiveStoreProvider } from '@livestore/react'
+import { adapter, schema, storeId } from './stores/livestore/store'
 
 import LayoutContainer from './containers/LayoutContainer'
 import AddMediaModal from './components/AddMediaModal'
@@ -78,11 +81,18 @@ const App = () => {
   const playerPortal = React.useMemo(() => portals.createHtmlPortalNode(), [])
 
   return (
-    <Provider store={store}>
-      <Router history={history}>
-        <AppContent playerPortal={playerPortal} />
-      </Router>
-    </Provider>
+    <LiveStoreProvider 
+      adapter={adapter} 
+      schema={schema} 
+      storeId={storeId}
+      batchUpdates={batchUpdates}
+    >
+      <Provider store={store}>
+        <Router history={history}>
+          <AppContent playerPortal={playerPortal} />
+        </Router>
+      </Provider>
+    </LiveStoreProvider>
   )
 }
 

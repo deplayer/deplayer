@@ -61,7 +61,7 @@ function WebtorrentServer({
   const client = webtorrentService.getClient()
   const [currentTorrent, setCurrentTorrent] = React.useState<Torrent | null>(null)
   const videoRef = React.useRef<HTMLVideoElement | null>(null)
-  const progressInterval = React.useRef<number>()
+  const progressInterval = React.useRef<ReturnType<typeof setInterval> | undefined>(undefined)
 
   // Register service worker and initialize server
   useRegisterSW({
@@ -95,7 +95,7 @@ function WebtorrentServer({
       })
     }
 
-    progressInterval.current = window.setInterval(handleProgress, 1000)
+    progressInterval.current = setInterval(handleProgress, 1000)
     return () => {
       if (progressInterval.current) {
         clearInterval(progressInterval.current)

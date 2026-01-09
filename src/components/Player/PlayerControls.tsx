@@ -82,7 +82,7 @@ interface State {
  */
 
 class PlayerControls extends React.Component<Props, State> {
-  private playerRef: React.RefObject<ReactPlayer>;
+  private playerRef: React.RefObject<ReactPlayer | null>;
   public state: State = {
     timeShown: 0,
     played: 0,

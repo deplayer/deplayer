@@ -13,7 +13,7 @@ const LazyImage: React.FC<Props> = ({ src, reflect, onClick, children, noFade })
   const [isLoaded, setIsLoaded] = useState(false)
   const [hasError, setHasError] = useState(false)
   const [showFallback, setShowFallback] = useState(false)
-  const fallbackTimer = useRef<number>()
+  const fallbackTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => {
     setIsLoaded(false)
@@ -28,7 +28,7 @@ const LazyImage: React.FC<Props> = ({ src, reflect, onClick, children, noFade })
     }
 
     // Set a timer to show fallback if loading takes too long
-    fallbackTimer.current = window.setTimeout(() => {
+    fallbackTimer.current = setTimeout(() => {
       if (!isLoaded) {
         setShowFallback(true)
       }

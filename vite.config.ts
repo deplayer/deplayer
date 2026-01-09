@@ -4,10 +4,12 @@ import fixReactVirtualized from 'esbuild-plugin-react-virtualized'
 import { fileURLToPath } from 'url'
 import { VitePWA } from 'vite-plugin-pwa'
 import svgr from 'vite-plugin-svgr'
+// @ts-ignore - No types available
+import crossOriginIsolation from 'vite-plugin-cross-origin-isolation'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [svgr(), react(), VitePWA({
+  plugins: [crossOriginIsolation(), svgr(), react(), VitePWA({
     strategies: 'injectManifest',
     registerType: 'autoUpdate',
     injectRegister: 'auto',
@@ -69,7 +71,7 @@ export default defineConfig({
     format: 'es'
   },
   optimizeDeps: {
-    exclude: ['@electric-sql/pglite', 'node-datachannel'],
+    exclude: ['@electric-sql/pglite', 'node-datachannel', '@livestore/wa-sqlite'],
     esbuildOptions: {
       plugins: [fixReactVirtualized as any],
     },
@@ -79,4 +81,5 @@ export default defineConfig({
       'webtorrent': fileURLToPath(new URL('./node_modules/webtorrent/dist/webtorrent.min.js', import.meta.url)),
     },
   },
+  assetsInclude: ['**/*.wasm'],
 })

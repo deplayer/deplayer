@@ -13,7 +13,7 @@ const logger = createLogger({ namespace: "PlayerRefService" });
 
 class PlayerRefService {
   private static instance: PlayerRefService;
-  private playerRef: React.RefObject<ReactPlayer> | null = null;
+  private playerRef: React.RefObject<ReactPlayer | null> | null = null;
   private peerStream: MediaStream | null = null;
 
   private constructor() {}
@@ -25,11 +25,11 @@ class PlayerRefService {
     return PlayerRefService.instance;
   }
 
-  setPlayerRef(ref: React.RefObject<ReactPlayer> | null) {
+  setPlayerRef(ref: React.RefObject<ReactPlayer | null> | null) {
     this.playerRef = ref;
   }
 
-  getPlayerRef(): React.RefObject<ReactPlayer> | null {
+  getPlayerRef(): React.RefObject<ReactPlayer | null> | null {
     return this.playerRef;
   }
 

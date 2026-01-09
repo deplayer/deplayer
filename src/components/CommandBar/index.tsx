@@ -145,7 +145,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
   const [search, setSearch] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
   const lastMediaSearch = useRef('')
-  const searchTimer = useRef<NodeJS.Timeout>()
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const resultsContainerRef = useRef<HTMLDivElement>(null)
   const selectedItemRef = useRef<HTMLButtonElement>(null)
 
