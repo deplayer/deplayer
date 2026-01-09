@@ -10,8 +10,10 @@ import { Route, Routes } from 'react-router-dom'
 import { HistoryRouter as Router } from "redux-first-history/rr6";
 import { Provider } from 'react-redux'
 import { store, history } from './store/configureStore'
-import { LiveStoreProvider } from '@livestore/react'
+import { LiveStoreProvider, useStore } from '@livestore/react'
 import { adapter, schema, storeId } from './stores/livestore/store'
+import { setupFts5 } from './stores/livestore/fts5-setup'
+import { PlaybackProvider, ThemeProvider, UIProvider } from './contexts'
 
 import LayoutContainer from './containers/LayoutContainer'
 import AddMediaModal from './components/AddMediaModal'
@@ -48,6 +50,18 @@ const Song = ({ playerPortal }: SongProps) => {
 
 const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) => {
   useLanguage()
+  
+  // Get LiveStore instance
+  const liveStore = useStore()
+  
+  // Initialize FTS5 full-text search on mount
+  React.useEffect(() => {
+    if (!liveStore) return
+    
+    setupFts5(liveStore).catch(error => {
+      console.error('[App] Failed to setup FTS5:', error)
+    })
+  }, [liveStore])
 
   return (
     <>
@@ -87,11 +101,17 @@ const App = () => {
       storeId={storeId}
       batchUpdates={batchUpdates}
     >
-      <Provider store={store}>
-        <Router history={history}>
-          <AppContent playerPortal={playerPortal} />
-        </Router>
-      </Provider>
+      <ThemeProvider>
+        <UIProvider>
+          <PlaybackProvider>
+            <Provider store={store}>
+              <Router history={history}>
+                <AppContent playerPortal={playerPortal} />
+              </Router>
+            </Provider>
+          </PlaybackProvider>
+        </UIProvider>
+      </ThemeProvider>
     </LiveStoreProvider>
   )
 }

@@ -267,8 +267,11 @@ const materializers = State.SQLite.materializers(events, {
   },
 
   'v1.MediaPlayed': ({ id }: { id: string }) => {
-    // For now, we'll handle playCount increment at the query layer or with a follow-up read
-    // TODO: Implement SQL expression for incrementing
+    // Note: PlayCount is tracked in the application layer, and when significant,
+    // a MediaUpdated event with the new playCount value should be dispatched.
+    // This event only updates the timestamp to track when the media was played.
+    // Alternative approach: Dispatch MediaUpdated({ id, playCount: currentPlayCount + 1 })
+    // from the application layer after reading current value.
     return tables.media
       .update({ updatedAt: Date.now() })
       .where('id', '=', id)
@@ -369,18 +372,25 @@ const materializers = State.SQLite.materializers(events, {
       .where('id', '=', playlistId)
   },
 
-  'v1.PlaylistTrackAdded': ({ playlistId }: any) => {
+  'v1.PlaylistTrackAdded': ({ playlistId, trackId: _trackId, position: _position }: { playlistId: string; trackId: string; position?: number }) => {
     const now = Date.now()
-    // TODO: Implement JSON array append - for now just update timestamp
-    // Will need to handle in query layer or with custom SQL
+    // Note: Since LiveStore's QueryBuilder doesn't support raw SQL expressions for JSON manipulation,
+    // we rely on the application layer to:
+    // 1. Read current trackIds
+    // 2. Append/insert trackId at position
+    // 3. Dispatch PlaylistReordered event with the new trackIds array
+    // This materializer only updates the timestamp to track when the change occurred
     return tables.playlists
       .update({ updatedAt: now })
       .where('id', '=', playlistId)
   },
 
-  'v1.PlaylistTrackRemoved': ({ playlistId }: any) => {
+  'v1.PlaylistTrackRemoved': ({ playlistId, trackId: _trackId }: { playlistId: string; trackId: string }) => {
     const now = Date.now()
-    // TODO: Implement JSON array removal
+    // Note: Same as PlaylistTrackAdded - application layer should:
+    // 1. Read current trackIds
+    // 2. Remove trackId
+    // 3. Dispatch PlaylistReordered event with the new trackIds array
     return tables.playlists
       .update({ updatedAt: now })
       .where('id', '=', playlistId)
@@ -433,17 +443,23 @@ const materializers = State.SQLite.materializers(events, {
       })
   },
 
-  'v1.QueueTrackAdded': ({ queueId }: any) => {
+  'v1.QueueTrackAdded': ({ queueId, trackId: _trackId, position: _position }: { queueId: string; trackId: string; position?: number }) => {
     const now = Date.now()
-    // TODO: Implement JSON array append
+    // Note: Same as playlists - application layer should:
+    // 1. Read current trackIds
+    // 2. Append/insert trackId at position
+    // 3. Dispatch QueueUpdated event with the new trackIds array
     return tables.queue
       .update({ updatedAt: now })
       .where('id', '=', queueId)
   },
 
-  'v1.QueueTrackRemoved': ({ queueId }: any) => {
+  'v1.QueueTrackRemoved': ({ queueId, trackId: _trackId }: { queueId: string; trackId: string }) => {
     const now = Date.now()
-    // TODO: Implement JSON array removal
+    // Note: Application layer should:
+    // 1. Read current trackIds
+    // 2. Remove trackId
+    // 3. Dispatch QueueUpdated event with the new trackIds array
     return tables.queue
       .update({ updatedAt: now })
       .where('id', '=', queueId)
