@@ -26,7 +26,7 @@ import PlayerContainer from './containers/PlayerContainer'
 import ContextMenuContainer from './containers/ContextMenuContainer'
 import PlaylistsContainer from './containers/PlaylistsContainer'
 import ProvidersContainer from './containers/ProvidersContainer'
-import QueueContainer from './containers/QueueContainer'
+import Queue from './components/Queue'
 import SearchResultsContainer from './containers/SearchResultsContainer'
 import SettingsContainer from './containers/SettingsContainer'
 import SongContainer from './containers/SongContainer'
@@ -42,7 +42,7 @@ interface SongProps {
 const Song = ({ playerPortal }: SongProps) => {
   return (
     <React.Fragment>
-      <QueueContainer slim className='slim' />
+      <Queue slim className='slim' />
       <SongContainer playerPortal={playerPortal} />
     </React.Fragment>
   )
@@ -72,7 +72,7 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
           <Route path="/join/:id" element={<JoinRoom />} />
           <Route path="/" element={<DashboardContainer />} />
           <Route path="/index.html" element={<DashboardContainer />} />
-          <Route path="/queue" element={<QueueContainer />} />
+          <Route path="/queue" element={<Queue />} />
           <Route path="/playlists" element={<PlaylistsContainer />} />
           <Route path="/collection/*" element={<CollectionContainer />} />
           <Route path="/search-results" element={<SearchResultsContainer />} />

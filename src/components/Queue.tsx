@@ -1,23 +1,20 @@
-import { Dispatch } from 'redux'
 import { Link } from 'react-router-dom'
-import { State as CollectionState } from '../reducers/collection'
-import { State as SettingsState } from '../reducers/settings'
 import MusicTable from './MusicTable/MusicTable'
 import Spinner from './Spinner'
 import EmptyState from './common/EmptyState/index'
 import { Translate } from 'react-redux-i18n'
 import classNames from 'classnames'
-import Icon from './common/Icon/index';
+import Icon from './common/Icon/index'
+import { useQueue } from '../stores/livestore/hooks'
+import { useMediaLibrary } from '../stores/livestore/hooks'
+import { useSettings } from '../stores/livestore/hooks'
+import { useUI } from '../contexts'
+import { useSelector, useDispatch } from 'react-redux'
+import { State } from '../reducers'
 
 type Props = {
-  queue: any,
-  player: any,
-  collection: CollectionState,
-  settings?: SettingsState,
-  dispatch: Dispatch,
   slim?: boolean,
   className?: string,
-  app: any,
 }
 
 type EmptyStateProps = {
@@ -28,15 +25,42 @@ type EmptyStateProps = {
 }
 
 const Queue = (props: Props) => {
-  const { queue, app, slim, className, collection, settings } = props
-  const trackIds = queue.shuffle ? queue.randomTrackIds : queue.trackIds
-  const hasCollectionItems = Object.keys(collection.rows).length > 0
-  const hasSearchableProviders = settings?.settings?.providers ? 
-    Object.values(settings.settings.providers).some(provider => provider.enabled) : 
+  const { slim, className } = props
+  
+  // Get data from LiveStore hooks and contexts for Queue logic
+  const liveQueue = useQueue('default')
+  const mediaLibrary = useMediaLibrary()
+  const liveSettings = useSettings()
+  const { loading, mqlMatch, displayMiniQueue } = useUI()
+  
+  // Get Redux state for MusicTable (not yet migrated)
+  const reduxQueue = useSelector((state: State) => state.queue)
+  const reduxCollection = useSelector((state: State) => state.collection)
+  const reduxApp = useSelector((state: State) => state.app)
+  const dispatch = useDispatch()
+  
+  // Parse trackIds from LiveStore queue (can be JSON string or array)
+  const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
+    if (!ids) return []
+    if (Array.isArray(ids)) return ids
+    try {
+      return JSON.parse(ids)
+    } catch {
+      return []
+    }
+  }
+  
+  const trackIds = liveQueue?.shuffle 
+    ? parseTrackIds(liveQueue.randomTrackIds)
+    : parseTrackIds(liveQueue?.trackIds)
+  
+  const hasCollectionItems = Array.isArray(mediaLibrary) && mediaLibrary.length > 0
+  const hasSearchableProviders = liveSettings?.providers ? 
+    Object.values(liveSettings.providers).some((provider) => (provider as { enabled?: boolean })?.enabled) : 
     false
 
   // Is disabled for small screens
-  if (slim && !app.mqlMatch) {
+  if (slim && !mqlMatch) {
     return null
   }
 
@@ -45,11 +69,11 @@ const Queue = (props: Props) => {
     return null
   }
 
-  if (slim && !app.displayMiniQueue) {
+  if (slim && !displayMiniQueue) {
     return null
   }
 
-  if (app.loading) {
+  if (loading) {
     return (
       <div className="queue">
         <EmptyState
@@ -61,7 +85,7 @@ const Queue = (props: Props) => {
   }
 
   if (!trackIds.length) {
-    let emptyStateProps: EmptyStateProps = {
+    const emptyStateProps: EmptyStateProps = {
       icon: "faMusic",
       title: "message.queueEmpty",
       description: "message.addSongsFromCollection",
@@ -103,11 +127,14 @@ const Queue = (props: Props) => {
   return (
     <div className={classNames('queue z-10 resize-x', className)}>
       <MusicTable
+        queue={reduxQueue}
+        app={reduxApp}
+        collection={reduxCollection}
+        dispatch={dispatch}
         tableIds={trackIds}
         disableCovers={slim}
         disableAddButton
         slim={slim}
-        {...props}
       />
     </div>
   )
