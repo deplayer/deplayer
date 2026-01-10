@@ -1,26 +1,14 @@
 /**
  * LiveStore Query Hooks
  * 
- * This module exports React hooks for querying LiveStore data.
- * All hooks are reactive and will automatically update when data changes.
- * 
- * Usage:
- * ```tsx
- * import { useMediaLibrary, usePlaylists, useQueue } from '@/stores/livestore/hooks'
- * 
- * const MyComponent = () => {
- *   const media = useMediaLibrary()
- *   const playlists = usePlaylists()
- *   const queue = useQueue()
- *   
- *   return <div>...</div>
- * }
- * ```
+ * This module exports all query hooks for accessing LiveStore data.
+ * All hooks are reactive and automatically update when data changes.
  */
 
 // Media hooks
 export {
   useMediaLibrary,
+  useMediaMap,
   useMediaById,
   useMediaByArtist,
   useMediaByAlbum,

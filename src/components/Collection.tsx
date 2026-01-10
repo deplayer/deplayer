@@ -9,7 +9,7 @@ import TryDemoButton from './Buttons/TryDemoButton'
 import Icon from './common/Icon'
 import { useSettings } from '../stores/livestore/hooks'
 import { useUI } from '../contexts'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { State } from '../reducers'
 
 const mediaForPath = (location: Location, collection: State['collection'], filteredSongs: string[]) => {
@@ -27,12 +27,9 @@ const Collection = () => {
   const { loading } = useUI()
   const location = useLocation()
   
-  // Get Redux state for features not yet migrated (filters, search) and MusicTable
+  // Get Redux state for features not yet migrated (filters, search)
   const reduxCollection = useSelector((state: State) => state.collection)
-  const reduxQueue = useSelector((state: State) => state.queue)
-  const reduxApp = useSelector((state: State) => state.app)
   const filteredSongs = useSelector((state: State) => state.collection.filteredSongs)
-  const dispatch = useDispatch()
   
   if (loading) {
     return <Spinner />
@@ -71,10 +68,6 @@ const Collection = () => {
           />
         ) : (
           <MusicTable
-            queue={reduxQueue}
-            app={reduxApp}
-            collection={reduxCollection}
-            dispatch={dispatch}
             tableIds={mediaItems}
             disableCovers={false}
           />

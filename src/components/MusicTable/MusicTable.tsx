@@ -12,19 +12,15 @@ import SongRow from './SongRow'
 import Spinner from '../Spinner'
 import ToggleMiniQueueButton from '../Buttons/ToggleMiniQueueButton'
 import * as types from '../../constants/ActionTypes'
-import { State as AppState } from '../../reducers/app'
 import FilterPanel from '../Collection/FilterPanel'
-import { State as CollectionState } from '../../reducers/collection'
-import { State as QueueState } from '../../reducers/queue'
-import { Dispatch } from 'redux'
+import { useMediaMap, useQueue } from '../../stores/livestore/hooks'
+import { useUI } from '../../contexts'
+import { useSelector, useDispatch } from 'react-redux'
+import { State } from '../../reducers'
 
 type Props = {
   error?: string,
-  queue: QueueState,
-  app: AppState,
   tableIds: Array<string>,
-  collection: CollectionState,
-  dispatch: Dispatch,
   disableCurrent?: boolean,
   disableCovers?: boolean,
   disableAddButton?: boolean,
@@ -45,8 +41,8 @@ const Toolbar = ({
   handleTransitionEnd: () => void, 
   tableIds: Array<string>, 
   actions: React.ReactNode,
-  dispatch: Dispatch,
-  collection: CollectionState,
+  dispatch: any,
+  collection: State['collection'],
 }) => {
   const location = useLocation()
   
@@ -102,15 +98,24 @@ const LoadingRow = ({ style, slim }: { style: any, slim: boolean }) => (
   </div>
 )
 
-const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disableCurrent, disableCovers, disableAddButton, slim }: Props) => {
+const MusicTable = ({ error, tableIds, disableCurrent, disableCovers, disableAddButton, slim }: Props) => {
+  // Get data from LiveStore hooks
+  const mediaMap = useMediaMap()
+  const liveQueue = useQueue('default')
+  const { loading, mqlMatch } = useUI()
+  const location = useLocation()
+  
+  // Get Redux state for features not yet migrated (FilterPanel, buttons)
+  const reduxCollection = useSelector((state: State) => state.collection)
+  const dispatch = useDispatch()
+  
   const [isToolbarVisible, setIsToolbarVisible] = React.useState(true)
   const [lastScrollTop, setLastScrollTop] = React.useState(0)
   const [isToolbarHidden, setIsToolbarHidden] = React.useState(false)
 
   const errors = error && <div>{error}</div>
-  const location = useLocation()
 
-  if (app.loading) {
+  if (loading) {
     return (
       <div className={`queue`}>
         <blockquote className='blockquote'>
@@ -120,7 +125,7 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
     )
   }
 
-  const id = queue.currentPlaying
+  const id = liveQueue?.currentPlaying
 
   const rowRenderer = ({
     index,       // Index of row
@@ -129,7 +134,7 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
     // This must be passed through to the rendered row element.
   }: { index: number, key: string, style: any, slim: boolean }): any => {
     const songId = tableIds[index]
-    const song = collection.rows[songId]
+    const song = mediaMap[songId]
 
     if (!song) {
       return <LoadingRow style={style} slim={slim} />
@@ -141,8 +146,8 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
 
     return (
       <SongRow
-        queue={queue}
-        mqlMatch={app.mqlMatch}
+        queue={liveQueue}
+        mqlMatch={mqlMatch}
         key={song.id}
         song={song}
         isCurrent={id === song.id}
@@ -159,7 +164,7 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
   }
 
   // Track the position of current playing to jump there
-  const currentIndex = !disableCurrent ? tableIds.indexOf(queue.currentPlaying || '') : 0
+  const currentIndex = !disableCurrent ? tableIds.indexOf(liveQueue?.currentPlaying || '') : 0
 
   const getActions = () => {
     if (location.pathname.match(/\/song\/.*/)) {
@@ -180,18 +185,18 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
         <>
           <AddNewMediaButton className='btn-sm' />
           <PlayAllButton className='btn-sm' dispatch={dispatch} />
-          {queue.currentPlaying && <PlayNextButton className='btn-sm' dispatch={dispatch} />}
+          {liveQueue?.currentPlaying && <PlayNextButton className='btn-sm' dispatch={dispatch} />}
         </>
       )
       case '/search-results':
         return (
           <>
             <PlayAllButton className='btn-sm' dispatch={dispatch} />
-            {queue.currentPlaying && (
+            {liveQueue?.currentPlaying && (
               <PlayNextButton 
                 className='btn-sm'
                 dispatch={dispatch} 
-                songs={tableIds.map(id => collection.rows[id]).filter(Boolean)} 
+                songs={tableIds.map(id => mediaMap[id]).filter(Boolean)} 
               />
             )}
           </>
@@ -201,7 +206,7 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
     }
   }
 
-  const actions = React.useMemo(() => getActions(), [location.pathname, collection.activeFilters])
+  const actions = React.useMemo(() => getActions(), [location.pathname, reduxCollection.activeFilters])
 
   const handleScroll = ({ clientHeight, scrollHeight, scrollTop }: { clientHeight: number, scrollHeight: number, scrollTop: number }) => {
     // If content isn't scrollable, always keep toolbar visible
@@ -235,7 +240,7 @@ const MusicTable = ({ error, queue, app, tableIds, collection, dispatch, disable
         tableIds={tableIds}
         actions={actions}
         dispatch={dispatch}
-        collection={collection}
+        collection={reduxCollection}
       />
       <AutoSizer className='music-table'>
         {({ height, width }: { height: number, width: number }) => (

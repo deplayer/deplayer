@@ -9,8 +9,6 @@ import { useQueue } from '../stores/livestore/hooks'
 import { useMediaLibrary } from '../stores/livestore/hooks'
 import { useSettings } from '../stores/livestore/hooks'
 import { useUI } from '../contexts'
-import { useSelector, useDispatch } from 'react-redux'
-import { State } from '../reducers'
 
 type Props = {
   slim?: boolean,
@@ -32,12 +30,6 @@ const Queue = (props: Props) => {
   const mediaLibrary = useMediaLibrary()
   const liveSettings = useSettings()
   const { loading, mqlMatch, displayMiniQueue } = useUI()
-  
-  // Get Redux state for MusicTable (not yet migrated)
-  const reduxQueue = useSelector((state: State) => state.queue)
-  const reduxCollection = useSelector((state: State) => state.collection)
-  const reduxApp = useSelector((state: State) => state.app)
-  const dispatch = useDispatch()
   
   // Parse trackIds from LiveStore queue (can be JSON string or array)
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
@@ -127,10 +119,6 @@ const Queue = (props: Props) => {
   return (
     <div className={classNames('queue z-10 resize-x', className)}>
       <MusicTable
-        queue={reduxQueue}
-        app={reduxApp}
-        collection={reduxCollection}
-        dispatch={dispatch}
         tableIds={trackIds}
         disableCovers={slim}
         disableAddButton

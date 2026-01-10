@@ -1,6 +1,7 @@
 import { useQuery } from '@livestore/react'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
+import { useMemo } from 'react'
 
 /**
  * Media Query Hooks
@@ -26,6 +27,29 @@ export const useMediaLibrary = () => {
         .orderBy('title', 'asc')
     )
   )
+}
+
+/**
+ * Get all media from the library as a map indexed by ID for fast lookups
+ * 
+ * @example
+ * ```tsx
+ * const mediaMap = useMediaMap()
+ * const song = mediaMap[songId]
+ * ```
+ */
+export const useMediaMap = () => {
+  const media = useMediaLibrary()
+  
+  return useMemo(() => {
+    const map: Record<string, any> = {}
+    if (Array.isArray(media)) {
+      media.forEach((item: any) => {
+        map[item.id] = item
+      })
+    }
+    return map
+  }, [media])
 }
 
 /**
