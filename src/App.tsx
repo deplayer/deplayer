@@ -8,12 +8,13 @@ import './tailwind.css'
 import * as portals from 'react-reverse-portal'
 import { Route, Routes } from 'react-router-dom'
 import { HistoryRouter as Router } from "redux-first-history/rr6";
-import { Provider } from 'react-redux'
+import { Provider, useSelector } from 'react-redux'
 import { store, history } from './store/configureStore'
 import { LiveStoreProvider, useStore } from '@livestore/react'
 import { adapter, schema, storeId } from './stores/livestore/store'
 import { setupFts5 } from './stores/livestore/fts5-setup'
-import { PlaybackProvider, ThemeProvider, UIProvider } from './contexts'
+import { PlaybackProvider, ThemeProvider, UIProvider, useUI } from './contexts'
+import { State } from './reducers'
 
 import LayoutContainer from './containers/LayoutContainer'
 import AddMediaModal from './components/AddMediaModal'
@@ -52,6 +53,23 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
   
   // Get LiveStore instance
   const { store: liveStore } = useStore()
+  
+  // Get Redux app state and UI context
+  const reduxApp = useSelector((state: State) => state.app)
+  const { setLoading, setMqlMatch, setHeightMqlMatch } = useUI()
+  
+  // Bridge: Sync Redux app state to UIContext during migration
+  React.useEffect(() => {
+    setLoading(reduxApp.loading)
+  }, [reduxApp.loading, setLoading])
+  
+  React.useEffect(() => {
+    setMqlMatch(reduxApp.mqlMatch)
+  }, [reduxApp.mqlMatch, setMqlMatch])
+  
+  React.useEffect(() => {
+    setHeightMqlMatch(reduxApp.heightMqlMatch)
+  }, [reduxApp.heightMqlMatch, setHeightMqlMatch])
   
   // Initialize FTS5 full-text search on mount
   React.useEffect(() => {
