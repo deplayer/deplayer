@@ -1,128 +1,101 @@
-import { Dispatch } from 'redux'
 import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
 
 import Tag from '../common/Tag'
 import Album from './Album'
-import Artist from '../../entities/Artist'
 import * as types from '../../constants/ActionTypes'
-import { State as CollectionState } from '../../reducers/collection'
-import { State as QueueState } from '../../reducers/queue'
-import Media from '../../entities/Media'
+import { State } from '../../reducers'
+import { useArtistById, useAlbumsByArtist, useSongsByAlbum, useMediaMap } from '../../stores/livestore/hooks'
+import { useQueue } from '../../stores/livestore/hooks/useQueue'
 
-type ArtistRelation = {
-  type: string
-  url: {
-    resource: string
+export default function ArtistView() {
+  const params = useParams()
+  const dispatch = useDispatch()
+  const artistId = params.id || ''
+  
+  // LiveStore hooks
+  const artist = useArtistById(artistId)
+  const albumsData = useAlbumsByArtist(artistId)
+  const songsByAlbum = useSongsByAlbum()
+  const queue = useQueue('main')
+  const mediaMap = useMediaMap()
+  
+  // Keep artistMetadata in Redux temporarily until migrated
+  const artistMetadata = useSelector((state: State) => state.artist.artistMetadata)
+  
+  if (!artist) {
+    return null
   }
-}
 
-type ArtistMetadata = {
-  'life-span'?: {
-    begin?: string
-    end?: string
-  }
-  country?: string
-  relations?: ArtistRelation[]
-  artist?: {
-    bio: {
-      content: string
+  // Extract background image from first album's first song
+  const extractBackground = (): string | undefined => {
+    if (albumsData && albumsData.length > 0) {
+      const firstAlbumId = albumsData[0].id
+      const albumSongs = songsByAlbum[firstAlbumId]
+      if (albumSongs && albumSongs.length > 0) {
+        return mediaMap[albumSongs[0]]?.cover?.fullUrl
+      }
     }
+    return undefined
   }
-}
-
-type Props = {
-  queue: QueueState,
-  albums: { [key: string]: Album },
-  albumsByArtist: string[],
-  artist: Artist,
-  artistMetadata: ArtistMetadata | null,
-  className: string | null,
-  collection: CollectionState,
-  dispatch: Dispatch,
-  songs: Media[],
-  songsByAlbum: { [key: string]: string[] }
-}
-
-function extractBackground(
-  collection: CollectionState,
-  songsByAlbum: { [key: string]: string[] },
-  albumsByArtist: string[]
-): string | undefined {
-  const albumId = albumsByArtist && albumsByArtist.length && albumsByArtist[0]
-  if (albumId && songsByAlbum[albumId]) {
-    return collection.rows[songsByAlbum[albumId][0]]?.cover?.fullUrl
-  }
-
-  return undefined
-}
-
-
-export default function ArtistView(props: Props) {
-  const {
-    artist,
-    albums,
-    albumsByArtist,
-    songsByAlbum,
-    collection
-  } = props
 
   React.useEffect(() => {
-    if (props.artist && props.artist.name) {
-      props.dispatch({
+    if (artist && artist.name) {
+      dispatch({
         type: types.LOAD_ARTIST,
-        artist: props.artist
+        artist: artist
       })
 
-      props.dispatch({
+      dispatch({
         type: types.SET_BACKGROUND_IMAGE,
-        backgroundImage: extractBackground(collection, songsByAlbum, albumsByArtist)
+        backgroundImage: extractBackground()
       })
     }
-  }, [props.artist.name, props.dispatch])
+  }, [artist?.name, dispatch])
 
   const extractSummary = (): string => {
-    if (props.artistMetadata && props.artistMetadata.artist) {
-      return props.artistMetadata.artist.bio.content
+    if (artistMetadata && artistMetadata.artist) {
+      return artistMetadata.artist.bio.content
     }
 
     return ''
   }
 
-  const albumRows = albumsByArtist?.map((albumId: string) => {
+  const albumRows = albumsData?.map((album: any) => {
     return (
       <Album
-        queue={props.queue}
-        key={albumId}
-        album={albums[albumId]}
-        dispatch={props.dispatch}
-        collection={props.collection}
-        songs={songsByAlbum[albumId]}
+        queue={queue}
+        key={album.id}
+        album={album}
+        dispatch={dispatch}
+        songs={songsByAlbum[album.id] || []}
       />
     )
   })
 
   return (
-    <div data-testid="artist-view" className={`artist-view ${props.className} z-50`}>
+    <div data-testid="artist-view" className='artist-view z-50'>
       <div className='main w-full z-10 md:p-4'>
         <h2 className='text-center text-3xl py-2'>{artist.name}</h2>
         <p className='text-center' dangerouslySetInnerHTML={{ __html: extractSummary() }} />
         {
-          props.artistMetadata?.['life-span'] && (
+          artistMetadata?.['life-span'] && (
             <div className='text-center text-md'>
-              {props.artistMetadata['life-span'].begin} {props.artistMetadata['life-span'].end && '- ' + props.artistMetadata['life-span'].end}
+              {artistMetadata['life-span'].begin} {artistMetadata['life-span'].end && '- ' + artistMetadata['life-span'].end}
             </div>
           )
         }
         {
-          props.artistMetadata?.country && (
+          artistMetadata?.country && (
             <div className='text-center text-md'>
-              {props.artistMetadata.country}
+              {artistMetadata.country}
             </div>
           )
         }
         <div className='py-4 text-center'>
           {
-            props.artistMetadata?.relations && props.artistMetadata.relations.map((relation: any, index: number) => {
+            artistMetadata?.relations && artistMetadata.relations.map((relation: any, index: number) => {
               return (
                 <div key={index} className='mr-2 py-1 inline-block'>
                   <Tag transparent>

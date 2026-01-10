@@ -91,3 +91,38 @@ export const useAlbumsByArtist = (artistId: string | null | undefined) => {
     )
   )
 }
+
+/**
+ * Get songs grouped by album ID
+ * Returns a map of albumId -> array of song IDs
+ * 
+ * @example
+ * ```tsx
+ * const songsByAlbum = useSongsByAlbum()
+ * const albumSongs = songsByAlbum['album-123'] // ['song-1', 'song-2', ...]
+ * ```
+ */
+export const useSongsByAlbum = () => {
+  const media = useQuery(
+    queryDb(
+      tables.media
+        .select()
+        .orderBy('track', 'asc')
+    )
+  )
+  
+  return useMemo(() => {
+    const map: Record<string, string[]> = {}
+    if (Array.isArray(media)) {
+      media.forEach((song: any) => {
+        if (song.albumId) {
+          if (!map[song.albumId]) {
+            map[song.albumId] = []
+          }
+          map[song.albumId].push(song.id)
+        }
+      })
+    }
+    return map
+  }, [media])
+}

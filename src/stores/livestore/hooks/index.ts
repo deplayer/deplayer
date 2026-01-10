@@ -23,6 +23,7 @@ export {
   useAlbumsMap,
   useAlbumById,
   useAlbumsByArtist,
+  useSongsByAlbum,
 } from './useAlbums'
 
 // Artist hooks

@@ -4,7 +4,6 @@ import { Translate } from 'react-redux-i18n'
 import Icon from '../common/Icon'
 import SongRow from '../MusicTable/SongRow'
 import CoverImage from '../MusicTable/CoverImage'
-import { State as CollectionState } from '../../reducers/collection'
 import { State as QueueState } from '../../reducers/queue'
 import { Dispatch } from 'redux'
 import { useMediaMap } from '../../stores/livestore/hooks'
@@ -19,16 +18,14 @@ type AlbumProps = {
   album: Album,
   queue: QueueState,
   songs: Array<string>,
-  collection?: CollectionState,  // Optional for backward compatibility during migration
   dispatch: Dispatch
 }
 
 const Album = (props: AlbumProps) => {
   const albumId = props.album.id
   
-  // Get media map from LiveStore (preferred) or fall back to Redux collection
-  const liveStoreMediaMap = useMediaMap()
-  const mediaMap = props.collection ? props.collection.rows : liveStoreMediaMap
+  // Get media map from LiveStore
+  const mediaMap = useMediaMap()
 
   const extractSongs = () => {
     if (!props.songs) {
