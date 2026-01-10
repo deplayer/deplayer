@@ -2,11 +2,11 @@ import { Translate } from 'react-redux-i18n'
 import { FunctionComponent, SVGProps, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import React from 'react'
+import { useDispatch } from 'react-redux'
 
 import MediaSlider from '../MediaSlider'
 import RelatedAlbums from '../RelatedAlbums'
 import RecentAlbums from './RecentAlbums'
-import { State as CollectionState } from '../../reducers/collection'
 import * as types from '../../constants/ActionTypes'
 import Footer from '../Footer'
 import TryDemoButton from '../Buttons/TryDemoButton'
@@ -21,11 +21,8 @@ import Auth from '../Auth'
 import Button from '../common/Button'
 import { Dispatch } from 'redux'
 import DeplayerTitle from '../DeplayerTitle'
-
-type Props = {
-  collection: CollectionState
-  dispatch: Dispatch
-}
+import { useMediaLibrary, useAlbumsMap } from '../../stores/livestore/hooks'
+import { useUI } from '../../contexts'
 
 const IMAGE_COMPONENTS: FunctionComponent<SVGProps<SVGSVGElement>>[] = [
   RecordPlayerSvg,
@@ -111,25 +108,29 @@ const WelcomeMessage = ({ dispatch }: { dispatch: Dispatch }) => {
   )
 }
 
-const Dashboard = ({
-  collection: { loading, rows, albums },
-  dispatch
-}: Props) => {
+const Dashboard = () => {
   const MAX_LIST_ITEMS = 25
+  
+  // Get data from LiveStore hooks
+  const mediaLibrary = useMediaLibrary()
+  const albumsMap = useAlbumsMap()
+  const { loading } = useUI()
+  
+  // Get Redux dispatch for modal actions (not yet migrated)
+  const dispatch = useDispatch()
 
   const mostPlayedSongs = useMemo(() => {
-    return Object.values(rows)
-      .filter(song => song.playCount > 0)
-      .sort((a, b) => (b.playCount || 0) - (a.playCount || 0))
+    if (!Array.isArray(mediaLibrary)) return []
+    return mediaLibrary
+      .filter((song: any) => song.playCount > 0)
+      .sort((a: any, b: any) => (b.playCount || 0) - (a.playCount || 0))
       .slice(0, MAX_LIST_ITEMS);
-  }, [rows]);
+  }, [mediaLibrary]);
 
   const slicedAlbums = useMemo(() => {
-    return Object
-      .keys(albums)
-      .slice(0, MAX_LIST_ITEMS)
-      .map((albumId) => albums[albumId]);
-  }, [albums]);
+    const albumsArray = Object.values(albumsMap)
+    return albumsArray.slice(0, MAX_LIST_ITEMS);
+  }, [albumsMap]);
 
   return (
     <div className='z-10 w-full md:px-12 mb-12 flex flex-col gap-4 md:gap-10'>

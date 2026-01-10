@@ -22,7 +22,7 @@ import AlbumContainer from './containers/AlbumContainer'
 import ArtistContainer from './containers/ArtistContainer'
 import ArtistsContainer from './containers/ArtistsContainer'
 import Collection from './components/Collection'
-import DashboardContainer from './containers/DashboardContainer'
+import Dashboard from './components/Dashboard'
 import PlayerContainer from './containers/PlayerContainer'
 import ContextMenuContainer from './containers/ContextMenuContainer'
 import PlaylistsContainer from './containers/PlaylistsContainer'
@@ -87,8 +87,8 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
       <LayoutContainer>
         <Routes>
           <Route path="/join/:id" element={<JoinRoom />} />
-          <Route path="/" element={<DashboardContainer />} />
-          <Route path="/index.html" element={<DashboardContainer />} />
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/index.html" element={<Dashboard />} />
           <Route path="/queue" element={<Queue />} />
           <Route path="/playlists" element={<PlaylistsContainer />} />
           <Route path="/collection/*" element={<Collection />} />

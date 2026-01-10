@@ -17,6 +17,14 @@ export {
   useMostPlayed,
 } from './useMedia'
 
+// Album hooks
+export {
+  useAlbums,
+  useAlbumsMap,
+  useAlbumById,
+  useAlbumsByArtist,
+} from './useAlbums'
+
 // Playlist hooks
 export {
   usePlaylists,
