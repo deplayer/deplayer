@@ -27,7 +27,6 @@ import ContextMenuContainer from './containers/ContextMenuContainer'
 import PlaylistsContainer from './containers/PlaylistsContainer'
 import ProvidersContainer from './containers/ProvidersContainer'
 import Queue from './components/Queue'
-import SearchResultsContainer from './containers/SearchResultsContainer'
 import SettingsContainer from './containers/SettingsContainer'
 import SongContainer from './containers/SongContainer'
 import Wiki from './components/Wiki'
@@ -75,7 +74,7 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
           <Route path="/queue" element={<Queue />} />
           <Route path="/playlists" element={<PlaylistsContainer />} />
           <Route path="/collection/*" element={<Collection />} />
-          <Route path="/search-results" element={<SearchResultsContainer />} />
+          <Route path="/search-results" element={<Collection />} />
           <Route path="/song/:id" element={<Song playerPortal={playerPortal} />} />
           <Route path="/album/:id" element={<AlbumContainer />} />
           <Route path="/artist/:id" element={<ArtistContainer />} />
