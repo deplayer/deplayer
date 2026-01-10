@@ -1,50 +1,46 @@
-import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import AddNewMediaButton from './Buttons/AddNewMediaButton'
 import MusicTable from './MusicTable/MusicTable'
 import Spinner from './Spinner'
-import { useLocation } from 'react-router'
 import { Location } from 'react-router'
 import EmptyState from './common/EmptyState/index'
 import TryDemoButton from './Buttons/TryDemoButton'
 import Icon from './common/Icon'
-import { State as SettingsState } from '../reducers/settings'
-import { State as AppState } from '../reducers/app'
-import { State as PlaylistState } from '../reducers/playlist'
-import { State as QueueState } from '../reducers/queue'
-import { State as PlayerState } from '../reducers/player'
-import { State as CollectionState } from '../reducers/collection'
+import { useSettings } from '../stores/livestore/hooks'
+import { useUI } from '../contexts'
+import { useSelector, useDispatch } from 'react-redux'
+import { State } from '../reducers'
 
-type Props = {
-  app: AppState,
-  playlist: PlaylistState,
-  queue: QueueState,
-  player: PlayerState,
-  collection: CollectionState,
-  settings?: SettingsState,
-  filteredSongs: Array<string>,
-  dispatch: Dispatch
-}
-
-const mediaForPath = (location: Location, props: Props) => {
+const mediaForPath = (location: Location, collection: State['collection'], filteredSongs: string[]) => {
   switch (location.pathname) {
     case '/search-results':
-      return props.collection.searchResults
+      return collection.searchResults
     default:
-      return props.filteredSongs
+      return filteredSongs
   }
 }
 
-const Collection = (props: Props) => {
-  if (props.app.loading) {
+const Collection = () => {
+  // Get data from LiveStore hooks and contexts
+  const liveSettings = useSettings()
+  const { loading } = useUI()
+  const location = useLocation()
+  
+  // Get Redux state for features not yet migrated (filters, search) and MusicTable
+  const reduxCollection = useSelector((state: State) => state.collection)
+  const reduxQueue = useSelector((state: State) => state.queue)
+  const reduxApp = useSelector((state: State) => state.app)
+  const filteredSongs = useSelector((state: State) => state.collection.filteredSongs)
+  const dispatch = useDispatch()
+  
+  if (loading) {
     return <Spinner />
   }
 
-  const location = useLocation()
-  const mediaItems = mediaForPath(location, props)
-  const hasSearchableProviders = props.settings?.settings?.providers ? 
-    Object.values(props.settings.settings.providers).some(provider => provider.enabled) : 
+  const mediaItems = mediaForPath(location, reduxCollection, filteredSongs)
+  const hasSearchableProviders = liveSettings?.providers ? 
+    Object.values(liveSettings.providers).some((provider) => (provider as { enabled?: boolean })?.enabled) : 
     false
 
   return (
@@ -75,9 +71,12 @@ const Collection = (props: Props) => {
           />
         ) : (
           <MusicTable
+            queue={reduxQueue}
+            app={reduxApp}
+            collection={reduxCollection}
+            dispatch={dispatch}
             tableIds={mediaItems}
             disableCovers={false}
-            {...props}
           />
         )}
       </div>
