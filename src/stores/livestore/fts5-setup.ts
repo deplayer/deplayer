@@ -149,7 +149,18 @@ export const allFtsSetup = [
 
 /**
  * Helper function to execute FTS setup
- * This should be called once when the store is initialized
+ * 
+ * NOTE: FTS5 is currently disabled because wa-sqlite (used by LiveStore)
+ * doesn't have the FTS5 extension compiled in by default.
+ * 
+ * Error: "no such module: fts5"
+ * 
+ * Alternative approaches:
+ * 1. Use regular SQL LIKE queries for search (current approach)
+ * 2. Implement client-side filtering with Fuse.js or similar
+ * 3. Use a custom wa-sqlite build with FTS5 enabled (requires fork/rebuild)
+ * 
+ * This function is kept for future reference when FTS5 becomes available.
  * 
  * @example
  * ```typescript
@@ -163,18 +174,22 @@ export const allFtsSetup = [
  * }, [store])
  * ```
  */
-export const setupFts5 = (store: any) => {
-  if (!store) {
+export const setupFts5 = (_store: any) => {
+  // FTS5 is disabled - wa-sqlite doesn't have FTS5 extension compiled in
+  console.warn('[LiveStore] FTS5 full-text search is not available in wa-sqlite. Using regular SQL search instead.')
+  
+  // Uncomment when FTS5 becomes available:
+  /*
+  if (!_store) {
     throw new Error('Store is not initialized')
   }
   
-  if (!store.sqliteDbWrapper) {
+  if (!_store.sqliteDbWrapper) {
     throw new Error('Store.sqliteDbWrapper is not available')
   }
   
   try {
     // Execute each FTS5 setup block separately
-    // SQLite may not support executing multiple statements at once
     const setupStatements = [
       mediaFtsSetup,
       artistFtsSetup,
@@ -190,7 +205,7 @@ export const setupFts5 = (store: any) => {
         .filter(s => s.length > 0)
       
       for (const statement of statements) {
-        store.sqliteDbWrapper.execute(statement + ';')
+        _store.sqliteDbWrapper.execute(statement + ';')
       }
     }
     
@@ -199,10 +214,37 @@ export const setupFts5 = (store: any) => {
     console.error('[LiveStore] Failed to initialize FTS5:', error)
     throw error
   }
+  */
 }
 
 /**
  * Search query builder helpers
+ * 
+ * NOTE: FTS5 queries below are disabled. Use the regular SQL search queries instead.
+ * 
+ * Alternative search implementation using LIKE:
+ * 
+ * ```typescript
+ * // Search media by title, artist, or album
+ * const searchMedia = (searchTerm: string) => 
+ *   tables.media
+ *     .select()
+ *     .where('title', 'LIKE', `%${searchTerm}%`)
+ *     .orWhere('artistName', 'LIKE', `%${searchTerm}%`)
+ *     .orWhere('albumName', 'LIKE', `%${searchTerm}%`)
+ *     .limit(100)
+ * 
+ * // Or use raw SQL:
+ * const searchMediaSQL = `
+ *   SELECT m.*, a.name as artist_name, al.name as album_name
+ *   FROM media m
+ *   LEFT JOIN artists a ON m.artistId = a.id
+ *   LEFT JOIN albums al ON m.albumId = al.id
+ *   WHERE m.title LIKE ? OR a.name LIKE ? OR al.name LIKE ?
+ *   LIMIT 100
+ * `
+ * store.query({ query: searchMediaSQL, bindValues: { 1: `%${term}%`, 2: `%${term}%`, 3: `%${term}%` } })
+ * ```
  */
 export const searchQueries = {
   /**
