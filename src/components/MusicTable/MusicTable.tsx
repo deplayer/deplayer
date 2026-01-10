@@ -92,8 +92,8 @@ const LoadingRow = ({ style, slim }: { style: any, slim: boolean }) => (
       <div className="h-3 bg-base-300/70 rounded w-1/4" /> {/* Subtitle placeholder */}
     </div>
     <div className="flex space-x-2">
-      <div className="w-8 h-8 bg-base-300 rounded" /> {/* Button placeholder */}
-      <div className="w-8 h-8 bg-base-300 rounded" /> {/* Button placeholder */}
+      <div key="btn1" className="w-8 h-8 bg-base-300 rounded" /> {/* Button placeholder */}
+      <div key="btn2" className="w-8 h-8 bg-base-300 rounded" /> {/* Button placeholder */}
     </div>
   </div>
 )

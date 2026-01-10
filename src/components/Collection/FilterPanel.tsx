@@ -34,7 +34,9 @@ type Props = {
 const FilterPanel = ({ collection, activeFilters, dispatch }: Props) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
-  const state = useSelector((state: State) => state)
+  
+  // Only select the favorites part of state that's actually needed for filtering
+  const favorites = useSelector((state: State) => state.favorites)
 
   useEffect(() => {
     const handleResize = () => {
@@ -211,7 +213,7 @@ const FilterPanel = ({ collection, activeFilters, dispatch }: Props) => {
       type: actionTypes.SET_COLLECTION_FILTER,
       filterType,
       values,
-      state
+      state: { favorites }
     })
   }
 
