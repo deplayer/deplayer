@@ -4,10 +4,8 @@ import { State } from '../reducers'
 
 export default connect(
   (state: State) => ({
-    app: state.app,
     queue: state.queue,
     playlist: state.playlist,
-    player: state.player,
-    collection: state.collection
+    settings: state.settings
   })
 )(Playlists)

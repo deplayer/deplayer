@@ -62,3 +62,9 @@ export {
   useLanguageSettings,
   useSyncSettings,
 } from './useSettings'
+
+// Genre hooks
+export {
+  useSongsByGenre,
+  useGenres,
+} from './useGenres'

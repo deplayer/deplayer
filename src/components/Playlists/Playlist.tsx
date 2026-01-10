@@ -6,11 +6,11 @@ import Button from '../common/Button'
 import Modal from '../common/Modal'
 import SongRow from '../MusicTable/SongRow'
 import * as types from '../../constants/ActionTypes'
-import { State as CollectionState } from '../../reducers/collection'
 import { IMedia } from '../../entities/Media'
 import { applyFilters } from '../../utils/apply-filters'
 import { useNavigate } from 'react-router-dom'
 import { Dispatch } from 'redux'
+import { useMediaMap } from '../../stores/livestore/hooks'
 
 type Props = {
   playlist: {
@@ -20,25 +20,27 @@ type Props = {
     id?: string
     name?: string
   }
-  collection: CollectionState
   dispatch: Dispatch
 }
 
-const Playlist = memo(({ playlist, collection, dispatch }: Props) => {
+const Playlist = memo(({ playlist, dispatch }: Props) => {
   const [showSongs, setShowSongs] = useState(false)
   const navigate = useNavigate()
   const isSmartPlaylist = 'filters' in playlist
+  
+  // Get all media from LiveStore
+  const mediaMap = useMediaMap()
 
   const handlePlayAll = useCallback(() => {
     if (isSmartPlaylist) {
-      const filteredSongIds = applyFilters(collection.rows, {
+      const filteredSongIds = applyFilters(mediaMap, {
         genres: playlist.filters?.genres || [],
         types: playlist.filters?.types || [],
         artists: playlist.filters?.artists || [],
         providers: playlist.filters?.providers || [],
         favorites: Boolean(playlist.filters?.favorites?.[0] === 'true')
       });
-      const filteredSongs = filteredSongIds.map(id => collection.rows[id]).filter(Boolean);
+      const filteredSongs = filteredSongIds.map(id => mediaMap[id]).filter(Boolean);
       dispatch({
         type: types.ADD_SONGS_TO_QUEUE,
         songs: filteredSongs,
@@ -54,15 +56,15 @@ const Playlist = memo(({ playlist, collection, dispatch }: Props) => {
     } else {
       dispatch({
         type: types.PLAY_ALL,
-        songs: playlist.trackIds.map(id => collection.rows[id]).filter(Boolean),
+        songs: playlist.trackIds.map(id => mediaMap[id]).filter(Boolean),
         path: `/playlists/${playlist._id}`
       });
     }
-  }, [isSmartPlaylist, playlist, collection.rows, dispatch])
+  }, [isSmartPlaylist, playlist, mediaMap, dispatch])
 
   const handleAddToQueue = useCallback(() => {
     if (isSmartPlaylist) {
-      const filteredSongIds = applyFilters(collection.rows, {
+      const filteredSongIds = applyFilters(mediaMap, {
         genres: playlist.filters?.genres || [],
         types: playlist.filters?.types || [],
         artists: playlist.filters?.artists || [],
@@ -79,7 +81,7 @@ const Playlist = memo(({ playlist, collection, dispatch }: Props) => {
         trackIds: playlist.trackIds
       });
     }
-  }, [isSmartPlaylist, playlist, collection.rows, dispatch])
+  }, [isSmartPlaylist, playlist, mediaMap, dispatch])
 
   const handleApplyFilters = useCallback(() => {
     dispatch({ type: types.CLEAR_COLLECTION_FILTERS })
@@ -103,7 +105,7 @@ const Playlist = memo(({ playlist, collection, dispatch }: Props) => {
   }, [playlist.id, dispatch])
 
   const tracksWithCovers = useMemo(() => {
-    const tracks = playlist.trackIds.map(id => collection.rows[id])
+    const tracks = playlist.trackIds.map(id => mediaMap[id])
     const uniqueAlbumTracks = new Map()
     
     tracks.forEach(track => {
@@ -116,18 +118,18 @@ const Playlist = memo(({ playlist, collection, dispatch }: Props) => {
     })
 
     return Array.from(uniqueAlbumTracks.values()).slice(0, 4)
-  }, [playlist.trackIds, collection.rows])
+  }, [playlist.trackIds, mediaMap])
 
   const totalDuration = useMemo(() => 
     playlist.trackIds.reduce((acc, id) => {
-      const track = collection.rows[id] as IMedia
+      const track = mediaMap[id] as IMedia
       return acc + (track?.duration || 0)
     }, 0)
-  , [playlist.trackIds, collection.rows])
+  , [playlist.trackIds, mediaMap])
 
   const songIds = useMemo(() => 
     isSmartPlaylist 
-      ? applyFilters(collection.rows, {
+      ? applyFilters(mediaMap, {
           genres: playlist.filters?.genres || [],
           types: playlist.filters?.types || [],
           artists: playlist.filters?.artists || [],
@@ -135,19 +137,19 @@ const Playlist = memo(({ playlist, collection, dispatch }: Props) => {
           favorites: Boolean(playlist.filters?.favorites?.[0] === 'true')
         })
       : playlist.trackIds
-  , [isSmartPlaylist, playlist, collection.rows])
+  , [isSmartPlaylist, playlist, mediaMap])
 
   const uniqueAlbumCount = useMemo(() => 
     new Set(
       playlist.trackIds
-        .map(id => collection.rows[id]?.album?.id)
+        .map(id => mediaMap[id]?.album?.id)
         .filter(Boolean)
     ).size
-  , [playlist.trackIds, collection.rows])
+  , [playlist.trackIds, mediaMap])
 
   const rowRenderer = useCallback(({ key, index, style }: { key: string, index: number, style: React.CSSProperties }) => {
     const songId = songIds[index]
-    const song = collection.rows[songId]
+    const song = mediaMap[songId]
     if (!song) return null
 
     return (
@@ -165,7 +167,7 @@ const Playlist = memo(({ playlist, collection, dispatch }: Props) => {
         song={song}
       />
     )
-  }, [songIds, collection.rows, dispatch])
+  }, [songIds, mediaMap, dispatch])
 
   const formatDuration = (seconds: number) => {
     const minutes = Math.floor(seconds / 60)

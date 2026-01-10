@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Translate } from 'react-redux-i18n'
-import { State as CollectionState } from '../../reducers/collection'
 import * as types from '../../constants/ActionTypes'
 import { Dispatch } from 'redux'
+import { useGenres } from '../../stores/livestore/hooks'
 
 interface GenreTag {
   name: string
@@ -12,39 +12,24 @@ interface GenreTag {
 }
 
 type Props = {
-  collection: CollectionState
   dispatch: Dispatch
 }
 
-const GenreTagCloud = ({ collection, dispatch }: Props) => {
+const GenreTagCloud = ({ dispatch }: Props) => {
   const navigate = useNavigate()
+  const genres = useGenres()
 
   const genreTags = useMemo(() => {
-    // Get all tracks from collection
-    const tracks = Object.values(collection.rows)
-    
-    // Count genres
-    const genreCounts = tracks.reduce((acc: { [key: string]: number }, track) => {
-      if (track?.genres?.length) {
-        track.genres.forEach(genre => {
-          acc[genre] = (acc[genre] || 0) + 1
-        })
-      }
-      return acc
-    }, {})
-
     // Find max count for weight calculation
-    const maxCount = Math.max(...Object.values(genreCounts))
+    const maxCount = Math.max(...genres.map(g => g.count), 1)
 
     // Convert to GenreTag array with weights
-    return Object.entries(genreCounts)
-      .map(([name, count]): GenreTag => ({
-        name,
-        count,
-        weight: Math.ceil((count / maxCount) * 5) || 1
-      }))
-      .sort((a, b) => b.count - a.count) // Sort by count descending
-  }, [collection.rows])
+    return genres.map(({ name, count }): GenreTag => ({
+      name,
+      count,
+      weight: Math.ceil((count / maxCount) * 5) || 1
+    }))
+  }, [genres])
 
   if (genreTags.length === 0) {
     return null

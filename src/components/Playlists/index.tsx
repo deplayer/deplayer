@@ -1,6 +1,5 @@
 import Playlist from './Playlist'
 import EmptyState from '../common/EmptyState/index'
-import { State as CollectionState } from '../../reducers/collection'
 import { State as PlaylistState } from '../../reducers/playlist'
 import { State as QueueState } from '../../reducers/queue'
 import { State as SettingsState } from '../../reducers/settings'
@@ -8,10 +7,10 @@ import { Link } from 'react-router-dom'
 import Icon from '../common/Icon'
 import { Translate } from 'react-redux-i18n'
 import { memo, useMemo } from 'react'
+import { useMediaMap, useSongsByGenre } from '../../stores/livestore/hooks'
 
 type Props = {
   playlist: PlaylistState,
-  collection: CollectionState,
   queue: QueueState,
   settings?: SettingsState,
   dispatch: any
@@ -32,10 +31,9 @@ type PlaylistType = {
   name?: string;
 }
 
-const PlaylistSection = memo(({ title, playlists, collection, dispatch }: { 
+const PlaylistSection = memo(({ title, playlists, dispatch }: { 
   title?: string, 
   playlists: PlaylistType[], 
-  collection: CollectionState,
   dispatch: any 
 }) => {
   if (!playlists.length) return null;
@@ -45,11 +43,10 @@ const PlaylistSection = memo(({ title, playlists, collection, dispatch }: {
       <Playlist
         dispatch={dispatch}
         key={playlist.id || playlist._id}
-        collection={collection}
         playlist={playlist}
       />
     ))
-  , [playlists, collection, dispatch]);
+  , [playlists, dispatch]);
 
   return (
     <div className="mb-8">
@@ -67,21 +64,26 @@ const PlaylistSection = memo(({ title, playlists, collection, dispatch }: {
 });
 
 const Playlists = memo((props: Props) => {
-  const { collection, queue, settings } = props
+  const { queue, settings } = props
   const { playlists, smartPlaylists } = props.playlist
+  
+  // LiveStore hooks
+  const mediaMap = useMediaMap()
+  const songsByGenre = useSongsByGenre()
+  
   const hasQueueItems = queue.trackIds.length > 0
-  const hasCollectionItems = Object.keys(collection.rows).length > 0
+  const hasCollectionItems = Object.keys(mediaMap).length > 0
   const hasSearchableProviders = settings?.settings?.providers ? 
     Object.values(settings.settings.providers).some(provider => provider.enabled) : 
     false
 
   // Memoize genre playlists generation
   const genrePlaylists: PlaylistType[] = useMemo(() => 
-    Object.keys(collection.songsByGenre || {}).map(genre => ({
+    Object.keys(songsByGenre || {}).map(genre => ({
       _id: `genre-${genre}`,
       id: `genre-${genre}`,
       name: genre,
-      trackIds: collection.songsByGenre[genre] || [],
+      trackIds: songsByGenre[genre] || [],
       filters: {
         genres: [genre],
         types: [],
@@ -89,7 +91,7 @@ const Playlists = memo((props: Props) => {
         providers: []
       }
     }))
-  , [collection.songsByGenre]);
+  , [songsByGenre]);
 
   // Memoize smart playlists transformation
   const transformedSmartPlaylists = useMemo(() => 
@@ -97,10 +99,10 @@ const Playlists = memo((props: Props) => {
       _id: playlist.id,
       id: playlist.id,
       name: playlist.name,
-      trackIds: collection.songsByGenre[playlist.filters.genres[0]] || [],
+      trackIds: songsByGenre[playlist.filters.genres[0]] || [],
       filters: playlist.filters
     }))
-  , [smartPlaylists, collection.songsByGenre]);
+  , [smartPlaylists, songsByGenre]);
 
   if (!playlists.length && !smartPlaylists.length && !genrePlaylists.length) {
     let emptyStateProps: EmptyStateProps = {
@@ -150,19 +152,16 @@ const Playlists = memo((props: Props) => {
     <div className='playlists z-10 flex flex-col w-full overflow-y-auto h-full py-6'>
       <PlaylistSection 
         playlists={playlists} 
-        collection={collection} 
         dispatch={props.dispatch}
       />
       <PlaylistSection 
         playlists={transformedSmartPlaylists} 
-        collection={collection} 
         dispatch={props.dispatch}
       />
       {genrePlaylists.length > 0 && (
         <PlaylistSection 
           title="titles.genrePlaylists"
           playlists={genrePlaylists} 
-          collection={collection} 
           dispatch={props.dispatch}
         />
       )}
