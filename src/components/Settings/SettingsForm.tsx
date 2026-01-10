@@ -39,17 +39,25 @@ interface SettingsFormProps {
     }
   }
   dispatch: (action: UnknownAction) => UnknownAction
+  onSave?: (settingsPayload: any) => Promise<void>
 }
 
 export const SettingsForm = ({
   settings,
-  dispatch
+  dispatch,
+  onSave
 }: SettingsFormProps) => {
-  const handleSubmit = (values: typeof settings.settings) => {
-    dispatch({
-      type: 'SAVE_SETTINGS',
-      settingsPayload: values
-    })
+  const handleSubmit = async (values: typeof settings.settings) => {
+    if (onSave) {
+      // Use LiveStore action
+      await onSave(values)
+    } else {
+      // Fallback to Redux dispatch
+      dispatch({
+        type: 'SAVE_SETTINGS',
+        settingsPayload: values
+      })
+    }
   }
 
   return (

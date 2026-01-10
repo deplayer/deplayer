@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
+import { useStore } from '@livestore/react'
 
 import Button from '../common/Button'
 import Importer from '../Importer'
@@ -9,6 +10,8 @@ import { SettingsForm } from './SettingsForm'
 import * as types from '../../constants/ActionTypes'
 import { State as SettingsState } from '../../reducers/settings'
 import CenteredMessage from '../common/CenteredMessage'
+import { useSettings } from '../../stores/livestore/hooks'
+import { saveSettingsAction, deleteSettingsAction } from '../../stores/livestore/actions'
 
 interface CollectionData {
   [key: string]: unknown;
@@ -16,7 +19,15 @@ interface CollectionData {
 
 const Settings: React.FC = () => {
   const dispatch = useDispatch()
-  const settings = useSelector((state: { settings: SettingsState }) => state.settings)
+  const { store: liveStore } = useStore()
+  
+  // Get settings from LiveStore
+  const liveStoreSettings = useSettings()
+  
+  // Get settingsForm schema from Redux (just UI schema, not data)
+  const reduxSettings = useSelector((state: { settings: SettingsState }) => state.settings)
+  const settingsForm = reduxSettings.settingsForm
+  
   const [showImporter, setShowImporter] = React.useState(false)
 
   const deleteCollection = () => {
@@ -39,12 +50,43 @@ const Settings: React.FC = () => {
 
   const toggleImporter = () => setShowImporter(true)
 
-  const deleteSettings = () => {
-    dispatch({ type: types.DELETE_SETTINGS })
+  const handleDeleteSettings = async () => {
+    if (!liveStore) return
+    
+    try {
+      await deleteSettingsAction(liveStore)
+      
+      // Dispatch action to trigger saga side effects (reconnection, notification)
+      dispatch({ type: types.SETTINGS_DELETED })
+    } catch (error) {
+      console.error('Failed to delete settings:', error)
+    }
   }
 
-  const settingsForm = settings.settingsForm
+  const handleSaveSettings = async (settingsPayload: any) => {
+    if (!liveStore) return
+    
+    try {
+      const result = await saveSettingsAction(liveStore, settingsPayload)
+      
+      // Dispatch action to trigger saga side effects (reconnection, notification)
+      dispatch({ 
+        type: types.SETTINGS_SAVED, 
+        prevSettings: result.prevSettings,
+        newSettings: result.newSettings,
+      })
+    } catch (error) {
+      console.error('Failed to save settings:', error)
+    }
+  }
+  
   const ImporterComp = showImporter ? <Importer onLoaded={importCollection} /> : null
+  
+  // Create settings object compatible with SettingsForm
+  const settingsForForm = {
+    settingsForm,
+    settings: liveStoreSettings || reduxSettings.settings,
+  }
 
   return (
     <MainContainer centerContents>
@@ -56,8 +98,9 @@ const Settings: React.FC = () => {
 
           <SettingsForm
             schema={settingsForm}
-            settings={settings}
+            settings={settingsForForm}
             dispatch={dispatch}
+            onSave={handleSaveSettings}
           />
 
           <div className='my-12'>
@@ -72,7 +115,7 @@ const Settings: React.FC = () => {
               <Button onClick={deleteCollection} inverted>
                 <Translate value="labels.deleteCollection" />
               </Button>
-              <Button onClick={deleteSettings} inverted>
+              <Button onClick={handleDeleteSettings} inverted>
                 <Translate value="labels.deleteSettings" />
               </Button>
               {ImporterComp}
