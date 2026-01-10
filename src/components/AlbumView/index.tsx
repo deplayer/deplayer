@@ -1,56 +1,52 @@
-import { Dispatch } from 'redux'
-
+import { useDispatch } from 'react-redux'
 import RelatedAlbums from '../RelatedAlbums'
 import Album from '../ArtistView/Album'
 import { useMatch } from 'react-router'
 import { redirect } from 'react-router-dom'
-import { getAlbum } from '../../containers/RouteSelectors'
+import { useAlbumById, useMediaByAlbum, useAlbumsByArtist } from '../../stores/livestore/hooks'
+import { useQueue } from '../../stores/livestore/hooks/useQueue'
+import { useMemo } from 'react'
 
-type Props = {
-  queue: any,
-  albumsByArtist: any,
-  artistMetadata: any,
-  className: string | null,
-  collection: any,
-  dispatch: Dispatch,
-  songs: any,
-  songsByAlbum: any
-}
-
-
-export default function AlbumView(props: Props) {
+export default function AlbumView() {
   const match = useMatch('/album/:id')
+  const dispatch = useDispatch()
 
   if (!match) {
     return null
   }
 
-  const { collection } = props
-
-  const album = getAlbum(match, collection)
-
+  const albumId = match.params.id || ''
+  
+  // LiveStore hooks
+  const album = useAlbumById(albumId)
+  const mediaItems = useMediaByAlbum(albumId)
+  const queue = useQueue('main')
+  
   if (!album) {
     redirect('/')
     return null
   }
 
-  const relatedAlbums = collection.albumsByArtist && collection.albumsByArtist[album.artist.id] && collection.albumsByArtist[album.artist.id].map((albumId: string) => {
-    return collection.albums[albumId]
-  })
+  // Get related albums by the same artist
+  const relatedAlbumsData = useAlbumsByArtist(album.artistId)
+  
+  // Extract song IDs from media items
+  const songIds = useMemo(() => 
+    mediaItems.map(item => item.id)
+  , [mediaItems])
 
   return (
-    <div className={`artist-view ${props.className} z-50`}>
+    <div className='artist-view z-50'>
       <div className='main w-full z-10 md:p-4'>
         <h2 className='text-center text-3xl py-3'>{album.name}</h2>
         <Album
-          queue={props.queue}
+          queue={queue}
           album={album}
-          dispatch={props.dispatch}
-          collection={props.collection}
-          songs={props.songsByAlbum[album.id]}
+          dispatch={dispatch}
+          songs={songIds}
         />
         <div className='w-full'>
-          <RelatedAlbums albums={relatedAlbums} />
+          <RelatedAlbums albums={relatedAlbumsData as any} />
         </div>
         <div className='placeholder'></div>
       </div>

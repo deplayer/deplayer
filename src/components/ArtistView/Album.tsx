@@ -7,6 +7,7 @@ import CoverImage from '../MusicTable/CoverImage'
 import { State as CollectionState } from '../../reducers/collection'
 import { State as QueueState } from '../../reducers/queue'
 import { Dispatch } from 'redux'
+import { useMediaMap } from '../../stores/livestore/hooks'
 
 interface Album {
   id: string
@@ -18,12 +19,16 @@ type AlbumProps = {
   album: Album,
   queue: QueueState,
   songs: Array<string>,
-  collection: CollectionState,
+  collection?: CollectionState,  // Optional for backward compatibility during migration
   dispatch: Dispatch
 }
 
 const Album = (props: AlbumProps) => {
   const albumId = props.album.id
+  
+  // Get media map from LiveStore (preferred) or fall back to Redux collection
+  const liveStoreMediaMap = useMediaMap()
+  const mediaMap = props.collection ? props.collection.rows : liveStoreMediaMap
 
   const extractSongs = () => {
     if (!props.songs) {
@@ -46,7 +51,7 @@ const Album = (props: AlbumProps) => {
     const songsByDiscMap = new Map<number, Set<string>>()
     
     for (const songId of uniqueSongsSet) {
-      const song = props.collection.rows[songId]
+      const song = mediaMap[songId]
       if (!song) {
         console.warn(`Song ${songId} not found in collection for album ${props.album.name}`)
         continue
@@ -66,8 +71,8 @@ const Album = (props: AlbumProps) => {
       const discSongsSet = songsByDiscMap.get(discNumber) || new Set<string>()
       const discSongs = Array.from(discSongsSet)
         .sort((a, b) => {
-          const songA = props.collection.rows[a]
-          const songB = props.collection.rows[b]
+          const songA = mediaMap[a]
+          const songB = mediaMap[b]
           // Sort by track number if available, otherwise by title
           if (songA.track && songB.track) {
             return songA.track - songB.track
@@ -77,7 +82,7 @@ const Album = (props: AlbumProps) => {
           return 0
         })
         .map((songId) => {
-          const songRow = props.collection.rows[songId]
+          const songRow = mediaMap[songId]
           return (
             <SongRow
               mqlMatch={false}
@@ -126,7 +131,7 @@ const Album = (props: AlbumProps) => {
         >
           <CoverImage
             cover={
-              props.collection.rows[Array.from(new Set(props.songs))[0]]?.cover
+              mediaMap[Array.from(new Set(props.songs))[0]]?.cover
             }
             size='thumbnail'
             albumName={props.album.name}
@@ -154,7 +159,7 @@ const Album = (props: AlbumProps) => {
               onClick={() => {
                 // Ensure unique songs when adding to queue
                 const uniqueSongIds = Array.from(new Set(props.songs))
-                const songs = uniqueSongIds.map(songId => props.collection.rows[songId])
+                const songs = uniqueSongIds.map(songId => mediaMap[songId])
                 props.dispatch({ type: types.ADD_TO_QUEUE_NEXT, songs })
               }}
             >
