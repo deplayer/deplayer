@@ -7,15 +7,15 @@ import { Location } from 'react-router'
 import EmptyState from './common/EmptyState/index'
 import TryDemoButton from './Buttons/TryDemoButton'
 import Icon from './common/Icon'
-import { useSettings } from '../stores/livestore/hooks'
+import { useSettings, useFilteredMedia } from '../stores/livestore/hooks'
 import { useUI } from '../contexts'
 import { useSelector } from 'react-redux'
 import { State } from '../reducers'
 
-const mediaForPath = (location: Location, collection: State['collection'], filteredSongs: string[]) => {
+const mediaForPath = (location: Location, searchResults: string[], filteredSongs: string[]) => {
   switch (location.pathname) {
     case '/search-results':
-      return collection.searchResults
+      return searchResults
     default:
       return filteredSongs
   }
@@ -24,18 +24,20 @@ const mediaForPath = (location: Location, collection: State['collection'], filte
 const Collection = () => {
   // Get data from LiveStore hooks and contexts
   const liveSettings = useSettings()
-  const { loading } = useUI()
+  const { loading, activeFilters } = useUI()
   const location = useLocation()
   
-  // Get Redux state for features not yet migrated (filters, search)
-  const reduxCollection = useSelector((state: State) => state.collection)
-  const filteredSongs = useSelector((state: State) => state.collection.filteredSongs)
+  // Get filtered media from LiveStore
+  const filteredSongs = useFilteredMedia(activeFilters)
+  
+  // Get Redux state for search results (not yet migrated)
+  const searchResults = useSelector((state: State) => state.collection.searchResults)
   
   if (loading) {
     return <Spinner />
   }
 
-  const mediaItems = mediaForPath(location, reduxCollection, filteredSongs)
+  const mediaItems = mediaForPath(location, searchResults, filteredSongs)
   const hasSearchableProviders = liveSettings?.providers ? 
     Object.values(liveSettings.providers).some((provider) => (provider as { enabled?: boolean })?.enabled) : 
     false

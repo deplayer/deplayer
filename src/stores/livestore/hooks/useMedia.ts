@@ -2,6 +2,8 @@ import { useQuery } from '@livestore/react'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 import { useMemo } from 'react'
+import type { Filter } from '../../../contexts/UIContext'
+import { useFavoriteIds } from './useFavorites'
 
 /**
  * Media Query Hooks
@@ -185,4 +187,87 @@ export const useMostPlayed = (limit = 20) => {
         .limit(limit)
     )
   )
+}
+
+/**
+ * Get filtered media based on active filters
+ * Applies genre, type, artist, provider, and favorites filters to all media
+ * 
+ * @param filters - Active filter state from UIContext
+ * 
+ * @example
+ * ```tsx
+ * const { activeFilters } = useUI()
+ * const filteredMedia = useFilteredMedia(activeFilters)
+ * return <div>{filteredMedia.length} filtered tracks</div>
+ * ```
+ */
+export const useFilteredMedia = (filters: Filter) => {
+  const allMedia = useMediaLibrary()
+  const favoriteIds = useFavoriteIds()
+  
+  return useMemo(() => {
+    // If no filters are active, return all media IDs
+    if (
+      filters.genres.length === 0 &&
+      filters.types.length === 0 &&
+      filters.artists.length === 0 &&
+      filters.providers.length === 0 &&
+      !filters.favorites
+    ) {
+      return Array.isArray(allMedia) ? allMedia.map((m: any) => m.id) : []
+    }
+
+    // Filter media based on active filters
+    const filtered = Array.isArray(allMedia) 
+      ? allMedia.filter((media: any) => {
+          let hasMatches = false
+
+          // Check genres
+          if (filters.genres.length > 0) {
+            const mediaGenres = Array.isArray(media.genres)
+              ? media.genres
+              : media.genres
+              ? [media.genres]
+              : []
+            if (filters.genres.some((g) => mediaGenres.includes(g))) {
+              hasMatches = true
+            }
+          }
+
+          // Check types
+          if (filters.types.length > 0) {
+            if (filters.types.includes(media.type)) {
+              hasMatches = true
+            }
+          }
+
+          // Check artists
+          if (filters.artists.length > 0) {
+            if (filters.artists.some((artistId) => artistId === media.artistId)) {
+              hasMatches = true
+            }
+          }
+
+          // Check providers
+          if (filters.providers.length > 0) {
+            const mediaProviders = media.stream ? Object.keys(media.stream) : []
+            if (filters.providers.some((p) => mediaProviders.includes(p))) {
+              hasMatches = true
+            }
+          }
+
+          // Check favorites
+          if (filters.favorites) {
+            if (favoriteIds.has(media.id)) {
+              hasMatches = true
+            }
+          }
+
+          return hasMatches
+        })
+      : []
+    
+    return filtered.map((m: any) => m.id)
+  }, [allMedia, filters, favoriteIds])
 }

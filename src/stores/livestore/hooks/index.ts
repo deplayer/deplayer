@@ -15,6 +15,7 @@ export {
   useSearchMedia,
   useRecentlyPlayed,
   useMostPlayed,
+  useFilteredMedia,
 } from './useMedia'
 
 // Album hooks
