@@ -63,7 +63,6 @@ const Toolbar = ({
               <FilterPanel
                 dispatch={dispatch}
                 collection={collection}
-                activeFilters={collection.activeFilters}
               />
             </div>
           )}
@@ -102,10 +101,10 @@ const MusicTable = ({ error, tableIds, disableCurrent, disableCovers, disableAdd
   // Get data from LiveStore hooks
   const mediaMap = useMediaMap()
   const liveQueue = useQueue('default')
-  const { loading, mqlMatch } = useUI()
+  const { loading, mqlMatch, activeFilters } = useUI()
   const location = useLocation()
   
-  // Get Redux state for features not yet migrated (FilterPanel, buttons)
+  // Get Redux state for features not yet migrated (buttons, actions)
   const reduxCollection = useSelector((state: State) => state.collection)
   const dispatch = useDispatch()
   
@@ -206,7 +205,7 @@ const MusicTable = ({ error, tableIds, disableCurrent, disableCovers, disableAdd
     }
   }
 
-  const actions = React.useMemo(() => getActions(), [location.pathname, reduxCollection.activeFilters])
+  const actions = React.useMemo(() => getActions(), [location.pathname, activeFilters])
 
   const handleScroll = ({ clientHeight, scrollHeight, scrollTop }: { clientHeight: number, scrollHeight: number, scrollTop: number }) => {
     // If content isn't scrollable, always keep toolbar visible

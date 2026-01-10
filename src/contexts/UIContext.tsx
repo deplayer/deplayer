@@ -10,9 +10,18 @@ import { createContext, useContext, useState, useCallback, ReactNode } from 'rea
  * - Form inputs
  * - Media query matches
  * - Visual effects (spectrum, visuals)
+ * - Active filters
  * 
  * This state is local-only and not synced.
  */
+
+export type Filter = {
+  genres: string[]
+  types: string[]
+  artists: string[]
+  providers: string[]
+  favorites: boolean
+}
 
 export type UIState = {
   // Panels
@@ -41,6 +50,9 @@ export type UIState = {
   
   // App ready state
   ready: boolean
+  
+  // Active filters
+  activeFilters: Filter
 }
 
 export type UIActions = {
@@ -70,6 +82,10 @@ export type UIActions = {
   
   // App ready state
   setReady: (ready: boolean) => void
+  
+  // Filters
+  setFilter: (filterType: keyof Filter, values: string[] | boolean) => void
+  clearFilters: () => void
 }
 
 type UIContextValue = UIState & UIActions
@@ -88,6 +104,13 @@ const initialState: UIState = {
   backgroundImage: '',
   loading: true,
   ready: false,
+  activeFilters: {
+    genres: [],
+    types: [],
+    artists: [],
+    providers: [],
+    favorites: false,
+  },
 }
 
 type Props = {
@@ -155,6 +178,30 @@ export const UIProvider = ({ children }: Props) => {
     setState(prev => ({ ...prev, ready }))
   }, [])
 
+  // Filters
+  const setFilter = useCallback((filterType: keyof Filter, values: string[] | boolean) => {
+    setState(prev => ({
+      ...prev,
+      activeFilters: {
+        ...prev.activeFilters,
+        [filterType]: values,
+      },
+    }))
+  }, [])
+
+  const clearFilters = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      activeFilters: {
+        genres: [],
+        types: [],
+        artists: [],
+        providers: [],
+        favorites: false,
+      },
+    }))
+  }, [])
+
   const value: UIContextValue = {
     ...state,
     toggleSidebar,
@@ -168,6 +215,8 @@ export const UIProvider = ({ children }: Props) => {
     setBackgroundImage,
     setLoading,
     setReady,
+    setFilter,
+    clearFilters,
   }
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>

@@ -1,13 +1,12 @@
 import Select from 'react-select'
-import { Filter } from '../../reducers/collection'
+import { Filter } from '../../contexts/UIContext'
 import Button from '../common/Button'
 import { Dispatch } from 'redux'
 import * as actionTypes from '../../constants/ActionTypes'
 import Icon from '../common/Icon'
 import Modal from '../common/Modal'
 import { useState, useEffect } from 'react'
-import { State } from '../../reducers'
-import { useSelector } from 'react-redux'
+import { useUI } from '../../contexts/UIContext'
 
 interface MediaItem {
   genres?: string[];
@@ -27,16 +26,13 @@ interface Collection {
 
 type Props = {
   collection: Collection;
-  activeFilters: Filter;
   dispatch: Dispatch;
 }
 
-const FilterPanel = ({ collection, activeFilters, dispatch }: Props) => {
+const FilterPanel = ({ collection, dispatch }: Props) => {
+  const { activeFilters, setFilter } = useUI()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
-  
-  // Only select the favorites part of state that's actually needed for filtering
-  const favorites = useSelector((state: State) => state.favorites)
 
   useEffect(() => {
     const handleResize = () => {
@@ -208,13 +204,8 @@ const FilterPanel = ({ collection, activeFilters, dispatch }: Props) => {
     }
   }
 
-  const handleFilterChange = (filterType: keyof Filter, values: string[]) => {
-    dispatch({
-      type: actionTypes.SET_COLLECTION_FILTER,
-      filterType,
-      values,
-      state: { favorites }
-    })
+  const handleFilterChange = (filterType: keyof Filter, values: string[] | boolean) => {
+    setFilter(filterType, values)
   }
 
   const hasActiveFilters = Object.entries(activeFilters).some(([key, value]) => {
@@ -250,7 +241,7 @@ const FilterPanel = ({ collection, activeFilters, dispatch }: Props) => {
       />
       <Button
         size='xs'
-        onClick={() => handleFilterChange('favorites', activeFilters.favorites ? [] : ['true'])}
+        onClick={() => setFilter('favorites', !activeFilters.favorites)}
         className={`ml-2 ${activeFilters.favorites ? 'text-red-500' : 'text-base-content/70'}`}
         transparent
         title={activeFilters.favorites ? "Remove favorites filter" : "Show favorites only"}
