@@ -1,8 +1,7 @@
 import { Translate } from 'react-redux-i18n'
-import { useSelector } from 'react-redux'
 import HorizontalSlider from '../HorizontalSlider'
-import { State as RootState } from '../../reducers'
 import AlbumCover from '../common/AlbumCover'
+import { useRecentAlbums, useArtistsMap } from '../../stores/livestore/hooks'
 
 const AlbumMediaSlider = ({ mediaItems, title }: { mediaItems: any[], title: React.ReactNode }) => {
   if (!mediaItems?.length) {
@@ -17,7 +16,10 @@ const AlbumMediaSlider = ({ mediaItems, title }: { mediaItems: any[], title: Rea
         id={album.id}
         name={album.name}
         artistName={album.artistName}
-        cover={album.cover}
+        cover={{ 
+          thumbnailUrl: album.thumbnailUrl,
+          fullUrl: album.thumbnailUrl 
+        }}
       />
     ))
 
@@ -34,16 +36,23 @@ const AlbumMediaSlider = ({ mediaItems, title }: { mediaItems: any[], title: Rea
 }
 
 const RecentAlbums = () => {
-  const recentAlbums = useSelector((state: RootState) => state.collection.recentAlbums || [])
+  const recentAlbums = useRecentAlbums(10)
+  const artistsMap = useArtistsMap()
 
   if (!recentAlbums?.length) {
     return null
   }
 
+  // Map LiveStore albums to expected format with artist names
+  const albumsWithArtists = (recentAlbums as any[]).map(album => ({
+    ...album,
+    artistName: artistsMap[album.artistId]?.name || 'Unknown Artist'
+  }))
+
   return (
     <AlbumMediaSlider
       title={<Translate value="dashboard.recentlyAdded" />}
-      mediaItems={recentAlbums}
+      mediaItems={albumsWithArtists}
     />
   )
 }

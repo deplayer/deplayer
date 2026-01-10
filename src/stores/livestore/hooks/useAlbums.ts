@@ -126,3 +126,26 @@ export const useSongsByAlbum = () => {
     return map
   }, [media])
 }
+
+/**
+ * Get recently added albums
+ * Returns albums sorted by creation date (most recent first)
+ * 
+ * @param limit - Number of albums to return (default 10)
+ * 
+ * @example
+ * ```tsx
+ * const recentAlbums = useRecentAlbums(20)
+ * return <div>{recentAlbums.length} recent albums</div>
+ * ```
+ */
+export const useRecentAlbums = (limit = 10) => {
+  return useQuery(
+    queryDb(
+      tables.albums
+        .select()
+        .orderBy('createdAt', 'desc')
+        .limit(limit)
+    )
+  )
+}

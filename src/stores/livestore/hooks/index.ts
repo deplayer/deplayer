@@ -25,6 +25,7 @@ export {
   useAlbumById,
   useAlbumsByArtist,
   useSongsByAlbum,
+  useRecentAlbums,
 } from './useAlbums'
 
 // Artist hooks
