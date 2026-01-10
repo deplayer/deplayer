@@ -7,6 +7,7 @@ import Tag from '../common/Tag'
 import React from 'react'
 import { State as RootState } from '../../reducers'
 import IMedia from '../../entities/Media'
+import { useAlbumsByArtist, useSongsByAlbum, useMediaMap } from '../../stores/livestore/hooks'
 
 type Props = {
   artist: Artist
@@ -22,10 +23,12 @@ type ArtistRelation = {
 }
 
 const ArtistGridItem = ({ artist, songs, style }: Props) => {
-  // More specific selectors with proper typing
-  const albumsByArtist = useSelector((state: RootState) => state.collection.albumsByArtist[artist.id])
-  const songsByAlbum = useSelector((state: RootState) => state.collection.songsByAlbum)
-  const collectionRows = useSelector((state: RootState) => state.collection.rows)
+  // Get data from LiveStore hooks
+  const albumsByArtist = useAlbumsByArtist(artist.id)
+  const songsByAlbum = useSongsByAlbum()
+  const mediaMap = useMediaMap()
+  
+  // Still using Redux for artist metadata (not yet migrated)
   const artistMetadata = useSelector((state: RootState) => 
     state.artist.artistMetadata?.[artist.name]?.relations as ArtistRelation[] | undefined
   )
@@ -41,13 +44,13 @@ const ArtistGridItem = ({ artist, songs, style }: Props) => {
   const randomAlbumCover = useMemo(() => {
     if (!albumsByArtist || albumsByArtist.length === 0) return undefined
 
-    const randomAlbumId = albumsByArtist[Math.floor(Math.random() * albumsByArtist.length)]
-    const albumSongs = songsByAlbum[randomAlbumId] || []
+    const randomAlbum = albumsByArtist[Math.floor(Math.random() * albumsByArtist.length)]
+    const albumSongs = songsByAlbum[randomAlbum.id] || []
     if (albumSongs.length === 0) return undefined
 
-    const song = collectionRows[albumSongs[0]] as IMedia
+    const song = mediaMap[albumSongs[0]] as IMedia
     return song?.cover
-  }, [albumsByArtist, songsByAlbum, collectionRows])
+  }, [albumsByArtist, songsByAlbum, mediaMap])
 
   const cover = artistPhoto ? {
     thumbnailUrl: artistPhoto,
