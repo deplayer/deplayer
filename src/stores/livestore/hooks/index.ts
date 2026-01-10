@@ -25,6 +25,14 @@ export {
   useAlbumsByArtist,
 } from './useAlbums'
 
+// Artist hooks
+export {
+  useArtists,
+  useArtistsMap,
+  useArtistById,
+  useSongsByArtist,
+} from './useArtists'
+
 // Playlist hooks
 export {
   usePlaylists,

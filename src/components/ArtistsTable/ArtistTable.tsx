@@ -3,23 +3,14 @@ import { useState } from 'react'
 import { Translate } from 'react-redux-i18n'
 import { Link } from 'react-router-dom'
 
-import { State as CollectionState } from '../../reducers/collection'
-import { State as SettingsState } from '../../reducers/settings'
 import ArtistRow from './ArtistRow'
 import ArtistGridItem from './ArtistGridItem'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
 import EmptyState from '../common/EmptyState/index'
-import { State as AppState } from '../../reducers/app'
-import { State as QueueState } from '../../reducers/queue'
-
-type Props = {
-  error?: string,
-  queue: QueueState,
-  collection: CollectionState,
-  settings?: SettingsState,
-  app: AppState
-}
+import { useArtistsMap, useSongsByArtist, useMediaLibrary } from '../../stores/livestore/hooks'
+import { useSettings } from '../../stores/livestore/hooks'
+import { useUI } from '../../contexts'
 
 interface GridProps {
   rowIndex: number
@@ -28,12 +19,20 @@ interface GridProps {
   style: React.CSSProperties
 }
 
-const ArtistTable = ({ collection: { artists, songsByArtist, rows }, app: { sidebarToggled, mqlMatch }, settings }: Props) => {
+const ArtistTable = () => {
+  // Get data from LiveStore hooks
+  const artistsMap = useArtistsMap()
+  const songsByArtist = useSongsByArtist()
+  const mediaLibrary = useMediaLibrary()
+  const liveSettings = useSettings()
+  const { sidebarToggled, mqlMatch } = useUI()
+  
   const [isGridView, setIsGridView] = useState(false)
-  const tableIds = Object.keys(artists)
-  const hasCollectionItems = Object.keys(rows).length > 0
-  const hasSearchableProviders = settings?.settings?.providers ? 
-    Object.values(settings.settings.providers).some(provider => provider.enabled) : 
+  
+  const tableIds = Object.keys(artistsMap)
+  const hasCollectionItems = Array.isArray(mediaLibrary) && mediaLibrary.length > 0
+  const hasSearchableProviders = liveSettings?.providers ? 
+    Object.values(liveSettings.providers).some((provider: any) => provider?.enabled) : 
     false
 
   if (!tableIds.length) {
@@ -70,7 +69,7 @@ const ArtistTable = ({ collection: { artists, songsByArtist, rows }, app: { side
 
   const rowRenderer = (props: any): any => {
     const artistId = tableIds[props.index]
-    const artist = artists[artistId]
+    const artist = artistsMap[artistId]
 
     return (
       <ArtistRow
@@ -86,7 +85,7 @@ const ArtistTable = ({ collection: { artists, songsByArtist, rows }, app: { side
     const artistId = tableIds[props.rowIndex * 4 + props.columnIndex]
     if (!artistId) return null
     
-    const artist = artists[artistId]
+    const artist = artistsMap[artistId]
     return (
       <ArtistGridItem
         key={props.key}

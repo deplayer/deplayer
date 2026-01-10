@@ -20,7 +20,7 @@ import LayoutContainer from './containers/LayoutContainer'
 import AddMediaModal from './components/AddMediaModal'
 import AlbumContainer from './containers/AlbumContainer'
 import ArtistContainer from './containers/ArtistContainer'
-import ArtistsContainer from './containers/ArtistsContainer'
+import ArtistTable from './components/ArtistsTable/ArtistTable'
 import Collection from './components/Collection'
 import Dashboard from './components/Dashboard'
 import PlayerContainer from './containers/PlayerContainer'
@@ -96,7 +96,7 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
           <Route path="/song/:id" element={<Song playerPortal={playerPortal} />} />
           <Route path="/album/:id" element={<AlbumContainer />} />
           <Route path="/artist/:id" element={<ArtistContainer />} />
-          <Route path="/artists" element={<ArtistsContainer />} />
+          <Route path="/artists" element={<ArtistTable />} />
           <Route path="/providers" element={<ProvidersContainer />} />
           <Route path="/settings" element={<SettingsContainer />} />
           <Route path="/wiki" element={<Wiki />} />
