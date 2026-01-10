@@ -1,6 +1,6 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { State } from '../../reducers'
-import * as types from '../../constants/ActionTypes'
+import { useStore } from '@livestore/react'
+import { useIsFavorite } from '../../stores/livestore/hooks'
+import { toggleFavoriteAction } from '../../stores/livestore/actions'
 
 interface Props {
   songId: string
@@ -8,13 +8,17 @@ interface Props {
 }
 
 const FavoriteButton: React.FC<Props> = ({ songId, className = '' }) => {
-  const dispatch = useDispatch()
-  const isFavorite = useSelector((state: State) => 
-    state.favorites.favoriteIds.has(songId)
-  )
+  const { store: liveStore } = useStore()
+  const isFavorite = useIsFavorite(songId)
 
-  const toggleFavorite = () => {
-    dispatch({ type: types.TOGGLE_FAVORITE, songId })
+  const toggleFavorite = async () => {
+    if (!liveStore) return
+    
+    try {
+      await toggleFavoriteAction(liveStore, songId)
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error)
+    }
   }
 
   return (
@@ -37,4 +41,4 @@ const FavoriteButton: React.FC<Props> = ({ songId, className = '' }) => {
   )
 }
 
-export default FavoriteButton 
+export default FavoriteButton

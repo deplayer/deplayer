@@ -1,6 +1,19 @@
 import * as types from '../constants/ActionTypes'
 import { getAdapter } from '../services/database'
 
+/**
+ * Favorites Reducer - LEGACY
+ * 
+ * This reducer is now deprecated. Favorites are managed by LiveStore.
+ * Kept for backwards compatibility during migration.
+ * 
+ * All favorite operations now use:
+ * - LiveStore hooks: useIsFavorite(), useFavorites(), useFavoriteIds()
+ * - LiveStore actions: toggleFavoriteAction(), addFavoriteAction(), removeFavoriteAction()
+ * 
+ * TODO: Remove this reducer once all components are migrated to LiveStore.
+ */
+
 export type State = {
   favoriteIds: Set<string>;
   loading: boolean;

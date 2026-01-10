@@ -1,38 +1,24 @@
-import { takeLatest, call, put } from "redux-saga/effects";
-import { getAdapter } from "../services/database";
+import { takeLatest } from "redux-saga/effects";
 import * as types from "../constants/ActionTypes";
 import { createLogger } from "../utils/logger";
-import { favorites } from "../schema";
-import { InferModel } from "drizzle-orm";
 
-const adapter = getAdapter();
 const logger = createLogger({ namespace: "favorites-saga" });
 
-type Favorite = InferModel<typeof favorites>;
+/**
+ * Favorites Saga - LEGACY
+ * 
+ * This saga is now deprecated. Favorites are managed by LiveStore.
+ * Kept for backwards compatibility during migration.
+ * 
+ * All favorite operations now use:
+ * - LiveStore hooks: useIsFavorite(), useFavorites(), useFavoriteIds()
+ * - LiveStore actions: toggleFavoriteAction(), addFavoriteAction(), removeFavoriteAction()
+ */
 
 // Application initialization routines
 function* initialize(): Generator<any, void, any> {
-  try {
-    logger.debug("Initializing favorites...");
-    const db = yield call(adapter.getDb);
-    
-    // Get all favorites from the database
-    const favoritesData = yield call(async () => {
-      return await db.select().from(favorites);
-    });
-
-    if (favoritesData && favoritesData.length > 0) {
-      // Extract media IDs from favorites
-      const favoriteIds = favoritesData.map((favorite: Favorite) => favorite.mediaId);
-      yield put({ type: types.LOAD_FAVORITES_SUCCESS, favoriteIds });
-    } else {
-      // No favorites found, initialize with empty array
-      yield put({ type: types.LOAD_FAVORITES_SUCCESS, favoriteIds: [] });
-    }
-  } catch (error: any) {
-    logger.error("Failed to load favorites:", error);
-    yield put({ type: types.LOAD_FAVORITES_ERROR, error: error.message });
-  }
+  logger.info("Favorites saga is now legacy - using LiveStore for favorites");
+  // No-op: Favorites are now loaded reactively from LiveStore via hooks
 }
 
 // Binding actions to sagas

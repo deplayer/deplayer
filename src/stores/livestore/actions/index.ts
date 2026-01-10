@@ -6,3 +6,4 @@
  */
 
 export * from './settings'
+export * from './favorites'
