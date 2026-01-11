@@ -7,3 +7,4 @@
 
 export * from './settings'
 export * from './favorites'
+export * from './queue'

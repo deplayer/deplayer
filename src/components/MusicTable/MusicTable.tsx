@@ -176,26 +176,25 @@ const MusicTable = ({ error, tableIds, disableCurrent, disableCovers, disableAdd
           <>
             <ClearQueueButton className='btn-sm' />
             <SaveQueueButton className='btn-sm' />
-            <PlayAllButton className='btn-sm' dispatch={dispatch} />
+            <PlayAllButton className='btn-sm' mediaIds={tableIds} />
           </>
         )
       case '/collection':
         return (
         <>
           <AddNewMediaButton className='btn-sm' />
-          <PlayAllButton className='btn-sm' dispatch={dispatch} />
-          {liveQueue?.currentPlaying && <PlayNextButton className='btn-sm' dispatch={dispatch} />}
+          <PlayAllButton className='btn-sm' mediaIds={tableIds} />
+          {liveQueue?.currentPlaying && <PlayNextButton className='btn-sm' mediaIds={tableIds} />}
         </>
       )
       case '/search-results':
         return (
           <>
-            <PlayAllButton className='btn-sm' dispatch={dispatch} />
+            <PlayAllButton className='btn-sm' mediaIds={tableIds} />
             {liveQueue?.currentPlaying && (
               <PlayNextButton 
                 className='btn-sm'
-                dispatch={dispatch} 
-                songs={tableIds.map(id => mediaMap[id]).filter(Boolean)} 
+                mediaIds={tableIds}
               />
             )}
           </>

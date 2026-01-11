@@ -1,21 +1,49 @@
-import { Dispatch } from 'redux'
+import { useStore } from '@livestore/react'
 import { Translate } from 'react-redux-i18n'
 import { useLocation } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 
-import { PLAY_ALL } from '../../constants/ActionTypes'
+import * as types from '../../constants/ActionTypes'
+import { playAllAction } from '../../stores/livestore/actions'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
 
 type Props = {
-  dispatch: Dispatch,
+  mediaIds?: string[]
   className?: string
 }
 
 const PlayAllButton = (props: Props) => {
+  const { store: liveStore } = useStore()
+  const dispatch = useDispatch()
   const location = useLocation()
-  const playAll = () => {
-    const path = location.pathname === '/' ? 'collection' : location.pathname.replace(/^\//, '')
-    props.dispatch({ type: PLAY_ALL, path })
+  
+  const playAll = async () => {
+    if (!liveStore) return
+    
+    try {
+      let firstTrackId: string | null = null
+      
+      if (props.mediaIds && props.mediaIds.length > 0) {
+        // Use provided media IDs
+        firstTrackId = await playAllAction(liveStore, props.mediaIds)
+      } else {
+        // Legacy: dispatch path-based action (will be handled by saga)
+        const path = location.pathname === '/' ? 'collection' : location.pathname.replace(/^\//, '')
+        dispatch({ type: types.PLAY_ALL, path })
+        return
+      }
+      
+      // Dispatch to saga to trigger playback side effects
+      if (firstTrackId) {
+        dispatch({ 
+          type: types.PLAY_ALL_COMPLETED,
+          trackId: firstTrackId 
+        })
+      }
+    } catch (error) {
+      console.error('Failed to play all:', error)
+    }
   }
 
   if (location.pathname === '/settings') {
