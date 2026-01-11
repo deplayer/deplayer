@@ -48,6 +48,8 @@ export {
   useQueue,
   useQueueTracks,
   useCurrentTrack,
+  useCurrentPlayingSongId,
+  useQueueNavigation,
 } from './useQueue'
 
 // Favorites hooks

@@ -35,6 +35,12 @@ import GlobalKeyHandlers from './components/GlobalKeyHandlers'
 import JoinRoom from './pages/JoinRoom';
 import { useLanguage } from './hooks/useLanguage'
 import { setLiveStoreInstance } from './middleware/livestore'
+import type { Store as LiveStore } from '@livestore/livestore'
+
+// Export LiveStore instance for use in sagas
+let liveStoreInstance: LiveStore | null = null
+
+export const getLiveStoreInstance = () => liveStoreInstance
 
 interface SongProps {
   playerPortal: portals.HtmlPortalNode
@@ -59,6 +65,7 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
   React.useEffect(() => {
     if (liveStore) {
       setLiveStoreInstance(liveStore)
+      liveStoreInstance = liveStore  // Also store for saga access
     }
   }, [liveStore])
   

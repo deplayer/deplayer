@@ -108,6 +108,11 @@ export const tables = {
       externalId: State.SQLite.text({ nullable: true }),
       shareUrl: State.SQLite.text({ nullable: true }),
       filePath: State.SQLite.text({ nullable: true }),
+      // Denormalized columns for fast queries
+      artistName: State.SQLite.text({ default: '' }),
+      albumName: State.SQLite.text({ default: '' }),
+      genresFlat: State.SQLite.text({ default: '' }), // Comma-separated genres
+      providersFlat: State.SQLite.text({ default: '' }), // Comma-separated providers
       createdAt: State.SQLite.integer({}),
       updatedAt: State.SQLite.integer({}),
     },
@@ -204,6 +209,10 @@ const materializers = State.SQLite.materializers(events, {
     const now = Date.now()
     const { id, title, artist, album, type, duration, track, discNumber, stream, cover, genres, externalId, shareUrl, filePath } = event
     
+    // Compute denormalized fields for fast queries
+    const genresFlat = Array.isArray(genres) ? genres.join(',') : ''
+    const providersFlat = stream ? Object.keys(stream).join(',') : ''
+    
     // Return array of operations: insert artist, insert album, insert media
     return [
       // Insert artist if not exists
@@ -229,7 +238,7 @@ const materializers = State.SQLite.materializers(events, {
         })
         .onConflict('id', 'ignore'),
       
-      // Insert media
+      // Insert media with denormalized fields
       tables.media
         .insert({
           id,
@@ -247,10 +256,33 @@ const materializers = State.SQLite.materializers(events, {
           externalId: externalId ?? null,
           shareUrl: shareUrl ?? null,
           filePath: filePath ?? null,
+          artistName: artist.name,
+          albumName: album.name,
+          genresFlat,
+          providersFlat,
           createdAt: now,
           updatedAt: now,
         })
-        .onConflict('id', 'ignore'),
+        .onConflict('id', 'update', {
+          title,
+          artistId: artist.id,
+          albumId: album.id,
+          type,
+          duration: duration ?? null,
+          track: track ?? null,
+          discNumber: discNumber ?? null,
+          stream,
+          cover: cover ?? null,
+          genres,
+          externalId: externalId ?? null,
+          shareUrl: shareUrl ?? null,
+          filePath: filePath ?? null,
+          artistName: artist.name,
+          albumName: album.name,
+          genresFlat,
+          providersFlat,
+          updatedAt: now,
+        }),
     ]
   },
 
@@ -259,9 +291,17 @@ const materializers = State.SQLite.materializers(events, {
     const updates: any = { updatedAt: now }
     if (title !== undefined) updates.title = title
     if (duration !== undefined) updates.duration = duration
-    if (stream !== undefined) updates.stream = stream
+    if (stream !== undefined) {
+      updates.stream = stream
+      // Update denormalized providers
+      updates.providersFlat = stream ? Object.keys(stream).join(',') : ''
+    }
     if (cover !== undefined) updates.cover = cover
-    if (genres !== undefined) updates.genres = genres
+    if (genres !== undefined) {
+      updates.genres = genres
+      // Update denormalized genres
+      updates.genresFlat = Array.isArray(genres) ? genres.join(',') : ''
+    }
 
     return tables.media.update(updates).where('id', '=', id)
   },

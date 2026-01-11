@@ -1,4 +1,5 @@
 import { events } from '../schema'
+import { queueEvents } from '../events/queue'
 
 /**
  * LiveStore Queue Actions
@@ -254,4 +255,116 @@ export const setCurrentPlayingAction = async (store: LiveStore, position: number
       position,
     })
   )
+}
+
+/**
+ * Play next song in queue
+ * Increments currentPlaying index or loops if repeat is on
+ * 
+ * @param store - LiveStore instance
+ * @param queueId - Queue ID (default: 'default')
+ */
+export async function playNextAction(
+  store: LiveStore,
+  queueId = QUEUE_ID
+): Promise<void> {
+  const queue = await getCurrentQueue(store)
+  
+  if (!queue) {
+    throw new Error(`Queue ${queueId} not found`)
+  }
+  
+  const trackIds = queue.shuffle ? queue.randomTrackIds : queue.trackIds
+  const currentIndex = queue.currentPlaying ?? -1
+  const nextIndex = currentIndex + 1
+  
+  // Determine next position
+  let newPosition: number | undefined
+  
+  if (nextIndex < trackIds.length) {
+    newPosition = nextIndex
+  } else if (queue.repeat && trackIds.length > 0) {
+    newPosition = 0 // Loop back to start
+  } else {
+    // End of queue, no repeat
+    newPosition = undefined
+  }
+  
+  if (newPosition !== undefined) {
+    await store.commit(queueEvents.queuePositionChanged({
+      queueId,
+      position: newPosition,
+    }))
+  }
+}
+
+/**
+ * Play previous song in queue
+ * Decrements currentPlaying index or loops if repeat is on
+ * 
+ * @param store - LiveStore instance
+ * @param queueId - Queue ID (default: 'default')
+ */
+export async function playPreviousAction(
+  store: LiveStore,
+  queueId = QUEUE_ID
+): Promise<void> {
+  const queue = await getCurrentQueue(store)
+  
+  if (!queue) {
+    throw new Error(`Queue ${queueId} not found`)
+  }
+  
+  const trackIds = queue.shuffle ? queue.randomTrackIds : queue.trackIds
+  const currentIndex = queue.currentPlaying ?? 0
+  const prevIndex = currentIndex - 1
+  
+  // Determine previous position
+  let newPosition: number
+  
+  if (prevIndex >= 0) {
+    newPosition = prevIndex
+  } else if (queue.repeat && trackIds.length > 0) {
+    newPosition = trackIds.length - 1 // Loop to end
+  } else {
+    // Start of queue, no repeat
+    newPosition = 0
+  }
+  
+  await store.commit(queueEvents.queuePositionChanged({
+    queueId,
+    position: newPosition,
+  }))
+}
+
+/**
+ * Play a specific song by ID
+ * Finds the song in the queue and sets currentPlaying to its index
+ * 
+ * @param store - LiveStore instance
+ * @param mediaId - Song ID to play
+ * @param queueId - Queue ID (default: 'default')
+ */
+export async function playMediaAction(
+  store: LiveStore,
+  mediaId: string,
+  queueId = QUEUE_ID
+): Promise<void> {
+  const queue = await getCurrentQueue(store)
+  
+  if (!queue) {
+    throw new Error(`Queue ${queueId} not found`)
+  }
+  
+  const trackIds = queue.trackIds
+  const index = trackIds.indexOf(mediaId)
+  
+  if (index === -1) {
+    throw new Error(`Media ${mediaId} not found in queue`)
+  }
+  
+  await store.commit(queueEvents.queuePositionChanged({
+    queueId,
+    position: index,
+  }))
 }
