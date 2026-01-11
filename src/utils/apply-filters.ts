@@ -1,12 +1,20 @@
 import { Filter } from "../reducers/collection";
 import type Media from "../entities/Media";
-import { State } from "../reducers";
 
+/**
+ * Apply filters to media collection
+ * 
+ * NOTE: Favorites filtering requires favoriteIds from LiveStore.
+ * When not provided, favorites filter will be ignored.
+ * The main collection view uses LiveStore's useMedia hook which handles favorites filtering.
+ * 
+ * TODO: Refactor Playlist.tsx and collection reducer to use LiveStore for all filtering
+ */
 export const applyFilters = (
   rows: { [key: string]: Media },
   filters: Filter,
   initialIds?: string[],
-  state?: State
+  favoriteIds?: Set<string>
 ): string[] => {
   const idsToFilter = initialIds || Object.keys(rows);
   return idsToFilter.filter((id) => {
@@ -56,8 +64,9 @@ export const applyFilters = (
       }
     }
 
-    if (filters.favorites) {
-      if (state?.favorites.favoriteIds.has(id)) {
+    // Favorites filter (requires favoriteIds from LiveStore)
+    if (filters.favorites && favoriteIds) {
+      if (favoriteIds.has(id)) {
         hasMatches = true;
       }
     }

@@ -13,7 +13,6 @@ import { State as LyricsState, defaultState as lyricsDefaultState } from "../red
 import { State as PlaylistState, defaultState as playlistDefaultState } from "../reducers/playlist";
 import { State as PeerState } from "../reducers/peers";
 import { State as RoomsState, defaultState as roomsDefaultState } from "../reducers/rooms";
-import { State as FavoritesState, defaultState as favoritesDefaultState } from "../reducers/favorites";
 
 export const createDefaultState = (): RootState => ({
   app: appDefaultState as AppState,
@@ -35,7 +34,6 @@ export const createDefaultState = (): RootState => ({
     roomCode: null,
   } as PeerState,
   rooms: roomsDefaultState as RoomsState,
-  favorites: favoritesDefaultState as FavoritesState
 });
 
 export const createTestStore = (initialState: Partial<RootState> = {}) => {

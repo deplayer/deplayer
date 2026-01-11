@@ -13,7 +13,6 @@ import settings, { State as SettingsState } from './settings'
 import queue, { State as QueueState } from './queue'
 import peers, { State as PeerState } from "./peers";
 import rooms, { State as RoomsState } from "./rooms";
-import favorites, { State as FavoritesState } from './favorites'
 
 export type State = {
   app: AppState
@@ -28,7 +27,6 @@ export type State = {
   settings: SettingsState
   peers: PeerState
   rooms: RoomsState
-  favorites: FavoritesState
 }
 
 const reducers = {
@@ -45,7 +43,6 @@ const reducers = {
   peers,
   i18n: i18nReducer,
   rooms,
-  favorites,
 };
 
 export default reducers

@@ -3,7 +3,6 @@ import { all } from "redux-saga/effects";
 import artistSaga from "./artist";
 import collectionSaga from "./collection";
 import connectionSaga from "./connection";
-import favoritesSaga from "./favorites";
 import mediaSessionSaga from "./mediaSession";
 import wakeLock from "./wakeLock";
 import notificationsSaga from "./notifications";
@@ -24,7 +23,6 @@ function* rootSaga(store: any) {
     artistSaga(),
     collectionSaga(),
     connectionSaga(store),
-    favoritesSaga(),
     mediaSessionSaga(store),
     wakeLock(store),
     notificationsSaga(store),
