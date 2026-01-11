@@ -20,7 +20,7 @@ import { State as CollectionState } from '../../reducers/collection'
 import { State as AppState } from '../../reducers/app'
 import { useLocation } from 'react-router'
 import DeplayerTitle from '../DeplayerTitle'
-import { usePlaylists, useSmartPlaylists, useQueue } from '../../stores/livestore/hooks'
+import { usePlaylists, useSmartPlaylists, useQueue, useMediaLibrary, useArtists } from '../../stores/livestore/hooks'
 
 import LogoSvg from '../../logo.svg?react'
 
@@ -82,6 +82,10 @@ const SidebarContents = (props: ContentProps) => {
   const totalPlaylists = playlists.length + smartPlaylists.length
   const liveQueue = useQueue('default')
   
+  // Get collection data from LiveStore
+  const mediaLibrary = useMediaLibrary()
+  const artists = useArtists()
+  
   // Parse trackIds from LiveStore queue (can be JSON string or array)
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
     if (!ids) return []
@@ -124,12 +128,12 @@ const SidebarContents = (props: ContentProps) => {
         />
         <CollectionMenuItem
           current={inSection(location, 'collection')}
-          totalItems={props.collection.totalRows}
+          totalItems={mediaLibrary.length}
         />
-        {Object.keys(props.collection.artists).length > 0 && (
+        {artists.length > 0 && (
           <ArtistsMenuItem
             current={inSection(location, 'artists')}
-            totalItems={Object.keys(props.collection.artists).length}
+            totalItems={artists.length}
           />
         )}
         <MenuItem
@@ -145,7 +149,7 @@ const SidebarContents = (props: ContentProps) => {
 
       <div className='w-full'>  
         <CommandBar 
-          navigateToArtists={() => Object.keys(props.collection.artists).length > 0 ? navigate('/artists') : navigate('/collection')}
+          navigateToArtists={() => artists.length > 0 ? navigate('/artists') : navigate('/collection')}
           navigateToAlbums={() => navigate('/albums')}
           navigateToQueue={() => trackIds.length > 0 ? navigate('/queue') : navigate('/collection')}
           navigateToPlaylists={() => navigate('/playlists')}
