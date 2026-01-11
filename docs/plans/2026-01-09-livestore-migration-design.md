@@ -1,9 +1,86 @@
 # LiveStore Migration Design
 
 **Date**: 2026-01-09  
-**Status**: Design Approved  
+**Status**: ✅ Phase 4 In Progress - Queue & Settings Migrated  
 **Migration Strategy**: Clean Break (Option 2)  
-**Timeline**: 6 weeks
+**Timeline**: 6 weeks  
+**Last Updated**: 2026-01-11
+
+---
+
+## 🚀 Migration Progress
+
+### ✅ Completed Domains
+
+#### 1. Queue Domain (2026-01-11)
+- ✅ LiveStore schema, actions, hooks created
+- ✅ All components migrated to useQueue() hook
+- ✅ Redux queue reducer/saga removed from root
+- ✅ Type stubs kept for backward compatibility
+- **Files migrated**: 9 files
+  - `useLanguage.ts`, `sw.ts`, `ContextMenuContainer.tsx`
+  - `PlayerContainer.tsx`, `SongContainer.tsx`
+  - `ContextualMenu.tsx`, `SaveQueueButton.tsx`
+  - `ClearQueueButton.tsx`, `SongView/index.tsx`
+- **Commits**: `6b2ef5f5`, `97f32c15`
+
+#### 2. Settings Domain (2026-01-11)
+- ✅ LiveStore schema, actions, hooks created
+- ✅ All components migrated to useSettings() hook
+- ✅ Redux settings reducer/saga removed from root
+- ✅ Type stubs kept for backward compatibility
+- **Files migrated**: Included with queue migration
+- **Status**: Runtime errors fixed, app starts successfully
+
+#### 3. Favorites Domain (Prior to 2026-01-11)
+- ✅ Migrated to LiveStore
+- ✅ Redux code removed
+
+#### 4. Lyrics Domain (Prior to 2026-01-11)
+- ✅ Migrated to LiveStore
+- ✅ Redux code removed
+
+#### 5. Playlists Domain (Prior to 2026-01-11)
+- ✅ Migrated to LiveStore
+- ✅ Redux infrastructure removed
+- **Commit**: `74e3d1f3`
+
+### 🔄 In Progress Domains
+
+*None currently - ready for next domain*
+
+### ⏳ Remaining Domains
+
+#### 6. Search Domain
+- ❌ Not started
+- **Complexity**: Medium
+- **Estimated effort**: 1-2 days
+
+#### 7. Media Collection Domain
+- ❌ Not started
+- **Complexity**: High (most complex)
+- **Estimated effort**: 3-5 days
+- **Note**: Includes normalization of artist/album data
+
+#### 8. P2P Domain (if used)
+- ❌ Not started
+- **Complexity**: Medium
+- **Estimated effort**: 1-2 days
+
+### 📊 Overall Progress
+
+| Domain | Status | Components | Redux Removed | Tests |
+|--------|--------|------------|---------------|-------|
+| Queue | ✅ Complete | 9 files | ✅ Yes | ⏳ Pending |
+| Settings | ✅ Complete | Shared with queue | ✅ Yes | ⏳ Pending |
+| Favorites | ✅ Complete | Multiple | ✅ Yes | ⏳ Pending |
+| Lyrics | ✅ Complete | Multiple | ✅ Yes | ⏳ Pending |
+| Playlists | ✅ Complete | Multiple | ✅ Yes | ⏳ Pending |
+| Search | ⏳ Pending | TBD | ❌ No | ❌ No |
+| Collection | ⏳ Pending | TBD | ❌ No | ❌ No |
+| P2P | ⏳ Pending | TBD | ❌ No | ❌ No |
+
+**Completion**: ~62% (5/8 domains complete)
 
 ---
 
@@ -266,14 +343,14 @@ CREATE VIRTUAL TABLE media_fts USING fts5(
 **Goal**: Migrate all components from Redux to LiveStore
 
 **Migration Order** (simplest → complex):
-1. Settings
-2. Favorites
-3. Lyrics
-4. Playlists
-5. Queue
-6. Search
-7. Media Collection (most complex)
-8. P2P (if used)
+1. ✅ Settings - **COMPLETE** (2026-01-11)
+2. ✅ Favorites - **COMPLETE** 
+3. ✅ Lyrics - **COMPLETE**
+4. ✅ Playlists - **COMPLETE**
+5. ✅ Queue - **COMPLETE** (2026-01-11)
+6. ⏳ Search - **NEXT**
+7. ⏳ Media Collection (most complex) - **AFTER SEARCH**
+8. ⏳ P2P (if used) - **AFTER COLLECTION**
 
 **Pattern**:
 ```typescript
@@ -296,6 +373,11 @@ const { data: media } = useMedia(filters)
 - ✅ Redux code removed
 - ✅ Service code removed
 - ✅ Tests pass
+
+**Progress**:
+- ✅ 5 of 8 domains complete (62%)
+- ✅ Queue & Settings: All runtime errors fixed, app starts successfully
+- ⏳ Next: Search domain migration
 
 ---
 
