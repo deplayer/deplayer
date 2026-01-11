@@ -3,6 +3,38 @@ import { mediaEvents } from '../events/media'
 import { IMedia } from '../../../entities/Media'
 
 /**
+ * Normalize media object to match LiveStore event schema
+ * Handles differences between IMedia structure and event schema
+ */
+function normalizeMediaForLiveStore(media: IMedia): any {
+  return {
+    id: media.id,
+    title: media.title,
+    artist: {
+      id: media.artist.id,
+      name: media.artist.name,
+    },
+    album: {
+      id: media.album.id,
+      name: media.album.name,
+      artistId: media.album.artist?.id || media.artist.id, // album.artist.id or fallback to media.artist.id
+      thumbnailUrl: media.album.thumbnailUrl,
+      year: media.album.year,
+    },
+    type: media.type,
+    duration: media.duration,
+    track: media.track,
+    discNumber: media.discNumber,
+    stream: media.stream,
+    cover: media.cover,
+    genres: media.genres || [],
+    externalId: media.externalId,
+    shareUrl: media.shareUrl,
+    filePath: media.filePath,
+  }
+}
+
+/**
  * Add a single media item to the collection
  */
 export async function addMediaAction(
@@ -13,7 +45,8 @@ export async function addMediaAction(
     throw new Error('Media must have an id')
   }
   
-  await store.commit(mediaEvents.mediaAdded(media as any))
+  const normalized = normalizeMediaForLiveStore(media)
+  await store.commit(mediaEvents.mediaAdded(normalized))
 }
 
 /**
@@ -38,10 +71,11 @@ export async function addMediaBulkAction(
   
   console.log(`[LiveStore] Adding ${validMedia.length}/${mediaItems.length} valid media items`)
   
-  // Commit events in a batch for better performance
-  const eventPromises = validMedia.map(media => 
-    store.commit(mediaEvents.mediaAdded(media as any))
-  )
+  // Normalize and commit events in a batch for better performance
+  const eventPromises = validMedia.map(media => {
+    const normalized = normalizeMediaForLiveStore(media)
+    return store.commit(mediaEvents.mediaAdded(normalized))
+  })
   
   await Promise.all(eventPromises)
 }
