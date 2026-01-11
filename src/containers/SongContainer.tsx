@@ -26,8 +26,6 @@ export default connect(
   (state: any) => {
     return {
       collection: state.collection,
-      settings: state.settings,
-      queue: state.queue,
       player: state.player,
       loading: state.collection.loading,
     }

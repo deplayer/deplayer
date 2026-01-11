@@ -21,10 +21,10 @@ import { getStreamUri } from '../../services/Song/StreamUriService'
 import IAlbum from '../../entities/Album'
 import ServiceIcon from '../ServiceIcon'
 import Media from '../../entities/Media'
-import { State as QueueState } from '../../reducers/queue'
 import { State as CollectionState } from '../../reducers/collection'
 import { State as PlayerState } from '../../reducers/player'
 import FavoriteButton from '../common/FavoriteButton'
+import { useQueue } from '../../stores/livestore/hooks'
 
 const MAX_LIST_ITEMS = 25
 
@@ -33,7 +33,6 @@ type Props = {
   location: Location,
   player: PlayerState,
   collection: CollectionState,
-  queue: QueueState,
   songId: string,
   dispatch: Dispatch,
   loading: boolean,
@@ -52,9 +51,23 @@ type StreamUrl = {
   service: string;
 }
 
-const SongView = ({ songId, loading, className = '', dispatch, playerPortal, player, queue, collection }: Props) => {
+const SongView = ({ songId, loading, className = '', dispatch, playerPortal, player, collection }: Props) => {
   const navigate = useNavigate()
-  const { trackIds, currentPlaying } = queue
+  const liveQueue = useQueue('default')
+  
+  // Helper to parse trackIds from LiveStore (can be JSON string or array)
+  const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
+    if (!ids) return []
+    if (Array.isArray(ids)) return ids
+    try {
+      return JSON.parse(ids)
+    } catch {
+      return []
+    }
+  }
+  
+  const trackIds = parseTrackIds(liveQueue?.trackIds)
+  const currentPlaying = liveQueue?.currentPlaying || null
 
   const { rows, albums, albumsByArtist, songsByGenre } = collection
 
