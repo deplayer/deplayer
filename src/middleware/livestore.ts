@@ -9,7 +9,7 @@
 
 import { Middleware } from 'redux'
 import { Store as LiveStore } from '@livestore/livestore'
-import { addMediaAction } from '../stores/livestore/actions'
+import { addMediaAction, addMediaBulkAction } from '../stores/livestore/actions'
 import * as types from '../constants/ActionTypes'
 
 let liveStoreInstance: LiveStore | null = null
@@ -38,6 +38,17 @@ export const livestoreMiddleware: Middleware = (store) => (next) => async (actio
           type: types.MEDIA_ADDED_TO_LIVESTORE,
           media: action.media
         })
+        break
+      }
+      
+      case types.RECEIVE_COLLECTION: {
+        // When providers fetch media, it dispatches RECEIVE_COLLECTION
+        // We need to add all that media to LiveStore
+        if (action.data && Array.isArray(action.data) && action.data.length > 0) {
+          console.log('[LiveStore] Syncing', action.data.length, 'media items to LiveStore')
+          await addMediaBulkAction(liveStoreInstance, action.data)
+          console.log('[LiveStore] Successfully synced', action.data.length, 'media items')
+        }
         break
       }
       
