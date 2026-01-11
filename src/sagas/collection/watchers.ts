@@ -4,6 +4,7 @@ import { saveToDbWorker } from "./workers";
 import { getAdapter } from "../../services/database";
 import { getLiveStoreInstance } from "../../App";
 import { initializeSettingsAction } from "../../stores/livestore/actions/settings";
+import { addMediaBulkAction } from "../../stores/livestore/actions/media";
 import CollectionService from "../../services/CollectionService";
 import * as types from "../../constants/ActionTypes";
 import { createLogger } from "../../utils/logger";
@@ -42,8 +43,10 @@ export function* initializeWatcher(): Generator<any, void, any> {
       yield call(adapter.getDb);
       logger.debug("Database initialized successfully");
 
-      // Initialize settings via LiveStore
+      // Get LiveStore instance for dual-write pattern
       const liveStore = getLiveStoreInstance();
+      
+      // Initialize settings via LiveStore
       if (liveStore) {
         logger.debug("Initializing LiveStore settings...");
         yield call(initializeSettingsAction, liveStore);
@@ -58,11 +61,28 @@ export function* initializeWatcher(): Generator<any, void, any> {
       const collection = yield call(collectionService.getAll);
       const mappedData = collection.map((elem: any) => elem);
 
-      // If collection is empty, show empty state
+      // Dual-write pattern: Write to both Redux AND LiveStore
       if (mappedData.length === 0) {
+        // Empty collection
         yield put({ type: types.RECEIVE_COLLECTION, data: [] });
+        logger.debug("Collection is empty - no data to sync to LiveStore");
       } else {
+        // Write to Redux (existing behavior)
         yield put({ type: types.RECEIVE_COLLECTION, data: mappedData });
+        
+        // Also write to LiveStore for dual-write migration
+        if (liveStore) {
+          logger.info(`Syncing ${mappedData.length} media items to LiveStore...`);
+          try {
+            yield call(addMediaBulkAction, liveStore, mappedData);
+            logger.info("Collection synced to LiveStore successfully");
+          } catch (liveStoreError: any) {
+            logger.error("Failed to sync collection to LiveStore:", liveStoreError);
+            // Continue anyway - Redux has the data
+          }
+        } else {
+          logger.warn("LiveStore not available - collection only in Redux");
+        }
       }
 
       yield put({ type: types.INITIALIZED });
