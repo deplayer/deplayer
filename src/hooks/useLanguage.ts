@@ -1,14 +1,13 @@
 import { useEffect } from 'react'
-import { useSelector } from 'react-redux'
 import { setLocale } from 'react-redux-i18n'
 import { useDispatch } from 'react-redux'
 import LanguageDetector from '../services/language/LanguageDetector'
-import type { State } from '../reducers/settings'
 import type { Dispatch, Action } from 'redux'
+import { useSettings } from '../stores/livestore/hooks'
 
 export const useLanguage = () => {
   const dispatch = useDispatch<Dispatch>()
-  const settings = useSelector((state: { settings: State }) => state.settings.settings)
+  const settings = useSettings()
   
   useEffect(() => {
     // Default to system language if settings structure is incomplete

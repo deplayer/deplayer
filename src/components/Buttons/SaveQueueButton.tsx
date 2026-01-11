@@ -1,19 +1,33 @@
 import { Translate } from 'react-redux-i18n'
-import { connect } from 'react-redux'
 import Icon from '../common/Icon'
 import Button from '../common/Button'
 import { useStore } from '@livestore/react'
 import { createPlaylistAction } from '../../stores/livestore/actions/playlists'
 import { reorderPlaylistAction } from '../../stores/livestore/actions/playlists'
+import { useQueue } from '../../stores/livestore/hooks'
 
 type Props = {
-  queue: any,
   className?: string
 }
 
 const SaveQueueButton = (props: Props) => {
   const { store: liveStore } = useStore()
-  const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
+  const liveQueue = useQueue('default')
+  
+  // Parse trackIds from LiveStore queue (can be JSON string or array)
+  const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
+    if (!ids) return []
+    if (Array.isArray(ids)) return ids
+    try {
+      return JSON.parse(ids)
+    } catch {
+      return []
+    }
+  }
+  
+  const trackIds = liveQueue?.shuffle 
+    ? parseTrackIds(liveQueue.randomTrackIds)
+    : parseTrackIds(liveQueue?.trackIds)
   
   if (!trackIds.length) {
     return null
@@ -47,8 +61,4 @@ const SaveQueueButton = (props: Props) => {
   )
 }
 
-export default connect(
-  (state: { queue: any }) => ({
-    queue: state.queue
-  })
-)(SaveQueueButton)
+export default SaveQueueButton

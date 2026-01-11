@@ -14,6 +14,13 @@ precacheAndRoute(self.__WB_MANIFEST);
 
 self.addEventListener("fetch", async (event) => {
   const url = new URL(event.request.url);
+  
+  // Bypass service worker for LiveStore endpoint requests
+  // LiveStore uses /_livestore for syncing - let browser handle it directly
+  if (url.origin === self.origin && url.pathname.startsWith("/_livestore")) {
+    return; // No service worker intervention
+  }
+  
   if (url.origin === self.origin && url.pathname.startsWith("/opfs-")) {
     event.respondWith(handleOpfsRequest(url.pathname));
   }

@@ -14,19 +14,36 @@ import * as types from '../../constants/ActionTypes'
 import Controls from './Controls'
 import { State as AppState } from '../../reducers/app'
 import { State as PlayerState } from '../../reducers/player'
-import { State as QueueState } from '../../reducers/queue'
+import { useQueue } from '../../stores/livestore/hooks'
 
 const MENU_ID = 'context-menu-player'
 
 type MenuProps = {
   app: AppState,
   player: PlayerState,
-  queue: QueueState,
   dispatch: Dispatch,
   volume: number,
 }
 
 const ContextualMenu = (props: MenuProps) => {
+  // Get queue from LiveStore
+  const liveQueue = useQueue('default')
+  
+  // Parse trackIds from LiveStore queue (can be JSON string or array)
+  const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
+    if (!ids) return []
+    if (Array.isArray(ids)) return ids
+    try {
+      return JSON.parse(ids)
+    } catch {
+      return []
+    }
+  }
+  
+  const trackIds = liveQueue?.shuffle 
+    ? parseTrackIds(liveQueue.randomTrackIds)
+    : parseTrackIds(liveQueue?.trackIds)
+  
   const TogglePlayer = () => {
     return (
       <Button alignLeft transparent fullWidth onClick={() => props.dispatch({ type: types.HIDE_PLAYER })}>
@@ -50,7 +67,6 @@ const ContextualMenu = (props: MenuProps) => {
 
   const showFullscreen = props.player.playing
   const showVisibilityCons = false
-  const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
   const showStartPlaying = trackIds.length && !props.player.playing
 
   const { show } = useContextMenu({
@@ -196,7 +212,7 @@ const ContextualMenu = (props: MenuProps) => {
                   </div>
                   <input
                     type="checkbox"
-                    checked={props.queue.shuffle}
+                    checked={liveQueue?.shuffle || false}
                     readOnly
                     className="toggle toggle-primary toggle-sm"
                   />
@@ -219,7 +235,7 @@ const ContextualMenu = (props: MenuProps) => {
                   </div>
                   <input
                     type="checkbox"
-                    checked={props.queue.repeat}
+                    checked={liveQueue?.repeat || false}
                     readOnly
                     className="toggle toggle-primary toggle-sm"
                   />

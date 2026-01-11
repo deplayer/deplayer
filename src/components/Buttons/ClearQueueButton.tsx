@@ -1,25 +1,41 @@
 import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
-import { connect } from 'react-redux'
 import Icon from '../common/Icon'
 
 import { CLEAR_QUEUE } from '../../constants/ActionTypes'
 import Button from '../common/Button'
+import { useQueue } from '../../stores/livestore/hooks'
+import { useDispatch } from 'react-redux'
 
 type Props = {
-  dispatch: Dispatch,
-  queue: any,
   className?: string
 }
 
 const ClearQueueButton = (props: Props) => {
-  const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
-  if (!trackIds) {
+  const dispatch = useDispatch<Dispatch>()
+  const liveQueue = useQueue('default')
+  
+  // Parse trackIds from LiveStore queue (can be JSON string or array)
+  const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
+    if (!ids) return []
+    if (Array.isArray(ids)) return ids
+    try {
+      return JSON.parse(ids)
+    } catch {
+      return []
+    }
+  }
+  
+  const trackIds = liveQueue?.shuffle 
+    ? parseTrackIds(liveQueue.randomTrackIds)
+    : parseTrackIds(liveQueue?.trackIds)
+    
+  if (!trackIds || trackIds.length === 0) {
     return null
   }
 
   const clearQueue = () => {
-    props.dispatch({ type: CLEAR_QUEUE })
+    dispatch({ type: CLEAR_QUEUE })
   }
 
   return (
@@ -34,8 +50,4 @@ const ClearQueueButton = (props: Props) => {
   )
 }
 
-export default connect(
-  (state: { queue: any }) => ({
-    queue: state.queue
-  })
-)(ClearQueueButton)
+export default ClearQueueButton
