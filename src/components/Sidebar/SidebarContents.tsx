@@ -19,9 +19,9 @@ import Icon from '../common/Icon'
 import { State as CollectionState } from '../../reducers/collection'
 import { State as QueueState } from '../../reducers/queue'
 import { State as AppState } from '../../reducers/app'
-import { State as PlaylistsState } from '../../reducers/playlist'
 import { useLocation } from 'react-router'
 import DeplayerTitle from '../DeplayerTitle'
+import { usePlaylists, useSmartPlaylists } from '../../stores/livestore/hooks'
 
 import LogoSvg from '../../logo.svg?react'
 
@@ -30,7 +30,6 @@ type ContentProps = {
   collection: CollectionState,
   queue: QueueState,
   app: AppState,
-  playlist: PlaylistsState,
   onSetSidebarOpen: Function,
   className?: string
 }
@@ -78,6 +77,11 @@ const DeplayerLogo = () => {
 const SidebarContents = (props: ContentProps) => {
   const location = useLocation()
   const navigate = useNavigate()
+  
+  // Get playlists from LiveStore
+  const playlists = usePlaylists()
+  const smartPlaylists = useSmartPlaylists()
+  const totalPlaylists = playlists.length + smartPlaylists.length
 
   return (
     <div className={`flex flex-col h-full bg-base-100 ${props.className || ''}`} onClick={() => props.onSetSidebarOpen(true)}>
@@ -102,7 +106,7 @@ const SidebarContents = (props: ContentProps) => {
         />
         <PlaylistsMenuItem 
           current={inSection(location, 'playlists')} 
-          totalItems={props.playlist.playlists.length} 
+          totalItems={totalPlaylists} 
         />
         <CollectionMenuItem
           current={inSection(location, 'collection')}

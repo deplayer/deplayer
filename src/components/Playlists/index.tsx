@@ -1,16 +1,14 @@
 import Playlist from './Playlist'
 import EmptyState from '../common/EmptyState/index'
-import { State as PlaylistState } from '../../reducers/playlist'
 import { State as QueueState } from '../../reducers/queue'
 import { State as SettingsState } from '../../reducers/settings'
 import { Link } from 'react-router-dom'
 import Icon from '../common/Icon'
 import { Translate } from 'react-redux-i18n'
 import { memo, useMemo } from 'react'
-import { useMediaMap, useSongsByGenre } from '../../stores/livestore/hooks'
+import { useMediaMap, useSongsByGenre, usePlaylists, useSmartPlaylists } from '../../stores/livestore/hooks'
 
 type Props = {
-  playlist: PlaylistState,
   queue: QueueState,
   settings?: SettingsState,
   dispatch: any
@@ -65,9 +63,10 @@ const PlaylistSection = memo(({ title, playlists, dispatch }: {
 
 const Playlists = memo((props: Props) => {
   const { queue, settings } = props
-  const { playlists, smartPlaylists } = props.playlist
   
-  // LiveStore hooks
+  // LiveStore hooks - get playlists and smart playlists
+  const playlists = usePlaylists()
+  const smartPlaylists = useSmartPlaylists()
   const mediaMap = useMediaMap()
   const songsByGenre = useSongsByGenre()
   
@@ -76,6 +75,18 @@ const Playlists = memo((props: Props) => {
   const hasSearchableProviders = settings?.settings?.providers ? 
     Object.values(settings.settings.providers).some(provider => provider.enabled) : 
     false
+
+  // Transform LiveStore playlists to match component expectations
+  const transformedPlaylists = useMemo(() => 
+    playlists.map((playlist: any) => ({
+      _id: playlist.id,
+      id: playlist.id,
+      name: playlist.name,
+      trackIds: typeof playlist.trackIds === 'string' 
+        ? JSON.parse(playlist.trackIds) 
+        : (playlist.trackIds || [])
+    }))
+  , [playlists]);
 
   // Memoize genre playlists generation
   const genrePlaylists: PlaylistType[] = useMemo(() => 
@@ -95,7 +106,7 @@ const Playlists = memo((props: Props) => {
 
   // Memoize smart playlists transformation
   const transformedSmartPlaylists = useMemo(() => 
-    smartPlaylists.map(playlist => ({
+    smartPlaylists.map((playlist: any) => ({
       _id: playlist.id,
       id: playlist.id,
       name: playlist.name,
@@ -104,7 +115,7 @@ const Playlists = memo((props: Props) => {
     }))
   , [smartPlaylists, songsByGenre]);
 
-  if (!playlists.length && !smartPlaylists.length && !genrePlaylists.length) {
+  if (!transformedPlaylists.length && !transformedSmartPlaylists.length && !genrePlaylists.length) {
     let emptyStateProps: EmptyStateProps = {
       icon: "faCompactDisc",
       title: "message.noPlaylists",
@@ -151,7 +162,7 @@ const Playlists = memo((props: Props) => {
   return (
     <div className='playlists z-10 flex flex-col w-full overflow-y-auto h-full py-6'>
       <PlaylistSection 
-        playlists={playlists} 
+        playlists={transformedPlaylists} 
         dispatch={props.dispatch}
       />
       <PlaylistSection 

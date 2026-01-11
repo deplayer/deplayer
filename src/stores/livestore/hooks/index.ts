@@ -43,6 +43,12 @@ export {
   usePlaylistTracks,
 } from './usePlaylists'
 
+// Smart Playlist hooks
+export {
+  useSmartPlaylists,
+  useSmartPlaylistById,
+} from './useSmartPlaylists'
+
 // Queue hooks
 export {
   useQueue,

@@ -4,7 +4,6 @@ import { State as PlayerState } from './player'
 import app, { State as AppState } from './app'
 import artist, { State as ArtistState } from './artist'
 import player from './player'
-import playlist, { State as PlaylistState } from './playlist'
 import collection, { State as CollectionState } from './collection'
 import connection, { State as ConnectionState } from './connection'
 import search, { State as SearchState } from './search'
@@ -19,7 +18,6 @@ export type State = {
   collection: CollectionState
   connection: ConnectionState
   player: PlayerState
-  playlist: PlaylistState
   queue: QueueState
   search: SearchState
   settings: SettingsState
@@ -33,7 +31,6 @@ const reducers = {
   collection,
   connection,
   player,
-  playlist,
   queue,
   search,
   settings,

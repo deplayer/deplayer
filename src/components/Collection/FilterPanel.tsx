@@ -2,11 +2,12 @@ import Select from 'react-select'
 import { Filter } from '../../contexts/UIContext'
 import Button from '../common/Button'
 import { Dispatch } from 'redux'
-import * as actionTypes from '../../constants/ActionTypes'
 import Icon from '../common/Icon'
 import Modal from '../common/Modal'
 import { useState, useEffect } from 'react'
 import { useUI } from '../../contexts/UIContext'
+import { useStore } from '@livestore/react'
+import { createSmartPlaylistAction } from '../../stores/livestore/actions/smartPlaylists'
 
 interface MediaItem {
   genres?: string[];
@@ -26,11 +27,12 @@ interface Collection {
 
 type Props = {
   collection: Collection;
-  dispatch: Dispatch;
+  dispatch?: Dispatch;
 }
 
-const FilterPanel = ({ collection, dispatch }: Props) => {
+const FilterPanel = ({ collection }: Props) => {
   const { activeFilters, setFilter } = useUI()
+  const { store: liveStore } = useStore()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
@@ -189,18 +191,21 @@ const FilterPanel = ({ collection, dispatch }: Props) => {
     }),
   }
 
-  const handleSaveSmartPlaylist = () => {
+  const handleSaveSmartPlaylist = async () => {
+    if (!liveStore) return
+    
     const name = window.prompt('Enter a name for this smart playlist:')
-    if (name) {
-      dispatch({
-        type: actionTypes.SAVE_SMART_PLAYLIST,
-        playlist: {
-          id: crypto.randomUUID(),
-          name,
-          filters: activeFilters,
-          createdAt: new Date()
-        }
+    if (!name) return
+    
+    try {
+      await createSmartPlaylistAction(liveStore, name, {
+        genres: activeFilters.genres,
+        types: activeFilters.types,
+        artists: activeFilters.artists,
+        providers: activeFilters.providers
       })
+    } catch (error) {
+      console.error('Failed to save smart playlist:', error)
     }
   }
 

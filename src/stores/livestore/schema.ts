@@ -2,6 +2,7 @@ import { makeSchema, State } from '@livestore/livestore'
 // Import event definitions
 import { mediaEvents } from './events/media'
 import { playlistEvents } from './events/playlist'
+import { smartPlaylistEvents } from './events/smartPlaylist'
 import { queueEvents } from './events/queue'
 import { favoriteEvents } from './events/favorites'
 import { lyricsEvents } from './events/lyrics'
@@ -169,6 +170,17 @@ export const tables = {
       updatedAt: State.SQLite.integer({}),
     },
   }),
+
+  // Smart Playlists table
+  smartPlaylists: State.SQLite.table({
+    name: 'smart_playlists',
+    columns: {
+      id: State.SQLite.text({ primaryKey: true }),
+      name: State.SQLite.text({}),
+      filters: State.SQLite.json({}), // { genres: [], types: [], artists: [], providers: [] }
+      createdAt: State.SQLite.integer({}),
+    },
+  }),
 }
 
 // ============================================================================
@@ -179,6 +191,7 @@ export const events = {
   ...settingsEvents,
   ...mediaEvents,
   ...playlistEvents,
+  ...smartPlaylistEvents,
   ...queueEvents,
   ...favoriteEvents,
   ...lyricsEvents,
@@ -578,6 +591,23 @@ const materializers = State.SQLite.materializers(events, {
 
   'v1.LyricsRemoved': ({ mediaId }: { mediaId: string }) => {
     return tables.lyrics.delete().where('mediaId', '=', mediaId)
+  },
+
+  // Smart Playlist materializers
+  'v1.SmartPlaylistCreated': ({ id, name, filters }: any) => {
+    const now = Date.now()
+    return tables.smartPlaylists
+      .insert({
+        id,
+        name,
+        filters,
+        createdAt: now,
+      })
+      .onConflict('id', 'ignore')
+  },
+
+  'v1.SmartPlaylistDeleted': ({ smartPlaylistId }: { smartPlaylistId: string }) => {
+    return tables.smartPlaylists.delete().where('id', '=', smartPlaylistId)
   },
 })
 

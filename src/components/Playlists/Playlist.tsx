@@ -13,6 +13,7 @@ import { Dispatch } from 'redux'
 import { useMediaMap } from '../../stores/livestore/hooks'
 import { useStore } from '@livestore/react'
 import { playAllAction, addToQueueAction } from '../../stores/livestore/actions'
+import { deleteSmartPlaylistAction } from '../../stores/livestore/actions/smartPlaylists'
 
 type Props = {
   playlist: {
@@ -107,12 +108,15 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
     navigate('/collection')
   }, [playlist.filters, dispatch, navigate])
 
-  const handleDeletePlaylist = useCallback(() => {
-    dispatch({
-      type: types.DELETE_SMART_PLAYLIST,
-      id: playlist.id
-    })
-  }, [playlist.id, dispatch])
+  const handleDeletePlaylist = useCallback(async () => {
+    if (!liveStore || !playlist.id) return
+    
+    try {
+      await deleteSmartPlaylistAction(liveStore, playlist.id)
+    } catch (error) {
+      console.error('Failed to delete smart playlist:', error)
+    }
+  }, [liveStore, playlist.id])
 
   const tracksWithCovers = useMemo(() => {
     const tracks = playlist.trackIds.map(id => mediaMap[id])

@@ -5,7 +5,6 @@ import { State } from '../reducers'
 export default connect(
   (state: State) => ({
     queue: state.queue,
-    playlist: state.playlist,
     settings: state.settings
   })
 )(Playlists)

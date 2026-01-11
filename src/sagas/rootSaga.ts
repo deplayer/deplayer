@@ -7,7 +7,6 @@ import mediaSessionSaga from "./mediaSession";
 import wakeLock from "./wakeLock";
 import notificationsSaga from "./notifications";
 import playerSaga from "./player";
-import playlistSaga from "./playlist";
 import providersSaga from "./providers";
 import queueSaga from "./queue";
 import searchSaga from "./search";
@@ -27,7 +26,6 @@ function* rootSaga(store: any) {
     wakeLock(store),
     notificationsSaga(store),
     playerSaga(),
-    playlistSaga(),
     providersSaga(),
     queueSaga(),
     searchSaga(),

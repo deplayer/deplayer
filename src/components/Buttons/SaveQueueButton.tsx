@@ -1,26 +1,38 @@
-import { Dispatch } from 'redux'
 import { Translate } from 'react-redux-i18n'
 import { connect } from 'react-redux'
 import Icon from '../common/Icon'
-
-import { SAVE_PLAYLIST } from '../../constants/ActionTypes'
 import Button from '../common/Button'
+import { useStore } from '@livestore/react'
+import { createPlaylistAction } from '../../stores/livestore/actions/playlists'
+import { reorderPlaylistAction } from '../../stores/livestore/actions/playlists'
 
 type Props = {
-  dispatch: Dispatch,
   queue: any,
   className?: string
 }
 
 const SaveQueueButton = (props: Props) => {
+  const { store: liveStore } = useStore()
   const trackIds = props.queue.shuffle ? props.queue.randomTrackIds : props.queue.trackIds
+  
   if (!trackIds.length) {
     return null
   }
 
-  const saveQueue = () => {
+  const saveQueue = async () => {
+    if (!liveStore) return
+    
     const playlistName = window.prompt('Set playlist name')
-    props.dispatch({ type: SAVE_PLAYLIST, name: playlistName })
+    if (!playlistName) return
+    
+    try {
+      // Create playlist with tracks from queue
+      const playlistId = await createPlaylistAction(liveStore, playlistName)
+      // Add all tracks to the playlist
+      await reorderPlaylistAction(liveStore, playlistId, trackIds)
+    } catch (error) {
+      console.error('Failed to save queue as playlist:', error)
+    }
   }
 
   return (
