@@ -1,6 +1,6 @@
 import ReactPlayer from "react-player";
-import { store } from "../store/configureStore";
 import { createLogger } from "../utils/logger";
+import { getLiveStoreInstance } from "../middleware/livestore";
 
 declare global {
   interface HTMLMediaElement {
@@ -34,8 +34,15 @@ class PlayerRefService {
   }
 
   getCurrentPlayingId(): string | null {
-    const state = store.getState();
-    return state.queue.currentPlaying;
+    // Get current playing from LiveStore queue
+    const liveStore = getLiveStoreInstance()
+    if (!liveStore) return null
+    
+    const result = liveStore.query({
+      query: `SELECT currentPlaying FROM queue WHERE id = ?`,
+      bindValues: { 1: 'default' }
+    }) as any[]
+    return result[0]?.currentPlaying || null;
   }
 
   getCurrentMedia() {

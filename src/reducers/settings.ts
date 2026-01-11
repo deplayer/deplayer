@@ -1,6 +1,8 @@
-import * as types from "../constants/ActionTypes";
+// DEPRECATED: This file is kept only for type compatibility during migration
+// Settings functionality has been migrated to LiveStore
+// Components should use LiveStore hooks instead: useSettings()
+
 import SettingsBuilder from "../services/settings/SettingsBuilder";
-import providerBuilders from "../services/settings/providers";
 
 type ProviderSettings = {
   enabled: boolean;
@@ -79,90 +81,4 @@ export const defaultState: State = {
       },
     },
   },
-};
-
-// Helper to get next available provider ID
-const getNextProviderId = (providers: State['settings']['providers'], baseKey: string) => {
-  const existingKeys = Object.keys(providers)
-    .filter(key => key.startsWith(baseKey))
-    .map(key => {
-      const num = key.replace(baseKey, '');
-      return num ? parseInt(num, 10) : 0;
-    })
-    .sort((a, b) => a - b);
-
-  const nextNum = existingKeys.length > 0 ? existingKeys[existingKeys.length - 1] + 1 : 0;
-  return `${baseKey}${nextNum}`;
-};
-
-export default (state: State = defaultState, action: any = {}) => {
-  switch (action.type) {
-    case types.RECEIVE_SETTINGS:
-    case types.SETTINGS_SAVED_SUCCESSFULLY: {
-      const settingsForm = settingsBuilder.getFormSchema(
-        action.settings?.providers || state.settings.providers
-      );
-
-      return {
-        ...state,
-        settingsForm,
-        settings: action.settings || state.settings,
-      };
-    }
-
-    case types.ADD_PROVIDER: {
-      const providerBuilder = providerBuilders[action.providerKey];
-      if (!providerBuilder) {
-        return state;
-      }
-
-      // For non-repeatable providers, use the base key
-      const providerId = providerBuilder.isRepeatable ? 
-        getNextProviderId(state.settings.providers, action.providerKey) : 
-        action.providerKey;
-      
-      const settings = {
-        ...state.settings,
-        providers: {
-          ...state.settings.providers,
-          [providerId]: {
-            enabled: false
-          }
-        }
-      };
-
-      const settingsForm = settingsBuilder.getFormSchema(settings.providers);
-
-      return {
-        ...state,
-        settingsForm,
-        settings
-      };
-    }
-
-    case types.REMOVE_PROVIDER: {
-      // Create new objects to avoid mutation
-      const newProviders = { ...state.settingsForm.providers };
-      delete newProviders[action.providerKey];
-
-      const newSettings = {
-        ...state.settings,
-        providers: {
-          ...state.settings.providers
-        }
-      };
-      delete newSettings.providers[action.providerKey];
-
-      const settingsForm = settingsBuilder.getFormSchema(newSettings.providers);
-
-      return {
-        ...state,
-        settingsForm,
-        settings: newSettings
-      };
-    }
-
-    default:
-      return state;
-  }
 };

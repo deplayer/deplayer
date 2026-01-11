@@ -3,9 +3,7 @@ import { AnyAction } from "redux";
 import { State as RootState } from "../reducers";
 import { State as CollectionState, defaultState as collectionDefaultState } from "../reducers/collection";
 import { State as SearchState, defaultState as searchDefaultState } from "../reducers/search";
-import { State as QueueState, defaultState as queueDefaultState } from "../reducers/queue";
 import { State as PlayerState, defaultState as playerDefaultState } from "../reducers/player";
-import { State as SettingsState, defaultState as settingsDefaultState } from "../reducers/settings";
 import { State as AppState, defaultState as appDefaultState } from "../reducers/app";
 import { State as ArtistState, defaultState as artistDefaultState } from "../reducers/artist";
 import { State as ConnectionState, defaultState as connectionDefaultState } from "../reducers/connection";
@@ -18,9 +16,7 @@ export const createDefaultState = (): RootState => ({
   collection: collectionDefaultState as CollectionState,
   connection: connectionDefaultState as ConnectionState,
   player: playerDefaultState as PlayerState,
-  queue: queueDefaultState as QueueState,
   search: searchDefaultState as SearchState,
-  settings: settingsDefaultState as SettingsState,
   peers: {
     peers: {},
     error: null,

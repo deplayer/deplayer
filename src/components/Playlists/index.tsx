@@ -1,16 +1,12 @@
 import Playlist from './Playlist'
 import EmptyState from '../common/EmptyState/index'
-import { State as QueueState } from '../../reducers/queue'
-import { State as SettingsState } from '../../reducers/settings'
 import { Link } from 'react-router-dom'
 import Icon from '../common/Icon'
 import { Translate } from 'react-redux-i18n'
 import { memo, useMemo } from 'react'
-import { useMediaMap, useSongsByGenre, usePlaylists, useSmartPlaylists } from '../../stores/livestore/hooks'
+import { useMediaMap, useSongsByGenre, usePlaylists, useSmartPlaylists, useQueue, useSettings } from '../../stores/livestore/hooks'
 
 type Props = {
-  queue: QueueState,
-  settings?: SettingsState,
   dispatch: any
 }
 
@@ -62,18 +58,33 @@ const PlaylistSection = memo(({ title, playlists, dispatch }: {
 });
 
 const Playlists = memo((props: Props) => {
-  const { queue, settings } = props
-  
-  // LiveStore hooks - get playlists and smart playlists
+  // LiveStore hooks - get playlists, smart playlists, queue, and settings
   const playlists = usePlaylists()
   const smartPlaylists = useSmartPlaylists()
   const mediaMap = useMediaMap()
   const songsByGenre = useSongsByGenre()
+  const liveQueue = useQueue('default')
+  const liveSettings = useSettings()
   
-  const hasQueueItems = queue.trackIds.length > 0
+  // Parse trackIds from LiveStore queue (can be JSON string or array)
+  const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
+    if (!ids) return []
+    if (Array.isArray(ids)) return ids
+    try {
+      return JSON.parse(ids)
+    } catch {
+      return []
+    }
+  }
+  
+  const queueTrackIds = liveQueue?.shuffle 
+    ? parseTrackIds(liveQueue.randomTrackIds)
+    : parseTrackIds(liveQueue?.trackIds)
+  
+  const hasQueueItems = queueTrackIds.length > 0
   const hasCollectionItems = Object.keys(mediaMap).length > 0
-  const hasSearchableProviders = settings?.settings?.providers ? 
-    Object.values(settings.settings.providers).some(provider => provider.enabled) : 
+  const hasSearchableProviders = liveSettings?.providers ? 
+    Object.values(liveSettings.providers).some((provider: any) => provider.enabled) : 
     false
 
   // Transform LiveStore playlists to match component expectations

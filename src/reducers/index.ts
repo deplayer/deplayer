@@ -7,8 +7,6 @@ import player from './player'
 import collection, { State as CollectionState } from './collection'
 import connection, { State as ConnectionState } from './connection'
 import search, { State as SearchState } from './search'
-import settings, { State as SettingsState } from './settings'
-import queue, { State as QueueState } from './queue'
 import peers, { State as PeerState } from "./peers";
 import rooms, { State as RoomsState } from "./rooms";
 
@@ -18,9 +16,7 @@ export type State = {
   collection: CollectionState
   connection: ConnectionState
   player: PlayerState
-  queue: QueueState
   search: SearchState
-  settings: SettingsState
   peers: PeerState
   rooms: RoomsState
 }
@@ -31,9 +27,7 @@ const reducers = {
   collection,
   connection,
   player,
-  queue,
   search,
-  settings,
   peers,
   i18n: i18nReducer,
   rooms,

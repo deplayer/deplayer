@@ -28,7 +28,6 @@ describe('MusicTable', () => {
       tableIds: ['song1', 'song2'],
       error: '',
       dispatch: vi.fn(),
-      queue: defaultState.queue,
       app: {
         ready: true,
         backgroundImage: '',

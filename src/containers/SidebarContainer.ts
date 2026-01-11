@@ -9,7 +9,6 @@ export default connect((state: State) => {
     loading: state.search.loading,
     collection: state.collection,
     app: state.app,
-    queue: state.queue,
     player: state.player,
     sidebarToggled: state.app.sidebarToggled
   }

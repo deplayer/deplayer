@@ -7,9 +7,9 @@ import Icon from '../components/common/Icon'
 import Topbar from '../components/Topbar/Topbar'
 import { State as CollectionState } from '../reducers/collection'
 import { State as SearchState } from '../reducers/search'
-import { State as QueueState } from '../reducers/queue'
 import { State as AppState } from '../reducers/app'
 import * as types from '../constants/ActionTypes'
+import { useQueue } from '../stores/livestore/hooks'
 
 type TitleCollection = {
   rows: any
@@ -137,7 +137,6 @@ const dynamicTitle = (
 interface TopbarWrapperProps {
   collection: CollectionState,  
   search: SearchState,
-  queue: QueueState,
   app: AppState,
   dispatch: Dispatch,
   children?: React.ReactNode,
@@ -148,7 +147,24 @@ interface TopbarWrapperProps {
 const TopbarWrapper = (props: TopbarWrapperProps) => {
   const location = useLocation()
   const title = dynamicTitle(location, props.collection, props.search.searchTerm)
-  const hasResults = props.queue.trackIds && props.queue.trackIds.length ? true : false
+  const liveQueue = useQueue('default')
+  
+  // Parse trackIds from LiveStore queue (can be JSON string or array)
+  const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
+    if (!ids) return []
+    if (Array.isArray(ids)) return ids
+    try {
+      return JSON.parse(ids)
+    } catch {
+      return []
+    }
+  }
+  
+  const queueTrackIds = liveQueue?.shuffle 
+    ? parseTrackIds(liveQueue.randomTrackIds)
+    : parseTrackIds(liveQueue?.trackIds)
+  
+  const hasResults = queueTrackIds && queueTrackIds.length ? true : false
   const inHome = location.pathname === '/' ? true : false
 
   const handleSidebarToggle = (open: boolean) => {
@@ -176,6 +192,5 @@ const TopbarWrapper = (props: TopbarWrapperProps) => {
 export default connect((state: RootState) => ({
   collection: state.collection,
   search: state.search,
-  queue: state.queue,
   app: state.app
 }))(TopbarWrapper)

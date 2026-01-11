@@ -80,7 +80,6 @@ const connector = connect(
   (state: State) => {
     return {
       backgroundImage: state.app.backgroundImage,
-      queue: state.queue,
       app: state.app,
       player: state.player,
       collection: state.collection,

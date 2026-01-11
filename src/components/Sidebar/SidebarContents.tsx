@@ -17,18 +17,16 @@ import ThemeModal from './ThemeModal'
 import { inSection } from '../../utils/router'
 import Icon from '../common/Icon'
 import { State as CollectionState } from '../../reducers/collection'
-import { State as QueueState } from '../../reducers/queue'
 import { State as AppState } from '../../reducers/app'
 import { useLocation } from 'react-router'
 import DeplayerTitle from '../DeplayerTitle'
-import { usePlaylists, useSmartPlaylists } from '../../stores/livestore/hooks'
+import { usePlaylists, useSmartPlaylists, useQueue } from '../../stores/livestore/hooks'
 
 import LogoSvg from '../../logo.svg?react'
 
 type ContentProps = {
   dispatch: Dispatch,
   collection: CollectionState,
-  queue: QueueState,
   app: AppState,
   onSetSidebarOpen: Function,
   className?: string
@@ -78,10 +76,26 @@ const SidebarContents = (props: ContentProps) => {
   const location = useLocation()
   const navigate = useNavigate()
   
-  // Get playlists from LiveStore
+  // Get playlists and queue from LiveStore
   const playlists = usePlaylists()
   const smartPlaylists = useSmartPlaylists()
   const totalPlaylists = playlists.length + smartPlaylists.length
+  const liveQueue = useQueue('default')
+  
+  // Parse trackIds from LiveStore queue (can be JSON string or array)
+  const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
+    if (!ids) return []
+    if (Array.isArray(ids)) return ids
+    try {
+      return JSON.parse(ids)
+    } catch {
+      return []
+    }
+  }
+  
+  const trackIds = liveQueue?.shuffle 
+    ? parseTrackIds(liveQueue.randomTrackIds)
+    : parseTrackIds(liveQueue?.trackIds)
 
   return (
     <div className={`flex flex-col h-full bg-base-100 ${props.className || ''}`} onClick={() => props.onSetSidebarOpen(true)}>
@@ -94,10 +108,10 @@ const SidebarContents = (props: ContentProps) => {
       </div>
       <ul className='menu menu-lg w-full flex-1 overflow-y-auto'>
         <ExploreMenuItem current={inSection(location, '$')} />
-        {props.queue.trackIds.length > 0 && (
+        {trackIds.length > 0 && (
           <QueueMenuItem
             current={inSection(location, 'queue')}
-            totalItems={props.queue.trackIds.length}
+            totalItems={trackIds.length}
           />
         )}
         <SearchMenuItem
@@ -133,7 +147,7 @@ const SidebarContents = (props: ContentProps) => {
         <CommandBar 
           navigateToArtists={() => Object.keys(props.collection.artists).length > 0 ? navigate('/artists') : navigate('/collection')}
           navigateToAlbums={() => navigate('/albums')}
-          navigateToQueue={() => props.queue.trackIds.length > 0 ? navigate('/queue') : navigate('/collection')}
+          navigateToQueue={() => trackIds.length > 0 ? navigate('/queue') : navigate('/collection')}
           navigateToPlaylists={() => navigate('/playlists')}
           navigateToSettings={() => navigate('/settings')}
           navigateToExplore={() => navigate('/explore')}

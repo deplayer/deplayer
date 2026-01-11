@@ -19,6 +19,11 @@ export const setLiveStoreInstance = (store: LiveStore) => {
   liveStoreInstance = store
 }
 
+// Get the LiveStore instance
+export const getLiveStoreInstance = (): LiveStore | null => {
+  return liveStoreInstance
+}
+
 export const livestoreMiddleware: Middleware = (store) => (next) => async (action: any) => {
   // Pass action through first
   const result = next(action)

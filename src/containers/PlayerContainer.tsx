@@ -6,12 +6,9 @@ import { State } from '../reducers'
 const ConnectedPlayer = connect(
   (state: State) => ({
     app: state.app,
-    settings: state.settings,
     slim: false,
     player: state.player,
-    queue: state.queue,
-    collection: state.collection,
-    itemCount: state.queue.trackIds ? state.queue.trackIds.length : 0
+    collection: state.collection
   })
 )((props: any) => {
   const location = useLocation()
