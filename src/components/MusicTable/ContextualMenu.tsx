@@ -2,12 +2,14 @@ import { Translate } from 'react-redux-i18n'
 import React, { useEffect, useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import type { Dispatch } from 'redux'
+import { useStore } from '@livestore/react'
 
 import Button from '../common/Button'
 import Icon from '../common/Icon'
 import Media from '../../entities/Media'
 import { State as QueueState } from '../../reducers/queue'
 import * as types from '../../constants/ActionTypes'
+import { addToQueueAction, addNextAction, removeFromQueueAction } from '../../stores/livestore/actions'
 
 // Global state for active menu with better synchronization
 let activeMenuId: string | null = null;
@@ -102,6 +104,7 @@ const getAdjustedPosition = (
 
 const ContextualMenu = (props: MenuProps) => {
   const { onClick, disableAddButton, song } = props
+  const { store: liveStore } = useStore()
   const [position, setPosition] = React.useState<Position>({ x: 0, y: 0 })
   const [clickPosition, setClickPosition] = React.useState<{ x: number, y: number } | null>(null)
   const [isOpen, setIsOpen] = React.useState(false)
@@ -173,14 +176,26 @@ const ContextualMenu = (props: MenuProps) => {
     closeAllMenus()
   }, [])
 
-  const addToQueue = () => {
-    props.dispatch({ type: types.ADD_TO_QUEUE, songs: [props.song] })
-    closeMenu()
+  const addToQueue = async () => {
+    if (!liveStore) return
+    
+    try {
+      await addToQueueAction(liveStore, [props.song.id])
+      closeMenu()
+    } catch (error) {
+      console.error('Failed to add to queue:', error)
+    }
   }
 
-  const removeFromQueue = () => {
-    props.dispatch({ type: types.REMOVE_FROM_QUEUE, data: [props.song] })
-    closeMenu()
+  const removeFromQueue = async () => {
+    if (!liveStore) return
+    
+    try {
+      await removeFromQueueAction(liveStore, props.song.id)
+      closeMenu()
+    } catch (error) {
+      console.error('Failed to remove from queue:', error)
+    }
   }
 
   const removeFromDatabase = () => {
@@ -193,9 +208,23 @@ const ContextualMenu = (props: MenuProps) => {
     closeMenu()
   }
 
-  const handleAddNext = () => {
-    props.dispatch({ type: types.ADD_TO_QUEUE_NEXT, songs: [props.song] })
-    closeMenu()
+  const handleAddNext = async () => {
+    if (!liveStore) return
+    
+    try {
+      const firstTrackId = await addNextAction(liveStore, [props.song.id])
+      closeMenu()
+      
+      // Dispatch if we need to trigger playback
+      if (firstTrackId) {
+        props.dispatch({ 
+          type: types.ADD_TO_QUEUE_NEXT_COMPLETED,
+          trackId: firstTrackId 
+        })
+      }
+    } catch (error) {
+      console.error('Failed to add next:', error)
+    }
   }
 
   // Enhanced click handler with right-click support

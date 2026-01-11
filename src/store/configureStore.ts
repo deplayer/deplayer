@@ -24,6 +24,7 @@ import rootSaga from "../sagas/rootSaga";
 // Custom middlewares
 // import exports from './middlewares/exports'
 import alerts from "./middlewares/alerts";
+import { livestoreMiddleware } from "../middleware/livestore";
 
 const mql = window.matchMedia(`(min-width: 800px)`);
 const heightMql = window.matchMedia(`(min-height: 300px)`);
@@ -53,6 +54,7 @@ function configureStore() {
     promise,
     thunk,
     alerts,
+    livestoreMiddleware, // NEW: LiveStore sync middleware
     sagaMiddleware,
     routerMiddleware,
   ];

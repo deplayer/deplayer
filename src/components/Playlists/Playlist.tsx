@@ -11,6 +11,8 @@ import { applyFilters } from '../../utils/apply-filters'
 import { useNavigate } from 'react-router-dom'
 import { Dispatch } from 'redux'
 import { useMediaMap } from '../../stores/livestore/hooks'
+import { useStore } from '@livestore/react'
+import { playAllAction, addToQueueAction } from '../../stores/livestore/actions'
 
 type Props = {
   playlist: {
@@ -30,58 +32,66 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
   
   // Get all media from LiveStore
   const mediaMap = useMediaMap()
+  const { store: liveStore } = useStore()
 
-  const handlePlayAll = useCallback(() => {
-    if (isSmartPlaylist) {
-      const filteredSongIds = applyFilters(mediaMap, {
-        genres: playlist.filters?.genres || [],
-        types: playlist.filters?.types || [],
-        artists: playlist.filters?.artists || [],
-        providers: playlist.filters?.providers || [],
-        favorites: Boolean(playlist.filters?.favorites?.[0] === 'true')
-      });
-      const filteredSongs = filteredSongIds.map(id => mediaMap[id]).filter(Boolean);
-      dispatch({
-        type: types.ADD_SONGS_TO_QUEUE,
-        songs: filteredSongs,
-        replace: true
-      });
-      if (filteredSongs.length > 0) {
-        dispatch({
-          type: types.SET_CURRENT_PLAYING,
-          songId: filteredSongs[0].id
-        });
-        dispatch({ type: types.START_PLAYING });
+  const handlePlayAll = useCallback(async () => {
+    if (!liveStore) return
+    
+    try {
+      let trackIds: string[] = []
+      
+      if (isSmartPlaylist) {
+        trackIds = applyFilters(mediaMap, {
+          genres: playlist.filters?.genres || [],
+          types: playlist.filters?.types || [],
+          artists: playlist.filters?.artists || [],
+          providers: playlist.filters?.providers || [],
+          favorites: Boolean(playlist.filters?.favorites?.[0] === 'true')
+        })
+      } else {
+        trackIds = playlist.trackIds
       }
-    } else {
-      dispatch({
-        type: types.PLAY_ALL,
-        songs: playlist.trackIds.map(id => mediaMap[id]).filter(Boolean),
-        path: `/playlists/${playlist._id}`
-      });
+      
+      if (trackIds.length === 0) return
+      
+      const firstTrackId = await playAllAction(liveStore, trackIds)
+      
+      if (firstTrackId) {
+        dispatch({ 
+          type: types.PLAY_ALL_COMPLETED,
+          trackId: firstTrackId 
+        })
+      }
+    } catch (error) {
+      console.error('Failed to play playlist:', error)
     }
-  }, [isSmartPlaylist, playlist, mediaMap, dispatch])
+  }, [liveStore, isSmartPlaylist, playlist, mediaMap, dispatch])
 
-  const handleAddToQueue = useCallback(() => {
-    if (isSmartPlaylist) {
-      const filteredSongIds = applyFilters(mediaMap, {
-        genres: playlist.filters?.genres || [],
-        types: playlist.filters?.types || [],
-        artists: playlist.filters?.artists || [],
-        providers: playlist.filters?.providers || [],
-        favorites: Boolean(playlist.filters?.favorites?.[0] === 'true')
-      });
-      dispatch({
-        type: types.ADD_SONGS_TO_QUEUE_BY_ID,
-        trackIds: filteredSongIds
-      });
-    } else {
-      dispatch({
-        type: types.ADD_SONGS_TO_QUEUE_BY_ID,
-        trackIds: playlist.trackIds
-      });
+  const handleAddToQueue = useCallback(async () => {
+    if (!liveStore) return
+    
+    try {
+      let trackIds: string[] = []
+      
+      if (isSmartPlaylist) {
+        trackIds = applyFilters(mediaMap, {
+          genres: playlist.filters?.genres || [],
+          types: playlist.filters?.types || [],
+          artists: playlist.filters?.artists || [],
+          providers: playlist.filters?.providers || [],
+          favorites: Boolean(playlist.filters?.favorites?.[0] === 'true')
+        })
+      } else {
+        trackIds = playlist.trackIds
+      }
+      
+      if (trackIds.length === 0) return
+      
+      await addToQueueAction(liveStore, trackIds)
+    } catch (error) {
+      console.error('Failed to add playlist to queue:', error)
     }
-  }, [isSmartPlaylist, playlist, mediaMap, dispatch])
+  }, [liveStore, isSmartPlaylist, playlist, mediaMap])
 
   const handleApplyFilters = useCallback(() => {
     dispatch({ type: types.CLEAR_COLLECTION_FILTERS })

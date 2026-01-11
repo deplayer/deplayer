@@ -34,6 +34,7 @@ import Wiki from './components/Wiki'
 import GlobalKeyHandlers from './components/GlobalKeyHandlers'
 import JoinRoom from './pages/JoinRoom';
 import { useLanguage } from './hooks/useLanguage'
+import { setLiveStoreInstance } from './middleware/livestore'
 
 interface SongProps {
   playerPortal: portals.HtmlPortalNode
@@ -53,6 +54,13 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
   
   // Get LiveStore instance
   const { store: liveStore } = useStore()
+  
+  // Set LiveStore instance for middleware (once on mount)
+  React.useEffect(() => {
+    if (liveStore) {
+      setLiveStoreInstance(liveStore)
+    }
+  }, [liveStore])
   
   // Get Redux app state and UI context
   const reduxApp = useSelector((state: State) => state.app)

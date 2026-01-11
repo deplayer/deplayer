@@ -112,11 +112,14 @@ function* startFilesystemProcess(action: any): any {
       );
       console.log("saving song: ", song);
 
+      const songDocument = song.toDocument();
+      
+      // NEW: Add to LiveStore (primary storage)
+      yield put({ type: types.ADD_MEDIA_TO_LIVESTORE, media: songDocument });
+      
+      // LEGACY: Keep PGlite sync for backward compatibility during migration
       const adapter = getAdapter();
       const collectionService = new CollectionService(adapter);
-
-      // Save song
-      const songDocument = song.toDocument();
       yield call(collectionService.save, song.id, songDocument);
       yield put({ type: types.ADD_TO_COLLECTION, data: [songDocument] });
       yield put({ type: types.RECEIVE_COLLECTION, data: [songDocument] });
