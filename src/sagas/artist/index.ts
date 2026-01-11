@@ -1,6 +1,6 @@
 import { call, put, select, takeLatest } from 'redux-saga/effects'
 import * as types from '../../constants/ActionTypes'
-import { getSongById, getSettings } from './../selectors'
+import { getSongById, getSettingsFromLiveStore } from './../selectors'
 import MusicbrainzProvider from '../../providers/MusicbrainzProvider'
 import ArtistService from '../../services/ArtistService'
 import LyricsService from '../../services/LyricsService'
@@ -89,7 +89,7 @@ function* loadMoreArtistSongsFromProvider(
   yield put({ type: types.START_SEARCH, searchTerm: action.artist.name, noRedirect: true })
 
   // Then fetch artist metadata from database or MusicBrainz
-  const settings = yield select(getSettings)
+  const settings = yield call(getSettingsFromLiveStore)
   const artistName = action.artist.name
 
   try {

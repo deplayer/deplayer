@@ -26,9 +26,9 @@ import Dashboard from './components/Dashboard'
 import PlayerContainer from './containers/PlayerContainer'
 import ContextMenuContainer from './containers/ContextMenuContainer'
 import PlaylistsContainer from './containers/PlaylistsContainer'
-import ProvidersContainer from './containers/ProvidersContainer'
+import Providers from './components/Providers'
+import Settings from './components/Settings/Settings'
 import Queue from './components/Queue'
-import SettingsContainer from './containers/SettingsContainer'
 import SongContainer from './containers/SongContainer'
 import Wiki from './components/Wiki'
 import GlobalKeyHandlers from './components/GlobalKeyHandlers'
@@ -112,8 +112,8 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
           <Route path="/album/:id" element={<AlbumView />} />
           <Route path="/artist/:id" element={<ArtistView />} />
           <Route path="/artists" element={<ArtistTable />} />
-          <Route path="/providers" element={<ProvidersContainer />} />
-          <Route path="/settings" element={<SettingsContainer />} />
+          <Route path="/providers" element={<Providers />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/wiki" element={<Wiki />} />
         </Routes>
       </LayoutContainer>

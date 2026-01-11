@@ -13,7 +13,11 @@ type Props = {
 
 const ProviderButton = (props: Props) => {
   const onClick = () => {
+    // Dispatch to Redux to update the local state/form
     props.dispatch({ type: types.ADD_PROVIDER, providerKey: props.providerKey })
+    
+    // Note: The actual save to LiveStore happens when user clicks "Save Settings" button
+    // in the Providers form. This just adds the provider to the local form state.
   }
 
   return (

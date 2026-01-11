@@ -2,7 +2,8 @@ import { call, actionChannel, fork, take, put } from "redux-saga/effects";
 
 import { saveToDbWorker } from "./workers";
 import { getAdapter } from "../../services/database";
-import { initialize } from "../settings";
+import { getLiveStoreInstance } from "../../App";
+import { initializeSettingsAction } from "../../stores/livestore/actions/settings";
 import CollectionService from "../../services/CollectionService";
 import * as types from "../../constants/ActionTypes";
 import { createLogger } from "../../utils/logger";
@@ -41,8 +42,17 @@ export function* initializeWatcher(): Generator<any, void, any> {
       yield call(adapter.getDb);
       logger.debug("Database initialized successfully");
 
-      // Initialize settings and collection
-      yield call(initialize);
+      // Initialize settings via LiveStore
+      const liveStore = getLiveStoreInstance();
+      if (liveStore) {
+        logger.debug("Initializing LiveStore settings...");
+        yield call(initializeSettingsAction, liveStore);
+        logger.debug("LiveStore settings initialized");
+      } else {
+        logger.warn("LiveStore not available for settings initialization");
+      }
+      
+      // Initialize collection
       yield call(collectionService.initialize);
       
       const collection = yield call(collectionService.getAll);

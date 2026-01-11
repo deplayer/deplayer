@@ -13,7 +13,7 @@ import Spinner from '../Spinner'
 import ToggleMiniQueueButton from '../Buttons/ToggleMiniQueueButton'
 import * as types from '../../constants/ActionTypes'
 import FilterPanel from '../Collection/FilterPanel'
-import { useMediaMap, useQueue } from '../../stores/livestore/hooks'
+import { useMediaById, useQueue, useCurrentPlayingSongId } from '../../stores/livestore/hooks'
 import { useUI } from '../../contexts'
 import { useSelector, useDispatch } from 'react-redux'
 import { State } from '../../reducers'
@@ -97,10 +97,68 @@ const LoadingRow = ({ style, slim }: { style: any, slim: boolean }) => (
   </div>
 )
 
+// Wrapper component for individual song loading
+const SongRowWrapper = React.memo(({ 
+  songId, 
+  isCurrent,
+  style, 
+  slim,
+  mqlMatch,
+  dispatch,
+  disableAddButton,
+  disableCovers,
+}: {
+  songId: string
+  isCurrent: boolean
+  style: any
+  slim: boolean
+  mqlMatch: boolean
+  dispatch: any
+  disableAddButton?: boolean
+  disableCovers?: boolean
+}) => {
+  const song = useMediaById(songId)
+  const liveQueue = useQueue('default')
+  
+  if (!song) {
+    return <LoadingRow style={style} slim={slim} />
+  }
+  
+  if (!song.id) {
+    return null
+  }
+  
+  const onClick = () => {
+    dispatch({ type: types.SET_CURRENT_PLAYING, songId: song.id })
+  }
+  
+  return (
+    <SongRow
+      song={song}
+      queue={liveQueue}
+      isCurrent={isCurrent}
+      onClick={onClick}
+      dispatch={dispatch}
+      disableAddButton={disableAddButton}
+      disableCovers={disableCovers}
+      mqlMatch={mqlMatch}
+      slim={slim}
+      style={style}
+    />
+  )
+}, (prevProps, nextProps) => {
+  // Only re-render if songId or isCurrent changed
+  return (
+    prevProps.songId === nextProps.songId &&
+    prevProps.isCurrent === nextProps.isCurrent &&
+    prevProps.slim === nextProps.slim &&
+    prevProps.mqlMatch === nextProps.mqlMatch
+  )
+})
+
 const MusicTable = ({ error, tableIds, disableCurrent, disableCovers, disableAddButton, slim }: Props) => {
   // Get data from LiveStore hooks
-  const mediaMap = useMediaMap()
-  const liveQueue = useQueue('default')
+  const currentSongId = useCurrentPlayingSongId('default')
   const { loading, mqlMatch, activeFilters } = useUI()
   const location = useLocation()
   
@@ -124,8 +182,6 @@ const MusicTable = ({ error, tableIds, disableCurrent, disableCovers, disableAdd
     )
   }
 
-  const id = liveQueue?.currentPlaying
-
   const rowRenderer = ({
     index,       // Index of row
     style,        // Style object to be applied to row (to position it);
@@ -133,37 +189,24 @@ const MusicTable = ({ error, tableIds, disableCurrent, disableCovers, disableAdd
     // This must be passed through to the rendered row element.
   }: { index: number, key: string, style: any, slim: boolean }): any => {
     const songId = tableIds[index]
-    const song = mediaMap[songId]
-
-    if (!song) {
-      return <LoadingRow style={style} slim={slim} />
-    }
-
-    if (!song.id) {
-      return null
-    }
+    const isCurrent = songId === currentSongId
 
     return (
-      <SongRow
-        queue={liveQueue}
-        mqlMatch={mqlMatch}
-        key={song.id}
-        song={song}
-        isCurrent={id === song.id}
-        style={style}
-        onClick={() => {
-          dispatch({ type: types.SET_CURRENT_PLAYING, songId: song.id })
-        }}
-        disableAddButton={disableAddButton}
-        disableCovers={slim || disableCovers} // Force disable covers in slim mode
+      <SongRowWrapper 
+        songId={songId} 
+        isCurrent={isCurrent}
+        style={style} 
         slim={slim}
+        mqlMatch={mqlMatch}
         dispatch={dispatch}
+        disableAddButton={disableAddButton}
+        disableCovers={slim || disableCovers}
       />
     )
   }
 
   // Track the position of current playing to jump there
-  const currentIndex = !disableCurrent ? tableIds.indexOf(liveQueue?.currentPlaying || '') : 0
+  const currentIndex = !disableCurrent ? tableIds.indexOf(currentSongId || '') : 0
 
   const getActions = () => {
     if (location.pathname.match(/\/song\/.*/)) {
@@ -184,14 +227,14 @@ const MusicTable = ({ error, tableIds, disableCurrent, disableCovers, disableAdd
         <>
           <AddNewMediaButton className='btn-sm' />
           <PlayAllButton className='btn-sm' mediaIds={tableIds} />
-          {liveQueue?.currentPlaying && <PlayNextButton className='btn-sm' mediaIds={tableIds} />}
+          {currentSongId && <PlayNextButton className='btn-sm' mediaIds={tableIds} />}
         </>
       )
       case '/search-results':
         return (
           <>
             <PlayAllButton className='btn-sm' mediaIds={tableIds} />
-            {liveQueue?.currentPlaying && (
+            {currentSongId && (
               <PlayNextButton 
                 className='btn-sm'
                 mediaIds={tableIds}

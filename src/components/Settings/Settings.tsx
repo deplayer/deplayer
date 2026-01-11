@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
 import { useStore } from '@livestore/react'
@@ -8,10 +8,10 @@ import Importer from '../Importer'
 import MainContainer from '../common/MainContainer'
 import { SettingsForm } from './SettingsForm'
 import * as types from '../../constants/ActionTypes'
-import { State as SettingsState } from '../../reducers/settings'
 import CenteredMessage from '../common/CenteredMessage'
 import { useSettings } from '../../stores/livestore/hooks'
 import { saveSettingsAction, deleteSettingsAction } from '../../stores/livestore/actions'
+import SettingsBuilder from '../../services/settings/SettingsBuilder'
 
 interface CollectionData {
   [key: string]: unknown;
@@ -24,9 +24,11 @@ const Settings: React.FC = () => {
   // Get settings from LiveStore
   const liveStoreSettings = useSettings()
   
-  // Get settingsForm schema from Redux (just UI schema, not data)
-  const reduxSettings = useSelector((state: { settings: SettingsState }) => state.settings)
-  const settingsForm = reduxSettings.settingsForm
+  // Generate form schema based on current providers
+  const settingsForm = React.useMemo(() => {
+    const builder = new SettingsBuilder()
+    return builder.getFormSchema(liveStoreSettings?.providers || {})
+  }, [liveStoreSettings?.providers])
   
   const [showImporter, setShowImporter] = React.useState(false)
 
@@ -85,7 +87,7 @@ const Settings: React.FC = () => {
   // Create settings object compatible with SettingsForm
   const settingsForForm = {
     settingsForm,
-    settings: liveStoreSettings || reduxSettings.settings,
+    settings: liveStoreSettings || { providers: {}, app: {} },
   }
 
   return (

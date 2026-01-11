@@ -219,18 +219,22 @@ export const useFilteredMedia = (filters: Filter) => {
     }
 
     // Filter media based on active filters
+    // Now uses denormalized columns (genresFlat, providersFlat) for better performance
     const filtered = Array.isArray(allMedia) 
       ? allMedia.filter((media: any) => {
           let hasMatches = false
 
-          // Check genres
+          // Check artists (indexed artistId column)
+          if (filters.artists.length > 0) {
+            if (filters.artists.includes(media.artistId)) {
+              hasMatches = true
+            }
+          }
+
+          // Check genres (denormalized genresFlat column)
           if (filters.genres.length > 0) {
-            const mediaGenres = Array.isArray(media.genres)
-              ? media.genres
-              : media.genres
-              ? [media.genres]
-              : []
-            if (filters.genres.some((g) => mediaGenres.includes(g))) {
+            const genresFlat = media.genresFlat || ''
+            if (filters.genres.some((g) => genresFlat.includes(g))) {
               hasMatches = true
             }
           }
@@ -242,17 +246,10 @@ export const useFilteredMedia = (filters: Filter) => {
             }
           }
 
-          // Check artists
-          if (filters.artists.length > 0) {
-            if (filters.artists.some((artistId) => artistId === media.artistId)) {
-              hasMatches = true
-            }
-          }
-
-          // Check providers
+          // Check providers (denormalized providersFlat column)
           if (filters.providers.length > 0) {
-            const mediaProviders = media.stream ? Object.keys(media.stream) : []
-            if (filters.providers.some((p) => mediaProviders.includes(p))) {
+            const providersFlat = media.providersFlat || ''
+            if (filters.providers.some((p) => providersFlat.includes(p))) {
               hasMatches = true
             }
           }

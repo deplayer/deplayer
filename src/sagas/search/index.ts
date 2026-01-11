@@ -2,13 +2,12 @@ import {
   call,
   put,
   takeLatest,
-  select,
 } from "redux-saga/effects";
 
 import { push } from "redux-first-history";
 import * as types from "../../constants/ActionTypes";
 import ProvidersService from "../../services/ProvidersService";
-import { getSettings } from "./../selectors";
+import { getSettingsFromLiveStore } from "./../selectors";
 import { getAdapter } from "../../services/database";
 import CollectionService from "../../services/CollectionService";
 import { SearchService } from "../../services/SearchService";
@@ -37,7 +36,7 @@ type SearchAction = {
 // Handling search saga
 export function* search(action: SearchAction): any {
   try {
-    const settings = yield select(getSettings);
+    const settings = yield call(getSettingsFromLiveStore);
     const searchService = createSearchService(settings);
 
     // Perform search

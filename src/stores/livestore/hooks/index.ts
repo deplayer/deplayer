@@ -66,6 +66,7 @@ export {
   useAppSettings,
   useLanguageSettings,
   useSyncSettings,
+  useEnabledProviders,
 } from './useSettings'
 
 // Genre hooks

@@ -89,3 +89,21 @@ export const useSyncSettings = () => {
   const appSettings = useAppSettings()
   return appSettings?.sync || null
 }
+
+/**
+ * Get list of enabled provider names
+ * 
+ * @example
+ * ```tsx
+ * const enabledProviders = useEnabledProviders()
+ * return <div>Enabled providers: {enabledProviders.join(', ')}</div>
+ * ```
+ */
+export const useEnabledProviders = () => {
+  const settings = useSettings()
+  if (!settings?.providers) return []
+  
+  return Object.keys(settings.providers).filter(
+    (key) => settings.providers[key]?.enabled === true
+  )
+}

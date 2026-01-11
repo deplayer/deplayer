@@ -1,11 +1,11 @@
-import { call, put, takeLatest, takeEvery, select } from "redux-saga/effects";
+import { call, put, takeLatest, takeEvery } from "redux-saga/effects";
 
 import { getAdapter } from "../../services/database";
 import {
   metadataToSong,
   readFileMetadata,
 } from "../../services/ID3Tag/ID3TagService";
-import { getSettings } from "../selectors";
+import { getSettingsFromLiveStore } from "../selectors";
 import CollectionService from "../../services/CollectionService";
 import YoutubeDlServerProvider from "../../providers/YoutubeDlServerProvider";
 import * as types from "../../constants/ActionTypes";
@@ -16,7 +16,7 @@ const validExtensions = ["mp3", "mp4", "flac"];
 
 // Watcher should enque tasks to avoid concurrency
 function* startProvidersScan(): any {
-  const settings = yield select(getSettings);
+  const settings = yield call(getSettingsFromLiveStore);
 
   const providerKeys = Object.keys(settings.providers).filter((key: string) => {
     return key.match(/ipfs|youtube-dl-server/);
@@ -138,7 +138,7 @@ function* startFilesystemProcess(action: any): any {
 
 function* startYoutubeDlScan(action: any): Generator<any, void, any> {
   try {
-    const settings = yield select(getSettings);
+    const settings = yield call(getSettingsFromLiveStore);
     const service = new YoutubeDlServerProvider(
       settings.app["youtube-dl-server"],
       action.key
@@ -165,7 +165,7 @@ function* startProviderSync(action: any): Generator<any, void, any> {
     }
 
     // Get settings for this specific provider instance
-    const settings = yield select(getSettings);
+    const settings = yield call(getSettingsFromLiveStore);
     const providerSettings = settings.providers[action.providerKey];
     
     if (!providerSettings) {

@@ -1,3 +1,28 @@
+import { call } from 'redux-saga/effects'
+import { getLiveStoreInstance } from '../App'
+import { queryDb } from '@livestore/livestore'
+import { tables } from '../stores/livestore/schema'
+
+/**
+ * Get settings from LiveStore
+ * Use this in sagas instead of select(getSettings)
+ */
+export function* getSettingsFromLiveStore(): Generator<any, any, any> {
+  const liveStore = getLiveStoreInstance()
+  if (!liveStore) {
+    console.warn('LiveStore not available, returning default settings')
+    return { providers: {}, app: {} }
+  }
+  
+  const query = queryDb(
+    tables.settings.select().where('id', '=', 'default').limit(1)
+  )
+  
+  const result = yield call(() => liveStore.query(query))
+  return result[0]?.settings || { providers: {}, app: {} }
+}
+
+// Legacy Redux selector (deprecated - use getSettingsFromLiveStore instead)
 // Extract settings from state
 export const getSettings = (state: any) => {
   return state ? state.settings.settings : { providers: {} }

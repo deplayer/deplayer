@@ -6,13 +6,51 @@ import Media from '../../entities/Media'
 import {
   getCollection,
   getPlayer,
-  getQueue,
   getSongBg,
   getState
 } from '../selectors'
 import { getStreamUri } from '../../services/Song/StreamUriService'
 import * as routes from '../../routes'
 import * as types from '../../constants/ActionTypes'
+import { getLiveStoreInstance } from '../../App'
+import { playNextAction, playPreviousAction } from '../../stores/livestore/actions'
+
+/**
+ * Get current song ID from LiveStore queue
+ */
+function* getCurrentSongIdFromLiveStore(): any {
+  const liveStore = getLiveStoreInstance()
+  
+  if (!liveStore) {
+    console.error('[Player Saga] LiveStore not available')
+    return null
+  }
+  
+  try {
+    const result = yield liveStore.query({
+      query: `SELECT * FROM queue WHERE id = ?`,
+      bindValues: { 1: 'default' }
+    })
+    
+    const rows = (result as any)?.[0]?.values || []
+    
+    if (rows.length === 0) {
+      return null
+    }
+    
+    const trackIds = JSON.parse(rows[0][1] || '[]')
+    const currentPlaying = rows[0][3]
+    
+    if (currentPlaying === null || currentPlaying === undefined) {
+      return null
+    }
+    
+    return trackIds[currentPlaying] || null
+  } catch (error) {
+    console.error('[Player Saga] Error getting current song ID:', error)
+    return null
+  }
+}
 
 function* setCurrentPlayingStream(songId: string, providerNum: number, media?: Media): any {
   const collection = yield select(getCollection)
@@ -23,11 +61,11 @@ function* setCurrentPlayingStream(songId: string, providerNum: number, media?: M
 
   // The song can't be found
   if (!currentPlaying) {
+    console.warn('[Player Saga] Song not found, playing next')
     return yield put({ type: types.PLAY_NEXT })
   }
 
-  // Getting the first stream URI, in the future will be choosen based on
-  // priorities
+  // Getting the first stream URI
   let streamUri = ''
   try {
     streamUri = yield getStreamUri(currentPlaying, providerNum)
@@ -36,6 +74,7 @@ function* setCurrentPlayingStream(songId: string, providerNum: number, media?: M
   }
 
   if (!streamUri) {
+    console.warn('[Player Saga] No stream URI, playing next')
     return yield put({ type: types.PLAY_NEXT })
   }
 
@@ -70,50 +109,78 @@ export function* setCurrentPlaying(action: SetCurrentPlayingAction): any {
 function* handleError(): any {
   yield put({ type: types.REGISTER_PLAYER_ERROR })
 
-  const queue = yield select(getQueue)
   const player = yield select(getPlayer)
-
-  yield call(setCurrentPlayingStream, queue.currentPlaying, player.errorCount)
+  
+  // Get current song ID from LiveStore
+  const currentSongId = yield call(getCurrentSongIdFromLiveStore)
+  
+  if (currentSongId) {
+    yield call(setCurrentPlayingStream, currentSongId, player.errorCount)
+  } else {
+    console.warn('[Player Saga] No current song to retry')
+  }
 }
 
 function* handlePlayNext(): any {
-  const queue = yield select(getQueue)
-  const trackIds = queue.shuffle ? queue.randomTrackIds : queue.trackIds
-  const songId = queue.nextSongId
+  const liveStore = getLiveStoreInstance()
+  
+  if (!liveStore) {
+    console.error('[Player Saga] LiveStore not available')
+    return
+  }
 
-  if (queue.repeat) {
-    // If there's a next song, play it
-    if (songId) {
-      yield put({ type: types.SET_CURRENT_PLAYING, songId })
-    } 
-    // If there's no next song but we have tracks, play the first one (loop back)
-    else if (trackIds.length > 0) {
-      yield put({ type: types.SET_CURRENT_PLAYING, songId: trackIds[0] })
+  // Call LiveStore action to move to next track
+  try {
+    yield call(playNextAction, liveStore)
+    
+    // Get the new current song ID
+    const currentSongId = yield call(getCurrentSongIdFromLiveStore)
+    
+    if (currentSongId) {
+      yield put({ type: types.SET_CURRENT_PLAYING, songId: currentSongId })
+    } else {
+      console.log('[Player Saga] End of queue reached')
     }
-  } else if (songId) {
-    // Not repeating, only play next if there is one
-    yield put({ type: types.SET_CURRENT_PLAYING, songId })
+  } catch (error) {
+    console.error('[Player Saga] Error in handlePlayNext:', error)
   }
 }
 
 function* handlePlayPrev(): any {
-  const queue = yield select(getQueue)
-  const trackIds = queue.shuffle ? queue.randomTrackIds : queue.trackIds
-  const songId = queue.prevSongId
+  const liveStore = getLiveStoreInstance()
+  
+  if (!liveStore) {
+    console.error('[Player Saga] LiveStore not available')
+    return
+  }
 
-  console.log('last item: ', trackIds[trackIds.length - 1])
-
-  if (queue.repeat && !songId && trackIds[trackIds.length - 1]) {
-    yield put({ type: types.SET_CURRENT_PLAYING, songId: trackIds[trackIds.length - 1] })
-  } else if (songId) {
-    yield put({ type: types.SET_CURRENT_PLAYING, songId })
+  // Call LiveStore action to move to previous track
+  try {
+    yield call(playPreviousAction, liveStore)
+    
+    // Get the new current song ID
+    const currentSongId = yield call(getCurrentSongIdFromLiveStore)
+    
+    if (currentSongId) {
+      yield put({ type: types.SET_CURRENT_PLAYING, songId: currentSongId })
+    }
+  } catch (error) {
+    console.error('[Player Saga] Error in handlePlayPrev:', error)
   }
 }
+
 function* goToViewPage(): any {
-  const queue = yield select(getQueue)
   const state = yield select(getState)
-  if (state.router.location.pathname.match(/^\/song.*?$/)) {
-    yield put(push(routes.songView(queue.currentPlaying)))
+  
+  if (!state.router.location.pathname.match(/^\/song.*?$/)) {
+    return
+  }
+  
+  // Get current song ID from LiveStore
+  const currentSongId = yield call(getCurrentSongIdFromLiveStore)
+  
+  if (currentSongId) {
+    yield put(push(routes.songView(currentSongId)))
   }
 }
 

@@ -1,9 +1,9 @@
 // Binding actions to sagas
-import { takeLatest, fork, call, put, select } from "redux-saga/effects";
+import { takeLatest, fork, call, put } from "redux-saga/effects";
 import * as types from "../../constants/ActionTypes";
 import { addToCollectionWatcher, initializeWatcher } from "./watchers";
 import { IMedia } from "../../entities/Media";
-import { State as RootState } from "../../reducers";
+import { getSettingsFromLiveStore } from "../selectors";
 import ProvidersService from "../../services/ProvidersService";
 import { getAdapter } from "../../services/database";
 import { desc } from "drizzle-orm";
@@ -58,9 +58,7 @@ export function* fetchRecentAlbums(): Generator<any, void, any> {
     }
 
     // Then try to fetch new albums from providers
-    const settings = yield select(
-      (state: RootState) => state.settings.settings
-    );
+    const settings = yield call(getSettingsFromLiveStore);
     if (!settings?.providers) {
       console.warn("No providers configured");
       return;
