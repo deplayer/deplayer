@@ -52,15 +52,18 @@
 ### ⏳ Remaining Domains
 
 #### 6. Search Domain
-- ❌ Not started
-- **Complexity**: Medium
-- **Estimated effort**: 1-2 days
+- ⏭️ **SKIPPED** - Keeping in Redux
+- **Reason**: Tightly coupled to saga/SearchService/CollectionService/ProvidersService
+- **Decision**: Search works well in current Redux/Saga architecture. Migration would require significant refactoring of search logic without clear benefits
+- **Status**: Will remain in Redux for now, can revisit after Collection migration
+- **Date**: 2026-01-11
 
 #### 7. Media Collection Domain
 - ❌ Not started
 - **Complexity**: High (most complex)
 - **Estimated effort**: 3-5 days
 - **Note**: Includes normalization of artist/album data
+- **Priority**: HIGH - This is the next target
 
 #### 8. P2P Domain (if used)
 - ❌ Not started
@@ -76,11 +79,12 @@
 | Favorites | ✅ Complete | Multiple | ✅ Yes | ⏳ Pending |
 | Lyrics | ✅ Complete | Multiple | ✅ Yes | ⏳ Pending |
 | Playlists | ✅ Complete | Multiple | ✅ Yes | ⏳ Pending |
-| Search | ⏳ Pending | TBD | ❌ No | ❌ No |
-| Collection | ⏳ Pending | TBD | ❌ No | ❌ No |
+| Search | ⏭️ Skipped | Keeping in Redux | ❌ No | N/A |
+| Collection | ⏳ **NEXT** | TBD | ❌ No | ❌ No |
 | P2P | ⏳ Pending | TBD | ❌ No | ❌ No |
 
-**Completion**: ~62% (5/8 domains complete)
+**Completion**: ~62% (5/8 domains complete, 1 skipped)
+**Next Target**: Collection (most complex, highest impact)
 
 ---
 
@@ -348,8 +352,8 @@ CREATE VIRTUAL TABLE media_fts USING fts5(
 3. ✅ Lyrics - **COMPLETE**
 4. ✅ Playlists - **COMPLETE**
 5. ✅ Queue - **COMPLETE** (2026-01-11)
-6. ⏳ Search - **NEXT**
-7. ⏳ Media Collection (most complex) - **AFTER SEARCH**
+6. ⏭️ Search - **SKIPPED** (keeping in Redux, too coupled to saga/services)
+7. ⏳ **Media Collection (NEXT)** - Most complex, highest impact
 8. ⏳ P2P (if used) - **AFTER COLLECTION**
 
 **Pattern**:
