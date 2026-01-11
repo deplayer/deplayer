@@ -46,8 +46,18 @@ export const livestoreMiddleware: Middleware = (store) => (next) => async (actio
         // We need to add all that media to LiveStore
         if (action.data && Array.isArray(action.data) && action.data.length > 0) {
           console.log('[LiveStore] Syncing', action.data.length, 'media items to LiveStore')
-          await addMediaBulkAction(liveStoreInstance, action.data)
-          console.log('[LiveStore] Successfully synced', action.data.length, 'media items')
+          console.log('[LiveStore] Sample media item:', action.data[0])
+          
+          try {
+            await addMediaBulkAction(liveStoreInstance, action.data)
+            console.log('[LiveStore] ✅ Successfully synced', action.data.length, 'media items')
+          } catch (error) {
+            console.error('[LiveStore] ❌ Failed to sync media:', error)
+            console.error('[LiveStore] Sample item that failed:', action.data[0])
+            throw error
+          }
+        } else {
+          console.log('[LiveStore] RECEIVE_COLLECTION with no data or empty array')
         }
         break
       }

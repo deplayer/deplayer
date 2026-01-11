@@ -23,8 +23,20 @@ export async function addMediaBulkAction(
   store: Store,
   mediaItems: IMedia[]
 ): Promise<void> {
-  // Filter out media without IDs
-  const validMedia = mediaItems.filter(m => m.id)
+  // Filter out media without IDs and validate structure
+  const validMedia = mediaItems.filter(m => {
+    if (!m.id) {
+      console.warn('[LiveStore] Skipping media without ID:', m.title)
+      return false
+    }
+    if (!m.artist?.id || !m.album?.id) {
+      console.warn('[LiveStore] Skipping media with incomplete artist/album:', m.id, m.title)
+      return false
+    }
+    return true
+  })
+  
+  console.log(`[LiveStore] Adding ${validMedia.length}/${mediaItems.length} valid media items`)
   
   // Commit events in a batch for better performance
   const eventPromises = validMedia.map(media => 
