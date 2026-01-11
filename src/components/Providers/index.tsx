@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Formik, Form } from 'formik'
 import { Translate } from 'react-redux-i18n'
 import { useStore } from '@livestore/react'
@@ -8,6 +8,7 @@ import * as types from '../../constants/ActionTypes'
 import { saveSettingsAction, initializeSettingsAction } from '../../stores/livestore/actions/settings'
 import { useSettings } from '../../stores/livestore/hooks'
 import SettingsBuilder from '../../services/settings/SettingsBuilder'
+import providerBuilders from '../../services/settings/providers'
 import MainContainer from '../common/MainContainer'
 import ProviderButton from './ProviderButton'
 import ProviderForm from '../Settings/ProviderForm'
@@ -16,14 +17,69 @@ const Providers = () => {
   const { store: liveStore } = useStore()
   const dispatch = useDispatch()
   
-  // Read settings from LiveStore (single source of truth)
+  // Read settings from LiveStore (single source of truth for saved data)
   const liveStoreSettings = useSettings()
+  
+  // Local state for managing providers during editing (before save)
+  const [localProviders, setLocalProviders] = useState<any>(null)
+  
+  // Use local state if set, otherwise use LiveStore settings
+  const currentProviders = localProviders || liveStoreSettings?.providers || {}
+  
+  // Reset local state when LiveStore settings change (after save)
+  useState(() => {
+    if (liveStoreSettings && !localProviders) {
+      setLocalProviders(liveStoreSettings.providers)
+    }
+  })
   
   // Generate form schema based on current providers
   const settingsForm = useMemo(() => {
     const builder = new SettingsBuilder()
-    return builder.getFormSchema(liveStoreSettings?.providers || {})
-  }, [liveStoreSettings?.providers])
+    return builder.getFormSchema(currentProviders)
+  }, [currentProviders])
+  
+  // Helper to get next available provider ID
+  const getNextProviderId = useCallback((providers: any, baseKey: string) => {
+    const existingKeys = Object.keys(providers)
+      .filter(key => key.startsWith(baseKey))
+      .map(key => {
+        const num = key.replace(baseKey, '');
+        return num ? parseInt(num, 10) : 0;
+      })
+      .sort((a, b) => a - b);
+
+    const nextNum = existingKeys.length > 0 ? existingKeys[existingKeys.length - 1] + 1 : 0;
+    return `${baseKey}${nextNum}`;
+  }, [])
+  
+  // Handle adding a provider
+  const handleAddProvider = useCallback((providerKey: string) => {
+    const providerBuilder = providerBuilders[providerKey];
+    if (!providerBuilder) {
+      console.warn(`Provider ${providerKey} not found`)
+      return;
+    }
+
+    // For non-repeatable providers, use the base key
+    const providerId = providerBuilder.isRepeatable ? 
+      getNextProviderId(currentProviders, providerKey) : 
+      providerKey;
+    
+    setLocalProviders({
+      ...currentProviders,
+      [providerId]: {
+        enabled: false
+      }
+    });
+  }, [currentProviders, getNextProviderId])
+  
+  // Handle removing a provider
+  const handleRemoveProvider = useCallback((providerKey: string) => {
+    const newProviders = { ...currentProviders };
+    delete newProviders[providerKey];
+    setLocalProviders(newProviders);
+  }, [currentProviders])
 
   const handleSubmit = async (values: any, actions: any) => {
     console.log('Providers handleSubmit called with values:', values)
@@ -60,6 +116,9 @@ const Providers = () => {
       const result = await saveSettingsAction(liveStore, settingsPayload)
       console.log('saveSettingsAction result:', result)
       
+      // Reset local state to match saved data
+      setLocalProviders(values.providers)
+      
       // Dispatch Redux action for side effects (notifications, etc.)
       console.log('Dispatching SETTINGS_SAVED action')
       dispatch({ 
@@ -91,9 +150,9 @@ const Providers = () => {
     return (
       <ProviderForm
         key={providerKey}
-        settings={liveStoreSettings}
+        settings={{ providers: currentProviders }}
         settingsForm={settingsForm}
-        dispatch={dispatch}
+        onRemove={handleRemoveProvider}
         providerKey={providerKey}
       />
     )
@@ -122,17 +181,17 @@ const Providers = () => {
             Select one of the providers below to configure it.
 
             <div className='flex pt-2'>
-              <ProviderButton providerKey='subsonic' />
-              <ProviderButton providerKey='mstream' />
-              <ProviderButton providerKey='itunes' />
-              <ProviderButton providerKey='jellyfin' />
-              <ProviderButton providerKey='musicbrainz' />
+              <ProviderButton providerKey='subsonic' onAdd={handleAddProvider} />
+              <ProviderButton providerKey='mstream' onAdd={handleAddProvider} />
+              <ProviderButton providerKey='itunes' onAdd={handleAddProvider} />
+              <ProviderButton providerKey='jellyfin' onAdd={handleAddProvider} />
+              <ProviderButton providerKey='musicbrainz' onAdd={handleAddProvider} />
             </div>
           </div>
 
           <Formik
             initialValues={{
-              providers: liveStoreSettings.providers || {}
+              providers: currentProviders
             }}
             onSubmit={handleSubmit}
             enableReinitialize
