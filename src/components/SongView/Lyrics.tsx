@@ -1,13 +1,12 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Modal from '../common/Modal'
 import Header from '../common/Header'
 import * as types from '../../constants/ActionTypes'
 import { Dispatch } from 'redux'
+import { useLyrics } from '../../stores/livestore/hooks'
 
 type Props = {
   onClose: () => void
-  lyrics: string,
-  error?: string,
   songId: string,
   dispatch: Dispatch<any>,
   isOpen: boolean,
@@ -15,33 +14,24 @@ type Props = {
 }
 
 const Lyrics = (props: Props) => {
-  // Clear and refetch lyrics when song changes, but only if no lyrics are provided
+  const lyricsData = useLyrics(props.songId)
+  const [error, setError] = useState<string | undefined>()
+  
+  // Get lyrics text from LiveStore query result
+  const lyrics = lyricsData && lyricsData.length > 0 ? lyricsData[0].lyricsText : undefined
+
+  // Fetch lyrics when modal opens and no lyrics exist
   useEffect(() => {
-    if (props.isOpen && !props.lyrics) {
-      // Clear previous lyrics first
-      props.dispatch({ type: types.CLEAR_LYRICS })
-      // Then fetch new lyrics if we have a song ID
-      if (props.songId) {
-        props.dispatch({ type: types.FETCH_LYRICS, songId: props.songId })
-      }
+    if (props.isOpen && !lyrics && props.songId) {
+      // Trigger saga to fetch lyrics from API
+      props.dispatch({ type: types.FETCH_LYRICS, songId: props.songId })
+      setError(undefined)
     }
-  }, [props.songId, props.isOpen, props.lyrics])
+  }, [props.songId, props.isOpen, lyrics])
 
-  // Clear lyrics when modal closes or component unmounts
-  useEffect(() => {
-    if (!props.isOpen) {
-      props.dispatch({ type: types.CLEAR_LYRICS })
-    }
-
-    return () => {
-      props.dispatch({ type: types.CLEAR_LYRICS })
-    }
-  }, [props.isOpen])
-
-  // Clear lyrics if the currently playing song changes and it doesn't match our songId
+  // Close modal if the currently playing song changes
   useEffect(() => {
     if (props.isOpen && props.currentPlayingSongId && props.currentPlayingSongId !== props.songId) {
-      props.dispatch({ type: types.CLEAR_LYRICS })
       props.onClose()
     }
   }, [props.currentPlayingSongId])
@@ -55,14 +45,18 @@ const Lyrics = (props: Props) => {
     >
       <Header>Lyrics</Header>
       <div className='p-4 my-6'>
-        {props.error ? (
+        {error ? (
           <div className='text-error text-center'>
-            {props.error}
+            {error}
           </div>
-        ) : (
+        ) : lyrics ? (
           <pre className='overflow-y-auto w-full whitespace-pre-wrap'>
-            {props.lyrics}
+            {lyrics}
           </pre>
+        ) : (
+          <div className='text-center'>
+            Loading lyrics...
+          </div>
         )}
       </div>
     </Modal>

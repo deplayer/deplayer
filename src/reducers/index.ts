@@ -7,7 +7,6 @@ import player from './player'
 import playlist, { State as PlaylistState } from './playlist'
 import collection, { State as CollectionState } from './collection'
 import connection, { State as ConnectionState } from './connection'
-import lyrics, { State as LyricsState } from './lyrics'
 import search, { State as SearchState } from './search'
 import settings, { State as SettingsState } from './settings'
 import queue, { State as QueueState } from './queue'
@@ -19,7 +18,6 @@ export type State = {
   artist: ArtistState
   collection: CollectionState
   connection: ConnectionState
-  lyrics: LyricsState
   player: PlayerState
   playlist: PlaylistState
   queue: QueueState
@@ -34,7 +32,6 @@ const reducers = {
   artist,
   collection,
   connection,
-  lyrics,
   player,
   playlist,
   queue,

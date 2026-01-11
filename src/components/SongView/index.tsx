@@ -24,7 +24,6 @@ import Media from '../../entities/Media'
 import { State as QueueState } from '../../reducers/queue'
 import { State as CollectionState } from '../../reducers/collection'
 import { State as PlayerState } from '../../reducers/player'
-import { State as LyricsState } from '../../reducers/lyrics'
 import FavoriteButton from '../common/FavoriteButton'
 
 const MAX_LIST_ITEMS = 25
@@ -33,7 +32,6 @@ type Props = {
   playerPortal: any,
   location: Location,
   player: PlayerState,
-  lyrics: LyricsState,
   collection: CollectionState,
   queue: QueueState,
   songId: string,
@@ -54,7 +52,7 @@ type StreamUrl = {
   service: string;
 }
 
-const SongView = ({ songId, loading, className = '', dispatch, playerPortal, player, lyrics, queue, collection }: Props) => {
+const SongView = ({ songId, loading, className = '', dispatch, playerPortal, player, queue, collection }: Props) => {
   const navigate = useNavigate()
   const { trackIds, currentPlaying } = queue
 
@@ -367,7 +365,6 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
               <Lyrics
                 dispatch={dispatch}
                 songId={song.id}
-                lyrics={lyrics.lyrics || ''}
                 onClose={() => setShowLyrics(false)}
                 isOpen={showLyrics}
               />

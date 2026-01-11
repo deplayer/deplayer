@@ -9,7 +9,6 @@ import { State as SettingsState, defaultState as settingsDefaultState } from "..
 import { State as AppState, defaultState as appDefaultState } from "../reducers/app";
 import { State as ArtistState, defaultState as artistDefaultState } from "../reducers/artist";
 import { State as ConnectionState, defaultState as connectionDefaultState } from "../reducers/connection";
-import { State as LyricsState, defaultState as lyricsDefaultState } from "../reducers/lyrics";
 import { State as PlaylistState, defaultState as playlistDefaultState } from "../reducers/playlist";
 import { State as PeerState } from "../reducers/peers";
 import { State as RoomsState, defaultState as roomsDefaultState } from "../reducers/rooms";
@@ -19,7 +18,6 @@ export const createDefaultState = (): RootState => ({
   artist: artistDefaultState as ArtistState,
   collection: collectionDefaultState as CollectionState,
   connection: connectionDefaultState as ConnectionState,
-  lyrics: lyricsDefaultState as LyricsState,
   player: playerDefaultState as PlayerState,
   playlist: playlistDefaultState as PlaylistState,
   queue: queueDefaultState as QueueState,

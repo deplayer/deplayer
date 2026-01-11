@@ -16,10 +16,7 @@ export const HIDE_ADD_MEDIA_MODAL = "HIDE_ADD_MEDIA_MODAL";
 export const START_YOUTUBE_DL_SERVER_SCAN = "START_YOUTUBE_DL_SERVER_SCAN";
 
 // Lyrics
-export const FETCH_LYRICS = "FETCH_LYRICS";
-export const LYRICS_FOUND = "LYRICS_FOUND";
-export const NO_LYRICS_FOUND = "NO_LYRICS_FOUND";
-export const CLEAR_LYRICS = "CLEAR_LYRICS";
+export const FETCH_LYRICS = "FETCH_LYRICS"; // Triggers saga to fetch from API
 
 // Player
 export const VOLUME_SET = "VOLUME_SET";

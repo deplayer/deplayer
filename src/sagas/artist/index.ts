@@ -3,63 +3,21 @@ import * as types from '../../constants/ActionTypes'
 import { getSongById, getSettingsFromLiveStore } from './../selectors'
 import MusicbrainzProvider from '../../providers/MusicbrainzProvider'
 import ArtistService from '../../services/ArtistService'
-import LyricsService from '../../services/LyricsService'
 import LyricsovhProvider from '../../providers/LyricsovhProvider'
 import { getAdapter } from '../../services/database'
 import { media } from '../../schema'
 import { eq } from 'drizzle-orm'
 import { createLogger } from '../../utils/logger'
+import { getLiveStoreInstance } from '../../App'
+import { addLyricsAction } from '../../stores/livestore/actions/lyrics'
+import { queryDb } from '@livestore/livestore'
+import { tables } from '../../stores/livestore/schema'
 
 const logger = createLogger({ namespace: 'artist-saga' })
-
-// Service interfaces for better testability
-export interface ILyricsRepository {
-  getLyrics(songId: string): Promise<{ lyrics: string } | null>
-  saveLyrics(songId: string, lyrics: string): Promise<void>
-  ensureSongExists(song: any): Promise<void>
-}
 
 interface IArtistRepository {
   getMetadata(artistName: string): Promise<any>
   saveMetadata(artistName: string, metadata: any): Promise<void>
-}
-
-// Default implementations (can be imported from separate files)
-class DefaultLyricsRepository implements ILyricsRepository {
-  constructor(private adapter: any, private lyricsService: any) {}
-
-  async getLyrics(songId: string) {
-    return this.lyricsService.get(songId)
-  }
-
-  async saveLyrics(songId: string, lyrics: string) {
-    return this.lyricsService.save(songId, lyrics)
-  }
-
-  async ensureSongExists(song: any) {
-    const db = await this.adapter.getDb()
-    const existingSong = await db.select().from(media).where(eq(media.id, song.id))
-
-    if (!existingSong || existingSong.length === 0) {
-      logger.debug('Song not in database, saving it first...')
-      await db.insert(media).values({
-        id: song.id,
-        title: song.title,
-        artist: song.artist,
-        type: song.type,
-        album: song.album,
-        cover: song.cover || null,
-        stream: song.stream,
-        duration: song.duration,
-        playCount: 0,
-        genres: song.genres || [],
-        track: song.track || null,
-        discNumber: song.discNumber || null,
-        year: song.year || null,
-        searchableText: `${song.title} ${song.artist.name} ${song.album.name}`,
-      })
-    }
-  }
 }
 
 class DefaultArtistRepository implements IArtistRepository {
@@ -117,33 +75,59 @@ function* loadMoreArtistSongsFromProvider(
   }
 }
 
-export function* fetchSongMetadata(
-  action: any,
-  lyricsRepo: ILyricsRepository = new DefaultLyricsRepository(getAdapter(), new LyricsService(getAdapter()))
-): any {
+export function* fetchSongMetadata(action: any): any {
   const song = yield select(getSongById, action.songId)
   if (!song) {
-    yield put({ type: types.NO_LYRICS_FOUND, error: 'Song not found' })
+    logger.error('Song not found:', action.songId)
+    return
+  }
+
+  const liveStore = getLiveStoreInstance()
+  if (!liveStore) {
+    logger.error('LiveStore not available')
     return
   }
 
   try {
     // First ensure the song exists in the database
-    yield call([lyricsRepo, 'ensureSongExists'], song)
+    const adapter = getAdapter()
+    const db = yield call([adapter, 'getDb'])
+    const existingSong = yield call([db, 'select'], { from: media, where: eq(media.id, song.id) })
 
-    // Now try to get lyrics from database
-    const storedLyrics = yield call([lyricsRepo, 'getLyrics'], song.id)
-    logger.debug('Database response:', storedLyrics)
+    if (!existingSong || existingSong.length === 0) {
+      logger.debug('Song not in database, saving it first...')
+      yield call([db, 'insert'], media, {
+        id: song.id,
+        title: song.title,
+        artist: song.artist,
+        type: song.type,
+        album: song.album,
+        cover: song.cover || null,
+        stream: song.stream,
+        duration: song.duration,
+        playCount: 0,
+        genres: song.genres || [],
+        track: song.track || null,
+        discNumber: song.discNumber || null,
+        year: song.year || null,
+        searchableText: `${song.title} ${song.artist.name} ${song.album.name}`,
+      })
+    }
 
-    // Check if we actually have lyrics in the database
-    if (storedLyrics && storedLyrics.lyrics) {
-      logger.debug('Found lyrics in database:', storedLyrics)
-      yield put({ type: types.LYRICS_FOUND, data: storedLyrics.lyrics })
+    // Check if lyrics already exist in LiveStore
+    const lyricsQuery = queryDb(
+      tables.lyrics.select().where('mediaId', '=', song.id).limit(1)
+    )
+    const storedLyrics = yield call(() => liveStore.query(lyricsQuery))
+    
+    if (storedLyrics && storedLyrics.length > 0 && storedLyrics[0].lyricsText) {
+      logger.debug('Found lyrics in LiveStore')
+      // Lyrics already exist, no need to dispatch anything - LiveStore hook will update automatically
       return
     }
 
-    logger.debug('No lyrics in database, fetching from API for song:', song)
-    // If not in database, try to fetch from API
+    logger.debug('No lyrics in LiveStore, fetching from API for song:', song)
+    // If not in LiveStore, try to fetch from API
     const mbProvider = new LyricsovhProvider()
     try {
       const response = yield call([mbProvider, 'searchLyrics'], song)
@@ -153,24 +137,16 @@ export function* fetchSongMetadata(
         throw new Error('No lyrics found in API response')
       }
 
-      // Save to database
-      yield call([lyricsRepo, 'saveLyrics'], song.id, response.lyrics)
-      yield put({ type: types.LYRICS_FOUND, data: response.lyrics })
+      // Save to LiveStore
+      yield call(addLyricsAction, liveStore, song.id, response.lyrics, 'lyrics.ovh')
+      logger.debug('Lyrics saved to LiveStore')
     } catch (apiError: any) {
       logger.error('API Error:', apiError)
-      // Handle API-specific errors
-      yield put({ 
-        type: types.NO_LYRICS_FOUND, 
-        error: apiError.message || 'Failed to fetch lyrics from provider'
-      })
+      // Lyrics fetch failed - component will show "Loading lyrics..." indefinitely or we can add error state
+      // For now, just log the error
     }
   } catch (error: any) {
-    logger.error('Database Error:', error)
-    // Handle database errors
-    yield put({ 
-      type: types.NO_LYRICS_FOUND, 
-      error: `Database error: ${error.message}` 
-    })
+    logger.error('Error fetching lyrics:', error)
   }
 }
 

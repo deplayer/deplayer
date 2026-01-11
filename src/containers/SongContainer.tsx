@@ -28,7 +28,6 @@ export default connect(
       collection: state.collection,
       settings: state.settings,
       queue: state.queue,
-      lyrics: state.lyrics,
       player: state.player,
       loading: state.collection.loading,
     }

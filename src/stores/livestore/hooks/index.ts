@@ -59,6 +59,12 @@ export {
   useFavoriteIds,
 } from './useFavorites'
 
+// Lyrics hooks
+export {
+  useLyrics,
+  useAllLyrics,
+} from './useLyrics'
+
 // Settings hooks
 export {
   useSettings,

@@ -9,14 +9,12 @@ import { renderWithProviders, defaultTestState, TestState } from '../../utils/te
 import { State as QueueState } from '../../reducers/queue'
 import { State as CollectionState } from '../../reducers/collection'
 import { State as PlayerState } from '../../reducers/player'
-import { State as LyricsState } from '../../reducers/lyrics'
 import { Dispatch } from 'redux'
 
 interface Props {
   playerPortal: any
   location: Location
   player: PlayerState
-  lyrics: LyricsState
   collection: CollectionState
   queue: QueueState
   songId: string
@@ -117,11 +115,6 @@ const createTestProps = (customProps: Partial<Props> = {}): TestSetup => {
       currentTime: 0,
       duration: song.duration
     },
-    lyrics: {
-      ...defaultTestState.lyrics!,
-      lyrics: undefined,
-      error: undefined
-    },
     location: window.location
   }
 
@@ -135,8 +128,7 @@ const createTestState = (setup: TestSetup): Partial<TestState> => ({
   ...defaultTestState,
   collection: setup.props.collection,
   queue: setup.props.queue,
-  player: setup.props.player,
-  lyrics: setup.props.lyrics
+  player: setup.props.player
 })
 
 describe('SongView', () => {
