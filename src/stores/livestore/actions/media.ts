@@ -18,19 +18,19 @@ function normalizeMediaForLiveStore(media: IMedia): any {
       id: media.album.id,
       name: media.album.name,
       artistId: media.album.artist?.id || media.artist.id, // album.artist.id or fallback to media.artist.id
-      thumbnailUrl: media.album.thumbnailUrl,
-      year: media.album.year,
+      thumbnailUrl: media.album.thumbnailUrl ?? undefined, // Convert null to undefined
+      year: media.album.year ?? undefined, // Convert null to undefined
     },
     type: media.type,
-    duration: media.duration,
-    track: media.track,
-    discNumber: media.discNumber,
+    duration: media.duration ?? undefined, // Convert null to undefined
+    track: media.track ?? undefined, // Convert null to undefined
+    discNumber: media.discNumber ?? undefined, // Convert null to undefined
     stream: media.stream,
-    cover: media.cover,
+    cover: media.cover ?? undefined, // Convert null to undefined
     genres: media.genres || [],
-    externalId: media.externalId,
-    shareUrl: media.shareUrl,
-    filePath: media.filePath,
+    externalId: media.externalId ?? undefined, // Convert null to undefined
+    shareUrl: media.shareUrl ?? undefined, // Convert null to undefined
+    filePath: media.filePath ?? undefined, // Convert null to undefined
   }
 }
 
