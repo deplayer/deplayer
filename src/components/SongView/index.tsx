@@ -25,6 +25,7 @@ import { State as CollectionState } from '../../reducers/collection'
 import { State as PlayerState } from '../../reducers/player'
 import FavoriteButton from '../common/FavoriteButton'
 import { useQueue } from '../../stores/livestore/hooks'
+import { useUI } from '../../contexts/UIContext'
 
 const MAX_LIST_ITEMS = 25
 
@@ -54,6 +55,7 @@ type StreamUrl = {
 const SongView = ({ songId, loading, className = '', dispatch, playerPortal, player, collection }: Props) => {
   const navigate = useNavigate()
   const liveQueue = useQueue('default')
+  const { setFilter, clearFilters } = useUI()
   
   // Helper to parse trackIds from LiveStore (can be JSON string or array)
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
@@ -144,26 +146,18 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
 
   const handleGenreClick = (genre: string) => {
     // Reset all filters first
-    dispatch({ type: types.CLEAR_COLLECTION_FILTERS })
+    clearFilters()
     // Set the genre filter
-    dispatch({
-      type: types.SET_COLLECTION_FILTER,
-      filterType: 'genres',
-      values: [genre]
-    })
+    setFilter('genres', [genre])
     // Navigate to collection view
     navigate('/collection')
   }
 
   const handleTypeClick = (type: string) => {
     // Reset all filters first
-    dispatch({ type: types.CLEAR_COLLECTION_FILTERS })
+    clearFilters()
     // Set the type filter
-    dispatch({
-      type: types.SET_COLLECTION_FILTER,
-      filterType: 'types',
-      values: [type]
-    })
+    setFilter('types', [type])
     // Navigate to collection view
     navigate('/collection')
   }

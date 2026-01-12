@@ -1,9 +1,8 @@
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Translate } from 'react-redux-i18n'
-import * as types from '../../constants/ActionTypes'
-import { Dispatch } from 'redux'
 import { useGenres } from '../../stores/livestore/hooks'
+import { useUI } from '../../contexts/UIContext'
 
 interface GenreTag {
   name: string
@@ -11,13 +10,10 @@ interface GenreTag {
   weight: number // 1-5 scale for font size
 }
 
-type Props = {
-  dispatch: Dispatch
-}
-
-const GenreTagCloud = ({ dispatch }: Props) => {
+const GenreTagCloud = () => {
   const navigate = useNavigate()
   const genres = useGenres()
+  const { setFilter, clearFilters } = useUI()
 
   const genreTags = useMemo(() => {
     // Find max count for weight calculation
@@ -45,12 +41,8 @@ const GenreTagCloud = ({ dispatch }: Props) => {
           <button
             key={name}
             onClick={() => {
-              dispatch({ type: types.CLEAR_COLLECTION_FILTERS })
-              dispatch({
-                type: types.SET_COLLECTION_FILTER,
-                filterType: 'genres',
-                values: [name]
-              })
+              clearFilters()
+              setFilter('genres', [name])
               navigate('/collection')
             }}
             className="px-3 py-2 rounded-full bg-base-300 hover:bg-primary/20 transition-colors duration-200"

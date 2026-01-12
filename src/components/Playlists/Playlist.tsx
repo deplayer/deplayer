@@ -14,6 +14,8 @@ import { useMediaMap } from '../../stores/livestore/hooks'
 import { useStore } from '@livestore/react'
 import { playAllAction, addToQueueAction } from '../../stores/livestore/actions'
 import { deleteSmartPlaylistAction } from '../../stores/livestore/actions/smartPlaylists'
+import { useUI } from '../../contexts/UIContext'
+import type { Filter } from '../../types/collection'
 
 type Props = {
   playlist: {
@@ -30,6 +32,7 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
   const [showSongs, setShowSongs] = useState(false)
   const navigate = useNavigate()
   const isSmartPlaylist = 'filters' in playlist
+  const { setFilter, clearFilters } = useUI()
   
   // Get all media from LiveStore
   const mediaMap = useMediaMap()
@@ -95,18 +98,14 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
   }, [liveStore, isSmartPlaylist, playlist, mediaMap])
 
   const handleApplyFilters = useCallback(() => {
-    dispatch({ type: types.CLEAR_COLLECTION_FILTERS })
+    clearFilters()
     Object.entries(playlist.filters || {}).forEach(([filterType, values]) => {
       if (values.length) {
-        dispatch({
-          type: types.SET_COLLECTION_FILTER,
-          filterType,
-          values
-        })
+        setFilter(filterType as keyof Filter, values)
       }
     })
     navigate('/collection')
-  }, [playlist.filters, dispatch, navigate])
+  }, [playlist.filters, clearFilters, setFilter, navigate])
 
   const handleDeletePlaylist = useCallback(async () => {
     if (!liveStore || !playlist.id) return
