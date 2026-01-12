@@ -115,10 +115,14 @@ const initialState: UIState = {
 
 type Props = {
   children: ReactNode
+  initialState?: Partial<UIState>
 }
 
-export const UIProvider = ({ children }: Props) => {
-  const [state, setState] = useState<UIState>(initialState)
+export const UIProvider = ({ children, initialState: customInitialState }: Props) => {
+  const [state, setState] = useState<UIState>({
+    ...initialState,
+    ...customInitialState
+  })
 
   // Panels
   const toggleSidebar = useCallback((value?: boolean) => {

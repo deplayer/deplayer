@@ -5,8 +5,7 @@ import EmptyState from './common/EmptyState/index'
 import { Translate } from 'react-redux-i18n'
 import classNames from 'classnames'
 import Icon from './common/Icon/index'
-import { useQueue } from '../stores/livestore/hooks'
-import { useMediaLibrary } from '../stores/livestore/hooks'
+import { useQueue, useMediaLibrary, useMediaMap } from '../stores/livestore/hooks'
 import { useSettings } from '../stores/livestore/hooks'
 import { useUI } from '../contexts'
 
@@ -30,6 +29,9 @@ const Queue = (props: Props) => {
   const mediaLibrary = useMediaLibrary()
   const liveSettings = useSettings()
   const { loading, mqlMatch, displayMiniQueue } = useUI()
+  
+  // Get mediaMap for efficient MusicTable lookup (performance optimization)
+  const mediaMap = useMediaMap()
   
   // Parse trackIds from LiveStore queue (can be JSON string or array)
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
@@ -120,6 +122,8 @@ const Queue = (props: Props) => {
     <div className={classNames('queue z-10 resize-x', className)}>
       <MusicTable
         tableIds={trackIds}
+        mediaMap={mediaMap}
+        queue={liveQueue}
         disableCovers={slim}
         disableAddButton
         slim={slim}

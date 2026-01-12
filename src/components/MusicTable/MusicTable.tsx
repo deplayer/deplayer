@@ -20,6 +20,8 @@ import { useDispatch } from 'react-redux'
 type Props = {
   error?: string,
   tableIds: Array<string>,
+  mediaMap?: Record<string, any>,  // Optional: Media lookup map for performance
+  queue?: any,  // Optional: Queue data to avoid N queries
   disableCurrent?: boolean,
   disableCovers?: boolean,
   disableAddButton?: boolean,
@@ -96,6 +98,8 @@ const LoadingRow = ({ style, slim }: { style: any, slim: boolean }) => (
 // Wrapper component for individual song loading
 const SongRowWrapper = React.memo(({ 
   songId, 
+  mediaMap,
+  queue,
   isCurrent,
   style, 
   slim,
@@ -105,6 +109,8 @@ const SongRowWrapper = React.memo(({
   disableCovers,
 }: {
   songId: string
+  mediaMap?: Record<string, any>
+  queue?: any
   isCurrent: boolean
   style: any
   slim: boolean
@@ -113,8 +119,15 @@ const SongRowWrapper = React.memo(({
   disableAddButton?: boolean
   disableCovers?: boolean
 }) => {
-  const song = useMediaById(songId)
-  const liveQueue = useQueue('default')
+  // Use provided mediaMap for efficient lookup, fallback to hook if not provided
+  const shouldFetchSong = !mediaMap
+  const songFromHook = useMediaById(shouldFetchSong ? songId : undefined)
+  const song = mediaMap?.[songId] ?? songFromHook
+  
+  // Use provided queue, fallback to hook if not provided
+  const shouldFetchQueue = !queue
+  const queueFromHook = useQueue(shouldFetchQueue ? 'default' : undefined)
+  const liveQueue = queue ?? queueFromHook
   
   if (!song) {
     return <LoadingRow style={style} slim={slim} />
@@ -143,19 +156,37 @@ const SongRowWrapper = React.memo(({
     />
   )
 }, (prevProps, nextProps) => {
-  // Only re-render if songId or isCurrent changed
+  // Enhanced memo comparison - skip re-render if all relevant props are equal
   return (
     prevProps.songId === nextProps.songId &&
     prevProps.isCurrent === nextProps.isCurrent &&
     prevProps.slim === nextProps.slim &&
-    prevProps.mqlMatch === nextProps.mqlMatch
+    prevProps.mqlMatch === nextProps.mqlMatch &&
+    prevProps.disableAddButton === nextProps.disableAddButton &&
+    prevProps.disableCovers === nextProps.disableCovers
+    // mediaMap and queue are stable references from parent, no need to compare
   )
 })
 
-const MusicTable = ({ error, tableIds, disableCurrent, disableCovers, disableAddButton, slim }: Props) => {
+const MusicTable = ({ 
+  error, 
+  tableIds, 
+  mediaMap,
+  queue: queueProp,
+  disableCurrent, 
+  disableCovers, 
+  disableAddButton, 
+  slim 
+}: Props) => {
+  // Only fetch queue as fallback if not provided (for backwards compatibility)
+  // Using conditional to avoid hook rules violation
+  const shouldFetchQueue = !queueProp
+  const liveQueueFallback = useQueue(shouldFetchQueue ? 'default' : undefined)
+  const liveQueue = queueProp ?? liveQueueFallback
+  
   // Get data from LiveStore hooks
   const currentSongId = useCurrentPlayingSongId('default')
-  const { loading, mqlMatch, activeFilters } = useUI()
+  const { loading, mqlMatch } = useUI()
   const location = useLocation()
   
   // Get Redux dispatch for features not yet migrated (buttons, actions)
@@ -179,7 +210,8 @@ const MusicTable = ({ error, tableIds, disableCurrent, disableCovers, disableAdd
 
   const rowRenderer = ({
     index,       // Index of row
-    style,        // Style object to be applied to row (to position it);
+    key,         // Key for React reconciliation
+    style,       // Style object to be applied to row (to position it);
     slim
     // This must be passed through to the rendered row element.
   }: { index: number, key: string, style: any, slim: boolean }): any => {
@@ -188,7 +220,10 @@ const MusicTable = ({ error, tableIds, disableCurrent, disableCovers, disableAdd
 
     return (
       <SongRowWrapper 
-        songId={songId} 
+        key={key}
+        songId={songId}
+        mediaMap={mediaMap}
+        queue={liveQueue}
         isCurrent={isCurrent}
         style={style} 
         slim={slim}
@@ -242,7 +277,7 @@ const MusicTable = ({ error, tableIds, disableCurrent, disableCovers, disableAdd
     }
   }
 
-  const actions = React.useMemo(() => getActions(), [location.pathname, activeFilters])
+  const actions = React.useMemo(() => getActions(), [location.pathname, currentSongId, tableIds.length])
 
   const handleScroll = ({ clientHeight, scrollHeight, scrollTop }: { clientHeight: number, scrollHeight: number, scrollTop: number }) => {
     // If content isn't scrollable, always keep toolbar visible

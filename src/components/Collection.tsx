@@ -7,7 +7,7 @@ import { Location } from 'react-router'
 import EmptyState from './common/EmptyState/index'
 import TryDemoButton from './Buttons/TryDemoButton'
 import Icon from './common/Icon'
-import { useSettings, useFilteredMedia } from '../stores/livestore/hooks'
+import { useSettings, useFilteredMedia, useMediaMap, useQueue } from '../stores/livestore/hooks'
 import { useUI } from '../contexts'
 import { useSelector } from 'react-redux'
 import { State } from '../reducers'
@@ -29,6 +29,12 @@ const Collection = () => {
   
   // Get filtered media from LiveStore
   const filteredSongs = useFilteredMedia(activeFilters)
+  
+  // Get mediaMap for efficient lookup (performance optimization)
+  const mediaMap = useMediaMap()
+  
+  // Get queue once for MusicTable (performance optimization)
+  const queue = useQueue('default')
   
   // Get Redux state for search results (not yet migrated)
   const searchResults = useSelector((state: State) => state.collection.searchResults)
@@ -71,6 +77,8 @@ const Collection = () => {
         ) : (
           <MusicTable
             tableIds={mediaItems}
+            mediaMap={mediaMap}
+            queue={queue}
             disableCovers={false}
           />
         )}

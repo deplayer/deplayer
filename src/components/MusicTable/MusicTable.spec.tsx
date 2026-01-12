@@ -1,9 +1,17 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { screen, within, cleanup } from '@testing-library/react'
+import { screen, within, cleanup, waitFor } from '@testing-library/react'
 import MusicTable from './MusicTable'
 import { renderWithProviders } from '../../test-utils/render'
 import { createTestMediaList } from '../../test-utils/factories'
 import { createDefaultState } from '../../test-utils/store'
+
+// Mock LiveStore hooks since tests provide data via props
+vi.mock('../../stores/livestore/hooks', () => ({
+  useMediaById: vi.fn(() => null),
+  useQueue: vi.fn(() => null),
+  useCurrentPlayingSongId: vi.fn(() => null),
+  useIsFavorite: vi.fn(() => false),
+}))
 
 // Mock react-virtualized's AutoSizer
 vi.mock('react-virtualized', async () => {
@@ -24,8 +32,27 @@ describe('MusicTable', () => {
   const setup = (customProps = {}) => {
     const defaultState = createDefaultState()
     const mediaList = createTestMediaList(2)
+    
+    // Create mediaMap from test media
+    const mediaMap = {
+      'song1': mediaList[0],
+      'song2': mediaList[1]
+    }
+    
+    // Create mock queue
+    const mockQueue = {
+      id: 'default',
+      trackIds: ['song1', 'song2'],
+      currentPlaying: null,
+      shuffle: false,
+      repeat: 'off',
+      randomTrackIds: []
+    }
+    
     const defaultProps = {
       tableIds: ['song1', 'song2'],
+      mediaMap: mediaMap,
+      queue: mockQueue,
       error: '',
       dispatch: vi.fn(),
       app: {
@@ -58,12 +85,19 @@ describe('MusicTable', () => {
     return {
       ...renderWithProviders(<MusicTable {...props} />, { initialState }),
       props,
-      mediaList
+      mediaList,
+      mediaMap,
+      mockQueue
     }
   }
 
-  it('renders a table with songs', () => {
+  it('renders a table with songs', async () => {
     const { mediaList } = setup()
+    
+    // Wait for LiveStore to initialize and component to render
+    await waitFor(() => {
+      expect(screen.queryByText(/LiveStore is loading/)).not.toBeInTheDocument()
+    })
     
     // Since we're using react-virtualized, we need to check for grid
     const grid = screen.getByRole('grid')
@@ -83,13 +117,25 @@ describe('MusicTable', () => {
     })
   })
 
-  it('displays error message when provided', () => {
+  it('displays error message when provided', async () => {
     setup({ error: 'Test error message' })
+    
+    // Wait for LiveStore to initialize
+    await waitFor(() => {
+      expect(screen.queryByText(/LiveStore is loading/)).not.toBeInTheDocument()
+    })
+    
     expect(screen.getByText('Test error message')).toBeInTheDocument()
   })
 
-  it('handles empty table gracefully', () => {
+  it('handles empty table gracefully', async () => {
     setup({ tableIds: [] })
+    
+    // Wait for LiveStore to initialize
+    await waitFor(() => {
+      expect(screen.queryByText(/LiveStore is loading/)).not.toBeInTheDocument()
+    })
+    
     const grid = screen.getByRole('grid')
     expect(grid).toBeInTheDocument()
     expect(within(grid).queryByRole('row')).not.toBeInTheDocument()
