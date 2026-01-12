@@ -13,6 +13,43 @@ import { useFavoriteIds } from './useFavorites'
  */
 
 /**
+ * Transform raw LiveStore media data to include nested artist/album objects
+ * 
+ * LiveStore stores artist/album data flat (artistId, artistName, albumId, albumName)
+ * but components expect nested objects (artist.id, artist.name, album.id, album.name)
+ * 
+ * This transformation reconstructs the nested structure while preserving flat fields.
+ * 
+ * @param rawMedia - Raw media object from LiveStore SQLite query
+ * @returns Transformed media with nested artist/album objects
+ */
+function transformMediaFromLiveStore(rawMedia: any): any {
+  if (!rawMedia) return null
+  
+  // Reconstruct nested artist object from flat fields
+  const artist = {
+    id: rawMedia.artistId || '',
+    name: rawMedia.artistName || 'Unknown Artist',
+  }
+  
+  // Reconstruct nested album object from flat fields
+  const album = {
+    id: rawMedia.albumId || '',
+    name: rawMedia.albumName || 'Unknown Album',
+    artistId: rawMedia.artistId || '',
+    artist: artist, // Album also references its artist
+    thumbnailUrl: rawMedia.cover?.thumbnailUrl || null,
+    year: rawMedia.year || null,
+  }
+  
+  return {
+    ...rawMedia, // Preserve all original flat fields (artistName, albumName, etc.)
+    artist,      // Add nested artist object
+    album,       // Add nested album object
+  }
+}
+
+/**
  * Get all media from the library
  * 
  * @example
@@ -22,13 +59,18 @@ import { useFavoriteIds } from './useFavorites'
  * ```
  */
 export const useMediaLibrary = () => {
-  return useQuery(
+  const rawMedia = useQuery(
     queryDb(
       tables.media
         .select()
         .orderBy('title', 'asc')
     )
   )
+  
+  return useMemo(() => {
+    if (!Array.isArray(rawMedia)) return []
+    return rawMedia.map(transformMediaFromLiveStore)
+  }, [rawMedia])
 }
 
 /**
@@ -72,7 +114,8 @@ export const useMediaById = (id: string | null | undefined) => {
         : tables.media.select().where('id', '=', '__NONE__').limit(1) // Return empty if no id
     )
   )
-  return (result as any[])[0] || null
+  const rawMedia = (result as any[])[0] || null
+  return transformMediaFromLiveStore(rawMedia)
 }
 
 /**
@@ -85,7 +128,7 @@ export const useMediaById = (id: string | null | undefined) => {
  * ```
  */
 export const useMediaByArtist = (artistId: string | null | undefined) => {
-  return useQuery(
+  const rawMedia = useQuery(
     queryDb(
       artistId
         ? tables.media
@@ -95,6 +138,11 @@ export const useMediaByArtist = (artistId: string | null | undefined) => {
         : tables.media.select().where('id', '=', '__NONE__') // Return empty if no artistId
     )
   )
+  
+  return useMemo(() => {
+    if (!Array.isArray(rawMedia)) return []
+    return rawMedia.map(transformMediaFromLiveStore)
+  }, [rawMedia])
 }
 
 /**
@@ -107,7 +155,7 @@ export const useMediaByArtist = (artistId: string | null | undefined) => {
  * ```
  */
 export const useMediaByAlbum = (albumId: string | null | undefined) => {
-  return useQuery(
+  const rawMedia = useQuery(
     queryDb(
       albumId
         ? tables.media
@@ -118,6 +166,11 @@ export const useMediaByAlbum = (albumId: string | null | undefined) => {
         : tables.media.select().where('id', '=', '__NONE__') // Return empty if no albumId
     )
   )
+  
+  return useMemo(() => {
+    if (!Array.isArray(rawMedia)) return []
+    return rawMedia.map(transformMediaFromLiveStore)
+  }, [rawMedia])
 }
 
 /**
@@ -133,7 +186,7 @@ export const useMediaByAlbum = (albumId: string | null | undefined) => {
 export const useSearchMedia = (searchTerm: string) => {
   const term = searchTerm.trim()
   
-  return useQuery(
+  const rawMedia = useQuery(
     queryDb(
       term.length > 0
         ? tables.media
@@ -143,6 +196,11 @@ export const useSearchMedia = (searchTerm: string) => {
         : tables.media.select().where('id', '=', '__NONE__') // Return empty if no search term
     )
   )
+  
+  return useMemo(() => {
+    if (!Array.isArray(rawMedia)) return []
+    return rawMedia.map(transformMediaFromLiveStore)
+  }, [rawMedia])
 }
 
 /**
@@ -157,7 +215,7 @@ export const useSearchMedia = (searchTerm: string) => {
  * ```
  */
 export const useRecentlyPlayed = (limit = 20) => {
-  return useQuery(
+  const rawMedia = useQuery(
     queryDb(
       tables.media
         .select()
@@ -165,6 +223,11 @@ export const useRecentlyPlayed = (limit = 20) => {
         .limit(limit)
     )
   )
+  
+  return useMemo(() => {
+    if (!Array.isArray(rawMedia)) return []
+    return rawMedia.map(transformMediaFromLiveStore)
+  }, [rawMedia])
 }
 
 /**
@@ -179,7 +242,7 @@ export const useRecentlyPlayed = (limit = 20) => {
  * ```
  */
 export const useMostPlayed = (limit = 20) => {
-  return useQuery(
+  const rawMedia = useQuery(
     queryDb(
       tables.media
         .select()
@@ -187,6 +250,11 @@ export const useMostPlayed = (limit = 20) => {
         .limit(limit)
     )
   )
+  
+  return useMemo(() => {
+    if (!Array.isArray(rawMedia)) return []
+    return rawMedia.map(transformMediaFromLiveStore)
+  }, [rawMedia])
 }
 
 /**
