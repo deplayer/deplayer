@@ -7,7 +7,6 @@ const ConnectedContextualMenu = connect(
     app: state.app,
     slim: state.app.slimPlayer,
     player: state.player,
-    collection: state.collection
   })
 )((props: any) => {
   return (

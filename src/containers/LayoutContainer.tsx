@@ -82,8 +82,6 @@ const connector = connect(
       backgroundImage: state.app.backgroundImage,
       app: state.app,
       player: state.player,
-      collection: state.collection,
-      tableIds: Object.keys(state.collection.artists)
     }
   }
 )

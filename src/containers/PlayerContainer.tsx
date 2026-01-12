@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import PlayerControls from '../components/Player/PlayerControls'
 import { useLocation } from 'react-router'
 import { State } from '../reducers'
-import { useQueue, useSettings } from '../stores/livestore/hooks'
+import { useQueue, useSettings, useMediaMap } from '../stores/livestore/hooks'
 import { defaultState as queueDefaultState } from '../reducers/queue'
 import { defaultState as settingsDefaultState } from '../reducers/settings'
 
@@ -11,12 +11,12 @@ const ConnectedPlayer = connect(
     app: state.app,
     slim: false,
     player: state.player,
-    collection: state.collection
   })
 )((props: any) => {
   const location = useLocation()
   const liveQueue = useQueue('default')
   const liveSettings = useSettings()
+  const mediaMap = useMediaMap()
   
   // Parse trackIds from LiveStore queue (can be JSON string or array)
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
@@ -51,6 +51,11 @@ const ConnectedPlayer = connect(
     settings: liveSettings,
     settingsForm: { providers: {}, fields: {} }
   } : settingsDefaultState
+  
+  // Create collection object with rows (mediaMap) for PlayerControls
+  const collection = {
+    rows: mediaMap
+  }
 
   return (
     <PlayerControls 
@@ -58,6 +63,7 @@ const ConnectedPlayer = connect(
       location={location}
       queue={queue}
       settings={settings}
+      collection={collection}
       itemCount={trackIds.length}
     />
   )
