@@ -1,4 +1,4 @@
-import { Filter } from "../reducers/collection";
+import { Filter } from "../types/collection";
 import type Media from "../entities/Media";
 
 /**

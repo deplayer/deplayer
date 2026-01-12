@@ -2,14 +2,10 @@ import * as types from "../constants/ActionTypes";
 import Artist from "../entities/Artist";
 import IMedia from "../entities/Media";
 import { applyFilters } from "../utils/apply-filters";
+import type { Filter } from "../types/collection";
 
-export type Filter = {
-  genres: string[];
-  types: string[];
-  artists: string[];
-  providers: string[];
-  favorites: boolean;
-};
+// Re-export Filter type for backward compatibility
+export type { Filter };
 
 export type State = {
   rows: { [key: string]: IMedia };

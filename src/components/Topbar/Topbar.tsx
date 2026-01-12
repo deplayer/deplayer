@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { Dispatch } from 'redux'
 import SearchInput from './SearchInput'
 import Icon from '../common/Icon'
-import { State as CollectionState } from '../../reducers/collection'
 import { State as AppState } from '../../reducers/app'
 import * as types from '../../constants/ActionTypes'
 import { startSearch, StartSearchAction } from '../../types/search'
@@ -15,7 +14,6 @@ type Props = {
   searchToggled: boolean,
   dispatch: Dispatch<StartSearchAction | { type: string; [key: string]: any }>,
   onSetSidebarOpen?: (open: boolean) => void,
-  collection?: CollectionState,
   app?: AppState,
   children?: React.ReactNode
 }

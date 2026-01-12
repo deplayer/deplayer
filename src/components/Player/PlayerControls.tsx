@@ -8,7 +8,6 @@ import { InPortal, OutPortal, createHtmlPortalNode } from 'react-reverse-portal'
 import SpectrumVisualizer from '../SpectrumVisualizer'
 import { State as PlayerState } from '../../reducers/player'
 import { State as SettingsState } from '../../reducers/settings'
-import { State as CollectionState } from '../../reducers/collection'
 import { State as QueueState } from '../../reducers/queue'
 import { State as AppState } from '../../reducers/app'
 import Controls from './Controls'
@@ -33,7 +32,7 @@ interface Props {
   player: PlayerState
   settings: SettingsState
   itemCount: number
-  collection: CollectionState
+  collection: { rows: Record<string, any> } // Simplified type - only needs rows (from LiveStore or Redux)
   dispatch: Dispatch
   playerPortal: ReturnType<typeof createHtmlPortalNode>
   match: {
