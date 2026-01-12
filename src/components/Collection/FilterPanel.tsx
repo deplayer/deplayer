@@ -8,33 +8,21 @@ import { useState, useEffect } from 'react'
 import { useUI } from '../../contexts/UIContext'
 import { useStore } from '@livestore/react'
 import { createSmartPlaylistAction } from '../../stores/livestore/actions/smartPlaylists'
-
-interface MediaItem {
-  genres?: string[];
-  type: string;
-  stream?: Record<string, unknown>;
-}
-
-interface Artist {
-  id: string;
-  name: string;
-}
-
-interface Collection {
-  rows: Record<string, MediaItem>;
-  artists: Record<string, Artist>;
-}
+import { useMediaLibrary, useArtists } from '../../stores/livestore/hooks'
 
 type Props = {
-  collection: Collection;
   dispatch?: Dispatch;
 }
 
-const FilterPanel = ({ collection }: Props) => {
+const FilterPanel = ({ }: Props) => {
   const { activeFilters, setFilter } = useUI()
   const { store: liveStore } = useStore()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  
+  // Get data from LiveStore
+  const mediaLibrary = useMediaLibrary()
+  const artists = useArtists()
 
   useEffect(() => {
     const handleResize = () => {
@@ -44,23 +32,30 @@ const FilterPanel = ({ collection }: Props) => {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // Get unique genres and types as before
-  const genres = Object.values(collection.rows).reduce((acc: Set<string>, media: any) => {
-    // Only process if genres exists and is an array
+  // Get unique genres from media library
+  const genres = mediaLibrary.reduce((acc: Set<string>, media: any) => {
     if (Array.isArray(media.genres)) {
       media.genres.forEach((g: string) => acc.add(g))
     }
     return acc
   }, new Set())
-  const types = new Set(Object.values(collection.rows).map((media: any) => media.type))
+  
+  // Get unique types
+  const types = new Set(mediaLibrary.map((media: any) => media.type))
 
   // Get unique providers from the media items
-  const providers = Object.values(collection.rows).reduce((acc: Set<string>, media: any) => {
+  const providers = mediaLibrary.reduce((acc: Set<string>, media: any) => {
     if (media.stream) {
       Object.keys(media.stream).forEach(provider => acc.add(provider));
     }
     return acc;
   }, new Set());
+  
+  // Create artists map for quick lookup
+  const artistsMap = artists.reduce((acc: Record<string, any>, artist: any) => {
+    acc[artist.id] = artist
+    return acc
+  }, {})
 
   // Create grouped options
   const groupedOptions = [
@@ -82,7 +77,7 @@ const FilterPanel = ({ collection }: Props) => {
     },
     {
       label: 'Artists',
-      options: Object.values(collection.artists).map((artist: any) => ({
+      options: artists.map((artist: any) => ({
         value: `artist:${artist.id}`,
         label: artist.name,
         color: '#9999ff' // Light blue for artists
@@ -104,7 +99,7 @@ const FilterPanel = ({ collection }: Props) => {
     ...activeFilters.types.map(t => ({ value: `type:${t}`, label: t, color: '#99ff99' })),
     ...activeFilters.artists.map(a => ({
       value: `artist:${a}`,
-      label: collection.artists[a].name,
+      label: artistsMap[a]?.name || a,
       color: '#9999ff'
     })),
     ...activeFilters.providers.map(p => ({

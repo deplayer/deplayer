@@ -15,8 +15,7 @@ import * as types from '../../constants/ActionTypes'
 import FilterPanel from '../Collection/FilterPanel'
 import { useMediaById, useQueue, useCurrentPlayingSongId } from '../../stores/livestore/hooks'
 import { useUI } from '../../contexts'
-import { useSelector, useDispatch } from 'react-redux'
-import { State } from '../../reducers'
+import { useDispatch } from 'react-redux'
 
 type Props = {
   error?: string,
@@ -34,7 +33,6 @@ const Toolbar = ({
   tableIds, 
   actions,
   dispatch,
-  collection,
 }: { 
   isToolbarVisible: boolean, 
   isToolbarHidden: boolean, 
@@ -42,7 +40,6 @@ const Toolbar = ({
   tableIds: Array<string>, 
   actions: React.ReactNode,
   dispatch: any,
-  collection: State['collection'],
 }) => {
   const location = useLocation()
   
@@ -62,7 +59,6 @@ const Toolbar = ({
             <div className='flex-1 max-w-xl'>
               <FilterPanel
                 dispatch={dispatch}
-                collection={collection}
               />
             </div>
           )}
@@ -162,8 +158,7 @@ const MusicTable = ({ error, tableIds, disableCurrent, disableCovers, disableAdd
   const { loading, mqlMatch, activeFilters } = useUI()
   const location = useLocation()
   
-  // Get Redux state for features not yet migrated (buttons, actions)
-  const reduxCollection = useSelector((state: State) => state.collection)
+  // Get Redux dispatch for features not yet migrated (buttons, actions)
   const dispatch = useDispatch()
   
   const [isToolbarVisible, setIsToolbarVisible] = React.useState(true)
@@ -281,7 +276,6 @@ const MusicTable = ({ error, tableIds, disableCurrent, disableCovers, disableAdd
         tableIds={tableIds}
         actions={actions}
         dispatch={dispatch}
-        collection={reduxCollection}
       />
       <AutoSizer className='music-table'>
         {({ height, width }: { height: number, width: number }) => (
