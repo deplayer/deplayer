@@ -93,6 +93,42 @@ export const useAlbumsByArtist = (artistId: string | null | undefined) => {
 }
 
 /**
+ * Get album IDs grouped by artist ID
+ * Returns a map of artistId -> array of album IDs
+ * Matches the Redux collection.albumsByArtist structure
+ * 
+ * @example
+ * ```tsx
+ * const albumsByArtist = useAlbumIdsByArtist()
+ * const artistAlbums = albumsByArtist['artist-123'] // ['album-1', 'album-2', ...]
+ * ```
+ */
+export const useAlbumIdsByArtist = () => {
+  const albums = useQuery(
+    queryDb(
+      tables.albums
+        .select()
+        .orderBy('year', 'desc')
+    )
+  )
+  
+  return useMemo(() => {
+    const map: Record<string, string[]> = {}
+    if (Array.isArray(albums)) {
+      albums.forEach((album: any) => {
+        if (album.artistId) {
+          if (!map[album.artistId]) {
+            map[album.artistId] = []
+          }
+          map[album.artistId].push(album.id)
+        }
+      })
+    }
+    return map
+  }, [albums])
+}
+
+/**
  * Get songs grouped by album ID
  * Returns a map of albumId -> array of song IDs
  * 

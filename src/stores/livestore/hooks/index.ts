@@ -24,6 +24,7 @@ export {
   useAlbumsMap,
   useAlbumById,
   useAlbumsByArtist,
+  useAlbumIdsByArtist,
   useSongsByAlbum,
   useRecentAlbums,
 } from './useAlbums'

@@ -1,6 +1,7 @@
 import { connect } from 'react-redux'
 import SongView from '../components/SongView'
 import { useLocation, Location } from 'react-router'
+import { useMediaMap, useAlbumsMap, useAlbumIdsByArtist, useSongsByGenre } from '../stores/livestore/hooks'
 
 const getSongId = (location: Location): string => {
   const songFinder = location.pathname.match(/\/song\/(.*)/)
@@ -17,17 +18,28 @@ const getSongId = (location: Location): string => {
 const RoutedSongView = (props: any) => {
   const location = useLocation()
   const songId = getSongId(location)
+  
+  // Get data from LiveStore
+  const mediaMap = useMediaMap()
+  const albumsMap = useAlbumsMap()
+  const albumIdsByArtist = useAlbumIdsByArtist()
+  const songsByGenre = useSongsByGenre()
+  
+  // Create collection object compatible with SongView
+  const collection = {
+    rows: mediaMap,
+    albums: albumsMap,
+    albumsByArtist: albumIdsByArtist,
+    songsByGenre: songsByGenre,
+  }
 
-
-  return (<SongView songId={songId} {...props} />)
+  return (<SongView songId={songId} collection={collection} loading={false} {...props} />)
 }
 
 export default connect(
   (state: any) => {
     return {
-      collection: state.collection,
       player: state.player,
-      loading: state.collection.loading,
     }
   }
 )(RoutedSongView)
