@@ -5,21 +5,16 @@ import { Dispatch } from 'redux'
 import { State as RootState } from '../reducers'
 import Icon from '../components/common/Icon'
 import Topbar from '../components/Topbar/Topbar'
-import { State as CollectionState } from '../reducers/collection'
 import { State as SearchState } from '../reducers/search'
 import { State as AppState } from '../reducers/app'
 import * as types from '../constants/ActionTypes'
-import { useQueue } from '../stores/livestore/hooks'
-
-type TitleCollection = {
-  rows: any
-  artists: any
-  albums: any
-}
+import { useQueue, useMediaMap, useArtistsMap, useAlbumsMap } from '../stores/livestore/hooks'
 
 const dynamicTitle = (
   location: Location,
-  collection: TitleCollection,
+  mediaMap: Record<string, any>,
+  artistsMap: Record<string, any>,
+  albumsMap: Record<string, any>,
   searchTerm: string = ''
 ): string | React.ReactNode => {
   const songFinder = location.pathname.match(/\/song\/(.*)/)
@@ -27,7 +22,7 @@ const dynamicTitle = (
   const albumFinder = location.pathname.match(/\/album\/(.*)/)
 
   if (songFinder && songFinder[1]) {
-    const song = collection.rows[songFinder[1]]
+    const song = mediaMap[songFinder[1]]
 
     if (!song) {
       return 'Song'
@@ -39,8 +34,7 @@ const dynamicTitle = (
   }
 
   if (artistFinder && artistFinder[1]) {
-    // return 'Artist'
-    const artist = collection.artists[artistFinder[1]]
+    const artist = artistsMap[artistFinder[1]]
 
     if (!artist) {
       return 'Artist'
@@ -50,8 +44,7 @@ const dynamicTitle = (
   }
 
   if (albumFinder && albumFinder[1]) {
-    // return 'Artist'
-    const album = collection.albums[albumFinder[1]]
+    const album = albumsMap[albumFinder[1]]
 
     if (!album) {
       return 'Album'
@@ -135,7 +128,6 @@ const dynamicTitle = (
 }
 
 interface TopbarWrapperProps {
-  collection: CollectionState,  
   search: SearchState,
   app: AppState,
   dispatch: Dispatch,
@@ -146,8 +138,14 @@ interface TopbarWrapperProps {
 // Create a new wrapper component to handle hooks
 const TopbarWrapper = (props: TopbarWrapperProps) => {
   const location = useLocation()
-  const title = dynamicTitle(location, props.collection, props.search.searchTerm)
+  
+  // Get data from LiveStore
+  const mediaMap = useMediaMap()
+  const artistsMap = useArtistsMap()
+  const albumsMap = useAlbumsMap()
   const liveQueue = useQueue('default')
+  
+  const title = dynamicTitle(location, mediaMap, artistsMap, albumsMap, props.search.searchTerm)
   
   // Parse trackIds from LiveStore queue (can be JSON string or array)
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
@@ -180,7 +178,6 @@ const TopbarWrapper = (props: TopbarWrapperProps) => {
       searchToggled={props.search.searchToggled}
       dispatch={props.dispatch}
       onSetSidebarOpen={handleSidebarToggle}
-      collection={props.collection}
       app={props.app}
     >
       {props.children}
@@ -190,7 +187,6 @@ const TopbarWrapper = (props: TopbarWrapperProps) => {
 
 // Connect the wrapper component instead
 export default connect((state: RootState) => ({
-  collection: state.collection,
   search: state.search,
   app: state.app
 }))(TopbarWrapper)

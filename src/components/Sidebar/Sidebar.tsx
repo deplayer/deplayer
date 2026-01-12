@@ -10,7 +10,7 @@ import { State as PlayerState } from '../../reducers/player'
 type Props = {
   sidebarToggled: boolean,
   mqlMatch: boolean,
-  collection: CollectionState,
+  collection: CollectionState, // Still needed for searchResults (Search domain not migrated)
   player: PlayerState,
   app: AppState,
   children: React.ReactNode,

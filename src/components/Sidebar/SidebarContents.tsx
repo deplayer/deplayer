@@ -26,7 +26,7 @@ import LogoSvg from '../../logo.svg?react'
 
 type ContentProps = {
   dispatch: Dispatch,
-  collection: CollectionState,
+  collection: CollectionState, // Still needed for searchResults (Search domain not migrated)
   app: AppState,
   onSetSidebarOpen: Function,
   className?: string
