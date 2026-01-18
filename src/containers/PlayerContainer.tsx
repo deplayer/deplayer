@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import PlayerControls from '../components/Player/PlayerControls'
 import { useLocation } from 'react-router'
 import { State } from '../reducers'
-import { useQueue, useSettings, useMediaMap } from '../stores/livestore/hooks'
+import { useQueue, useSettings, useMediaMapForIds } from '../stores/livestore/hooks'
 import { defaultState as queueDefaultState } from '../reducers/queue'
 import { defaultState as settingsDefaultState } from '../reducers/settings'
 
@@ -16,7 +16,6 @@ const ConnectedPlayer = connect(
   const location = useLocation()
   const liveQueue = useQueue('default')
   const liveSettings = useSettings()
-  const mediaMap = useMediaMap()
   
   // Parse trackIds from LiveStore queue (can be JSON string or array)
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
@@ -33,11 +32,20 @@ const ConnectedPlayer = connect(
     ? parseTrackIds(liveQueue.randomTrackIds)
     : parseTrackIds(liveQueue?.trackIds)
   
+  // ====== OPTIMIZATION: Only load media for queue tracks (not entire library) ======
+  // This is much more efficient: load 10-50 queue items instead of 1000+ library items
+  const mediaMap = useMediaMapForIds(trackIds)
+  
   // Convert LiveStore queue to Redux-compatible format for PlayerControls
+  // IMPORTANT: LiveStore stores currentPlaying as INDEX, but PlayerControls expects TRACK ID
+  const currentPlayingId = (liveQueue?.currentPlaying !== null && liveQueue?.currentPlaying !== undefined)
+    ? trackIds[liveQueue.currentPlaying]
+    : null
+  
   const queue = liveQueue ? {
     trackIds,
     randomTrackIds: parseTrackIds(liveQueue.randomTrackIds),
-    currentPlaying: liveQueue.currentPlaying,
+    currentPlaying: currentPlayingId,  // Convert index to track ID
     repeat: liveQueue.repeat,
     shuffle: liveQueue.shuffle,
     nextSongId: liveQueue.nextSongId,

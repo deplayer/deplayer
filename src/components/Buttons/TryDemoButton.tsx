@@ -5,6 +5,8 @@ import Button from '../common/Button'
 import defaultMedia from '../../constants/defaultMedia'
 import * as types from '../../constants/ActionTypes'
 import { useMediaLibrary } from '../../stores/livestore/hooks'
+import { getLiveStoreInstance } from '../../App'
+import { addMediaBulkAction } from '../../stores/livestore/actions/media'
 
 type Props = {
   dispatch: Dispatch,
@@ -18,11 +20,20 @@ const TryDemoButton = ({ dispatch }: Props) => {
     return null
   }
 
-  const handleTryDemo = () => {
-    // First update the collection state immediately (still needs Redux for now)
-    dispatch({ type: types.RECEIVE_COLLECTION, data: [defaultMedia] })
-    // Finally set it as current playing
-    dispatch({ type: types.SET_CURRENT_PLAYING, songId: defaultMedia.id, media: defaultMedia })
+  const handleTryDemo = async () => {
+    try {
+      // Add demo media to LiveStore
+      const liveStore = getLiveStoreInstance()
+      if (liveStore) {
+        await addMediaBulkAction(liveStore, [defaultMedia])
+        // Set as current playing
+        dispatch({ type: types.SET_CURRENT_PLAYING, songId: defaultMedia.id, media: defaultMedia })
+      } else {
+        console.warn('[TryDemo] LiveStore not available')
+      }
+    } catch (error) {
+      console.error('[TryDemo] Failed to add demo media:', error)
+    }
   }
 
   return (

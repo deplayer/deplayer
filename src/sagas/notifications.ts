@@ -1,23 +1,20 @@
-import { takeLatest, call, select } from 'redux-saga/effects'
+import { takeLatest, call } from 'redux-saga/effects'
 
 import NotificatoinService from '../services/NotificationService'
 import * as types from '../constants/ActionTypes'
-
-const getCurrentSong = (state: any) => {
-  if (!state) {
-    return
-  }
-
-  const rows = state.collection.rows
-  const currentId = state.queue.currentPlaying
-  return rows[currentId]
-}
+import { getCurrentSongFromLiveStore } from './selectors'
 
 // Handling START_PLAYING saga
 function* sendCurrentPlayingNotification(): any {
   const notificationService = new NotificatoinService()
-  const currentSong = yield select(getCurrentSong)
-  yield call(notificationService.sendNotification, currentSong)
+  const currentSong = yield call(getCurrentSongFromLiveStore)
+  
+  // Defensive check: only send notification if we have a valid song
+  if (currentSong && currentSong.title && currentSong.artist) {
+    yield call(notificationService.sendNotification, currentSong)
+  } else {
+    console.warn('[Notifications] No valid current song to notify about')
+  }
 }
 
 function* setupNotifications(): any {

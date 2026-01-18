@@ -1,17 +1,16 @@
-import { Dispatch } from 'redux'
 import { useState, useEffect, useMemo, useCallback, useRef, ReactNode } from 'react'
-import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import Modal from '../common/Modal'
 import Icon from '../common/Icon'
 import Button from '../common/Button'
 import { IconType } from '../common/Icon'
-import { State as RootState } from '../../reducers'
-import { State as CollectionState } from '../../reducers/collection'
-import { startSearch, StartSearchAction } from '../../types/search'
+import { startSearch } from '../../types/search'
 import { THEMES } from '../Sidebar/ThemeModal'
 import { I18n, Translate } from 'react-redux-i18n'
 import * as types from '../../constants/ActionTypes'
+import { useSearchMediaIds, useMediaMapForIds } from '../../stores/livestore/hooks'
+import { useUI } from '../../contexts'
 
 interface BaseItem {
   id: string | number
@@ -68,19 +67,9 @@ interface GroupedItems {
 }
 
 interface Props {
-  dispatch: Dispatch<StartSearchAction | { type: string; [key: string]: any }>
-  searchResults: MediaItem[]
-  loading: boolean
-  collection: CollectionState
   togglePlaying: () => void
   playNext: () => void
   playPrev: () => void
-  navigateToArtists: () => void
-  navigateToAlbums: () => void
-  navigateToQueue: () => void
-  navigateToPlaylists: () => void
-  navigateToSettings: () => void
-  navigateToExplore: () => void
 }
 
 // Group configurations with priorities
@@ -139,8 +128,9 @@ type CommandItem = {
   icon: IconType;
 }
 
-function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext, playPrev }: Props) {
+function CommandBar({ togglePlaying, playNext, playPrev }: Props) {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -148,6 +138,27 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
   const searchTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const resultsContainerRef = useRef<HTMLDivElement>(null)
   const selectedItemRef = useRef<HTMLButtonElement>(null)
+  
+  // ====== NEW: Use LiveStore hooks for search ======
+  const { searchTerm: globalSearchTerm } = useUI()
+  const searchResultIds = useSearchMediaIds(globalSearchTerm, 50)
+  const searchResultsMedia = useMediaMapForIds(searchResultIds)
+  
+  // Convert to MediaItem format for existing code
+  const searchResults: MediaItem[] = useMemo(() => {
+    return searchResultIds.map(id => {
+      const media = searchResultsMedia[id]
+      if (!media) return null
+      return {
+        id,
+        name: media.title,
+        type: 'song' as const,
+        cover: media.cover?.thumbnailUrl,
+        artist: media.artist?.name,
+        album: media.album?.name
+      }
+    }).filter(Boolean) as MediaItem[]
+  }, [searchResultIds, searchResultsMedia])
 
   // Define available themes
   const themeItems: ThemeItem[] = THEMES.map(themeName => ({
@@ -291,7 +302,7 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
         // Only dispatch search if we have no local matches and haven't searched for this term yet
         if (localItems.length === 0 && value !== lastMediaSearch.current) {
           lastMediaSearch.current = value
-          dispatch(startSearch(value, 'all', true))
+          dispatch(startSearch(value, 'all', true) as any)
         }
         searchTimer.current = undefined
       }, 500)
@@ -512,20 +523,12 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
               data-testid="command-search-input"
             />
             <div className="p-2">
-              {loading ? (
-                <Icon icon="faSpinner" className="fa-pulse text-primary text-2xl" />
-              ) : (
-                <Icon icon="faSearch" className="text-primary text-2xl" />
-              )}
+              <Icon icon="faSearch" className="text-primary text-2xl" />
             </div>
           </div>
 
           <div className="max-h-[60vh] overflow-y-auto w-full" ref={resultsContainerRef}>
-            {loading && search.length > 1 && (
-              <div className="p-6 text-center text-lg" data-testid="search-loading">{I18n.t('menu.searching')}</div>
-            )}
-            
-            {!loading && allItems.length === 0 && search.length > 1 && (
+            {allItems.length === 0 && search.length > 1 && (
               <div className="p-6 text-center text-lg" data-testid="search-no-results">{I18n.t('menu.noResults')}</div>
             )}
 
@@ -604,27 +607,4 @@ function CommandBar({ dispatch, searchResults, loading, togglePlaying, playNext,
   )
 }
 
-export default connect(
-  (state: RootState) => ({
-    searchResults: state.collection.searchResults.map(id => {
-      const media = state.collection.rows[id];
-      if (!media) return null;
-      return {
-        id,
-        name: media.title,
-        type: 'song' as const,
-        cover: media.cover?.thumbnailUrl,
-        artist: media.artist?.name,
-        album: media.album?.name
-      };
-    }).filter(Boolean) as MediaItem[],
-    loading: state.collection.loading,
-    collection: state.collection
-  }),
-  (dispatch: Dispatch<StartSearchAction | { type: string; [key: string]: any }>) => ({
-    dispatch,
-    togglePlaying: () => dispatch({ type: 'TOGGLE_PLAYING' }),
-    playNext: () => dispatch({ type: 'PLAY_NEXT' }),
-    playPrev: () => dispatch({ type: 'PLAY_PREV' }),
-  })
-)(CommandBar)
+export default CommandBar

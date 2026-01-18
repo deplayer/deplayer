@@ -1,6 +1,5 @@
 import { Dispatch } from 'redux'
 import React from 'react'
-import { useNavigate } from 'react-router'
 import { Translate, I18n } from 'react-redux-i18n'
 
 import CommandBar from '../CommandBar'
@@ -16,17 +15,16 @@ import ThemeModal from './ThemeModal'
 
 import { inSection } from '../../utils/router'
 import Icon from '../common/Icon'
-import { State as CollectionState } from '../../reducers/collection'
 import { State as AppState } from '../../reducers/app'
 import { useLocation } from 'react-router'
 import DeplayerTitle from '../DeplayerTitle'
-import { usePlaylists, useSmartPlaylists, useQueue, useMediaLibrary, useArtists } from '../../stores/livestore/hooks'
+import { usePlaylists, useSmartPlaylists, useQueue, useMediaLibrary, useArtists, useSearchMediaIds } from '../../stores/livestore/hooks'
+import { useUI } from '../../contexts'
 
 import LogoSvg from '../../logo.svg?react'
 
 type ContentProps = {
   dispatch: Dispatch,
-  collection: CollectionState, // Still needed for searchResults (Search domain not migrated)
   app: AppState,
   onSetSidebarOpen: Function,
   className?: string
@@ -74,7 +72,9 @@ const DeplayerLogo = () => {
 
 const SidebarContents = (props: ContentProps) => {
   const location = useLocation()
-  const navigate = useNavigate()
+  
+  // Get UI state from context
+  const { searchTerm } = useUI()
   
   // Get playlists and queue from LiveStore
   const playlists = usePlaylists()
@@ -85,6 +85,9 @@ const SidebarContents = (props: ContentProps) => {
   // Get collection data from LiveStore
   const mediaLibrary = useMediaLibrary()
   const artists = useArtists()
+  
+  // Get search results count from LiveStore
+  const searchResultIds = useSearchMediaIds(searchTerm, 1000)
   
   // Parse trackIds from LiveStore queue (can be JSON string or array)
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
@@ -120,7 +123,7 @@ const SidebarContents = (props: ContentProps) => {
         )}
         <SearchMenuItem
           current={inSection(location, 'search-results')}
-          totalItems={props.collection.searchResults.length}
+          totalItems={searchResultIds.length}
         />
         <PlaylistsMenuItem 
           current={inSection(location, 'playlists')} 
@@ -149,12 +152,9 @@ const SidebarContents = (props: ContentProps) => {
 
       <div className='w-full'>  
         <CommandBar 
-          navigateToArtists={() => artists.length > 0 ? navigate('/artists') : navigate('/collection')}
-          navigateToAlbums={() => navigate('/albums')}
-          navigateToQueue={() => trackIds.length > 0 ? navigate('/queue') : navigate('/collection')}
-          navigateToPlaylists={() => navigate('/playlists')}
-          navigateToSettings={() => navigate('/settings')}
-          navigateToExplore={() => navigate('/explore')}
+          togglePlaying={() => props.dispatch({ type: 'TOGGLE_PLAYING' })}
+          playNext={() => props.dispatch({ type: 'PLAY_NEXT' })}
+          playPrev={() => props.dispatch({ type: 'PLAY_PREV' })}
         />
       </div>
 

@@ -61,6 +61,16 @@ const ProviderTags = ({ song }: { song: Media }) => {
 
 const SongRow = (props: Props) => {
   const { song, disableCovers, slim, mqlMatch } = props
+  
+  // 🔍 DEBUG: Track SongRow render
+  const renderCountRef = React.useRef(0)
+  renderCountRef.current += 1
+  
+  React.useEffect(() => {
+    if (renderCountRef.current === 1) {
+      console.log(`[SongRow] 🎵 First render: ${song.id} - ${song.title}`)
+    }
+  }, [])
 
   // Validate song data
   if (!song || !song.id) {

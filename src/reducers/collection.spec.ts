@@ -25,28 +25,11 @@ describe("collection reducer", () => {
         },
       },
     });
-    const rows = { [fixtureSong.id]: fixtureSong.toDocument() };
-    const artists = {
-      [fixtureSong.artist.id]: fixtureSong.artist.toDocument(),
-    };
-    const songsByArtist = { [fixtureSong.artist.id]: [fixtureSong.id] };
-    const albumsByArtist = { [fixtureSong.artist.id]: [fixtureSong.album.id] };
-    const songsByAlbum = { [fixtureSong.album.id]: [fixtureSong.id] };
-    const albums = { [fixtureSong.album.id]: fixtureSong.album.toDocument() };
 
+    // RECEIVE_COLLECTION no longer populates state
+    // All data lives in LiveStore, saga handles insert directly
     const expected = {
       ...initialState,
-      totalRows: 1,
-      artists,
-      songsByArtist,
-      albumsByArtist,
-      songsByAlbum,
-      albums,
-      rows,
-      loading: false,
-      mediaByType: {},
-      searchResults: [],
-      filteredSongs: [fixtureSong.id],
     };
 
     expect(

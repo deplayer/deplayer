@@ -26,6 +26,8 @@ import { State as PlayerState } from '../../reducers/player'
 import FavoriteButton from '../common/FavoriteButton'
 import { useQueue } from '../../stores/livestore/hooks'
 import { useUI } from '../../contexts/UIContext'
+import { useStore } from '@livestore/react'
+import { ensureMediaInQueueAndPlay } from '../../utils/queueHelpers'
 
 const MAX_LIST_ITEMS = 25
 
@@ -56,6 +58,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
   const navigate = useNavigate()
   const liveQueue = useQueue('default')
   const { setFilter, clearFilters } = useUI()
+  const { store: liveStore } = useStore()
   
   // Helper to parse trackIds from LiveStore (can be JSON string or array)
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
@@ -190,8 +193,19 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
               {(!songFinder || !player.playing) &&
                 <Button
                   large
-                  onClick={() => {
-                    dispatch({ type: types.SET_CURRENT_PLAYING, songId: song.id })
+                  onClick={async () => {
+                    if (!liveStore) {
+                      console.error('[SongView] LiveStore not available')
+                      return
+                    }
+                    
+                    try {
+                      // Single song view - no allMediaIds available (will create 1-song queue)
+                      await ensureMediaInQueueAndPlay(liveStore, song.id)
+                      dispatch({ type: types.SET_CURRENT_PLAYING, songId: song.id })
+                    } catch (error) {
+                      console.error('[SongView] Failed to play song:', error)
+                    }
                   }}
                 >
                   <Icon

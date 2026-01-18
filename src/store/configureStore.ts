@@ -90,7 +90,9 @@ function configureStore() {
     store.dispatch({ type: types.SET_HEIGHT_MQL, value: heightMql.matches });
   });
 
-  store.dispatch({ type: types.INITIALIZE });
+  // NOTE: INITIALIZE action is now dispatched from App.tsx after LiveStore is ready
+  // This prevents the "Cannot access 'getLiveStoreInstance' before initialization" error
+  
   // Setting up locales
   syncTranslationWithStore(store);
   store.dispatch(loadTranslations(translationsObject));

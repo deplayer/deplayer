@@ -1,31 +1,21 @@
-import { Dispatch } from 'redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import * as types from '../../constants/ActionTypes'
 import SidebarContents from './SidebarContents'
 import Sidebar from 'react-sidebar'
-import { State as CollectionState } from '../../reducers/collection'
-import { State as AppState } from '../../reducers/app'
-import { State as PlayerState } from '../../reducers/player'
+import { State } from '../../reducers'
 
 type Props = {
-  sidebarToggled: boolean,
-  mqlMatch: boolean,
-  collection: CollectionState, // Still needed for searchResults (Search domain not migrated)
-  player: PlayerState,
-  app: AppState,
-  children: React.ReactNode,
-  dispatch: Dispatch
+  children: React.ReactNode
 }
 
-function MSidebar({
-  app,
-  collection,
-  player,
-  sidebarToggled,
-  mqlMatch,
-  children,
-  dispatch
-}: Props) {
+function MSidebar({ children }: Props) {
+  const dispatch = useDispatch()
+  const sidebarToggled = useSelector((state: State) => state.app.sidebarToggled)
+  const mqlMatch = useSelector((state: State) => state.app.mqlMatch)
+  const app = useSelector((state: State) => state.app)
+  const player = useSelector((state: State) => state.player)
+  
   const docked = mqlMatch && sidebarToggled
 
   const onSetSidebarOpen = (open: boolean) => {
@@ -37,7 +27,6 @@ function MSidebar({
   const contents = (
     <SidebarContents
       app={app}
-      collection={collection}
       onSetSidebarOpen={onSetSidebarOpen}
       dispatch={dispatch}
       className={(player.playing && player.streamUri) ? 'pb-20' : ''}

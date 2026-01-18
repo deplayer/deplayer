@@ -7,6 +7,12 @@ import type { Filter } from "../types/collection";
 // Re-export Filter type for backward compatibility
 export type { Filter };
 
+/**
+ * DEPRECATED: This reducer is being phased out in favor of LiveStore.
+ * It now returns a minimal stub state for backward compatibility.
+ * DO NOT ADD NEW FEATURES HERE - use LiveStore hooks instead.
+ */
+
 export type State = {
   rows: { [key: string]: IMedia };
   albums: { [key: string]: any };
@@ -26,6 +32,7 @@ export type State = {
   recentAlbums: IMedia[];
 };
 
+// Minimal stub state - collection data now lives in LiveStore
 export const defaultState: State = {
   rows: {},
   albums: {},
@@ -38,7 +45,7 @@ export const defaultState: State = {
   searchTerm: "",
   searchResults: [],
   enabledProviders: [],
-  loading: true,
+  loading: false, // CHANGED: No longer manages loading state
   totalRows: 0,
   activeFilters: {
     genres: [],
@@ -51,85 +58,17 @@ export const defaultState: State = {
   recentAlbums: [],
 };
 
-const populateFromAction = (
-  state: State,
-  action: { data: IMedia[] }
-): State => {
-  const aggregation = action.data
-    .sort((a: IMedia, b: IMedia) => {
-      if (a.id < b.id) return -1;
-      if (a.id > b.id) return 1;
-      return 0;
-    })
-    .reduce(
-      (acc: State, songDocument: IMedia) => {
-        // Use Set for genre deduplication
-        const uniqueGenres = Array.from(new Set(songDocument.genres || []));
-        const processedSong = {
-          ...songDocument,
-          genres: uniqueGenres,
-        } as IMedia;
-
-        // Add to main collections
-        acc.rows[processedSong.id] = processedSong;
-        acc.albums[processedSong.album.id] = processedSong.album;
-        acc.artists[processedSong.artist.id] = processedSong.artist;
-
-        // Use Sets for efficient tracking of songs and albums
-        const artistSongsSet = new Set(acc.songsByArtist[processedSong.artist.id] || []);
-        const artistAlbumsSet = new Set(acc.albumsByArtist[processedSong.artist.id] || []);
-        const albumSongsSet = new Set(acc.songsByAlbum[processedSong.album.id] || []);
-
-        // Add items to Sets (automatic deduplication)
-        artistSongsSet.add(processedSong.id);
-        artistAlbumsSet.add(processedSong.album.id);
-        albumSongsSet.add(processedSong.id);
-
-        // Convert Sets back to arrays for Redux state
-        acc.songsByArtist[processedSong.artist.id] = Array.from(artistSongsSet);
-        acc.albumsByArtist[processedSong.artist.id] = Array.from(artistAlbumsSet);
-        acc.songsByAlbum[processedSong.album.id] = Array.from(albumSongsSet);
-
-        // Handle genres with Sets
-        uniqueGenres.forEach((genre) => {
-          const genreSongsSet = new Set(acc.songsByGenre[genre] || []);
-          genreSongsSet.add(processedSong.id);
-          acc.songsByGenre[genre] = Array.from(genreSongsSet);
-        });
-
-        // Handle media type with Sets
-        const mediaTypeSet = new Set(acc.mediaByType[processedSong.type] || []);
-        mediaTypeSet.add(processedSong.id);
-        acc.mediaByType[processedSong.type] = Array.from(mediaTypeSet);
-
-        return acc;
-      },
-      {
-        ...defaultState,
-        rows: { ...state.rows },
-        albums: { ...state.albums },
-        artists: { ...state.artists },
-        songsByArtist: { ...state.songsByArtist },
-        songsByGenre: { ...state.songsByGenre },
-        albumsByArtist: { ...state.albumsByArtist },
-        songsByAlbum: { ...state.songsByAlbum },
-        mediaByType: { ...state.mediaByType },
-        enabledProviders: [...state.enabledProviders],
-      }
-    );
-
-  // Use Set for filtered songs deduplication
-  const filteredSongsSet = new Set(applyFilters(aggregation.rows, state.activeFilters));
-
-  return {
-    ...aggregation,
-    searchResults: state.searchResults, // Keep existing search results
-    filteredSongs: Array.from(filteredSongsSet),
-    totalRows: Object.keys(aggregation.rows).length,
-    loading: false,
-  };
-};
-
+/**
+ * DEPRECATED REDUCER - Being migrated to LiveStore
+ * 
+ * This reducer is maintained for backward compatibility during the migration.
+ * New features should use LiveStore hooks instead of Redux collection state.
+ * 
+ * Current status:
+ * - Most functionality migrated to LiveStore
+ * - Components use LiveStore hooks (useFilteredMedia, useMediaMapForIds, etc.)
+ * - This reducer now primarily handles legacy Redux actions
+ */
 export default (state: State = defaultState, action: any = {}) => {
   switch (action.type) {
     case types.SET_SEARCH_TERM:
@@ -156,7 +95,11 @@ export default (state: State = defaultState, action: any = {}) => {
 
     case types.RECEIVE_COLLECTION_ITEM:
     case types.RECEIVE_COLLECTION:
-      return populateFromAction(state, action);
+      // REMOVED: All collection data now lives in LiveStore
+      // Saga handles LiveStore insert directly before dispatching
+      // Components use LiveStore hooks (useFilteredMedia, useMediaMapForIds, etc.)
+      // No Redux state update needed
+      return state;
 
     case types.RECEIVE_SETTINGS:
       const enabledProviders = Array.from(
@@ -188,12 +131,9 @@ export default (state: State = defaultState, action: any = {}) => {
       };
 
     case types.REMOVE_FROM_COLLECTION_FULFILLED:
-      const songIds = new Set<string>(action.data.map((media: IMedia) => media.id));
-      const newRows = { ...state.rows };
-      songIds.forEach((songId: string) => {
-        delete newRows[songId];
-      });
-      return populateFromAction(state, { data: Object.values(newRows) });
+      // REMOVED: LiveStore handles removal
+      // No Redux state needed - components use LiveStore hooks
+      return state;
 
     case types.UPDATE_MEDIA:
       const media = action.media;

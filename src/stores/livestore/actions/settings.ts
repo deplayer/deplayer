@@ -1,7 +1,9 @@
 import { updateSettings, initializeSettings, defaultSettings, getSettingsData } from '../settingsStore'
-import { storeSyncSettings } from '../../../services/settings/syncSettings'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
+
+// Stub for removed sync settings functionality
+const storeSyncSettings = async (_settings: any) => {}
 
 /**
  * LiveStore Settings Actions

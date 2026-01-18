@@ -1,14 +1,12 @@
-import { takeLatest, select } from 'redux-saga/effects'
+import { takeLatest, call } from 'redux-saga/effects'
 
-import { getCollection, getQueue } from './selectors';
+import { getCurrentSongFromLiveStore } from './selectors';
 import * as types from '../constants/ActionTypes'
 
 // Handling setCurrentPlaying saga
 function* setCurrentPlaying(): any {
   // Setting current playing title
-  const queue = yield select(getQueue)
-  const collection = yield select(getCollection)
-  const song = collection.rows[queue.currentPlaying]
+  const song = yield call(getCurrentSongFromLiveStore)
   if (song && song.title) {
     document.title = song.title + ' - ' + song.artist.name
   }

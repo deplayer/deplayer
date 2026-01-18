@@ -5,6 +5,7 @@ import Icon from '../common/Icon'
 import { State as AppState } from '../../reducers/app'
 import * as types from '../../constants/ActionTypes'
 import { startSearch, StartSearchAction } from '../../types/search'
+import { useUI } from '../../contexts'
 
 type Props = {
   title: React.ReactNode,
@@ -20,9 +21,15 @@ type Props = {
 
 const Topbar = (props: Props) => {
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null)
+  const { setSearchTerm } = useUI()
 
   const handleSearchChange = (event: React.FormEvent<HTMLInputElement>) => {
     const searchTerm = event.currentTarget.value
+    
+    // Update UIContext with search term (replaces Redux SET_SEARCH_TERM)
+    setSearchTerm(searchTerm)
+    
+    // Also update Redux for backward compatibility (can be removed later)
     props.dispatch({
       type: types.SET_SEARCH_TERM,
       searchTerm
@@ -36,10 +43,15 @@ const Topbar = (props: Props) => {
     // Only set a new timeout if the search term is long enough
     if (searchTerm.length > 2) {
       const timeout = setTimeout(() => {
+        // Keep Redux saga for provider search (external API calls)
+        // LiveStore hook handles local search automatically
         props.dispatch(startSearch(searchTerm))
       }, 800) // Wait 800ms after last keystroke before searching
 
       setSearchTimeout(timeout)
+    } else if (searchTerm.length === 0) {
+      // Clear search when empty
+      // LiveStore hook will return empty results automatically
     }
   }
 

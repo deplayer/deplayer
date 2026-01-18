@@ -13,6 +13,7 @@ import { store, history } from './store/configureStore'
 import { LiveStoreProvider, useStore } from '@livestore/react'
 import { adapter, schema, storeId } from './stores/livestore/store'
 import { setupFts5 } from './stores/livestore/fts5-setup'
+import { setupIndexes } from './stores/livestore/indexes-setup'
 import { PlaybackProvider, ThemeProvider, UIProvider, useUI } from './contexts'
 import { State } from './reducers'
 
@@ -66,6 +67,11 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
     if (liveStore) {
       setLiveStoreInstance(liveStore)
       liveStoreInstance = liveStore  // Also store for saga access
+      
+      // Now that LiveStore is ready, dispatch INITIALIZE action
+      // This was moved from configureStore.ts to prevent the
+      // "Cannot access 'getLiveStoreInstance' before initialization" error
+      store.dispatch({ type: 'INITIALIZE' })
     }
   }, [liveStore])
   
@@ -86,14 +92,18 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
     setHeightMqlMatch(reduxApp.heightMqlMatch)
   }, [reduxApp.heightMqlMatch, setHeightMqlMatch])
   
-  // Initialize FTS5 full-text search on mount
+  // Initialize FTS5 full-text search and database indexes on mount
   React.useEffect(() => {
     if (!liveStore?.sqliteDbWrapper) return
     
     try {
+      // Setup FTS5 (currently disabled due to wa-sqlite limitations)
       setupFts5(liveStore)
+      
+      // Setup database indexes for performance
+      setupIndexes(liveStore)
     } catch (error) {
-      console.error('[App] Failed to setup FTS5:', error)
+      console.error('[App] Failed to setup database:', error)
     }
   }, [liveStore])
 

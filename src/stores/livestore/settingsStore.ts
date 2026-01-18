@@ -1,6 +1,8 @@
 import { events } from './schema.js'
 import { settings$ } from './queries.js'
-import { type SyncSettings } from '../../services/settings/syncSettings'
+
+// Stub type for removed sync settings
+type SyncSettings = { enabled?: boolean; serverUrl?: string };
 
 type SettingsRow = {
   id: string;

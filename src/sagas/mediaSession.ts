@@ -1,6 +1,6 @@
-import { takeLatest, call, select } from 'redux-saga/effects'
+import { takeLatest, call } from 'redux-saga/effects'
 
-import { getCurrentSong } from './selectors'
+import { getCurrentSongFromLiveStore } from './selectors'
 import MediaSessionService from '../services/MediaSessionService'
 import logger from '../utils/logger'
 import * as types from '../constants/ActionTypes'
@@ -8,7 +8,7 @@ import * as types from '../constants/ActionTypes'
 // Handling START_PLAYING saga
 function* setCurrentPlayingMeta (dispatch: any): any {
   const mediaSessionService = new MediaSessionService()
-  const currentSong = yield select(getCurrentSong)
+  const currentSong = yield call(getCurrentSongFromLiveStore)
   try {
     yield call(mediaSessionService.updateMetadata, currentSong, dispatch)
   } catch (e) {

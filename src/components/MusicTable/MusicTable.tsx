@@ -16,6 +16,8 @@ import FilterPanel from '../Collection/FilterPanel'
 import { useMediaById, useQueue, useCurrentPlayingSongId } from '../../stores/livestore/hooks'
 import { useUI } from '../../contexts'
 import { useDispatch } from 'react-redux'
+import { useStore } from '@livestore/react'
+import { ensureMediaInQueueAndPlay } from '../../utils/queueHelpers'
 
 type Props = {
   error?: string,
@@ -107,6 +109,8 @@ const SongRowWrapper = React.memo(({
   dispatch,
   disableAddButton,
   disableCovers,
+  visibleIds,
+  liveStore,
 }: {
   songId: string
   mediaMap?: Record<string, any>
@@ -118,6 +122,8 @@ const SongRowWrapper = React.memo(({
   dispatch: any
   disableAddButton?: boolean
   disableCovers?: boolean
+  visibleIds: string[]
+  liveStore: any
 }) => {
   // Use provided mediaMap for efficient lookup, fallback to hook if not provided
   const shouldFetchSong = !mediaMap
@@ -137,8 +143,22 @@ const SongRowWrapper = React.memo(({
     return null
   }
   
-  const onClick = () => {
-    dispatch({ type: types.SET_CURRENT_PLAYING, songId: song.id })
+  const onClick = async () => {
+    if (!liveStore) {
+      console.error('[MusicTable] LiveStore not available')
+      return
+    }
+    
+    try {
+      // Update LiveStore queue first (Option C strategy)
+      await ensureMediaInQueueAndPlay(liveStore, song.id, visibleIds)
+      
+      // Then dispatch Redux action for sagas to handle playback
+      dispatch({ type: types.SET_CURRENT_PLAYING, songId: song.id })
+    } catch (error) {
+      console.error('[MusicTable] Failed to play song:', error)
+      // TODO: Show user-facing error notification
+    }
   }
   
   return (
@@ -164,7 +184,7 @@ const SongRowWrapper = React.memo(({
     prevProps.mqlMatch === nextProps.mqlMatch &&
     prevProps.disableAddButton === nextProps.disableAddButton &&
     prevProps.disableCovers === nextProps.disableCovers
-    // mediaMap and queue are stable references from parent, no need to compare
+    // mediaMap, queue, visibleIds, liveStore are stable references from parent, no need to compare
   )
 })
 
@@ -178,6 +198,17 @@ const MusicTable = ({
   disableAddButton, 
   slim 
 }: Props) => {
+  // 🔍 DEBUG: Track when MusicTable receives new data
+  React.useEffect(() => {
+    if (tableIds.length > 0) {
+      console.log(`[MusicTable] 📥 Received tableIds: ${tableIds.length} items`)
+      console.log(`[MusicTable] 📥 Received mediaMap: ${mediaMap ? Object.keys(mediaMap).length : 'undefined'} items`)
+    }
+  }, [tableIds.length, mediaMap])
+  
+  // Get LiveStore instance for queue operations
+  const { store: liveStore } = useStore()
+  
   // Only fetch queue as fallback if not provided (for backwards compatibility)
   // Using conditional to avoid hook rules violation
   const shouldFetchQueue = !queueProp
@@ -231,6 +262,8 @@ const MusicTable = ({
         dispatch={dispatch}
         disableAddButton={disableAddButton}
         disableCovers={slim || disableCovers}
+        visibleIds={tableIds}
+        liveStore={liveStore}
       />
     )
   }

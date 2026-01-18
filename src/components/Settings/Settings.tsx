@@ -6,12 +6,10 @@ import { useStore } from '@livestore/react'
 import Button from '../common/Button'
 import Importer from '../Importer'
 import MainContainer from '../common/MainContainer'
-import { SettingsForm } from './SettingsForm'
 import * as types from '../../constants/ActionTypes'
 import CenteredMessage from '../common/CenteredMessage'
-import { useSettings } from '../../stores/livestore/hooks'
-import { saveSettingsAction, deleteSettingsAction } from '../../stores/livestore/actions'
-import SettingsBuilder from '../../services/settings/SettingsBuilder'
+import { deleteSettingsAction } from '../../stores/livestore/actions'
+
 
 interface CollectionData {
   [key: string]: unknown;
@@ -20,15 +18,6 @@ interface CollectionData {
 const Settings: React.FC = () => {
   const dispatch = useDispatch()
   const { store: liveStore } = useStore()
-  
-  // Get settings from LiveStore
-  const liveStoreSettings = useSettings()
-  
-  // Generate form schema based on current providers
-  const settingsForm = React.useMemo(() => {
-    const builder = new SettingsBuilder()
-    return builder.getFormSchema(liveStoreSettings?.providers || {})
-  }, [liveStoreSettings?.providers])
   
   const [showImporter, setShowImporter] = React.useState(false)
 
@@ -65,30 +54,8 @@ const Settings: React.FC = () => {
     }
   }
 
-  const handleSaveSettings = async (settingsPayload: any) => {
-    if (!liveStore) return
-    
-    try {
-      const result = await saveSettingsAction(liveStore, settingsPayload)
-      
-      // Dispatch action to trigger saga side effects (reconnection, notification)
-      dispatch({ 
-        type: types.SETTINGS_SAVED, 
-        prevSettings: result.prevSettings,
-        newSettings: result.newSettings,
-      })
-    } catch (error) {
-      console.error('Failed to save settings:', error)
-    }
-  }
   
   const ImporterComp = showImporter ? <Importer onLoaded={importCollection} /> : null
-  
-  // Create settings object compatible with SettingsForm
-  const settingsForForm = {
-    settingsForm,
-    settings: liveStoreSettings || { providers: {}, app: {} },
-  }
 
   return (
     <MainContainer centerContents>
@@ -98,12 +65,12 @@ const Settings: React.FC = () => {
             <Translate value="labels.settingsDescription" />
           </h2>
 
-          <SettingsForm
-            schema={settingsForm}
-            settings={settingsForForm}
-            dispatch={dispatch}
-            onSave={handleSaveSettings}
-          />
+        {/* SettingsForm temporarily disabled */}
+        {/* SettingsForm temporarily disabled */}
+        {/* SettingsForm temporarily disabled */}
+        {/* SettingsForm temporarily disabled */}
+        {/* SettingsForm temporarily disabled */}
+        {/* SettingsForm temporarily disabled */}
 
           <div className='my-12'>
             <h2 className='text-2xl py-3 text-base-content'><Translate value="labels.actions" /></h2>

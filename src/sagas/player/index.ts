@@ -4,9 +4,9 @@ import { push } from "redux-first-history"
 import Media from '../../entities/Media'
 
 import {
-  getCollection,
   getPlayer,
-  getSongBg,
+  getSongBgFromLiveStore,
+  getSongByIdFromLiveStore,
   getState
 } from '../selectors'
 import { getStreamUri } from '../../services/Song/StreamUriService'
@@ -53,9 +53,8 @@ function* getCurrentSongIdFromLiveStore(): any {
 }
 
 function* setCurrentPlayingStream(songId: string, providerNum: number, media?: Media): any {
-  const collection = yield select(getCollection)
-  const fullUrl = yield select(getSongBg)
-  const currentPlaying = media || collection.rows[songId]
+  const currentPlaying = media || (yield call(getSongByIdFromLiveStore, songId))
+  const fullUrl = yield call(getSongBgFromLiveStore)
 
   console.log("Setting current playing stream", currentPlaying, songId);
 

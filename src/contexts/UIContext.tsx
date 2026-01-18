@@ -53,6 +53,10 @@ export type UIState = {
   
   // Active filters
   activeFilters: Filter
+  
+  // Search state
+  searchTerm: string
+  searchActive: boolean
 }
 
 export type UIActions = {
@@ -86,6 +90,10 @@ export type UIActions = {
   // Filters
   setFilter: (filterType: keyof Filter, values: string[] | boolean) => void
   clearFilters: () => void
+  
+  // Search
+  setSearchTerm: (term: string) => void
+  clearSearch: () => void
 }
 
 type UIContextValue = UIState & UIActions
@@ -111,6 +119,8 @@ const initialState: UIState = {
     providers: [],
     favorites: false,
   },
+  searchTerm: '',
+  searchActive: false,
 }
 
 type Props = {
@@ -206,6 +216,23 @@ export const UIProvider = ({ children, initialState: customInitialState }: Props
     }))
   }, [])
 
+  // Search
+  const setSearchTerm = useCallback((term: string) => {
+    setState(prev => ({
+      ...prev,
+      searchTerm: term,
+      searchActive: term.trim().length > 0,
+    }))
+  }, [])
+
+  const clearSearch = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      searchTerm: '',
+      searchActive: false,
+    }))
+  }, [])
+
   const value: UIContextValue = {
     ...state,
     toggleSidebar,
@@ -221,6 +248,8 @@ export const UIProvider = ({ children, initialState: customInitialState }: Props
     setReady,
     setFilter,
     clearFilters,
+    setSearchTerm,
+    clearSearch,
   }
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>

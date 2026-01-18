@@ -21,6 +21,11 @@ const LazyImage: React.FC<Props> = ({ src, reflect, onClick, children, noFade })
     setShowFallback(false)
 
     if (!src) return
+    
+    // 🔍 DEBUG: Track image load start
+    const imageId = src.substring(src.length - 20)
+    console.log(`[LazyImage] 🖼️  Starting load: ${imageId}`)
+    const loadStart = performance.now()
 
     // Clear any existing timer
     if (fallbackTimer.current) {
@@ -35,7 +40,10 @@ const LazyImage: React.FC<Props> = ({ src, reflect, onClick, children, noFade })
     }, 150) // Small delay to avoid flashing during fast scrolling
 
     const img = new Image()
+    img.crossOrigin = 'anonymous' // Required for COEP compatibility
     img.onload = () => {
+      const loadTime = performance.now() - loadStart
+      console.log(`[LazyImage] ✅ Loaded in ${loadTime.toFixed(2)}ms: ${imageId}`)
       setIsLoaded(true)
       setShowFallback(false)
       if (fallbackTimer.current) {
@@ -43,6 +51,8 @@ const LazyImage: React.FC<Props> = ({ src, reflect, onClick, children, noFade })
       }
     }
     img.onerror = () => {
+      const loadTime = performance.now() - loadStart
+      console.log(`[LazyImage] ❌ Failed after ${loadTime.toFixed(2)}ms: ${imageId}`)
       setHasError(true)
       setShowFallback(true)
       if (fallbackTimer.current) {

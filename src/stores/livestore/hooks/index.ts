@@ -5,14 +5,20 @@
  * All hooks are reactive and automatically update when data changes.
  */
 
+// Collection data hook (optimized single query)
+export { useCollectionData } from './useCollectionData'
+
 // Media hooks
 export {
   useMediaLibrary,
   useMediaMap,
+  useMediaMapForIds,
+  useMediaByType,
   useMediaById,
   useMediaByArtist,
   useMediaByAlbum,
   useSearchMedia,
+  useSearchMediaIds,
   useRecentlyPlayed,
   useMostPlayed,
   useFilteredMedia,

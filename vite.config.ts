@@ -4,8 +4,19 @@ import fixReactVirtualized from 'esbuild-plugin-react-virtualized'
 import { fileURLToPath } from 'url'
 import { VitePWA } from 'vite-plugin-pwa'
 import svgr from 'vite-plugin-svgr'
-// @ts-ignore - No types available
-import crossOriginIsolation from 'vite-plugin-cross-origin-isolation'
+
+// Custom cross-origin isolation plugin with credentialless mode
+// This is less strict than require-corp and works better with third-party resources
+const crossOriginIsolation = () => ({
+  name: 'configure-cross-origin-isolation',
+  configureServer(server: any) {
+    server.middlewares.use((_req: any, res: any, next: any) => {
+      res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+      res.setHeader("Cross-Origin-Embedder-Policy", "credentialless");
+      next();
+    });
+  }
+})
 
 // https://vitejs.dev/config/
 export default defineConfig({

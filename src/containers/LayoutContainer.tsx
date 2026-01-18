@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import * as React from 'react'
 import { Dispatch } from 'redux'
-import SidebarContainer from './SidebarContainer'
+import Sidebar from '../components/Sidebar/Sidebar'
 import TopbarContainer from './TopbarContainer'
 import SearchButton from '../components/Buttons/SearchButton'
 import Placeholder from '../components/Player/Placeholder'
@@ -50,7 +50,7 @@ function Layout(props: LayoutProps) {
     <>
       {background}
       <ToastContainer theme='dark' />
-      <SidebarContainer>
+      <Sidebar>
         <ReloadPrompt />
         <TopbarContainer>
           <SearchButton />
@@ -61,7 +61,7 @@ function Layout(props: LayoutProps) {
         </div>
         <Placeholder mqlMatch={props.app.mqlMatch} />
 
-        </SidebarContainer>
+        </Sidebar>
         {internalPlayer && props.app.showVisuals && (
           <ButterchurnVisualizer
             playerRef={internalPlayer}

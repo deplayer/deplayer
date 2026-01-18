@@ -24,7 +24,7 @@ const QUEUE_ID = 'default'
 const getCurrentQueue = async (store: LiveStore) => {
   const result = await store.query({
     query: `SELECT * FROM queue WHERE id = ?`,
-    bindValues: [QUEUE_ID]
+    bindValues: { 1: QUEUE_ID }
   })
   
   const rows = (result as any)?.[0]?.values || []
@@ -58,7 +58,7 @@ export const playAllAction = async (store: LiveStore, trackIds: string[]) => {
   }
 
   // Replace entire queue
-  store.commit(
+  await store.commit(
     events.queueUpdated({
       id: QUEUE_ID,
       trackIds,
@@ -102,7 +102,7 @@ export const addToQueueAction = async (store: LiveStore, trackIds: string[]) => 
   // Append to existing queue
   const newTrackIds = [...currentQueue.trackIds, ...trackIds]
   
-  store.commit(
+  await store.commit(
     events.queueUpdated({
       id: QUEUE_ID,
       trackIds: newTrackIds,
@@ -129,7 +129,7 @@ export const addNextAction = async (store: LiveStore, trackIds: string[]) => {
   
   if (!currentQueue) {
     // No queue exists, create one and start playing
-    store.commit(
+    await store.commit(
       events.queueUpdated({
         id: QUEUE_ID,
         trackIds,
@@ -152,7 +152,7 @@ export const addNextAction = async (store: LiveStore, trackIds: string[]) => {
     ...currentQueue.trackIds.slice(insertPosition),
   ]
   
-  store.commit(
+  await store.commit(
     events.queueUpdated({
       id: QUEUE_ID,
       trackIds: newTrackIds,
@@ -188,7 +188,7 @@ export const removeFromQueueAction = async (store: LiveStore, trackId: string) =
     newCurrentPlaying = newTrackIds.length > 0 ? newTrackIds.length - 1 : null
   }
   
-  store.commit(
+  await store.commit(
     events.queueUpdated({
       id: QUEUE_ID,
       trackIds: newTrackIds,
@@ -205,7 +205,7 @@ export const removeFromQueueAction = async (store: LiveStore, trackId: string) =
  * @param store - LiveStore instance
  */
 export const clearQueueAction = async (store: LiveStore) => {
-  store.commit(
+  await store.commit(
     events.queueCleared({
       queueId: QUEUE_ID,
     })
@@ -219,7 +219,7 @@ export const clearQueueAction = async (store: LiveStore) => {
  * @param shuffle - New shuffle state
  */
 export const toggleShuffleAction = async (store: LiveStore, shuffle: boolean) => {
-  store.commit(
+  await store.commit(
     events.queueShuffleToggled({
       queueId: QUEUE_ID,
       shuffle,
@@ -234,7 +234,7 @@ export const toggleShuffleAction = async (store: LiveStore, shuffle: boolean) =>
  * @param repeat - New repeat state
  */
 export const toggleRepeatAction = async (store: LiveStore, repeat: boolean) => {
-  store.commit(
+  await store.commit(
     events.queueRepeatToggled({
       queueId: QUEUE_ID,
       repeat,
@@ -249,7 +249,7 @@ export const toggleRepeatAction = async (store: LiveStore, repeat: boolean) => {
  * @param position - Index in queue to play
  */
 export const setCurrentPlayingAction = async (store: LiveStore, position: number) => {
-  store.commit(
+  await store.commit(
     events.queuePositionChanged({
       queueId: QUEUE_ID,
       position,

@@ -1,29 +1,11 @@
-import { put, call } from "redux-saga/effects";
+// TEMPORARILY DISABLED - PGlite migration in progress
+// Will be re-enabled with LiveStore-based persistence
 
-import { getAdapter } from "../../services/database";
-import { magnetToMedia } from "../../services/Webtorrent";
-import CollectionService from "../../services/CollectionService";
-import * as types from "../../constants/ActionTypes";
-import Media from "../../entities/Media"
+export function* readWebtorrentFile(_action: any): any {
+  console.warn('Webtorrent functionality temporarily disabled during migration')
+  // Stub to prevent errors
+}
 
-export function* readWebtorrentFile(action: any): Generator<any, void, any> {
-  console.log("getting media objects from magnet: ", action.magnet);
-  const medias = yield call(magnetToMedia, action.magnet);
-  const adapter = getAdapter();
-  const collectionService = new CollectionService(adapter);
-
-  console.log("medias: ", medias);
-
-  const mediasDocs = medias.map((media: Media) => media.toDocument());
-
-  // Save song
-  for (let i = 0; i < mediasDocs.length; i++) {
-    const med = mediasDocs[i];
-    yield call(collectionService.save, med.id, med);
-  }
-  yield put({ type: types.RECEIVE_COLLECTION, data: mediasDocs });
-  yield put({
-    type: types.SEND_NOTIFICATION,
-    notification: `adding webtorrent ${action.magnet}`,
-  });
+export default function* webtorrentWorkersSaga() {
+  // disabled
 }

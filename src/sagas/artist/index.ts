@@ -1,12 +1,8 @@
-import { call, put, select, takeLatest } from 'redux-saga/effects'
+import { call, put, takeLatest } from 'redux-saga/effects'
 import * as types from '../../constants/ActionTypes'
-import { getSongById, getSettingsFromLiveStore } from './../selectors'
+import { getSongByIdFromLiveStore, getSettingsFromLiveStore } from './../selectors'
 import MusicbrainzProvider from '../../providers/MusicbrainzProvider'
-import ArtistService from '../../services/ArtistService'
 import LyricsovhProvider from '../../providers/LyricsovhProvider'
-import { getAdapter } from '../../services/database'
-import { media } from '../../schema'
-import { eq } from 'drizzle-orm'
 import { createLogger } from '../../utils/logger'
 import { getLiveStoreInstance } from '../../App'
 import { addLyricsAction } from '../../stores/livestore/actions/lyrics'
@@ -15,68 +11,36 @@ import { tables } from '../../stores/livestore/schema'
 
 const logger = createLogger({ namespace: 'artist-saga' })
 
-interface IArtistRepository {
-  getMetadata(artistName: string): Promise<any>
-  saveMetadata(artistName: string, metadata: any): Promise<void>
-}
-
-class DefaultArtistRepository implements IArtistRepository {
-  constructor(private artistService: any) {}
-
-  async getMetadata(artistName: string) {
-    return this.artistService.get(artistName)
-  }
-
-  async saveMetadata(artistName: string, metadata: any) {
-    return this.artistService.save(artistName, metadata)
-  }
-}
-
-// Create default instances
-const artistService = new ArtistService()
-const defaultArtistRepo = new DefaultArtistRepository(artistService)
-
-function* loadMoreArtistSongsFromProvider(
-  action: any,
-  artistRepo: IArtistRepository = defaultArtistRepo
-): any {
+// Simplified artist metadata fetching (no persistence for now)
+function* loadMoreArtistSongsFromProvider(action: any): any {
   // Clear existing artist metadata first
   yield put({ type: types.CLEAR_ARTIST_METADATA })
 
   // First dispatch search action to load more songs
   yield put({ type: types.START_SEARCH, searchTerm: action.artist.name, noRedirect: true })
 
-  // Then fetch artist metadata from database or MusicBrainz
+  // Then fetch artist metadata from MusicBrainz
   const settings = yield call(getSettingsFromLiveStore)
   const artistName = action.artist.name
 
   try {
-    // Try to get metadata from database first
-    const storedMetadata = yield call([artistRepo, 'getMetadata'], artistName)
-    
-    if (storedMetadata) {
-      yield put({ type: types.RECEIVE_ARTIST_METADATA, data: storedMetadata })
-      return
-    }
-
-    // If not in database and MusicBrainz is enabled, fetch from there
+    // Note: Artist metadata persistence removed with PGlite migration
+    // Fetch from MusicBrainz directly if enabled
     if (settings.providers.musicbrainz?.enabled) {
       const mbProvider = new MusicbrainzProvider(settings.providers.musicbrainz || {}, 'musicbrainz')
       const artistMetadata = yield call([mbProvider, 'searchArtistInfo'], artistName)
       
       if (artistMetadata) {
-        // Save metadata to database
-        yield call([artistRepo, 'saveMetadata'], artistName, artistMetadata)
         yield put({ type: types.RECEIVE_ARTIST_METADATA, data: artistMetadata })
       }
     }
   } catch (error) {
-    console.error('Failed to fetch artist metadata:', error)
+    logger.error('Failed to fetch artist metadata:', error)
   }
 }
 
 export function* fetchSongMetadata(action: any): any {
-  const song = yield select(getSongById, action.songId)
+  const song = yield call(getSongByIdFromLiveStore, action.songId)
   if (!song) {
     logger.error('Song not found:', action.songId)
     return
@@ -89,31 +53,6 @@ export function* fetchSongMetadata(action: any): any {
   }
 
   try {
-    // First ensure the song exists in the database
-    const adapter = getAdapter()
-    const db = yield call([adapter, 'getDb'])
-    const existingSong = yield call([db, 'select'], { from: media, where: eq(media.id, song.id) })
-
-    if (!existingSong || existingSong.length === 0) {
-      logger.debug('Song not in database, saving it first...')
-      yield call([db, 'insert'], media, {
-        id: song.id,
-        title: song.title,
-        artist: song.artist,
-        type: song.type,
-        album: song.album,
-        cover: song.cover || null,
-        stream: song.stream,
-        duration: song.duration,
-        playCount: 0,
-        genres: song.genres || [],
-        track: song.track || null,
-        discNumber: song.discNumber || null,
-        year: song.year || null,
-        searchableText: `${song.title} ${song.artist.name} ${song.album.name}`,
-      })
-    }
-
     // Check if lyrics already exist in LiveStore
     const lyricsQuery = queryDb(
       tables.lyrics.select().where('mediaId', '=', song.id).limit(1)
@@ -142,8 +81,7 @@ export function* fetchSongMetadata(action: any): any {
       logger.debug('Lyrics saved to LiveStore')
     } catch (apiError: any) {
       logger.error('API Error:', apiError)
-      // Lyrics fetch failed - component will show "Loading lyrics..." indefinitely or we can add error state
-      // For now, just log the error
+      // Lyrics fetch failed - component will show "Loading lyrics..." or error state
     }
   } catch (error: any) {
     logger.error('Error fetching lyrics:', error)
@@ -157,4 +95,3 @@ function* artistSaga(): any {
 }
 
 export default artistSaga
-

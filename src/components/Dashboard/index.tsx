@@ -51,7 +51,7 @@ const WelcomeMessage = ({ dispatch }: { dispatch: Dispatch }) => {
 
   return (
     <div className='flex flex-col md:flex-row w-full content-start'>
-      {showAuthModal && <Auth dispatch={dispatch} onClose={() => setShowAuthModal(false)} isOpen={showAuthModal} />}
+      {showAuthModal && <Auth />}
       <div className='flex flex-col items-center min-w-1/2'>
         <h4 className="text-xl text-center py-4 p-4">
           <Translate value="dashboard.welcome.title" dangerousHTML /> <DeplayerTitle />

@@ -7,6 +7,8 @@ import { MediaFileService } from "./MediaFileService";
 import { writeFile } from "@happy-js/happy-opfs";
 import PlayerRefService from "./PlayerRefService";
 import { createLogger } from "../utils/logger";
+import { getLiveStoreInstance } from "../App";
+import { addMediaBulkAction } from "../stores/livestore/actions/media";
 
 const logger = createLogger({ namespace: "PeerService" });
 
@@ -297,10 +299,19 @@ export default class PeerService {
       },
     };
 
-    this.dispatchFn({
-      type: types.RECEIVE_COLLECTION,
-      data: [modifiedMedia],
-    });
+    // Add shared media to LiveStore
+    try {
+      const liveStore = getLiveStoreInstance();
+      if (liveStore) {
+        await addMediaBulkAction(liveStore, [modifiedMedia]);
+        logger.info("Added P2P shared media to LiveStore:", media.title);
+      } else {
+        logger.warn("LiveStore not available, P2P media not persisted");
+      }
+    } catch (error) {
+      logger.error("Failed to add P2P shared media to LiveStore:", error);
+    }
+    
     this.dispatchFn({
       type: types.SEND_NOTIFICATION,
       notification: `${this.username} shared ${media.title}`,
@@ -333,7 +344,7 @@ export default class PeerService {
     if (!roomState) return;
 
     // Set up one-time stream handler
-    const streamHandler = (
+    const streamHandler = async (
       stream: MediaStream,
       _peerId: string,
       metadata: JsonValue
@@ -357,12 +368,20 @@ export default class PeerService {
         },
       };
 
-      // Update collection and current playing
-      this.dispatchFn({
-        type: types.RECEIVE_COLLECTION,
-        data: [fixedMedia],
-      });
+      // Add peer-streamed media to LiveStore
+      try {
+        const liveStore = getLiveStoreInstance();
+        if (liveStore) {
+          await addMediaBulkAction(liveStore, [fixedMedia]);
+          logger.info("Added P2P stream media to LiveStore:", media.title);
+        } else {
+          logger.warn("LiveStore not available, P2P stream media not persisted");
+        }
+      } catch (error) {
+        logger.error("Failed to add P2P stream media to LiveStore:", error);
+      }
 
+      // Set current playing
       this.dispatchFn({
         type: types.SET_CURRENT_PLAYING,
         songId: fixedMedia.id,
