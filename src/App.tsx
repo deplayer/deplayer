@@ -12,6 +12,7 @@ import { Provider, useSelector } from 'react-redux'
 import { store, history } from './store/configureStore'
 import { LiveStoreProvider, useStore } from '@livestore/react'
 import { adapter, schema, storeId } from './stores/livestore/store'
+import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck'
 import { setupFts5 } from './stores/livestore/fts5-setup'
 import { setupIndexes } from './stores/livestore/indexes-setup'
 import { PlaybackProvider, ThemeProvider, UIProvider, useUI } from './contexts'
@@ -139,24 +140,26 @@ const App = () => {
   const playerPortal = React.useMemo(() => portals.createHtmlPortalNode(), [])
 
   return (
-    <LiveStoreProvider 
-      adapter={adapter} 
-      schema={schema} 
-      storeId={storeId}
-      batchUpdates={batchUpdates}
-    >
-      <ThemeProvider>
-        <UIProvider>
-          <PlaybackProvider>
-            <Provider store={store}>
-              <Router history={history}>
-                <AppContent playerPortal={playerPortal} />
-              </Router>
-            </Provider>
-          </PlaybackProvider>
-        </UIProvider>
-      </ThemeProvider>
-    </LiveStoreProvider>
+    <BrowserCompatibilityCheck>
+      <LiveStoreProvider 
+        adapter={adapter} 
+        schema={schema} 
+        storeId={storeId}
+        batchUpdates={batchUpdates}
+      >
+        <ThemeProvider>
+          <UIProvider>
+            <PlaybackProvider>
+              <Provider store={store}>
+                <Router history={history}>
+                  <AppContent playerPortal={playerPortal} />
+                </Router>
+              </Provider>
+            </PlaybackProvider>
+          </UIProvider>
+        </ThemeProvider>
+      </LiveStoreProvider>
+    </BrowserCompatibilityCheck>
   )
 }
 

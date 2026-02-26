@@ -10,7 +10,24 @@ const getStoreId = (): string => {
   if (stored) {
     return stored
   }
-  const newId = crypto.randomUUID()
+  
+  // Generate unique ID with fallback for older browsers that don't support crypto.randomUUID()
+  let newId: string
+  try {
+    // Try modern Web Crypto API first
+    if ('crypto' in window && typeof window.crypto?.randomUUID === 'function') {
+      newId = crypto.randomUUID()
+    } else {
+      // Fallback to timestamp + random value for older environments
+      const timestamp = Date.now().toString(36)
+      const randomPart = Math.random().toString(36).substring(2, 11)
+      newId = `${timestamp}-${randomPart}`
+    }
+  } catch (e) {
+    // Last resort fallback - use localStorage key itself with a prefix to avoid conflicts
+    newId = 'livestore-store-' + Date.now()
+  }
+
   localStorage.setItem('livestore-store-id', newId)
   return newId
 }
