@@ -5,4 +5,5 @@ export interface IMusicProvider {
   search(searchTerm: string): Promise<IMedia[]>;
   fullSync?(): Promise<IMedia[]>;
   getRecentMedia?(): Promise<IMedia[]>;
+  getArtistSongs?(artistName: string): Promise<IMedia[]>;
 }
