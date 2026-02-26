@@ -185,4 +185,45 @@ export default class JellyfinProvider implements IMusicProvider {
       throw error;
     }
   }
+
+  async getArtistSongs(artistName: string): Promise<Array<Media>> {
+    await this.initialize();
+
+    if (!this.userId) {
+      throw new Error("User ID not found");
+    }
+
+    try {
+      // Search for all audio items and filter by artist name
+      const results = await getItemsApi(this.api).getItems({
+        userId: this.userId,
+        searchTerm: artistName,
+        includeItemTypes: ["Audio"],
+        recursive: true,
+        fields: [
+          ItemFields.Path,
+          ItemFields.Genres,
+          ItemFields.Studios,
+          ItemFields.ParentId,
+        ] as ItemFields[],
+        limit: 10000,
+      });
+
+      const items = results.data.Items || [];
+
+      // Filter to only include songs where artist matches (case-insensitive)
+      const artistItems = items.filter((item: any) => {
+        const itemArtist = item.AlbumArtist || item.Artists?.[0] || "";
+        return itemArtist.toLowerCase() === artistName.toLowerCase();
+      });
+
+      logger.debug(
+        `Found ${artistItems.length} songs for artist: ${artistName}`
+      );
+      return this.mapSongs(artistItems);
+    } catch (error) {
+      logger.error(`Error fetching artist songs for ${artistName}:`, error);
+      return [];
+    }
+  }
 }
