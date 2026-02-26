@@ -74,4 +74,9 @@ export default class MstreamApiProvider implements IMusicProvider {
         })
     })
   }
+
+  async getArtistSongs(artistName: string): Promise<Array<Media>> {
+    // Mstream doesn't have artist-specific endpoint, use search as fallback
+    return this.search(artistName)
+  }
 }
