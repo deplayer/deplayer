@@ -362,6 +362,10 @@ const materializers = State.SQLite.materializers(events, {
           .onConflict('id', 'ignore')
       )
       
+      // Compute denormalized fields for fast queries
+      const genresFlat = Array.isArray(item.genres) ? item.genres.join(',') : ''
+      const providersFlat = item.stream ? Object.keys(item.stream).join(',') : ''
+      
       // Insert media
       operations.push(
         tables.media
@@ -381,6 +385,10 @@ const materializers = State.SQLite.materializers(events, {
             externalId: item.externalId ?? null,
             shareUrl: item.shareUrl ?? null,
             filePath: item.filePath ?? null,
+            artistName: item.artist.name,
+            albumName: item.album.name,
+            genresFlat,
+            providersFlat,
             createdAt: now,
             updatedAt: now,
           })
