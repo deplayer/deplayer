@@ -149,4 +149,66 @@ export default class SubsonicApiProvider implements IMusicProvider {
       return [];
     }
   }
+
+  async getArtistSongs(artistName: string): Promise<IMedia[]> {
+    try {
+      // 1. Search for artist by name
+      const searchResult = await axios.get(
+        `${this.searchUrl}&query=${encodeURIComponent(artistName)}`
+      );
+
+      const artists =
+        searchResult.data["subsonic-response"].searchResult3?.artist || [];
+
+      // Find exact or closest match (case-insensitive)
+      const artist =
+        artists.find(
+          (a: { name: string }) =>
+            a.name.toLowerCase() === artistName.toLowerCase()
+        ) || artists[0];
+
+      if (!artist) {
+        logger.debug(`Artist not found: ${artistName}`);
+        return [];
+      }
+
+      // 2. Get artist details with albums
+      const artistResult = await axios.get(
+        `${this.baseUrl}/rest/getArtist.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.11.0&f=json&id=${artist.id}`
+      );
+
+      const albums =
+        artistResult.data["subsonic-response"].artist?.album || [];
+
+      if (albums.length === 0) {
+        logger.debug(`No albums found for artist: ${artistName}`);
+        return [];
+      }
+
+      // 3. Get songs from each album
+      const allSongs: IMedia[] = [];
+
+      for (const album of albums) {
+        try {
+          const albumResult = await axios.get(
+            `${this.baseUrl}/rest/getAlbum.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.11.0&f=json&id=${album.id}`
+          );
+
+          const songs =
+            albumResult.data["subsonic-response"].album?.song || [];
+          const mappedSongs = this.mapSongs(songs, [album]);
+          allSongs.push(...mappedSongs);
+        } catch (error) {
+          logger.error(`Error fetching album ${album.id}:`, error);
+          // Continue with next album
+        }
+      }
+
+      logger.debug(`Found ${allSongs.length} songs for artist: ${artistName}`);
+      return allSongs;
+    } catch (error) {
+      logger.error(`Error fetching artist songs for ${artistName}:`, error);
+      return [];
+    }
+  }
 }
