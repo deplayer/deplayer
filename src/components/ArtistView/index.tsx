@@ -42,8 +42,15 @@ export default function ArtistView() {
 
   React.useEffect(() => {
     if (artist && artist.name) {
+      // Fetch artist metadata from MusicBrainz
       dispatch({
         type: types.LOAD_ARTIST,
+        artist: artist
+      })
+
+      // Fetch songs from all providers
+      dispatch({
+        type: types.FETCH_ARTIST_SONGS,
         artist: artist
       })
 
