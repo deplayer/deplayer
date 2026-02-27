@@ -61,28 +61,19 @@ export async function addMediaBulkAction(
   store: Store,
   mediaItems: IMedia[]
 ): Promise<void> {
-  const perfStart = performance.now()
-  
   // 1. Validate structure and ensure we have string IDs
   const validMedia = mediaItems.filter((m): m is IMedia & { id: string } => {
-    if (!m.id) {
-      console.warn('[LiveStore] Skipping media without ID:', m.title)
-      return false
-    }
-    if (!m.artist?.id || !m.album?.id) {
-      console.warn('[LiveStore] Skipping media with incomplete artist/album:', m.id, m.title)
+    if (!m.id || !m.artist?.id || !m.album?.id) {
       return false
     }
     return true
   })
   
   if (validMedia.length === 0) {
-    console.log('[LiveStore] No valid media to add')
     return
   }
   
   // 2. Query which media IDs already exist in database (PHASE 1 OPTIMIZATION)
-  const queryStart = performance.now()
   const placeholders = validMedia.map(() => '?').join(',')
   const bindValues = validMedia.reduce((acc, m, i) => {
     acc[i + 1] = m.id
@@ -98,30 +89,13 @@ export async function addMediaBulkAction(
   const rows = (result as any)?.[0]?.values || []
   rows.forEach((row: any) => existingIds.add(row[0]))
   
-  const queryTime = performance.now() - queryStart
-  
   // 3. Filter to only new media items
   const newMedia = validMedia.filter(m => !existingIds.has(m.id))
   
-  console.log(
-    `[LiveStore] Bulk add: ${newMedia.length} new items out of ${validMedia.length} total ` +
-    `(${existingIds.size} already exist) - Query: ${queryTime.toFixed(2)}ms`
-  )
-  
   // 4. Only insert new items using bulk event (PHASE 1 OPTIMIZATION)
   if (newMedia.length > 0) {
-    const insertStart = performance.now()
     const normalizedMedia = newMedia.map(normalizeMediaForLiveStore)
     await store.commit(mediaEvents.mediaBulkAdded({ media: normalizedMedia }))
-    const insertTime = performance.now() - insertStart
-    const totalTime = performance.now() - perfStart
-    console.log(
-      `[LiveStore] Bulk insert of ${newMedia.length} items: ${insertTime.toFixed(2)}ms ` +
-      `(Total: ${totalTime.toFixed(2)}ms)`
-    )
-  } else {
-    const totalTime = performance.now() - perfStart
-    console.log(`[LiveStore] All items already exist, skipping insert (${totalTime.toFixed(2)}ms)`)
   }
 }
 

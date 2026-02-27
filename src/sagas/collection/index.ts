@@ -104,17 +104,11 @@ export function* fetchRecentAlbums(): Generator<any, void, any> {
     // Expected result: No UI freeze, single render with complete data
     
     if (allRecentMedia.length > 0) {
-      console.log('[Collection Saga] Starting LiveStore bulk insert for', allRecentMedia.length, 'items')
-      const insertStart = performance.now()
-      
       try {
         // Blocking call - wait for insert to complete BEFORE any Redux dispatch
         yield call(addMediaBulkAction, liveStore, allRecentMedia)
-        
-        const insertTime = performance.now() - insertStart
-        console.log('[Collection Saga] ✅ LiveStore insert completed in', insertTime.toFixed(2), 'ms')
       } catch (error) {
-        console.error('[Collection Saga] ❌ LiveStore insert failed:', error)
+        console.error('[Collection Saga] LiveStore insert failed:', error)
         yield put({
           type: types.SEND_NOTIFICATION,
           notification: 'Failed to load media library',
