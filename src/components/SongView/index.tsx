@@ -130,7 +130,9 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
     return <NotFound>The requested song can not be found</NotFound>
   }
 
-  const genres = song.genres || []
+  // Use songObj (Media instance) for accessing nested artist/album properties
+  // The raw song from rows might not have these nested objects
+  const genres = songObj?.genres || song.genres || []
 
   const sameGenreSongs = genres.length && songsByGenre[genres[0]]
     ? songsByGenre[genres[0]]
@@ -139,7 +141,8 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
       .map((songId: string) => rows[songId])
     : null
 
-  const relatedAlbums = song.artist?.id && albumsByArtist?.[song.artist.id]?.reduce((acc: IAlbum[], albumId: string): IAlbum[] => {
+  // Use songObj.artist.id for looking up related albums
+  const relatedAlbums = songObj?.artist?.id && albumsByArtist?.[songObj.artist.id]?.reduce((acc: IAlbum[], albumId: string): IAlbum[] => {
     if (!albums[albumId]) return acc
     acc.push(albums[albumId])
     return acc
@@ -185,7 +188,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
                 useImage
                 cover={song.cover}
                 size='thumbnail'
-                albumName={song.album?.name || 'N/A'}
+                albumName={songObj?.album?.name || 'N/A'}
               />
             }
 
@@ -293,27 +296,27 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
               {song.title}
               <Tag onClick={() => handleTypeClick(song.type)} className="cursor-pointer hover:bg-opacity-50 mr-2 mt-4 w-fit inline-block" transparent>{typeIcon} {song.type}</Tag>
             </h2>
-            {song.artist?.id && (
+            {songObj?.artist?.id && (
               <div className='text-lg mt-2'>
-                <Link to={`/artist/${song.artist.id}`}>
+                <Link to={`/artist/${songObj.artist.id}`}>
                   <h3>
                     <Icon
                       icon='faMicrophoneAlt'
                       className='mr-1 w-8'
                     />
-                    <span>{song.artist?.name || 'Unknown Artist'}</span>
+                    <span>{songObj.artist?.name || 'Unknown Artist'}</span>
                   </h3>
                 </Link>
               </div>
             )}
-            {song.album?.id && (
+            {songObj?.album?.id && (
               <div className='color-white text-lg mt-2'>
-                <Link to={`/album/${song.album.id}`}>
+                <Link to={`/album/${songObj.album.id}`}>
                   <Icon
                     className='mr-1 w-8'
                     icon='faCompactDisc'
                   />
-                  {song.album?.name || 'N/A'} {song.album?.year && `(${song.album.year})`}
+                  {songObj.album?.name || 'N/A'} {songObj.album?.year && `(${songObj.album.year})`}
                 </Link>
               </div>
             )}
