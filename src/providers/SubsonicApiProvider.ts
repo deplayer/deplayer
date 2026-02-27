@@ -127,7 +127,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
       // PERF FIX: Fetch album details in parallel batches instead of sequentially
       // This reduces main thread blocking from 50 sequential awaits to ~5 batch awaits
       const BATCH_SIZE = 10
-      const allSongs: IMedia[] = []
+      const allRawSongs: any[][] = []  // Collect raw songs first
       
       for (let i = 0; i < albums.length; i += BATCH_SIZE) {
         const batch = albums.slice(i, i + BATCH_SIZE)
@@ -139,21 +139,41 @@ export default class SubsonicApiProvider implements IMusicProvider {
               `${this.baseUrl}/rest/getAlbum.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.11.0&f=json&id=${album.id}`
             )
             const songs = albumDetails.data["subsonic-response"].album.song || []
-            return this.mapSongs(songs, [album])
+            // Return raw songs with album info, don't process yet
+            return { songs, album }
           })
         )
         
         // Collect successful results
         for (const result of batchResults) {
           if (result.status === 'fulfilled') {
-            allSongs.push(...result.value)
+            allRawSongs.push([result.value.songs, result.value.album])
           } else {
             logger.error('Error fetching album songs:', result.reason)
           }
         }
         
-        // Yield to main thread between batches to prevent FPS drops
+        // Yield to main thread between network batches
         if (i + BATCH_SIZE < albums.length) {
+          await new Promise(resolve => requestAnimationFrame(resolve))
+        }
+      }
+      
+      // PERF FIX: Process mapSongs in chunks to avoid blocking main thread
+      // mapSongs calls new Media() which calls slugify() - expensive!
+      const PROCESS_BATCH_SIZE = 5  // Process 5 albums worth of songs at a time
+      const allSongs: IMedia[] = []
+      
+      for (let i = 0; i < allRawSongs.length; i += PROCESS_BATCH_SIZE) {
+        const processBatch = allRawSongs.slice(i, i + PROCESS_BATCH_SIZE)
+        
+        for (const [songs, album] of processBatch) {
+          const mappedSongs = this.mapSongs(songs, [album])
+          allSongs.push(...mappedSongs)
+        }
+        
+        // Yield to main thread between processing batches
+        if (i + PROCESS_BATCH_SIZE < allRawSongs.length) {
           await new Promise(resolve => requestAnimationFrame(resolve))
         }
       }
