@@ -1,6 +1,5 @@
 import { Translate } from 'react-redux-i18n'
 import { Link } from 'react-router-dom'
-import { useEffect } from 'react'
 import AddNewMediaButton from './Buttons/AddNewMediaButton'
 import MusicTable from './MusicTable/MusicTable'
 import Spinner from './Spinner'
@@ -19,20 +18,6 @@ const Collection = () => {
   // This prevents the cascade of re-renders from separate queries
   // Performance: Single DB query, single React render, no freeze
   const { ids, map } = useCollectionData(activeFilters, searchTerm)
-  
-  // 🔍 DEBUG: Track when data arrives and component renders
-  useEffect(() => {
-    if (ids.length > 0) {
-      const renderStart = performance.now()
-      console.log(`[Collection] 📦 Received ${ids.length} IDs, preparing to render MusicTable`)
-      
-      // Measure when React actually finishes rendering (next frame)
-      requestAnimationFrame(() => {
-        const renderTime = performance.now() - renderStart
-        console.log(`[Collection] 🎨 MusicTable render initiated in ${renderTime.toFixed(2)}ms`)
-      })
-    }
-  }, [ids.length])
   
   // Get queue once for MusicTable (performance optimization)
   const queue = useQueue('default')

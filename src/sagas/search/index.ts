@@ -29,7 +29,6 @@ function* performSingleProviderSearch(
     const settings = yield call(getSettingsFromLiveStore);
     const providerService = new ProvidersService(settings);
     
-    console.log(`[Search Saga] Searching provider: ${provider} for "${searchTerm}"`)
     const searchResults: IMedia[] = yield call(
       providerService.searchForProvider,
       searchTerm,
@@ -37,8 +36,6 @@ function* performSingleProviderSearch(
     );
 
     if (searchResults && searchResults.length > 0) {
-      console.log(`[Search Saga] Provider ${provider} returned ${searchResults.length} results`)
-      
       // Get LiveStore instance and initialize batched committer
       const liveStore = getLiveStoreInstance();
       if (liveStore) {
@@ -48,12 +45,7 @@ function* performSingleProviderSearch(
         // Add to batched committer - will be committed after throttle window
         // This reduces UI refreshes: 5 providers = 1-2 commits instead of 5
         yield call([batchedMediaCommitter, 'add'], searchResults);
-        console.log(`[Search Saga] ✅ Queued ${searchResults.length} results from ${provider} for batched commit`)
-      } else {
-        console.warn('[Search Saga] LiveStore not available, cannot insert search results')
       }
-    } else {
-      console.log(`[Search Saga] Provider ${provider} returned no results`)
     }
   } catch (e: any) {
     console.error(`[Search Saga] Error searching provider ${provider}:`, e);
@@ -73,20 +65,15 @@ export function* search(action: SearchAction): Generator<any, void, any> {
   const searchTerm = action.searchTerm;
   const redirect = !action.noRedirect;
 
-  console.log(`[Search Saga] Starting search for "${searchTerm}", redirect: ${redirect}`)
-
   // Get settings from LiveStore
   const settings = yield call(getSettingsFromLiveStore);
   if (!settings?.providers) {
-    console.warn('[Search Saga] No providers configured');
     yield put({ type: types.SEARCH_FINISHED, searchTerm });
     return;
   }
 
   const providersService = new ProvidersService(settings);
   const enabledProviders = Object.keys(providersService.providers);
-  
-  console.log(`[Search Saga] Found ${enabledProviders.length} enabled providers:`, enabledProviders)
 
   // Redirect to search results page to show local results immediately
   // (LiveStore hooks will handle displaying local matches)
@@ -102,8 +89,6 @@ export function* search(action: SearchAction): Generator<any, void, any> {
     });
     
     yield all(searchTasks);
-  } else {
-    console.log('[Search Saga] No enabled providers to search');
   }
 
   yield put({

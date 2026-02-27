@@ -1,6 +1,7 @@
 import { useQuery } from '@livestore/react'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
+import { useMemo } from 'react'
 
 /**
  * Favorites Query Hooks
@@ -70,12 +71,18 @@ export const useIsFavorite = (mediaId: string | null | undefined) => {
  * ))
  * ```
  */
-export const useFavoriteIds = () => {
+export const useFavoriteIds = (): Set<string> => {
   const favoriteRecords = useQuery(
     queryDb(
-      tables.favorites.select()
+      tables.favorites.select('mediaId')
     )
   )
   
-  return new Set((favoriteRecords as any[]).map(f => f.mediaId))
+  // IMPORTANT: Wrap in useMemo to prevent creating new Set on every render
+  // Without this, every component using this hook would re-render on any state change
+  return useMemo(() => {
+    const records = favoriteRecords as any[] | undefined
+    if (!records || !Array.isArray(records)) return new Set<string>()
+    return new Set<string>(records.map(f => f.mediaId))
+  }, [favoriteRecords])
 }

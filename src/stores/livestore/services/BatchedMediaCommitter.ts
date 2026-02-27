@@ -93,11 +93,8 @@ class BatchedMediaCommitter {
     
     this.pendingMedia.push(...validItems)
     
-    console.log(`[BatchedMediaCommitter] Added ${validItems.length} items, pending: ${this.pendingMedia.length}`)
-    
     // Force flush if batch too large (prevents memory buildup for large imports)
     if (this.pendingMedia.length >= this.MAX_BATCH_SIZE) {
-      console.log(`[BatchedMediaCommitter] Max batch size reached, forcing flush`)
       await this.flush()
       return
     }
@@ -132,8 +129,6 @@ class BatchedMediaCommitter {
     const mediaToCommit = [...this.pendingMedia]
     this.pendingMedia = []
     
-    const startTime = performance.now()
-    
     try {
       // Query existing IDs to avoid redundant inserts
       const placeholders = mediaToCommit.map(() => '?').join(',')
@@ -155,14 +150,11 @@ class BatchedMediaCommitter {
       const newMedia = mediaToCommit.filter(m => !existingIds.has(m.id))
       
       if (newMedia.length === 0) {
-        console.log(`[BatchedMediaCommitter] All ${mediaToCommit.length} items already exist, skipping`)
         return
       }
       
       // Normalize and commit with skipRefresh
       const normalizedMedia = newMedia.map(normalizeMediaForLiveStore)
-      
-      console.log(`[BatchedMediaCommitter] Committing ${newMedia.length} new items (${existingIds.size} already exist)`)
       
       await this.store.commit(
         { skipRefresh: true },
@@ -171,9 +163,6 @@ class BatchedMediaCommitter {
       
       // Single refresh after commit
       this.store.manualRefresh()
-      
-      const elapsed = performance.now() - startTime
-      console.log(`[BatchedMediaCommitter] ✅ Flushed ${newMedia.length} items in ${elapsed.toFixed(2)}ms`)
       
     } catch (error) {
       console.error('[BatchedMediaCommitter] Flush failed:', error)

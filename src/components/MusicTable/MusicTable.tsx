@@ -198,14 +198,6 @@ const MusicTable = ({
   disableAddButton, 
   slim 
 }: Props) => {
-  // 🔍 DEBUG: Track when MusicTable receives new data
-  React.useEffect(() => {
-    if (tableIds.length > 0) {
-      console.log(`[MusicTable] 📥 Received tableIds: ${tableIds.length} items`)
-      console.log(`[MusicTable] 📥 Received mediaMap: ${mediaMap ? Object.keys(mediaMap).length : 'undefined'} items`)
-    }
-  }, [tableIds.length, mediaMap])
-  
   // Get LiveStore instance for queue operations
   const { store: liveStore } = useStore()
   

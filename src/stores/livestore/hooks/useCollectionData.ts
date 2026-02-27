@@ -1,7 +1,7 @@
 import { useQuery } from '@livestore/react'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
-import { useMemo, useEffect } from 'react'
+import { useMemo } from 'react'
 import type { Filter } from '../../../contexts/UIContext'
 import { useFavoriteIds } from './useFavorites'
 
@@ -95,24 +95,14 @@ export const useCollectionData = (filters: Filter, searchTerm: string) => {
     queryDb(query)
   )
   
-  // 🔍 DEBUG: Measure query result timing
-  useEffect(() => {
-    if (Array.isArray(rawMedia) && rawMedia.length > 0) {
-      console.log(`[useCollectionData] 📊 Query returned ${rawMedia.length} items`)
-    }
-  }, [rawMedia])
-  
   // Transform and filter in-memory (fast for typical collection sizes)
   return useMemo(() => {
-    const startTransform = performance.now()
     const ids: string[] = []
     const map: Record<string, any> = {}
     
     if (!Array.isArray(rawMedia)) {
       return { ids, map }
     }
-    
-    console.log(`[useCollectionData] 🔄 Starting transform/filter of ${rawMedia.length} items`)
     
     // Apply client-side filters that can't be done in SQL
     const filtered = rawMedia.filter((item: any) => {
@@ -148,9 +138,6 @@ export const useCollectionData = (filters: Filter, searchTerm: string) => {
       ids.push(media.id)
       map[media.id] = media
     })
-    
-    const transformTime = performance.now() - startTransform
-    console.log(`[useCollectionData] ✅ Transform completed: ${filtered.length} items in ${transformTime.toFixed(2)}ms`)
     
     return { ids, map }
   }, [rawMedia, filters.genres, filters.providers, searchTerm])
