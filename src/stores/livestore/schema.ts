@@ -334,39 +334,74 @@ const materializers = State.SQLite.materializers(events, {
     const now = Date.now()
     const operations: any[] = []
     
+    // PERFORMANCE OPTIMIZATION: Pre-deduplicate artists and albums
+    // Instead of inserting 3 ops per media item (artist + album + media),
+    // we collect unique artists/albums first, reducing total operations by ~60%
+    // Example: 500 songs from 10 artists, 50 albums
+    //   Before: 500 + 500 + 500 = 1,500 operations
+    //   After:  10 + 50 + 500 = 560 operations
+    
+    const uniqueArtists = new Map<string, { id: string; name: string }>()
+    const uniqueAlbums = new Map<string, any>()
+    
+    // First pass: collect unique artists and albums
     for (const item of event.media) {
-      // Insert artist
+      if (!uniqueArtists.has(item.artist.id)) {
+        uniqueArtists.set(item.artist.id, {
+          id: item.artist.id,
+          name: item.artist.name,
+        })
+      }
+      
+      if (!uniqueAlbums.has(item.album.id)) {
+        uniqueAlbums.set(item.album.id, {
+          id: item.album.id,
+          name: item.album.name,
+          artistId: item.album.artistId,
+          thumbnailUrl: item.album.thumbnailUrl ?? null,
+          year: item.album.year ?? null,
+        })
+      }
+    }
+    
+    // Insert unique artists only (e.g., 10 ops instead of 500)
+    // Note: Using Array.from() for compatibility with current tsconfig target
+    Array.from(uniqueArtists.values()).forEach(artist => {
       operations.push(
         tables.artists
           .insert({
-            id: item.artist.id,
-            name: item.artist.name,
+            id: artist.id,
+            name: artist.name,
             createdAt: now,
             updatedAt: now,
           })
           .onConflict('id', 'ignore')
       )
-      
-      // Insert album
+    })
+    
+    // Insert unique albums only (e.g., 50 ops instead of 500)
+    Array.from(uniqueAlbums.values()).forEach(album => {
       operations.push(
         tables.albums
           .insert({
-            id: item.album.id,
-            name: item.album.name,
-            artistId: item.album.artistId,
-            thumbnailUrl: item.album.thumbnailUrl ?? null,
-            year: item.album.year ?? null,
+            id: album.id,
+            name: album.name,
+            artistId: album.artistId,
+            thumbnailUrl: album.thumbnailUrl,
+            year: album.year,
             createdAt: now,
             updatedAt: now,
           })
           .onConflict('id', 'ignore')
       )
-      
+    })
+    
+    // Insert all media items (unavoidable - one per item)
+    for (const item of event.media) {
       // Compute denormalized fields for fast queries
       const genresFlat = Array.isArray(item.genres) ? item.genres.join(',') : ''
       const providersFlat = item.stream ? Object.keys(item.stream).join(',') : ''
       
-      // Insert media
       operations.push(
         tables.media
           .insert({

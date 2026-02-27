@@ -10,7 +10,7 @@ type MediaCoverProps = {
 }
 
 const MediaCoverWrapper = ({ media }: MediaCoverProps) => {
-  if (!media.cover) {
+  if (!media?.cover) {
     return null
   }
 
@@ -18,7 +18,7 @@ const MediaCoverWrapper = ({ media }: MediaCoverProps) => {
     <MediaCover
       id={media.id}
       name={media.title}
-      artistName={media.artist.name}
+      artistName={media.artist?.name || 'Unknown Artist'}
       cover={media.cover}
       playCount={media.playCount}
       showPlayCount
@@ -30,15 +30,17 @@ const MediaCoverWrapper = ({ media }: MediaCoverProps) => {
 // All items component
 // Important! add unique key
 const MediaItems = (list: Array<any>) => {
-  return list.map((media) => {
-    return (
-      <MediaCoverWrapper
-        itemId={media.id}
-        key={media.id}
-        media={media}
-      />
-    )
-  })
+  return list
+    .filter((media) => media && media.id) // Filter out null/undefined items
+    .map((media) => {
+      return (
+        <MediaCoverWrapper
+          itemId={media.id}
+          key={media.id}
+          media={media}
+        />
+      )
+    })
 }
 
 type Props = {

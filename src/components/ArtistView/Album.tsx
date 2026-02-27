@@ -1,3 +1,4 @@
+import * as React from 'react'
 import * as types from '../../constants/ActionTypes'
 import Button from '../common/Button'
 import { Translate } from 'react-redux-i18n'
@@ -6,41 +7,45 @@ import SongRow from '../MusicTable/SongRow'
 import CoverImage from '../MusicTable/CoverImage'
 import { State as QueueState } from '../../reducers/queue'
 import { Dispatch } from 'redux'
-import { useMediaMap } from '../../stores/livestore/hooks'
 
-interface Album {
+interface AlbumData {
   id: string
   name: string
   year?: number
 }
 
 type AlbumProps = {
-  album: Album,
+  album: AlbumData,
   queue: QueueState,
   songs: Array<string>,
-  dispatch: Dispatch
+  dispatch: Dispatch,
+  mediaMap: Record<string, any>  // Passed from parent - no hook call needed
 }
 
-const Album = (props: AlbumProps) => {
-  const albumId = props.album.id
-  
-  // Get media map from LiveStore
-  const mediaMap = useMediaMap()
+/**
+ * Album component - displays an album with its songs grouped by disc
+ * 
+ * PERFORMANCE: mediaMap is passed as prop from ArtistView, not fetched via hook.
+ * This prevents each Album from triggering a separate full-library query.
+ */
+const Album = React.memo((props: AlbumProps) => {
+  const { album, mediaMap, songs, dispatch, queue } = props
+  const albumId = album.id
 
-  const extractSongs = () => {
-    if (!props.songs) {
+  const extractSongs = React.useCallback(() => {
+    if (!songs) {
       return null
     }
 
     // Create a Set of unique song IDs
-    const uniqueSongsSet = new Set(props.songs)
+    const uniqueSongsSet = new Set(songs)
 
     // Log any duplicates that were removed
-    if (uniqueSongsSet.size !== props.songs.length) {
-      const duplicates = props.songs.filter(songId => 
-        props.songs.indexOf(songId) !== props.songs.lastIndexOf(songId)
+    if (uniqueSongsSet.size !== songs.length) {
+      const duplicates = songs.filter(songId => 
+        songs.indexOf(songId) !== songs.lastIndexOf(songId)
       )
-      console.warn(`Removed ${props.songs.length - uniqueSongsSet.size} duplicate songs from album ${props.album.name} (${albumId}):`, 
+      console.warn(`Removed ${songs.length - uniqueSongsSet.size} duplicate songs from album ${album.name} (${albumId}):`, 
         [...new Set(duplicates)])
     }
 
@@ -86,11 +91,11 @@ const Album = (props: AlbumProps) => {
               disableCovers
               style={{}}
               key={songId}
-              dispatch={props.dispatch}
+              dispatch={dispatch}
               isCurrent={false}
               slim={true}
               onClick={() => {
-                props.dispatch({ type: types.ADD_ALBUM_TO_QUEUE, albumId })
+                dispatch({ type: types.ADD_ALBUM_TO_QUEUE, albumId })
               }}
               song={songRow}
             />
@@ -112,7 +117,13 @@ const Album = (props: AlbumProps) => {
         </div>
       )
     })
-  }
+  }, [songs, album.name, albumId, mediaMap, dispatch])
+
+  // Memoize the cover image source
+  const coverSource = React.useMemo(() => {
+    const firstSongId = songs?.[0]
+    return firstSongId ? mediaMap[firstSongId]?.cover : undefined
+  }, [songs, mediaMap])
 
   return (
     <div 
@@ -123,24 +134,22 @@ const Album = (props: AlbumProps) => {
         <div
           className='h-56 w-56 mb-2 p-4 md:h-56 md:w-56 cursor-pointer md:mr-4'
           onClick={() => {
-            props.dispatch({ type: types.ADD_ALBUM_TO_QUEUE, albumId })
+            dispatch({ type: types.ADD_ALBUM_TO_QUEUE, albumId })
           }}
         >
           <CoverImage
-            cover={
-              mediaMap[Array.from(new Set(props.songs))[0]]?.cover
-            }
+            cover={coverSource}
             size='thumbnail'
-            albumName={props.album.name}
+            albumName={album.name}
           />
         </div>
         <div className='flex flex-col items-center justify-center gap-2'>
-          <h3 className='text-lg p-4 w-56'>{props.album.name}</h3>
-            { props.album.year && <h4 className='text-md p-4 w-56'>{props.album.year}</h4>}
+          <h3 className='text-lg p-4 w-56'>{album.name}</h3>
+            { album.year && <h4 className='text-md p-4 w-56'>{album.year}</h4>}
           <Button
             transparent
             onClick={() => {
-              props.dispatch({ type: types.ADD_ALBUM_TO_QUEUE, albumId })
+              dispatch({ type: types.ADD_ALBUM_TO_QUEUE, albumId })
             }}
           >
             <Icon
@@ -150,14 +159,14 @@ const Album = (props: AlbumProps) => {
             <Translate value='buttons.addToQueue' />
           </Button>
 
-          {props.queue?.currentPlaying && (
+          {queue?.currentPlaying && (
             <Button
               transparent
               onClick={() => {
                 // Ensure unique songs when adding to queue
-                const uniqueSongIds = Array.from(new Set(props.songs))
-                const songs = uniqueSongIds.map(songId => mediaMap[songId])
-                props.dispatch({ type: types.ADD_TO_QUEUE_NEXT, songs })
+                const uniqueSongIds = Array.from(new Set(songs))
+                const songsToAdd = uniqueSongIds.map(songId => mediaMap[songId])
+                dispatch({ type: types.ADD_TO_QUEUE_NEXT, songs: songsToAdd })
               }}
             >
               <Icon
@@ -171,7 +180,7 @@ const Album = (props: AlbumProps) => {
           <Button
             transparent
             onClick={() => {
-              props.dispatch({ type: types.PIN_ALBUM, albumId })
+              dispatch({ type: types.PIN_ALBUM, albumId })
             }}
           >
             <Icon
@@ -187,6 +196,8 @@ const Album = (props: AlbumProps) => {
       </div>
     </div>
   )
-}
+})
+
+Album.displayName = 'Album'
 
 export default Album

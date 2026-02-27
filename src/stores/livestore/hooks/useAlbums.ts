@@ -132,6 +132,9 @@ export const useAlbumIdsByArtist = () => {
  * Get songs grouped by album ID
  * Returns a map of albumId -> array of song IDs
  * 
+ * ⚠️ PERFORMANCE WARNING: This loads ALL media in the library.
+ * For artist views, use `useSongsByAlbumForArtist(artistId)` instead.
+ * 
  * @example
  * ```tsx
  * const songsByAlbum = useSongsByAlbum()
@@ -160,6 +163,95 @@ export const useSongsByAlbum = () => {
       })
     }
     return map
+  }, [media])
+}
+
+/**
+ * Transform raw LiveStore media data to include nested artist/album objects
+ * (Same transformation as useMedia.ts to ensure consistent data shape)
+ */
+function transformMediaFromLiveStore(rawMedia: any): any {
+  if (!rawMedia) return null
+  
+  // Reconstruct nested artist object from flat fields
+  const artist = {
+    id: rawMedia.artistId || '',
+    name: rawMedia.artistName || 'Unknown Artist',
+  }
+  
+  // Reconstruct nested album object from flat fields
+  const album = {
+    id: rawMedia.albumId || '',
+    name: rawMedia.albumName || 'Unknown Album',
+    artistId: rawMedia.artistId || '',
+    artist: artist,
+    thumbnailUrl: rawMedia.cover?.thumbnailUrl || null,
+    year: rawMedia.year || null,
+  }
+  
+  return {
+    ...rawMedia,
+    artist,
+    album,
+  }
+}
+
+/**
+ * OPTIMIZED: Get songs grouped by album ID for a specific artist
+ * Only fetches media for the given artist, not the entire library.
+ * 
+ * Performance: O(artist's songs) instead of O(entire library)
+ * 
+ * @param artistId - Artist ID to fetch songs for
+ * @returns Object with:
+ *   - songsByAlbum: Map of albumId -> array of song IDs
+ *   - mediaMap: Map of songId -> song object (only for this artist's songs)
+ *   - allSongIds: Array of all song IDs for this artist
+ * 
+ * @example
+ * ```tsx
+ * const { songsByAlbum, mediaMap } = useSongsByAlbumForArtist('artist-123')
+ * const albumSongs = songsByAlbum['album-123'] // ['song-1', 'song-2', ...]
+ * const song = mediaMap['song-1'] // Full song object with nested artist/album
+ * ```
+ */
+export const useSongsByAlbumForArtist = (artistId: string | null | undefined) => {
+  const media = useQuery(
+    queryDb(
+      artistId
+        ? tables.media
+            .select()
+            .where('artistId', '=', artistId)
+            .orderBy('track', 'asc')
+        : tables.media.select().where('id', '=', '__NONE__')
+    )
+  )
+  
+  return useMemo(() => {
+    const songsByAlbum: Record<string, string[]> = {}
+    const mediaMap: Record<string, any> = {}
+    const allSongIds: string[] = []
+    
+    if (Array.isArray(media)) {
+      media.forEach((rawSong: any) => {
+        // Transform to include nested artist/album objects
+        const song = transformMediaFromLiveStore(rawSong)
+        
+        // Build mediaMap for quick lookups
+        mediaMap[song.id] = song
+        allSongIds.push(song.id)
+        
+        // Group by album
+        if (song.albumId) {
+          if (!songsByAlbum[song.albumId]) {
+            songsByAlbum[song.albumId] = []
+          }
+          songsByAlbum[song.albumId].push(song.id)
+        }
+      })
+    }
+    
+    return { songsByAlbum, mediaMap, allSongIds }
   }, [media])
 }
 

@@ -4,7 +4,7 @@
   "version": "2.5.2",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 127.0.0.1",
+    "dev": "vite --host",
     "build": "tsc && vite build",
     "test": "vitest --config vitest.config.ts --watch=false",
     "test:watch": "vitest --config vitest.config.ts --watch",

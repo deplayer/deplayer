@@ -1,5 +1,6 @@
+import React from 'react'
 import { useStore } from '@livestore/react'
-import { useIsFavorite } from '../../stores/livestore/hooks'
+import { useFavoriteIds } from '../../stores/livestore/hooks'
 import { toggleFavoriteAction } from '../../stores/livestore/actions'
 
 interface Props {
@@ -7,11 +8,21 @@ interface Props {
   className?: string
 }
 
-const FavoriteButton: React.FC<Props> = ({ songId, className = '' }) => {
+/**
+ * FavoriteButton - Toggle favorite status for a song
+ * 
+ * PERFORMANCE: Uses useFavoriteIds() which loads all favorites once as a Set,
+ * instead of useIsFavorite(songId) which runs a separate query per song.
+ * This is critical for lists with many songs (e.g., artist view with 100+ tracks).
+ */
+const FavoriteButton: React.FC<Props> = React.memo(({ songId, className = '' }) => {
   const { store: liveStore } = useStore()
-  const isFavorite = useIsFavorite(songId)
+  // Use shared Set of all favorite IDs - single query for all songs
+  const favoriteIds = useFavoriteIds()
+  const isFavorite = favoriteIds.has(songId)
 
-  const toggleFavorite = async () => {
+  const toggleFavorite = React.useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation() // Prevent row click
     if (!liveStore) return
     
     try {
@@ -19,7 +30,7 @@ const FavoriteButton: React.FC<Props> = ({ songId, className = '' }) => {
     } catch (error) {
       console.error('Failed to toggle favorite:', error)
     }
-  }
+  }, [liveStore, songId])
 
   return (
     <button
@@ -39,6 +50,8 @@ const FavoriteButton: React.FC<Props> = ({ songId, className = '' }) => {
       </svg>
     </button>
   )
-}
+})
+
+FavoriteButton.displayName = 'FavoriteButton'
 
 export default FavoriteButton

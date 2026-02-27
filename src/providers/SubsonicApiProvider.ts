@@ -40,16 +40,10 @@ export default class SubsonicApiProvider implements IMusicProvider {
     }
 
     const secureSongs = songs instanceof Array ? songs : [songs];
-    
-    // DEBUG: Time individual parts
-    let mediaCreationTime = 0
-    let dataPreparationTime = 0
-    
-    const result = secureSongs.map((song: any) => {
-      const t0 = performance.now()
-      
+    return secureSongs.map((song: any) => {
       const album = albums.find((album) => album.id === song.album.id);
-      const mediaParams = {
+
+      return new Media({
         title: song.title ? song.title : song.path,
         artist: { name: song.artist },
         artistName: song.artist,
@@ -65,31 +59,15 @@ export default class SubsonicApiProvider implements IMusicProvider {
         track: song.track,
         discNumber: song.discNumber,
         filePath: song.path,
-        type: "audio" as const,
+        type: "audio",
         stream: {
           subsonic: {
             service: this.providerKey,
             uris: [{ uri: this.streamBase + "&id=" + song.id }],
           },
         },
-      }
-      
-      const t1 = performance.now()
-      dataPreparationTime += (t1 - t0)
-      
-      const media = new Media(mediaParams);
-      
-      const t2 = performance.now()
-      mediaCreationTime += (t2 - t1)
-      
-      return media
+      });
     });
-    
-    if (secureSongs.length > 0) {
-      console.log(`[Subsonic PERF] mapSongs(${secureSongs.length}): dataPrep=${dataPreparationTime.toFixed(2)}ms, mediaCreation=${mediaCreationTime.toFixed(2)}ms, avg=${(mediaCreationTime/secureSongs.length).toFixed(2)}ms/song`)
-    }
-    
-    return result
   };
 
   search(searchTerm: string): Promise<Array<IMedia>> {
@@ -138,33 +116,20 @@ export default class SubsonicApiProvider implements IMusicProvider {
   }
 
   async getRecentMedia(): Promise<IMedia[]> {
-    const perfLog = (label: string, startTime?: number) => {
-      const now = performance.now()
-      if (startTime !== undefined) {
-        console.log(`[Subsonic PERF] ${label}: ${(now - startTime).toFixed(2)}ms`)
-      }
-      return now
-    }
-    
     try {
-      const t0 = perfLog('getRecentMedia START')
-      
       // Get recently added media items
       const result = await axios.get(
         `${this.baseUrl}/rest/getAlbumList2.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.11.0&f=json&type=newest&size=50`
       );
-      perfLog('Album list fetched', t0)
 
       const albums = result.data["subsonic-response"].albumList2.album || [];
-      console.log(`[Subsonic PERF] Albums to fetch: ${albums.length}`)
       
       // PERF FIX: Fetch album details in parallel batches instead of sequentially
+      // This reduces main thread blocking from 50 sequential awaits to ~5 batch awaits
       const BATCH_SIZE = 10
       const allRawSongs: any[][] = []
       
-      const t1 = performance.now()
       for (let i = 0; i < albums.length; i += BATCH_SIZE) {
-        const batchStart = performance.now()
         const batch = albums.slice(i, i + BATCH_SIZE)
         
         // Fetch all albums in this batch in parallel
@@ -182,50 +147,34 @@ export default class SubsonicApiProvider implements IMusicProvider {
         for (const result of batchResults) {
           if (result.status === 'fulfilled') {
             allRawSongs.push([result.value.songs, result.value.album])
+          } else {
+            logger.error('Error fetching album songs:', result.reason)
           }
         }
         
-        console.log(`[Subsonic PERF] Network batch ${i/BATCH_SIZE}: ${(performance.now() - batchStart).toFixed(2)}ms`)
-        
-        // Yield to main thread between network batches
+        // Yield to main thread between network batches to prevent FPS drops
         if (i + BATCH_SIZE < albums.length) {
           await new Promise(resolve => requestAnimationFrame(resolve))
         }
       }
-      perfLog('All network requests done', t1)
       
-      // Count total songs
-      let totalSongs = 0
-      for (const [songs] of allRawSongs) {
-        totalSongs += songs?.length || 0
-      }
-      console.log(`[Subsonic PERF] Total songs to process: ${totalSongs}`)
-      
-      // Process mapSongs in chunks
+      // Process mapSongs in chunks to avoid blocking main thread
       const PROCESS_BATCH_SIZE = 5
       const allSongs: IMedia[] = []
       
-      const t2 = performance.now()
       for (let i = 0; i < allRawSongs.length; i += PROCESS_BATCH_SIZE) {
-        const processBatchStart = performance.now()
         const processBatch = allRawSongs.slice(i, i + PROCESS_BATCH_SIZE)
         
-        let songsInBatch = 0
         for (const [songs, album] of processBatch) {
-          songsInBatch += songs?.length || 0
           const mappedSongs = this.mapSongs(songs, [album])
           allSongs.push(...mappedSongs)
         }
-        
-        console.log(`[Subsonic PERF] Process batch ${i/PROCESS_BATCH_SIZE} (${songsInBatch} songs): ${(performance.now() - processBatchStart).toFixed(2)}ms`)
         
         // Yield to main thread between processing batches
         if (i + PROCESS_BATCH_SIZE < allRawSongs.length) {
           await new Promise(resolve => requestAnimationFrame(resolve))
         }
       }
-      perfLog('All processing done', t2)
-      perfLog('getRecentMedia TOTAL', t0)
 
       return allSongs;
     } catch (error) {

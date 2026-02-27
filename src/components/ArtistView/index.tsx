@@ -6,7 +6,7 @@ import Tag from '../common/Tag'
 import Album from './Album'
 import * as types from '../../constants/ActionTypes'
 import { State } from '../../reducers'
-import { useArtistById, useAlbumsByArtist, useSongsByAlbum, useMediaMap } from '../../stores/livestore/hooks'
+import { useArtistById, useAlbumsByArtist, useSongsByAlbumForArtist } from '../../stores/livestore/hooks'
 import { useQueue } from '../../stores/livestore/hooks/useQueue'
 
 export default function ArtistView() {
@@ -14,22 +14,17 @@ export default function ArtistView() {
   const dispatch = useDispatch()
   const artistId = params.id || ''
   
-  // LiveStore hooks
+  // LiveStore hooks - OPTIMIZED: Only fetch this artist's songs, not entire library
   const artist = useArtistById(artistId)
   const albumsData = useAlbumsByArtist(artistId)
-  const songsByAlbum = useSongsByAlbum()
+  const { songsByAlbum, mediaMap } = useSongsByAlbumForArtist(artistId)
   const queue = useQueue('main')
-  const mediaMap = useMediaMap()
   
   // Keep artistMetadata in Redux temporarily until migrated
   const artistMetadata = useSelector((state: State) => state.artist.artistMetadata)
   
-  if (!artist) {
-    return null
-  }
-
   // Extract background image from first album's first song
-  const extractBackground = (): string | undefined => {
+  const extractBackground = React.useCallback((): string | undefined => {
     if (albumsData && albumsData.length > 0) {
       const firstAlbumId = albumsData[0].id
       const albumSongs = songsByAlbum[firstAlbumId]
@@ -38,7 +33,30 @@ export default function ArtistView() {
       }
     }
     return undefined
-  }
+  }, [albumsData, songsByAlbum, mediaMap])
+
+  // Memoize album rows - must be before any early returns (React hooks rules)
+  const albumRows = React.useMemo(() => {
+    if (!albumsData) return null
+    return albumsData.map((album: any) => (
+      <Album
+        queue={queue}
+        key={album.id}
+        album={album}
+        dispatch={dispatch}
+        songs={songsByAlbum[album.id] || []}
+        mediaMap={mediaMap}
+      />
+    ))
+  }, [albumsData, queue, songsByAlbum, mediaMap, dispatch])
+
+  // Extract artist bio summary
+  const artistSummary = React.useMemo(() => {
+    if (artistMetadata?.artist?.bio?.content) {
+      return artistMetadata.artist.bio.content
+    }
+    return ''
+  }, [artistMetadata])
 
   React.useEffect(() => {
     if (artist && artist.name) {
@@ -59,33 +77,17 @@ export default function ArtistView() {
         backgroundImage: extractBackground()
       })
     }
-  }, [artist?.name, dispatch])
-
-  const extractSummary = (): string => {
-    if (artistMetadata && artistMetadata.artist) {
-      return artistMetadata.artist.bio.content
-    }
-
-    return ''
+  }, [artist, extractBackground, dispatch])
+  
+  if (!artist) {
+    return null
   }
-
-  const albumRows = albumsData?.map((album: any) => {
-    return (
-      <Album
-        queue={queue}
-        key={album.id}
-        album={album}
-        dispatch={dispatch}
-        songs={songsByAlbum[album.id] || []}
-      />
-    )
-  })
 
   return (
     <div data-testid="artist-view" className='artist-view z-50'>
       <div className='main w-full z-10 md:p-4'>
         <h2 className='text-center text-3xl py-2'>{artist.name}</h2>
-        <p className='text-center' dangerouslySetInnerHTML={{ __html: extractSummary() }} />
+        <p className='text-center' dangerouslySetInnerHTML={{ __html: artistSummary }} />
         {
           artistMetadata?.['life-span'] && (
             <div className='text-center text-md'>

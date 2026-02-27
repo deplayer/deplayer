@@ -10,30 +10,37 @@ import { useMemo } from 'react'
 export default function AlbumView() {
   const match = useMatch('/album/:id')
   const dispatch = useDispatch()
+  const albumId = match?.params.id || ''
+  
+  // LiveStore hooks - call unconditionally to follow React rules
+  const album = useAlbumById(albumId)
+  const mediaItems = useMediaByAlbum(albumId)
+  const queue = useQueue('main')
+  const relatedAlbumsData = useAlbumsByArtist(album?.artistId)
+  
+  // Build mediaMap and songIds from the album's media items
+  const { songIds, mediaMap } = useMemo(() => {
+    const map: Record<string, any> = {}
+    const ids: string[] = []
+    
+    if (Array.isArray(mediaItems)) {
+      mediaItems.forEach((item: any) => {
+        map[item.id] = item
+        ids.push(item.id)
+      })
+    }
+    
+    return { songIds: ids, mediaMap: map }
+  }, [mediaItems])
 
   if (!match) {
     return null
   }
-
-  const albumId = match.params.id || ''
-  
-  // LiveStore hooks
-  const album = useAlbumById(albumId)
-  const mediaItems = useMediaByAlbum(albumId)
-  const queue = useQueue('main')
   
   if (!album) {
     redirect('/')
     return null
   }
-
-  // Get related albums by the same artist
-  const relatedAlbumsData = useAlbumsByArtist(album.artistId)
-  
-  // Extract song IDs from media items
-  const songIds = useMemo(() => 
-    mediaItems.map(item => item.id)
-  , [mediaItems])
 
   return (
     <div className='artist-view z-50'>
@@ -44,6 +51,7 @@ export default function AlbumView() {
           album={album}
           dispatch={dispatch}
           songs={songIds}
+          mediaMap={mediaMap}
         />
         <div className='w-full'>
           <RelatedAlbums albums={relatedAlbumsData as any} />

@@ -59,38 +59,13 @@ const ProviderTags = ({ song }: { song: Media }) => {
   )
 }
 
-const SongRow = (props: Props) => {
+const SongRow = React.memo((props: Props) => {
   const { song, disableCovers, slim, mqlMatch } = props
-  
-  // 🔍 DEBUG: Track SongRow render
-  const renderCountRef = React.useRef(0)
-  renderCountRef.current += 1
-  
-  React.useEffect(() => {
-    if (renderCountRef.current === 1) {
-      console.log(`[SongRow] 🎵 First render: ${song.id} - ${song.title}`)
-    }
-  }, [])
 
   // Validate song data
   if (!song || !song.id) {
-    console.warn('SongRow: Invalid song data received')
     return null
   }
-
-  // Add debug logging
-  React.useEffect(() => {
-    if (!song.title || !song.artist || !song.album) {
-      console.warn('SongRow: Incomplete song data detected:', {
-        id: song.id,
-        title: song.title,
-        artist: song?.artist?.name,
-        album: song?.album?.name,
-        hasStream: !!song.stream,
-        hasCovers: !!song.cover
-      })
-    }
-  }, [song])
 
   const nonAvailable = <Translate value='song.row.na' />
 
@@ -147,6 +122,8 @@ const SongRow = (props: Props) => {
       </div>
     </div>
   )
-}
+})
+
+SongRow.displayName = 'SongRow'
 
 export default SongRow
