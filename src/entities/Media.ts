@@ -76,7 +76,13 @@ export default class Media implements IMedia {
   track?: number
   discNumber?: number
 
+  // DEBUG: Track constructor timing
+  private static constructorCount = 0
+  private static totalTime = 0
+  
   constructor(songParams: IMedia) {
+    const t0 = performance.now()
+    
     this.title = songParams.title
     this.playCount = songParams.playCount ?? 0
     this.duration = songParams.duration ?? 0
@@ -88,12 +94,16 @@ export default class Media implements IMedia {
     this.type = songParams.type || 'audio'
     this.discNumber = songParams.discNumber
 
+    const t1 = performance.now()
+
     // Ensure we have valid artist data
     const artistName = songParams.artistName || 'Unknown Artist'
     const artistId = songParams.artistId || undefined
     const artist = this.generateArtist(artistName, artistId)
     this.artist = artist
     this.artistName = artist.name
+
+    const t2 = performance.now()
 
     // Ensure we have valid album data
     const albumProps: IAlbum = {
@@ -104,6 +114,8 @@ export default class Media implements IMedia {
       artist: songParams.album?.artist || { name: artistName, id: artistId }
     }
     this.album = new Album(albumProps)
+
+    const t3 = performance.now()
 
     this.stream = songParams.stream || {}
 
@@ -116,10 +128,23 @@ export default class Media implements IMedia {
 
     this.track = songParams.track
 
+    const t4 = performance.now()
+
     // this must be the last assignment
     const id = songParams.forcedId ? songParams.forcedId : new MediaId(this).value
     this.id = id
     this.externalId = id
+    
+    const t5 = performance.now()
+    
+    // Report timing every 100 items
+    Media.constructorCount++
+    Media.totalTime += (t5 - t0)
+    if (Media.constructorCount % 100 === 0) {
+      const avgTime = Media.totalTime / Media.constructorCount
+      console.log(`[Media PERF] After ${Media.constructorCount} items: avg=${avgTime.toFixed(2)}ms/item`)
+      console.log(`[Media PERF] Breakdown - props:${(t1-t0).toFixed(2)}, artist:${(t2-t1).toFixed(2)}, album:${(t3-t2).toFixed(2)}, stream:${(t4-t3).toFixed(2)}, id:${(t5-t4).toFixed(2)}`)
+    }
   }
 
   generateArtist(artistName: string, artistId?: string): Artist {
