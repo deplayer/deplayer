@@ -123,23 +123,38 @@ export default class SubsonicApiProvider implements IMusicProvider {
       );
 
       const albums = result.data["subsonic-response"].albumList2.album || [];
-      const allSongs: IMedia[] = [];
-
-      // For each album, get its songs
-      for (const album of albums) {
-        try {
-          const albumDetails = await axios.get(
-            `${this.baseUrl}/rest/getAlbum.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.11.0&f=json&id=${album.id}`
-          );
-
-          const songs = albumDetails.data["subsonic-response"].album.song || [];
-          // Map songs with album information
-          const mappedSongs = this.mapSongs(songs, [album]);
-          allSongs.push(...mappedSongs);
-        } catch (error) {
-          logger.error(`Error fetching songs for album ${album.id}:`, error);
-          // Continue with next album even if one fails
-          continue;
+      
+      // PERF FIX: Fetch album details in parallel batches instead of sequentially
+      // This reduces main thread blocking from 50 sequential awaits to ~5 batch awaits
+      const BATCH_SIZE = 10
+      const allSongs: IMedia[] = []
+      
+      for (let i = 0; i < albums.length; i += BATCH_SIZE) {
+        const batch = albums.slice(i, i + BATCH_SIZE)
+        
+        // Fetch all albums in this batch in parallel
+        const batchResults = await Promise.allSettled(
+          batch.map(async (album: any) => {
+            const albumDetails = await axios.get(
+              `${this.baseUrl}/rest/getAlbum.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.11.0&f=json&id=${album.id}`
+            )
+            const songs = albumDetails.data["subsonic-response"].album.song || []
+            return this.mapSongs(songs, [album])
+          })
+        )
+        
+        // Collect successful results
+        for (const result of batchResults) {
+          if (result.status === 'fulfilled') {
+            allSongs.push(...result.value)
+          } else {
+            logger.error('Error fetching album songs:', result.reason)
+          }
+        }
+        
+        // Yield to main thread between batches to prevent FPS drops
+        if (i + BATCH_SIZE < albums.length) {
+          await new Promise(resolve => requestAnimationFrame(resolve))
         }
       }
 
