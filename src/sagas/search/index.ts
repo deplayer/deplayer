@@ -11,7 +11,7 @@ import * as types from "../../constants/ActionTypes";
 import ProvidersService from "../../services/ProvidersService";
 import { getSettingsFromLiveStore } from "../selectors";
 import { getLiveStoreInstance } from "../../App";
-import { addMediaBulkAction } from "../../stores/livestore/actions/media";
+import { batchedMediaCommitter } from "../../stores/livestore/services/BatchedMediaCommitter";
 import { IMedia } from "../../entities/Media";
 
 // Going to search results page
@@ -20,6 +20,7 @@ export function* goToSearchResults(): Generator<any, void, any> {
 }
 
 // Handle every provider as independent thread
+// Uses BatchedMediaCommitter to throttle commits and reduce UI refreshes
 function* performSingleProviderSearch(
   searchTerm: string,
   provider: string
@@ -38,18 +39,19 @@ function* performSingleProviderSearch(
     if (searchResults && searchResults.length > 0) {
       console.log(`[Search Saga] Provider ${provider} returned ${searchResults.length} results`)
       
-      // Get LiveStore instance and insert results
+      // Get LiveStore instance and initialize batched committer
       const liveStore = getLiveStoreInstance();
       if (liveStore) {
-        // Insert to LiveStore - this will automatically update UI via reactive hooks
-        yield call(addMediaBulkAction, liveStore, searchResults);
-        console.log(`[Search Saga] ✅ Inserted ${searchResults.length} results from ${provider} to LiveStore`)
+        // Set store on committer (idempotent)
+        batchedMediaCommitter.setStore(liveStore);
+        
+        // Add to batched committer - will be committed after throttle window
+        // This reduces UI refreshes: 5 providers = 1-2 commits instead of 5
+        yield call([batchedMediaCommitter, 'add'], searchResults);
+        console.log(`[Search Saga] ✅ Queued ${searchResults.length} results from ${provider} for batched commit`)
       } else {
         console.warn('[Search Saga] LiveStore not available, cannot insert search results')
       }
-      
-      // Legacy Redux dispatch for backward compatibility
-      yield put({ type: types.RECEIVE_COLLECTION, data: searchResults });
     } else {
       console.log(`[Search Saga] Provider ${provider} returned no results`)
     }

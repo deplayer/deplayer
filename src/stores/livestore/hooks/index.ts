@@ -32,6 +32,7 @@ export {
   useAlbumsByArtist,
   useAlbumIdsByArtist,
   useSongsByAlbum,
+  useSongsByAlbumForArtist,  // OPTIMIZED: Only fetches artist's songs
   useRecentAlbums,
 } from './useAlbums'
 
@@ -93,3 +94,11 @@ export {
   useSongsByGenre,
   useGenres,
 } from './useGenres'
+
+// Metadata hooks (lightweight facet queries for filters)
+export {
+  useAvailableGenres,
+  useAvailableProviders,
+  useAvailableTypes,
+  useMediaCount,
+} from './useMetadata'
