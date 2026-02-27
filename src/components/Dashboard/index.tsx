@@ -1,5 +1,5 @@
 import { Translate } from 'react-redux-i18n'
-import { FunctionComponent, SVGProps, useMemo } from 'react'
+import { FunctionComponent, SVGProps } from 'react'
 import { Link } from 'react-router-dom'
 import React from 'react'
 import { useDispatch } from 'react-redux'
@@ -21,7 +21,7 @@ import Auth from '../Auth'
 import Button from '../common/Button'
 import { Dispatch } from 'redux'
 import DeplayerTitle from '../DeplayerTitle'
-import { useMediaLibrary, useAlbumsMap } from '../../stores/livestore/hooks'
+import { useMostPlayed, useRecentAlbums } from '../../stores/livestore/hooks'
 import { useUI } from '../../contexts'
 
 const IMAGE_COMPONENTS: FunctionComponent<SVGProps<SVGSVGElement>>[] = [
@@ -111,26 +111,15 @@ const WelcomeMessage = ({ dispatch }: { dispatch: Dispatch }) => {
 const Dashboard = () => {
   const MAX_LIST_ITEMS = 25
   
-  // Get data from LiveStore hooks
-  const mediaLibrary = useMediaLibrary()
-  const albumsMap = useAlbumsMap()
+  // Get data from LiveStore hooks - OPTIMIZED: targeted queries instead of full library
+  // useMostPlayed: Only fetches top N by playCount (vs loading ALL media and sorting in JS)
+  // useRecentAlbums: Only fetches recent albums (vs loading ALL albums)
+  const mostPlayedSongs = useMostPlayed(MAX_LIST_ITEMS)
+  const recentAlbumsData = useRecentAlbums(MAX_LIST_ITEMS)
   const { loading } = useUI()
   
   // Get Redux dispatch for modal actions (not yet migrated)
   const dispatch = useDispatch()
-
-  const mostPlayedSongs = useMemo(() => {
-    if (!Array.isArray(mediaLibrary)) return []
-    return mediaLibrary
-      .filter((song: any) => song.playCount > 0)
-      .sort((a: any, b: any) => (b.playCount || 0) - (a.playCount || 0))
-      .slice(0, MAX_LIST_ITEMS);
-  }, [mediaLibrary]);
-
-  const slicedAlbums = useMemo(() => {
-    const albumsArray = Object.values(albumsMap)
-    return albumsArray.slice(0, MAX_LIST_ITEMS);
-  }, [albumsMap]);
 
   return (
     <div className='z-10 w-full md:px-12 mb-12 flex flex-col gap-4 md:gap-10'>
@@ -142,7 +131,7 @@ const Dashboard = () => {
           title={<Translate value='titles.mostPlayedSongs' />}
           mediaItems={mostPlayedSongs}
         />}
-      {!!slicedAlbums.length && <RelatedAlbums albums={slicedAlbums} />}
+      {!!recentAlbumsData?.length && <RelatedAlbums albums={recentAlbumsData as any} />}
       <Footer />
     </div>
   )

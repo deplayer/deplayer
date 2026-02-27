@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { useLocation, Location } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { Dispatch } from 'redux'
 
 import { State as RootState } from '../reducers'
@@ -8,57 +8,50 @@ import Topbar from '../components/Topbar/Topbar'
 import { State as SearchState } from '../reducers/search'
 import { State as AppState } from '../reducers/app'
 import * as types from '../constants/ActionTypes'
-import { useQueue, useMediaMap, useArtistsMap, useAlbumsMap } from '../stores/livestore/hooks'
+import { useQueue, useMediaById, useArtistById, useAlbumById } from '../stores/livestore/hooks'
 
-const dynamicTitle = (
-  location: Location,
-  mediaMap: Record<string, any>,
-  artistsMap: Record<string, any>,
-  albumsMap: Record<string, any>,
-  searchTerm: string = ''
-): string | React.ReactNode => {
-  const songFinder = location.pathname.match(/\/song\/(.*)/)
-  const artistFinder = location.pathname.match(/\/artist\/(.*)/)
-  const albumFinder = location.pathname.match(/\/album\/(.*)/)
+// Extract ID from route path
+const extractIdFromPath = (pathname: string): { type: 'song' | 'artist' | 'album' | null, id: string | null } => {
+  const songMatch = pathname.match(/\/song\/(.+)/)
+  if (songMatch) return { type: 'song', id: songMatch[1] }
+  
+  const artistMatch = pathname.match(/\/artist\/(.+)/)
+  if (artistMatch) return { type: 'artist', id: artistMatch[1] }
+  
+  const albumMatch = pathname.match(/\/album\/(.+)/)
+  if (albumMatch) return { type: 'album', id: albumMatch[1] }
+  
+  return { type: null, id: null }
+}
 
-  if (songFinder && songFinder[1]) {
-    const song = mediaMap[songFinder[1]]
-
-    if (!song) {
-      return 'Song'
-    }
-
-    const title = song.title + ' - ' + song.artist.name
-
-    return <><Icon icon='faMusic' /> {title}</>
+// Component that renders dynamic title for detail pages
+// OPTIMIZED: Uses targeted single-item queries instead of loading all maps
+const DynamicDetailTitle = ({ type, id }: { type: 'song' | 'artist' | 'album', id: string }) => {
+  // Only query the specific item we need
+  const song = useMediaById(type === 'song' ? id : undefined)
+  const artist = useArtistById(type === 'artist' ? id : undefined)
+  const album = useAlbumById(type === 'album' ? id : undefined)
+  
+  if (type === 'song') {
+    if (!song) return <>Song</>
+    return <><Icon icon='faMusic' /> {song.title} - {song.artist?.name}</>
   }
-
-  if (artistFinder && artistFinder[1]) {
-    const artist = artistsMap[artistFinder[1]]
-
-    if (!artist) {
-      return 'Artist'
-    }
-
+  
+  if (type === 'artist') {
+    if (!artist) return <>Artist</>
     return <><Icon icon='faMicrophoneAlt' /> {artist.name}</>
   }
-
-  if (albumFinder && albumFinder[1]) {
-    const album = albumsMap[albumFinder[1]]
-
-    if (!album) {
-      return 'Album'
-    }
-
-    return (
-      <>
-        <Icon icon='faMusic' className='mr-4' />
-        {album.name}
-      </>
-    )
+  
+  if (type === 'album') {
+    if (!album) return <>Album</>
+    return <><Icon icon='faMusic' className='mr-4' />{album.name}</>
   }
+  
+  return null
+}
 
-  switch (location.pathname) {
+const staticTitle = (pathname: string, searchTerm: string = ''): React.ReactNode => {
+  switch (pathname) {
     case '/settings':
       return (
         <>
@@ -139,13 +132,16 @@ interface TopbarWrapperProps {
 const TopbarWrapper = (props: TopbarWrapperProps) => {
   const location = useLocation()
   
-  // Get data from LiveStore
-  const mediaMap = useMediaMap()
-  const artistsMap = useArtistsMap()
-  const albumsMap = useAlbumsMap()
+  // Get queue from LiveStore (lightweight query)
   const liveQueue = useQueue('default')
   
-  const title = dynamicTitle(location, mediaMap, artistsMap, albumsMap, props.search.searchTerm)
+  // OPTIMIZED: Check if we're on a detail page that needs dynamic title
+  const { type: detailType, id: detailId } = extractIdFromPath(location.pathname)
+  
+  // Build title: either static or dynamic detail component
+  const title = detailType && detailId 
+    ? <DynamicDetailTitle type={detailType} id={detailId} />
+    : staticTitle(location.pathname, props.search.searchTerm)
   
   // Parse trackIds from LiveStore queue (can be JSON string or array)
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {

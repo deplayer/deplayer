@@ -138,3 +138,31 @@ export const useMediaCount = (): number => {
   
   return Array.isArray(result) ? result.length : 0
 }
+
+/**
+ * Get count of artists in the library
+ * Lightweight alternative to useArtists().length
+ * 
+ * @returns Total count of artists
+ */
+export const useArtistsCount = (): number => {
+  const result = useQuery(
+    queryDb(tables.artists.select('id'))
+  )
+  
+  return Array.isArray(result) ? result.length : 0
+}
+
+/**
+ * Get count of albums in the library
+ * Lightweight alternative to useAlbums().length
+ * 
+ * @returns Total count of albums
+ */
+export const useAlbumsCount = (): number => {
+  const result = useQuery(
+    queryDb(tables.albums.select('id'))
+  )
+  
+  return Array.isArray(result) ? result.length : 0
+}

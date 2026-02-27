@@ -101,4 +101,6 @@ export {
   useAvailableProviders,
   useAvailableTypes,
   useMediaCount,
+  useArtistsCount,
+  useAlbumsCount,
 } from './useMetadata'

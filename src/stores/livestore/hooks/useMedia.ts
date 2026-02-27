@@ -390,10 +390,13 @@ export const useRecentlyPlayed = (limit = 20) => {
  * ```
  */
 export const useMostPlayed = (limit = 20) => {
+  // Query media with playCount > 0, sorted by playCount descending
+  // This is more efficient than loading all and filtering in JS
   const rawMedia = useQuery(
     queryDb(
       tables.media
         .select()
+        .where({ playCount: { op: '>', value: 0 } })
         .orderBy('playCount', 'desc')
         .limit(limit)
     )

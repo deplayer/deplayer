@@ -18,7 +18,7 @@ import Icon from '../common/Icon'
 import { State as AppState } from '../../reducers/app'
 import { useLocation } from 'react-router'
 import DeplayerTitle from '../DeplayerTitle'
-import { usePlaylists, useSmartPlaylists, useQueue, useMediaLibrary, useArtists, useSearchMediaIds } from '../../stores/livestore/hooks'
+import { usePlaylists, useSmartPlaylists, useQueue, useMediaCount, useArtistsCount, useSearchMediaIds } from '../../stores/livestore/hooks'
 import { useUI } from '../../contexts'
 
 import LogoSvg from '../../logo.svg?react'
@@ -82,9 +82,9 @@ const SidebarContents = (props: ContentProps) => {
   const totalPlaylists = playlists.length + smartPlaylists.length
   const liveQueue = useQueue('default')
   
-  // Get collection data from LiveStore
-  const mediaLibrary = useMediaLibrary()
-  const artists = useArtists()
+  // Get collection counts from LiveStore - OPTIMIZED: count queries instead of full data
+  const mediaCount = useMediaCount()
+  const artistsCount = useArtistsCount()
   
   // Get search results count from LiveStore
   const searchResultIds = useSearchMediaIds(searchTerm, 1000)
@@ -131,12 +131,12 @@ const SidebarContents = (props: ContentProps) => {
         />
         <CollectionMenuItem
           current={inSection(location, 'collection')}
-          totalItems={mediaLibrary.length}
+          totalItems={mediaCount}
         />
-        {artists.length > 0 && (
+        {artistsCount > 0 && (
           <ArtistsMenuItem
             current={inSection(location, 'artists')}
-            totalItems={artists.length}
+            totalItems={artistsCount}
           />
         )}
         <MenuItem
