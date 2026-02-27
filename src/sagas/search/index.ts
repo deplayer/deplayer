@@ -1,4 +1,123 @@
-// TEMPORARILY DISABLED - PGlite migration in progress
-export default function* searchSaga() {
-  // disabled
+import {
+  call,
+  put,
+  takeLatest,
+  all,
+  fork,
+} from "redux-saga/effects";
+
+import { push } from "redux-first-history";
+import * as types from "../../constants/ActionTypes";
+import ProvidersService from "../../services/ProvidersService";
+import { getSettingsFromLiveStore } from "../selectors";
+import { getLiveStoreInstance } from "../../App";
+import { addMediaBulkAction } from "../../stores/livestore/actions/media";
+import { IMedia } from "../../entities/Media";
+
+// Going to search results page
+export function* goToSearchResults(): Generator<any, void, any> {
+  yield put(push("/search-results"));
 }
+
+// Handle every provider as independent thread
+function* performSingleProviderSearch(
+  searchTerm: string,
+  provider: string
+): Generator<any, void, any> {
+  try {
+    const settings = yield call(getSettingsFromLiveStore);
+    const providerService = new ProvidersService(settings);
+    
+    console.log(`[Search Saga] Searching provider: ${provider} for "${searchTerm}"`)
+    const searchResults: IMedia[] = yield call(
+      providerService.searchForProvider,
+      searchTerm,
+      provider
+    );
+
+    if (searchResults && searchResults.length > 0) {
+      console.log(`[Search Saga] Provider ${provider} returned ${searchResults.length} results`)
+      
+      // Get LiveStore instance and insert results
+      const liveStore = getLiveStoreInstance();
+      if (liveStore) {
+        // Insert to LiveStore - this will automatically update UI via reactive hooks
+        yield call(addMediaBulkAction, liveStore, searchResults);
+        console.log(`[Search Saga] ✅ Inserted ${searchResults.length} results from ${provider} to LiveStore`)
+      } else {
+        console.warn('[Search Saga] LiveStore not available, cannot insert search results')
+      }
+      
+      // Legacy Redux dispatch for backward compatibility
+      yield put({ type: types.RECEIVE_COLLECTION, data: searchResults });
+    } else {
+      console.log(`[Search Saga] Provider ${provider} returned no results`)
+    }
+  } catch (e: any) {
+    console.error(`[Search Saga] Error searching provider ${provider}:`, e);
+    yield put({ type: types.SEARCH_REJECTED, message: e.message });
+  }
+}
+
+type SearchAction = {
+  type: string;
+  searchTerm: string;
+  searchType?: string;
+  noRedirect?: boolean;
+};
+
+// Handling search saga
+export function* search(action: SearchAction): Generator<any, void, any> {
+  const searchTerm = action.searchTerm;
+  const redirect = !action.noRedirect;
+
+  console.log(`[Search Saga] Starting search for "${searchTerm}", redirect: ${redirect}`)
+
+  // Get settings from LiveStore
+  const settings = yield call(getSettingsFromLiveStore);
+  if (!settings?.providers) {
+    console.warn('[Search Saga] No providers configured');
+    yield put({ type: types.SEARCH_FINISHED, searchTerm });
+    return;
+  }
+
+  const providersService = new ProvidersService(settings);
+  const enabledProviders = Object.keys(providersService.providers);
+  
+  console.log(`[Search Saga] Found ${enabledProviders.length} enabled providers:`, enabledProviders)
+
+  // Redirect to search results page to show local results immediately
+  // (LiveStore hooks will handle displaying local matches)
+  if (redirect) {
+    yield call(goToSearchResults);
+  }
+
+  // Then search in providers if any
+  if (enabledProviders.length > 0) {
+    // Fork all provider searches in parallel
+    const searchTasks = enabledProviders.map((provider) => {
+      return fork(performSingleProviderSearch, searchTerm, provider);
+    });
+    
+    yield all(searchTasks);
+  } else {
+    console.log('[Search Saga] No enabled providers to search');
+  }
+
+  yield put({
+    type: types.SEARCH_FINISHED,
+    searchTerm,
+  });
+  
+  yield put({
+    type: types.SEND_NOTIFICATION,
+    notification: "notifications.search.finished",
+  });
+}
+
+// Binding actions to sagas
+function* searchSaga(): Generator<any, void, any> {
+  yield takeLatest(types.START_SEARCH, search);
+}
+
+export default searchSaga;

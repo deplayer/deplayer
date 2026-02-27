@@ -192,33 +192,41 @@ export const useMediaByAlbum = (albumId: string | null | undefined) => {
  * return <div>Found {results.length} matches</div>
  * ```
  */
-export const useSearchMedia = (searchTerm: string, limit = 100) => {
-  const term = searchTerm.trim()
+export const useSearchMedia = (searchTerm: string | undefined | null, limit = 100) => {
+  // Normalize search term - ensure it's always a valid string
+  const term = (searchTerm ?? '').trim()
   const hasSearch = term.length > 0
   
-  // Search by title
-  const titleMatches = useQuery(
-    queryDb(
-      hasSearch
-        ? tables.media
-            .select()
-            .where('title', 'LIKE', `%${term}%`)
-            .limit(limit)
-        : tables.media.select().where('id', '=', '__NONE__')
+  // Use useMemo to create stable query objects
+  const titleQuery = useMemo(() => {
+    if (!hasSearch || !term) {
+      return queryDb(tables.media.select().where('id', '=', '__NONE__'))
+    }
+    return queryDb(
+      tables.media
+        .select()
+        .where('title', 'LIKE', `%${term}%`)
+        .limit(limit)
     )
-  )
+  }, [hasSearch, term, limit])
+  
+  const artistQuery = useMemo(() => {
+    if (!hasSearch || !term) {
+      return queryDb(tables.media.select().where('id', '=', '__NONE__'))
+    }
+    return queryDb(
+      tables.media
+        .select()
+        .where('artistName', 'LIKE', `%${term}%`)
+        .limit(limit)
+    )
+  }, [hasSearch, term, limit])
+  
+  // Search by title
+  const titleMatches = useQuery(titleQuery)
   
   // Search by artist name
-  const artistMatches = useQuery(
-    queryDb(
-      hasSearch
-        ? tables.media
-            .select()
-            .where('artistName', 'LIKE', `%${term}%`)
-            .limit(limit)
-        : tables.media.select().where('id', '=', '__NONE__')
-    )
-  )
+  const artistMatches = useQuery(artistQuery)
   
   return useMemo(() => {
     if (!hasSearch) return []
@@ -231,17 +239,20 @@ export const useSearchMedia = (searchTerm: string, limit = 100) => {
     const mergedResults: any[] = []
     
     // Add title matches first (prioritize exact title matches)
+    // Guard against undefined/null IDs
     for (const media of titleResults) {
-      if (!seenIds.has(media.id)) {
-        seenIds.add(media.id)
+      const id = media?.id
+      if (id && typeof id === 'string' && !seenIds.has(id)) {
+        seenIds.add(id)
         mergedResults.push(transformMediaFromLiveStore(media))
       }
     }
     
     // Add artist matches
     for (const media of artistResults) {
-      if (!seenIds.has(media.id)) {
-        seenIds.add(media.id)
+      const id = media?.id
+      if (id && typeof id === 'string' && !seenIds.has(id)) {
+        seenIds.add(id)
         mergedResults.push(transformMediaFromLiveStore(media))
       }
     }
@@ -267,37 +278,42 @@ export const useSearchMedia = (searchTerm: string, limit = 100) => {
  * return <MusicTable mediaIds={mediaIds} />
  * ```
  */
-export const useSearchMediaIds = (searchTerm: string, limit = 100) => {
-  const term = searchTerm.trim()
+export const useSearchMediaIds = (searchTerm: string | undefined | null, limit = 100) => {
+  // Normalize search term - ensure it's always a valid string
+  const term = (searchTerm ?? '').trim()
   const hasSearch = term.length > 0
   
-  // OPTIMIZATION: Use stable empty query that can be cached by LiveStore
-  // When no search term, use a query that returns no results but is consistent
-  const emptyQuery = queryDb(tables.media.select('id').where('id', '=', '__NONE__'))
+  // Use useMemo to create stable query objects
+  // This prevents LiveStore from re-parsing identical queries on every render
+  const titleQuery = useMemo(() => {
+    if (!hasSearch || !term) {
+      return queryDb(tables.media.select('id').where('id', '=', '__NONE__'))
+    }
+    return queryDb(
+      tables.media
+        .select('id')
+        .where('title', 'LIKE', `%${term}%`)
+        .limit(limit)
+    )
+  }, [hasSearch, term, limit])
+  
+  const artistQuery = useMemo(() => {
+    if (!hasSearch || !term) {
+      return queryDb(tables.media.select('id').where('id', '=', '__NONE__'))
+    }
+    return queryDb(
+      tables.media
+        .select('id')
+        .where('artistName', 'LIKE', `%${term}%`)
+        .limit(limit)
+    )
+  }, [hasSearch, term, limit])
   
   // Search by title - only select ID
-  const titleMatches = useQuery(
-    hasSearch
-      ? queryDb(
-          tables.media
-            .select('id')
-            .where('title', 'LIKE', `%${term}%`)
-            .limit(limit)
-        )
-      : emptyQuery
-  )
+  const titleMatches = useQuery(titleQuery)
   
   // Search by artist name - only select ID
-  const artistMatches = useQuery(
-    hasSearch
-      ? queryDb(
-          tables.media
-            .select('id')
-            .where('artistName', 'LIKE', `%${term}%`)
-            .limit(limit)
-        )
-      : emptyQuery
-  )
+  const artistMatches = useQuery(artistQuery)
   
   return useMemo(() => {
     // Early return for no search - most common case on /collection page
@@ -307,10 +323,12 @@ export const useSearchMediaIds = (searchTerm: string, limit = 100) => {
     const mergedIds: string[] = []
     
     // Add title match IDs (objects with { id: string })
+    // Filter out any undefined/null IDs to prevent downstream query errors
     if (Array.isArray(titleMatches)) {
       for (const result of titleMatches) {
-        const id = (result as any).id as string
-        if (!seenIds.has(id)) {
+        const id = (result as any)?.id
+        // Guard against undefined/null IDs
+        if (id && typeof id === 'string' && !seenIds.has(id)) {
           seenIds.add(id)
           mergedIds.push(id)
         }
@@ -320,8 +338,9 @@ export const useSearchMediaIds = (searchTerm: string, limit = 100) => {
     // Add artist match IDs
     if (Array.isArray(artistMatches)) {
       for (const result of artistMatches) {
-        const id = (result as any).id as string
-        if (!seenIds.has(id)) {
+        const id = (result as any)?.id
+        // Guard against undefined/null IDs
+        if (id && typeof id === 'string' && !seenIds.has(id)) {
           seenIds.add(id)
           mergedIds.push(id)
         }
@@ -579,18 +598,28 @@ export const useFilteredMedia = (filters: Filter) => {
  * ```
  */
 export const useMediaMapForIds = (ids: string[]) => {
-  // Only query if we have IDs
-  const shouldQuery = ids.length > 0
-  
-  const rawMedia = useQuery(
-    shouldQuery
-      ? queryDb(
-          tables.media
-            .select()
-            .where({ id: { op: 'IN', value: ids } })
-        )
-      : queryDb(tables.media.select().where('id', '=', '__NONE__'))
+  // Filter out any undefined/null values and ensure we have valid string IDs
+  const validIds = useMemo(() => 
+    ids.filter((id): id is string => typeof id === 'string' && id.length > 0),
+    [ids]
   )
+  
+  // Only query if we have valid IDs
+  const shouldQuery = validIds.length > 0
+  
+  // Use useMemo for stable query object
+  const query = useMemo(() => {
+    if (!shouldQuery) {
+      return queryDb(tables.media.select().where('id', '=', '__NONE__'))
+    }
+    return queryDb(
+      tables.media
+        .select()
+        .where({ id: { op: 'IN', value: validIds } })
+    )
+  }, [shouldQuery, validIds])
+  
+  const rawMedia = useQuery(query)
   
   return useMemo(() => {
     const map: Record<string, any> = {}
