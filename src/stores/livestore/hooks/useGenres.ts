@@ -57,3 +57,29 @@ export const useGenres = (): Array<{ name: string; count: number }> => {
       .sort((a, b) => b.count - a.count)
   }, [songsByGenre])
 }
+
+/**
+ * Get media items for a specific genre
+ * PERF: Only loads songs matching the genre (not entire library)
+ * 
+ * @param genre - Genre name to filter by (optional)
+ * @param limit - Max number of results (default 25)
+ * @returns Array of media objects matching the genre
+ */
+export const useMediaByGenre = (genre: string | undefined | null, limit = 25): any[] => {
+  const result = useQuery(
+    queryDb(
+      genre
+        ? tables.media
+            .select()
+            .where('genresFlat', 'LIKE', `%${genre}%`)
+            .limit(limit)
+        : tables.media.select().where('id', '=', '__NONE__')
+    )
+  )
+
+  return useMemo(() => {
+    if (!Array.isArray(result)) return []
+    return result
+  }, [result])
+}

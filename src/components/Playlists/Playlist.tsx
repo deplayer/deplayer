@@ -7,10 +7,10 @@ import Modal from '../common/Modal'
 import SongRow from '../MusicTable/SongRow'
 import * as types from '../../constants/ActionTypes'
 import { IMedia } from '../../entities/Media'
-import { applyFilters } from '../../utils/apply-filters'
+
 import { useNavigate } from 'react-router-dom'
 import { Dispatch } from 'redux'
-import { useMediaMap } from '../../stores/livestore/hooks'
+import { useFilteredMedia, useMediaMapForIds } from '../../stores/livestore/hooks'
 import { useStore } from '@livestore/react'
 import { playAllAction, addToQueueAction } from '../../stores/livestore/actions'
 import { deleteSmartPlaylistAction } from '../../stores/livestore/actions/smartPlaylists'
@@ -34,32 +34,36 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
   const navigate = useNavigate()
   const isSmartPlaylist = 'filters' in playlist
   const { setFilter, clearFilters } = useUI()
-  
-  // Get all media from LiveStore
-  const mediaMap = useMediaMap()
   const { store: liveStore } = useStore()
+  
+  // PERF: For smart playlists, use database-level filtering (not entire mediaMap)
+  const smartPlaylistFilters = useMemo(() => ({
+    genres: playlist.filters?.genres || [],
+    types: playlist.filters?.types || [],
+    artists: playlist.filters?.artists || [],
+    providers: playlist.filters?.providers || [],
+    favorites: Boolean(playlist.filters?.favorites?.[0] === 'true')
+  }), [playlist.filters])
+  
+  // This hook only loads filtered IDs, not entire library
+  const filteredTrackIds = useFilteredMedia(smartPlaylistFilters)
+  
+  // Get the effective track IDs based on playlist type
+  const effectiveTrackIds = useMemo(() => {
+    if (isSmartPlaylist) {
+      return filteredTrackIds
+    }
+    return playlist.trackIds
+  }, [isSmartPlaylist, filteredTrackIds, playlist.trackIds])
+  
+  // PERF: Only load media for tracks in THIS playlist (not entire library)
+  const mediaMap = useMediaMapForIds(effectiveTrackIds)
 
   const handlePlayAll = useCallback(async () => {
-    if (!liveStore) return
+    if (!liveStore || effectiveTrackIds.length === 0) return
     
     try {
-      let trackIds: string[] = []
-      
-      if (isSmartPlaylist) {
-        trackIds = applyFilters(mediaMap, {
-          genres: playlist.filters?.genres || [],
-          types: playlist.filters?.types || [],
-          artists: playlist.filters?.artists || [],
-          providers: playlist.filters?.providers || [],
-          favorites: Boolean(playlist.filters?.favorites?.[0] === 'true')
-        })
-      } else {
-        trackIds = playlist.trackIds
-      }
-      
-      if (trackIds.length === 0) return
-      
-      const firstTrackId = await playAllAction(liveStore, trackIds)
+      const firstTrackId = await playAllAction(liveStore, effectiveTrackIds)
       
       if (firstTrackId) {
         dispatch({ 
@@ -70,33 +74,17 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
     } catch (error) {
       console.error('Failed to play playlist:', error)
     }
-  }, [liveStore, isSmartPlaylist, playlist, mediaMap, dispatch])
+  }, [liveStore, effectiveTrackIds, dispatch])
 
   const handleAddToQueue = useCallback(async () => {
-    if (!liveStore) return
+    if (!liveStore || effectiveTrackIds.length === 0) return
     
     try {
-      let trackIds: string[] = []
-      
-      if (isSmartPlaylist) {
-        trackIds = applyFilters(mediaMap, {
-          genres: playlist.filters?.genres || [],
-          types: playlist.filters?.types || [],
-          artists: playlist.filters?.artists || [],
-          providers: playlist.filters?.providers || [],
-          favorites: Boolean(playlist.filters?.favorites?.[0] === 'true')
-        })
-      } else {
-        trackIds = playlist.trackIds
-      }
-      
-      if (trackIds.length === 0) return
-      
-      await addToQueueAction(liveStore, trackIds)
+      await addToQueueAction(liveStore, effectiveTrackIds)
     } catch (error) {
       console.error('Failed to add playlist to queue:', error)
     }
-  }, [liveStore, isSmartPlaylist, playlist, mediaMap])
+  }, [liveStore, effectiveTrackIds])
 
   const handleApplyFilters = useCallback(() => {
     clearFilters()
@@ -141,17 +129,8 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
     }, 0)
   , [playlist.trackIds, mediaMap])
 
-  const songIds = useMemo(() => 
-    isSmartPlaylist 
-      ? applyFilters(mediaMap, {
-          genres: playlist.filters?.genres || [],
-          types: playlist.filters?.types || [],
-          artists: playlist.filters?.artists || [],
-          providers: playlist.filters?.providers || [],
-          favorites: Boolean(playlist.filters?.favorites?.[0] === 'true')
-        })
-      : playlist.trackIds
-  , [isSmartPlaylist, playlist, mediaMap])
+  // Use the already-computed effectiveTrackIds (no need for applyFilters)
+  const songIds = effectiveTrackIds
 
   const uniqueAlbumCount = useMemo(() => 
     new Set(

@@ -93,6 +93,7 @@ export {
 export {
   useSongsByGenre,
   useGenres,
+  useMediaByGenre,
 } from './useGenres'
 
 // Metadata hooks (lightweight facet queries for filters)

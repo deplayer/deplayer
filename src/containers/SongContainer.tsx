@@ -1,7 +1,12 @@
 import { connect } from 'react-redux'
 import SongView from '../components/SongView'
 import { useLocation, Location } from 'react-router'
-import { useMediaMap, useAlbumsMap, useAlbumIdsByArtist, useSongsByGenre } from '../stores/livestore/hooks'
+import { useMemo } from 'react'
+import { 
+  useMediaById, 
+  useAlbumsByArtist, 
+  useMediaByGenre
+} from '../stores/livestore/hooks'
 
 const getSongId = (location: Location): string => {
   const songFinder = location.pathname.match(/\/song\/(.*)/)
@@ -10,8 +15,6 @@ const getSongId = (location: Location): string => {
     return songFinder[1]
   }
 
-  console.log('No song id found in location', location)
-
   return '0'
 }
 
@@ -19,19 +22,53 @@ const RoutedSongView = (props: any) => {
   const location = useLocation()
   const songId = getSongId(location)
   
-  // Get data from LiveStore
-  const mediaMap = useMediaMap()
-  const albumsMap = useAlbumsMap()
-  const albumIdsByArtist = useAlbumIdsByArtist()
-  const songsByGenre = useSongsByGenre()
+  // PERF: Only load the ONE song we need (not entire library)
+  const song = useMediaById(songId)
   
-  // Create collection object compatible with SongView
-  const collection = {
-    rows: mediaMap,
-    albums: albumsMap,
-    albumsByArtist: albumIdsByArtist,
-    songsByGenre: songsByGenre,
-  }
+  // Get artist's albums (only when we have the song)
+  const artistId = song?.artist?.id
+  const albumsByArtist = useAlbumsByArtist(artistId)
+  
+  // Get songs by genre for recommendations (only first genre)
+  const firstGenre = song?.genres?.[0]
+  const genreSongs = useMediaByGenre(firstGenre)
+  
+  // Build minimal collection object compatible with SongView
+  // Only include the data we actually have
+  const collection = useMemo(() => {
+    const rows: Record<string, any> = {}
+    const albums: Record<string, any> = {}
+    const albumsByArtistMap: Record<string, string[]> = {}
+    const songsByGenre: Record<string, string[]> = {}
+    
+    // Add the current song
+    if (song) {
+      rows[song.id] = song
+    }
+    
+    // Add genre songs for recommendations
+    if (firstGenre && genreSongs) {
+      songsByGenre[firstGenre] = genreSongs.map((s: any) => s.id)
+      genreSongs.forEach((s: any) => {
+        rows[s.id] = s
+      })
+    }
+    
+    // Add artist's albums
+    if (artistId && albumsByArtist) {
+      albumsByArtistMap[artistId] = albumsByArtist.map((a: any) => a.id)
+      albumsByArtist.forEach((a: any) => {
+        albums[a.id] = a
+      })
+    }
+    
+    return {
+      rows,
+      albums,
+      albumsByArtist: albumsByArtistMap,
+      songsByGenre,
+    }
+  }, [song, artistId, albumsByArtist, firstGenre, genreSongs])
 
   return (<SongView songId={songId} collection={collection} loading={false} {...props} />)
 }
