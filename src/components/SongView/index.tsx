@@ -139,7 +139,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
       .map((songId: string) => rows[songId])
     : null
 
-  const relatedAlbums = song.artist.id && albumsByArtist?.[song.artist.id].reduce((acc: IAlbum[], albumId: string): IAlbum[] => {
+  const relatedAlbums = song.artist?.id && albumsByArtist?.[song.artist.id]?.reduce((acc: IAlbum[], albumId: string): IAlbum[] => {
     if (!albums[albumId]) return acc
     acc.push(albums[albumId])
     return acc
@@ -185,7 +185,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
                 useImage
                 cover={song.cover}
                 size='thumbnail'
-                albumName={song.album.name || 'N/A'}
+                albumName={song.album?.name || 'N/A'}
               />
             }
 
@@ -293,26 +293,30 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
               {song.title}
               <Tag onClick={() => handleTypeClick(song.type)} className="cursor-pointer hover:bg-opacity-50 mr-2 mt-4 w-fit inline-block" transparent>{typeIcon} {song.type}</Tag>
             </h2>
-            <div className='text-lg mt-2'>
-              <Link to={`/artist/${song.artist.id}`}>
-                <h3>
+            {song.artist?.id && (
+              <div className='text-lg mt-2'>
+                <Link to={`/artist/${song.artist.id}`}>
+                  <h3>
+                    <Icon
+                      icon='faMicrophoneAlt'
+                      className='mr-1 w-8'
+                    />
+                    <span>{song.artist?.name || 'Unknown Artist'}</span>
+                  </h3>
+                </Link>
+              </div>
+            )}
+            {song.album?.id && (
+              <div className='color-white text-lg mt-2'>
+                <Link to={`/album/${song.album.id}`}>
                   <Icon
-                    icon='faMicrophoneAlt'
                     className='mr-1 w-8'
+                    icon='faCompactDisc'
                   />
-                  <span>{song.artist.name}</span>
-                </h3>
-              </Link>
-            </div>
-            <div className='color-white text-lg mt-2'>
-              <Link to={`/album/${song.album.id}`}>
-                <Icon
-                  className='mr-1 w-8'
-                  icon='faCompactDisc'
-                />
-                {song.album.name || 'N/A'} {song.album.year && `(${song.album.year})`}
-              </Link>
-            </div>
+                  {song.album?.name || 'N/A'} {song.album?.year && `(${song.album.year})`}
+                </Link>
+              </div>
+            )}
             {song.genres?.length > 0 && (
               <div className='mt-2 flex flex-wrap'>
                 {song.genres.map((genre: string) => (
