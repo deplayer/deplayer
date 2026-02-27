@@ -70,6 +70,9 @@ export async function ensureMediaInQueueAndPlay(
       console.log('[QueueHelper] Creating queue with', allMediaIds.length, 'songs')
       await playAllAction(liveStore, allMediaIds)
       
+      // Ensure LiveStore has materialized the queue before querying
+      liveStore.manualRefresh?.()
+      
       // Set position to clicked song
       const index = allMediaIds.indexOf(mediaId)
       if (index > 0) {
