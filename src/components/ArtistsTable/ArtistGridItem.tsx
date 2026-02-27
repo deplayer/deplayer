@@ -7,7 +7,7 @@ import Tag from '../common/Tag'
 import React from 'react'
 import { State as RootState } from '../../reducers'
 import IMedia from '../../entities/Media'
-import { useAlbumsByArtist, useSongsByAlbum, useMediaMap } from '../../stores/livestore/hooks'
+import { useAlbumsByArtist, useSongsByAlbum, useMediaById } from '../../stores/livestore/hooks'
 
 type Props = {
   artist: Artist
@@ -26,7 +26,6 @@ const ArtistGridItem = ({ artist, songs, style }: Props) => {
   // Get data from LiveStore hooks
   const albumsByArtist = useAlbumsByArtist(artist.id)
   const songsByAlbum = useSongsByAlbum()
-  const mediaMap = useMediaMap()
   
   // Still using Redux for artist metadata (not yet migrated)
   const artistMetadata = useSelector((state: RootState) => 
@@ -40,17 +39,19 @@ const ArtistGridItem = ({ artist, songs, style }: Props) => {
     )?.url?.resource
   }, [artistMetadata])
 
-  // Memoize the random album cover
-  const randomAlbumCover = useMemo(() => {
+  // PERF: Calculate which song we need for the cover (deterministic, not random)
+  const coverSongId = useMemo(() => {
     if (!albumsByArtist || albumsByArtist.length === 0) return undefined
-
-    const randomAlbum = albumsByArtist[Math.floor(Math.random() * albumsByArtist.length)]
-    const albumSongs = songsByAlbum[randomAlbum.id] || []
-    if (albumSongs.length === 0) return undefined
-
-    const song = mediaMap[albumSongs[0]] as IMedia
-    return song?.cover
-  }, [albumsByArtist, songsByAlbum, mediaMap])
+    // Use first album instead of random to keep it stable and avoid re-renders
+    const firstAlbum = albumsByArtist[0]
+    const albumSongs = songsByAlbum[firstAlbum.id] || []
+    return albumSongs[0]
+  }, [albumsByArtist, songsByAlbum])
+  
+  // PERF: Only load the ONE song we need for the cover (not entire library)
+  const coverSong = useMediaById(coverSongId) as IMedia | null
+  
+  const randomAlbumCover = coverSong?.cover
 
   const cover = artistPhoto ? {
     thumbnailUrl: artistPhoto,

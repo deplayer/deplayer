@@ -5,7 +5,7 @@ import EmptyState from './common/EmptyState/index'
 import { Translate } from 'react-redux-i18n'
 import classNames from 'classnames'
 import Icon from './common/Icon/index'
-import { useQueue, useMediaLibrary, useMediaMap } from '../stores/livestore/hooks'
+import { useQueue, useMediaMapForIds, useMediaCount } from '../stores/livestore/hooks'
 import { useSettings } from '../stores/livestore/hooks'
 import { useUI } from '../contexts'
 
@@ -26,12 +26,8 @@ const Queue = (props: Props) => {
   
   // Get data from LiveStore hooks and contexts for Queue logic
   const liveQueue = useQueue('default')
-  const mediaLibrary = useMediaLibrary()
   const liveSettings = useSettings()
   const { loading, mqlMatch, displayMiniQueue } = useUI()
-  
-  // Get mediaMap for efficient MusicTable lookup (performance optimization)
-  const mediaMap = useMediaMap()
   
   // Parse trackIds from LiveStore queue (can be JSON string or array)
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
@@ -48,7 +44,12 @@ const Queue = (props: Props) => {
     ? parseTrackIds(liveQueue.randomTrackIds)
     : parseTrackIds(liveQueue?.trackIds)
   
-  const hasCollectionItems = Array.isArray(mediaLibrary) && mediaLibrary.length > 0
+  // PERF: Use count hook instead of loading entire library
+  const mediaCount = useMediaCount()
+  const hasCollectionItems = mediaCount > 0
+  
+  // PERF: Only load media for tracks actually in queue (not entire library)
+  const mediaMap = useMediaMapForIds(trackIds)
   const hasSearchableProviders = liveSettings?.providers ? 
     Object.values(liveSettings.providers).some((provider) => (provider as { enabled?: boolean })?.enabled) : 
     false

@@ -8,7 +8,7 @@ import ArtistGridItem from './ArtistGridItem'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
 import EmptyState from '../common/EmptyState/index'
-import { useArtistsMap, useSongsByArtist, useMediaLibrary } from '../../stores/livestore/hooks'
+import { useArtistsMap, useSongsByArtist, useMediaCount } from '../../stores/livestore/hooks'
 import { useSettings } from '../../stores/livestore/hooks'
 import { useUI } from '../../contexts'
 
@@ -23,14 +23,16 @@ const ArtistTable = () => {
   // Get data from LiveStore hooks
   const artistsMap = useArtistsMap()
   const songsByArtist = useSongsByArtist()
-  const mediaLibrary = useMediaLibrary()
   const liveSettings = useSettings()
   const { sidebarToggled, mqlMatch } = useUI()
+  
+  // PERF: Use count hook instead of loading entire library
+  const mediaCount = useMediaCount()
   
   const [isGridView, setIsGridView] = useState(false)
   
   const tableIds = Object.keys(artistsMap)
-  const hasCollectionItems = Array.isArray(mediaLibrary) && mediaLibrary.length > 0
+  const hasCollectionItems = mediaCount > 0
   const hasSearchableProviders = liveSettings?.providers ? 
     Object.values(liveSettings.providers).some((provider: any) => provider?.enabled) : 
     false

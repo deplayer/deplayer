@@ -1,6 +1,7 @@
 import { Store } from '@livestore/livestore'
 import { mediaEvents } from '../events/media'
 import { IMedia } from '../../../entities/Media'
+import { profiler } from '../../../utils/performanceProfiler'
 
 /**
  * Normalize media object to match LiveStore event schema
@@ -126,6 +127,48 @@ class BatchedMediaCommitter {
   }
   
   /**
+   * Defer the manualRefresh() call to avoid blocking main thread
+   * 
+   * manualRefresh() triggers all React components to re-render synchronously,
+   * which was causing 96ms FPS drops. By deferring to requestIdleCallback,
+   * we allow the browser to handle urgent work (animations, input) first.
+   */
+  private deferredRefresh(): Promise<void> {
+    return new Promise(resolve => {
+      if (!this.store) {
+        resolve()
+        return
+      }
+      
+      const store = this.store
+      
+      // Use requestIdleCallback for non-urgent refresh
+      // Falls back to requestAnimationFrame -> setTimeout chain for broader support
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(
+          () => {
+            profiler.start('actual-refresh')
+            store.manualRefresh()
+            profiler.end('actual-refresh')
+            resolve()
+          },
+          { timeout: 100 } // Max 100ms delay
+        )
+      } else {
+        // Fallback: use rAF + setTimeout to yield to rendering
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            profiler.start('actual-refresh')
+            store.manualRefresh()
+            profiler.end('actual-refresh')
+            resolve()
+          }, 0)
+        })
+      }
+    })
+  }
+  
+  /**
    * Immediately flush all pending media to LiveStore
    * Uses skipRefresh for the commit, then calls manualRefresh() once
    * Processes in chunks to avoid blocking main thread
@@ -146,8 +189,11 @@ class BatchedMediaCommitter {
     const mediaToCommit = [...this.pendingMedia]
     this.pendingMedia = []
     
+    profiler.mark(`flush-start (${mediaToCommit.length} items)`)
+    
     try {
       // Query existing IDs to avoid redundant inserts
+      profiler.start('query-existing-ids')
       const placeholders = mediaToCommit.map(() => '?').join(',')
       const bindValues = mediaToCommit.reduce((acc, m, i) => {
         acc[i + 1] = m.id
@@ -158,6 +204,7 @@ class BatchedMediaCommitter {
         query: `SELECT id FROM media WHERE id IN (${placeholders})`,
         bindValues
       })
+      profiler.end('query-existing-ids')
       
       const existingIds = new Set<string>()
       const rows = (result as any)?.[0]?.values || []
@@ -166,29 +213,48 @@ class BatchedMediaCommitter {
       // Filter to only new items
       const newMedia = mediaToCommit.filter(m => !existingIds.has(m.id))
       
+      profiler.mark(`filtered: ${newMedia.length} new of ${mediaToCommit.length}`)
+      
       if (newMedia.length === 0) {
+        profiler.mark('flush-end (no new items)')
         return
       }
       
       // Process in chunks to avoid blocking main thread
       // Each chunk: normalize → commit with skipRefresh → yield to main thread
+      let chunkIndex = 0
       for (let i = 0; i < newMedia.length; i += this.CHUNK_SIZE) {
         const chunk = newMedia.slice(i, i + this.CHUNK_SIZE)
-        const normalizedChunk = chunk.map(normalizeMediaForLiveStore)
         
+        profiler.start(`chunk-${chunkIndex}-normalize`)
+        const normalizedChunk = chunk.map(normalizeMediaForLiveStore)
+        profiler.end(`chunk-${chunkIndex}-normalize`)
+        
+        profiler.start(`chunk-${chunkIndex}-commit`)
         await this.store.commit(
           { skipRefresh: true },
           mediaEvents.mediaBulkAdded({ media: normalizedChunk })
         )
+        profiler.end(`chunk-${chunkIndex}-commit`)
         
         // Yield to main thread between chunks to allow UI updates
         if (i + this.CHUNK_SIZE < newMedia.length) {
+          profiler.start(`chunk-${chunkIndex}-yield`)
           await this.yieldToMain()
+          profiler.end(`chunk-${chunkIndex}-yield`)
         }
+        
+        chunkIndex++
       }
       
-      // Single refresh after all chunks are committed
-      this.store.manualRefresh()
+      // Defer the refresh to avoid blocking main thread
+      // The 96ms manualRefresh() was causing FPS drops
+      profiler.start('schedule-refresh')
+      await this.deferredRefresh()
+      profiler.end('schedule-refresh')
+      
+      profiler.mark('flush-end')
+      profiler.report()
       
     } catch (error) {
       console.error('[BatchedMediaCommitter] Flush failed:', error)

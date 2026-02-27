@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import Icon from '../common/Icon'
 import { Translate } from 'react-redux-i18n'
 import { memo, useMemo } from 'react'
-import { useMediaMap, useSongsByGenre, usePlaylists, useSmartPlaylists, useQueue, useSettings } from '../../stores/livestore/hooks'
+import { useMediaCount, useSongsByGenre, usePlaylists, useSmartPlaylists, useQueue, useSettings } from '../../stores/livestore/hooks'
 
 type Props = {
   dispatch: any
@@ -61,10 +61,12 @@ const Playlists = memo((props: Props) => {
   // LiveStore hooks - get playlists, smart playlists, queue, and settings
   const playlists = usePlaylists()
   const smartPlaylists = useSmartPlaylists()
-  const mediaMap = useMediaMap()
   const songsByGenre = useSongsByGenre()
   const liveQueue = useQueue('default')
   const liveSettings = useSettings()
+  
+  // PERF: Use count hook instead of loading entire library
+  const mediaCount = useMediaCount()
   
   // Parse trackIds from LiveStore queue (can be JSON string or array)
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
@@ -82,7 +84,7 @@ const Playlists = memo((props: Props) => {
     : parseTrackIds(liveQueue?.trackIds)
   
   const hasQueueItems = queueTrackIds.length > 0
-  const hasCollectionItems = Object.keys(mediaMap).length > 0
+  const hasCollectionItems = mediaCount > 0
   const hasSearchableProviders = liveSettings?.providers ? 
     Object.values(liveSettings.providers).some((provider: any) => provider.enabled) : 
     false

@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import Button from '../common/Button'
 import defaultMedia from '../../constants/defaultMedia'
 import * as types from '../../constants/ActionTypes'
-import { useMediaLibrary } from '../../stores/livestore/hooks'
+import { useMediaCount } from '../../stores/livestore/hooks'
 import { getLiveStoreInstance } from '../../App'
 import { addMediaBulkAction } from '../../stores/livestore/actions/media'
 
@@ -13,10 +13,11 @@ type Props = {
 }
 
 const TryDemoButton = ({ dispatch }: Props) => {
-  const mediaLibrary = useMediaLibrary()
+  // PERF: Use count hook instead of loading entire library
+  const mediaCount = useMediaCount()
   
   // Only show the button if the collection is completely empty
-  if (mediaLibrary.length > 0) {
+  if (mediaCount > 0) {
     return null
   }
 
