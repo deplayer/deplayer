@@ -8,7 +8,7 @@ import ProvidersService from "../../services/ProvidersService";
 import { getLiveStoreInstance } from "../../App";
 import { queryDb } from "@livestore/livestore";
 import { tables } from "../../stores/livestore/schema";
-import { addMediaBulkAction } from "../../stores/livestore/actions/media";
+import { batchedMediaCommitter } from "../../stores/livestore/services/BatchedMediaCommitter";
 
 import {
   deleteCollectionWorker,
@@ -98,15 +98,22 @@ export function* fetchRecentAlbums(): Generator<any, void, any> {
       }
     }
 
-    // ===== PERFORMANCE FIX: Insert to LiveStore BEFORE dispatching Redux action =====
-    // This ensures the bulk insert completes before any React components try to query,
-    // preventing the cascade of reactive queries during the insert transaction.
-    // Expected result: No UI freeze, single render with complete data
+    // ===== PERFORMANCE FIX: Use BatchedMediaCommitter with skipRefresh =====
+    // This prevents FPS drops by:
+    // 1. Using skipRefresh during bulk insert (no intermediate UI updates)
+    // 2. Calling manualRefresh() once after all items are inserted
+    // 3. Chunking large batches to avoid blocking main thread
     
     if (allRecentMedia.length > 0) {
       try {
-        // Blocking call - wait for insert to complete BEFORE any Redux dispatch
-        yield call(addMediaBulkAction, liveStore, allRecentMedia)
+        // Initialize committer with store
+        batchedMediaCommitter.setStore(liveStore)
+        
+        // Add all items - will be committed with skipRefresh
+        yield call([batchedMediaCommitter, 'add'], allRecentMedia)
+        
+        // Force flush to ensure data is available before Redux dispatch
+        yield call([batchedMediaCommitter, 'flush'])
       } catch (error) {
         console.error('[Collection Saga] LiveStore insert failed:', error)
         yield put({

@@ -109,9 +109,26 @@ class BatchedMediaCommitter {
     }, this.THROTTLE_MS)
   }
   
+  // Chunk size for processing - smaller chunks = less main thread blocking
+  private readonly CHUNK_SIZE = 100
+  
+  /**
+   * Yield to main thread to prevent blocking UI
+   */
+  private yieldToMain(): Promise<void> {
+    return new Promise(resolve => {
+      if ('scheduler' in window && 'yield' in (window as any).scheduler) {
+        (window as any).scheduler.yield().then(resolve)
+      } else {
+        setTimeout(resolve, 0)
+      }
+    })
+  }
+  
   /**
    * Immediately flush all pending media to LiveStore
    * Uses skipRefresh for the commit, then calls manualRefresh() once
+   * Processes in chunks to avoid blocking main thread
    */
   async flush(): Promise<void> {
     // Clear timeout if called manually
@@ -153,15 +170,24 @@ class BatchedMediaCommitter {
         return
       }
       
-      // Normalize and commit with skipRefresh
-      const normalizedMedia = newMedia.map(normalizeMediaForLiveStore)
+      // Process in chunks to avoid blocking main thread
+      // Each chunk: normalize → commit with skipRefresh → yield to main thread
+      for (let i = 0; i < newMedia.length; i += this.CHUNK_SIZE) {
+        const chunk = newMedia.slice(i, i + this.CHUNK_SIZE)
+        const normalizedChunk = chunk.map(normalizeMediaForLiveStore)
+        
+        await this.store.commit(
+          { skipRefresh: true },
+          mediaEvents.mediaBulkAdded({ media: normalizedChunk })
+        )
+        
+        // Yield to main thread between chunks to allow UI updates
+        if (i + this.CHUNK_SIZE < newMedia.length) {
+          await this.yieldToMain()
+        }
+      }
       
-      await this.store.commit(
-        { skipRefresh: true },
-        mediaEvents.mediaBulkAdded({ media: normalizedMedia })
-      )
-      
-      // Single refresh after commit
+      // Single refresh after all chunks are committed
       this.store.manualRefresh()
       
     } catch (error) {
