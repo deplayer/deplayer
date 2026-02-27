@@ -111,17 +111,21 @@ class BatchedMediaCommitter {
   }
   
   // Chunk size for processing - smaller chunks = less main thread blocking
-  private readonly CHUNK_SIZE = 100
+  // Reduced from 100 to 50 to keep each commit under 10ms
+  private readonly CHUNK_SIZE = 50
   
   /**
    * Yield to main thread to prevent blocking UI
+   * Uses scheduler.yield() if available, otherwise requestAnimationFrame
+   * to align with browser frame boundaries
    */
   private yieldToMain(): Promise<void> {
     return new Promise(resolve => {
       if ('scheduler' in window && 'yield' in (window as any).scheduler) {
         (window as any).scheduler.yield().then(resolve)
       } else {
-        setTimeout(resolve, 0)
+        // Use rAF to yield at frame boundary (better for animations)
+        requestAnimationFrame(() => resolve())
       }
     })
   }
