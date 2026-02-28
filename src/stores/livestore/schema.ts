@@ -7,6 +7,7 @@ import { queueEvents } from './events/queue'
 import { favoriteEvents } from './events/favorites'
 import { lyricsEvents } from './events/lyrics'
 import { settingsEvents } from './events/settings'
+import { playbackEvents } from './events/playback'
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -210,6 +211,7 @@ export const events = {
   ...queueEvents,
   ...favoriteEvents,
   ...lyricsEvents,
+  ...playbackEvents,
 }
 
 // ============================================================================
@@ -667,6 +669,80 @@ const materializers = State.SQLite.materializers(events, {
 
   'v1.SmartPlaylistDeleted': ({ smartPlaylistId }: { smartPlaylistId: string }) => {
     return tables.smartPlaylists.delete().where('id', '=', smartPlaylistId)
+  },
+
+  // Playback materializers (LOCAL - not synced)
+  'v1.PlaybackUpdated': ({ id, currentTrackId, streamUri, playing, volume, duration, position }: any) => {
+    const now = Date.now()
+    return tables.playback
+      .insert({
+        id,
+        currentTrackId: currentTrackId ?? null,
+        streamUri: streamUri ?? null,
+        playing,
+        volume,
+        duration: duration ?? 0,
+        position: position ?? 0,
+        updatedAt: now,
+      })
+      .onConflict('id', 'update', {
+        currentTrackId: currentTrackId ?? null,
+        streamUri: streamUri ?? null,
+        playing,
+        volume,
+        duration: duration ?? 0,
+        position: position ?? 0,
+        updatedAt: now,
+      })
+  },
+
+  'v1.PlaybackPlayingChanged': ({ id, playing }: any) => {
+    const now = Date.now()
+    return tables.playback
+      .update({ playing, updatedAt: now })
+      .where('id', '=', id)
+  },
+
+  'v1.PlaybackVolumeChanged': ({ id, volume }: any) => {
+    const now = Date.now()
+    return tables.playback
+      .update({ volume, updatedAt: now })
+      .where('id', '=', id)
+  },
+
+  'v1.PlaybackPositionChanged': ({ id, position }: any) => {
+    const now = Date.now()
+    return tables.playback
+      .update({ position, updatedAt: now })
+      .where('id', '=', id)
+  },
+
+  'v1.PlaybackTrackChanged': ({ id, currentTrackId, streamUri, duration }: any) => {
+    const now = Date.now()
+    return tables.playback
+      .update({
+        currentTrackId,
+        streamUri,
+        duration: duration ?? 0,
+        position: 0,
+        playing: true,
+        updatedAt: now,
+      })
+      .where('id', '=', id)
+  },
+
+  'v1.PlaybackCleared': ({ id }: any) => {
+    const now = Date.now()
+    return tables.playback
+      .update({
+        currentTrackId: null,
+        streamUri: null,
+        playing: false,
+        position: 0,
+        duration: 0,
+        updatedAt: now,
+      })
+      .where('id', '=', id)
   },
 })
 
