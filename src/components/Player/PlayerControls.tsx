@@ -108,17 +108,33 @@ class PlayerControls extends React.Component<Props, State> {
     const streamChanged = prevProps.player.streamUri !== player.streamUri
     
     if (trackChanged || streamChanged) {
+      console.log('[PlayerControls] State change detected:', {
+        trackChanged,
+        streamChanged,
+        prevTrack: prevProps.queue.currentPlaying,
+        newTrack: currentPlaying,
+        prevStream: prevProps.player.streamUri?.substring(0, 50),
+        newStream: player.streamUri?.substring(0, 50),
+      })
+      
       // Stop ALL audio/video elements except the current one
       // This prevents multiple songs playing at once
       const allMediaElements = document.querySelectorAll('audio, video')
-      allMediaElements.forEach((el) => {
+      console.log('[PlayerControls] Found', allMediaElements.length, 'media elements')
+      
+      allMediaElements.forEach((el, index) => {
         const mediaEl = el as HTMLMediaElement
         // Stop if it's playing and either:
         // - Has a different src than current
         // - Has no src (orphaned element)
         const isCurrentSrc = player.streamUri && mediaEl.src === player.streamUri
+        console.log(`[PlayerControls] Element ${index}:`, {
+          src: mediaEl.src?.substring(0, 50) || 'no-src',
+          paused: mediaEl.paused,
+          isCurrentSrc,
+        })
         if (!mediaEl.paused && !isCurrentSrc) {
-          console.log('[PlayerControls] Stopping other media element:', mediaEl.src?.substring(0, 50) || 'no-src')
+          console.log('[PlayerControls] Stopping element:', mediaEl.src?.substring(0, 50) || 'no-src')
           mediaEl.pause()
           mediaEl.currentTime = 0
         }
