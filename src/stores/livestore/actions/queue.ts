@@ -1,4 +1,5 @@
-import { events } from '../schema'
+import { queryDb } from '@livestore/livestore'
+import { events, tables } from '../schema'
 import { queueEvents } from '../events/queue'
 
 /**
@@ -20,27 +21,49 @@ const QUEUE_ID = 'default'
 
 /**
  * Get current queue from LiveStore
+ * Uses queryDb for consistency with hooks
  */
 const getCurrentQueue = async (store: LiveStore) => {
-  const result = await store.query({
-    query: `SELECT * FROM queue WHERE id = ?`,
-    bindValues: { 1: QUEUE_ID }
-  })
-  
-  const rows = (result as any)?.[0]?.values || []
-  
-  if (rows.length === 0) {
+  try {
+    const query = queryDb(
+      tables.queue
+        .select()
+        .where('id', '=', QUEUE_ID)
+        .limit(1)
+    )
+    
+    const result = await store.query(query)
+    
+    // queryDb returns array of objects directly
+    const row = Array.isArray(result) ? result[0] : null
+    
+    if (!row) {
+      return null
+    }
+    
+    // Parse JSON fields if they're strings
+    const parseJson = (val: any, defaultVal: string[] = []): string[] => {
+      if (!val) return defaultVal
+      if (Array.isArray(val)) return val as string[]
+      try {
+        return JSON.parse(val) as string[]
+      } catch {
+        return defaultVal
+      }
+    }
+    
+    return {
+      id: row.id as string,
+      trackIds: parseJson(row.trackIds),
+      randomTrackIds: parseJson(row.randomTrackIds),
+      currentPlaying: row.currentPlaying,
+      shuffle: Boolean(row.shuffle),
+      repeat: Boolean(row.repeat),
+      updatedAt: row.updatedAt,
+    }
+  } catch (error) {
+    console.error('[getCurrentQueue] Error:', error)
     return null
-  }
-  
-  return {
-    id: rows[0][0],
-    trackIds: JSON.parse(rows[0][1] || '[]'),
-    randomTrackIds: JSON.parse(rows[0][2] || '[]'),
-    currentPlaying: rows[0][3],
-    shuffle: Boolean(rows[0][4]),
-    repeat: Boolean(rows[0][5]),
-    updatedAt: rows[0][6],
   }
 }
 
@@ -213,18 +236,87 @@ export const clearQueueAction = async (store: LiveStore) => {
 }
 
 /**
- * Toggle shuffle mode
+ * Shuffle an array using Fisher-Yates algorithm
+ */
+const shuffleArray = <T>(array: T[]): T[] => {
+  const shuffled = [...array]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
+}
+
+/**
+ * Toggle shuffle mode (Spotify-style)
+ * 
+ * - Current song keeps playing uninterrupted
+ * - Only affects next/previous navigation order
+ * - currentPlaying index updates to point to same song in new array
  * 
  * @param store - LiveStore instance
  * @param shuffle - New shuffle state
  */
 export const toggleShuffleAction = async (store: LiveStore, shuffle: boolean) => {
-  await store.commit(
-    events.queueShuffleToggled({
-      queueId: QUEUE_ID,
-      shuffle,
-    })
-  )
+  const currentQueue = await getCurrentQueue(store)
+  
+  if (!currentQueue || currentQueue.trackIds.length === 0) {
+    // No queue exists or queue is empty - nothing to shuffle
+    console.warn('[toggleShuffleAction] No queue or empty queue, cannot toggle shuffle')
+    return
+  }
+
+  if (shuffle) {
+    // ENABLE SHUFFLE
+    // Generate randomized track order
+    const randomTrackIds = shuffleArray(currentQueue.trackIds)
+    
+    // Find current song's position in the NEW shuffled array
+    // This keeps the same song playing, just changes what "next" means
+    let newCurrentPlaying = currentQueue.currentPlaying
+    if (currentQueue.currentPlaying !== null && currentQueue.currentPlaying !== undefined) {
+      const currentTrackId = currentQueue.trackIds[currentQueue.currentPlaying]
+      const indexInShuffled = randomTrackIds.indexOf(currentTrackId)
+      if (indexInShuffled !== -1) {
+        newCurrentPlaying = indexInShuffled
+      }
+    }
+
+    // Atomic update - all fields at once
+    await store.commit(
+      events.queueUpdated({
+        id: QUEUE_ID,
+        trackIds: currentQueue.trackIds,
+        randomTrackIds,
+        currentPlaying: newCurrentPlaying,
+        shuffle: true,
+        repeat: currentQueue.repeat,
+      })
+    )
+  } else {
+    // DISABLE SHUFFLE
+    // Find current song's position in the ORIGINAL track order
+    let newCurrentPlaying = currentQueue.currentPlaying
+    if (currentQueue.currentPlaying !== null && currentQueue.currentPlaying !== undefined && currentQueue.randomTrackIds.length > 0) {
+      const currentTrackId = currentQueue.randomTrackIds[currentQueue.currentPlaying]
+      const indexInOriginal = currentQueue.trackIds.indexOf(currentTrackId)
+      if (indexInOriginal !== -1) {
+        newCurrentPlaying = indexInOriginal
+      }
+    }
+
+    // Atomic update - all fields at once
+    await store.commit(
+      events.queueUpdated({
+        id: QUEUE_ID,
+        trackIds: currentQueue.trackIds,
+        randomTrackIds: [],
+        currentPlaying: newCurrentPlaying,
+        shuffle: false,
+        repeat: currentQueue.repeat,
+      })
+    )
+  }
 }
 
 /**
@@ -234,6 +326,13 @@ export const toggleShuffleAction = async (store: LiveStore, shuffle: boolean) =>
  * @param repeat - New repeat state
  */
 export const toggleRepeatAction = async (store: LiveStore, repeat: boolean) => {
+  const currentQueue = await getCurrentQueue(store)
+  
+  if (!currentQueue) {
+    console.warn('[toggleRepeatAction] No queue exists, cannot toggle repeat')
+    return
+  }
+  
   await store.commit(
     events.queueRepeatToggled({
       queueId: QUEUE_ID,
@@ -271,7 +370,8 @@ export async function playNextAction(
   const queue = await getCurrentQueue(store)
   
   if (!queue) {
-    throw new Error(`Queue ${queueId} not found`)
+    console.warn(`[playNextAction] Queue ${queueId} not found`)
+    return
   }
   
   const trackIds = queue.shuffle ? queue.randomTrackIds : queue.trackIds
@@ -312,7 +412,8 @@ export async function playPreviousAction(
   const queue = await getCurrentQueue(store)
   
   if (!queue) {
-    throw new Error(`Queue ${queueId} not found`)
+    console.warn(`[playPreviousAction] Queue ${queueId} not found`)
+    return
   }
   
   const trackIds = queue.shuffle ? queue.randomTrackIds : queue.trackIds
@@ -353,14 +454,17 @@ export async function playMediaAction(
   const queue = await getCurrentQueue(store)
   
   if (!queue) {
-    throw new Error(`Queue ${queueId} not found`)
+    console.warn(`[playMediaAction] Queue ${queueId} not found`)
+    return
   }
   
-  const trackIds = queue.trackIds
+  // Use the active track list based on shuffle state
+  const trackIds = queue.shuffle ? queue.randomTrackIds : queue.trackIds
   const index = trackIds.indexOf(mediaId)
   
   if (index === -1) {
-    throw new Error(`Media ${mediaId} not found in queue`)
+    console.warn(`[playMediaAction] Media ${mediaId} not found in queue`)
+    return
   }
   
   await store.commit(queueEvents.queuePositionChanged({

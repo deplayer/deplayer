@@ -100,8 +100,23 @@ class PlayerControls extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props): void {
-    const { queue, collection, settings } = this.props
+    const { queue, collection, settings, player } = this.props
     const { currentPlaying } = queue
+
+    // When stream URL changes, ensure old audio is stopped
+    if (prevProps.player.streamUri !== player.streamUri && prevProps.player.streamUri) {
+      // The old ReactPlayer should be unmounted due to key change,
+      // but let's also try to stop any orphaned audio elements
+      const oldAudioElements = document.querySelectorAll('audio, video')
+      oldAudioElements.forEach((el) => {
+        const mediaEl = el as HTMLMediaElement
+        if (mediaEl.src && mediaEl.src !== player.streamUri && !mediaEl.paused) {
+          console.log('[PlayerControls] Stopping orphaned media element:', mediaEl.src)
+          mediaEl.pause()
+          mediaEl.src = ''
+        }
+      })
+    }
 
     // Show notification for track changes if enabled
     if (prevProps.queue.currentPlaying !== currentPlaying && currentPlaying) {
@@ -302,16 +317,21 @@ class PlayerControls extends React.Component<Props, State> {
     } = this.state
 
     const currentPlayingId = this.props.queue.currentPlaying
-    if (!currentPlayingId) {
-      console.log("No current playing id")
+    const { streamUri } = this.props.player
+    
+    // DEFENSIVE: Don't unmount player if audio is still playing
+    // This prevents flickering during state transitions (e.g., shuffle toggle)
+    if (!currentPlayingId && !streamUri) {
+      console.log("No current playing id and no stream")
       return null
     }
 
-    const currentPlaying = this.props.collection.rows[currentPlayingId]
+    const currentPlaying = currentPlayingId 
+      ? this.props.collection.rows[currentPlayingId]
+      : null
 
-    const { streamUri } = this.props.player
-
-    if (!this.props.itemCount || !streamUri || !currentPlaying) {
+    // If we have no media info but audio is playing, show minimal player
+    if (!currentPlaying && !streamUri) {
       return null
     }
 
@@ -323,27 +343,30 @@ class PlayerControls extends React.Component<Props, State> {
     // Show controls only if player is shown
     const showControls = this.props.player.showPlayer
 
-    const songFinder = this.props
+    const songFinder = currentPlayingId && this.props
       .location
       .pathname
       .match(new RegExp(`/song/${currentPlayingId}`))
 
+    // Default to audio type if currentPlaying is not available (during transitions)
+    const mediaType = currentPlaying?.type || 'audio'
+    
     const config = {
       file: {
-        forceAudio: currentPlaying.type === 'audio',
+        forceAudio: mediaType === 'audio',
         attributes: {
           id: 'react-player-internal',
-          className: currentPlaying.type === 'video' ? 'video-element' : 'audio-element',
+          className: mediaType === 'video' ? 'video-element' : 'audio-element',
           crossOrigin: 'anonymous'
         }
       }
     }
 
-    if (currentPlaying.type === 'audio') {
+    if (mediaType === 'audio') {
       config.file.attributes['crossOrigin'] = 'anonymous'
     }
 
-    const showFullscreen = this.props.app.showVisuals || currentPlaying.type === 'video'
+    const showFullscreen = this.props.app.showVisuals || mediaType === 'video'
     const playerControlsClassnames = classNames({
       'flex': true,
       'justify-between': true,
@@ -360,12 +383,13 @@ class PlayerControls extends React.Component<Props, State> {
         <div id="player" style={{ gridArea: 'player' }} className='before:content-[""] before:absolute before:inset-0 before:blur-sm before:bg-base-200/70'>
           <InPortal node={this.props.playerPortal}>
             <ReactPlayer
+              key={currentPlayingId || 'no-track'}
               id="react-player"
               pip
               fullscreen={this.props.player.fullscreen ? "true" : "false"}
               className={playerClassnames}
               ref={this.playerRef}
-              url={streamUri}
+              url={streamUri || undefined}
               playing={playing}
               onClick={this.playPause}
               onDoubleClick={() => {
@@ -378,7 +402,9 @@ class PlayerControls extends React.Component<Props, State> {
               onEnded={() => {
                 this.resetPlayedSeconds()
                 this.playNext()
-                this.saveTrackPlayed(currentPlayingId)
+                if (currentPlayingId) {
+                  this.saveTrackPlayed(currentPlayingId)
+                }
               }}
               config={config}
               onError={this.handleError}
@@ -387,13 +413,13 @@ class PlayerControls extends React.Component<Props, State> {
               progressInterval={1000}
               width={'100%'}
               height={'100%'}
-              controls={currentPlaying.type === 'video'}
+              controls={mediaType === 'video'}
             />
           </InPortal>
-          {!songFinder && currentPlaying.type === 'video' && (
+          {!songFinder && mediaType === 'video' && (
             <div id='player-portal' className="background-video left-0 right-0 top-0 botton-0 absolute bg-handler">
               <OutPortal
-                className={`player-portal background-video left-0 right-0 top-0 botton-0 absolute ${currentPlaying.type === 'video' && 'bg-handler'}`}
+                className={`player-portal background-video left-0 right-0 top-0 botton-0 absolute ${mediaType === 'video' && 'bg-handler'}`}
                 node={this.props.playerPortal}
               />
             </div>

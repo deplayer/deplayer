@@ -148,6 +148,21 @@ export const tables = {
     },
   }),
 
+  // Playback state table (LOCAL - not synced across devices)
+  playback: State.SQLite.table({
+    name: 'playback',
+    columns: {
+      id: State.SQLite.text({ primaryKey: true }), // 'default'
+      currentTrackId: State.SQLite.text({ nullable: true }),
+      streamUri: State.SQLite.text({ nullable: true }),
+      playing: State.SQLite.boolean({ default: false }),
+      volume: State.SQLite.integer({ default: 80 }),
+      duration: State.SQLite.real({ default: 0 }),
+      position: State.SQLite.real({ default: 0 }),
+      updatedAt: State.SQLite.integer({}),
+    },
+  }),
+
   // Favorites table
   favorites: State.SQLite.table({
     name: 'favorites',
@@ -518,13 +533,13 @@ const materializers = State.SQLite.materializers(events, {
   },
 
   // Queue materializers
-  'v1.QueueUpdated': ({ id, trackIds, currentPlaying, shuffle, repeat }: any) => {
+  'v1.QueueUpdated': ({ id, trackIds, randomTrackIds, currentPlaying, shuffle, repeat }: any) => {
     const now = Date.now()
     return tables.queue
       .insert({
         id,
         trackIds,
-        randomTrackIds: [],
+        randomTrackIds: randomTrackIds ?? [],
         currentPlaying: currentPlaying ?? null,
         shuffle,
         repeat,
@@ -532,6 +547,7 @@ const materializers = State.SQLite.materializers(events, {
       })
       .onConflict('id', 'update', {
         trackIds,
+        randomTrackIds: randomTrackIds ?? [],
         currentPlaying: currentPlaying ?? null,
         shuffle,
         repeat,

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef, ReactNode } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { useStore } from '@livestore/react'
 import Modal from '../common/Modal'
 import Icon from '../common/Icon'
 import Button from '../common/Button'
@@ -8,8 +9,8 @@ import { IconType } from '../common/Icon'
 import { startSearch } from '../../types/search'
 import { THEMES } from '../Sidebar/ThemeModal'
 import { I18n, Translate } from 'react-redux-i18n'
-import * as types from '../../constants/ActionTypes'
-import { useSearchMediaIds, useMediaMapForIds } from '../../stores/livestore/hooks'
+import { useSearchMediaIds, useMediaMapForIds, useQueue } from '../../stores/livestore/hooks'
+import { toggleRepeatAction, toggleShuffleAction } from '../../stores/livestore/actions'
 import { useUI } from '../../contexts'
 
 interface BaseItem {
@@ -131,6 +132,8 @@ type CommandItem = {
 function CommandBar({ togglePlaying, playNext, playPrev }: Props) {
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const { store: liveStore } = useStore()
+  const liveQueue = useQueue('default')
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -203,7 +206,7 @@ function CommandBar({ togglePlaying, playNext, playPrev }: Props) {
       id: 'toggle-shuffle',
       type: 'command',
       name: <Translate value="buttons.shuffle" />,
-      command: () => dispatch({ type: types.SHUFFLE }),
+      command: () => toggleShuffleAction(liveStore, !liveQueue?.shuffle),
       category: 'commands',
       icon: 'faRandom'
     },
@@ -211,7 +214,7 @@ function CommandBar({ togglePlaying, playNext, playPrev }: Props) {
       id: 'toggle-repeat',
       type: 'command',
       name: <Translate value="buttons.repeat" />,
-      command: () => dispatch({ type: types.REPEAT }),
+      command: () => toggleRepeatAction(liveStore, !liveQueue?.repeat),
       category: 'commands',
       icon: 'faRedo'
     }
