@@ -38,6 +38,7 @@ import JoinRoom from './pages/JoinRoom';
 import { useLanguage } from './hooks/useLanguage'
 import { setLiveStoreInstance } from './middleware/livestore'
 import type { Store as LiveStore } from '@livestore/livestore'
+import PlaybackController from './services/PlaybackController'
 
 // Export LiveStore instance for use in sagas
 let liveStoreInstance: LiveStore | null = null
@@ -68,6 +69,9 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
     if (liveStore) {
       setLiveStoreInstance(liveStore)
       liveStoreInstance = liveStore  // Also store for saga access
+      
+      // Initialize PlaybackController with LiveStore
+      PlaybackController.getInstance().initialize(liveStore)
       
       // Now that LiveStore is ready, dispatch INITIALIZE action
       // This was moved from configureStore.ts to prevent the
