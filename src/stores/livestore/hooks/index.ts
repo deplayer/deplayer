@@ -105,3 +105,6 @@ export {
   useArtistsCount,
   useAlbumsCount,
 } from './useMetadata'
+
+// Playback hook (SINGLE SOURCE OF TRUTH for all playback)
+export { usePlayback } from './usePlayback'
