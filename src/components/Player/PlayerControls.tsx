@@ -103,23 +103,30 @@ class PlayerControls extends React.Component<Props, State> {
     const { queue, collection, settings, player } = this.props
     const { currentPlaying } = queue
 
-    // When stream URL changes, ensure old audio is stopped
-    if (prevProps.player.streamUri !== player.streamUri && prevProps.player.streamUri) {
-      // The old ReactPlayer should be unmounted due to key change,
-      // but let's also try to stop any orphaned audio elements
-      const oldAudioElements = document.querySelectorAll('audio, video')
-      oldAudioElements.forEach((el) => {
+    // When track changes OR stream URL changes, stop all other audio elements
+    const trackChanged = prevProps.queue.currentPlaying !== currentPlaying
+    const streamChanged = prevProps.player.streamUri !== player.streamUri
+    
+    if (trackChanged || streamChanged) {
+      // Stop ALL audio/video elements except the current one
+      // This prevents multiple songs playing at once
+      const allMediaElements = document.querySelectorAll('audio, video')
+      allMediaElements.forEach((el) => {
         const mediaEl = el as HTMLMediaElement
-        if (mediaEl.src && mediaEl.src !== player.streamUri && !mediaEl.paused) {
-          console.log('[PlayerControls] Stopping orphaned media element:', mediaEl.src)
+        // Stop if it's playing and either:
+        // - Has a different src than current
+        // - Has no src (orphaned element)
+        const isCurrentSrc = player.streamUri && mediaEl.src === player.streamUri
+        if (!mediaEl.paused && !isCurrentSrc) {
+          console.log('[PlayerControls] Stopping other media element:', mediaEl.src?.substring(0, 50) || 'no-src')
           mediaEl.pause()
-          mediaEl.src = ''
+          mediaEl.currentTime = 0
         }
       })
     }
 
     // Show notification for track changes if enabled
-    if (prevProps.queue.currentPlaying !== currentPlaying && currentPlaying) {
+    if (trackChanged && currentPlaying) {
       const currentTrack = collection.rows[currentPlaying]
       if (currentTrack && settings.settings.app.notifications?.enabled && 
           settings.settings.app.notifications?.showTrackChanges) {

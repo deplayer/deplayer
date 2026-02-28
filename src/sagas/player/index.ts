@@ -1,6 +1,7 @@
 import { call, takeLatest, takeEvery, put, select } from 'redux-saga/effects'
 import screenfull from 'screenfull'
 import { push } from "redux-first-history"
+import { queryDb } from '@livestore/livestore'
 import Media from '../../entities/Media'
 
 import {
@@ -14,6 +15,7 @@ import * as routes from '../../routes'
 import * as types from '../../constants/ActionTypes'
 import { getLiveStoreInstance } from '../../App'
 import { playNextAction, playPreviousAction } from '../../stores/livestore/actions'
+import { tables } from '../../stores/livestore/schema'
 
 /**
  * Get current song ID from LiveStore queue
@@ -27,19 +29,47 @@ function* getCurrentSongIdFromLiveStore(): any {
   }
   
   try {
-    const result = yield liveStore.query({
-      query: `SELECT * FROM queue WHERE id = ?`,
-      bindValues: { 1: 'default' }
-    })
+    const query = queryDb(
+      tables.queue
+        .select()
+        .where('id', '=', 'default')
+        .limit(1)
+    )
     
-    const rows = (result as any)?.[0]?.values || []
+    const result = yield liveStore.query(query)
     
-    if (rows.length === 0) {
+    // queryDb returns array of objects directly
+    const row = Array.isArray(result) ? result[0] : null
+    
+    if (!row) {
       return null
     }
     
-    const trackIds = JSON.parse(rows[0][1] || '[]')
-    const currentPlaying = rows[0][3]
+    // Parse trackIds if it's a string
+    let trackIds = row.trackIds
+    if (typeof trackIds === 'string') {
+      try {
+        trackIds = JSON.parse(trackIds)
+      } catch {
+        trackIds = []
+      }
+    }
+    
+    const currentPlaying = row.currentPlaying
+    const shuffle = Boolean(row.shuffle)
+    
+    // Use randomTrackIds if shuffle is enabled
+    if (shuffle && row.randomTrackIds) {
+      let randomTrackIds = row.randomTrackIds
+      if (typeof randomTrackIds === 'string') {
+        try {
+          randomTrackIds = JSON.parse(randomTrackIds)
+        } catch {
+          randomTrackIds = []
+        }
+      }
+      trackIds = randomTrackIds
+    }
     
     if (currentPlaying === null || currentPlaying === undefined) {
       return null
@@ -99,6 +129,20 @@ export interface SetCurrentPlayingAction {
 
 // Handling setCurrentPlaying saga
 export function* setCurrentPlaying(action: SetCurrentPlayingAction): any {
+  const liveStore = getLiveStoreInstance()
+  
+  // Sync LiveStore queue position if store is available
+  if (liveStore && action.songId) {
+    try {
+      // Import playMediaAction dynamically to avoid circular deps
+      const { playMediaAction } = yield import('../../stores/livestore/actions')
+      yield call(playMediaAction, liveStore, action.songId)
+    } catch (error) {
+      // Non-fatal: song might not be in queue yet
+      console.debug('[Player Saga] Could not sync LiveStore position:', error)
+    }
+  }
+  
   // Redirect to song view page
   yield put({ type: types.PUSH_TO_VIEW, song: action.songId })
 
@@ -198,6 +242,16 @@ function* handleFullscreen(): any {
   }
 }
 
+/**
+ * Handle PLAY_ALL_COMPLETED action
+ * Triggered after LiveStore queue is updated by playAllAction
+ */
+function* handlePlayAllCompleted(action: { type: string; trackId: string }): any {
+  if (action.trackId) {
+    yield put({ type: types.SET_CURRENT_PLAYING, songId: action.trackId })
+  }
+}
+
 // Binding actions to sagas
 function* playerSaga(): any {
   yield takeLatest(types.SET_CURRENT_PLAYING, setCurrentPlaying)
@@ -206,6 +260,7 @@ function* playerSaga(): any {
   yield takeLatest(types.PLAY_PREV, handlePlayPrev)
   yield takeLatest(types.TOGGLE_FULL_SCREEN, handleFullscreen)
   yield takeLatest(types.PUSH_TO_VIEW, goToViewPage)
+  yield takeLatest(types.PLAY_ALL_COMPLETED, handlePlayAllCompleted)
 }
 
 export default playerSaga

@@ -38,6 +38,8 @@ class PlaybackController {
 
   /**
    * Initialize controller with LiveStore instance
+   * NOTE: Does NOT create audio element until play() is called
+   * to avoid conflicts with existing ReactPlayer during migration
    */
   initialize(store: LiveStore): void {
     if (this.initialized && this.store === store) {
@@ -45,10 +47,11 @@ class PlaybackController {
     }
     
     this.store = store
-    this.createAudioElement()
+    // DON'T create audio element here - wait until play() is called
+    // this.createAudioElement()
     this.ensurePlaybackRow()
     this.initialized = true
-    console.log('[PlaybackController] Initialized')
+    console.log('[PlaybackController] Initialized (audio element will be created on first play)')
   }
 
   /**
@@ -141,9 +144,14 @@ class PlaybackController {
    * Play a track by ID
    */
   async play(trackId?: string): Promise<void> {
-    if (!this.store || !this.audioElement) {
-      console.warn('[PlaybackController] Not initialized')
+    if (!this.store) {
+      console.warn('[PlaybackController] Store not initialized')
       return
+    }
+    
+    // Lazy create audio element on first play
+    if (!this.audioElement) {
+      this.createAudioElement()
     }
 
     if (trackId) {
@@ -152,7 +160,7 @@ class PlaybackController {
     } else {
       // Resume current track
       const state = await this.getPlaybackState()
-      if (state?.streamUri) {
+      if (state?.streamUri && this.audioElement) {
         // If audio element doesn't have a src or has different src, reload
         if (!this.audioElement.src || this.audioElement.src !== state.streamUri) {
           this.audioElement.src = state.streamUri
@@ -167,7 +175,14 @@ class PlaybackController {
    * Load and play a specific track
    */
   private async loadAndPlayTrack(trackId: string): Promise<void> {
-    if (!this.store || !this.audioElement) return
+    if (!this.store) return
+    
+    // Ensure audio element exists
+    if (!this.audioElement) {
+      this.createAudioElement()
+    }
+    
+    if (!this.audioElement) return
 
     // Stop current playback
     this.audioElement.pause()

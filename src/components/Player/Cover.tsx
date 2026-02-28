@@ -5,7 +5,7 @@ import Media from '../../entities/Media'
 
 type Props = {
   slim?: boolean,
-  song: Media,
+  song?: Media | null,
   onClick?: () => void
 }
 
@@ -15,19 +15,23 @@ const Cover = (props: Props) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false)
   const imageRef = useRef<HTMLImageElement | null>(null)
 
+  // Handle null/undefined song gracefully
+  const song = props.song
+  
   useEffect(() => {
-    if (props.song.cover?.thumbnailUrl) {
+    if (song?.cover?.thumbnailUrl) {
       const img = new Image()
       img.onload = () => setIsImageLoaded(true)
-      img.src = props.song.cover.thumbnailUrl
+      img.src = song.cover.thumbnailUrl
       imageRef.current = img
       return () => {
         imageRef.current = null
       }
     }
-  }, [props.song.cover?.thumbnailUrl])
+  }, [song?.cover?.thumbnailUrl])
 
-  if (props.slim) {
+  // Don't render if no song or slim mode
+  if (props.slim || !song) {
     return null
   }
 
@@ -38,7 +42,7 @@ const Cover = (props: Props) => {
     }
   }
 
-  const albumName = props.song.album ? props.song.album.name : 'N/A'
+  const albumName = song.album ? song.album.name : 'N/A'
 
   return (
     <>
@@ -52,7 +56,7 @@ const Cover = (props: Props) => {
         <div className="w-full h-full">
           <CoverImage
             useImage
-            cover={props.song.cover}
+            cover={song.cover}
             size='thumbnail'
             albumName={albumName}
             noFade
@@ -74,7 +78,7 @@ const Cover = (props: Props) => {
           >
             <CoverImage
               useImage
-              cover={props.song.cover}
+              cover={song.cover}
               size='medium'
               albumName={albumName}
               noFade
@@ -93,7 +97,7 @@ const Cover = (props: Props) => {
           <div className="w-full max-w-2xl aspect-square">
             <CoverImage
               useImage
-              cover={props.song.cover}
+              cover={song.cover}
               size='large'
               albumName={albumName}
               noFade

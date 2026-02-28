@@ -28,6 +28,7 @@ import { useQueue } from '../../stores/livestore/hooks'
 import { useUI } from '../../contexts/UIContext'
 import { useStore } from '@livestore/react'
 import { ensureMediaInQueueAndPlay } from '../../utils/queueHelpers'
+import { addToQueueAction, removeFromQueueAction } from '../../stores/livestore/actions'
 
 const MAX_LIST_ITEMS = 25
 
@@ -223,8 +224,10 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
                 <Button
                   transparent
                   alignLeft
-                  onClick={() => {
-                    dispatch({ type: types.ADD_TO_QUEUE, songs: [song] })
+                  onClick={async () => {
+                    if (liveStore) {
+                      await addToQueueAction(liveStore, [song.id])
+                    }
                   }}
                 >
                   <Icon
@@ -239,8 +242,10 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
                 <Button
                   transparent
                   alignLeft
-                  onClick={() => {
-                    dispatch({ type: types.REMOVE_FROM_QUEUE, song })
+                  onClick={async () => {
+                    if (liveStore) {
+                      await removeFromQueueAction(liveStore, song.id)
+                    }
                   }}
                 >
                   <Icon

@@ -4,6 +4,7 @@ import { Menu, useContextMenu, Item } from 'react-contexify'
 import { Translate } from 'react-redux-i18n'
 import React from 'react'
 import { Dispatch } from 'redux'
+import { useStore } from '@livestore/react'
 
 import Button from '../common/Button'
 import Icon from '../common/Icon'
@@ -15,6 +16,7 @@ import Controls from './Controls'
 import { State as AppState } from '../../reducers/app'
 import { State as PlayerState } from '../../reducers/player'
 import { useQueue } from '../../stores/livestore/hooks'
+import { toggleRepeatAction, toggleShuffleAction } from '../../stores/livestore/actions'
 
 const MENU_ID = 'context-menu-player'
 
@@ -26,8 +28,9 @@ type MenuProps = {
 }
 
 const ContextualMenu = (props: MenuProps) => {
-  // Get queue from LiveStore
+  // Get queue and store from LiveStore
   const liveQueue = useQueue('default')
+  const { store: liveStore } = useStore()
   
   // Parse trackIds from LiveStore queue (can be JSON string or array)
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
@@ -202,7 +205,7 @@ const ContextualMenu = (props: MenuProps) => {
                 transparent
                 alignLeft
                 onClick={() => {
-                  props.dispatch({ type: types.SHUFFLE })
+                  toggleShuffleAction(liveStore, !liveQueue?.shuffle)
                 }}
               >
                 <div className='flex items-center justify-between w-full'>
@@ -225,7 +228,7 @@ const ContextualMenu = (props: MenuProps) => {
                 transparent
                 alignLeft
                 onClick={() => {
-                  props.dispatch({ type: types.REPEAT })
+                  toggleRepeatAction(liveStore, !liveQueue?.repeat)
                 }}
               >
                 <div className='flex items-center justify-between w-full'>

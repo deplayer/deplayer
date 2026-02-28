@@ -1,4 +1,5 @@
 import { connect } from 'react-redux'
+import { useRef } from 'react'
 import PlayerControls from '../components/Player/PlayerControls'
 import { useLocation } from 'react-router'
 import { State } from '../reducers'
@@ -17,6 +18,9 @@ const ConnectedPlayer = connect(
   const liveQueue = useQueue('default')
   const liveSettings = useSettings()
   
+  // Track the last valid currentPlayingId to prevent flickering during state transitions
+  const lastValidCurrentPlayingIdRef = useRef<string | null>(null)
+  
   // Parse trackIds from LiveStore queue (can be JSON string or array)
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
     if (!ids) return []
@@ -28,6 +32,7 @@ const ConnectedPlayer = connect(
     }
   }
   
+  // Get the active track list based on shuffle state
   const trackIds = liveQueue?.shuffle 
     ? parseTrackIds(liveQueue.randomTrackIds)
     : parseTrackIds(liveQueue?.trackIds)
@@ -38,9 +43,21 @@ const ConnectedPlayer = connect(
   
   // Convert LiveStore queue to Redux-compatible format for PlayerControls
   // IMPORTANT: LiveStore stores currentPlaying as INDEX, but PlayerControls expects TRACK ID
-  const currentPlayingId = (liveQueue?.currentPlaying !== null && liveQueue?.currentPlaying !== undefined)
-    ? trackIds[liveQueue.currentPlaying]
-    : null
+  let currentPlayingId: string | null = null
+  if (liveQueue?.currentPlaying !== null && liveQueue?.currentPlaying !== undefined) {
+    currentPlayingId = trackIds[liveQueue.currentPlaying] || null
+  }
+  
+  // DEFENSIVE: If currentPlayingId is temporarily undefined during a state transition
+  // (e.g., shuffle toggle), use the last known valid ID to prevent UI flickering
+  if (!currentPlayingId && lastValidCurrentPlayingIdRef.current && props.player?.streamUri) {
+    currentPlayingId = lastValidCurrentPlayingIdRef.current
+  }
+  
+  // Update the ref when we have a valid ID
+  if (currentPlayingId) {
+    lastValidCurrentPlayingIdRef.current = currentPlayingId
+  }
   
   const queue = liveQueue ? {
     trackIds,

@@ -7,6 +7,8 @@ import SongRow from '../MusicTable/SongRow'
 import CoverImage from '../MusicTable/CoverImage'
 import { State as QueueState } from '../../reducers/queue'
 import { Dispatch } from 'redux'
+import { useStore } from '@livestore/react'
+import { playAllAction, addToQueueAction, addNextAction } from '../../stores/livestore/actions'
 
 interface AlbumData {
   id: string
@@ -31,6 +33,51 @@ type AlbumProps = {
 const Album = React.memo((props: AlbumProps) => {
   const { album, mediaMap, songs, dispatch, queue } = props
   const albumId = album.id
+  const { store: liveStore } = useStore()
+
+  // Play album: add all songs to queue and start playing
+  const playAlbum = React.useCallback(async () => {
+    if (!liveStore || !songs || songs.length === 0) return
+    
+    try {
+      // Get unique song IDs in track order
+      const uniqueSongIds = Array.from(new Set(songs))
+      const firstTrackId = await playAllAction(liveStore, uniqueSongIds)
+      
+      if (firstTrackId) {
+        dispatch({ 
+          type: types.PLAY_ALL_COMPLETED,
+          trackId: firstTrackId 
+        })
+      }
+    } catch (error) {
+      console.error('Failed to play album:', error)
+    }
+  }, [liveStore, songs, dispatch])
+
+  // Add album to end of queue
+  const addAlbumToQueue = React.useCallback(async () => {
+    if (!liveStore || !songs || songs.length === 0) return
+    
+    try {
+      const uniqueSongIds = Array.from(new Set(songs))
+      await addToQueueAction(liveStore, uniqueSongIds)
+    } catch (error) {
+      console.error('Failed to add album to queue:', error)
+    }
+  }, [liveStore, songs])
+
+  // Add album next in queue
+  const addAlbumNext = React.useCallback(async () => {
+    if (!liveStore || !songs || songs.length === 0) return
+    
+    try {
+      const uniqueSongIds = Array.from(new Set(songs))
+      await addNextAction(liveStore, uniqueSongIds)
+    } catch (error) {
+      console.error('Failed to add album next:', error)
+    }
+  }, [liveStore, songs])
 
   const extractSongs = React.useCallback(() => {
     if (!songs) {
@@ -94,9 +141,7 @@ const Album = React.memo((props: AlbumProps) => {
               dispatch={dispatch}
               isCurrent={false}
               slim={true}
-              onClick={() => {
-                dispatch({ type: types.ADD_ALBUM_TO_QUEUE, albumId })
-              }}
+              onClick={playAlbum}
               song={songRow}
             />
           )
@@ -117,7 +162,7 @@ const Album = React.memo((props: AlbumProps) => {
         </div>
       )
     })
-  }, [songs, album.name, albumId, mediaMap, dispatch])
+  }, [songs, album.name, albumId, mediaMap, dispatch, playAlbum])
 
   // Memoize the cover image source
   const coverSource = React.useMemo(() => {
@@ -133,9 +178,7 @@ const Album = React.memo((props: AlbumProps) => {
       <div className='sticky backdrop-blur-sm bg-black/30 md:bg-transparent shadow-lg md:shadow-none py-4 top-0 mt-0 w-full md:w-56 flex md:flex-col items-center md:mx-8 z-10'>
         <div
           className='h-56 w-56 mb-2 p-4 md:h-56 md:w-56 cursor-pointer md:mr-4'
-          onClick={() => {
-            dispatch({ type: types.ADD_ALBUM_TO_QUEUE, albumId })
-          }}
+          onClick={playAlbum}
         >
           <CoverImage
             cover={coverSource}
@@ -148,9 +191,7 @@ const Album = React.memo((props: AlbumProps) => {
             { album.year && <h4 className='text-md p-4 w-56'>{album.year}</h4>}
           <Button
             transparent
-            onClick={() => {
-              dispatch({ type: types.ADD_ALBUM_TO_QUEUE, albumId })
-            }}
+            onClick={addAlbumToQueue}
           >
             <Icon
               icon='faFolderPlus'
@@ -162,12 +203,7 @@ const Album = React.memo((props: AlbumProps) => {
           {queue?.currentPlaying && (
             <Button
               transparent
-              onClick={() => {
-                // Ensure unique songs when adding to queue
-                const uniqueSongIds = Array.from(new Set(songs))
-                const songsToAdd = uniqueSongIds.map(songId => mediaMap[songId])
-                dispatch({ type: types.ADD_TO_QUEUE_NEXT, songs: songsToAdd })
-              }}
+              onClick={addAlbumNext}
             >
               <Icon
                 icon='faPlusCircle'

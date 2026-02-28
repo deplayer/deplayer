@@ -15,6 +15,7 @@ export const queueEvents = {
     schema: Schema.Struct({
       id: Schema.String,
       trackIds: Schema.Array(Schema.String),
+      randomTrackIds: Schema.optional(Schema.Array(Schema.String)),
       currentPlaying: Schema.optional(Schema.Number),
       shuffle: Schema.Boolean,
       repeat: Schema.Boolean,

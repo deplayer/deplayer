@@ -1,6 +1,6 @@
 import { call } from 'redux-saga/effects'
-import { getLiveStoreInstance } from '../App'
 import { queryDb } from '@livestore/livestore'
+import { getLiveStoreInstance } from '../App'
 import { tables } from '../stores/livestore/schema'
 
 /**
@@ -23,6 +23,50 @@ export function* getSettingsFromLiveStore(): Generator<any, any, any> {
 }
 
 /**
+ * Transform raw LiveStore media data to include nested artist/album objects
+ * and parse JSON fields. Mirrors the transformation in hooks/useMedia.ts
+ */
+function transformMediaFromLiveStore(rawMedia: any): any {
+  if (!rawMedia) return null
+  
+  // Parse JSON fields if they're strings
+  const parseJson = (val: any, defaultVal: any = {}) => {
+    if (!val) return defaultVal
+    if (typeof val === 'object') return val
+    try {
+      return JSON.parse(val)
+    } catch {
+      return defaultVal
+    }
+  }
+  
+  // Reconstruct nested artist object from flat fields
+  const artist = {
+    id: rawMedia.artistId || '',
+    name: rawMedia.artistName || 'Unknown Artist',
+  }
+  
+  // Reconstruct nested album object from flat fields
+  const album = {
+    id: rawMedia.albumId || '',
+    name: rawMedia.albumName || 'Unknown Album',
+    artistId: rawMedia.artistId || '',
+    artist: artist,
+    thumbnailUrl: rawMedia.cover?.thumbnailUrl || null,
+    year: rawMedia.year || null,
+  }
+  
+  return {
+    ...rawMedia,
+    stream: parseJson(rawMedia.stream, {}),
+    cover: parseJson(rawMedia.cover, null),
+    genres: parseJson(rawMedia.genres, []),
+    artist,
+    album,
+  }
+}
+
+/**
  * Get media by ID from LiveStore
  * Use this in sagas instead of select(getSongById, id)
  */
@@ -38,7 +82,7 @@ export function* getSongByIdFromLiveStore(songId: string): Generator<any, any, a
   )
   
   const result = yield call(() => liveStore.query(query))
-  return result[0] || null
+  return transformMediaFromLiveStore(result[0])
 }
 
 /**
@@ -52,21 +96,49 @@ export function* getCurrentSongFromLiveStore(): Generator<any, any, any> {
     return null
   }
   
-  // Get currentPlaying ID from LiveStore queue
+  // Get currentPlaying ID from LiveStore queue using queryDb for consistency
   try {
-    const result = yield call(() => liveStore.query({
-      query: `SELECT * FROM queue WHERE id = ?`,
-      bindValues: { 1: 'default' }
-    }))
+    const query = queryDb(
+      tables.queue
+        .select()
+        .where('id', '=', 'default')
+        .limit(1)
+    )
     
-    const rows = (result as any)?.[0]?.values || []
+    const result = yield call(() => liveStore.query(query))
     
-    if (rows.length === 0) {
+    // queryDb returns array of objects directly
+    const row = Array.isArray(result) ? result[0] : null
+    
+    if (!row) {
       return null
     }
     
-    const trackIds = JSON.parse(rows[0][1] || '[]')
-    const currentPlaying = rows[0][3]
+    // Parse trackIds if it's a string
+    let trackIds = row.trackIds
+    if (typeof trackIds === 'string') {
+      try {
+        trackIds = JSON.parse(trackIds)
+      } catch {
+        trackIds = []
+      }
+    }
+    
+    const currentPlaying = row.currentPlaying
+    const shuffle = Boolean(row.shuffle)
+    
+    // Use randomTrackIds if shuffle is enabled
+    if (shuffle && row.randomTrackIds) {
+      let randomTrackIds = row.randomTrackIds
+      if (typeof randomTrackIds === 'string') {
+        try {
+          randomTrackIds = JSON.parse(randomTrackIds)
+        } catch {
+          randomTrackIds = []
+        }
+      }
+      trackIds = randomTrackIds
+    }
     
     if (currentPlaying === null || currentPlaying === undefined || currentPlaying < 0) {
       return null

@@ -7,8 +7,9 @@ import * as types from '../constants/ActionTypes'
 function* setCurrentPlaying(): any {
   // Setting current playing title
   const song = yield call(getCurrentSongFromLiveStore)
-  if (song && song.title) {
-    document.title = song.title + ' - ' + song.artist.name
+  if (song?.title) {
+    const artistName = song.artist?.name || song.artistName || 'Unknown Artist'
+    document.title = `${song.title} - ${artistName}`
   }
 }
 

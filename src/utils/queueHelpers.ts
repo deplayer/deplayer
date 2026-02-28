@@ -1,4 +1,5 @@
-import { Store as LiveStore } from '@livestore/livestore'
+import { Store as LiveStore, queryDb } from '@livestore/livestore'
+import { tables } from '../stores/livestore/schema'
 import { 
   playAllAction, 
   addNextAction, 
@@ -7,28 +8,49 @@ import {
 
 /**
  * Get current queue from LiveStore
- * (Helper to avoid code duplication)
+ * Uses queryDb for consistency with hooks
  */
 const getCurrentQueue = async (store: LiveStore) => {
-  const result = await store.query({
-    query: `SELECT * FROM queue WHERE id = ?`,
-    bindValues: { 1: 'default' }
-  })
-  
-  const rows = (result as any)?.[0]?.values || []
-  
-  if (rows.length === 0) {
+  try {
+    const query = queryDb(
+      tables.queue
+        .select()
+        .where('id', '=', 'default')
+        .limit(1)
+    )
+    
+    const result = await store.query(query)
+    
+    // queryDb returns array of objects directly
+    const row = Array.isArray(result) ? result[0] : null
+    
+    if (!row) {
+      return null
+    }
+    
+    // Parse JSON fields if they're strings
+    const parseJson = (val: any, defaultVal: any[] = []) => {
+      if (!val) return defaultVal
+      if (Array.isArray(val)) return val
+      try {
+        return JSON.parse(val)
+      } catch {
+        return defaultVal
+      }
+    }
+    
+    return {
+      id: row.id,
+      trackIds: parseJson(row.trackIds),
+      randomTrackIds: parseJson(row.randomTrackIds),
+      currentPlaying: row.currentPlaying,
+      shuffle: Boolean(row.shuffle),
+      repeat: Boolean(row.repeat),
+      updatedAt: row.updatedAt,
+    }
+  } catch (error) {
+    console.error('[getCurrentQueue] Error:', error)
     return null
-  }
-  
-  return {
-    id: rows[0][0],
-    trackIds: JSON.parse(rows[0][1] || '[]'),
-    randomTrackIds: JSON.parse(rows[0][2] || '[]'),
-    currentPlaying: rows[0][3],
-    shuffle: Boolean(rows[0][4]),
-    repeat: Boolean(rows[0][5]),
-    updatedAt: rows[0][6],
   }
 }
 
