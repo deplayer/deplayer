@@ -3,6 +3,7 @@
 // Components should use LiveStore hooks instead: useSettings()
 
 import SettingsBuilder from "../services/settings/SettingsBuilder";
+import type { FormField } from '../types/providers';
 
 type ProviderSettings = {
   enabled: boolean;
@@ -38,15 +39,10 @@ export type State = {
   settingsForm: {
     providers: {
       [key: string]: {
-        fields: Array<{
-          title: string;
-          name?: string;
-          type: string;
-          showSync?: boolean;
-        }>;
+        fields: FormField[];
       };
     };
-    fields: any;
+    fields: FormField[];
   };
 };
 

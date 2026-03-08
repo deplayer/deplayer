@@ -1,48 +1,43 @@
 import { Translate } from 'react-redux-i18n'
-import FormField, { TYPES } from './FormField'
+import FormField from './FormField'
 import SyncButton from '../Buttons/SyncButton'
-import { FormField as FormFieldType } from '../../types/forms'
+import type { FormField as FormFieldType, BuiltFieldSchema } from '../../types/providers'
 
 type Props = {
-  providerKey?: string
   schema: { fields: FormFieldType[] }
 }
 
-// Convert schema object to form elements
-const FormSchema = (props: Props) => {
-  const { fields } = props.schema
+const FormSchema = ({ schema }: Props) => {
+  return (
+    <>
+      {schema.fields.map((field, index) => {
+        if (field.type === 'title') {
+          return (
+            <h3 key={`title-${index}`} className="text-2xl leading-loose py-2 uppercase tracking-wide pt-4 pb-2">
+              <Translate value={field.label} />
+            </h3>
+          )
+        }
 
-  const populatedFields = fields.map((field: FormFieldType) => {
-    if (field.type === TYPES.title) {
-      return (
-        <h3 className='text-2xl leading-loose py-2 uppercase tracking-wide pt-4 pb-2' key={`title-${field.title}`}>
-          <Translate value={field.title} />
-        </h3>
-      )
-    }
+        if (field.type === 'sync') {
+          return <SyncButton key={`sync-${field.providerKey}`} providerKey={field.providerKey} />
+        }
 
-    if (field.type === "sync" && props.providerKey) {
-      return <SyncButton key={`sync-${props.providerKey}`} providerKey={props.providerKey} />;
-    }
-
-    return (
-      <div
-        key={`field-${field.name}`}
-        className="my-3"
-      >
-        <div className='w-full flex items-center'>
-          <label className='w-40 capitalize text-xl'>
-            <Translate value={field.title} />
-          </label>
-          <FormField
-            field={field}
-          />
-        </div>
-      </div>
-    )
-  })
-
-  return populatedFields
+        // It's a BuiltFieldSchema (FieldSchema + name) from SettingsBuilder
+        const builtField = field as BuiltFieldSchema
+        return (
+          <div key={`field-${builtField.name}`} className="my-3">
+            <div className="w-full flex items-center">
+              <label className="w-40 capitalize text-xl">
+                <Translate value={field.label} />
+              </label>
+              <FormField field={builtField} />
+            </div>
+          </div>
+        )
+      })}
+    </>
+  )
 }
 
 export default FormSchema

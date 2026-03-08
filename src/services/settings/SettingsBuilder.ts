@@ -1,43 +1,54 @@
-import sections from "./sections";
-import providerBuilders from "./providers";
+import providerRegistry from './providers'
+import sectionRegistry from './sections'
+import type { FormField, BuiltFieldSchema } from '../../types/providers'
 
 export default class SettingsBuilder {
-  getFormSchema(providers: any = {}) {
-    const totalFields = Object.keys(sections).reduce(
-      (accumulator: any, sectionId: string) => {
-        if (sections[sectionId].isRepeatable) {
-          return accumulator;
+  getFormSchema(providers: Record<string, any> = {}) {
+    const fields: FormField[] = []
+
+    for (const section of Object.values(sectionRegistry)) {
+      fields.push({ type: 'title', label: section.label })
+      for (const field of section.fields) {
+        const built: BuiltFieldSchema = {
+          ...field,
+          name: `app.${section.key}.${field.key}`,
         }
+        fields.push(built)
+      }
+    }
 
-        return [...accumulator, ...sections[sectionId].getFormSchema()];
-      },
-      []
-    );
+    const providerFields: Record<string, { fields: FormField[] }> = {}
 
-    const providerFields = Object.keys(providers).reduce(
-      (accumulator: any, providerId: string) => {
-        const providerType = providerId.replace(/[0-9]/g, "");
+    for (const providerId of Object.keys(providers)) {
+      const providerType = providerId.replace(/\d+$/, '')
+      const schema = providerRegistry[providerType]
 
-        if (!providerBuilders[providerType]) {
-          return accumulator;
+      if (!schema) {
+        continue
+      }
+
+      const pFields: FormField[] = []
+
+      pFields.push({ type: 'title', label: schema.label })
+
+      for (const field of schema.fields) {
+        const built: BuiltFieldSchema = {
+          ...field,
+          name: `providers.${providerId}.${field.key}`,
         }
+        pFields.push(built)
+      }
 
-        // Extract the numeric suffix if it exists
-        const numMatch = providerId.match(/\d+$/);
-        const providerNum = numMatch ? numMatch[0] : "";
+      if (schema.capabilities.includes('sync')) {
+        pFields.push({ type: 'sync', providerKey: providerId })
+      }
 
-        accumulator[providerId] = providerBuilders[providerType].getFormSchema(
-          providerNum
-        );
-
-        return accumulator;
-      },
-      {}
-    );
+      providerFields[providerId] = { fields: pFields }
+    }
 
     return {
       providers: providerFields,
-      fields: totalFields,
-    };
+      fields,
+    }
   }
 }

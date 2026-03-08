@@ -8,7 +8,7 @@ import * as types from '../../constants/ActionTypes'
 import { saveSettingsAction, initializeSettingsAction } from '../../stores/livestore/actions/settings'
 import { useSettings } from '../../stores/livestore/hooks'
 import SettingsBuilder from '../../services/settings/SettingsBuilder'
-import providerBuilders from '../../services/settings/providers'
+import providerRegistry from '../../services/settings/providers'
 import MainContainer from '../common/MainContainer'
 import ProviderButton from './ProviderButton'
 import ProviderForm from '../Settings/ProviderForm'
@@ -22,16 +22,12 @@ const Providers = () => {
   
   // Local state for managing providers during editing (before save)
   const [localProviders, setLocalProviders] = useState<any>(null)
-  
+
   // Use local state if set, otherwise use LiveStore settings
-  const currentProviders = localProviders || liveStoreSettings?.providers || {}
-  
-  // Reset local state when LiveStore settings change (after save)
-  useState(() => {
-    if (liveStoreSettings && !localProviders) {
-      setLocalProviders(liveStoreSettings.providers)
-    }
-  })
+  const currentProviders = useMemo(
+    () => localProviders ?? liveStoreSettings?.providers ?? {},
+    [localProviders, liveStoreSettings?.providers]
+  )
   
   // Generate form schema based on current providers
   const settingsForm = useMemo(() => {
@@ -55,14 +51,14 @@ const Providers = () => {
   
   // Handle adding a provider
   const handleAddProvider = useCallback((providerKey: string) => {
-    const providerBuilder = providerBuilders[providerKey];
-    if (!providerBuilder) {
+    const schema = providerRegistry[providerKey];
+    if (!schema) {
       console.warn(`Provider ${providerKey} not found`)
       return;
     }
 
     // For non-repeatable providers, use the base key
-    const providerId = providerBuilder.isRepeatable ? 
+    const providerId = schema.repeatable ? 
       getNextProviderId(currentProviders, providerKey) : 
       providerKey;
     
@@ -180,12 +176,10 @@ const Providers = () => {
 
             Select one of the providers below to configure it.
 
-            <div className='flex pt-2'>
-              <ProviderButton providerKey='subsonic' onAdd={handleAddProvider} />
-              <ProviderButton providerKey='mstream' onAdd={handleAddProvider} />
-              <ProviderButton providerKey='itunes' onAdd={handleAddProvider} />
-              <ProviderButton providerKey='jellyfin' onAdd={handleAddProvider} />
-              <ProviderButton providerKey='musicbrainz' onAdd={handleAddProvider} />
+            <div className='flex flex-wrap gap-2 pt-2'>
+              {Object.keys(providerRegistry).map(key => (
+                <ProviderButton key={key} providerKey={key} onAdd={handleAddProvider} />
+              ))}
             </div>
           </div>
 
