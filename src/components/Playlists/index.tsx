@@ -1,20 +1,14 @@
 import Playlist from './Playlist'
 import EmptyState from '../common/EmptyState/index'
-import { Link } from 'react-router-dom'
 import Icon from '../common/Icon'
 import { Translate } from 'react-redux-i18n'
 import { memo, useMemo } from 'react'
 import { useMediaCount, useSongsByGenre, usePlaylists, useSmartPlaylists, useQueue, useSettings } from '../../stores/livestore/hooks'
+import { getEmptyStateFallback, queueStep, searchStep } from '../common/EmptyState/emptyStateFallback'
+import EmptyStateAction from '../common/EmptyState/EmptyStateAction'
 
 type Props = {
   dispatch: any
-}
-
-type EmptyStateProps = {
-  icon: "faCompactDisc" | "faMusic" | "faSearch" | "faPlug";
-  title: string;
-  description: string;
-  action: React.ReactNode;
 }
 
 type PlaylistType = {
@@ -128,48 +122,21 @@ const Playlists = memo((props: Props) => {
     }))
   , [smartPlaylists, songsByGenre]);
 
+  const { action: fallbackAction, description: fallbackDescription } = getEmptyStateFallback([
+    queueStep(hasQueueItems),
+    { condition: hasCollectionItems, action: <EmptyStateAction to='/collection' icon='faDatabase' label='message.jumpToCollection' />, description: 'message.addSongsToQueue' },
+    searchStep(hasSearchableProviders),
+  ])
+
   if (!transformedPlaylists.length && !transformedSmartPlaylists.length && !genrePlaylists.length) {
-    let emptyStateProps: EmptyStateProps = {
-      icon: "faCompactDisc",
-      title: "message.noPlaylists",
-      description: "message.createPlaylistHint",
-      action: null
-    }
-
-    if (hasQueueItems) {
-      emptyStateProps.action = (
-        <Link to="/queue" className="btn btn-primary">
-          <Icon icon="faMusic" className="mr-2" />
-          <Translate value="message.goToQueue" />
-        </Link>
-      )
-    } else if (hasCollectionItems) {
-      emptyStateProps.description = "message.addSongsToQueue"
-      emptyStateProps.action = (
-        <Link to="/collection" className="btn btn-primary">
-          <Icon icon="faDatabase" className="mr-2" />
-          <Translate value="message.jumpToCollection" />
-        </Link>
-      )
-    } else if (hasSearchableProviders) {
-      emptyStateProps.description = "message.startSearchingForMusic"
-      emptyStateProps.action = (
-        <Link to="/search" className="btn btn-primary">
-          <Icon icon="faSearch" className="mr-2" />
-          <Translate value="message.startSearch" />
-        </Link>
-      )
-    } else {
-      emptyStateProps.description = "message.addSearchableProvider"
-      emptyStateProps.action = (
-        <Link to="/settings" className="btn btn-primary">
-          <Icon icon="faPlug" className="mr-2" />
-          <Translate value="message.addProvider" />
-        </Link>
-      )
-    }
-
-    return <EmptyState {...emptyStateProps} />
+    return (
+      <EmptyState
+        icon="faCompactDisc"
+        title="message.noPlaylists"
+        description={fallbackDescription || 'message.createPlaylistHint'}
+        action={fallbackAction}
+      />
+    )
   }
 
   return (

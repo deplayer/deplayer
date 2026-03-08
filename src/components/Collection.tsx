@@ -8,6 +8,7 @@ import TryDemoButton from './Buttons/TryDemoButton'
 import Icon from './common/Icon'
 import { useSettings, useCollectionData, useQueue } from '../stores/livestore/hooks'
 import { useUI } from '../contexts'
+import { getEmptyStateFallback } from './common/EmptyState/emptyStateFallback'
 
 const Collection = () => {
   // Get data from LiveStore hooks and contexts
@@ -30,6 +31,23 @@ const Collection = () => {
     Object.values(liveSettings.providers).some((provider) => (provider as { enabled?: boolean })?.enabled) : 
     false
 
+  const { action, description } = getEmptyStateFallback([
+    {
+      condition: hasSearchableProviders,
+      action: (
+        <div className='flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-center'>
+          <Link to="/search" className="btn btn-primary">
+            <Icon icon="faSearch" className="mr-2" />
+            <Translate value="message.startSearch" />
+          </Link>
+          <AddNewMediaButton />
+          <TryDemoButton />
+        </div>
+      ),
+      description: 'message.startSearchingForMusic',
+    },
+  ])
+
   return (
     <div className="collection z-10 flex">
       <div className="flex-1 w-full">
@@ -37,24 +55,8 @@ const Collection = () => {
           <EmptyState
             icon={hasSearchableProviders ? "faSearch" : "faPlug"}
             title="message.noCollectionItems"
-            description={hasSearchableProviders ? "message.startSearchingForMusic" : "message.addSearchableProvider"}
-            action={
-              hasSearchableProviders ? (
-                <div className='flex space-x-4 items-center justify-center'>
-                  <Link to="/search" className="btn btn-primary">
-                    <Icon icon="faSearch" className="mr-2" />
-                    <Translate value="message.startSearch" />
-                  </Link>
-                  <AddNewMediaButton />
-                  <TryDemoButton />
-                </div>
-              ) : (
-                <Link to="/settings" className="btn btn-primary">
-                  <Icon icon="faPlug" className="mr-2" />
-                  <Translate value="message.addProvider" />
-                </Link>
-              )
-            }
+            description={description}
+            action={action}
           />
         ) : (
           <MusicTable

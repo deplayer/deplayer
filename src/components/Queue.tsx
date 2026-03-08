@@ -1,24 +1,15 @@
-import { Link } from 'react-router-dom'
 import MusicTable from './MusicTable/MusicTable'
 import Spinner from './Spinner'
 import EmptyState from './common/EmptyState/index'
-import { Translate } from 'react-redux-i18n'
 import classNames from 'classnames'
-import Icon from './common/Icon/index'
 import { useQueue, useMediaMapForIds, useMediaCount } from '../stores/livestore/hooks'
 import { useSettings } from '../stores/livestore/hooks'
 import { useUI } from '../contexts'
+import { getEmptyStateFallback, collectionStep, searchStep } from './common/EmptyState/emptyStateFallback'
 
 type Props = {
   slim?: boolean,
   className?: string,
-}
-
-type EmptyStateProps = {
-  icon: "faMusic" | "faSearch" | "faPlug";
-  title: string;
-  description: string;
-  action: React.ReactNode;
 }
 
 const Queue = (props: Props) => {
@@ -54,6 +45,11 @@ const Queue = (props: Props) => {
     Object.values(liveSettings.providers).some((provider) => (provider as { enabled?: boolean })?.enabled) : 
     false
 
+  const { action: fallbackAction, description: fallbackDescription } = getEmptyStateFallback([
+    collectionStep(hasCollectionItems),
+    searchStep(hasSearchableProviders),
+  ])
+
   // Is disabled for small screens
   if (slim && !mqlMatch) {
     return null
@@ -80,41 +76,14 @@ const Queue = (props: Props) => {
   }
 
   if (!trackIds.length) {
-    const emptyStateProps: EmptyStateProps = {
-      icon: "faMusic",
-      title: "message.queueEmpty",
-      description: "message.addSongsFromCollection",
-      action: null
-    }
-
-    if (hasCollectionItems) {
-      emptyStateProps.action = (
-        <Link to="/collection" className="btn btn-primary">
-          <Icon icon="faDatabase" className="mr-2" />
-          <Translate value="message.jumpToCollection" />
-        </Link>
-      )
-    } else if (hasSearchableProviders) {
-      emptyStateProps.description = "message.startSearchingForMusic"
-      emptyStateProps.action = (
-        <Link to="/search" className="btn btn-primary">
-          <Icon icon="faSearch" className="mr-2" />
-          <Translate value="message.startSearch" />
-        </Link>
-      )
-    } else {
-      emptyStateProps.description = "message.addSearchableProvider"
-      emptyStateProps.action = (
-        <Link to="/settings" className="btn btn-primary">
-          <Icon icon="faPlug" className="mr-2" />
-          <Translate value="message.addProvider" />
-        </Link>
-      )
-    }
-
     return (
       <div className={classNames('queue z-10 no-results', className)}>
-        <EmptyState {...emptyStateProps} />
+        <EmptyState
+          icon="faMusic"
+          title="message.queueEmpty"
+          description={fallbackDescription || 'message.addSongsFromCollection'}
+          action={fallbackAction}
+        />
       </div>
     )
   }
