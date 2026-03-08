@@ -1,6 +1,7 @@
 import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
+import { resolveCurrentSongId, resolveQueueNavigation } from './queueUtils'
 
 /**
  * Queue Query Hooks
@@ -86,16 +87,7 @@ export const useCurrentTrack = (queueId = 'default') => {
   const store = useAppStore()
   const queue = useQueue(queueId)
   
-  if (!queue || queue.currentPlaying === null || queue.currentPlaying === undefined) {
-    return null
-  }
-  
-  // Parse trackIds
-  const trackIds = typeof queue.trackIds === 'string'
-    ? JSON.parse(queue.trackIds)
-    : queue.trackIds
-  
-  const currentTrackId = trackIds[queue.currentPlaying]
+  const currentTrackId = resolveCurrentSongId(queue)
   
   if (!currentTrackId) {
     return null
@@ -127,16 +119,7 @@ export const useCurrentTrack = (queueId = 'default') => {
 export const useCurrentPlayingSongId = (queueId = 'default'): string | null => {
   const queue = useQueue(queueId)
   
-  if (!queue || queue.currentPlaying === null || queue.currentPlaying === undefined) {
-    return null
-  }
-  
-  // Parse trackIds (it's stored as JSON in SQLite)
-  const trackIds = typeof queue.trackIds === 'string'
-    ? JSON.parse(queue.trackIds)
-    : queue.trackIds
-  
-  return trackIds[queue.currentPlaying] || null
+  return resolveCurrentSongId(queue)
 }
 
 /**
@@ -150,43 +133,5 @@ export const useCurrentPlayingSongId = (queueId = 'default'): string | null => {
 export const useQueueNavigation = (queueId = 'default') => {
   const queue = useQueue(queueId)
   
-  if (!queue || queue.currentPlaying === null || queue.currentPlaying === undefined) {
-    return { nextSongId: null, prevSongId: null }
-  }
-  
-  const trackIds = typeof queue.trackIds === 'string'
-    ? JSON.parse(queue.trackIds)
-    : queue.trackIds
-  
-  const currentIndex = queue.currentPlaying
-  
-  // Determine which track list to use
-  const activeTrackIds = queue.shuffle 
-    ? (typeof queue.randomTrackIds === 'string' 
-        ? JSON.parse(queue.randomTrackIds) 
-        : queue.randomTrackIds)
-    : trackIds
-  
-  // Calculate next/prev
-  const nextIndex = currentIndex + 1
-  const prevIndex = currentIndex - 1
-  
-  let nextSongId = null
-  let prevSongId = null
-  
-  // Next song
-  if (nextIndex < activeTrackIds.length) {
-    nextSongId = activeTrackIds[nextIndex]
-  } else if (queue.repeat && activeTrackIds.length > 0) {
-    nextSongId = activeTrackIds[0] // Loop back to start
-  }
-  
-  // Previous song
-  if (prevIndex >= 0) {
-    prevSongId = activeTrackIds[prevIndex]
-  } else if (queue.repeat && activeTrackIds.length > 0) {
-    prevSongId = activeTrackIds[activeTrackIds.length - 1] // Loop to end
-  }
-  
-  return { nextSongId, prevSongId }
+  return resolveQueueNavigation(queue)
 }
