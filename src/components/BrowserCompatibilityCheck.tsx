@@ -18,10 +18,10 @@ const BROWSER_REQUIREMENTS: BrowserRequirement[] = [
     description: 'Required for generating unique identifiers',
   },
   {
-    name: 'SharedWorker',
-    check: () => typeof SharedWorker !== 'undefined',
-    description: 'Required for background data synchronization',
-  },
+ name: 'SharedWorker',
+ check: () => typeof SharedWorker !== 'undefined' || typeof Worker !== 'undefined',
+ description: 'Required for background data synchronization',
+ },
   {
     name: 'Origin Private File System',
     check: () => typeof navigator !== 'undefined' && 'storage' in navigator,

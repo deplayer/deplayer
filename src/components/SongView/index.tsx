@@ -26,7 +26,7 @@ import { State as PlayerState } from '../../reducers/player'
 import FavoriteButton from '../common/FavoriteButton'
 import { useQueue } from '../../stores/livestore/hooks'
 import { useUI } from '../../contexts/UIContext'
-import { useStore } from '@livestore/react'
+import { useAppStore } from '../../stores/livestore/store'
 import { ensureMediaInQueueAndPlay } from '../../utils/queueHelpers'
 import { addToQueueAction, removeFromQueueAction } from '../../stores/livestore/actions'
 
@@ -59,7 +59,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
   const navigate = useNavigate()
   const liveQueue = useQueue('default')
   const { setFilter, clearFilters } = useUI()
-  const { store: liveStore } = useStore()
+  const liveStore = useAppStore()
   
   // Helper to parse trackIds from LiveStore (can be JSON string or array)
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {

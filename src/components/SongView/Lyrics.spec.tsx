@@ -4,6 +4,10 @@ import Lyrics from './Lyrics'
 import * as types from '../../constants/ActionTypes'
 
 // Mock the LiveStore hooks
+vi.mock('../../stores/livestore/store', () => ({
+  useAppStore: () => ({ commit: vi.fn() }),
+}))
+
 vi.mock('../../stores/livestore/hooks', () => ({
   useLyrics: vi.fn(() => [])
 }))

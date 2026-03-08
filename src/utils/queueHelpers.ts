@@ -1,4 +1,5 @@
-import { Store as LiveStore, queryDb } from '@livestore/livestore'
+import { Store, queryDb } from '@livestore/livestore'
+type LiveStore = Store<any, any>
 import { tables } from '../stores/livestore/schema'
 import { 
   playAllAction, 

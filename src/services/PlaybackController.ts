@@ -1,5 +1,5 @@
-import type { Store as LiveStore } from '@livestore/livestore'
-import { queryDb } from '@livestore/livestore'
+import { Store, queryDb } from '@livestore/livestore'
+type LiveStore = Store<any, any>
 import { tables, events } from '../stores/livestore/schema'
 import { getStreamUri } from './Song/StreamUriService'
 

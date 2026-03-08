@@ -1,4 +1,4 @@
-import { useQuery } from '@livestore/react'
+import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 import { useMemo } from 'react'
@@ -20,7 +20,8 @@ import { useMemo } from 'react'
  * ```
  */
 export const useAlbums = () => {
-  return useQuery(
+  const store = useAppStore()
+  return store.useQuery(
     queryDb(
       tables.albums
         .select()
@@ -63,7 +64,8 @@ export const useAlbumsMap = () => {
  * ```
  */
 export const useAlbumById = (id: string | null | undefined) => {
-  const result = useQuery(
+  const store = useAppStore()
+  const result = store.useQuery(
     queryDb(
       id 
         ? tables.albums.select().where('id', '=', id).limit(1)
@@ -83,7 +85,8 @@ export const useAlbumById = (id: string | null | undefined) => {
  * ```
  */
 export const useAlbumsByArtist = (artistId: string | null | undefined) => {
-  return useQuery(
+  const store = useAppStore()
+  return store.useQuery(
     queryDb(
       artistId
         ? tables.albums.select().where('artistId', '=', artistId).orderBy('year', 'desc')
@@ -104,7 +107,8 @@ export const useAlbumsByArtist = (artistId: string | null | undefined) => {
  * ```
  */
 export const useAlbumIdsByArtist = () => {
-  const albums = useQuery(
+  const store = useAppStore()
+  const albums = store.useQuery(
     queryDb(
       tables.albums
         .select()
@@ -142,7 +146,8 @@ export const useAlbumIdsByArtist = () => {
  * ```
  */
 export const useSongsByAlbum = () => {
-  const media = useQuery(
+  const store = useAppStore()
+  const media = store.useQuery(
     queryDb(
       tables.media
         .select()
@@ -216,7 +221,8 @@ function transformMediaFromLiveStore(rawMedia: any): any {
  * ```
  */
 export const useSongsByAlbumForArtist = (artistId: string | null | undefined) => {
-  const media = useQuery(
+  const store = useAppStore()
+  const media = store.useQuery(
     queryDb(
       artistId
         ? tables.media
@@ -268,7 +274,8 @@ export const useSongsByAlbumForArtist = (artistId: string | null | undefined) =>
  * ```
  */
 export const useRecentAlbums = (limit = 10) => {
-  return useQuery(
+  const store = useAppStore()
+  return store.useQuery(
     queryDb(
       tables.albums
         .select()

@@ -1,10 +1,9 @@
-import { useQuery } from '@livestore/react'
+import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { useCallback, useEffect } from 'react'
 import { tables } from '../schema'
 import { useMediaById } from './useMedia'
 import PlaybackController from '../../../services/PlaybackController'
-import { useStore } from '@livestore/react'
 
 /**
  * usePlayback - Central hook for all playback needs
@@ -18,7 +17,7 @@ import { useStore } from '@livestore/react'
  * All components should use this hook instead of Redux player state.
  */
 export function usePlayback() {
-  const { store } = useStore()
+  const store = useAppStore()
   
   // Initialize controller with store
   useEffect(() => {
@@ -34,7 +33,7 @@ export function usePlayback() {
       .where('id', '=', 'default')
       .limit(1)
   )
-  const playbackResult = useQuery(playbackQuery)
+  const playbackResult = store.useQuery(playbackQuery)
   const playback = (playbackResult as any[])?.[0] || null
 
   // Get queue state from LiveStore
@@ -44,7 +43,7 @@ export function usePlayback() {
       .where('id', '=', 'default')
       .limit(1)
   )
-  const queueResult = useQuery(queueQuery)
+  const queueResult = store.useQuery(queueQuery)
   const queue = (queueResult as any[])?.[0] || null
 
   // Get current track info

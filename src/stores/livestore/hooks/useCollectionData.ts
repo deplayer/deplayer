@@ -1,4 +1,4 @@
-import { useQuery } from '@livestore/react'
+import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 import { useMemo } from 'react'
@@ -55,6 +55,7 @@ function transformMediaFromLiveStore(rawMedia: any): any {
  * ```
  */
 export const useCollectionData = (filters: Filter, searchTerm: string) => {
+  const store = useAppStore()
   const favoriteIds = useFavoriteIds()
   // Convert Set to Array for type compatibility
   const favoriteIdsArray = useMemo(() => Array.from(favoriteIds), [favoriteIds])
@@ -91,7 +92,7 @@ export const useCollectionData = (filters: Filter, searchTerm: string) => {
   }, [filters.artists, filters.types, filters.favorites, favoriteIdsArray])
   
   // Execute single reactive query
-  const rawMedia = useQuery(
+  const rawMedia = store.useQuery(
     queryDb(query)
   )
   

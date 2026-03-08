@@ -1,4 +1,4 @@
-import { useQuery } from '@livestore/react'
+import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 
@@ -9,7 +9,8 @@ import { tables } from '../schema'
  * @returns Lyrics data or undefined if not found
  */
 export const useLyrics = (mediaId: string | undefined) => {
-  return useQuery(
+  const store = useAppStore()
+  return store.useQuery(
     mediaId
       ? queryDb(
           tables.lyrics.select().where('mediaId', '=', mediaId).limit(1)
@@ -24,5 +25,6 @@ export const useLyrics = (mediaId: string | undefined) => {
  * @returns Array of all lyrics entries
  */
 export const useAllLyrics = () => {
-  return useQuery(queryDb(tables.lyrics.select()))
+  const store = useAppStore()
+  return store.useQuery(queryDb(tables.lyrics.select()))
 }

@@ -11,7 +11,7 @@ import { IMedia } from '../../entities/Media'
 import { useNavigate } from 'react-router-dom'
 import { Dispatch } from 'redux'
 import { useFilteredMedia, useMediaMapForIds } from '../../stores/livestore/hooks'
-import { useStore } from '@livestore/react'
+import { useAppStore } from '../../stores/livestore/store'
 import { playAllAction, addToQueueAction } from '../../stores/livestore/actions'
 import { deleteSmartPlaylistAction } from '../../stores/livestore/actions/smartPlaylists'
 import { useUI } from '../../contexts/UIContext'
@@ -34,7 +34,7 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
   const navigate = useNavigate()
   const isSmartPlaylist = 'filters' in playlist
   const { setFilter, clearFilters } = useUI()
-  const { store: liveStore } = useStore()
+  const liveStore = useAppStore()
   
   // PERF: For smart playlists, use database-level filtering (not entire mediaMap)
   const smartPlaylistFilters = useMemo(() => ({

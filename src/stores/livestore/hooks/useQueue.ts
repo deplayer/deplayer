@@ -1,4 +1,4 @@
-import { useQuery } from '@livestore/react'
+import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 
@@ -22,7 +22,8 @@ import { tables } from '../schema'
  * ```
  */
 export const useQueue = (queueId = 'default') => {
-  const result = useQuery(
+  const store = useAppStore()
+  const result = store.useQuery(
     queryDb(
       tables.queue
         .select()
@@ -43,6 +44,7 @@ export const useQueue = (queueId = 'default') => {
  * ```
  */
 export const useQueueTracks = (queueId = 'default') => {
+  const store = useAppStore()
   const queue = useQueue(queueId)
   
   if (!queue || !queue.trackIds || (queue.trackIds as any[]).length === 0) {
@@ -55,7 +57,7 @@ export const useQueueTracks = (queueId = 'default') => {
     : queue.trackIds
   
   // Get media items by their IDs
-  const media = useQuery(
+  const media = store.useQuery(
     queryDb(
       tables.media
         .select()
@@ -81,6 +83,7 @@ export const useQueueTracks = (queueId = 'default') => {
  * ```
  */
 export const useCurrentTrack = (queueId = 'default') => {
+  const store = useAppStore()
   const queue = useQueue(queueId)
   
   if (!queue || queue.currentPlaying === null || queue.currentPlaying === undefined) {
@@ -99,7 +102,7 @@ export const useCurrentTrack = (queueId = 'default') => {
   }
   
   // Get the current track
-  const result = useQuery(
+  const result = store.useQuery(
     queryDb(
       tables.media
         .select()

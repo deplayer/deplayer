@@ -11,6 +11,65 @@ import { State as CollectionState } from '../../reducers/collection'
 import { State as PlayerState } from '../../reducers/player'
 import { Dispatch } from 'redux'
 
+vi.mock('../../stores/livestore/store', () => ({
+  useAppStore: () => ({ commit: vi.fn() }),
+}))
+
+vi.mock('../../contexts/UIContext', () => ({
+  useUI: () => ({
+    searchTerm: '',
+    searchActive: false,
+    loading: false,
+    ready: true,
+    sidebarToggled: false,
+    rightPanelToggled: false,
+    showAddMediaModal: false,
+    mqlMatch: false,
+    heightMqlMatch: false,
+    showSpectrum: false,
+    showVisuals: false,
+    displayMiniQueue: true,
+    backgroundImage: '',
+    activeFilters: { genres: [], types: [], artists: [], providers: [], favorites: false },
+    toggleSidebar: vi.fn(),
+    toggleRightPanel: vi.fn(),
+    setShowAddMediaModal: vi.fn(),
+    setMqlMatch: vi.fn(),
+    setHeightMqlMatch: vi.fn(),
+    toggleSpectrum: vi.fn(),
+    toggleVisuals: vi.fn(),
+    toggleMiniQueue: vi.fn(),
+    setBackgroundImage: vi.fn(),
+    setLoading: vi.fn(),
+    setReady: vi.fn(),
+    setFilter: vi.fn(),
+    clearFilters: vi.fn(),
+    setSearchTerm: vi.fn(),
+    clearSearch: vi.fn(),
+  }),
+}))
+
+vi.mock('../../stores/livestore/hooks', () => ({
+  useQueue: vi.fn(() => ({ trackIds: [], currentPlaying: null })),
+  useMediaById: vi.fn(() => null),
+  useCurrentPlayingSongId: vi.fn(() => null),
+  useIsFavorite: vi.fn(() => false),
+  useFavoriteIds: vi.fn(() => new Set()),
+}))
+
+vi.mock('../../stores/livestore/hooks/useQueue', () => ({
+  useQueue: vi.fn(() => ({ trackIds: [], currentPlaying: null })),
+}))
+
+vi.mock('../../stores/livestore/actions', () => ({
+  addToQueueAction: vi.fn(),
+  removeFromQueueAction: vi.fn(),
+}))
+
+vi.mock('../../utils/queueHelpers', () => ({
+  ensureMediaInQueueAndPlay: vi.fn(),
+}))
+
 interface Props {
   playerPortal: any
   location: Location

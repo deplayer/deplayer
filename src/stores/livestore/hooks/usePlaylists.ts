@@ -1,4 +1,4 @@
-import { useQuery } from '@livestore/react'
+import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 
@@ -19,7 +19,8 @@ import { tables } from '../schema'
  * ```
  */
 export const usePlaylists = () => {
-  return useQuery(
+  const store = useAppStore()
+  return store.useQuery(
     queryDb(
       tables.playlists
         .select()
@@ -39,7 +40,8 @@ export const usePlaylists = () => {
  * ```
  */
 export const usePlaylistById = (id: string | null | undefined) => {
-  const result = useQuery(
+  const store = useAppStore()
+  const result = store.useQuery(
     queryDb(
       id
         ? tables.playlists.select().where('id', '=', id).limit(1)
@@ -62,6 +64,7 @@ export const usePlaylistById = (id: string | null | undefined) => {
  * ```
  */
 export const usePlaylistTracks = (playlistId: string | null | undefined) => {
+  const store = useAppStore()
   // First get the playlist to access trackIds
   const playlist = usePlaylistById(playlistId)
   
@@ -76,7 +79,7 @@ export const usePlaylistTracks = (playlistId: string | null | undefined) => {
   
   // Get media items by their IDs
   // Note: This might not maintain playlist order - we'll need to sort manually
-  const media = useQuery(
+  const media = store.useQuery(
     queryDb(
       tables.media
         .select()

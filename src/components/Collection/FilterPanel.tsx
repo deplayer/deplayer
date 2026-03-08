@@ -6,7 +6,7 @@ import Icon from '../common/Icon'
 import Modal from '../common/Modal'
 import { useState, useEffect } from 'react'
 import { useUI } from '../../contexts/UIContext'
-import { useStore } from '@livestore/react'
+import { useAppStore } from '../../stores/livestore/store'
 import { createSmartPlaylistAction } from '../../stores/livestore/actions/smartPlaylists'
 import { useArtists, useAvailableGenres, useAvailableProviders, useAvailableTypes } from '../../stores/livestore/hooks'
 
@@ -16,7 +16,7 @@ type Props = {
 
 const FilterPanel = (_props: Props) => {
   const { activeFilters, setFilter } = useUI()
-  const { store: liveStore } = useStore()
+  const liveStore = useAppStore()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   

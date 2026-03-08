@@ -1,4 +1,4 @@
-import { useQuery } from '@livestore/react'
+import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 import { useMemo } from 'react'
@@ -59,7 +59,8 @@ function transformMediaFromLiveStore(rawMedia: any): any {
  * ```
  */
 export const useMediaLibrary = () => {
-  const rawMedia = useQuery(
+  const store = useAppStore()
+  const rawMedia = store.useQuery(
     queryDb(
       tables.media
         .select()
@@ -107,7 +108,8 @@ export const useMediaMap = () => {
  * ```
  */
 export const useMediaById = (id: string | null | undefined) => {
-  const result = useQuery(
+  const store = useAppStore()
+  const result = store.useQuery(
     queryDb(
       id 
         ? tables.media.select().where('id', '=', id).limit(1)
@@ -128,7 +130,8 @@ export const useMediaById = (id: string | null | undefined) => {
  * ```
  */
 export const useMediaByArtist = (artistId: string | null | undefined) => {
-  const rawMedia = useQuery(
+  const store = useAppStore()
+  const rawMedia = store.useQuery(
     queryDb(
       artistId
         ? tables.media
@@ -155,7 +158,8 @@ export const useMediaByArtist = (artistId: string | null | undefined) => {
  * ```
  */
 export const useMediaByAlbum = (albumId: string | null | undefined) => {
-  const rawMedia = useQuery(
+  const store = useAppStore()
+  const rawMedia = store.useQuery(
     queryDb(
       albumId
         ? tables.media
@@ -193,6 +197,7 @@ export const useMediaByAlbum = (albumId: string | null | undefined) => {
  * ```
  */
 export const useSearchMedia = (searchTerm: string | undefined | null, limit = 100) => {
+  const store = useAppStore()
   // Normalize search term - ensure it's always a valid string
   const term = (searchTerm ?? '').trim()
   const hasSearch = term.length > 0
@@ -223,10 +228,10 @@ export const useSearchMedia = (searchTerm: string | undefined | null, limit = 10
   }, [hasSearch, term, limit])
   
   // Search by title
-  const titleMatches = useQuery(titleQuery)
+  const titleMatches = store.useQuery(titleQuery)
   
   // Search by artist name
-  const artistMatches = useQuery(artistQuery)
+  const artistMatches = store.useQuery(artistQuery)
   
   return useMemo(() => {
     if (!hasSearch) return []
@@ -279,6 +284,7 @@ export const useSearchMedia = (searchTerm: string | undefined | null, limit = 10
  * ```
  */
 export const useSearchMediaIds = (searchTerm: string | undefined | null, limit = 100) => {
+  const store = useAppStore()
   // Normalize search term - ensure it's always a valid string
   const term = (searchTerm ?? '').trim()
   const hasSearch = term.length > 0
@@ -310,10 +316,10 @@ export const useSearchMediaIds = (searchTerm: string | undefined | null, limit =
   }, [hasSearch, term, limit])
   
   // Search by title - only select ID
-  const titleMatches = useQuery(titleQuery)
+  const titleMatches = store.useQuery(titleQuery)
   
   // Search by artist name - only select ID
-  const artistMatches = useQuery(artistQuery)
+  const artistMatches = store.useQuery(artistQuery)
   
   return useMemo(() => {
     // Early return for no search - most common case on /collection page
@@ -363,7 +369,8 @@ export const useSearchMediaIds = (searchTerm: string | undefined | null, limit =
  * ```
  */
 export const useRecentlyPlayed = (limit = 20) => {
-  const rawMedia = useQuery(
+  const store = useAppStore()
+  const rawMedia = store.useQuery(
     queryDb(
       tables.media
         .select()
@@ -390,9 +397,10 @@ export const useRecentlyPlayed = (limit = 20) => {
  * ```
  */
 export const useMostPlayed = (limit = 20) => {
+  const store = useAppStore()
   // Query media with playCount > 0, sorted by playCount descending
   // This is more efficient than loading all and filtering in JS
-  const rawMedia = useQuery(
+  const rawMedia = store.useQuery(
     queryDb(
       tables.media
         .select()
@@ -458,6 +466,7 @@ export const useMostPlayed = (limit = 20) => {
  * ```
  */
 export const useFilteredMedia = (filters: Filter) => {
+  const store = useAppStore()
   const favoriteIds = useFavoriteIds()
   
   // Determine which filtering strategy to use
@@ -499,7 +508,7 @@ export const useFilteredMedia = (filters: Filter) => {
   }, [canUseDbQuery, hasArtists, hasTypes, filters.artists, filters.types])
   
   // Execute database query if applicable
-  const dbResults = useQuery(
+  const dbResults = store.useQuery(
     dbQuery ? queryDb(dbQuery) : queryDb(tables.media.select('id').where('id', '=', '__NONE__'))
   )
   
@@ -508,7 +517,7 @@ export const useFilteredMedia = (filters: Filter) => {
   // CRITICAL: Only load all media if we're NOT using the optimized DB query
   // This prevents unnecessary large queries when single-category filters can use DB-level filtering
   const shouldLoadAllMedia = !canUseDbQuery
-  const allMediaForFiltering = useQuery(
+  const allMediaForFiltering = store.useQuery(
     shouldLoadAllMedia
       ? queryDb(
           tables.media
@@ -601,6 +610,7 @@ export const useFilteredMedia = (filters: Filter) => {
  * ```
  */
 export const useMediaMapForIds = (ids: string[]) => {
+  const store = useAppStore()
   // Filter out any undefined/null values and ensure we have valid string IDs
   const validIds = useMemo(() => 
     ids.filter((id): id is string => typeof id === 'string' && id.length > 0),
@@ -622,7 +632,7 @@ export const useMediaMapForIds = (ids: string[]) => {
     )
   }, [shouldQuery, validIds])
   
-  const rawMedia = useQuery(query)
+  const rawMedia = store.useQuery(query)
   
   return useMemo(() => {
     const map: Record<string, any> = {}
@@ -649,7 +659,8 @@ export const useMediaMapForIds = (ids: string[]) => {
  * ```
  */
 export const useMediaByType = () => {
-  const allMedia = useQuery(
+  const store = useAppStore()
+  const allMedia = store.useQuery(
     queryDb(
       tables.media
         .select('id', 'type')

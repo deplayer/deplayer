@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import { Formik, Form } from 'formik'
 import { Translate } from 'react-redux-i18n'
-import { useStore } from '@livestore/react'
+import { useAppStore } from '../../stores/livestore/store'
 import { useDispatch } from 'react-redux'
 
 import * as types from '../../constants/ActionTypes'
@@ -14,7 +14,7 @@ import ProviderButton from './ProviderButton'
 import ProviderForm from '../Settings/ProviderForm'
 
 const Providers = () => {
-  const { store: liveStore } = useStore()
+  const liveStore = useAppStore()
   const dispatch = useDispatch()
   
   // Read settings from LiveStore (single source of truth for saved data)

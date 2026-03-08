@@ -1,5 +1,5 @@
 import React from 'react'
-import { useStore } from '@livestore/react'
+import { useAppStore } from '../../stores/livestore/store'
 import { useFavoriteIds } from '../../stores/livestore/hooks'
 import { toggleFavoriteAction } from '../../stores/livestore/actions'
 
@@ -16,7 +16,7 @@ interface Props {
  * This is critical for lists with many songs (e.g., artist view with 100+ tracks).
  */
 const FavoriteButton: React.FC<Props> = React.memo(({ songId, className = '' }) => {
-  const { store: liveStore } = useStore()
+  const liveStore = useAppStore()
   // Use shared Set of all favorite IDs - single query for all songs
   const favoriteIds = useFavoriteIds()
   const isFavorite = favoriteIds.has(songId)

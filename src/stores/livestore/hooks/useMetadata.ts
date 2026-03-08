@@ -1,4 +1,4 @@
-import { useQuery } from '@livestore/react'
+import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 import { useMemo } from 'react'
@@ -28,8 +28,9 @@ import { useMemo } from 'react'
  * ```
  */
 export const useAvailableGenres = (): string[] => {
+  const store = useAppStore()
   // Query only the genresFlat column (comma-separated string)
-  const result = useQuery(
+  const result = store.useQuery(
     queryDb(tables.media.select('genresFlat'))
   )
   
@@ -63,8 +64,9 @@ export const useAvailableGenres = (): string[] => {
  * ```
  */
 export const useAvailableProviders = (): string[] => {
+  const store = useAppStore()
   // Query only the providersFlat column (comma-separated string)
-  const result = useQuery(
+  const result = store.useQuery(
     queryDb(tables.media.select('providersFlat'))
   )
   
@@ -98,8 +100,9 @@ export const useAvailableProviders = (): string[] => {
  * ```
  */
 export const useAvailableTypes = (): string[] => {
+  const store = useAppStore()
   // Query only the type column
-  const result = useQuery(
+  const result = store.useQuery(
     queryDb(tables.media.select('type'))
   )
   
@@ -131,8 +134,9 @@ export const useAvailableTypes = (): string[] => {
  * ```
  */
 export const useMediaCount = (): number => {
+  const store = useAppStore()
   // Query only IDs for counting
-  const result = useQuery(
+  const result = store.useQuery(
     queryDb(tables.media.select('id'))
   )
   
@@ -146,7 +150,8 @@ export const useMediaCount = (): number => {
  * @returns Total count of artists
  */
 export const useArtistsCount = (): number => {
-  const result = useQuery(
+  const store = useAppStore()
+  const result = store.useQuery(
     queryDb(tables.artists.select('id'))
   )
   
@@ -160,7 +165,8 @@ export const useArtistsCount = (): number => {
  * @returns Total count of albums
  */
 export const useAlbumsCount = (): number => {
-  const result = useQuery(
+  const store = useAppStore()
+  const result = store.useQuery(
     queryDb(tables.albums.select('id'))
   )
   

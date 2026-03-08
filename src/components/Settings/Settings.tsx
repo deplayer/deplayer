@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux'
 import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
-import { useStore } from '@livestore/react'
+import { useAppStore } from '../../stores/livestore/store'
 
 import Button from '../common/Button'
 import Importer from '../Importer'
@@ -17,7 +17,7 @@ interface CollectionData {
 
 const Settings: React.FC = () => {
   const dispatch = useDispatch()
-  const { store: liveStore } = useStore()
+  const liveStore = useAppStore()
   
   const [showImporter, setShowImporter] = React.useState(false)
 

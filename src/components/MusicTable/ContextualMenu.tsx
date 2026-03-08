@@ -2,7 +2,7 @@ import { Translate } from 'react-redux-i18n'
 import React, { useEffect, useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import type { Dispatch } from 'redux'
-import { useStore } from '@livestore/react'
+import { useAppStore } from '../../stores/livestore/store'
 
 import Button from '../common/Button'
 import Icon from '../common/Icon'
@@ -104,7 +104,7 @@ const getAdjustedPosition = (
 
 const ContextualMenu = (props: MenuProps) => {
   const { onClick, disableAddButton, song } = props
-  const { store: liveStore } = useStore()
+  const liveStore = useAppStore()
   const [position, setPosition] = React.useState<Position>({ x: 0, y: 0 })
   const [clickPosition, setClickPosition] = React.useState<{ x: number, y: number } | null>(null)
   const [isOpen, setIsOpen] = React.useState(false)

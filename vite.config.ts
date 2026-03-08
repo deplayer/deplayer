@@ -78,6 +78,9 @@ export default defineConfig({
       ]
     }
   })],
+  server: {
+    allowedHosts: ['deplayer.dev.genar.me'],
+  },
   worker: {
     format: 'es'
   },

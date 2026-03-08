@@ -1,4 +1,4 @@
-import { useQuery } from '@livestore/react'
+import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 import { useMemo } from 'react'
@@ -8,7 +8,8 @@ import { useMemo } from 'react'
  * Matches the Redux collection.songsByGenre structure
  */
 export const useSongsByGenre = (): Record<string, string[]> => {
-  const media = useQuery(
+  const store = useAppStore()
+  const media = store.useQuery(
     queryDb(
       tables.media.select()
     )
@@ -67,7 +68,8 @@ export const useGenres = (): Array<{ name: string; count: number }> => {
  * @returns Array of media objects matching the genre
  */
 export const useMediaByGenre = (genre: string | undefined | null, limit = 25): any[] => {
-  const result = useQuery(
+  const store = useAppStore()
+  const result = store.useQuery(
     queryDb(
       genre
         ? tables.media

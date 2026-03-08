@@ -16,6 +16,30 @@ vi.mock('react-dom', async () => {
   }
 })
 
+const mockAddToQueueAction = vi.fn().mockResolvedValue(undefined)
+const mockRemoveFromQueueAction = vi.fn().mockResolvedValue(undefined)
+const mockAddNextAction = vi.fn().mockResolvedValue('track-id')
+
+vi.mock('../../stores/livestore/actions', () => ({
+  addToQueueAction: (...args: any[]) => mockAddToQueueAction(...args),
+  addNextAction: (...args: any[]) => mockAddNextAction(...args),
+  removeFromQueueAction: (...args: any[]) => mockRemoveFromQueueAction(...args),
+}))
+
+vi.mock('../../stores/livestore/store', () => ({
+  useAppStore: () => ({ commit: vi.fn() }),
+}))
+
+vi.mock('../../stores/livestore/hooks', () => ({
+  useMediaById: vi.fn(() => null),
+  useQueue: vi.fn(() => ({ trackIds: [], currentPlaying: null })),
+  useCurrentPlayingSongId: vi.fn(() => null),
+  useIsFavorite: vi.fn(() => false),
+  useFavoriteIds: vi.fn(() => new Set()),
+  useFilteredMedia: vi.fn(() => []),
+  useMediaMapForIds: vi.fn(() => ({})),
+}))
+
 describe('ContextualMenu', () => {
   let mockSong1: Media
   let mockSong2: Media
@@ -24,6 +48,9 @@ describe('ContextualMenu', () => {
 
   beforeEach(() => {
     user = userEvent.setup()
+    mockAddToQueueAction.mockClear()
+    mockRemoveFromQueueAction.mockClear()
+    mockAddNextAction.mockClear()
     
     mockSong1 = new Media({
       id: 'test-song-1',
@@ -197,45 +224,36 @@ describe('ContextualMenu', () => {
     })
 
     it('should dispatch ADD_TO_QUEUE action when clicking add to queue', async () => {
-      const { dispatch } = setup()
+      setup()
       const trigger = screen.getByRole('button', { name: /open context menu/i })
       
       await user.click(trigger)
       const addButton = screen.getByRole('button', { name: /addToQueue/i })
       await user.click(addButton)
       
-      expect(dispatch).toHaveBeenCalledWith({
-        type: 'ADD_TO_QUEUE',
-        songs: [mockSong1]
-      })
+      expect(mockAddToQueueAction).toHaveBeenCalledWith(expect.any(Object), [mockSong1.id])
     })
 
     it('should dispatch REMOVE_FROM_QUEUE action when song is in queue', async () => {
-      const { dispatch } = setup()
+      setup()
       const trigger = screen.getByRole('button', { name: /open context menu/i })
       
       await user.click(trigger)
       const removeButton = screen.getByRole('button', { name: /^remove$/i })
       await user.click(removeButton)
       
-      expect(dispatch).toHaveBeenCalledWith({
-        type: 'REMOVE_FROM_QUEUE',
-        data: [mockSong1]
-      })
+      expect(mockRemoveFromQueueAction).toHaveBeenCalledWith(expect.any(Object), mockSong1.id)
     })
 
     it('should dispatch ADD_TO_QUEUE_NEXT when add next is available', async () => {
-      const { dispatch } = setup()
+      setup()
       const trigger = screen.getByRole('button', { name: /open context menu/i })
       
       await user.click(trigger)
       const addNextButton = screen.getByRole('button', { name: /addNext/i })
       await user.click(addNextButton)
       
-      expect(dispatch).toHaveBeenCalledWith({
-        type: 'ADD_TO_QUEUE_NEXT',
-        songs: [mockSong1]
-      })
+      expect(mockAddNextAction).toHaveBeenCalledWith(expect.any(Object), [mockSong1.id])
     })
 
     it('should dispatch REMOVE_FROM_COLLECTION action', async () => {

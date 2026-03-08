@@ -6,11 +6,23 @@ import { createTestMediaList } from '../../test-utils/factories'
 import { createDefaultState } from '../../test-utils/store'
 
 // Mock LiveStore hooks since tests provide data via props
+vi.mock('../../stores/livestore/store', () => ({
+  useAppStore: () => ({ commit: vi.fn() }),
+}))
+
 vi.mock('../../stores/livestore/hooks', () => ({
   useMediaById: vi.fn(() => null),
   useQueue: vi.fn(() => null),
   useCurrentPlayingSongId: vi.fn(() => null),
   useIsFavorite: vi.fn(() => false),
+  useFavoriteIds: vi.fn(() => new Set()),
+}))
+
+vi.mock('../../stores/livestore/actions', () => ({
+  toggleFavoriteAction: vi.fn(),
+  addToQueueAction: vi.fn(),
+  removeFromQueueAction: vi.fn(),
+  playAllAction: vi.fn(),
 }))
 
 // Mock react-virtualized's AutoSizer

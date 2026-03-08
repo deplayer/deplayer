@@ -10,6 +10,21 @@ import {
 } from "./workers";
 import * as types from "../../constants/ActionTypes";
 
+// Mock getLiveStoreInstance to return a fake store in tests
+vi.mock("../../App", () => ({
+  getLiveStoreInstance: vi.fn(() => ({
+    // Minimal mock — workers call LiveStore actions via `call` effect,
+    // which redux-saga-test-plan doesn't actually execute by default
+  })),
+}));
+
+// Mock LiveStore actions so `call` effects resolve without error
+vi.mock("../../stores/livestore/actions/media", () => ({
+  addMediaBulkAction: vi.fn(),
+  removeMediaAction: vi.fn(),
+  trackMediaPlayedAction: vi.fn(),
+}));
+
 describe("collection workers", () => {
   afterEach(() => {
     vi.clearAllMocks();
@@ -48,20 +63,26 @@ describe("collection workers", () => {
   });
 
   describe("exportCollectionWorker", () => {
-    it("works", () => {
+    it("dispatches rejection since export is temporarily unavailable", () => {
       return expectSaga(exportCollectionWorker)
-        .put({ type: types.EXPORT_COLLECTION_FINISHED, exported: {} })
+        .put({
+          type: types.EXPORT_COLLECTION_REJECTED,
+          message: "Export collection is temporarily unavailable",
+        })
         .run(100);
     });
   });
 
   describe("importCollectionWorker", () => {
-    it("works", () => {
+    it("dispatches finished with error since import is temporarily unavailable", () => {
       return expectSaga(importCollectionWorker, {
         type: "TO_BE_FIXED",
         data: {},
       })
-        .put({ type: types.IMPORT_COLLECTION_FINISHED, result: {} })
+        .put({
+          type: types.IMPORT_COLLECTION_FINISHED,
+          result: { error: "Import collection is temporarily unavailable" },
+        })
         .run(100);
     });
   });

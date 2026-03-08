@@ -1,7 +1,7 @@
 import { Translate } from 'react-redux-i18n'
 import Icon from '../common/Icon'
 import Button from '../common/Button'
-import { useStore } from '@livestore/react'
+import { useAppStore } from '../../stores/livestore/store'
 import { createPlaylistAction } from '../../stores/livestore/actions/playlists'
 import { reorderPlaylistAction } from '../../stores/livestore/actions/playlists'
 import { useQueue } from '../../stores/livestore/hooks'
@@ -11,7 +11,7 @@ type Props = {
 }
 
 const SaveQueueButton = (props: Props) => {
-  const { store: liveStore } = useStore()
+  const liveStore = useAppStore()
   const liveQueue = useQueue('default')
   
   // Parse trackIds from LiveStore queue (can be JSON string or array)

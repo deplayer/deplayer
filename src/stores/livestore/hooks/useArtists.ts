@@ -1,4 +1,4 @@
-import { useQuery } from '@livestore/react'
+import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 import { useMemo } from 'react'
@@ -20,7 +20,8 @@ import { useMemo } from 'react'
  * ```
  */
 export const useArtists = () => {
-  return useQuery(
+  const store = useAppStore()
+  return store.useQuery(
     queryDb(
       tables.artists
         .select()
@@ -63,7 +64,8 @@ export const useArtistsMap = () => {
  * ```
  */
 export const useArtistById = (id: string | null | undefined) => {
-  const result = useQuery(
+  const store = useAppStore()
+  const result = store.useQuery(
     queryDb(
       id 
         ? tables.artists.select().where('id', '=', id).limit(1)
@@ -84,7 +86,8 @@ export const useArtistById = (id: string | null | undefined) => {
  * ```
  */
 export const useSongsByArtist = () => {
-  const media = useQuery(
+  const store = useAppStore()
+  const media = store.useQuery(
     queryDb(
       tables.media
         .select()

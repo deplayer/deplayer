@@ -3,7 +3,7 @@ import axios from 'axios'
 import SubsonicApiProvider from './SubsonicApiProvider'
 
 vi.mock('axios')
-const mockedAxios = vi.mocked(axios)
+const mockedGet = axios.get as ReturnType<typeof vi.fn>
 
 describe('SubsonicApiProvider.getArtistSongs', () => {
   let provider: SubsonicApiProvider
@@ -19,7 +19,7 @@ describe('SubsonicApiProvider.getArtistSongs', () => {
 
   it('should return songs for an artist', async () => {
     // Mock search3 to find artist
-    mockedAxios.get.mockResolvedValueOnce({
+    mockedGet.mockResolvedValueOnce({
       data: {
         'subsonic-response': {
           searchResult3: {
@@ -30,7 +30,7 @@ describe('SubsonicApiProvider.getArtistSongs', () => {
     })
 
     // Mock getArtist to get albums
-    mockedAxios.get.mockResolvedValueOnce({
+    mockedGet.mockResolvedValueOnce({
       data: {
         'subsonic-response': {
           artist: {
@@ -46,7 +46,7 @@ describe('SubsonicApiProvider.getArtistSongs', () => {
     })
 
     // Mock getAlbum for each album
-    mockedAxios.get.mockResolvedValueOnce({
+    mockedGet.mockResolvedValueOnce({
       data: {
         'subsonic-response': {
           album: {
@@ -61,7 +61,7 @@ describe('SubsonicApiProvider.getArtistSongs', () => {
       }
     })
 
-    mockedAxios.get.mockResolvedValueOnce({
+    mockedGet.mockResolvedValueOnce({
       data: {
         'subsonic-response': {
           album: {
@@ -84,7 +84,7 @@ describe('SubsonicApiProvider.getArtistSongs', () => {
   })
 
   it('should return empty array when artist not found', async () => {
-    mockedAxios.get.mockResolvedValueOnce({
+    mockedGet.mockResolvedValueOnce({
       data: {
         'subsonic-response': {
           searchResult3: {
@@ -101,7 +101,7 @@ describe('SubsonicApiProvider.getArtistSongs', () => {
 
   it('should match artist name case-insensitively', async () => {
     // Mock search3 to find artist with different case
-    mockedAxios.get.mockResolvedValueOnce({
+    mockedGet.mockResolvedValueOnce({
       data: {
         'subsonic-response': {
           searchResult3: {
@@ -112,7 +112,7 @@ describe('SubsonicApiProvider.getArtistSongs', () => {
     })
 
     // Mock getArtist to get albums
-    mockedAxios.get.mockResolvedValueOnce({
+    mockedGet.mockResolvedValueOnce({
       data: {
         'subsonic-response': {
           artist: {
@@ -128,11 +128,11 @@ describe('SubsonicApiProvider.getArtistSongs', () => {
 
     expect(songs).toEqual([])
     // Verify search was called
-    expect(mockedAxios.get).toHaveBeenCalledTimes(2)
+    expect(mockedGet).toHaveBeenCalledTimes(2)
   })
 
   it('should handle artist with no albums', async () => {
-    mockedAxios.get.mockResolvedValueOnce({
+    mockedGet.mockResolvedValueOnce({
       data: {
         'subsonic-response': {
           searchResult3: {
@@ -142,7 +142,7 @@ describe('SubsonicApiProvider.getArtistSongs', () => {
       }
     })
 
-    mockedAxios.get.mockResolvedValueOnce({
+    mockedGet.mockResolvedValueOnce({
       data: {
         'subsonic-response': {
           artist: {

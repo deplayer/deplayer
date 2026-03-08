@@ -1,5 +1,4 @@
-import React from 'react'
-import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
+import React, { Suspense } from 'react'
 
 import './styles/App.scss'
 import 'rc-slider/assets/index.css';
@@ -10,8 +9,8 @@ import { Route, Routes } from 'react-router-dom'
 import { HistoryRouter as Router } from "redux-first-history/rr6";
 import { Provider, useSelector } from 'react-redux'
 import { store, history } from './store/configureStore'
-import { LiveStoreProvider, useStore } from '@livestore/react'
-import { adapter, schema, storeId } from './stores/livestore/store'
+import { StoreRegistry, StoreRegistryProvider } from '@livestore/react'
+import { useAppStore } from './stores/livestore/store'
 import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck'
 import { setupFts5 } from './stores/livestore/fts5-setup'
 import { setupIndexes } from './stores/livestore/indexes-setup'
@@ -37,7 +36,8 @@ import GlobalKeyHandlers from './components/GlobalKeyHandlers'
 import JoinRoom from './pages/JoinRoom';
 import { useLanguage } from './hooks/useLanguage'
 import { setLiveStoreInstance } from './middleware/livestore'
-import type { Store as LiveStore } from '@livestore/livestore'
+import { Store } from '@livestore/livestore'
+type LiveStore = Store<any, any>
 import PlaybackController from './services/PlaybackController'
 
 // Export LiveStore instance for use in sagas
@@ -62,7 +62,7 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
   useLanguage()
   
   // Get LiveStore instance
-  const { store: liveStore } = useStore()
+  const liveStore = useAppStore()
   
   // Set LiveStore instance for middleware (once on mount)
   React.useEffect(() => {
@@ -100,7 +100,7 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
   // Initialize FTS5 full-text search and database indexes on mount
   // OPTIMIZED: Defer to idle time to avoid blocking first paint
   React.useEffect(() => {
-    if (!liveStore?.sqliteDbWrapper) return
+    if (!(liveStore as any)?.sqliteDbWrapper) return
     
     const setupDatabase = () => {
       try {
@@ -153,29 +153,32 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
   )
 }
 
+const storeRegistry = new StoreRegistry()
+
 const App = () => {
   const playerPortal = React.useMemo(() => portals.createHtmlPortalNode(), [])
 
   return (
     <BrowserCompatibilityCheck>
-      <LiveStoreProvider 
-        adapter={adapter} 
-        schema={schema} 
-        storeId={storeId}
-        batchUpdates={batchUpdates}
-      >
-        <ThemeProvider>
-          <UIProvider>
-            <PlaybackProvider>
-              <Provider store={store}>
-                <Router history={history}>
-                  <AppContent playerPortal={playerPortal} />
-                </Router>
-              </Provider>
-            </PlaybackProvider>
-          </UIProvider>
-        </ThemeProvider>
-      </LiveStoreProvider>
+      <StoreRegistryProvider storeRegistry={storeRegistry}>
+        <Suspense fallback={
+          <div className='flex items-center justify-center min-h-screen bg-base-200'>
+            <span className='loading loading-spinner loading-lg'></span>
+          </div>
+        }>
+          <ThemeProvider>
+            <UIProvider>
+              <PlaybackProvider>
+                <Provider store={store}>
+                  <Router history={history}>
+                    <AppContent playerPortal={playerPortal} />
+                  </Router>
+                </Provider>
+              </PlaybackProvider>
+            </UIProvider>
+          </ThemeProvider>
+        </Suspense>
+      </StoreRegistryProvider>
     </BrowserCompatibilityCheck>
   )
 }

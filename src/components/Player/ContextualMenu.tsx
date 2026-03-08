@@ -4,7 +4,7 @@ import { Menu, useContextMenu, Item } from 'react-contexify'
 import { Translate } from 'react-redux-i18n'
 import React from 'react'
 import { Dispatch } from 'redux'
-import { useStore } from '@livestore/react'
+import { useAppStore } from '../../stores/livestore/store'
 
 import Button from '../common/Button'
 import Icon from '../common/Icon'
@@ -30,7 +30,7 @@ type MenuProps = {
 const ContextualMenu = (props: MenuProps) => {
   // Get queue and store from LiveStore
   const liveQueue = useQueue('default')
-  const { store: liveStore } = useStore()
+  const liveStore = useAppStore()
   
   // Parse trackIds from LiveStore queue (can be JSON string or array)
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {

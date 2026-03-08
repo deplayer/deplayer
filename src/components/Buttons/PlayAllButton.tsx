@@ -1,4 +1,4 @@
-import { useStore } from '@livestore/react'
+import { useAppStore } from '../../stores/livestore/store'
 import { Translate } from 'react-redux-i18n'
 import { useLocation } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
@@ -14,7 +14,7 @@ type Props = {
 }
 
 const PlayAllButton = (props: Props) => {
-  const { store: liveStore } = useStore()
+  const liveStore = useAppStore()
   const dispatch = useDispatch()
   const location = useLocation()
   

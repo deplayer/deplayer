@@ -9,6 +9,24 @@ import Album from '../../../entities/Album'
 import SongRow from './index'
 import type { Props } from './index'
 
+vi.mock('../../../stores/livestore/store', () => ({
+  useAppStore: () => ({ commit: vi.fn() }),
+}))
+
+vi.mock('../../../stores/livestore/hooks', () => ({
+  useMediaById: vi.fn(() => null),
+  useQueue: vi.fn(() => ({ trackIds: [], currentPlaying: null })),
+  useCurrentPlayingSongId: vi.fn(() => null),
+  useIsFavorite: vi.fn(() => false),
+  useFavoriteIds: vi.fn(() => new Set()),
+}))
+
+vi.mock('../../../stores/livestore/actions', () => ({
+  toggleFavoriteAction: vi.fn(),
+  addToQueueAction: vi.fn(),
+  removeFromQueueAction: vi.fn(),
+}))
+
 // Create a mock store
 const createMockStore = () => configureStore({
   reducer: {

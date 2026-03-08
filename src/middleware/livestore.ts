@@ -8,7 +8,8 @@
  */
 
 import { Middleware } from 'redux'
-import { Store as LiveStore } from '@livestore/livestore'
+import { Store } from '@livestore/livestore'
+type LiveStore = Store<any, any>
 import { addMediaAction } from '../stores/livestore/actions'
 import * as types from '../constants/ActionTypes'
 

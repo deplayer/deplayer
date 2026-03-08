@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef, ReactNode } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { useStore } from '@livestore/react'
+import { useAppStore } from '../../stores/livestore/store'
 import Modal from '../common/Modal'
 import Icon from '../common/Icon'
 import Button from '../common/Button'
@@ -132,7 +132,7 @@ type CommandItem = {
 function CommandBar({ togglePlaying, playNext, playPrev }: Props) {
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { store: liveStore } = useStore()
+  const liveStore = useAppStore()
   const liveQueue = useQueue('default')
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')

@@ -4,7 +4,7 @@ import { tables } from './schema.js'
 // Query to get settings by id (default: 'settings')
 export const settings$ = (id: string = 'settings') =>
   queryDb(
-    () => tables.settings.where({ id }).first({ fallback: () => null }),
+    () => tables.settings.where({ id }).first({ behaviour: 'fallback', fallback: () => null }),
     { label: `settings-${id}` }
   )
 

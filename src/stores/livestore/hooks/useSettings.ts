@@ -1,4 +1,4 @@
-import { useQuery } from '@livestore/react'
+import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 
@@ -20,7 +20,8 @@ import { tables } from '../schema'
  * ```
  */
 export const useSettings = (settingsId = 'default') => {
-  const result = useQuery(
+  const store = useAppStore()
+  const result = store.useQuery(
     queryDb(
       tables.settings
         .select()

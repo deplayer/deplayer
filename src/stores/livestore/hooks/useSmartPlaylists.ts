@@ -1,4 +1,4 @@
-import { useQuery } from '@livestore/react'
+import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 
@@ -26,7 +26,8 @@ type SmartPlaylist = {
  * @returns Array of smart playlists
  */
 export const useSmartPlaylists = (): SmartPlaylist[] => {
-  return useQuery(
+  const store = useAppStore()
+  return store.useQuery(
     queryDb(
       tables.smartPlaylists
         .select()
@@ -41,7 +42,8 @@ export const useSmartPlaylists = (): SmartPlaylist[] => {
  * @returns Smart playlist or null if not found
  */
 export const useSmartPlaylistById = (smartPlaylistId: string | null | undefined): SmartPlaylist | null => {
-  const result = useQuery(
+  const store = useAppStore()
+  const result = store.useQuery(
     queryDb(
       smartPlaylistId
         ? tables.smartPlaylists.select().where('id', '=', smartPlaylistId).limit(1)

@@ -7,7 +7,7 @@ import SongRow from '../MusicTable/SongRow'
 import CoverImage from '../MusicTable/CoverImage'
 import { State as QueueState } from '../../reducers/queue'
 import { Dispatch } from 'redux'
-import { useStore } from '@livestore/react'
+import { useAppStore } from '../../stores/livestore/store'
 import { playAllAction, addToQueueAction, addNextAction } from '../../stores/livestore/actions'
 
 interface AlbumData {
@@ -33,7 +33,7 @@ type AlbumProps = {
 const Album = React.memo((props: AlbumProps) => {
   const { album, mediaMap, songs, dispatch, queue } = props
   const albumId = album.id
-  const { store: liveStore } = useStore()
+  const liveStore = useAppStore()
 
   // Play album: add all songs to queue and start playing
   const playAlbum = React.useCallback(async () => {

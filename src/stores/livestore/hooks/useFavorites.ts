@@ -1,4 +1,4 @@
-import { useQuery } from '@livestore/react'
+import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 import { useMemo } from 'react'
@@ -20,9 +20,10 @@ import { useMemo } from 'react'
  * ```
  */
 export const useFavorites = () => {
+  const store = useAppStore()
   // Get favorite records with media joined
   // Using raw SQL for the JOIN
-  return useQuery(
+  return store.useQuery(
     queryDb({
       query: `
         SELECT m.*, f.createdAt as favorited_at
@@ -45,7 +46,8 @@ export const useFavorites = () => {
  * ```
  */
 export const useIsFavorite = (mediaId: string | null | undefined) => {
-  const result = useQuery(
+  const store = useAppStore()
+  const result = store.useQuery(
     queryDb(
       mediaId
         ? tables.favorites
@@ -72,7 +74,8 @@ export const useIsFavorite = (mediaId: string | null | undefined) => {
  * ```
  */
 export const useFavoriteIds = (): Set<string> => {
-  const favoriteRecords = useQuery(
+  const store = useAppStore()
+  const favoriteRecords = store.useQuery(
     queryDb(
       tables.favorites.select('mediaId')
     )

@@ -16,7 +16,7 @@ import FilterPanel from '../Collection/FilterPanel'
 import { useMediaById, useQueue, useCurrentPlayingSongId } from '../../stores/livestore/hooks'
 import { useUI } from '../../contexts'
 import { useDispatch } from 'react-redux'
-import { useStore } from '@livestore/react'
+import { useAppStore } from '../../stores/livestore/store'
 import { ensureMediaInQueueAndPlay } from '../../utils/queueHelpers'
 
 type Props = {
@@ -199,7 +199,7 @@ const MusicTable = ({
   slim 
 }: Props) => {
   // Get LiveStore instance for queue operations
-  const { store: liveStore } = useStore()
+  const liveStore = useAppStore()
   
   // Only fetch queue as fallback if not provided (for backwards compatibility)
   // Using conditional to avoid hook rules violation

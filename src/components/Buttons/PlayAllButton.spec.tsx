@@ -28,6 +28,18 @@ vi.mock('../common/Button', () => ({
   )
 }))
 
+vi.mock('../../stores/livestore/store', () => ({
+ useAppStore: () => ({ commit: vi.fn() }),
+}))
+
+vi.mock('../../stores/livestore/actions', () => ({
+  playAllAction: vi.fn(),
+}))
+
+vi.mock('../../stores/livestore/hooks', () => ({
+  useQueue: vi.fn(() => ({ trackIds: [], currentPlaying: null })),
+}))
+
 const mockStore = configureStore<any, any>([])
 let store: ReturnType<typeof mockStore>
 
