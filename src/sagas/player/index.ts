@@ -82,7 +82,27 @@ function* getCurrentSongIdFromLiveStore(): any {
   }
 }
 
+/**
+ * Stop all currently playing audio/video elements in the DOM.
+ * Centralized kill switch that prevents dual-audio bugs.
+ * Called before every new track load to ensure only one stream plays.
+ */
+function stopAllPlayback() {
+  if (typeof document === 'undefined') return
+  document.querySelectorAll('audio, video').forEach((el) => {
+    const mediaEl = el as HTMLMediaElement
+    if (!mediaEl.paused) {
+      mediaEl.pause()
+      mediaEl.currentTime = 0
+    }
+  })
+}
+
 function* setCurrentPlayingStream(songId: string, providerNum: number, media?: Media): any {
+  // Kill any playing audio FIRST — prevents dual-stream bug
+  yield put({ type: types.STOP_PLAYING })
+  stopAllPlayback()
+
   const currentPlaying = media || (yield call(getSongByIdFromLiveStore, songId))
   const fullUrl = yield call(getSongBgFromLiveStore)
 
