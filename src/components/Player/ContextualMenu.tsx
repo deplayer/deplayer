@@ -156,7 +156,7 @@ const ContextualMenu = (props: MenuProps) => {
             fullWidth
             onClick={() => props.dispatch({ type: types.TOGGLE_VISUALS })}
           >
-            <div className='flex items-center justify-between w-full'>
+            <div className='flex items-center justify-between w-full gap-2'>
               <div className='flex items-center'>
                 <Icon
                   icon='faBahai'
@@ -180,7 +180,7 @@ const ContextualMenu = (props: MenuProps) => {
             fullWidth
             onClick={() => props.dispatch({ type: types.TOGGLE_SPECTRUM })}
           >
-            <div className='flex items-center justify-between w-full'>
+            <div className='flex items-center justify-between w-full gap-2'>
               <div className='flex items-center'>
                 <Icon
                   icon='faDeezer'
@@ -208,7 +208,7 @@ const ContextualMenu = (props: MenuProps) => {
                   toggleShuffleAction(liveStore, !liveQueue?.shuffle)
                 }}
               >
-                <div className='flex items-center justify-between w-full'>
+                <div className='flex items-center justify-between w-full gap-2'>
                   <div className='flex items-center'>
                     <Icon icon='faRandom' className='mr-2' />
                     <Translate value='buttons.shuffle' />
@@ -231,7 +231,7 @@ const ContextualMenu = (props: MenuProps) => {
                   toggleRepeatAction(liveStore, !liveQueue?.repeat)
                 }}
               >
-                <div className='flex items-center justify-between w-full'>
+                <div className='flex items-center justify-between w-full gap-2'>
                   <div className='flex items-center'>
                     <Icon icon='faRedo' className='mr-2' />
                     <Translate value='buttons.repeat' />

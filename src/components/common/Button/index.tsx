@@ -103,7 +103,7 @@ const Button = (props: Props) => {
       onClick={props.onClick}
       data-testid={props['data-testid']}
     >
-      <span className="inline-flex items-center gap-2 truncate">
+      <span className={`inline-flex items-center gap-2 truncate${props.fullWidth ? ' w-full' : ''}`}>
         {props.children}
       </span>
     </button>
