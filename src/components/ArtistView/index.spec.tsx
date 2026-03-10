@@ -39,9 +39,6 @@ vi.mock('../../stores/livestore/actions', () => ({
   toggleFavoriteAction: vi.fn(),
 }))
 
-vi.mock('../../utils/queueHelpers', () => ({
-  ensureMediaInQueueAndPlay: vi.fn(),
-}))
 
 const createMockStore = () => configureStore({
   reducer: {

@@ -68,16 +68,15 @@ const getCurrentQueue = async (store: LiveStore) => {
 }
 
 /**
- * Play all - Replace queue with new tracks and start playing
+ * Replace queue with new tracks, positioned at the first track.
  * 
  * @param store - LiveStore instance
  * @param trackIds - Array of media IDs to play
- * @returns First track ID for saga to trigger playback
  */
-export const playAllAction = async (store: LiveStore, trackIds: string[]) => {
+export const playAllAction = async (store: LiveStore, trackIds: string[]): Promise<void> => {
   if (!trackIds || trackIds.length === 0) {
     console.warn('playAllAction: No tracks provided')
-    return null
+    return
   }
 
   // Replace entire queue
@@ -90,9 +89,6 @@ export const playAllAction = async (store: LiveStore, trackIds: string[]) => {
       repeat: false,
     })
   )
-
-  // Return first track ID for saga to start playback
-  return trackIds[0]
 }
 
 /**

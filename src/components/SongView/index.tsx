@@ -27,7 +27,6 @@ import FavoriteButton from '../common/FavoriteButton'
 import { useQueue } from '../../stores/livestore/hooks'
 import { useUI } from '../../contexts/UIContext'
 import { useAppStore } from '../../stores/livestore/store'
-import { ensureMediaInQueueAndPlay } from '../../utils/queueHelpers'
 import { addToQueueAction, removeFromQueueAction } from '../../stores/livestore/actions'
 
 const MAX_LIST_ITEMS = 25
@@ -197,19 +196,8 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
               {(!songFinder || !player.playing) &&
                 <Button
                   large
-                  onClick={async () => {
-                    if (!liveStore) {
-                      console.error('[SongView] LiveStore not available')
-                      return
-                    }
-                    
-                    try {
-                      // Single song view - no allMediaIds available (will create 1-song queue)
-                      await ensureMediaInQueueAndPlay(liveStore, song.id)
-                      dispatch({ type: types.SET_CURRENT_PLAYING, songId: song.id })
-                    } catch (error) {
-                      console.error('[SongView] Failed to play song:', error)
-                    }
+                  onClick={() => {
+                    dispatch({ type: types.PLAY_SONG, songId: song.id })
                   }}
                 >
                   <Icon

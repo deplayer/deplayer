@@ -66,9 +66,6 @@ vi.mock('../../stores/livestore/actions', () => ({
   removeFromQueueAction: vi.fn(),
 }))
 
-vi.mock('../../utils/queueHelpers', () => ({
-  ensureMediaInQueueAndPlay: vi.fn(),
-}))
 
 interface Props {
   playerPortal: any

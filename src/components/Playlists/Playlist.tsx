@@ -12,11 +12,10 @@ import { useNavigate } from 'react-router-dom'
 import { Dispatch } from 'redux'
 import { useFilteredMedia, useMediaMapForIds } from '../../stores/livestore/hooks'
 import { useAppStore } from '../../stores/livestore/store'
-import { playAllAction, addToQueueAction } from '../../stores/livestore/actions'
+import { addToQueueAction } from '../../stores/livestore/actions'
 import { deleteSmartPlaylistAction } from '../../stores/livestore/actions/smartPlaylists'
 import { useUI } from '../../contexts/UIContext'
 import type { Filter } from '../../types/collection'
-import { ensureMediaInQueueAndPlay } from '../../utils/queueHelpers'
 
 type Props = {
   playlist: {
@@ -59,22 +58,10 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
   // PERF: Only load media for tracks in THIS playlist (not entire library)
   const mediaMap = useMediaMapForIds(effectiveTrackIds)
 
-  const handlePlayAll = useCallback(async () => {
-    if (!liveStore || effectiveTrackIds.length === 0) return
-    
-    try {
-      const firstTrackId = await playAllAction(liveStore, effectiveTrackIds)
-      
-      if (firstTrackId) {
-        dispatch({ 
-          type: types.PLAY_ALL_COMPLETED,
-          trackId: firstTrackId 
-        })
-      }
-    } catch (error) {
-      console.error('Failed to play playlist:', error)
-    }
-  }, [liveStore, effectiveTrackIds, dispatch])
+  const handlePlayAll = useCallback(() => {
+    if (effectiveTrackIds.length === 0) return
+    dispatch({ type: types.PLAY_LIST, trackIds: effectiveTrackIds })
+  }, [effectiveTrackIds, dispatch])
 
   const handleAddToQueue = useCallback(async () => {
     if (!liveStore || effectiveTrackIds.length === 0) return
@@ -154,19 +141,8 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
         dispatch={dispatch}
         isCurrent={false}
         slim={true}
-        onClick={async () => {
-          if (!liveStore) {
-            console.error('[Playlist] LiveStore not available')
-            return
-          }
-          
-          try {
-            // Use songIds (all songs in playlist) for queue population
-            await ensureMediaInQueueAndPlay(liveStore, song.id, songIds)
-            dispatch({ type: types.SET_CURRENT_PLAYING, songId: song.id })
-          } catch (error) {
-            console.error('[Playlist] Failed to play song:', error)
-          }
+        onClick={() => {
+          dispatch({ type: types.PLAY_SONG, songId: song.id, contextIds: songIds })
         }}
         song={song}
       />

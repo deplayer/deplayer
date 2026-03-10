@@ -253,7 +253,7 @@ const ContextualMenu = (props: MenuProps) => {
               transparent
               alignLeft
               fullWidth
-              onClick={() => props.dispatch({ type: types.SET_CURRENT_PLAYING, songId: trackIds[0] })}
+              onClick={() => props.dispatch({ type: types.PLAY_SONG, songId: trackIds[0] })}
             >
               <div className='flex items-center w-full'>
                 <Icon

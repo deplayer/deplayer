@@ -16,6 +16,7 @@ import * as types from '../../constants/ActionTypes'
 import { getLiveStoreInstance } from '../../App'
 import { playNextAction, playPreviousAction } from '../../stores/livestore/actions'
 import { tables } from '../../stores/livestore/schema'
+import { handlePlayList, handlePlaySong, stopAllPlayback } from './commands'
 
 /**
  * Get current song ID from LiveStore queue
@@ -82,21 +83,6 @@ function* getCurrentSongIdFromLiveStore(): any {
   }
 }
 
-/**
- * Stop all currently playing audio/video elements in the DOM.
- * Centralized kill switch that prevents dual-audio bugs.
- * Called before every new track load to ensure only one stream plays.
- */
-function stopAllPlayback() {
-  if (typeof document === 'undefined') return
-  document.querySelectorAll('audio, video').forEach((el) => {
-    const mediaEl = el as HTMLMediaElement
-    if (!mediaEl.paused) {
-      mediaEl.pause()
-      mediaEl.currentTime = 0
-    }
-  })
-}
 
 function* setCurrentPlayingStream(songId: string, providerNum: number, media?: Media): any {
   // Kill any playing audio FIRST — prevents dual-stream bug
@@ -148,21 +134,9 @@ export interface SetCurrentPlayingAction {
 }
 
 // Handling setCurrentPlaying saga
+// Used by internal sagas (next/prev/error) and legacy callers (PeerService, TryDemoButton).
+// Queue position is already set by the caller — this only resolves the stream and plays.
 export function* setCurrentPlaying(action: SetCurrentPlayingAction): any {
-  const liveStore = getLiveStoreInstance()
-  
-  // Sync LiveStore queue position if store is available
-  if (liveStore && action.songId) {
-    try {
-      // Import playMediaAction dynamically to avoid circular deps
-      const { playMediaAction } = yield import('../../stores/livestore/actions')
-      yield call(playMediaAction, liveStore, action.songId)
-    } catch (error) {
-      // Non-fatal: song might not be in queue yet
-      console.debug('[Player Saga] Could not sync LiveStore position:', error)
-    }
-  }
-  
   // Redirect to song view page
   yield put({ type: types.PUSH_TO_VIEW, song: action.songId })
 
@@ -262,15 +236,6 @@ function* handleFullscreen(): any {
   }
 }
 
-/**
- * Handle PLAY_ALL_COMPLETED action
- * Triggered after LiveStore queue is updated by playAllAction
- */
-function* handlePlayAllCompleted(action: { type: string; trackId: string }): any {
-  if (action.trackId) {
-    yield put({ type: types.SET_CURRENT_PLAYING, songId: action.trackId })
-  }
-}
 
 // Binding actions to sagas
 function* playerSaga(): any {
@@ -280,7 +245,8 @@ function* playerSaga(): any {
   yield takeLatest(types.PLAY_PREV, handlePlayPrev)
   yield takeLatest(types.TOGGLE_FULL_SCREEN, handleFullscreen)
   yield takeLatest(types.PUSH_TO_VIEW, goToViewPage)
-  yield takeLatest(types.PLAY_ALL_COMPLETED, handlePlayAllCompleted)
+  yield takeLatest(types.PLAY_LIST, handlePlayList)
+  yield takeLatest(types.PLAY_SONG, handlePlaySong)
 }
 
 export default playerSaga

@@ -85,9 +85,6 @@ vi.mock('../../stores/livestore/actions/smartPlaylists', () => ({
   deleteSmartPlaylistAction: (...args: any[]) => mockDeleteSmartPlaylistAction(...args),
 }))
 
-vi.mock('../../utils/queueHelpers', () => ({
-  ensureMediaInQueueAndPlay: vi.fn(),
-}))
 
 const mockDispatch = vi.fn()
 
@@ -184,7 +181,7 @@ describe('Playlist', () => {
     mockDeleteSmartPlaylistAction.mockClear()
   })
 
-  it('dispatches PLAY_ALL with correct songs and replace:true for regular playlist', async () => {
+  it('dispatches PLAY_LIST with correct songs for regular playlist', async () => {
     render(
       <BrowserRouter>
         <Playlist {...defaultProps} />
@@ -194,7 +191,10 @@ describe('Playlist', () => {
     fireEvent.click(screen.getByText('buttons.playAll'))
 
     await waitFor(() => {
-      expect(mockPlayAllAction).toHaveBeenCalledWith(expect.any(Object), ['song-1', 'song-2'])
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: 'PLAY_LIST',
+        trackIds: ['song-1', 'song-2']
+      })
     })
   })
 

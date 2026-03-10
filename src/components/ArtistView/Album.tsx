@@ -8,7 +8,7 @@ import CoverImage from '../MusicTable/CoverImage'
 import { State as QueueState } from '../../reducers/queue'
 import { Dispatch } from 'redux'
 import { useAppStore } from '../../stores/livestore/store'
-import { playAllAction, addToQueueAction, addNextAction } from '../../stores/livestore/actions'
+import { addToQueueAction, addNextAction } from '../../stores/livestore/actions'
 
 interface AlbumData {
   id: string
@@ -36,24 +36,11 @@ const Album = React.memo((props: AlbumProps) => {
   const liveStore = useAppStore()
 
   // Play album: add all songs to queue and start playing
-  const playAlbum = React.useCallback(async () => {
-    if (!liveStore || !songs || songs.length === 0) return
-    
-    try {
-      // Get unique song IDs in track order
-      const uniqueSongIds = Array.from(new Set(songs))
-      const firstTrackId = await playAllAction(liveStore, uniqueSongIds)
-      
-      if (firstTrackId) {
-        dispatch({ 
-          type: types.PLAY_ALL_COMPLETED,
-          trackId: firstTrackId 
-        })
-      }
-    } catch (error) {
-      console.error('Failed to play album:', error)
-    }
-  }, [liveStore, songs, dispatch])
+  const playAlbum = React.useCallback(() => {
+    if (!songs || songs.length === 0) return
+    const uniqueSongIds = Array.from(new Set(songs))
+    dispatch({ type: types.PLAY_LIST, trackIds: uniqueSongIds })
+  }, [songs, dispatch])
 
   // Add album to end of queue
   const addAlbumToQueue = React.useCallback(async () => {
