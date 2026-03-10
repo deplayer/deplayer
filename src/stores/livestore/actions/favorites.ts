@@ -1,4 +1,5 @@
-import { events } from '../schema'
+import { queryDb } from '@livestore/livestore'
+import { events, tables } from '../schema'
 
 /**
  * LiveStore Favorites Actions
@@ -11,7 +12,7 @@ import { events } from '../schema'
 
 type LiveStore = {
   commit: (event: any) => void
-  query: (query: any) => Promise<any>
+  query: (query: any) => any
   [key: string]: any
 }
 
@@ -22,26 +23,24 @@ type LiveStore = {
  * @param store - LiveStore instance from useStore()
  * @param mediaId - Media track ID to toggle
  */
-export const toggleFavoriteAction = async (store: LiveStore, mediaId: string) => {
-  // Check if already favorited using raw SQL query
-  const result = await store.query({
-    query: `SELECT id FROM favorites WHERE mediaId = ?`,
-    bindValues: [mediaId]
-  })
-  
-  const rows = (result as any)?.[0]?.values || []
-  const isFavorited = rows.length > 0
+export const toggleFavoriteAction = (store: LiveStore, mediaId: string) => {
+  const query = queryDb(
+    tables.favorites
+      .select()
+      .where('mediaId', '=', mediaId)
+      .limit(1)
+  )
+  const result = store.query(query)
+  const isFavorited = Array.isArray(result) && result.length > 0
   
   if (isFavorited) {
-    // Unfavorite
     store.commit(events.mediaUnfavorited({ mediaId }))
   } else {
-    // Favorite - generate new ID
     const favoriteId = `fav-${mediaId}-${Date.now()}`
     store.commit(events.mediaFavorited({ id: favoriteId, mediaId }))
   }
   
-  return !isFavorited // Return new favorite status
+  return !isFavorited
 }
 
 /**
@@ -50,21 +49,19 @@ export const toggleFavoriteAction = async (store: LiveStore, mediaId: string) =>
  * @param store - LiveStore instance from useStore()
  * @param mediaId - Media track ID to favorite
  */
-export const addFavoriteAction = async (store: LiveStore, mediaId: string) => {
-  // Check if already favorited
-  const result = await store.query({
-    query: `SELECT id FROM favorites WHERE mediaId = ?`,
-    bindValues: [mediaId]
-  })
+export const addFavoriteAction = (store: LiveStore, mediaId: string) => {
+  const query = queryDb(
+    tables.favorites
+      .select()
+      .where('mediaId', '=', mediaId)
+      .limit(1)
+  )
+  const result = store.query(query)
   
-  const rows = (result as any)?.[0]?.values || []
-  
-  if (rows.length === 0) {
-    // Not favorited yet, add it
+  if (!Array.isArray(result) || result.length === 0) {
     const favoriteId = `fav-${mediaId}-${Date.now()}`
     store.commit(events.mediaFavorited({ id: favoriteId, mediaId }))
   }
-  // If already favorited, do nothing (idempotent)
 }
 
 /**
@@ -73,7 +70,6 @@ export const addFavoriteAction = async (store: LiveStore, mediaId: string) => {
  * @param store - LiveStore instance from useStore()
  * @param mediaId - Media track ID to unfavorite
  */
-export const removeFavoriteAction = async (store: LiveStore, mediaId: string) => {
+export const removeFavoriteAction = (store: LiveStore, mediaId: string) => {
   store.commit(events.mediaUnfavorited({ mediaId }))
-  // Idempotent - if not favorited, delete does nothing
 }
