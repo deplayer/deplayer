@@ -166,6 +166,11 @@ function* handlePlayNext(): any {
     return
   }
 
+  // 1. Kill audio BEFORE touching LiveStore — prevents reactive re-render
+  //    from mounting a new ReactPlayer that auto-plays the old streamUri
+  yield put({ type: types.STOP_PLAYING })
+  stopAllPlayback()
+
   // Call LiveStore action to move to next track
   try {
     yield call(playNextAction, liveStore)
@@ -190,6 +195,11 @@ function* handlePlayPrev(): any {
     console.error('[Player Saga] LiveStore not available')
     return
   }
+
+  // 1. Kill audio BEFORE touching LiveStore — prevents reactive re-render
+  //    from mounting a new ReactPlayer that auto-plays the old streamUri
+  yield put({ type: types.STOP_PLAYING })
+  stopAllPlayback()
 
   // Call LiveStore action to move to previous track
   try {
