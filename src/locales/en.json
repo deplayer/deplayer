@@ -20,7 +20,10 @@
     "relatedAlbums": "Same artist albums",
     "mostPlayedSongs": "Most played songs",
     "sameGenreSongs": "Songs of the same genre",
-    "genrePlaylists": "Genre Playlists"
+    "genrePlaylists": "Genre Playlists",
+    "becauseYouListenedTo": "Because you listened to",
+    "popularTracks": "Popular Tracks",
+    "about": "About"
   },
   "labels": {
     "sync": "Sync",
@@ -214,5 +217,11 @@
     "empty.description": "Click the heart icon on any song to add it to your favorites",
     "addToFavorites": "Add to favorites",
     "removeFromFavorites": "Remove from favorites"
+  },
+  "common": {
+    "songs": "songs",
+    "playAll": "Play All",
+    "shuffle": "Shuffle",
+    "showMore": "Show more"
   }
 }

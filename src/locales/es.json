@@ -20,7 +20,10 @@
     "relatedAlbums": "Álbumes del mismo artista",
     "mostPlayedSongs": "Canciones más reproducidas",
     "sameGenreSongs": "Canciones del mismo género",
-    "genrePlaylists": "Listas por Género"
+    "genrePlaylists": "Listas por Género",
+    "becauseYouListenedTo": "Porque escuchaste a",
+    "popularTracks": "Canciones populares",
+    "about": "Acerca de"
   },
   "labels": {
     "sync": "Sincronizar",
@@ -196,5 +199,11 @@
     "empty.description": "Haz clic en el icono de corazón en cualquier canción para añadirla a tus favoritos",
     "addToFavorites": "Añadir a favoritos",
     "removeFromFavorites": "Eliminar de favoritos"
+  },
+  "common": {
+    "songs": "canciones",
+    "playAll": "Reproducir todo",
+    "shuffle": "Aleatorio",
+    "showMore": "Ver más"
   }
-} 
+}

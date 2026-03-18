@@ -21,7 +21,10 @@
     "relatedAlbums": "Àlbums del mateix artista",
     "mostPlayedSongs": "Cançons més reproduïdes",
     "sameGenreSongs": "Cançons del mateix gènere",
-    "genrePlaylists": "Llistes per Gènere"
+    "genrePlaylists": "Llistes per Gènere",
+    "becauseYouListenedTo": "Perquè has escoltat",
+    "popularTracks": "Cançons populars",
+    "about": "Sobre"
   },
   "labels": {
     "sync": "Sincronitza",
@@ -197,5 +200,11 @@
     "empty.description": "Fes clic a la icona de cor a qualsevol cançó per afegir-la als preferits",
     "addToFavorites": "Afegir als preferits",
     "removeFromFavorites": "Eliminar dels preferits"
+  },
+  "common": {
+    "songs": "cançons",
+    "playAll": "Reproduir tot",
+    "shuffle": "Aleatori",
+    "showMore": "Veure més"
   }
-} 
+}
