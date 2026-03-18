@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { Formik, Form } from 'formik'
 import { Translate } from 'react-redux-i18n'
 import { useAppStore } from '../../stores/livestore/store'
@@ -12,6 +12,7 @@ import providerRegistry from '../../services/settings/providers'
 import MainContainer from '../common/MainContainer'
 import ProviderButton from './ProviderButton'
 import ProviderForm from '../Settings/ProviderForm'
+import Icon from '../common/Icon'
 
 const Providers = () => {
   const liveStore = useAppStore()
@@ -22,6 +23,22 @@ const Providers = () => {
   
   // Local state for managing providers during editing (before save)
   const [localProviders, setLocalProviders] = useState<any>(null)
+  
+  // Save feedback state
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saved' | 'error'>('idle')
+  const [saveError, setSaveError] = useState<string>('')
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  
+  // Auto-dismiss save feedback after 3 seconds
+  useEffect(() => {
+    if (saveStatus !== 'idle') {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+      saveTimerRef.current = setTimeout(() => setSaveStatus('idle'), 3000)
+    }
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    }
+  }, [saveStatus])
 
   // Use local state if set, otherwise use LiveStore settings
   const currentProviders = useMemo(
@@ -78,23 +95,21 @@ const Providers = () => {
   }, [currentProviders])
 
   const handleSubmit = async (values: any, actions: any) => {
-    console.log('Providers handleSubmit called with values:', values)
-    
     if (!liveStore) {
       console.error('LiveStore not available')
-      alert('Error: LiveStore not available')
+      setSaveError('LiveStore not available')
+      setSaveStatus('error')
       actions.setSubmitting(false)
       return
     }
 
     // Ensure settings are initialized in LiveStore first
     try {
-      console.log('Initializing LiveStore settings if needed...')
       await initializeSettingsAction(liveStore)
-      console.log('Settings initialized')
     } catch (error) {
       console.error('Failed to initialize settings:', error)
-      alert(`Error initializing settings: ${error instanceof Error ? error.message : String(error)}`)
+      setSaveError(error instanceof Error ? error.message : String(error))
+      setSaveStatus('error')
       actions.setSubmitting(false)
       return
     }
@@ -104,31 +119,26 @@ const Providers = () => {
       providers: values.providers
     }
     
-    console.log('Settings payload to save:', settingsPayload)
-    
     try {
       // Save via LiveStore
-      console.log('Calling saveSettingsAction...')
       const result = await saveSettingsAction(liveStore, settingsPayload)
-      console.log('saveSettingsAction result:', result)
       
       // Reset local state to match saved data
       setLocalProviders(values.providers)
       
       // Dispatch Redux action for side effects (notifications, etc.)
-      console.log('Dispatching SETTINGS_SAVED action')
       dispatch({ 
         type: types.SETTINGS_SAVED, 
         prevSettings: result.prevSettings,
         newSettings: result.newSettings
       })
       
-      console.log('Settings saved successfully!')
+      setSaveStatus('saved')
       actions.setSubmitting(false)
     } catch (error) {
       console.error('Failed to save settings:', error)
-      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack')
-      alert(`Error saving settings: ${error instanceof Error ? error.message : String(error)}`)
+      setSaveError(error instanceof Error ? error.message : String(error))
+      setSaveStatus('error')
       actions.setSubmitting(false)
     }
   }
@@ -198,7 +208,19 @@ const Providers = () => {
                   {providers}
                 </div>
 
-                <div className='w-full flex justify-end mt-12'>
+                <div className='w-full flex justify-end items-center gap-4 mt-12'>
+                  {saveStatus === 'saved' && (
+                    <div className="alert alert-success shadow-lg py-2 px-4 w-auto">
+                      <Icon icon="faCheck" />
+                      <span><Translate value="notifications.settings.saved" /></span>
+                    </div>
+                  )}
+                  {saveStatus === 'error' && (
+                    <div className="alert alert-error shadow-lg py-2 px-4 w-auto">
+                      <Icon icon="faExclamationTriangle" />
+                      <span>{saveError || 'Error saving settings'}</span>
+                    </div>
+                  )}
                   {!!providers.length && (
                     <div className="flex justify-end">
                       <button type="submit" className="btn btn-primary"><Translate value="buttons.saveSettings" /> </button>
