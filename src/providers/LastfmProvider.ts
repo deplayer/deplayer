@@ -10,12 +10,14 @@ export default class LastfmProvider implements IMusicMetadataProvider {
   providerKey: string;
   enabled: boolean;
   artistInfoUrl: string;
+  similarArtistsUrl: string;
 
   constructor(settings: any, providerKey: string) {
     this.providerKey = providerKey;
     this.enabled = settings.enabled;
     this.apikey = settings.apikey;
     this.artistInfoUrl = `${this.baseUrl}?method=artist.getinfo&api_key=${this.apikey}&format=json`;
+    this.similarArtistsUrl = `${this.baseUrl}?method=artist.getsimilar&api_key=${this.apikey}&format=json&limit=20`;
   }
 
   searchArtistInfo(searchTerm: string): Promise<any> {
@@ -35,5 +37,22 @@ export default class LastfmProvider implements IMusicMetadataProvider {
           reject(err);
         });
     });
+  }
+
+  searchSimilarArtists(artistName: string): Promise<string[]> {
+    if (!this.enabled || !this.apikey) {
+      return Promise.resolve([]);
+    }
+
+    return axios
+      .get(`${this.similarArtistsUrl}&artist=${encodeURIComponent(artistName)}`)
+      .then((result) => {
+        const artists = result.data?.similarartists?.artist || [];
+        return artists.map((a: any) => a.name as string);
+      })
+      .catch((err) => {
+        logger.error("Error fetching similar artists:", err);
+        return [];
+      });
   }
 }
