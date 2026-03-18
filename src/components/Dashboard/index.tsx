@@ -113,7 +113,7 @@ const Dashboard = () => {
     <div className="z-10 w-full md:px-12 mb-12 flex flex-col gap-6 md:gap-10">
       {/* Widget cards grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 px-4 md:px-0 pt-4">
-        {!hasLibrary && <WelcomeCard />}
+        <WelcomeCard />
         {hasLibrary && <ContinueListeningCard />}
         {hasLibrary && <StatsCard />}
         {hasLibrary && <TopThisWeekCard />}
