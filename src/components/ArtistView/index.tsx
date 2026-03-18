@@ -1,125 +1,197 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
+import { Translate } from 'react-redux-i18n'
 
+import HeroSection from '../common/HeroSection'
 import Tag from '../common/Tag'
-import Album from './Album'
+import Button from '../common/Button'
+import Icon from '../common/Icon'
+import RelatedAlbums from '../RelatedAlbums'
+import BecauseYouListened from '../BecauseYouListened'
+import SongRow from '../MusicTable/SongRow'
 import * as types from '../../constants/ActionTypes'
 import { State } from '../../reducers'
 import { useArtistById, useAlbumsByArtist, useSongsByAlbumForArtist } from '../../stores/livestore/hooks'
-import { useQueue } from '../../stores/livestore/hooks/useQueue'
+import IAlbum from '../../entities/Album'
 
 export default function ArtistView() {
   const params = useParams()
   const dispatch = useDispatch()
   const artistId = params.id || ''
-  
-  // LiveStore hooks - OPTIMIZED: Only fetch this artist's songs, not entire library
+  const [showAllTracks, setShowAllTracks] = React.useState(false)
+
   const artist = useArtistById(artistId)
   const albumsData = useAlbumsByArtist(artistId)
   const { songsByAlbum, mediaMap } = useSongsByAlbumForArtist(artistId)
-  const queue = useQueue('main')
-  
-  // Keep artistMetadata in Redux temporarily until migrated
   const artistMetadata = useSelector((state: State) => state.artist.artistMetadata)
-  
-  // Extract background image from first album's first song
-  const extractBackground = React.useCallback((): string | undefined => {
-    if (albumsData && albumsData.length > 0) {
-      const firstAlbumId = albumsData[0].id
-      const albumSongs = songsByAlbum[firstAlbumId]
-      if (albumSongs && albumSongs.length > 0) {
-        return mediaMap[albumSongs[0]]?.cover?.fullUrl
+
+  // Background image from first album's first song
+  const backgroundImage = React.useMemo(() => {
+    if (albumsData?.length > 0) {
+      const firstAlbumSongs = songsByAlbum[albumsData[0].id]
+      if (firstAlbumSongs?.length > 0) {
+        return mediaMap[firstAlbumSongs[0]]?.cover?.fullUrl
       }
     }
     return undefined
   }, [albumsData, songsByAlbum, mediaMap])
 
-  // Memoize album rows - must be before any early returns (React hooks rules)
-  const albumRows = React.useMemo(() => {
-    if (!albumsData) return null
-    return albumsData.map((album: any) => (
-      <Album
-        queue={queue}
-        key={album.id}
-        album={album}
-        dispatch={dispatch}
-        songs={songsByAlbum[album.id] || []}
-        mediaMap={mediaMap}
-      />
-    ))
-  }, [albumsData, queue, songsByAlbum, mediaMap, dispatch])
+  // Popular tracks sorted by playCount
+  const popularTracks = React.useMemo(() => {
+    return Object.values(mediaMap)
+      .filter((s: Record<string, unknown>) => s && (s.playCount as number) > 0)
+      .sort((a: Record<string, unknown>, b: Record<string, unknown>) =>
+        ((b.playCount as number) || 0) - ((a.playCount as number) || 0)
+      )
+  }, [mediaMap])
 
-  // Extract artist bio summary
+  // All song IDs
+  const allSongIds = React.useMemo(() => Object.keys(mediaMap), [mediaMap])
+
+  // Collect genres
+  const artistGenres = React.useMemo(() => {
+    const genreSet = new Set<string>()
+    Object.values(mediaMap).forEach((song: Record<string, unknown>) => {
+      const genres = (song.genres as string[]) || (song.genresFlat ? (song.genresFlat as string).split(',') : [])
+      if (Array.isArray(genres)) genres.forEach((g: string) => g.trim() && genreSet.add(g.trim()))
+    })
+    return Array.from(genreSet)
+  }, [mediaMap])
+
   const artistSummary = React.useMemo(() => {
-    if (artistMetadata?.artist?.bio?.content) {
-      return artistMetadata.artist.bio.content
-    }
-    return ''
+    return artistMetadata?.artist?.bio?.content || ''
   }, [artistMetadata])
 
   React.useEffect(() => {
-    if (artist && artist.name) {
-      // Fetch artist metadata from MusicBrainz
-      dispatch({
-        type: types.LOAD_ARTIST,
-        artist: artist
-      })
-
-      // Fetch songs from all providers
-      dispatch({
-        type: types.FETCH_ARTIST_SONGS,
-        artist: artist
-      })
-
-      dispatch({
-        type: types.SET_BACKGROUND_IMAGE,
-        backgroundImage: extractBackground()
-      })
+    if (artist?.name) {
+      dispatch({ type: types.LOAD_ARTIST, artist })
+      dispatch({ type: types.FETCH_ARTIST_SONGS, artist })
+      dispatch({ type: types.SET_BACKGROUND_IMAGE, backgroundImage })
     }
-  }, [artist, extractBackground, dispatch])
-  
-  if (!artist) {
-    return null
+  }, [artist, backgroundImage, dispatch])
+
+  if (!artist) return null
+
+  const playAll = () => {
+    if (allSongIds.length) dispatch({ type: types.PLAY_LIST, trackIds: allSongIds })
   }
 
-  return (
-    <div data-testid="artist-view" className='artist-view z-50'>
-      <div className='main w-full z-10 md:p-4'>
-        <h2 className='text-center text-3xl py-2'>{artist.name}</h2>
-        <p className='text-center' dangerouslySetInnerHTML={{ __html: artistSummary }} />
-        {
-          artistMetadata?.['life-span'] && (
-            <div className='text-center text-md'>
-              {artistMetadata['life-span'].begin} {artistMetadata['life-span'].end && '- ' + artistMetadata['life-span'].end}
-            </div>
-          )
-        }
-        {
-          artistMetadata?.country && (
-            <div className='text-center text-md'>
-              {artistMetadata.country}
-            </div>
-          )
-        }
-        <div className='py-4 text-center'>
-          {
-            artistMetadata?.relations && artistMetadata.relations.map((relation: any, index: number) => {
-              return (
-                <div key={index} className='mr-2 py-1 inline-block'>
-                  <Tag transparent>
-                    <a target="_blank" href={relation.url.resource}>{relation.type}</a>
-                  </Tag>
-                </div>
-              )
-            })
-          }
-        </div>
+  const shuffleAll = () => {
+    if (allSongIds.length) {
+      const shuffled = [...allSongIds].sort(() => Math.random() - 0.5)
+      dispatch({ type: types.PLAY_LIST, trackIds: shuffled })
+    }
+  }
 
-        <div className='yt-4'>
-          {albumRows}
+  const visibleTracks = showAllTracks ? popularTracks.slice(0, 10) : popularTracks.slice(0, 5)
+
+  return (
+    <div data-testid="artist-view" className="artist-view z-10 w-full">
+      {/* Netflix-style Hero */}
+      <HeroSection backgroundImage={backgroundImage}>
+        <div className="flex flex-col gap-2">
+          <h1 className="text-4xl md:text-5xl font-bold">{artist.name}</h1>
+          <div className="flex items-center gap-2 text-sm opacity-80 flex-wrap">
+            {artistMetadata?.country && <span>{artistMetadata.country}</span>}
+            {artistMetadata?.['life-span']?.begin && (
+              <span>
+                • {artistMetadata['life-span'].begin}
+                {artistMetadata['life-span'].end && ` - ${artistMetadata['life-span'].end}`}
+              </span>
+            )}
+            {albumsData && <span>• {albumsData.length} albums</span>}
+            <span>• {allSongIds.length} songs</span>
+          </div>
+          {artistGenres.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-1">
+              {artistGenres.slice(0, 5).map(genre => (
+                <Tag key={genre} transparent>{genre}</Tag>
+              ))}
+            </div>
+          )}
+          <div className="flex items-center gap-3 mt-3">
+            <Button onClick={playAll} className="btn-primary">
+              <Icon icon="faPlay" className="mr-2" />
+              <Translate value="common.playAll" />
+            </Button>
+            <Button onClick={shuffleAll} transparent>
+              <Icon icon="faShuffle" className="mr-2" />
+              <Translate value="common.shuffle" />
+            </Button>
+          </div>
+          {artistMetadata?.relations && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {artistMetadata.relations.map((relation: Record<string, unknown>, index: number) => (
+                <a
+                  key={index}
+                  target="_blank"
+                  href={(relation.url as Record<string, string>).resource}
+                  rel="noopener noreferrer"
+                  className="text-xs opacity-70 hover:opacity-100 underline"
+                >
+                  {relation.type as string}
+                </a>
+              ))}
+            </div>
+          )}
         </div>
-        <div className='placeholder'></div>
+      </HeroSection>
+
+      <div className="w-full md:px-8 flex flex-col gap-8 mb-12">
+        {/* Popular Tracks */}
+        {visibleTracks.length > 0 && (
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold mb-4 px-4">
+              <Translate value="titles.popularTracks" />
+            </h2>
+            {visibleTracks.map((song: Record<string, unknown>) => (
+              <SongRow
+                key={song.id as string}
+                mqlMatch={false}
+                disableCovers={false}
+                style={{}}
+                dispatch={dispatch}
+                isCurrent={false}
+                slim={true}
+                onClick={() => dispatch({ type: types.PLAY_LIST, trackIds: allSongIds, startFromId: song.id as string })}
+                song={song}
+              />
+            ))}
+            {popularTracks.length > 5 && !showAllTracks && (
+              <button
+                onClick={() => setShowAllTracks(true)}
+                className="btn btn-ghost btn-sm mt-2 ml-4"
+              >
+                <Translate value="common.showMore" />
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Discography */}
+        {albumsData && albumsData.length > 0 && (
+          <RelatedAlbums albums={albumsData as IAlbum[]} />
+        )}
+
+        {/* Because you listened to */}
+        {artistGenres.length > 0 && (
+          <BecauseYouListened
+            artistId={artistId}
+            artistName={artist.name}
+            genres={artistGenres}
+          />
+        )}
+
+        {/* Bio */}
+        {artistSummary && (
+          <div className="px-4">
+            <h2 className="text-xl font-semibold mb-4">
+              <Translate value="titles.about" />
+            </h2>
+            <p className="opacity-80 leading-relaxed" dangerouslySetInnerHTML={{ __html: artistSummary }} />
+          </div>
+        )}
       </div>
     </div>
   )
