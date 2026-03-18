@@ -66,6 +66,8 @@ const Album = React.memo((props: AlbumProps) => {
     }
   }, [liveStore, songs])
 
+  const uniqueSongIds = React.useMemo(() => Array.from(new Set(songs || [])), [songs])
+
   const extractSongs = React.useCallback(() => {
     if (!songs) {
       return null
@@ -128,7 +130,9 @@ const Album = React.memo((props: AlbumProps) => {
               dispatch={dispatch}
               isCurrent={false}
               slim={true}
-              onClick={playAlbum}
+              onClick={() => {
+                dispatch({ type: types.PLAY_SONG, songId, contextIds: uniqueSongIds })
+              }}
               song={songRow}
             />
           )
