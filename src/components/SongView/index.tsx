@@ -17,6 +17,7 @@ import { OutPortal } from 'react-reverse-portal'
 import MediaSlider from '../MediaSlider'
 import { sortByPlayCount } from '../../utils/sorting'
 import Lyrics from './Lyrics'
+import BecauseYouListened from '../BecauseYouListened'
 import { getStreamUri } from '../../services/Song/StreamUriService'
 import IAlbum from '../../entities/Album'
 import ServiceIcon from '../ServiceIcon'
@@ -81,7 +82,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
   const isSongPinned = songObj?.hasAnyProviderOf(['opfs']) || false
 
   const [pinned, setPinnedSong] = React.useState(isSongPinned)
-  const [showLyrics, setShowLyrics] = React.useState(false)
+  const [showLyrics, setShowLyrics] = React.useState(true)
   const [streamUrls, setStreamUrls] = React.useState<StreamUrl[]>([])
 
   React.useEffect(() => {
@@ -391,6 +392,16 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
               />
             )
           }
+
+          {songObj?.artist?.id && genres.length > 0 && (
+            <div className="mt-8">
+              <BecauseYouListened
+                artistId={songObj.artist.id}
+                artistName={songObj.artist?.name || 'Unknown'}
+                genres={genres}
+              />
+            </div>
+          )}
 
           <AutoSizer>
             {({ width }) => (

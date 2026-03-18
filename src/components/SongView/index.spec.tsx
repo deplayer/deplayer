@@ -55,6 +55,12 @@ vi.mock('../../stores/livestore/hooks', () => ({
   useCurrentPlayingSongId: vi.fn(() => null),
   useIsFavorite: vi.fn(() => false),
   useFavoriteIds: vi.fn(() => new Set()),
+  useRecommendations: vi.fn(() => []),
+  useLyrics: vi.fn(() => null),
+}))
+
+vi.mock('../../stores/livestore/hooks/useRecommendations', () => ({
+  useRecommendations: vi.fn(() => []),
 }))
 
 vi.mock('../../stores/livestore/hooks/useQueue', () => ({
