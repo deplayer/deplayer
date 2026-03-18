@@ -111,18 +111,18 @@ const Dashboard = () => {
 
   return (
     <div className="z-10 w-full md:px-12 mb-12 flex flex-col gap-6 md:gap-10">
-      {/* Two-column layout: Welcome left, widgets right */}
+      {/* Two-column layout: Widgets left, Welcome right */}
       <div className="flex flex-col md:flex-row gap-4 md:gap-6 px-4 md:px-0 pt-4">
-        <div className="md:w-1/2">
-          <WelcomeCard />
-        </div>
         {hasLibrary && (
-          <div className="md:w-1/2 flex flex-col gap-4 md:gap-6">
+          <div className="md:w-1/2 flex flex-col gap-4 md:gap-6 order-2 md:order-1">
             <ContinueListeningCard />
             <StatsCard />
             <TopThisWeekCard />
           </div>
         )}
+        <div className="md:w-1/2 order-1 md:order-2">
+          <WelcomeCard />
+        </div>
       </div>
 
       {/* Recently added albums */}
