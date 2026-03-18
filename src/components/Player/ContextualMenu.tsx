@@ -17,6 +17,7 @@ import { State as AppState } from '../../reducers/app'
 import { State as PlayerState } from '../../reducers/player'
 import { useQueue } from '../../stores/livestore/hooks'
 import { toggleRepeatAction, toggleShuffleAction } from '../../stores/livestore/actions'
+import PlayerRefService from '../../services/PlayerRefService'
 
 const MENU_ID = 'context-menu-player'
 
@@ -275,7 +276,7 @@ const ContextualMenu = (props: MenuProps) => {
               playPrev={() => props.dispatch({ type: types.PLAY_PREV })}
               isPlaying={props.player.playing}
               mqlMatch={true}
-              playPause={() => props.dispatch({ type: types.TOGGLE_PLAYING })}
+              playPause={() => PlayerRefService.getInstance().toggle()}
               playNext={() => props.dispatch({ type: types.PLAY_NEXT })}
             />
             </div>

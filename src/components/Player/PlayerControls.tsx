@@ -18,6 +18,7 @@ import PeerStreamPlayer from './CustomPlayers/PeerStreamPlayer'
 import DigitalScreen from './DigitalScreen'
 import * as types from '../../constants/ActionTypes'
 import PlayerRefService from '../../services/PlayerRefService'
+import MediaSessionService from '../../services/MediaSessionService'
 import type Media from '../../entities/Media'
 
 // Add custom players to ReactPlayer with proper type casting
@@ -185,11 +186,19 @@ class PlayerControls extends React.Component<Props, State> {
   }
 
   playPause = (): void => {
-    this.props.dispatch({ type: types.TOGGLE_PLAYING })
+    PlayerRefService.getInstance().toggle()
   }
 
   onPlay = (): void => {
     this.props.dispatch({ type: types.START_PLAYING })
+    // Sync media session playback state
+    new MediaSessionService().setPlaybackState('playing')
+  }
+
+  onPause = (): void => {
+    this.props.dispatch({ type: types.PAUSE_PLAYING })
+    // Sync media session playback state
+    new MediaSessionService().setPlaybackState('paused')
   }
 
   onSeekChange = (value: number | number[]): void => {
@@ -296,7 +305,6 @@ class PlayerControls extends React.Component<Props, State> {
 
   render(): React.ReactNode {
     const {
-      playing,
       duration,
       volume
     } = this.props.player
@@ -380,7 +388,7 @@ class PlayerControls extends React.Component<Props, State> {
               className={playerClassnames}
               ref={this.playerRef}
               url={streamUri || undefined}
-              playing={playing}
+              playing={false}  // Never declaratively — playback is imperative via PlayerRefService
               onClick={this.playPause}
               onDoubleClick={() => {
                 this.props.dispatch({ type: types.TOGGLE_FULL_SCREEN })
@@ -389,6 +397,7 @@ class PlayerControls extends React.Component<Props, State> {
               volume={volume / 100}
               muted={false}
               onPlay={this.onPlay}
+              onPause={this.onPause}
               onEnded={() => {
                 this.resetPlayedSeconds()
                 this.playNext()

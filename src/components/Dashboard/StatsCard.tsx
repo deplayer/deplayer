@@ -8,7 +8,7 @@ const StatsCard = () => {
   const artistCount = useArtistsCount()
 
   return (
-    <DashboardCard title="Your Library" icon="faChartBar">
+    <DashboardCard title="Your Library" icon="faDatabase">
       <div className="grid grid-cols-3 gap-4 text-center">
         <div>
           <p className="text-2xl font-bold">{songCount}</p>

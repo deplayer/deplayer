@@ -17,6 +17,7 @@ import { getLiveStoreInstance } from '../../App'
 import { playNextAction, playPreviousAction } from '../../stores/livestore/actions'
 import { tables } from '../../stores/livestore/schema'
 import { handlePlayList, handlePlaySong, stopAllPlayback } from './commands'
+import PlayerRefService from '../../services/PlayerRefService'
 
 /**
  * Get current song ID from LiveStore queue
@@ -116,7 +117,10 @@ function* setCurrentPlayingStream(songId: string, providerNum: number, media?: M
   yield put({ type: types.SET_CURRENT_PLAYING_URL, url: streamUri })
   yield put({ type: types.SET_CURRENT_PLAYING_STREAMS, streams: currentPlaying.stream })
   yield put({ type: types.SHOW_PLAYER })
-  yield put({ type: types.START_PLAYING })
+
+  // Imperative play — waits for ReactPlayer to mount the internal element.
+  // Redux `playing` state will be set by ReactPlayer's onPlay callback.
+  yield call(() => PlayerRefService.getInstance().play())
 
   if (fullUrl) {
     yield put({

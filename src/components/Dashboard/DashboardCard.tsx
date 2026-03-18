@@ -1,10 +1,10 @@
-import { ReactNode } from 'react'
+import { ReactNode, ComponentProps } from 'react'
 import { Link } from 'react-router-dom'
 import Icon from '../common/Icon'
 
 type Props = {
   title: string
-  icon: string
+  icon: ComponentProps<typeof Icon>['icon']
   children: ReactNode
   seeAllLink?: string
   className?: string

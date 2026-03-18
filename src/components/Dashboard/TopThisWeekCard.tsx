@@ -11,20 +11,20 @@ const TopThisWeekCard = () => {
   if (!topSongs.length) return null
 
   return (
-    <DashboardCard title="Most Played" icon="faFire" seeAllLink="/collection">
+    <DashboardCard title="Most Played" icon="faHeart" seeAllLink="/collection">
       <div className="flex flex-col gap-2">
-        {topSongs.map((song: Record<string, unknown>, index: number) => (
+        {topSongs.map((song: any, index: number) => (
           <div
             key={song.id}
             className="flex items-center gap-3 py-1 hover:bg-base-300 rounded-lg px-2 cursor-pointer group"
-            onClick={() => dispatch({ type: types.PLAY_SONG, songId: song.id as string })}
+            onClick={() => dispatch({ type: types.PLAY_SONG, songId: song.id })}
           >
             <span className="text-sm opacity-50 w-5 text-right">{index + 1}</span>
             <div className="flex-1 min-w-0">
-              <p className="text-sm truncate">{song.title as string}</p>
-              <p className="text-xs opacity-70 truncate">{song.artistName as string}</p>
+              <p className="text-sm truncate">{song.title}</p>
+              <p className="text-xs opacity-70 truncate">{song.artistName}</p>
             </div>
-            <span className="text-xs opacity-50">{song.playCount as number}×</span>
+            <span className="text-xs opacity-50">{song.playCount}×</span>
             <Icon icon="faPlay" className="opacity-0 group-hover:opacity-100 text-primary text-sm" />
           </div>
         ))}

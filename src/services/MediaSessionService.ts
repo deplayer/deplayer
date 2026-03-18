@@ -1,6 +1,7 @@
 import Media from '../entities/Media'
 import * as actions from '../constants/ActionTypes'
 import logger from '../utils/logger'
+import PlayerRefService from './PlayerRefService'
 
 // fix ts navigator typings
 declare var navigator: any
@@ -22,10 +23,22 @@ export default class MediaSessionService {
           }
         ]
       })
-      navigator.mediaSession.setActionHandler('play', () => {
+
+      // Set initial playback state to playing (this is called when a track starts)
+      navigator.mediaSession.playbackState = 'playing'
+
+      navigator.mediaSession.setActionHandler('play', async () => {
+        logger.log('MediaSession', 'play action handler called')
+        // Use PlayerRefService for imperative playback control
+        await PlayerRefService.getInstance().play()
+        navigator.mediaSession.playbackState = 'playing'
         dispatch({type: actions.START_PLAYING})
       })
       navigator.mediaSession.setActionHandler('pause', () => {
+        logger.log('MediaSession', 'pause action handler called')
+        // Use PlayerRefService for imperative playback control
+        PlayerRefService.getInstance().pause()
+        navigator.mediaSession.playbackState = 'paused'
         dispatch({type: actions.PAUSE_PLAYING})
       })
       navigator.mediaSession.setActionHandler('previoustrack', () => {
@@ -34,6 +47,15 @@ export default class MediaSessionService {
       navigator.mediaSession.setActionHandler('nexttrack', () => {
         dispatch({type: actions.PLAY_NEXT})
       })
+    }
+  }
+
+  /**
+   * Update playback state independently (called from player events)
+   */
+  setPlaybackState = (state: 'playing' | 'paused' | 'none') => {
+    if (this.canSetMediaSession()) {
+      navigator.mediaSession.playbackState = state
     }
   }
 

@@ -22,6 +22,7 @@ import { usePlaylists, useSmartPlaylists, useQueue, useMediaCount, useArtistsCou
 import { useUI } from '../../contexts'
 
 import LogoSvg from '../../logo.svg?react'
+import PlayerRefService from '../../services/PlayerRefService'
 
 type ContentProps = {
   dispatch: Dispatch,
@@ -152,7 +153,7 @@ const SidebarContents = (props: ContentProps) => {
 
       <div className='w-full'>  
         <CommandBar 
-          togglePlaying={() => props.dispatch({ type: 'TOGGLE_PLAYING' })}
+          togglePlaying={() => PlayerRefService.getInstance().toggle()}
           playNext={() => props.dispatch({ type: 'PLAY_NEXT' })}
           playPrev={() => props.dispatch({ type: 'PLAY_PREV' })}
         />

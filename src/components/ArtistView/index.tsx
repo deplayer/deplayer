@@ -40,10 +40,8 @@ export default function ArtistView() {
   // Popular tracks sorted by playCount
   const popularTracks = React.useMemo(() => {
     return Object.values(mediaMap)
-      .filter((s: Record<string, unknown>) => s && (s.playCount as number) > 0)
-      .sort((a: Record<string, unknown>, b: Record<string, unknown>) =>
-        ((b.playCount as number) || 0) - ((a.playCount as number) || 0)
-      )
+      .filter((s: any) => s && s.playCount > 0)
+      .sort((a: any, b: any) => (b.playCount || 0) - (a.playCount || 0))
   }, [mediaMap])
 
   // All song IDs
@@ -52,8 +50,8 @@ export default function ArtistView() {
   // Collect genres
   const artistGenres = React.useMemo(() => {
     const genreSet = new Set<string>()
-    Object.values(mediaMap).forEach((song: Record<string, unknown>) => {
-      const genres = (song.genres as string[]) || (song.genresFlat ? (song.genresFlat as string).split(',') : [])
+    Object.values(mediaMap).forEach((song: any) => {
+      const genres = song.genres || (song.genresFlat ? song.genresFlat.split(',') : [])
       if (Array.isArray(genres)) genres.forEach((g: string) => g.trim() && genreSet.add(g.trim()))
     })
     return Array.from(genreSet)
@@ -116,7 +114,7 @@ export default function ArtistView() {
               <Translate value="common.playAll" />
             </Button>
             <Button onClick={shuffleAll} transparent>
-              <Icon icon="faShuffle" className="mr-2" />
+              <Icon icon="faRandom" className="mr-2" />
               <Translate value="common.shuffle" />
             </Button>
           </div>
@@ -145,16 +143,16 @@ export default function ArtistView() {
             <h2 className="text-xl font-semibold mb-4 px-4">
               <Translate value="titles.popularTracks" />
             </h2>
-            {visibleTracks.map((song: Record<string, unknown>) => (
+            {visibleTracks.map((song: any) => (
               <SongRow
-                key={song.id as string}
+                key={song.id}
                 mqlMatch={false}
                 disableCovers={false}
                 style={{}}
                 dispatch={dispatch}
                 isCurrent={false}
                 slim={true}
-                onClick={() => dispatch({ type: types.PLAY_LIST, trackIds: allSongIds, startFromId: song.id as string })}
+                onClick={() => dispatch({ type: types.PLAY_LIST, trackIds: allSongIds, startFromId: song.id })}
                 song={song}
               />
             ))}
@@ -171,7 +169,7 @@ export default function ArtistView() {
 
         {/* Discography */}
         {albumsData && albumsData.length > 0 && (
-          <RelatedAlbums albums={albumsData as IAlbum[]} />
+          <RelatedAlbums albums={albumsData as unknown as IAlbum[]} />
         )}
 
         {/* Because you listened to */}

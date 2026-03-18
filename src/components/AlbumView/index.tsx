@@ -13,6 +13,7 @@ import RelatedAlbums from '../RelatedAlbums'
 import BecauseYouListened from '../BecauseYouListened'
 import * as types from '../../constants/ActionTypes'
 import { getDurationStr } from '../../utils/timeFormatter'
+import IAlbum from '../../entities/Album'
 import { useAlbumById, useMediaByAlbum, useAlbumsByArtist } from '../../stores/livestore/hooks'
 import { useQueue } from '../../stores/livestore/hooks/useQueue'
 
@@ -45,9 +46,12 @@ export default function AlbumView() {
     return { songIds: ids, mediaMap: map, totalDuration: duration, genres: Array.from(genreSet) }
   }, [mediaItems])
 
-  const coverSource = useMemo(() => {
+  const coverSource = useMemo((): { thumbnailUrl: string; fullUrl: string } | undefined => {
     const firstId = songIds[0]
-    return firstId ? (mediaMap[firstId] as Record<string, unknown>)?.cover as Record<string, string> | undefined : undefined
+    if (!firstId) return undefined
+    const item = mediaMap[firstId] as Record<string, unknown> | undefined
+    const cover = item?.cover as { thumbnailUrl: string; fullUrl: string } | undefined
+    return cover
   }, [songIds, mediaMap])
 
   if (!match) return null
@@ -98,7 +102,7 @@ export default function AlbumView() {
               <Translate value="common.play" />
             </Button>
             <Button onClick={shuffleAlbum} transparent>
-              <Icon icon="faShuffle" className="mr-2" />
+              <Icon icon="faRandom" className="mr-2" />
               <Translate value="common.shuffle" />
             </Button>
           </div>
@@ -125,7 +129,7 @@ export default function AlbumView() {
             genres={genres}
           />
         )}
-        <RelatedAlbums albums={relatedAlbumsData as Record<string, unknown>[]} />
+        <RelatedAlbums albums={relatedAlbumsData as unknown as IAlbum[]} />
       </div>
     </div>
   )

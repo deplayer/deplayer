@@ -26,6 +26,7 @@ import {
   getSongByIdFromLiveStore,
   getSongBgFromLiveStore,
 } from '../selectors'
+import PlayerRefService from '../../services/PlayerRefService'
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -75,8 +76,11 @@ function* startStream(songId: string): any {
   yield put({ type: types.SET_CURRENT_PLAYING_URL, url: streamUri })
   yield put({ type: types.SET_CURRENT_PLAYING_STREAMS, streams: media.stream })
   yield put({ type: types.SHOW_PLAYER })
-  yield put({ type: types.START_PLAYING })
   yield put({ type: types.PUSH_TO_VIEW, song: songId })
+
+  // Imperative play — waits for ReactPlayer to mount the internal element.
+  // Redux `playing` state will be set by ReactPlayer's onPlay callback.
+  yield call(() => PlayerRefService.getInstance().play())
 
   if (fullUrl) {
     yield put({ type: types.SET_BACKGROUND_IMAGE, backgroundImage: fullUrl })

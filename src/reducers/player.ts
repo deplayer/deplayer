@@ -44,8 +44,13 @@ export const defaultState: State = {
 export default (state: State = defaultState, action: PlayerAction): State => {
   switch (action.type) {
     case types.PAUSE_PLAYING:
-    case types.STOP_PLAYING:
       return { ...state, playing: false }
+
+    case types.STOP_PLAYING:
+      // Clear streamUri so ReactPlayer unmounts immediately.
+      // This prevents the race where a re-render resumes the old stream
+      // before the new one is ready.
+      return { ...state, playing: false, streamUri: null }
 
     case types.START_PLAYING:
       return { ...state, playing: true, showPlayer: true }

@@ -14,7 +14,7 @@ import { useAppStore } from './stores/livestore/store'
 import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck'
 import { setupFts5 } from './stores/livestore/fts5-setup'
 import { setupIndexes } from './stores/livestore/indexes-setup'
-import { PlaybackProvider, ThemeProvider, UIProvider, useUI } from './contexts'
+import { ThemeProvider, UIProvider, useUI } from './contexts'
 import { State } from './reducers'
 
 import LayoutContainer from './containers/LayoutContainer'
@@ -38,7 +38,7 @@ import { useLanguage } from './hooks/useLanguage'
 import { setLiveStoreInstance } from './middleware/livestore'
 import { Store } from '@livestore/livestore'
 type LiveStore = Store<any, any>
-import PlaybackController from './services/PlaybackController'
+
 
 // Export LiveStore instance for use in sagas
 let liveStoreInstance: LiveStore | null = null
@@ -69,9 +69,6 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
     if (liveStore) {
       setLiveStoreInstance(liveStore)
       liveStoreInstance = liveStore  // Also store for saga access
-      
-      // Initialize PlaybackController with LiveStore
-      PlaybackController.getInstance().initialize(liveStore)
       
       // Now that LiveStore is ready, dispatch INITIALIZE action
       // This was moved from configureStore.ts to prevent the
@@ -168,13 +165,11 @@ const App = () => {
         }>
           <ThemeProvider>
             <UIProvider>
-              <PlaybackProvider>
-                <Provider store={store}>
-                  <Router history={history}>
-                    <AppContent playerPortal={playerPortal} />
-                  </Router>
-                </Provider>
-              </PlaybackProvider>
+              <Provider store={store}>
+                <Router history={history}>
+                  <AppContent playerPortal={playerPortal} />
+                </Router>
+              </Provider>
             </UIProvider>
           </ThemeProvider>
         </Suspense>

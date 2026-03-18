@@ -60,7 +60,6 @@ describe('setCurrentPlaying', async () => {
       .put({ type: types.PUSH_TO_VIEW, song: action.songId })
       .put({ type: types.SET_CURRENT_PLAYING_URL, url: streamUrl })
       .put({ type: types.SET_CURRENT_PLAYING_STREAMS, streams: streams })
-      .put({ type: types.START_PLAYING })
       .run()
   })
 })

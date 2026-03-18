@@ -31,4 +31,11 @@ describe('collection reducer', () => {
     expect(reducer(defaultState, { type: SET_CURRENT_TIME, value: 23 }))
       .toEqual(expected)
   })
+
+  it('STOP_PLAYING clears streamUri to prevent dual-stream races', () => {
+    const playing = { ...defaultState, playing: true, streamUri: 'http://song.mp3', showPlayer: true }
+    const result = reducer(playing, { type: STOP_PLAYING })
+    expect(result.playing).toBe(false)
+    expect(result.streamUri).toBeNull()
+  })
 })
