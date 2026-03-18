@@ -131,7 +131,7 @@ const Album = React.memo((props: AlbumProps) => {
               isCurrent={false}
               slim={true}
               onClick={() => {
-                dispatch({ type: types.PLAY_SONG, songId, contextIds: uniqueSongIds })
+                dispatch({ type: types.PLAY_LIST, trackIds: uniqueSongIds, startFromId: songId })
               }}
               song={songRow}
             />

@@ -90,12 +90,14 @@ function* startStream(songId: string): any {
 export interface PlayListAction {
   type: typeof types.PLAY_LIST
   trackIds: string[]
+  /** Optional: start playback from this track instead of the first one */
+  startFromId?: string
 }
 
 /**
- * Replace the queue and play from the top.
+ * Replace the queue and play from the top (or from startFromId if provided).
  *
- * Dispatched by: PlayAllButton, Album.playAlbum, Playlist.handlePlayAll
+ * Dispatched by: PlayAllButton, Album.playAlbum, Album song click, Playlist.handlePlayAll
  */
 export function* handlePlayList(action: PlayListAction): any {
   const liveStore = getLiveStoreInstance()
@@ -116,9 +118,21 @@ export function* handlePlayList(action: PlayListAction): any {
   // 2. Replace queue in LiveStore (sets currentPlaying: 0)
   yield call(playAllAction, liveStore, action.trackIds)
 
-  // 3. Resolve stream and start playback
-  const firstTrackId = action.trackIds[0]
-  yield call(startStream, firstTrackId)
+  // 3. If startFromId provided, reposition to that track
+  const startId = action.startFromId
+  let targetTrackId = action.trackIds[0]
+  if (startId) {
+    const index = action.trackIds.indexOf(startId)
+    if (index !== -1) {
+      targetTrackId = startId
+      if (index > 0) {
+        yield call(playMediaAction, liveStore, startId)
+      }
+    }
+  }
+
+  // 4. Resolve stream and start playback
+  yield call(startStream, targetTrackId)
 }
 
 // ---------------------------------------------------------------------------
