@@ -107,12 +107,15 @@ export const useArtistById = (id: string | null | undefined) => {
  * const artistSongs = songsByArtist['artist-123'] // ['song-1', 'song-2', ...]
  * ```
  */
+/**
+ * @deprecated For single-artist views, prefer useSongsByAlbumForArtist(artistId) from useAlbums.ts
+ */
 export const useSongsByArtist = () => {
   const store = useAppStore()
   const media = store.useQuery(
     queryDb(
       tables.media
-        .select()
+        .select('id', 'artistId')
         .orderBy('title', 'asc')
     )
   )

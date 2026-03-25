@@ -137,7 +137,7 @@ export const useAlbumIdsByArtist = () => {
  * Returns a map of albumId -> array of song IDs
  * 
  * ⚠️ PERFORMANCE WARNING: This loads ALL media in the library.
- * For artist views, use `useSongsByAlbumForArtist(artistId)` instead.
+ * @deprecated For artist views, use `useSongsByAlbumForArtist(artistId)` instead.
  * 
  * @example
  * ```tsx
@@ -150,7 +150,7 @@ export const useSongsByAlbum = () => {
   const media = store.useQuery(
     queryDb(
       tables.media
-        .select()
+        .select('id', 'albumId')
         .orderBy('track', 'asc')
     )
   )

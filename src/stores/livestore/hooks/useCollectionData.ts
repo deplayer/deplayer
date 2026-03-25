@@ -86,6 +86,8 @@ export const useCollectionData = (filters: Filter, searchTerm: string) => {
     }
     
     // Note: Genres and Providers require client-side filtering due to JSON arrays
+    // Search also requires client-side filtering (needs OR across title/artist/album,
+    // but LiveStore query builder only supports AND)
     // These are filtered in the useMemo below
     
     return baseQuery.orderBy('title', 'asc')

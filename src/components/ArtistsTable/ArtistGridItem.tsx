@@ -7,7 +7,7 @@ import Tag from '../common/Tag'
 import React from 'react'
 import { State as RootState } from '../../reducers'
 import IMedia from '../../entities/Media'
-import { useAlbumsByArtist, useSongsByAlbum, useMediaById } from '../../stores/livestore/hooks'
+import { useAlbumsByArtist, useSongsByAlbumForArtist, useMediaById } from '../../stores/livestore/hooks'
 
 type Props = {
   artist: Artist
@@ -25,7 +25,7 @@ type ArtistRelation = {
 const ArtistGridItem = ({ artist, songs, style }: Props) => {
   // Get data from LiveStore hooks
   const albumsByArtist = useAlbumsByArtist(artist.id)
-  const songsByAlbum = useSongsByAlbum()
+  const { songsByAlbum } = useSongsByAlbumForArtist(artist.id)
   
   // Still using Redux for artist metadata (not yet migrated)
   const artistMetadata = useSelector((state: RootState) => 
