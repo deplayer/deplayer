@@ -1,7 +1,8 @@
 import { Translate } from 'react-redux-i18n'
 import HorizontalSlider from '../HorizontalSlider'
 import AlbumCover from '../common/AlbumCover'
-import { useRecentAlbums, useArtistsMap } from '../../stores/livestore/hooks'
+import { useMemo } from 'react'
+import { useRecentAlbums, useArtistsByIds } from '../../stores/livestore/hooks'
 
 const AlbumMediaSlider = ({ mediaItems, title }: { mediaItems: any[], title: React.ReactNode }) => {
   if (!mediaItems?.length) {
@@ -37,7 +38,11 @@ const AlbumMediaSlider = ({ mediaItems, title }: { mediaItems: any[], title: Rea
 
 const RecentAlbums = () => {
   const recentAlbums = useRecentAlbums(10)
-  const artistsMap = useArtistsMap()
+  const artistIds = useMemo(
+    () => [...new Set((recentAlbums as any[]).map((a: any) => a.artistId).filter(Boolean))],
+    [recentAlbums]
+  )
+  const artistsMap = useArtistsByIds(artistIds)
 
   if (!recentAlbums?.length) {
     return null

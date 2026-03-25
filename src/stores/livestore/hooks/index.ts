@@ -40,6 +40,7 @@ export {
 export {
   useArtists,
   useArtistsMap,
+  useArtistsByIds,
   useArtistById,
   useSongsByArtist,
 } from './useArtists'

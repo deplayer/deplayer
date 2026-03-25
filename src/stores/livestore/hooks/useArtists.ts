@@ -54,6 +54,28 @@ export const useArtistsMap = () => {
 }
 
 /**
+ * Get artists by a list of IDs (targeted lookup instead of loading all artists)
+ */
+export const useArtistsByIds = (ids: string[]) => {
+  const store = useAppStore()
+  
+  const query = useMemo(() => {
+    if (!ids.length) return tables.artists.select().where('id', '=', '__NONE__')
+    return tables.artists.select().where({ id: { op: 'IN', value: ids } })
+  }, [ids])
+  
+  const result = store.useQuery(queryDb(query))
+  
+  return useMemo(() => {
+    const map: Record<string, any> = {}
+    if (Array.isArray(result)) {
+      result.forEach((artist: any) => { map[artist.id] = artist })
+    }
+    return map
+  }, [result])
+}
+
+/**
  * Get a single artist by ID
  * 
  * @example
