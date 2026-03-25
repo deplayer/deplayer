@@ -21,13 +21,20 @@ export const useRecommendations = (
 ) => {
   const store = useAppStore()
 
-  const library = store.useQuery(
-    queryDb(
-      tables.media
-        .select('id', 'artistId', 'artistName', 'genresFlat', 'playCount')
-        .orderBy('playCount', 'desc')
-    )
-  )
+  // Scoped query: exclude source artist at SQL level and cap candidate pool
+  // Previously loaded the entire media table; now limited to 200 top-played candidates
+  const query = useMemo(() => {
+    if (!artistId) return tables.media
+      .select('id', 'title', 'artistId', 'artistName', 'genresFlat', 'playCount', 'cover')
+      .where('id', '=', '__NONE__')
+    return tables.media
+      .select('id', 'title', 'artistId', 'artistName', 'genresFlat', 'playCount', 'cover')
+      .where({ artistId: { op: 'NOT IN', value: [artistId] } })
+      .orderBy('playCount', 'desc')
+      .limit(200)
+  }, [artistId])
+
+  const library = store.useQuery(queryDb(query))
 
   return useMemo(() => {
     if (!artistId || !genres.length || !Array.isArray(library)) return []

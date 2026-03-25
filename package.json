@@ -15,7 +15,7 @@
     "knip": "knip",
     "knip:production": "knip --production",
     "roomba": "knip --fix",
-    "deploy": "npm run test && npm run build && cp dist/index.html dist/200.html && wrangler pages deploy ./dist --project-name=deplayer --branch=main"
+    "deploy": "npm run test && npm run build && cp dist/index.html dist/200.html && npx wrangler pages deploy ./dist --project-name=deplayer --branch=main"
   },
   "dependencies": {
     "@effect/cli": "^0.72.1",

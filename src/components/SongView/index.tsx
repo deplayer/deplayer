@@ -82,7 +82,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
   const isSongPinned = songObj?.hasAnyProviderOf(['opfs']) || false
 
   const [pinned, setPinnedSong] = React.useState(isSongPinned)
-  const [showLyrics, setShowLyrics] = React.useState(true)
+  const [showLyrics, setShowLyrics] = React.useState(false)
   const [streamUrls, setStreamUrls] = React.useState<StreamUrl[]>([])
 
   React.useEffect(() => {
@@ -176,7 +176,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
   return (
     <div data-testid="song-view" className={`song-view ${className} w-full overflow-y-auto z-10 flex flex-col`}>
       <div className={`song sm:flex ${flexDirection}`}>
-        <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className={`w-full ${imageSize}`}>
+        <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className={`w-full shrink-0 ${imageSize}`}>
           <div className='flex flex-col w-full md:sticky md:top-0 h-full'>
             {songFinder && song.type === 'video' && (
               <OutPortal
@@ -284,7 +284,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
           </div>
         </div>
 
-        <div className="content flex-grow pt-6 sm:pt-0 md:pt-6 md:pr-6 justify-between">
+        <div className="content flex-grow pt-6 sm:pt-0 md:pt-6 md:pr-6 justify-between min-w-0">
           <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className="p-6 rounded-lg">
             <h2 className='text-3xl inline-block text-wrap truncate ...'>
               {song.title}
@@ -394,7 +394,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
           }
 
           {songObj?.artist?.id && genres.length > 0 && (
-            <div className="mt-8">
+            <div className="mt-8 overflow-hidden">
               <BecauseYouListened
                 artistId={songObj.artist.id}
                 artistName={songObj.artist?.name || 'Unknown'}
