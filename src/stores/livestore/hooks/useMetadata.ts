@@ -135,40 +135,32 @@ export const useAvailableTypes = (): string[] => {
  */
 export const useMediaCount = (): number => {
   const store = useAppStore()
-  // Query only IDs for counting
-  const result = store.useQuery(
-    queryDb(tables.media.select('id'))
-  )
-  
-  return Array.isArray(result) ? result.length : 0
+  // Use SQL COUNT — returns a number, not an array of IDs
+  return store.useQuery(
+    queryDb(tables.media.count())
+  ) as unknown as number
 }
 
 /**
  * Get count of artists in the library
- * Lightweight alternative to useArtists().length
  * 
  * @returns Total count of artists
  */
 export const useArtistsCount = (): number => {
   const store = useAppStore()
-  const result = store.useQuery(
-    queryDb(tables.artists.select('id'))
-  )
-  
-  return Array.isArray(result) ? result.length : 0
+  return store.useQuery(
+    queryDb(tables.artists.count())
+  ) as unknown as number
 }
 
 /**
  * Get count of albums in the library
- * Lightweight alternative to useAlbums().length
  * 
  * @returns Total count of albums
  */
 export const useAlbumsCount = (): number => {
   const store = useAppStore()
-  const result = store.useQuery(
-    queryDb(tables.albums.select('id'))
-  )
-  
-  return Array.isArray(result) ? result.length : 0
+  return store.useQuery(
+    queryDb(tables.albums.count())
+  ) as unknown as number
 }

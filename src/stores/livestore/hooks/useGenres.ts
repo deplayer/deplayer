@@ -9,9 +9,10 @@ import { useMemo } from 'react'
  */
 export const useSongsByGenre = (): Record<string, string[]> => {
   const store = useAppStore()
+  // Only select id and genresFlat — no need for full rows
   const media = store.useQuery(
     queryDb(
-      tables.media.select()
+      tables.media.select('id', 'genresFlat')
     )
   )
 
@@ -21,20 +22,17 @@ export const useSongsByGenre = (): Record<string, string[]> => {
     if (!Array.isArray(media)) return songsByGenre
 
     for (const track of media) {
-      if (!track.genres) continue
-      
-      // Parse genres if it's stored as JSON string
-      const genres = typeof track.genres === 'string' 
-        ? JSON.parse(track.genres) 
-        : track.genres
+      if (!track.genresFlat) continue
 
-      if (!Array.isArray(genres)) continue
+      const genres = track.genresFlat.split(',')
 
       for (const genre of genres) {
-        if (!songsByGenre[genre]) {
-          songsByGenre[genre] = []
+        const trimmed = genre.trim()
+        if (!trimmed) continue
+        if (!songsByGenre[trimmed]) {
+          songsByGenre[trimmed] = []
         }
-        songsByGenre[genre].push(track.id)
+        songsByGenre[trimmed].push(track.id)
       }
     }
 
