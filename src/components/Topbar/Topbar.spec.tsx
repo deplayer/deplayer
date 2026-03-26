@@ -15,40 +15,6 @@ vi.mock('react-redux-i18n', () => ({
   Translate: ({ value }: { value: string }) => value
 }))
 
-vi.mock('../../contexts', () => ({
-  useUI: () => ({
-    searchTerm: '',
-    searchActive: false,
-    loading: false,
-    ready: true,
-    sidebarToggled: false,
-    rightPanelToggled: false,
-    showAddMediaModal: false,
-    mqlMatch: false,
-    heightMqlMatch: false,
-    showSpectrum: false,
-    showVisuals: false,
-    displayMiniQueue: true,
-    backgroundImage: '',
-    activeFilters: { genres: [], types: [], artists: [], providers: [], favorites: false },
-    toggleSidebar: vi.fn(),
-    toggleRightPanel: vi.fn(),
-    setShowAddMediaModal: vi.fn(),
-    setMqlMatch: vi.fn(),
-    setHeightMqlMatch: vi.fn(),
-    toggleSpectrum: vi.fn(),
-    toggleVisuals: vi.fn(),
-    toggleMiniQueue: vi.fn(),
-    setBackgroundImage: vi.fn(),
-    setLoading: vi.fn(),
-    setReady: vi.fn(),
-    setFilter: vi.fn(),
-    clearFilters: vi.fn(),
-    setSearchTerm: vi.fn(),
-    clearSearch: vi.fn(),
-  }),
-}))
-
 // Mock clipboard API
 const mockClipboard = {
   writeText: vi.fn()

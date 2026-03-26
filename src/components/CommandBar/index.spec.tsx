@@ -42,41 +42,6 @@ vi.mock('../../stores/livestore/actions', () => ({
   removeFromQueueAction: vi.fn(),
 }))
 
-vi.mock('../../contexts', () => ({
-  useUI: () => ({
-    searchTerm: '',
-    searchActive: false,
-    loading: false,
-    ready: true,
-    sidebarToggled: false,
-    rightPanelToggled: false,
-    showAddMediaModal: false,
-    mqlMatch: false,
-    heightMqlMatch: false,
-    showSpectrum: false,
-    showVisuals: false,
-    displayMiniQueue: true,
-    backgroundImage: '',
-    activeFilters: { genres: [], types: [], artists: [], providers: [], favorites: false },
-    toggleSidebar: vi.fn(),
-    toggleRightPanel: vi.fn(),
-    setShowAddMediaModal: vi.fn(),
-    setMqlMatch: vi.fn(),
-    setHeightMqlMatch: vi.fn(),
-    toggleSpectrum: vi.fn(),
-    toggleVisuals: vi.fn(),
-    toggleMiniQueue: vi.fn(),
-    setBackgroundImage: vi.fn(),
-    setLoading: vi.fn(),
-    setReady: vi.fn(),
-    setFilter: vi.fn(),
-    clearFilters: vi.fn(),
-    setSearchTerm: vi.fn(),
-    clearSearch: vi.fn(),
-  }),
-}))
-
-
 describe('CommandBar', () => {
   beforeEach(() => {
     vi.useFakeTimers({ shouldAdvanceTime: true })
