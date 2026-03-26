@@ -5,6 +5,7 @@ import { State as RootState } from '../reducers'
 import { createTestStore } from './store'
 import userEvent from '@testing-library/user-event'
 import { UIProvider } from '../contexts/UIContext'
+import { useUIStore } from '../stores/uiStore'
 import { StoreRegistry, StoreRegistryProvider } from '@livestore/react'
 import { Suspense } from 'react'
 
@@ -22,6 +23,9 @@ export const renderWithProviders = (
   }: RenderOptions = {}
 ) => {
   window.history.pushState({}, 'Test page', route)
+  
+  // Set Zustand UI store to test-friendly defaults
+  useUIStore.setState({ loading: false, ready: true })
   
   const store = createTestStore(initialState)
   const storeRegistry = new StoreRegistry()

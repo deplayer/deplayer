@@ -7,13 +7,15 @@ import EmptyState from './common/EmptyState/index'
 import TryDemoButton from './Buttons/TryDemoButton'
 import Icon from './common/Icon'
 import { useSettings, useCollectionData, useQueue } from '../stores/livestore/hooks'
-import { useUI } from '../contexts'
+import { useUIStore } from '../stores/uiStore'
 import { getEmptyStateFallback } from './common/EmptyState/emptyStateFallback'
 
 const Collection = () => {
   // Get data from LiveStore hooks and contexts
   const liveSettings = useSettings()
-  const { loading, activeFilters, searchTerm } = useUI()
+  const loading = useUIStore(s => s.loading)
+  const activeFilters = useUIStore(s => s.activeFilters)
+  const searchTerm = useUIStore(s => s.searchTerm)
   
   // ===== OPTIMIZED: Single reactive query that combines filtering + media map =====
   // This prevents the cascade of re-renders from separate queries

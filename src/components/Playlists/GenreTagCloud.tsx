@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Translate } from 'react-redux-i18n'
 import { useGenres } from '../../stores/livestore/hooks'
-import { useUI } from '../../contexts/UIContext'
+import { useUIStore } from '../../stores/uiStore'
 
 interface GenreTag {
   name: string
@@ -13,7 +13,8 @@ interface GenreTag {
 const GenreTagCloud = () => {
   const navigate = useNavigate()
   const genres = useGenres()
-  const { setFilter, clearFilters } = useUI()
+  const setFilter = useUIStore(s => s.setFilter)
+  const clearFilters = useUIStore(s => s.clearFilters)
 
   const genreTags = useMemo(() => {
     // Find max count for weight calculation

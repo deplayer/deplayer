@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import { useGenres } from '../../stores/livestore/hooks'
-import { useUI } from '../../contexts'
+import { useUIStore } from '../../stores/uiStore'
 
 const GenreChips = () => {
   const genres = useGenres()
   const navigate = useNavigate()
-  const { setFilter, clearFilters } = useUI()
+  const setFilter = useUIStore(s => s.setFilter)
+  const clearFilters = useUIStore(s => s.clearFilters)
   const topGenres = genres.slice(0, 8)
 
   if (!topGenres.length) return null

@@ -14,7 +14,7 @@ import { useFilteredMedia, useMediaMapForIds } from '../../stores/livestore/hook
 import { useAppStore } from '../../stores/livestore/store'
 import { addToQueueAction } from '../../stores/livestore/actions'
 import { deleteSmartPlaylistAction } from '../../stores/livestore/actions/smartPlaylists'
-import { useUI } from '../../contexts/UIContext'
+import { useUIStore } from '../../stores/uiStore'
 import type { Filter } from '../../types/collection'
 
 type Props = {
@@ -32,7 +32,8 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
   const [showSongs, setShowSongs] = useState(false)
   const navigate = useNavigate()
   const isSmartPlaylist = 'filters' in playlist
-  const { setFilter, clearFilters } = useUI()
+  const setFilter = useUIStore(s => s.setFilter)
+  const clearFilters = useUIStore(s => s.clearFilters)
   const liveStore = useAppStore()
   
   // PERF: For smart playlists, use database-level filtering (not entire mediaMap)

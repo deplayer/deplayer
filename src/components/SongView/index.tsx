@@ -26,7 +26,7 @@ import { State as CollectionState } from '../../reducers/collection'
 import { State as PlayerState } from '../../reducers/player'
 import FavoriteButton from '../common/FavoriteButton'
 import { useQueue } from '../../stores/livestore/hooks'
-import { useUI } from '../../contexts/UIContext'
+import { useUIStore } from '../../stores/uiStore'
 import { useAppStore } from '../../stores/livestore/store'
 import { addToQueueAction, removeFromQueueAction } from '../../stores/livestore/actions'
 
@@ -58,7 +58,8 @@ type StreamUrl = {
 const SongView = ({ songId, loading, className = '', dispatch, playerPortal, player, collection }: Props) => {
   const navigate = useNavigate()
   const liveQueue = useQueue('default')
-  const { setFilter, clearFilters } = useUI()
+  const setFilter = useUIStore(s => s.setFilter)
+  const clearFilters = useUIStore(s => s.clearFilters)
   const liveStore = useAppStore()
   
   // Helper to parse trackIds from LiveStore (can be JSON string or array)

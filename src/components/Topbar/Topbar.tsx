@@ -5,7 +5,7 @@ import Icon from '../common/Icon'
 import { State as AppState } from '../../reducers/app'
 import * as types from '../../constants/ActionTypes'
 import { startSearch, StartSearchAction } from '../../types/search'
-import { useUI } from '../../contexts'
+import { useUIStore } from '../../stores/uiStore'
 
 type Props = {
   title: React.ReactNode,
@@ -21,7 +21,7 @@ type Props = {
 
 const Topbar = (props: Props) => {
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null)
-  const { setSearchTerm } = useUI()
+  const setSearchTerm = useUIStore(s => s.setSearchTerm)
 
   const handleSearchChange = (event: React.FormEvent<HTMLInputElement>) => {
     const searchTerm = event.currentTarget.value

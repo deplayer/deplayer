@@ -4,7 +4,7 @@ import EmptyState from './common/EmptyState/index'
 import classNames from 'classnames'
 import { useQueue, useMediaMapForIds, useMediaCount } from '../stores/livestore/hooks'
 import { useSettings } from '../stores/livestore/hooks'
-import { useUI } from '../contexts'
+import { useUIStore } from '../stores/uiStore'
 import { getEmptyStateFallback, collectionStep, searchStep } from './common/EmptyState/emptyStateFallback'
 
 type Props = {
@@ -18,7 +18,9 @@ const Queue = (props: Props) => {
   // Get data from LiveStore hooks and contexts for Queue logic
   const liveQueue = useQueue('default')
   const liveSettings = useSettings()
-  const { loading, mqlMatch, displayMiniQueue } = useUI()
+  const loading = useUIStore(s => s.loading)
+  const mqlMatch = useUIStore(s => s.mqlMatch)
+  const displayMiniQueue = useUIStore(s => s.displayMiniQueue)
   
   // Parse trackIds from LiveStore queue (can be JSON string or array)
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {

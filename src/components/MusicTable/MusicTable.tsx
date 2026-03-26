@@ -14,7 +14,7 @@ import ToggleMiniQueueButton from '../Buttons/ToggleMiniQueueButton'
 import * as types from '../../constants/ActionTypes'
 import FilterPanel from '../Collection/FilterPanel'
 import { useMediaById, useQueue, useCurrentPlayingSongId } from '../../stores/livestore/hooks'
-import { useUI } from '../../contexts'
+import { useUIStore } from '../../stores/uiStore'
 import { useDispatch } from 'react-redux'
 
 type Props = {
@@ -189,7 +189,8 @@ const MusicTable = ({
   
   // Get data from LiveStore hooks
   const currentSongId = useCurrentPlayingSongId('default')
-  const { loading, mqlMatch } = useUI()
+  const loading = useUIStore(s => s.loading)
+  const mqlMatch = useUIStore(s => s.mqlMatch)
   const location = useLocation()
   
   // Get Redux dispatch for features not yet migrated (buttons, actions)

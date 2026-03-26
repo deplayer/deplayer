@@ -11,7 +11,7 @@ import { THEMES } from '../Sidebar/ThemeModal'
 import { I18n, Translate } from 'react-redux-i18n'
 import { useSearchMediaIds, useMediaMapForIds, useQueue } from '../../stores/livestore/hooks'
 import { toggleRepeatAction, toggleShuffleAction } from '../../stores/livestore/actions'
-import { useUI } from '../../contexts'
+import { useUIStore } from '../../stores/uiStore'
 
 interface BaseItem {
   id: string | number
@@ -143,7 +143,7 @@ function CommandBar({ togglePlaying, playNext, playPrev }: Props) {
   const selectedItemRef = useRef<HTMLButtonElement>(null)
   
   // ====== NEW: Use LiveStore hooks for search ======
-  const { searchTerm: globalSearchTerm } = useUI()
+  const globalSearchTerm = useUIStore(s => s.searchTerm)
   const searchResultIds = useSearchMediaIds(globalSearchTerm, 50)
   const searchResultsMedia = useMediaMapForIds(searchResultIds)
   

@@ -10,7 +10,7 @@ import EmptyState from '../common/EmptyState/index'
 import { getEmptyStateFallback, collectionStep, searchStep } from '../common/EmptyState/emptyStateFallback'
 import { useArtistsMap, useSongsByArtist, useMediaCount } from '../../stores/livestore/hooks'
 import { useSettings } from '../../stores/livestore/hooks'
-import { useUI } from '../../contexts'
+import { useUIStore } from '../../stores/uiStore'
 
 interface GridProps {
   rowIndex: number
@@ -24,7 +24,8 @@ const ArtistTable = () => {
   const artistsMap = useArtistsMap()
   const songsByArtist = useSongsByArtist()
   const liveSettings = useSettings()
-  const { sidebarToggled, mqlMatch } = useUI()
+  const sidebarToggled = useUIStore(s => s.sidebarToggled)
+  const mqlMatch = useUIStore(s => s.mqlMatch)
   
   // PERF: Use count hook instead of loading entire library
   const mediaCount = useMediaCount()

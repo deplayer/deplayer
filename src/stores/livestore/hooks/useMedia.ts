@@ -2,7 +2,7 @@ import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 import { useMemo } from 'react'
-import type { Filter } from '../../../contexts/UIContext'
+import type { Filter } from '../../uiStore'
 import { useFavoriteIds } from './useFavorites'
 
 /**

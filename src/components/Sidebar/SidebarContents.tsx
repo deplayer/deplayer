@@ -19,7 +19,7 @@ import { State as AppState } from '../../reducers/app'
 import { useLocation } from 'react-router'
 import DeplayerTitle from '../DeplayerTitle'
 import { usePlaylists, useSmartPlaylists, useQueue, useMediaCount, useArtistsCount, useSearchMediaIds } from '../../stores/livestore/hooks'
-import { useUI } from '../../contexts'
+import { useUIStore } from '../../stores/uiStore'
 
 import LogoSvg from '../../logo.svg?react'
 import PlayerRefService from '../../services/PlayerRefService'
@@ -75,7 +75,7 @@ const SidebarContents = (props: ContentProps) => {
   const location = useLocation()
   
   // Get UI state from context
-  const { searchTerm } = useUI()
+  const searchTerm = useUIStore(s => s.searchTerm)
   
   // Get playlists and queue from LiveStore
   const playlists = usePlaylists()

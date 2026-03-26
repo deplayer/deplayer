@@ -7,15 +7,15 @@ import './tailwind.css'
 import * as portals from 'react-reverse-portal'
 import { Route, Routes } from 'react-router-dom'
 import { HistoryRouter as Router } from "redux-first-history/rr6";
-import { Provider, useSelector } from 'react-redux'
+import { Provider } from 'react-redux'
 import { store, history } from './store/configureStore'
 import { StoreRegistry, StoreRegistryProvider } from '@livestore/react'
 import { useAppStore } from './stores/livestore/store'
 import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck'
 import { setupFts5 } from './stores/livestore/fts5-setup'
 import { setupIndexes } from './stores/livestore/indexes-setup'
-import { ThemeProvider, UIProvider, useUI } from './contexts'
-import { State } from './reducers'
+import { ThemeProvider, UIProvider } from './contexts'
+
 
 import LayoutContainer from './containers/LayoutContainer'
 import AddMediaModal from './components/AddMediaModal'
@@ -77,22 +77,7 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
     }
   }, [liveStore])
   
-  // Get Redux app state and UI context
-  const reduxApp = useSelector((state: State) => state.app)
-  const { setLoading, setMqlMatch, setHeightMqlMatch } = useUI()
-  
-  // Bridge: Sync Redux app state to UIContext during migration
-  React.useEffect(() => {
-    setLoading(reduxApp.loading)
-  }, [reduxApp.loading, setLoading])
-  
-  React.useEffect(() => {
-    setMqlMatch(reduxApp.mqlMatch)
-  }, [reduxApp.mqlMatch, setMqlMatch])
-  
-  React.useEffect(() => {
-    setHeightMqlMatch(reduxApp.heightMqlMatch)
-  }, [reduxApp.heightMqlMatch, setHeightMqlMatch])
+  // Redux→Zustand sync is handled by uiSyncMiddleware — no bridge needed here
   
   // Initialize FTS5 full-text search and database indexes on mount
   // OPTIMIZED: Defer to idle time to avoid blocking first paint

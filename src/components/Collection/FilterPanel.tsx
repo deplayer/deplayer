@@ -1,11 +1,11 @@
 import Select from 'react-select'
-import { Filter } from '../../contexts/UIContext'
+import { Filter } from '../../stores/uiStore'
 import Button from '../common/Button'
 import { Dispatch } from 'redux'
 import Icon from '../common/Icon'
 import Modal from '../common/Modal'
 import { useState, useEffect } from 'react'
-import { useUI } from '../../contexts/UIContext'
+import { useUIStore } from '../../stores/uiStore'
 import { useAppStore } from '../../stores/livestore/store'
 import { createSmartPlaylistAction } from '../../stores/livestore/actions/smartPlaylists'
 import { useArtists, useAvailableGenres, useAvailableProviders, useAvailableTypes } from '../../stores/livestore/hooks'
@@ -15,7 +15,8 @@ type Props = {
 }
 
 const FilterPanel = (_props: Props) => {
-  const { activeFilters, setFilter } = useUI()
+  const activeFilters = useUIStore(s => s.activeFilters)
+  const setFilter = useUIStore(s => s.setFilter)
   const liveStore = useAppStore()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
