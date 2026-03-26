@@ -13,7 +13,7 @@ import Spinner from '../Spinner'
 import ToggleMiniQueueButton from '../Buttons/ToggleMiniQueueButton'
 import * as types from '../../constants/ActionTypes'
 import FilterPanel from '../Collection/FilterPanel'
-import { useMediaById, useQueue, useCurrentPlayingSongId } from '../../stores/livestore/hooks'
+import { useMediaById, useQueue, useCurrentPlayingSongId, useFavoriteIds } from '../../stores/livestore/hooks'
 import { useUIStore } from '../../stores/uiStore'
 import { useDispatch } from 'react-redux'
 
@@ -108,6 +108,7 @@ const SongRowWrapper = React.memo(({
   disableAddButton,
   disableCovers,
   visibleIds,
+  favoriteIds,
 }: {
   songId: string
   mediaMap?: Record<string, any>
@@ -120,6 +121,7 @@ const SongRowWrapper = React.memo(({
   disableAddButton?: boolean
   disableCovers?: boolean
   visibleIds: string[]
+  favoriteIds: Set<string>
 }) => {
   // Use provided mediaMap for efficient lookup, fallback to hook if not provided
   const shouldFetchSong = !mediaMap
@@ -155,6 +157,7 @@ const SongRowWrapper = React.memo(({
       mqlMatch={mqlMatch}
       slim={slim}
       style={style}
+      favoriteIds={favoriteIds}
     />
   )
 }, (prevProps, nextProps) => {
@@ -189,6 +192,7 @@ const MusicTable = ({
   
   // Get data from LiveStore hooks
   const currentSongId = useCurrentPlayingSongId('default')
+  const favoriteIds = useFavoriteIds() // Single query, shared by all rows
   const loading = useUIStore(s => s.loading)
   const mqlMatch = useUIStore(s => s.mqlMatch)
   const location = useLocation()
@@ -197,7 +201,7 @@ const MusicTable = ({
   const dispatch = useDispatch()
   
   const [isToolbarVisible, setIsToolbarVisible] = React.useState(true)
-  const [lastScrollTop, setLastScrollTop] = React.useState(0)
+  const lastScrollTopRef = React.useRef(0)
   const [isToolbarHidden, setIsToolbarHidden] = React.useState(false)
 
   const errors = error && <div>{error}</div>
@@ -212,7 +216,7 @@ const MusicTable = ({
     )
   }
 
-  const rowRenderer = ({
+  const rowRenderer = React.useCallback(({
     index,       // Index of row
     key,         // Key for React reconciliation
     style,       // Style object to be applied to row (to position it);
@@ -236,9 +240,10 @@ const MusicTable = ({
         disableAddButton={disableAddButton}
         disableCovers={slim || disableCovers}
         visibleIds={tableIds}
+        favoriteIds={favoriteIds}
       />
     )
-  }
+  }, [tableIds, currentSongId, mediaMap, liveQueue, mqlMatch, dispatch, disableAddButton, disableCovers, favoriteIds])
 
   // Track the position of current playing to jump there
   const currentIndex = !disableCurrent ? tableIds.indexOf(currentSongId || '') : 0
@@ -284,7 +289,7 @@ const MusicTable = ({
 
   const actions = React.useMemo(() => getActions(), [location.pathname, currentSongId, tableIds.length])
 
-  const handleScroll = ({ clientHeight, scrollHeight, scrollTop }: { clientHeight: number, scrollHeight: number, scrollTop: number }) => {
+  const handleScroll = React.useCallback(({ clientHeight, scrollHeight, scrollTop }: { clientHeight: number, scrollHeight: number, scrollTop: number }) => {
     // If content isn't scrollable, always keep toolbar visible
     if (clientHeight === scrollHeight) {
       setIsToolbarVisible(true)
@@ -292,14 +297,17 @@ const MusicTable = ({
       return
     }
 
-    if (scrollTop > lastScrollTop) {
-      setIsToolbarVisible(false)
+    const scrollingDown = scrollTop > lastScrollTopRef.current
+    lastScrollTopRef.current = scrollTop
+
+    // Only update state when visibility actually changes
+    if (scrollingDown) {
+      setIsToolbarVisible(prev => prev ? false : prev)
     } else {
       setIsToolbarHidden(false)
-      setIsToolbarVisible(true)
+      setIsToolbarVisible(prev => prev ? prev : true)
     }
-    setLastScrollTop(scrollTop)
-  }
+  }, [])
 
   const handleTransitionEnd = () => {
     if (!isToolbarVisible) {
@@ -327,7 +335,6 @@ const MusicTable = ({
             width={width}
             overscanRowCount={10}
             scrollToIndex={currentIndex}
-            recomputeRowHeights
             onScroll={handleScroll}
           />
         )}

@@ -73,19 +73,20 @@ export const useIsFavorite = (mediaId: string | null | undefined) => {
  * ))
  * ```
  */
-export const useFavoriteIds = (): Set<string> => {
+export const useFavoriteIds = (skip = false): Set<string> => {
   const store = useAppStore()
   const favoriteRecords = store.useQuery(
     queryDb(
-      tables.favorites.select('mediaId')
+      skip
+        ? tables.favorites.select('mediaId').where('id', '=', '__NONE__')
+        : tables.favorites.select('mediaId')
     )
   )
   
-  // IMPORTANT: Wrap in useMemo to prevent creating new Set on every render
-  // Without this, every component using this hook would re-render on any state change
   return useMemo(() => {
+    if (skip) return new Set<string>()
     const records = favoriteRecords as any[] | undefined
     if (!records || !Array.isArray(records)) return new Set<string>()
     return new Set<string>(records.map(f => f.mediaId))
-  }, [favoriteRecords])
+  }, [favoriteRecords, skip])
 }

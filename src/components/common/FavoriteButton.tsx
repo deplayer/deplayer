@@ -6,19 +6,22 @@ import { toggleFavoriteAction } from '../../stores/livestore/actions'
 interface Props {
   songId: string
   className?: string
+  favoriteIds?: Set<string> // Optional: pass from parent to avoid N+1 query subscriptions
 }
 
 /**
  * FavoriteButton - Toggle favorite status for a song
  * 
- * PERFORMANCE: Uses useFavoriteIds() which loads all favorites once as a Set,
- * instead of useIsFavorite(songId) which runs a separate query per song.
- * This is critical for lists with many songs (e.g., artist view with 100+ tracks).
+ * PERFORMANCE: When rendered in a list, pass `favoriteIds` from the parent
+ * to share a single query subscription. Falls back to its own hook when
+ * rendered standalone (e.g., SongView).
  */
-const FavoriteButton: React.FC<Props> = React.memo(({ songId, className = '' }) => {
+const FavoriteButton: React.FC<Props> = React.memo(({ songId, className = '', favoriteIds: favoriteIdsProp }) => {
   const liveStore = useAppStore()
-  // Use shared Set of all favorite IDs - single query for all songs
-  const favoriteIds = useFavoriteIds()
+  // When rendered in a list, parent passes favoriteIds — skip the query
+  // When standalone, run own query (pass undefined to hook to get real data)
+  const favoriteIdsFromHook = useFavoriteIds(favoriteIdsProp !== undefined)
+  const favoriteIds = favoriteIdsProp ?? favoriteIdsFromHook
   const isFavorite = favoriteIds.has(songId)
 
   const toggleFavorite = React.useCallback(async (e: React.MouseEvent) => {

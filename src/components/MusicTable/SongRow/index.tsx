@@ -22,7 +22,8 @@ export type Props = {
   disableCovers?: boolean,
   mqlMatch?: boolean,
   slim?: boolean,
-  style: React.CSSProperties
+  style: React.CSSProperties,
+  favoriteIds?: Set<string>,
 }
 
 const SongCover = React.memo(({ cover, onClick, albumName }: { cover: Cover, onClick: () => void, albumName: string }) => {
@@ -109,7 +110,7 @@ const SongRow = React.memo((props: Props) => {
         )}
       </div>
       <div className='flex items-center min-w-fit' tabIndex={0}>
-        <FavoriteButton songId={song.id} className="mr-2" />
+        <FavoriteButton songId={song.id} className="mr-2" favoriteIds={props.favoriteIds} />
         <div className='mx-4'>
           { !props.slim && song.stream && <ProviderTags song={song} /> }
           {props.slim && (

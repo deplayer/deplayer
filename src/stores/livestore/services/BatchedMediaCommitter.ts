@@ -38,7 +38,8 @@ function normalizeMediaForLiveStore(media: IMedia): any {
  * BatchedMediaCommitter - Throttled commit service for LiveStore
  * 
  * Batches multiple provider results into fewer commits to reduce UI refreshes.
- * Uses skipRefresh during batch window, then manualRefresh() at the end.
+ * All chunks except the last use skipRefresh; the last chunk commits normally
+ * so LiveStore's natural reactivity handles the refresh incrementally.
  * 
  * Performance improvement:
  * - Before: 5 providers = 5 commits = 5 UI refreshes
@@ -130,47 +131,7 @@ class BatchedMediaCommitter {
     })
   }
   
-  /**
-   * Defer the manualRefresh() call to avoid blocking main thread
-   * 
-   * manualRefresh() triggers all React components to re-render synchronously,
-   * which was causing 96ms FPS drops. By deferring to requestIdleCallback,
-   * we allow the browser to handle urgent work (animations, input) first.
-   */
-  private deferredRefresh(): Promise<void> {
-    return new Promise(resolve => {
-      if (!this.store) {
-        resolve()
-        return
-      }
-      
-      const store = this.store
-      
-      // Use requestIdleCallback for non-urgent refresh
-      // Falls back to requestAnimationFrame -> setTimeout chain for broader support
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(
-          () => {
-            profiler.start('actual-refresh')
-            store.manualRefresh()
-            profiler.end('actual-refresh')
-            resolve()
-          },
-          { timeout: 100 } // Max 100ms delay
-        )
-      } else {
-        // Fallback: use rAF + setTimeout to yield to rendering
-        requestAnimationFrame(() => {
-          setTimeout(() => {
-            profiler.start('actual-refresh')
-            store.manualRefresh()
-            profiler.end('actual-refresh')
-            resolve()
-          }, 0)
-        })
-      }
-    })
-  }
+  
   
   /**
    * Immediately flush all pending media to LiveStore
@@ -225,24 +186,35 @@ class BatchedMediaCommitter {
       }
       
       // Process in chunks to avoid blocking main thread
-      // Each chunk: normalize → commit with skipRefresh → yield to main thread
+      // All chunks except the last use skipRefresh
+      // The last chunk commits normally, letting LiveStore's reactivity handle the refresh
+      const totalChunks = Math.ceil(newMedia.length / this.CHUNK_SIZE)
       let chunkIndex = 0
       for (let i = 0; i < newMedia.length; i += this.CHUNK_SIZE) {
         const chunk = newMedia.slice(i, i + this.CHUNK_SIZE)
+        const isLastChunk = chunkIndex === totalChunks - 1
         
         profiler.start(`chunk-${chunkIndex}-normalize`)
         const normalizedChunk = chunk.map(normalizeMediaForLiveStore)
         profiler.end(`chunk-${chunkIndex}-normalize`)
         
         profiler.start(`chunk-${chunkIndex}-commit`)
-        await this.store.commit(
-          { skipRefresh: true },
-          mediaEvents.mediaBulkAdded({ media: normalizedChunk })
-        )
+        if (isLastChunk) {
+          // Last chunk: normal commit triggers LiveStore's natural reactivity
+          await this.store.commit(
+            mediaEvents.mediaBulkAdded({ media: normalizedChunk })
+          )
+        } else {
+          // Earlier chunks: skip refresh to avoid intermediate UI updates
+          await this.store.commit(
+            { skipRefresh: true },
+            mediaEvents.mediaBulkAdded({ media: normalizedChunk })
+          )
+        }
         profiler.end(`chunk-${chunkIndex}-commit`)
         
         // Yield to main thread between chunks to allow UI updates
-        if (i + this.CHUNK_SIZE < newMedia.length) {
+        if (!isLastChunk) {
           profiler.start(`chunk-${chunkIndex}-yield`)
           await this.yieldToMain()
           profiler.end(`chunk-${chunkIndex}-yield`)
@@ -250,12 +222,6 @@ class BatchedMediaCommitter {
         
         chunkIndex++
       }
-      
-      // Defer the refresh to avoid blocking main thread
-      // The 96ms manualRefresh() was causing FPS drops
-      profiler.start('schedule-refresh')
-      await this.deferredRefresh()
-      profiler.end('schedule-refresh')
       
       profiler.mark('flush-end')
       profiler.report()
