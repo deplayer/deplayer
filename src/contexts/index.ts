@@ -8,4 +8,3 @@
  */
 
 export { ThemeProvider, useTheme, THEMES, type Theme } from './ThemeContext'
-export { UIProvider, useUI, type UIState, type UIActions } from './UIContext'

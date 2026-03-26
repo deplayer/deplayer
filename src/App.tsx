@@ -14,7 +14,7 @@ import { useAppStore } from './stores/livestore/store'
 import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck'
 import { setupFts5 } from './stores/livestore/fts5-setup'
 import { setupIndexes } from './stores/livestore/indexes-setup'
-import { ThemeProvider, UIProvider } from './contexts'
+import { ThemeProvider } from './contexts'
 
 
 import LayoutContainer from './containers/LayoutContainer'
@@ -149,13 +149,11 @@ const App = () => {
           </div>
         }>
           <ThemeProvider>
-            <UIProvider>
-              <Provider store={store}>
-                <Router history={history}>
-                  <AppContent playerPortal={playerPortal} />
-                </Router>
-              </Provider>
-            </UIProvider>
+            <Provider store={store}>
+              <Router history={history}>
+                <AppContent playerPortal={playerPortal} />
+              </Router>
+            </Provider>
           </ThemeProvider>
         </Suspense>
       </StoreRegistryProvider>

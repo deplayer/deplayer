@@ -4,7 +4,6 @@ import { BrowserRouter } from 'react-router-dom'
 import { State as RootState } from '../reducers'
 import { createTestStore } from './store'
 import userEvent from '@testing-library/user-event'
-import { UIProvider } from '../contexts/UIContext'
 import { useUIStore } from '../stores/uiStore'
 import { StoreRegistry, StoreRegistryProvider } from '@livestore/react'
 import { Suspense } from 'react'
@@ -35,11 +34,9 @@ export const renderWithProviders = (
       <StoreRegistryProvider storeRegistry={storeRegistry}>
         <Suspense fallback={null}>
           <Provider store={store}>
-            <UIProvider initialState={{ loading: false, ready: true }}>
-              <BrowserRouter>
-                {children}
-              </BrowserRouter>
-            </UIProvider>
+            <BrowserRouter>
+              {children}
+            </BrowserRouter>
           </Provider>
         </Suspense>
       </StoreRegistryProvider>
