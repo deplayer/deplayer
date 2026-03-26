@@ -1,13 +1,14 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import * as types from "../constants/ActionTypes";
 import { useEffect } from "react";
+import { useUIStore } from "../stores/uiStore";
 
 const JoinRoom = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const appReady = useSelector((state: any) => state.app.ready);
+  const appReady = useUIStore(s => s.ready);
 
   useEffect(() => {
     if (id && appReady) {

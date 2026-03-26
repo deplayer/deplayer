@@ -4,6 +4,7 @@ import * as types from '../../constants/ActionTypes'
 import SidebarContents from './SidebarContents'
 import Sidebar from 'react-sidebar'
 import { State } from '../../reducers'
+import { useUIStore } from '../../stores/uiStore'
 
 type Props = {
   children: React.ReactNode
@@ -11,8 +12,8 @@ type Props = {
 
 function MSidebar({ children }: Props) {
   const dispatch = useDispatch()
-  const sidebarToggled = useSelector((state: State) => state.app.sidebarToggled)
-  const mqlMatch = useSelector((state: State) => state.app.mqlMatch)
+  const sidebarToggled = useUIStore(s => s.sidebarToggled)
+  const mqlMatch = useUIStore(s => s.mqlMatch)
   const app = useSelector((state: State) => state.app)
   const player = useSelector((state: State) => state.player)
   
