@@ -2,7 +2,7 @@ import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 import { useMemo } from 'react'
-import type { Filter } from '../../uiStore'
+import { useUIStore } from '../../uiStore'
 import { useFavoriteIds } from './useFavorites'
 
 /**
@@ -54,8 +54,10 @@ function transformMediaFromLiveStore(rawMedia: any): any {
  * return <MusicTable tableIds={ids} mediaMap={map} />
  * ```
  */
-export const useCollectionData = (filters: Filter, searchTerm: string) => {
+export const useCollectionData = () => {
   const store = useAppStore()
+  const filters = useUIStore(s => s.activeFilters)
+  const searchTerm = useUIStore(s => s.searchTerm)
   const favoriteIds = useFavoriteIds()
   // Convert Set to Array for type compatibility
   const favoriteIdsArray = useMemo(() => Array.from(favoriteIds), [favoriteIds])

@@ -14,13 +14,11 @@ const Collection = () => {
   // Get data from LiveStore hooks and contexts
   const liveSettings = useSettings()
   const loading = useUIStore(s => s.loading)
-  const activeFilters = useUIStore(s => s.activeFilters)
-  const searchTerm = useUIStore(s => s.searchTerm)
   
   // ===== OPTIMIZED: Single reactive query that combines filtering + media map =====
   // This prevents the cascade of re-renders from separate queries
   // Performance: Single DB query, single React render, no freeze
-  const { ids, map } = useCollectionData(activeFilters, searchTerm)
+  const { ids, map } = useCollectionData()
   
   // Get queue once for MusicTable (performance optimization)
   const queue = useQueue('default')
