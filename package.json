@@ -50,7 +50,8 @@
     "react-slick": "^0.30.3",
     "react-toastify": "^10.0.5",
     "redux-first-history": "^5.2.0",
-    "slick-carousel": "^1.8.1"
+    "slick-carousel": "^1.8.1",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@fortawesome/free-brands-svg-icons": "^6.5.2",
