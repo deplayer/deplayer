@@ -256,6 +256,26 @@ describe('ContextualMenu', () => {
       expect(mockAddNextAction).toHaveBeenCalledWith(expect.any(Object), [mockSong1.id])
     })
 
+    it('should show Add Next button when currentPlaying is 0 (first track)', async () => {
+      // Regression test: currentPlaying === 0 is a valid position, not falsy
+      const queueWithFirstTrack = {
+        trackIds: [mockSong1.id],
+        randomTrackIds: [],
+        currentPlaying: 0, // First track position - should NOT be treated as falsy
+        repeat: false,
+        shuffle: false,
+        nextSongId: null,
+        prevSongId: null
+      }
+      setup({ queue: queueWithFirstTrack })
+      const trigger = screen.getByRole('button', { name: /open context menu/i })
+      
+      await user.click(trigger)
+      
+      // Add Next should be visible even when currentPlaying is 0
+      expect(screen.getByRole('button', { name: /addNext/i })).toBeInTheDocument()
+    })
+
     it('should dispatch REMOVE_FROM_COLLECTION action', async () => {
       const { dispatch } = setup()
       const trigger = screen.getByRole('button', { name: /open context menu/i })

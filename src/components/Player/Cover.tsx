@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import CoverImage from '../MusicTable/CoverImage'
 import Modal from '../common/Modal'
 import Media from '../../entities/Media'
@@ -12,25 +12,9 @@ type Props = {
 const Cover = (props: Props) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
-  const [isImageLoaded, setIsImageLoaded] = useState(false)
-  const imageRef = useRef<HTMLImageElement | null>(null)
 
-  // Handle null/undefined song gracefully
   const song = props.song
-  
-  useEffect(() => {
-    if (song?.cover?.thumbnailUrl) {
-      const img = new Image()
-      img.onload = () => setIsImageLoaded(true)
-      img.src = song.cover.thumbnailUrl
-      imageRef.current = img
-      return () => {
-        imageRef.current = null
-      }
-    }
-  }, [song?.cover?.thumbnailUrl])
 
-  // Don't render if no song or slim mode
   if (props.slim || !song) {
     return null
   }
@@ -46,7 +30,7 @@ const Cover = (props: Props) => {
 
   return (
     <>
-      <div 
+      <div
         className='relative text-lg hidden md:block cursor-pointer w-16 h-16 aspect-square'
         onClick={handleClick}
         onMouseEnter={() => setIsHovered(true)}
@@ -62,29 +46,27 @@ const Cover = (props: Props) => {
             noFade
           />
         </div>
-        
+
         {/* Hover Preview */}
-        {isImageLoaded && (
-          <div 
-            className={`absolute z-[100] bg-base-100 p-2 rounded-lg shadow-xl transition-all duration-200 ${isHovered ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
-            style={{ 
-              bottom: 'calc(100% + 10px)',
-              left: '0',
-              width: '200px',
-              aspectRatio: '1/1',
-              pointerEvents: 'none'
-            }}
-            data-testid="hover-preview"
-          >
-            <CoverImage
-              useImage
-              cover={song.cover}
-              size='medium'
-              albumName={albumName}
-              noFade
-            />
-          </div>
-        )}
+        <div
+          className={`absolute z-[100] bg-base-100 p-2 rounded-lg shadow-xl transition-all duration-200 ${isHovered ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+          style={{
+            bottom: 'calc(100% + 10px)',
+            left: '0',
+            width: '200px',
+            aspectRatio: '1/1',
+            pointerEvents: 'none'
+          }}
+          data-testid="hover-preview"
+        >
+          <CoverImage
+            useImage
+            cover={song.cover}
+            size='medium'
+            albumName={albumName}
+            noFade
+          />
+        </div>
       </div>
 
       {/* Fullscreen Modal */}
@@ -98,7 +80,7 @@ const Cover = (props: Props) => {
             <CoverImage
               useImage
               cover={song.cover}
-              size='large'
+              size='full'
               albumName={albumName}
               noFade
             />

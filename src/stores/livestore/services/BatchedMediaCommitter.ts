@@ -185,36 +185,28 @@ class BatchedMediaCommitter {
         return
       }
       
-      // Process in chunks to avoid blocking main thread
-      // All chunks except the last use skipRefresh
-      // The last chunk commits normally, letting LiveStore's reactivity handle the refresh
+      // Process ALL chunks with skipRefresh to avoid blocking the main thread.
+      // Previously, the last chunk committed without skipRefresh which triggered
+      // LiveStore to re-execute ALL reactive queries synchronously — causing 17+
+      // second main thread blocks when the collection had thousands of items.
       const totalChunks = Math.ceil(newMedia.length / this.CHUNK_SIZE)
       let chunkIndex = 0
       for (let i = 0; i < newMedia.length; i += this.CHUNK_SIZE) {
         const chunk = newMedia.slice(i, i + this.CHUNK_SIZE)
-        const isLastChunk = chunkIndex === totalChunks - 1
         
         profiler.start(`chunk-${chunkIndex}-normalize`)
         const normalizedChunk = chunk.map(normalizeMediaForLiveStore)
         profiler.end(`chunk-${chunkIndex}-normalize`)
         
         profiler.start(`chunk-${chunkIndex}-commit`)
-        if (isLastChunk) {
-          // Last chunk: normal commit triggers LiveStore's natural reactivity
-          await this.store.commit(
-            mediaEvents.mediaBulkAdded({ media: normalizedChunk })
-          )
-        } else {
-          // Earlier chunks: skip refresh to avoid intermediate UI updates
-          await this.store.commit(
-            { skipRefresh: true },
-            mediaEvents.mediaBulkAdded({ media: normalizedChunk })
-          )
-        }
+        await this.store.commit(
+          { skipRefresh: true },
+          mediaEvents.mediaBulkAdded({ media: normalizedChunk })
+        )
         profiler.end(`chunk-${chunkIndex}-commit`)
         
         // Yield to main thread between chunks to allow UI updates
-        if (!isLastChunk) {
+        if (chunkIndex < totalChunks - 1) {
           profiler.start(`chunk-${chunkIndex}-yield`)
           await this.yieldToMain()
           profiler.end(`chunk-${chunkIndex}-yield`)
@@ -222,6 +214,18 @@ class BatchedMediaCommitter {
         
         chunkIndex++
       }
+      
+      // Trigger a single refresh after all data is committed.
+      // Previously, the last chunk committed without skipRefresh, which
+      // re-executed all reactive queries while still inside the commit loop.
+      // Now we commit all chunks with skipRefresh, then trigger ONE refresh
+      // after yielding to the main thread (so the browser can paint first).
+      await this.yieldToMain()
+      profiler.start('final-refresh')
+      await this.store.commit(
+        mediaEvents.mediaBulkAdded({ media: [] })
+      )
+      profiler.end('final-refresh')
       
       profiler.mark('flush-end')
       profiler.report()

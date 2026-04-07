@@ -96,7 +96,8 @@ const LoadingRow = ({ style, slim }: { style: any, slim: boolean }) => (
 )
 
 // Wrapper component for individual song loading
-const SongRowWrapper = React.memo(({ 
+// Fast path: when mediaMap + queue are provided as props, skip all LiveStore hooks
+const SongRowDirect = React.memo(({ 
   songId, 
   mediaMap,
   queue,
@@ -111,8 +112,8 @@ const SongRowWrapper = React.memo(({
   favoriteIds,
 }: {
   songId: string
-  mediaMap?: Record<string, any>
-  queue?: any
+  mediaMap: Record<string, any>
+  queue: any
   isCurrent: boolean
   style: any
   slim: boolean
@@ -123,22 +124,71 @@ const SongRowWrapper = React.memo(({
   visibleIds: string[]
   favoriteIds: Set<string>
 }) => {
-  // Use provided mediaMap for efficient lookup, fallback to hook if not provided
-  const shouldFetchSong = !mediaMap
-  const songFromHook = useMediaById(shouldFetchSong ? songId : undefined)
-  const song = mediaMap?.[songId] ?? songFromHook
+  const song = mediaMap[songId]
   
-  // Use provided queue, fallback to hook if not provided
-  const shouldFetchQueue = !queue
-  const queueFromHook = useQueue(shouldFetchQueue ? 'default' : undefined)
-  const liveQueue = queue ?? queueFromHook
-  
-  if (!song) {
+  if (!song || !song.id) {
     return <LoadingRow style={style} slim={slim} />
   }
   
-  if (!song.id) {
-    return null
+  const onClick = () => {
+    dispatch({ type: types.PLAY_SONG, songId: song.id, contextIds: visibleIds })
+  }
+  
+  return (
+    <SongRow
+      song={song}
+      queue={queue}
+      isCurrent={isCurrent}
+      onClick={onClick}
+      dispatch={dispatch}
+      disableAddButton={disableAddButton}
+      disableCovers={disableCovers}
+      mqlMatch={mqlMatch}
+      slim={slim}
+      style={style}
+      favoriteIds={favoriteIds}
+    />
+  )
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.songId === nextProps.songId &&
+    prevProps.isCurrent === nextProps.isCurrent &&
+    prevProps.slim === nextProps.slim &&
+    prevProps.mqlMatch === nextProps.mqlMatch &&
+    prevProps.disableAddButton === nextProps.disableAddButton &&
+    prevProps.disableCovers === nextProps.disableCovers
+  )
+})
+
+// Slow path: uses LiveStore hooks for data fetching (fallback when no mediaMap/queue provided)
+const SongRowWithHooks = React.memo(({ 
+  songId, 
+  isCurrent,
+  style, 
+  slim,
+  mqlMatch,
+  dispatch,
+  disableAddButton,
+  disableCovers,
+  visibleIds,
+  favoriteIds,
+}: {
+  songId: string
+  isCurrent: boolean
+  style: any
+  slim: boolean
+  mqlMatch: boolean
+  dispatch: any
+  disableAddButton?: boolean
+  disableCovers?: boolean
+  visibleIds: string[]
+  favoriteIds: Set<string>
+}) => {
+  const song = useMediaById(songId)
+  const liveQueue = useQueue('default')
+  
+  if (!song || !song.id) {
+    return <LoadingRow style={style} slim={slim} />
   }
   
   const onClick = () => {
@@ -161,7 +211,6 @@ const SongRowWrapper = React.memo(({
     />
   )
 }, (prevProps, nextProps) => {
-  // Enhanced memo comparison - skip re-render if all relevant props are equal
   return (
     prevProps.songId === nextProps.songId &&
     prevProps.isCurrent === nextProps.isCurrent &&
@@ -169,7 +218,6 @@ const SongRowWrapper = React.memo(({
     prevProps.mqlMatch === nextProps.mqlMatch &&
     prevProps.disableAddButton === nextProps.disableAddButton &&
     prevProps.disableCovers === nextProps.disableCovers
-    // mediaMap, queue, visibleIds are stable references from parent, no need to compare
   )
 })
 
@@ -216,6 +264,16 @@ const MusicTable = ({
     )
   }
 
+  // Use refs for values that change frequently but shouldn't cause rowRenderer to be recreated
+  const tableIdsRef = React.useRef(tableIds)
+  tableIdsRef.current = tableIds
+  const currentSongIdRef = React.useRef(currentSongId)
+  currentSongIdRef.current = currentSongId
+  const mediaMapRef = React.useRef(mediaMap)
+  mediaMapRef.current = mediaMap
+  const favoriteIdsRef = React.useRef(favoriteIds)
+  favoriteIdsRef.current = favoriteIds
+
   const rowRenderer = React.useCallback(({
     index,       // Index of row
     key,         // Key for React reconciliation
@@ -223,30 +281,48 @@ const MusicTable = ({
     slim
     // This must be passed through to the rendered row element.
   }: { index: number, key: string, style: any, slim: boolean }): any => {
-    const songId = tableIds[index]
-    const isCurrent = songId === currentSongId
+    const songId = tableIdsRef.current[index]
+    const isCurrent = songId === currentSongIdRef.current
 
-    return (
-      <SongRowWrapper 
-        key={key}
-        songId={songId}
-        mediaMap={mediaMap}
-        queue={liveQueue}
-        isCurrent={isCurrent}
-        style={style} 
-        slim={slim}
-        mqlMatch={mqlMatch}
-        dispatch={dispatch}
-        disableAddButton={disableAddButton}
-        disableCovers={slim || disableCovers}
-        visibleIds={tableIds}
-        favoriteIds={favoriteIds}
-      />
-    )
-  }, [tableIds, currentSongId, mediaMap, liveQueue, mqlMatch, dispatch, disableAddButton, disableCovers, favoriteIds])
+    const currentMediaMap = mediaMapRef.current
+    const currentQueue = liveQueue
+    const sharedProps = {
+      key,
+      songId,
+      isCurrent,
+      style, 
+      slim,
+      mqlMatch,
+      dispatch,
+      disableAddButton,
+      disableCovers: slim || disableCovers,
+      visibleIds: tableIdsRef.current,
+      favoriteIds: favoriteIdsRef.current,
+    }
 
-  // Track the position of current playing to jump there
-  const currentIndex = !disableCurrent ? tableIds.indexOf(currentSongId || '') : 0
+    // Fast path: skip LiveStore hooks when data is provided via props
+    if (currentMediaMap && currentQueue) {
+      return <SongRowDirect {...sharedProps} mediaMap={currentMediaMap} queue={currentQueue} />
+    }
+
+    // Slow path: use LiveStore hooks
+    return <SongRowWithHooks {...sharedProps} />
+  }, [liveQueue, mqlMatch, dispatch, disableAddButton, disableCovers])
+
+  // Stable rowRenderer wrapper that includes slim without creating new function refs
+  const slimRef = React.useRef(slim)
+  slimRef.current = slim
+  const stableRowRenderer = React.useCallback(
+    ({ index, key, style }: { index: number, key: string, style: any }) => 
+      rowRenderer({ index, key, style, slim: !!slimRef.current }),
+    [rowRenderer]
+  )
+
+  // Only scroll to current song on initial mount, not on every re-render
+  const initialScrollIndex = React.useRef(
+    !disableCurrent ? tableIds.indexOf(currentSongId || '') : -1
+  )
+  const [scrollToIndex, setScrollToIndex] = React.useState(initialScrollIndex.current)
 
   const getActions = () => {
     if (location.pathname.match(/\/song\/.*/)) {
@@ -288,6 +364,14 @@ const MusicTable = ({
   }
 
   const actions = React.useMemo(() => getActions(), [location.pathname, currentSongId, tableIds.length])
+
+  // Clear scrollToIndex after first render so it doesn't fight with user scrolling
+  React.useEffect(() => {
+    if (scrollToIndex >= 0) {
+      const timer = setTimeout(() => setScrollToIndex(-1), 100)
+      return () => clearTimeout(timer)
+    }
+  }, [scrollToIndex])
 
   const handleScroll = React.useCallback(({ clientHeight, scrollHeight, scrollTop }: { clientHeight: number, scrollHeight: number, scrollTop: number }) => {
     // If content isn't scrollable, always keep toolbar visible
@@ -331,10 +415,10 @@ const MusicTable = ({
             height={height}
             rowCount={tableIds.length}
             rowHeight={slim ? 80 : 100}
-            rowRenderer={({ index, key, style }) => rowRenderer({ index, key, style, slim: !!slim })}
+            rowRenderer={stableRowRenderer}
             width={width}
             overscanRowCount={10}
-            scrollToIndex={currentIndex}
+            scrollToIndex={scrollToIndex >= 0 ? scrollToIndex : undefined}
             onScroll={handleScroll}
           />
         )}

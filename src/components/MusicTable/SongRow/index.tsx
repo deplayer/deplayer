@@ -4,12 +4,41 @@ import { Translate } from 'react-redux-i18n'
 import React from 'react'
 
 import { getDurationStr } from '../../../utils/timeFormatter'
-import ContextualMenu from './../ContextualMenu'
 import CoverImage from './../CoverImage'
 import Media, { Cover } from '../../../entities/Media'
 import Tag from '../../common/Tag'
 import ServiceIcon from '../../ServiceIcon'
 import { State as QueueState } from '../../../reducers/queue'
+
+const ContextualMenu = React.lazy(() => import('./../ContextualMenu'))
+
+// Lightweight trigger that only mounts the heavy ContextualMenu on demand
+const LazyContextualMenuTrigger = (props: any) => {
+  const [opened, setOpened] = React.useState(false)
+  const Icon = React.lazy(() => import('../../common/Icon'))
+
+  if (!opened) {
+    return (
+      <div
+        onClick={(e) => { e.stopPropagation(); setOpened(true) }}
+        role="button"
+        tabIndex={0}
+        aria-label="Open context menu"
+        className='cursor-pointer p-2 menu-trigger focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset rounded'
+      >
+        <React.Suspense fallback={<span>⋮</span>}>
+          <Icon icon='faEllipsisV' className='text-blue-400' />
+        </React.Suspense>
+      </div>
+    )
+  }
+
+  return (
+    <React.Suspense fallback={<span>⋮</span>}>
+      <ContextualMenu {...props} />
+    </React.Suspense>
+  )
+}
 import FavoriteButton from '../../common/FavoriteButton'
 
 export type Props = {
@@ -118,7 +147,7 @@ const SongRow = React.memo((props: Props) => {
           )}
         </div>
         <div className='relative'>
-          <ContextualMenu {...props} />
+          <LazyContextualMenuTrigger {...props} />
         </div>
       </div>
     </div>

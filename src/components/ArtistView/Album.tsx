@@ -191,7 +191,7 @@ const Album = React.memo((props: AlbumProps) => {
             <Translate value='buttons.addToQueue' />
           </Button>
 
-          {queue?.currentPlaying && (
+          {queue?.currentPlaying !== null && queue?.currentPlaying !== undefined && (
             <Button
               transparent
               onClick={addAlbumNext}

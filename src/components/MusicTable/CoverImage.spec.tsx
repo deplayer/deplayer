@@ -1,28 +1,26 @@
 import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
-
-import Media from '../../entities/Media'
+import { describe, it, expect, vi } from 'vitest'
 import CoverImage from './CoverImage'
-import { mediaParams } from '../../entities/Media.spec'
 
-const setup = () => {
-  const props = {
-    song: new Media(mediaParams),
-    size: 'thumbnail',
-    albumName: 'My album',
-    cover: {
-      fullUrl: '',
-      thumbnailUrl: '',
-    },
-    isCurrent: false
-  }
-
-  render(<CoverImage {...props} />)
-}
+vi.mock('../../hooks/useCoverImage', () => ({
+  useCoverImage: vi.fn().mockReturnValue(undefined),
+}))
 
 describe('CoverImage', () => {
-  it('should show render without errors', () => {
-    setup()
+  it('should render without errors', () => {
+    render(
+      <CoverImage
+        cover={{ fullUrl: '', thumbnailUrl: '' }}
+        size="thumbnail"
+        albumName="My album"
+      />
+    )
     expect(screen.getByTestId('cover-image')).toBeTruthy()
+  })
+
+  it('should show placeholder when no cover provided', () => {
+    render(<CoverImage albumName="No cover" />)
+    const el = screen.getByTestId('cover-image')
+    expect(el.style.backgroundImage).toContain('disc.svg')
   })
 })

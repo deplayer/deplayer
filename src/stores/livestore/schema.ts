@@ -8,6 +8,7 @@ import { favoriteEvents } from './events/favorites'
 import { lyricsEvents } from './events/lyrics'
 import { settingsEvents } from './events/settings'
 import { playbackEvents } from './events/playback'
+import { syncEvents } from './events/sync'
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -197,6 +198,19 @@ export const tables = {
       createdAt: State.SQLite.integer({}),
     },
   }),
+
+  // Sync State table (tracks incremental sync progress)
+  syncState: State.SQLite.table({
+    name: 'sync_state',
+    columns: {
+      id: State.SQLite.text({ primaryKey: true }),
+      lastSyncTimestamp: State.SQLite.text({ default: '' }),
+      lastKnownCount: State.SQLite.integer({ default: 0 }),
+      initialSyncCursor: State.SQLite.integer({ default: 0 }),
+      initialSyncComplete: State.SQLite.boolean({ default: false }),
+      updatedAt: State.SQLite.integer({}),
+    },
+  }),
 }
 
 // ============================================================================
@@ -212,6 +226,7 @@ export const events = {
   ...favoriteEvents,
   ...lyricsEvents,
   ...playbackEvents,
+  ...syncEvents,
 }
 
 // ============================================================================
@@ -729,6 +744,27 @@ const materializers = State.SQLite.materializers(events, {
         updatedAt: now,
       })
       .where('id', '=', id)
+  },
+
+  // Sync State materializer
+  'v1.SyncStateUpdated': ({ id, lastSyncTimestamp, lastKnownCount, initialSyncCursor, initialSyncComplete }: any) => {
+    const now = Date.now()
+    return tables.syncState
+      .insert({
+        id,
+        lastSyncTimestamp,
+        lastKnownCount,
+        initialSyncCursor,
+        initialSyncComplete,
+        updatedAt: now,
+      })
+      .onConflict('id', 'update', {
+        lastSyncTimestamp,
+        lastKnownCount,
+        initialSyncCursor,
+        initialSyncComplete,
+        updatedAt: now,
+      })
   },
 
   'v1.PlaybackCleared': ({ id }: any) => {

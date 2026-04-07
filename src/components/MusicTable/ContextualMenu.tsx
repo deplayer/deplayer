@@ -442,7 +442,7 @@ const ContextualMenu = (props: MenuProps) => {
             </div>
           )}
 
-          {!disableAddButton && props.queue?.currentPlaying && (
+          {!disableAddButton && props.queue?.currentPlaying !== null && props.queue?.currentPlaying !== undefined && (
             <div role="menuitem" tabIndex={-1}>
               <Button
                 fullWidth
