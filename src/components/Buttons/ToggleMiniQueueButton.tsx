@@ -1,18 +1,13 @@
-import { Dispatch } from 'redux'
+import { useDispatch } from 'react-redux'
 import { I18n } from 'react-redux-i18n'
-import { connect } from 'react-redux'
-
 import { TOGGLE_MINI_QUEUE } from '../../constants/ActionTypes'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
 
-type Props = {
-  dispatch: Dispatch
-}
-
-const ToggleMiniQueue = (props: Props) => {
+const ToggleMiniQueueButton = () => {
+  const dispatch = useDispatch()
   const toggleMiniQueue = () => {
-    props.dispatch({ type: TOGGLE_MINI_QUEUE })
+    dispatch({ type: TOGGLE_MINI_QUEUE })
   }
 
   return (
@@ -21,12 +16,9 @@ const ToggleMiniQueue = (props: Props) => {
       onClick={toggleMiniQueue}
       title={I18n.t('buttons.toggleMiniQueue')}
     >
-      <Icon
-        icon='faEyeSlash'
-        className='mx-2'
-      />
+      <Icon icon='faEyeSlash' className='mx-2' />
     </Button>
   )
 }
 
-export default connect()(ToggleMiniQueue)
+export default ToggleMiniQueueButton
