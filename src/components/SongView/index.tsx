@@ -4,7 +4,7 @@ import { Translate } from 'react-redux-i18n'
 import * as React from 'react'
 import { AutoSizer } from 'react-virtualized'
 
-import NotFound from '../NotFound'
+import CenteredMessage from '../common/CenteredMessage'
 import { getDurationStr } from '../../utils/timeFormatter'
 import Button from '../common/Button'
 import CoverImage from '../MusicTable/CoverImage'
@@ -129,7 +129,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
   }
 
   if (!song || !song.id) {
-    return <NotFound>The requested song can not be found</NotFound>
+    return <CenteredMessage><div className='text-center'>The requested song can not be found</div></CenteredMessage>
   }
 
   // Use songObj (Media instance) for accessing nested artist/album properties
