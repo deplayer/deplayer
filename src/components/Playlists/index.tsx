@@ -3,13 +3,10 @@ import EmptyState from '../common/EmptyState/index'
 import Icon from '../common/Icon'
 import { Translate } from 'react-redux-i18n'
 import { memo, useMemo } from 'react'
+import { useDispatch } from 'react-redux'
 import { useMediaCount, useSongsByGenre, usePlaylists, useSmartPlaylists, useQueue, useSettings } from '../../stores/livestore/hooks'
 import { getEmptyStateFallback, queueStep, searchStep } from '../common/EmptyState/emptyStateFallback'
 import EmptyStateAction from '../common/EmptyState/EmptyStateAction'
-
-type Props = {
-  dispatch: any
-}
 
 type PlaylistType = {
   _id: string;
@@ -51,7 +48,8 @@ const PlaylistSection = memo(({ title, playlists, dispatch }: {
   );
 });
 
-const Playlists = memo((props: Props) => {
+const Playlists = memo(() => {
+  const dispatch = useDispatch()
   // LiveStore hooks - get playlists, smart playlists, queue, and settings
   const playlists = usePlaylists()
   const smartPlaylists = useSmartPlaylists()
@@ -143,17 +141,17 @@ const Playlists = memo((props: Props) => {
     <div className='playlists z-10 flex flex-col w-full overflow-y-auto h-full py-6'>
       <PlaylistSection 
         playlists={transformedPlaylists} 
-        dispatch={props.dispatch}
+        dispatch={dispatch}
       />
       <PlaylistSection 
         playlists={transformedSmartPlaylists} 
-        dispatch={props.dispatch}
+        dispatch={dispatch}
       />
       {genrePlaylists.length > 0 && (
         <PlaylistSection 
           title="titles.genrePlaylists"
           playlists={genrePlaylists} 
-          dispatch={props.dispatch}
+          dispatch={dispatch}
         />
       )}
     </div>

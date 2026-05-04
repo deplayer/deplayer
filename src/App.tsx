@@ -26,7 +26,7 @@ import Collection from './components/Collection'
 import Dashboard from './components/Dashboard'
 import PlayerContainer from './containers/PlayerContainer'
 import ContextMenuContainer from './containers/ContextMenuContainer'
-import PlaylistsContainer from './containers/PlaylistsContainer'
+import Playlists from './components/Playlists'
 import Providers from './components/Providers'
 import Settings from './components/Settings/Settings'
 import Queue from './components/Queue'
@@ -115,7 +115,7 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
           <Route path="/" element={<Dashboard />} />
           <Route path="/index.html" element={<Dashboard />} />
           <Route path="/queue" element={<Queue />} />
-          <Route path="/playlists" element={<PlaylistsContainer />} />
+          <Route path="/playlists" element={<Playlists />} />
           <Route path="/collection/*" element={<Collection />} />
           <Route path="/search-results" element={<Collection />} />
           <Route path="/song/:id" element={<Song playerPortal={playerPortal} />} />
