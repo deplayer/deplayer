@@ -3,7 +3,7 @@ import 'react-contexify/ReactContexify.css';
 import { Menu, useContextMenu, Item } from 'react-contexify'
 import { Translate } from 'react-redux-i18n'
 import React from 'react'
-import { Dispatch } from 'redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useAppStore } from '../../stores/livestore/store'
 
 import Button from '../common/Button'
@@ -21,14 +21,10 @@ import PlayerRefService from '../../services/PlayerRefService'
 
 const MENU_ID = 'context-menu-player'
 
-type MenuProps = {
-  app: AppState,
-  player: PlayerState,
-  dispatch: Dispatch,
-  volume: number,
-}
-
-const ContextualMenu = (props: MenuProps) => {
+const ContextualMenu = () => {
+  const app = useSelector((state: any) => state.app) as AppState
+  const player = useSelector((state: any) => state.player) as PlayerState
+  const dispatch = useDispatch()
   // Get queue and store from LiveStore
   const liveQueue = useQueue('default')
   const liveStore = useAppStore()
@@ -50,7 +46,7 @@ const ContextualMenu = (props: MenuProps) => {
   
   const TogglePlayer = () => {
     return (
-      <Button alignLeft transparent fullWidth onClick={() => props.dispatch({ type: types.HIDE_PLAYER })}>
+      <Button alignLeft transparent fullWidth onClick={() => dispatch({ type: types.HIDE_PLAYER })}>
         <Icon
           icon='faEyeSlash'
           className='mr-2'
@@ -61,17 +57,17 @@ const ContextualMenu = (props: MenuProps) => {
   }
 
   const setVolume = (value: number | number[]) => {
-    props.dispatch({ type: types.VOLUME_SET, value: value })
+    dispatch({ type: types.VOLUME_SET, value: value })
   }
 
-  const animate = !props.player.playing && 'animate-ping'
+  const animate = !player.playing && 'animate-ping'
   const base = 'absolute right-0 bottom-0 bg-primary hover:bg-primary/80 focus:bg-primary/90 focus:outline-none flex justify-center'
   const integratedClassnames = `${base} w-10 h-10 rounded-full text-2xl m-2 mb-2.5 bg-accent`
   const standaloneClassnames = `${base} w-20 h-20 rounded-full text-4xl m-6 shadow-lg bg-accent`
 
-  const showFullscreen = props.player.playing
+  const showFullscreen = player.playing
   const showVisibilityCons = false
-  const showStartPlaying = trackIds.length && !props.player.playing
+  const showStartPlaying = trackIds.length && !player.playing
 
   const { show } = useContextMenu({
     id: MENU_ID,
@@ -91,7 +87,7 @@ const ContextualMenu = (props: MenuProps) => {
   return (
     <React.Fragment>
       <button
-        className={props.player.showPlayer ? integratedClassnames : standaloneClassnames}
+        className={player.showPlayer ? integratedClassnames : standaloneClassnames}
         id={MENU_ID}
         style={{
           zIndex: 103,
@@ -113,10 +109,10 @@ const ContextualMenu = (props: MenuProps) => {
         id={MENU_ID}
         theme='dark'
         className='flex flex-col justify-items-stretch flex-grow bg-base-300 text-base-content rounded-lg shadow-lg'
-        style={{ marginTop: props.player.showPlayer ? '-68px' : '-124px' }}
+        style={{ marginTop: player.showPlayer ? '-68px' : '-124px' }}
       >
         <VolumeControl
-          volume={props.player.volume}
+          volume={player.volume}
           onChange={setVolume}
         />
         {showVisibilityCons &&
@@ -138,7 +134,7 @@ const ContextualMenu = (props: MenuProps) => {
               transparent
               alignLeft
               fullWidth
-              onClick={() => props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
+              onClick={() => dispatch({ type: types.TOGGLE_FULL_SCREEN })}
             >
               <div className='flex items-center w-full'>
                 <Icon
@@ -155,7 +151,7 @@ const ContextualMenu = (props: MenuProps) => {
             transparent
             alignLeft
             fullWidth
-            onClick={() => props.dispatch({ type: types.TOGGLE_VISUALS })}
+            onClick={() => dispatch({ type: types.TOGGLE_VISUALS })}
           >
             <div className='flex items-center justify-between w-full gap-2'>
               <div className='flex items-center'>
@@ -167,7 +163,7 @@ const ContextualMenu = (props: MenuProps) => {
               </div>
               <input
                 type="checkbox"
-                checked={props.app.showVisuals}
+                checked={app.showVisuals}
                 readOnly
                 className="toggle toggle-primary toggle-sm"
               />
@@ -179,7 +175,7 @@ const ContextualMenu = (props: MenuProps) => {
             transparent
             alignLeft
             fullWidth
-            onClick={() => props.dispatch({ type: types.TOGGLE_SPECTRUM })}
+            onClick={() => dispatch({ type: types.TOGGLE_SPECTRUM })}
           >
             <div className='flex items-center justify-between w-full gap-2'>
               <div className='flex items-center'>
@@ -191,7 +187,7 @@ const ContextualMenu = (props: MenuProps) => {
               </div>
               <input
                 type="checkbox"
-                checked={props.app.showSpectrum}
+                checked={app.showSpectrum}
                 readOnly
                 className="toggle toggle-primary toggle-sm"
               />
@@ -254,7 +250,7 @@ const ContextualMenu = (props: MenuProps) => {
               transparent
               alignLeft
               fullWidth
-              onClick={() => props.dispatch({ type: types.PLAY_SONG, songId: trackIds[0] })}
+              onClick={() => dispatch({ type: types.PLAY_SONG, songId: trackIds[0] })}
             >
               <div className='flex items-center w-full'>
                 <Icon
@@ -267,17 +263,17 @@ const ContextualMenu = (props: MenuProps) => {
           </Item>
         }
 
-        {!props.player.showPlayer &&
+        {!player.showPlayer &&
           <Item>
             <div className='flex justify-center w-full my-4'>
               <Controls
               showFullscreen={showFullscreen}
-              toggleFullscreen={() => props.dispatch({ type: types.TOGGLE_FULL_SCREEN })}
-              playPrev={() => props.dispatch({ type: types.PLAY_PREV })}
-              isPlaying={props.player.playing}
+              toggleFullscreen={() => dispatch({ type: types.TOGGLE_FULL_SCREEN })}
+              playPrev={() => dispatch({ type: types.PLAY_PREV })}
+              isPlaying={player.playing}
               mqlMatch={true}
               playPause={() => PlayerRefService.getInstance().toggle()}
-              playNext={() => props.dispatch({ type: types.PLAY_NEXT })}
+              playNext={() => dispatch({ type: types.PLAY_NEXT })}
             />
             </div>
           </Item>

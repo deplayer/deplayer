@@ -25,7 +25,7 @@ import ArtistTable from './components/ArtistsTable/ArtistTable'
 import Collection from './components/Collection'
 import Dashboard from './components/Dashboard'
 import PlayerContainer from './containers/PlayerContainer'
-import ContextMenuContainer from './containers/ContextMenuContainer'
+import ContextualMenu from './components/Player/ContextualMenu'
 import Playlists from './components/Playlists'
 import Providers from './components/Providers'
 import Settings from './components/Settings/Settings'
@@ -127,7 +127,9 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
           <Route path="/wiki" element={<Wiki />} />
         </Routes>
       </LayoutContainer>
-      <ContextMenuContainer />
+      <div className='flex justify-end items-center' style={{ backgroundColor: 'transparent' }}>
+        <ContextualMenu />
+      </div>
       <PlayerContainer playerPortal={playerPortal} />
       <AddMediaModal />
       <GlobalKeyHandlers />
