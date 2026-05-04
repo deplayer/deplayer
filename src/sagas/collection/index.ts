@@ -2,7 +2,7 @@
 import { takeLatest, fork, call, put, delay } from "redux-saga/effects";
 import * as types from "../../constants/ActionTypes";
 import { addToCollectionWatcher, initializeWatcher } from "./watchers";
-import { IMedia } from "../../entities/Media";
+import { NormalizedMedia } from "../../utils/normalizeMedia";
 import { getSettingsFromLiveStore } from "../selectors";
 import ProvidersService from "../../services/ProvidersService";
 import { getLiveStoreInstance } from "../../App";
@@ -77,7 +77,7 @@ function* progressiveHydration(
   batchedMediaCommitter.setStore(liveStore);
 
   while (batchesProcessed < MAX_BATCHES_PER_SESSION) {
-    const batch: { media: IMedia[]; hasMore: boolean } = yield call(
+    const batch: { media: NormalizedMedia[]; hasMore: boolean } = yield call(
       [provider, provider.getAlbumsBatch!],
       cursor,
       BATCH_SIZE
@@ -167,7 +167,7 @@ export function* syncMediaLibrary(): Generator<any, void, any> {
         // Step 2: Fetch only new albums (or initial batch on first sync)
         if (syncState?.lastSyncTimestamp) {
           logger.debug(`Fetching albums newer than ${syncState.lastSyncTimestamp}`);
-          const newMedia: IMedia[] = yield call(
+          const newMedia: NormalizedMedia[] = yield call(
             [provider, provider.getNewestAlbumsSince!],
             syncState.lastSyncTimestamp
           );
@@ -180,7 +180,7 @@ export function* syncMediaLibrary(): Generator<any, void, any> {
         } else if (provider.getAlbumsBatch) {
           // First sync ever — fetch initial batch for immediate UI
           logger.debug("First sync — fetching initial batch");
-          const batch: { media: IMedia[]; hasMore: boolean } = yield call(
+          const batch: { media: NormalizedMedia[]; hasMore: boolean } = yield call(
             [provider, provider.getAlbumsBatch!],
             0,
             50

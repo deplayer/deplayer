@@ -9,8 +9,49 @@ import PlayerRefService from "./PlayerRefService";
 import { createLogger } from "../utils/logger";
 import { getLiveStoreInstance } from "../App";
 import { addMediaBulkAction } from "../stores/livestore/actions/media";
+import { NormalizedMedia } from "../utils/normalizeMedia";
 
 const logger = createLogger({ namespace: "PeerService" });
+
+/**
+ * Convert a received IMedia (from peer wire protocol) into NormalizedMedia
+ */
+function imediaToNormalized(media: IMedia): NormalizedMedia {
+  return {
+    media: {
+      id: media.id || 'unknown',
+      title: media.title,
+      artistId: media.artist?.id || 'unknown',
+      albumId: media.album?.id || 'unknown',
+      artistName: media.artist?.name || 'Unknown Artist',
+      albumName: media.album?.name || 'Unknown Album',
+      type: media.type || 'audio',
+      duration: media.duration || 0,
+      playCount: 0,
+      track: media.track ?? null,
+      discNumber: media.discNumber ?? null,
+      stream: media.stream || {},
+      cover: media.cover || null,
+      genres: media.genres || [],
+      externalId: media.externalId ?? null,
+      shareUrl: media.shareUrl ?? null,
+      filePath: media.filePath ?? null,
+      genresFlat: (media.genres || []).join(','),
+      providersFlat: Object.keys(media.stream || {}).join(','),
+    },
+    artist: {
+      id: media.artist?.id || 'unknown',
+      name: media.artist?.name || 'Unknown Artist',
+    },
+    album: {
+      id: media.album?.id || 'unknown',
+      name: media.album?.name || 'Unknown Album',
+      artistId: media.artist?.id || 'unknown',
+      thumbnailUrl: media.album?.thumbnailUrl || null,
+      year: media.album?.year ?? null,
+    },
+  }
+}
 
 // Interfaces
 export interface PeerStatus {
@@ -303,7 +344,7 @@ export default class PeerService {
     try {
       const liveStore = getLiveStoreInstance();
       if (liveStore) {
-        await addMediaBulkAction(liveStore, [modifiedMedia]);
+        await addMediaBulkAction(liveStore, [imediaToNormalized(modifiedMedia)]);
         logger.info("Added P2P shared media to LiveStore:", media.title);
       } else {
         logger.warn("LiveStore not available, P2P media not persisted");
@@ -372,7 +413,7 @@ export default class PeerService {
       try {
         const liveStore = getLiveStoreInstance();
         if (liveStore) {
-          await addMediaBulkAction(liveStore, [fixedMedia]);
+          await addMediaBulkAction(liveStore, [imediaToNormalized(fixedMedia)]);
           logger.info("Added P2P stream media to LiveStore:", media.title);
         } else {
           logger.warn("LiveStore not available, P2P stream media not persisted");

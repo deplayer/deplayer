@@ -1,36 +1,36 @@
 import { Store } from '@livestore/livestore'
 import { mediaEvents } from '../events/media'
-import { IMedia } from '../../../entities/Media'
+import { NormalizedMedia } from '../../../utils/normalizeMedia'
 
 /**
- * Normalize media object to match LiveStore event schema
- * Handles differences between IMedia structure and event schema
+ * Convert NormalizedMedia to the shape expected by LiveStore media events
  */
-function normalizeMediaForLiveStore(media: IMedia): any {
+function toEventPayload(item: NormalizedMedia): any {
+  const { media, artist, album } = item
   return {
     id: media.id,
     title: media.title,
     artist: {
-      id: media.artist.id,
-      name: media.artist.name,
+      id: artist.id,
+      name: artist.name,
     },
     album: {
-      id: media.album.id,
-      name: media.album.name,
-      artistId: media.album.artist?.id || media.artist.id, // album.artist.id or fallback to media.artist.id
-      thumbnailUrl: media.album.thumbnailUrl ?? undefined, // Convert null to undefined
-      year: media.album.year ?? undefined, // Convert null to undefined
+      id: album.id,
+      name: album.name,
+      artistId: album.artistId,
+      thumbnailUrl: album.thumbnailUrl ?? undefined,
+      year: album.year ?? undefined,
     },
     type: media.type,
-    duration: media.duration ?? undefined, // Convert null to undefined
-    track: media.track ?? undefined, // Convert null to undefined
-    discNumber: media.discNumber ?? undefined, // Convert null to undefined
+    duration: media.duration || undefined,
+    track: media.track ?? undefined,
+    discNumber: media.discNumber ?? undefined,
     stream: media.stream,
-    cover: media.cover ?? undefined, // Convert null to undefined
-    genres: media.genres || [],
-    externalId: media.externalId ?? undefined, // Convert null to undefined
-    shareUrl: media.shareUrl ?? undefined, // Convert null to undefined
-    filePath: media.filePath ?? undefined, // Convert null to undefined
+    cover: media.cover ?? undefined,
+    genres: media.genres,
+    externalId: media.externalId ?? undefined,
+    shareUrl: media.shareUrl ?? undefined,
+    filePath: media.filePath ?? undefined,
   }
 }
 
@@ -39,19 +39,15 @@ function normalizeMediaForLiveStore(media: IMedia): any {
  */
 export async function addMediaAction(
   store: Store,
-  media: IMedia
+  media: NormalizedMedia
 ): Promise<void> {
-  if (!media.id) {
-    throw new Error('Media must have an id')
-  }
-  
-  const normalized = normalizeMediaForLiveStore(media)
-  await store.commit(mediaEvents.mediaAdded(normalized))
+  const payload = toEventPayload(media)
+  await store.commit(mediaEvents.mediaAdded(payload))
 }
 
 /**
  * Add multiple media items to the collection (bulk add)
- * 
+ *
  * PHASE 1 OPTIMIZATION:
  * - Pre-filters items that already exist in database (avoids redundant inserts)
  * - Uses mediaBulkAdded event for single transaction (vs N individual transactions)
@@ -59,42 +55,34 @@ export async function addMediaAction(
  */
 export async function addMediaBulkAction(
   store: Store,
-  mediaItems: IMedia[]
+  mediaItems: NormalizedMedia[]
 ): Promise<void> {
-  // 1. Validate structure and ensure we have string IDs
-  const validMedia = mediaItems.filter((m): m is IMedia & { id: string } => {
-    if (!m.id || !m.artist?.id || !m.album?.id) {
-      return false
-    }
-    return true
-  })
-  
-  if (validMedia.length === 0) {
+  if (mediaItems.length === 0) {
     return
   }
-  
-  // 2. Query which media IDs already exist in database (PHASE 1 OPTIMIZATION)
-  const placeholders = validMedia.map(() => '?').join(',')
-  const bindValues = validMedia.reduce((acc, m, i) => {
-    acc[i + 1] = m.id
+
+  // 1. Query which media IDs already exist in database (PHASE 1 OPTIMIZATION)
+  const placeholders = mediaItems.map(() => '?').join(',')
+  const bindValues = mediaItems.reduce((acc, m, i) => {
+    acc[i + 1] = m.media.id
     return acc
   }, {} as Record<number, string>)
-  
+
   const result = await store.query({
     query: `SELECT id FROM media WHERE id IN (${placeholders})`,
     bindValues
   })
-  
+
   const existingIds = new Set<string>()
   const rows = (result as any)?.[0]?.values || []
   rows.forEach((row: any) => existingIds.add(row[0]))
-  
-  // 3. Filter to only new media items
-  const newMedia = validMedia.filter(m => !existingIds.has(m.id))
-  
-  // 4. Only insert new items using bulk event (PHASE 1 OPTIMIZATION)
+
+  // 2. Filter to only new media items
+  const newMedia = mediaItems.filter(m => !existingIds.has(m.media.id))
+
+  // 3. Only insert new items using bulk event (PHASE 1 OPTIMIZATION)
   if (newMedia.length > 0) {
-    const normalizedMedia = newMedia.map(normalizeMediaForLiveStore)
+    const normalizedMedia = newMedia.map(toEventPayload)
     await store.commit(mediaEvents.mediaBulkAdded({ media: normalizedMedia }))
   }
 }
@@ -105,7 +93,7 @@ export async function addMediaBulkAction(
 export async function updateMediaAction(
   store: Store,
   mediaId: string,
-  updates: Partial<IMedia>
+  updates: Record<string, unknown>
 ): Promise<void> {
   await store.commit(mediaEvents.mediaUpdated({
     id: mediaId,

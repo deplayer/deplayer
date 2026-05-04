@@ -12,7 +12,7 @@ import ProvidersService from "../../services/ProvidersService";
 import { getSettingsFromLiveStore } from "../selectors";
 import { getLiveStoreInstance } from "../../App";
 import { batchedMediaCommitter } from "../../stores/livestore/services/BatchedMediaCommitter";
-import { IMedia } from "../../entities/Media";
+import { NormalizedMedia } from "../../utils/normalizeMedia";
 
 // Going to search results page
 export function* goToSearchResults(): Generator<any, void, any> {
@@ -29,7 +29,7 @@ function* performSingleProviderSearch(
     const settings = yield call(getSettingsFromLiveStore);
     const providerService = new ProvidersService(settings);
     
-    const searchResults: IMedia[] = yield call(
+    const searchResults: NormalizedMedia[] = yield call(
       providerService.searchForProvider,
       searchTerm,
       provider

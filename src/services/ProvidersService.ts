@@ -1,6 +1,6 @@
 import { ISearchService } from './ISearchService'
 import providersIndex from '../providers'
-import Media from '../entities/Media'
+import { NormalizedMedia } from '../utils/normalizeMedia'
 
 export default class ProvidersService implements ISearchService {
   providers: { [key: string]: any} = {}
@@ -26,7 +26,7 @@ export default class ProvidersService implements ISearchService {
     })
   }
 
-  searchForProvider = (searchTerm: string, provider: string): Promise<Array<Media>> => {
+  searchForProvider = (searchTerm: string, provider: string): Promise<NormalizedMedia[]> => {
     if (!this.providers[provider]) {
       throw Error(`Provider ${provider} not found`)
     }
