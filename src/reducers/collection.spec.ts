@@ -1,8 +1,30 @@
 import { describe, expect, it } from "vitest";
 import * as types from "../constants/ActionTypes";
-import Media from "../entities/Media";
+import type { MediaRow } from "../types/media";
 import reducer, { defaultState } from "./collection";
-import { mediaParams } from "../entities/Media.spec";
+
+const createTestMediaRow = (overrides: Partial<MediaRow> = {}): MediaRow => ({
+  id: "test-id",
+  title: "Test Song",
+  artistId: "test-artist",
+  albumId: "test-album",
+  artistName: "Test Artist",
+  albumName: "Test Album",
+  type: "audio",
+  duration: 180,
+  playCount: 0,
+  track: null,
+  discNumber: null,
+  stream: {},
+  cover: null,
+  genres: [],
+  externalId: null,
+  shareUrl: null,
+  filePath: null,
+  genresFlat: "",
+  providersFlat: "",
+  ...overrides,
+});
 
 describe("collection reducer", () => {
   it("should return the initial state", () => {
@@ -11,9 +33,8 @@ describe("collection reducer", () => {
 
   it("should handle RECEIVE_COLLECTION", () => {
     const initialState = { ...defaultState, enabledProviders: ["itunes"] };
-    const fixtureSong = new Media({
-      ...mediaParams,
-      forcedId: "the-doors",
+    const fixtureSong = createTestMediaRow({
+      id: "the-doors",
       artistName: "The Doors",
       type: "video",
       artistId: "the-doors",
@@ -41,15 +62,14 @@ describe("collection reducer", () => {
   });
 
   it("should handle SEARCH_FINISHED", () => {
-    const fixtureSong = new Media({
-      ...mediaParams,
-      forcedId: "the-doors",
+    const fixtureSong = createTestMediaRow({
+      id: "the-doors",
       artistName: "The Doors",
     });
 
     const state = {
       ...defaultState,
-      rows: { [fixtureSong.id]: fixtureSong.toDocument() },
+      rows: { [fixtureSong.id]: fixtureSong },
     };
 
     const expected = {
@@ -61,7 +81,7 @@ describe("collection reducer", () => {
     expect(
       reducer(state, {
         type: types.SEARCH_FINISHED,
-        data: [fixtureSong.toDocument()],
+        data: [fixtureSong],
       })
     ).toMatchObject(expected);
   });
@@ -86,8 +106,8 @@ describe("collection reducer", () => {
 
   it("should handle SET_SEARCH_RESULTS", () => {
     const searchResults = [
-      new Media({ ...mediaParams, forcedId: "song1" }).toDocument(),
-      new Media({ ...mediaParams, forcedId: "song2" }).toDocument(),
+      createTestMediaRow({ id: "song1" }),
+      createTestMediaRow({ id: "song2" }),
     ];
     expect(reducer(defaultState, { type: types.SET_SEARCH_RESULTS, searchResults })).toEqual({
       ...defaultState,

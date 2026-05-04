@@ -1,68 +1,75 @@
-import Media, { IMedia, Stream } from "../entities/Media";
-import Artist, { IArtist } from "../entities/Artist";
-import Album, { IAlbum } from "../entities/Album";
+import type { MediaRow, ArtistRow, AlbumRow, Stream } from "../types/media";
 
-interface ArtistOverrides extends Partial<IArtist> {
+interface ArtistOverrides extends Partial<ArtistRow> {
   [key: string]: any;
 }
 
-interface AlbumOverrides extends Partial<IAlbum> {
+interface AlbumOverrides extends Partial<AlbumRow> {
   [key: string]: any;
 }
 
-interface MediaOverrides extends Partial<IMedia> {
+interface MediaOverrides extends Partial<MediaRow> {
   [key: string]: any;
 }
 
-const createTestArtist = (overrides: ArtistOverrides = {}): Artist => {
-  return new Artist({
+export const createTestArtist = (overrides: ArtistOverrides = {}): ArtistRow => {
+  return {
+    id: "test-artist-id",
     name: "Test Artist",
     ...overrides,
-  });
+  };
 };
 
-const createTestAlbum = (overrides: AlbumOverrides = {}): Album => {
-  const artist = overrides.artist || createTestArtist();
-  return new Album({
+export const createTestAlbum = (overrides: AlbumOverrides = {}): AlbumRow => {
+  return {
+    id: "test-album-id",
     name: "Test Album",
-    artist,
+    artistId: overrides.artistId || "test-artist-id",
+    thumbnailUrl: null,
+    year: null,
     ...overrides,
-  });
+  };
 };
 
-const createTestMedia = (overrides: MediaOverrides = {}): Media => {
-  const artist = overrides.artist || createTestArtist();
-  const album = overrides.album || createTestAlbum({ artist });
-
-  const defaultStream: { [key: string]: Stream } = {
+export const createTestMedia = (overrides: MediaOverrides = {}): MediaRow => {
+  const defaultStream: Record<string, Stream> = {
     local: {
       service: "local",
       uris: [{ uri: "file:///test.mp3" }],
     },
   };
 
-  return new Media({
+  return {
+    id: "test-media-id",
     title: "Test Song",
-    artist,
-    album,
-    artistName: artist.name,
-    albumName: album.name,
+    artistId: "test-artist-id",
+    albumId: "test-album-id",
+    artistName: "Test Artist",
+    albumName: "Test Album",
     type: "audio",
     duration: 180,
+    playCount: 0,
     track: 1,
-    year: 2024,
-    genres: [],
+    discNumber: null,
     stream: defaultStream,
+    cover: null,
+    genres: [],
+    externalId: null,
+    shareUrl: null,
+    filePath: null,
+    genresFlat: "",
+    providersFlat: "local",
     ...overrides,
-  });
+  };
 };
 
 export const createTestMediaList = (
   count: number,
   overrides: MediaOverrides = {}
-): Media[] => {
+): MediaRow[] => {
   return Array.from({ length: count }, (_, i) =>
     createTestMedia({
+      id: `test-media-${i + 1}`,
       title: `Test Song ${i + 1}`,
       track: i + 1,
       ...overrides,

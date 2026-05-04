@@ -13,7 +13,7 @@ import SongRow from '../MusicTable/SongRow'
 import * as types from '../../constants/ActionTypes'
 import { State } from '../../reducers'
 import { useArtistById, useAlbumsByArtist, useSongsByAlbumForArtist } from '../../stores/livestore/hooks'
-import IAlbum from '../../entities/Album'
+import type { AlbumRow } from '../../types/media'
 
 export default function ArtistView() {
   const params = useParams()
@@ -169,7 +169,7 @@ export default function ArtistView() {
 
         {/* Discography */}
         {albumsData && albumsData.length > 0 && (
-          <RelatedAlbums albums={albumsData as unknown as IAlbum[]} />
+          <RelatedAlbums albums={albumsData as unknown as AlbumRow[]} />
         )}
 
         {/* Because you listened to */}

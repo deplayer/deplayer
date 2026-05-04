@@ -124,8 +124,8 @@ describe('MusicTable', () => {
       const media = mediaList[index]
       const withinRow = within(row)
       expect(withinRow.getByText(media.title)).toBeInTheDocument()
-      expect(withinRow.getByText(media.artist.name)).toBeInTheDocument()
-      expect(withinRow.getByText(media.album.name)).toBeInTheDocument()
+      expect(withinRow.getByText(media.artistName)).toBeInTheDocument()
+      expect(withinRow.getByText(media.albumName)).toBeInTheDocument()
     })
   })
 

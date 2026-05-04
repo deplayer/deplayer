@@ -1,7 +1,7 @@
 import { Dispatch } from "redux";
 import { Room, ActionSender, DataPayload, JsonValue, selfId } from "trystero";
 import * as types from "../constants/ActionTypes";
-import { IMedia } from "../entities/Media";
+import type { MediaRow } from "../types/media";
 import { State as CollectionState } from "../reducers/collection";
 import { MediaFileService } from "./MediaFileService";
 import { writeFile } from "@happy-js/happy-opfs";
@@ -14,17 +14,18 @@ import { NormalizedMedia } from "../utils/normalizeMedia";
 const logger = createLogger({ namespace: "PeerService" });
 
 /**
- * Convert a received IMedia (from peer wire protocol) into NormalizedMedia
+ * Convert received peer wire data into NormalizedMedia.
+ * Peer data may have nested artist/album objects (legacy IMedia shape).
  */
-function imediaToNormalized(media: IMedia): NormalizedMedia {
+function peerDataToNormalized(media: any): NormalizedMedia {
   return {
     media: {
       id: media.id || 'unknown',
       title: media.title,
-      artistId: media.artist?.id || 'unknown',
-      albumId: media.album?.id || 'unknown',
-      artistName: media.artist?.name || 'Unknown Artist',
-      albumName: media.album?.name || 'Unknown Album',
+      artistId: media.artistId || media.artist?.id || 'unknown',
+      albumId: media.albumId || media.album?.id || 'unknown',
+      artistName: media.artistName || media.artist?.name || 'Unknown Artist',
+      albumName: media.albumName || media.album?.name || 'Unknown Album',
       type: media.type || 'audio',
       duration: media.duration || 0,
       playCount: 0,
@@ -40,14 +41,14 @@ function imediaToNormalized(media: IMedia): NormalizedMedia {
       providersFlat: Object.keys(media.stream || {}).join(','),
     },
     artist: {
-      id: media.artist?.id || 'unknown',
-      name: media.artist?.name || 'Unknown Artist',
+      id: media.artistId || media.artist?.id || 'unknown',
+      name: media.artistName || media.artist?.name || 'Unknown Artist',
     },
     album: {
-      id: media.album?.id || 'unknown',
-      name: media.album?.name || 'Unknown Album',
-      artistId: media.artist?.id || 'unknown',
-      thumbnailUrl: media.album?.thumbnailUrl || null,
+      id: media.albumId || media.album?.id || 'unknown',
+      name: media.albumName || media.album?.name || 'Unknown Album',
+      artistId: media.artistId || media.artist?.id || 'unknown',
+      thumbnailUrl: media.album?.thumbnailUrl || media.cover?.thumbnailUrl || null,
       year: media.album?.year ?? null,
     },
   }
@@ -59,7 +60,7 @@ export interface PeerStatus {
   username: string;
   peerId: string;
   isPlaying: boolean;
-  media?: IMedia;
+  media?: any;
   roomCode: string;
   streaming: boolean;
 }
@@ -124,7 +125,7 @@ export default class PeerService {
   /**
    * Client requests media stream from a peer in a specific room
    */
-  requestSongFile = async (peerId: string, media: IMedia, roomCode: string) => {
+  requestSongFile = async (peerId: string, media: MediaRow, roomCode: string) => {
     const roomState = this.rooms.get(roomCode);
     if (!roomState) return;
 
@@ -325,7 +326,7 @@ export default class PeerService {
   ) => {
     if (!data || !metadata) return;
 
-    const media = (metadata as any).media as IMedia;
+    const media = (metadata as any).media as MediaRow;
 
     const songFsUri = `/${media.id}`;
     await writeFile(songFsUri, data as ArrayBuffer);
@@ -344,7 +345,7 @@ export default class PeerService {
     try {
       const liveStore = getLiveStoreInstance();
       if (liveStore) {
-        await addMediaBulkAction(liveStore, [imediaToNormalized(modifiedMedia)]);
+        await addMediaBulkAction(liveStore, [peerDataToNormalized(modifiedMedia)]);
         logger.info("Added P2P shared media to LiveStore:", media.title);
       } else {
         logger.warn("LiveStore not available, P2P media not persisted");
@@ -413,7 +414,7 @@ export default class PeerService {
       try {
         const liveStore = getLiveStoreInstance();
         if (liveStore) {
-          await addMediaBulkAction(liveStore, [imediaToNormalized(fixedMedia)]);
+          await addMediaBulkAction(liveStore, [peerDataToNormalized(fixedMedia)]);
           logger.info("Added P2P stream media to LiveStore:", media.title);
         } else {
           logger.warn("LiveStore not available, P2P stream media not persisted");
@@ -441,7 +442,7 @@ export default class PeerService {
     } as JsonValue);
   };
 
-  private async processMediaRequest(media: IMedia, roomCode: string) {
+  private async processMediaRequest(media: MediaRow, roomCode: string) {
     const mediaFile = await MediaFileService.getMediaFile(media);
     const roomState = this.rooms.get(roomCode);
 
@@ -453,7 +454,7 @@ export default class PeerService {
       return null;
     }
 
-    const { stream, updatedAt, ...fixedMedia } = media as IMedia & {
+    const { stream, updatedAt, ...fixedMedia } = media as MediaRow & {
       updatedAt: string;
     };
 

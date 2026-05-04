@@ -1,4 +1,4 @@
-import Media from '../entities/Media'
+import type { MediaRow } from '../types/media'
 import * as actions from '../constants/ActionTypes'
 import logger from '../utils/logger'
 import PlayerRefService from './PlayerRefService'
@@ -8,7 +8,7 @@ declare var navigator: any
 declare var window: any
 
 export default class MediaSessionService {
-  updateMetadata = (media: Media, dispatch: any) => {
+  updateMetadata = (media: MediaRow | null, dispatch: any) => {
     if (this.canSetMediaSession() && media) {
       navigator.mediaSession.metadata = new window.MediaMetadata({
         title: media.title,
@@ -59,11 +59,11 @@ export default class MediaSessionService {
     }
   }
 
-  getThumbnail(media: Media) {
+  getThumbnail(media: MediaRow) {
     return media.cover ? media.cover.thumbnailUrl : ''
   }
 
-  getFullCover(media: Media) {
+  getFullCover(media: MediaRow) {
     return media.cover ? media.cover.fullUrl : ''
   }
 

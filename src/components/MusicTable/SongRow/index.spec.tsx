@@ -3,9 +3,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
-import Media from '../../../entities/Media'
-import Artist from '../../../entities/Artist'
-import Album from '../../../entities/Album'
+import type { MediaRow } from '../../../types/media'
 import SongRow from './index'
 import type { Props } from './index'
 
@@ -36,32 +34,31 @@ const createMockStore = () => configureStore({
 
 const setup = (overrideProps = {}) => {
   const mockOnClick = vi.fn()
+  const mockSong: MediaRow = {
+    id: 'artist-name-album-name-undefined-title',
+    title: 'title',
+    cover: { thumbnailUrl: 'thumbnail', fullUrl: '' },
+    artistId: '1',
+    albumId: 'foo',
+    artistName: 'artistName',
+    albumName: 'album',
+    type: 'audio',
+    duration: 100,
+    playCount: 0,
+    track: null,
+    discNumber: null,
+    stream: {},
+    genres: [],
+    externalId: null,
+    shareUrl: null,
+    filePath: null,
+    genresFlat: '',
+    providersFlat: '',
+  }
+
   const props: Props = {
     dispatch: (_action: any) => _action,
-    song: new Media({
-      id: 'artist-name-album-name-undefined-title',
-      title: 'title',
-      cover: { thumbnailUrl: 'thumbnail', fullUrl: '' },
-      artist: new Artist({
-        id: '1',
-        name: 'artistName'
-      }),
-      album: new Album({
-        id: 'foo',
-        name: 'album',
-        artist: new Artist({
-          id: 'foo',
-          name: 'foo'
-        }),
-        thumbnailUrl: 'thumbnail'
-      }),
-      artistName: 'artistName',
-      albumName: 'album',
-      type: 'audio',
-      duration: 100,
-      stream: {},
-      genres: []
-    }),
+    song: mockSong,
     queue: {
       trackIds: [],
       randomTrackIds: [],

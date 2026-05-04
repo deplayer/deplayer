@@ -5,7 +5,7 @@ import React from 'react'
 
 import { getDurationStr } from '../../../utils/timeFormatter'
 import CoverImage from './../CoverImage'
-import Media, { Cover } from '../../../entities/Media'
+import type { MediaRow, Cover } from '../../../types/media'
 import Tag from '../../common/Tag'
 import ServiceIcon from '../../ServiceIcon'
 import { State as QueueState } from '../../../reducers/queue'
@@ -42,7 +42,7 @@ const LazyContextualMenuTrigger = (props: any) => {
 import FavoriteButton from '../../common/FavoriteButton'
 
 export type Props = {
-  song: Media,
+  song: MediaRow,
   queue?: QueueState,
   isCurrent?: boolean | null,
   onClick: () => void,
@@ -79,7 +79,7 @@ const SongCover = React.memo(({ cover, onClick, albumName }: { cover: Cover, onC
   )
 })  
 
-const ProviderTags = ({ song }: { song: Media }) => {
+const ProviderTags = ({ song }: { song: MediaRow }) => {
   return (
     <div className='flex items-center min-w-fit'>
       {Object.values(song.stream).map((provider) => {
@@ -116,7 +116,7 @@ const SongRow = React.memo((props: Props) => {
         <SongCover 
           cover={song.cover} 
           onClick={onClick} 
-          albumName={song.albumName || (song.album && song.album.name) || 'N/A'} 
+          albumName={song.albumName || 'N/A'}
         />
       )}
       <div className='media-info truncate w-full whitespace-no-wrap'>
@@ -127,11 +127,11 @@ const SongRow = React.memo((props: Props) => {
           </Link>
         </h4>
         <h5 className='text-base-content/70 text-sm'>
-          {(song.album && song.album.name) || nonAvailable}
+          {song.albumName || nonAvailable}
         </h5>
         <h6 className='text-sm'>
-          <Link to={`/artist/${song.artist?.id || ''}`} className="text-base-content/70 hover:text-primary">
-            {(song.artist && song.artist.name) || nonAvailable}
+          <Link to={`/artist/${song.artistId || ''}`} className="text-base-content/70 hover:text-primary">
+            {song.artistName || nonAvailable}
           </Link>
         </h6>
         {props.slim && (

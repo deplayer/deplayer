@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import ContextualMenu from './ContextualMenu'
-import Media, { IMedia } from '../../entities/Media'
+import type { MediaRow } from '../../types/media'
 import { State as QueueState } from '../../reducers/queue'
 
 // Mock createPortal to render in the same container for testing
@@ -41,8 +41,8 @@ vi.mock('../../stores/livestore/hooks', () => ({
 }))
 
 describe('ContextualMenu', () => {
-  let mockSong1: Media
-  let mockSong2: Media
+  let mockSong1: MediaRow
+  let mockSong2: MediaRow
   let mockStore: any
   let user: ReturnType<typeof userEvent.setup>
 
@@ -51,38 +51,50 @@ describe('ContextualMenu', () => {
     mockAddToQueueAction.mockClear()
     mockRemoveFromQueueAction.mockClear()
     mockAddNextAction.mockClear()
-    
-    mockSong1 = new Media({
+
+    mockSong1 = {
       id: 'test-song-1',
       title: 'Test Song 1',
-      artist: { name: 'Test Artist' },
-      artistName: 'Test Artist',
       artistId: 'test-artist-1',
-      type: 'audio',
-      album: { id: 'test-album-1', name: 'Test Album', artist: { name: 'Test Artist' } },
+      albumId: 'test-album-1',
+      artistName: 'Test Artist',
       albumName: 'Test Album',
-      cover: { thumbnailUrl: 'test-cover.jpg', fullUrl: 'test-cover.jpg' },
-      stream: { url: { service: 'test', uris: [{ uri: 'test-stream.mp3' }] } },
+      type: 'audio',
       duration: 180000,
       playCount: 0,
-      genres: ['test']
-    } as IMedia)
+      track: null,
+      discNumber: null,
+      cover: { thumbnailUrl: 'test-cover.jpg', fullUrl: 'test-cover.jpg' },
+      stream: { url: { service: 'test', uris: [{ uri: 'test-stream.mp3' }] } },
+      genres: ['test'],
+      externalId: null,
+      shareUrl: null,
+      filePath: null,
+      genresFlat: 'test',
+      providersFlat: 'url',
+    }
 
-    mockSong2 = new Media({
+    mockSong2 = {
       id: 'test-song-2',
       title: 'Test Song 2',
-      artist: { name: 'Test Artist' },
-      artistName: 'Test Artist',
       artistId: 'test-artist-1',
-      type: 'audio',
-      album: { id: 'test-album-1', name: 'Test Album', artist: { name: 'Test Artist' } },
+      albumId: 'test-album-1',
+      artistName: 'Test Artist',
       albumName: 'Test Album',
-      cover: { thumbnailUrl: 'test-cover.jpg', fullUrl: 'test-cover.jpg' },
-      stream: { url: { service: 'test', uris: [{ uri: 'test-stream.mp3' }] } },
+      type: 'audio',
       duration: 180000,
       playCount: 0,
-      genres: ['test']
-    } as IMedia)
+      track: null,
+      discNumber: null,
+      cover: { thumbnailUrl: 'test-cover.jpg', fullUrl: 'test-cover.jpg' },
+      stream: { url: { service: 'test', uris: [{ uri: 'test-stream.mp3' }] } },
+      genres: ['test'],
+      externalId: null,
+      shareUrl: null,
+      filePath: null,
+      genresFlat: 'test',
+      providersFlat: 'url',
+    }
 
     mockStore = createStore((state: { queue: QueueState } = {
       queue: {

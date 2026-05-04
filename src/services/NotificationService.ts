@@ -1,15 +1,15 @@
-import Media from '../entities/Media'
+import type { MediaRow } from '../types/media'
 import logger from '../utils/logger'
 
 // fix ts window typings
 declare var window: any
 
 export default class NotificationService {
-  sendNotification = (media: Media) => {
+  sendNotification = (media: MediaRow) => {
     const Notification = this.getNotificationClass()
     if (Notification) {
       new Notification(
-        media.title + ' - ' + media.artist.name
+        media.title + ' - ' + media.artistName
       )
     }
   }

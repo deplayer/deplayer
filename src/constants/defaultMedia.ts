@@ -1,16 +1,15 @@
-import Media from "../entities/Media";
+import type { MediaRow } from "../types/media";
 
-const defaultMedia = new Media({
+const defaultMedia: MediaRow = {
   id: "winamp-demo",
   title: "Winamp Demo Song",
   type: "audio",
-  artist: { name: "Winamp" },
-  artistName: "Winamp",
   artistId: "winamp",
+  albumId: "winamp-demo",
+  artistName: "Winamp",
   albumName: "Demo",
-  album: { id: "winamp-demo", name: "Demo", artist: { name: "Winamp" } },
   genres: ["Electronic"],
-  duration: 0, // Will be set by player
+  duration: 0,
   stream: {
     url: {
       service: "url",
@@ -18,7 +17,14 @@ const defaultMedia = new Media({
     },
   },
   playCount: 0,
-  forcedId: "winamp-demo",
-});
+  track: null,
+  discNumber: null,
+  cover: null,
+  externalId: null,
+  shareUrl: null,
+  filePath: null,
+  genresFlat: "Electronic",
+  providersFlat: "url",
+};
 
 export default defaultMedia;

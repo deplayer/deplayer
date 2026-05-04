@@ -6,7 +6,7 @@ import { useAppStore } from '../../stores/livestore/store'
 
 import Button from '../common/Button'
 import Icon from '../common/Icon'
-import Media from '../../entities/Media'
+import type { MediaRow } from '../../types/media'
 import { State as QueueState } from '../../reducers/queue'
 import * as types from '../../constants/ActionTypes'
 import { addToQueueAction, addNextAction, removeFromQueueAction } from '../../stores/livestore/actions'
@@ -27,7 +27,7 @@ type MenuProps = {
   disableAddButton?: boolean,
   queue?: QueueState,
   onClick: () => void,
-  song: Media,
+  song: MediaRow,
 }
 
 type Position = {

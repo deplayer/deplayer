@@ -6,7 +6,7 @@ import Button from '../common/Button'
 import Modal from '../common/Modal'
 import SongRow from '../MusicTable/SongRow'
 import * as types from '../../constants/ActionTypes'
-import { IMedia } from '../../entities/Media'
+import type { MediaRow } from '../../types/media'
 
 import { useNavigate } from 'react-router-dom'
 import { Dispatch } from 'redux'
@@ -100,10 +100,10 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
     
     tracks.forEach(track => {
       if (!track?.cover?.thumbnailUrl) return
-      if (!track.album?.id) return
-      
-      if (!uniqueAlbumTracks.has(track.album.id)) {
-        uniqueAlbumTracks.set(track.album.id, track)
+      if (!track.albumId) return
+
+      if (!uniqueAlbumTracks.has(track.albumId)) {
+        uniqueAlbumTracks.set(track.albumId, track)
       }
     })
 
@@ -112,7 +112,7 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
 
   const totalDuration = useMemo(() => 
     playlist.trackIds.reduce((acc, id) => {
-      const track = mediaMap[id] as IMedia
+      const track = mediaMap[id] as MediaRow
       return acc + (track?.duration || 0)
     }, 0)
   , [playlist.trackIds, mediaMap])
@@ -120,10 +120,10 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
   // Use the already-computed effectiveTrackIds (no need for applyFilters)
   const songIds = effectiveTrackIds
 
-  const uniqueAlbumCount = useMemo(() => 
+  const uniqueAlbumCount = useMemo(() =>
     new Set(
       playlist.trackIds
-        .map(id => mediaMap[id]?.album?.id)
+        .map(id => mediaMap[id]?.albumId)
         .filter(Boolean)
     ).size
   , [playlist.trackIds, mediaMap])
@@ -161,7 +161,7 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
       <figure className="relative aspect-square w-full overflow-hidden bg-base-300">
         {tracksWithCovers.length > 0 ? (
           <div className="grid grid-cols-2 w-full h-full">
-            {tracksWithCovers.map((track: IMedia, index: number) => (
+            {tracksWithCovers.map((track: MediaRow, index: number) => (
               <div key={track.id} className="relative w-full h-full overflow-hidden">
                 <img 
                   src={track.cover?.thumbnailUrl} 

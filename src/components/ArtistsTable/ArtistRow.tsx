@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
-import Artist from '../../entities/Artist'
+import type { ArtistRow as ArtistRowType } from '../../types/media'
 import Tag from '../common/Tag'
 import Icon from '../common/Icon'
 
 type Props = {
-  artist: Artist,
+  artist: ArtistRowType,
   songs: any,
   style: any
 }

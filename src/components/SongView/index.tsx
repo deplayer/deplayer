@@ -19,9 +19,9 @@ import { sortByPlayCount } from '../../utils/sorting'
 import Lyrics from './Lyrics'
 import BecauseYouListened from '../BecauseYouListened'
 import { getStreamUri } from '../../services/Song/StreamUriService'
-import IAlbum from '../../entities/Album'
+import type { AlbumRow } from '../../types/media'
+import { hasAnyProviderOf } from '../../utils/hasAnyProviderOf'
 import ServiceIcon from '../ServiceIcon'
-import Media from '../../entities/Media'
 import { State as CollectionState } from '../../reducers/collection'
 import { State as PlayerState } from '../../reducers/player'
 import FavoriteButton from '../common/FavoriteButton'
@@ -79,8 +79,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
   const { rows, albums, albumsByArtist, songsByGenre } = collection
 
   const song = rows[songId]
-  const songObj = song ? new Media(song) : null
-  const isSongPinned = songObj?.hasAnyProviderOf(['opfs']) || false
+  const isSongPinned = song ? hasAnyProviderOf(song.stream, ['opfs']) : false
 
   const [pinned, setPinnedSong] = React.useState(isSongPinned)
   const [showLyrics, setShowLyrics] = React.useState(false)
@@ -132,9 +131,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
     return <CenteredMessage><div className='text-center'>The requested song can not be found</div></CenteredMessage>
   }
 
-  // Use songObj (Media instance) for accessing nested artist/album properties
-  // The raw song from rows might not have these nested objects
-  const genres = songObj?.genres || song.genres || []
+  const genres = song.genres || []
 
   const sameGenreSongs = genres.length && songsByGenre[genres[0]]
     ? songsByGenre[genres[0]]
@@ -143,8 +140,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
       .map((songId: string) => rows[songId])
     : null
 
-  // Use songObj.artist.id for looking up related albums
-  const relatedAlbums = songObj?.artist?.id && albumsByArtist?.[songObj.artist.id]?.reduce((acc: IAlbum[], albumId: string): IAlbum[] => {
+  const relatedAlbums = song?.artistId && albumsByArtist?.[song.artistId]?.reduce((acc: AlbumRow[], albumId: string): AlbumRow[] => {
     if (!albums[albumId]) return acc
     acc.push(albums[albumId])
     return acc
@@ -188,9 +184,9 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
             {(song.type !== 'video' || !songFinder) &&
               <CoverImage
                 useImage
-                cover={song.cover}
+                cover={song.cover || undefined}
                 size='thumbnail'
-                albumName={songObj?.album?.name || 'N/A'}
+                albumName={song.albumName || 'N/A'}
               />
             }
 
@@ -291,27 +287,27 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
               {song.title}
               <Tag onClick={() => handleTypeClick(song.type)} className="cursor-pointer hover:bg-opacity-50 mr-2 mt-4 w-fit inline-block" transparent>{typeIcon} {song.type}</Tag>
             </h2>
-            {songObj?.artist?.id && (
+            {song.artistId && (
               <div className='text-lg mt-2'>
-                <Link to={`/artist/${songObj.artist.id}`}>
+                <Link to={`/artist/${song.artistId}`}>
                   <h3>
                     <Icon
                       icon='faMicrophoneAlt'
                       className='mr-1 w-8'
                     />
-                    <span>{songObj.artist?.name || 'Unknown Artist'}</span>
+                    <span>{song.artistName || 'Unknown Artist'}</span>
                   </h3>
                 </Link>
               </div>
             )}
-            {songObj?.album?.id && (
+            {song.albumId && (
               <div className='color-white text-lg mt-2'>
-                <Link to={`/album/${songObj.album.id}`}>
+                <Link to={`/album/${song.albumId}`}>
                   <Icon
                     className='mr-1 w-8'
                     icon='faCompactDisc'
                   />
-                  {songObj.album?.name || 'N/A'} {songObj.album?.year && `(${songObj.album.year})`}
+                  {song.albumName || 'N/A'}
                 </Link>
               </div>
             )}
@@ -394,11 +390,11 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
             )
           }
 
-          {songObj?.artist?.id && genres.length > 0 && (
+          {song.artistId && genres.length > 0 && (
             <div className="mt-8 overflow-hidden">
               <BecauseYouListened
-                artistId={songObj.artist.id}
-                artistName={songObj.artist?.name || 'Unknown'}
+                artistId={song.artistId}
+                artistName={song.artistName || 'Unknown'}
                 genres={genres}
               />
             </div>

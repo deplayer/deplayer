@@ -1,7 +1,8 @@
 import axios from "axios";
 import { readFile } from "@happy-js/happy-opfs";
 import { get } from "idb-keyval";
-import { IMedia, hasAnyProviderOf } from "../entities/Media";
+import type { MediaRow } from "../types/media";
+import { hasAnyProviderOf } from "../utils/hasAnyProviderOf";
 import { verifyPermission } from "./FileSystemService";
 import { createLogger } from "../utils/logger";
 
@@ -9,21 +10,21 @@ const logger = createLogger({ namespace: "MediaFileService" });
 
 export class MediaFileService {
   /**
-   * Gets a File object from an IMedia, handling different stream sources
+   * Gets a File object from an MediaRow, handling different stream sources
    */
-  static async getMediaFile(media: IMedia): Promise<File | Blob | null> {
-    if (hasAnyProviderOf(media, ["opfs"])) {
+  static async getMediaFile(media: MediaRow): Promise<File | Blob | null> {
+    if (hasAnyProviderOf(media.stream, ["opfs"])) {
       return await this.handleOpfsMedia(media);
     }
 
-    if (hasAnyProviderOf(media, ["filesystem"])) {
+    if (hasAnyProviderOf(media.stream, ["filesystem"])) {
       return await this.handleFilesystemMedia(media);
     }
 
     return await this.handleRemoteMedia(media);
   }
 
-  private static async handleOpfsMedia(media: IMedia): Promise<Blob | null> {
+  private static async handleOpfsMedia(media: MediaRow): Promise<Blob | null> {
     const songFsUri = `/${media.id}`;
     try {
       const file = await readFile(songFsUri);
@@ -35,7 +36,7 @@ export class MediaFileService {
   }
 
   private static async handleFilesystemMedia(
-    media: IMedia
+    media: MediaRow
   ): Promise<File | null> {
     const streamUri = Object.values(media.stream)[0].uris[0].uri;
     try {
@@ -57,7 +58,7 @@ export class MediaFileService {
     }
   }
 
-  private static async handleRemoteMedia(media: IMedia): Promise<Blob | null> {
+  private static async handleRemoteMedia(media: MediaRow): Promise<Blob | null> {
     const streamUrl = Object.values(media.stream)[0].uris[0].uri;
     if (!streamUrl) {
       logger.error("No stream URL found for media", media);

@@ -1,8 +1,8 @@
 import { useEffect, useCallback } from 'react';
-import type Media from '../entities/Media';
+import type { MediaRow } from '../types/media';
 
 interface UseNotificationsProps {
-  currentTrack: Media | null;
+  currentTrack: MediaRow | null;
   notificationsEnabled: boolean;
 }
 
@@ -17,7 +17,7 @@ export function useNotifications({ currentTrack, notificationsEnabled }: UseNoti
     }
   }, []);
 
-  const showTrackNotification = useCallback((track: Media) => {
+  const showTrackNotification = useCallback((track: MediaRow) => {
     if (!('Notification' in window) || Notification.permission !== 'granted' || !notificationsEnabled) {
       return;
     }

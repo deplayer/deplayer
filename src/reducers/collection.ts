@@ -1,6 +1,5 @@
 import * as types from "../constants/ActionTypes";
-import Artist from "../entities/Artist";
-import IMedia from "../entities/Media";
+import type { MediaRow, ArtistRow } from "../types/media";
 import { applyFilters } from "../utils/apply-filters";
 import type { Filter } from "../types/collection";
 
@@ -14,9 +13,9 @@ export type { Filter };
  */
 
 export type State = {
-  rows: { [key: string]: IMedia };
+  rows: { [key: string]: MediaRow };
   albums: { [key: string]: any };
-  artists: { [key: string]: Artist };
+  artists: { [key: string]: ArtistRow };
   songsByArtist: { [key: string]: string[] };
   songsByGenre: { [key: string]: string[] };
   albumsByArtist: { [key: string]: string[] };
@@ -29,7 +28,7 @@ export type State = {
   totalRows: number;
   activeFilters: Filter;
   filteredSongs: string[];
-  recentAlbums: IMedia[];
+  recentAlbums: MediaRow[];
 };
 
 // Minimal stub state - collection data now lives in LiveStore
@@ -89,7 +88,7 @@ export default (state: State = defaultState, action: any = {}) => {
         ...state,
         loading: false,
         searchResults: action.data
-          ? Array.from(new Set(action.data.map((item: IMedia) => item.id)))
+          ? Array.from(new Set(action.data.map((item: MediaRow) => item.id)))
           : [],
       };
 
@@ -174,7 +173,7 @@ export default (state: State = defaultState, action: any = {}) => {
       const searchResults = action.searchResults || [];
       return {
         ...state,
-        searchResults: Array.from(new Set(searchResults.map((media: IMedia) => media.id))),
+        searchResults: Array.from(new Set(searchResults.map((media: MediaRow) => media.id))),
       };
 
     case types.FETCH_RECENT_ALBUMS_SUCCESS:

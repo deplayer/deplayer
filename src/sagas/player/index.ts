@@ -2,7 +2,7 @@ import { call, takeLatest, takeEvery, put, select } from 'redux-saga/effects'
 import screenfull from 'screenfull'
 import { push } from "redux-first-history"
 import { queryDb } from '@livestore/livestore'
-import Media from '../../entities/Media'
+import type { MediaRow } from '../../types/media'
 
 import {
   getPlayer,
@@ -85,7 +85,7 @@ function* getCurrentSongIdFromLiveStore(): any {
 }
 
 
-function* setCurrentPlayingStream(songId: string, providerNum: number, media?: Media): any {
+function* setCurrentPlayingStream(songId: string, providerNum: number, media?: MediaRow): any {
   // Kill any playing audio FIRST — prevents dual-stream bug
   yield put({ type: types.STOP_PLAYING })
   stopAllPlayback()
@@ -134,7 +134,7 @@ export interface SetCurrentPlayingAction {
   type: typeof types.SET_CURRENT_PLAYING
   songId: string
   url: string
-  media: Media
+  media: MediaRow
 }
 
 // Handling setCurrentPlaying saga

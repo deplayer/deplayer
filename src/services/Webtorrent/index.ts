@@ -1,7 +1,7 @@
 import Webtorrent, { Torrent, TorrentFile } from "webtorrent";
 import { createLogger } from "../../utils/logger";
 
-import Media from "../../entities/Media";
+import type { MediaRow } from "../../types/media";
 
 const logger = createLogger({ namespace: "WebtorrentService" });
 
@@ -20,7 +20,7 @@ const audioExtensions = [".mp3"];
 
 export const magnetToMedia = async (
   torrentUrl: string
-): Promise<Array<Media>> => {
+): Promise<Array<MediaRow>> => {
   const client = new Webtorrent();
 
   return new Promise((resolve): void => {
@@ -39,34 +39,36 @@ export const magnetToMedia = async (
           );
         });
 
-        const medias = files.map((file: TorrentFile) => {
+        const medias: MediaRow[] = files.map((file: TorrentFile) => {
           const type = videoExtensions.some((ext) => file.name.endsWith(ext))
             ? "video"
             : "audio";
-          return new Media({
+          return {
+            id: `webtorrent-${file.name}`,
             title: file.name,
-            artist: {
-              name: "webtorrent",
-            },
-            album: {
-              name: "webtorrent",
-              artist: { name: "webtorrent" },
-            },
+            artistId: "webtorrent",
+            albumId: "webtorrent",
             artistName: "webtorrent",
             albumName: "webtorrent",
-            genres: [],
-            type: type,
+            type: type as 'audio' | 'video',
+            duration: 0,
+            playCount: 0,
+            track: null,
+            discNumber: null,
             stream: {
               webtorrent: {
                 service: "webtorrent",
-                uris: [
-                  {
-                    uri: torrentUrl,
-                  },
-                ],
+                uris: [{ uri: torrentUrl }],
               },
             },
-          });
+            cover: null,
+            genres: [],
+            externalId: null,
+            shareUrl: null,
+            filePath: null,
+            genresFlat: "",
+            providersFlat: "webtorrent",
+          };
         });
 
         return resolve(medias);

@@ -2,10 +2,10 @@ import React from 'react'
 import HorizontalSlider from '../HorizontalSlider'
 import Spinner from '../Spinner'
 import MediaCover from '../common/AlbumCover'
-import type Media from '../../entities/Media'
+import type { MediaRow } from '../../types/media'
 
 type MediaCoverProps = {
-  media: Media,
+  media: MediaRow,
   itemId: string
 }
 
@@ -18,7 +18,7 @@ const MediaCoverWrapper = ({ media }: MediaCoverProps) => {
     <MediaCover
       id={media.id}
       name={media.title}
-      artistName={media.artist?.name || 'Unknown Artist'}
+      artistName={media.artistName || 'Unknown Artist'}
       cover={media.cover}
       playCount={media.playCount}
       showPlayCount

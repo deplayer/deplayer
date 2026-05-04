@@ -19,7 +19,7 @@ import DigitalScreen from './DigitalScreen'
 import * as types from '../../constants/ActionTypes'
 import PlayerRefService from '../../services/PlayerRefService'
 import MediaSessionService from '../../services/MediaSessionService'
-import type Media from '../../entities/Media'
+import type { MediaRow } from '../../types/media'
 
 // Add custom players to ReactPlayer with proper type casting
 ReactPlayer.addCustomPlayer(WebtorrentPlayer as unknown as ReactPlayer)
@@ -123,7 +123,7 @@ class PlayerControls extends React.Component<Props, State> {
     PlayerRefService.getInstance().setPlayerRef(null)
   }
 
-  showTrackNotification = (track: Media): void => {
+  showTrackNotification = (track: MediaRow): void => {
     if (!('Notification' in window) || Notification.permission !== 'granted') {
       return
     }

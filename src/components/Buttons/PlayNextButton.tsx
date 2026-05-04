@@ -7,10 +7,10 @@ import * as types from '../../constants/ActionTypes'
 import { addNextAction } from '../../stores/livestore/actions'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
-import Media from '../../entities/Media'
+import type { MediaRow } from '../../types/media'
 
 type Props = {
-  songs?: Media[],
+  songs?: MediaRow[],
   mediaIds?: string[],
   transparent?: boolean,
   fullWidth?: boolean,

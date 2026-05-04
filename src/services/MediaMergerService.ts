@@ -1,18 +1,18 @@
 import merge from 'deepmerge'
 
-import Media from '../entities/Media'
+import type { MediaRow } from '../types/media'
 
 // TODO: Review the need of this util
 export default class MediaMergerService {
-  mediaA: Media
-  mediaB: Media
+  mediaA: MediaRow
+  mediaB: MediaRow
 
-  constructor(mediaA: Media, mediaB: Media) {
+  constructor(mediaA: MediaRow, mediaB: MediaRow) {
     this.mediaA = mediaA
     this.mediaB = mediaB
   }
 
-  getMerged(): Media {
+  getMerged(): MediaRow {
     const mergeStream = (streamA: any, streamB: any) => {
       const concatStreams = { ...streamA, ...streamB }
       return Object.values(concatStreams).filter((elem: any, index: number) => {

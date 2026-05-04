@@ -6,7 +6,7 @@ import { channel, Channel } from "redux-saga";
 import { addToCollectionWatcher } from "./watchers";
 import * as types from "../../constants/ActionTypes";
 import { saveToDbWorker } from "./workers";
-import Media from "../../entities/Media";
+import type { MediaRow } from "../../types/media";
 
 // Mock database adapter
 vi.mock("../../services/database", () => ({
@@ -37,7 +37,7 @@ describe("addToCollectionWatcher", () => {
   });
 
   it("handles collection updates correctly", () => {
-    const testData: Media[] = [];
+    const testData: MediaRow[] = [];
 
     expectSaga(addToCollectionWatcher)
       .withState({ collection: { rows: {} } })

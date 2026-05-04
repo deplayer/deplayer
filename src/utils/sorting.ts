@@ -1,9 +1,9 @@
-import IMedia from '../entities/Media';
+import type { MediaRow } from '../types/media';
 
 export const sortByPlayCount = (
   songId1: string,
   songId2: string,
-  rows: { [key: string]: IMedia }
+  rows: { [key: string]: MediaRow }
 ) => {
   const song1 = rows[songId1];
   const song2 = rows[songId2];

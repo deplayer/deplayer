@@ -1,10 +1,10 @@
 import { Translate } from 'react-redux-i18n'
 import HorizontalSlider from '../HorizontalSlider'
 import AlbumCover from '../common/AlbumCover'
-import IAlbum from '../../entities/Album'
+import type { AlbumRow } from '../../types/media'
 
 type Props = {
-  albums: Array<IAlbum>
+  albums: Array<AlbumRow>
 }
 
 const RelatedAlbums = (props: Props) => {
@@ -23,8 +23,8 @@ const RelatedAlbums = (props: Props) => {
           id={album.id}
           name={album.name}
           cover={{
-            thumbnailUrl: album.thumbnailUrl,
-            fullUrl: album.thumbnailUrl
+            thumbnailUrl: album.thumbnailUrl || '',
+            fullUrl: album.thumbnailUrl || ''
           }}
         />
       )

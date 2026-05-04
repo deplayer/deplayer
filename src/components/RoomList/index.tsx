@@ -5,7 +5,7 @@ import Icon from '../common/Icon'
 import { PeerStatus } from '../../services/PeerService'
 import { Dispatch } from 'redux'
 import * as types from '../../constants/ActionTypes'
-import { IMedia } from '../../entities/Media'
+import type { MediaRow } from '../../types/media'
 import CreateRoomModal from '../CreateRoomModal'
 import ShareRoomModal from '../ShareRoomModal'
 import { Room } from '../../reducers/rooms'
@@ -37,11 +37,11 @@ const RoomList = ({ peers, rooms, dispatch, onJoinRoom }: Props) => {
     }
   }, [rooms, peers]);
 
-  const requestSongFile = (peerId: string, media: IMedia, roomCode: string) => {
+  const requestSongFile = (peerId: string, media: MediaRow, roomCode: string) => {
     dispatch({ type: types.REQUEST_SONG_FILE, peerId, media: media, roomCode })
   }
 
-  const requestRealtimeStream = (peerId: string, roomCode: string, media: IMedia) => {
+  const requestRealtimeStream = (peerId: string, roomCode: string, media: MediaRow) => {
     dispatch({ type: types.REQUEST_REALTIME_STREAM, peerId, roomCode, media })
   }
 

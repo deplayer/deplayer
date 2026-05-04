@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import CoverImage from '../MusicTable/CoverImage'
 import Modal from '../common/Modal'
-import Media from '../../entities/Media'
+import type { MediaRow } from '../../types/media'
 
 type Props = {
   slim?: boolean,
-  song?: Media | null,
+  song?: MediaRow | null,
   onClick?: () => void
 }
 
@@ -26,7 +26,7 @@ const Cover = (props: Props) => {
     }
   }
 
-  const albumName = song.album ? song.album.name : 'N/A'
+  const albumName = song.albumName || 'N/A'
 
   return (
     <>
@@ -40,7 +40,7 @@ const Cover = (props: Props) => {
         <div className="w-full h-full">
           <CoverImage
             useImage
-            cover={song.cover}
+            cover={song.cover || undefined}
             size='thumbnail'
             albumName={albumName}
             noFade
@@ -61,7 +61,7 @@ const Cover = (props: Props) => {
         >
           <CoverImage
             useImage
-            cover={song.cover}
+            cover={song.cover || undefined}
             size='medium'
             albumName={albumName}
             noFade
@@ -79,7 +79,7 @@ const Cover = (props: Props) => {
           <div className="w-full max-w-2xl aspect-square">
             <CoverImage
               useImage
-              cover={song.cover}
+              cover={song.cover || undefined}
               size='full'
               albumName={albumName}
               noFade

@@ -13,7 +13,7 @@ import RelatedAlbums from '../RelatedAlbums'
 import BecauseYouListened from '../BecauseYouListened'
 import * as types from '../../constants/ActionTypes'
 import { getDurationStr } from '../../utils/timeFormatter'
-import IAlbum from '../../entities/Album'
+import type { AlbumRow } from '../../types/media'
 import { useAlbumById, useMediaByAlbum, useAlbumsByArtist } from '../../stores/livestore/hooks'
 import { useQueue } from '../../stores/livestore/hooks/useQueue'
 
@@ -129,7 +129,7 @@ export default function AlbumView() {
             genres={genres}
           />
         )}
-        <RelatedAlbums albums={relatedAlbumsData as unknown as IAlbum[]} />
+        <RelatedAlbums albums={relatedAlbumsData as unknown as AlbumRow[]} />
       </div>
     </div>
   )

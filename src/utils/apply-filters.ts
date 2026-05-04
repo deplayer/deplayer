@@ -1,5 +1,5 @@
 import { Filter } from "../types/collection";
-import type Media from "../entities/Media";
+import type { MediaRow } from "../types/media";
 
 /**
  * Apply filters to media collection
@@ -11,7 +11,7 @@ import type Media from "../entities/Media";
  * TODO: Refactor Playlist.tsx and collection reducer to use LiveStore for all filtering
  */
 export const applyFilters = (
-  rows: { [key: string]: Media },
+  rows: { [key: string]: MediaRow },
   filters: Filter,
   initialIds?: string[],
   favoriteIds?: Set<string>
@@ -52,7 +52,7 @@ export const applyFilters = (
     }
 
     if (filters.artists.length > 0) {
-      if (filters.artists.some((artistId) => artistId === media.artist.id)) {
+      if (filters.artists.some((artistId) => artistId === media.artistId)) {
         hasMatches = true;
       }
     }

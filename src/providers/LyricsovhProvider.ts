@@ -1,13 +1,13 @@
 import axios from "axios";
-import { IMedia } from "../entities/Media";
+import type { MediaRow } from "../types/media";
 import { createLogger } from "../utils/logger";
 
 const logger = createLogger({ namespace: "LyricsovhProvider" });
 
 export default class LyricsovhProvider {
-  async searchLyrics(song: IMedia): Promise<any> {
+  async searchLyrics(song: MediaRow): Promise<any> {
     const baseUrl = "https://api.lyrics.ovh/v1";
-    const artist = encodeURIComponent(song.artist.name);
+    const artist = encodeURIComponent(song.artistName);
     const title = encodeURIComponent(song.title);
 
     logger.info("Fetching lyrics for:", { artist, title });

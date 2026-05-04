@@ -1,16 +1,15 @@
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { useMemo } from 'react'
-import Artist from '../../entities/Artist'
 import CoverImage from '../MusicTable/CoverImage'
 import Tag from '../common/Tag'
 import React from 'react'
 import { State as RootState } from '../../reducers'
-import IMedia from '../../entities/Media'
+import type { ArtistRow, MediaRow } from '../../types/media'
 import { useAlbumsByArtist, useSongsByAlbumForArtist, useMediaById } from '../../stores/livestore/hooks'
 
 type Props = {
-  artist: Artist
+  artist: ArtistRow
   songs: string[]
   style?: React.CSSProperties
 }
@@ -49,9 +48,9 @@ const ArtistGridItem = ({ artist, songs, style }: Props) => {
   }, [albumsByArtist, songsByAlbum])
   
   // PERF: Only load the ONE song we need for the cover (not entire library)
-  const coverSong = useMediaById(coverSongId) as IMedia | null
+  const coverSong = useMediaById(coverSongId) as MediaRow | null
   
-  const randomAlbumCover = coverSong?.cover
+  const randomAlbumCover = coverSong?.cover || undefined
 
   const cover = artistPhoto ? {
     thumbnailUrl: artistPhoto,

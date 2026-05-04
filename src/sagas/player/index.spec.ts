@@ -3,8 +3,7 @@ import { describe, it, vi } from 'vitest'
 import {
   setCurrentPlaying
 } from './index'
-import Media from '../../entities/Media'
-import { mediaParams } from '../../entities/Media.spec'
+import type { MediaRow } from '../../types/media'
 import * as types from '../../constants/ActionTypes'
 import { SetCurrentPlayingAction } from './index'
 
@@ -24,11 +23,28 @@ describe('setCurrentPlaying', async () => {
       }
     }
 
-    const song = new Media({
-      ...mediaParams,
-      forcedId: 'foo',
-      stream: streams
-    })
+    const song: MediaRow = {
+      id: 'foo',
+      title: 'Test Song',
+      artistId: 'test-artist',
+      albumId: 'test-album',
+      artistName: 'Test Artist',
+      albumName: 'Test Album',
+      type: 'audio',
+      duration: 180,
+      playCount: 0,
+      track: null,
+      discNumber: null,
+      stream: streams,
+      cover: null,
+      genres: [],
+      externalId: null,
+      shareUrl: null,
+      filePath: null,
+      genresFlat: '',
+      providersFlat: 'subsonic',
+    }
+
     const state = {
       collection: {
         rows: {

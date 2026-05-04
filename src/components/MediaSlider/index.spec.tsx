@@ -2,22 +2,33 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, it, expect } from 'vitest'
 import MediaSlider from '.'
-import type Media from '../../entities/Media'
+import type { MediaRow } from '../../types/media'
 
 describe('MediaSlider', () => {
-  const mockMedia = {
+  const mockMedia: MediaRow = {
     id: 'song-1',
     title: 'Test Song',
-    artist: {
-      id: 'artist-1',
-      name: 'Test Artist'
-    },
+    artistId: 'artist-1',
+    albumId: 'album-1',
+    artistName: 'Test Artist',
+    albumName: 'Test Album',
+    type: 'audio',
+    duration: 0,
+    playCount: 3,
+    track: null,
+    discNumber: null,
     cover: {
       thumbnailUrl: 'test-thumb.jpg',
       fullUrl: 'test-full.jpg'
     },
-    playCount: 3
-  } as Media
+    stream: {},
+    genres: [],
+    externalId: null,
+    shareUrl: null,
+    filePath: null,
+    genresFlat: '',
+    providersFlat: '',
+  }
 
   const defaultProps = {
     title: 'Test Slider',
