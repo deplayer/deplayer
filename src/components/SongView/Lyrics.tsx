@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import Modal from '../common/Modal'
-import Header from '../common/Header'
 import * as types from '../../constants/ActionTypes'
 import { Dispatch } from 'redux'
 import { useLyrics } from '../../stores/livestore/hooks'
@@ -43,7 +42,7 @@ const Lyrics = (props: Props) => {
       }}
       isOpen={props.isOpen}
     >
-      <Header>Lyrics</Header>
+      <h2>Lyrics</h2>
       <div className='p-4 my-6'>
         {error ? (
           <div className='text-error text-center'>
