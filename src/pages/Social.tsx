@@ -1,14 +1,11 @@
+import { useDispatch } from 'react-redux'
 import RoomList from '../components/RoomList'
 import * as types from '../constants/ActionTypes'
 import Icon from '../components/common/Icon'
-import { Dispatch } from 'redux'
 import { useState } from 'react'
 
-interface Props {
-  dispatch: Dispatch
-}
-
-const Social = ({ dispatch }: Props) => {
+const Social = () => {
+  const dispatch = useDispatch()
   const [showUsernameModal, setShowUsernameModal] = useState(false)
   const [pendingRoomCode, setPendingRoomCode] = useState<string | null>(null)
 
@@ -19,9 +16,9 @@ const Social = ({ dispatch }: Props) => {
       setShowUsernameModal(true)
       return
     }
-    
-    dispatch({ 
-      type: types.JOIN_PEER_ROOM, 
+
+    dispatch({
+      type: types.JOIN_PEER_ROOM,
       roomCode: code,
       username: savedUsername
     })
@@ -52,7 +49,7 @@ const Social = ({ dispatch }: Props) => {
           <Icon icon="faTimes" />
         </button>
       </h2>
-      
+
       <div>
         <p className="text-base-content/70">
           Connect with your friends and share your contents!

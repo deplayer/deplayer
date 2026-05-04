@@ -1,24 +1,26 @@
 import Sidebar from 'react-sidebar'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { State as RootState } from '../reducers'
 import Social from '../pages/Social'
-import { Dispatch } from 'redux'
 import * as types from '../constants/ActionTypes'
 
-const SidebarContents = ({ dispatch }: { dispatch: Dispatch }) => {
+const SidebarContents = () => {
   return <div className='w-full h-full'>
-    <Social dispatch={dispatch} />
+    <Social />
   </div>
 }
 
-const RightPanelContainer = ({ rightPanelToggled, dispatch }: { rightPanelToggled: boolean, dispatch: Dispatch }) => {
+const RightPanelContainer = () => {
+  const dispatch = useDispatch()
+  const rightPanelToggled = useSelector((state: RootState) => state.app.rightPanelToggled)
+
   const handleSetSidebarOpen = (open: boolean) => {
     dispatch({ type: types.TOGGLE_RIGHT_PANEL, value: open })
   }
 
   return (
     <Sidebar
-      sidebar={<SidebarContents dispatch={dispatch} />}
+      sidebar={<SidebarContents />}
       open={rightPanelToggled}
       pullRight={true}
       onSetOpen={handleSetSidebarOpen}
@@ -27,8 +29,8 @@ const RightPanelContainer = ({ rightPanelToggled, dispatch }: { rightPanelToggle
       overlayId='right-sidebar-overlay'
       overlayClassName='fixed inset-0'
       contentId='right-sidebar-content'
-      styles={{ 
-        overlay: { backgroundColor: 'rgba(0, 0, 0, 0.3)', zIndex: '40' }, 
+      styles={{
+        overlay: { backgroundColor: 'rgba(0, 0, 0, 0.3)', zIndex: '40' },
         sidebar: { position: 'fixed', zIndex: '50' },
         content: { position: 'relative' }
       }}
@@ -38,8 +40,4 @@ const RightPanelContainer = ({ rightPanelToggled, dispatch }: { rightPanelToggle
   )
 }
 
-const mapStateToProps = (state: RootState) => ({
-  rightPanelToggled: state.app.rightPanelToggled
-})
-
-export default connect(mapStateToProps)(RightPanelContainer)
+export default RightPanelContainer
