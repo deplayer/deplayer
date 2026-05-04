@@ -57,8 +57,8 @@ describe('SubsonicApiProvider.getNewestAlbumsSince', () => {
     const result = await provider.getNewestAlbumsSince('2026-03-15T00:00:00Z')
 
     expect(result).toHaveLength(2)
-    expect(result[0].title).toBe('Song 1')
-    expect(result[1].title).toBe('Song 2')
+    expect(result[0].media.title).toBe('Song 1')
+    expect(result[1].media.title).toBe('Song 2')
     expect(mockedAxios.get).toHaveBeenCalledTimes(3)
   })
 

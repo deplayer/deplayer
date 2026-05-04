@@ -2,7 +2,8 @@ import * as musicMetadata from "music-metadata";
 import { writeFile } from "@happy-js/happy-opfs";
 import { createLogger } from "../../utils/logger";
 
-import Media, { IMedia, Cover } from "../../entities/Media";
+import { normalizeMedia, NormalizedMedia } from "../../utils/normalizeMedia";
+import type { Cover } from "../../types/media";
 
 const logger = createLogger({ namespace: "ID3TagService" });
 
@@ -55,24 +56,29 @@ export async function metadataToSong(
   metadata: musicMetadata.IAudioMetadata,
   fileUri: string,
   service: string
-): Promise<Media> {
+): Promise<NormalizedMedia> {
   const cover = metadata.common.picture ? metadata.common.picture[0] : null;
 
   logger.debug("metadata.common.genre: ", metadata.common.genre);
 
-  let mediaProps: IMedia = {
+  let mediaCover: Cover | null = null;
+
+  if (cover?.data) {
+    const fileName = generateHexHash(10);
+    const coverFs = `/opfs-${fileName}.jpeg`;
+    await writeFile(coverFs, cover.data);
+    mediaCover = { thumbnailUrl: coverFs, fullUrl: coverFs };
+  }
+
+  return normalizeMedia({
     title: metadata.common.title || fileUri,
-    artist: { name: metadata.common.artist || "" },
-    album: {
-      name: metadata.common.album || "",
-      artist: { name: metadata.common.artist || "" },
-    },
     artistName: metadata.common.artist || "",
     albumName: metadata.common.album || "",
     type: fileUri.endsWith(".mp4") ? "video" : "audio",
-    duration: metadata.format.duration || 0,
+    duration: { value: metadata.format.duration || 0, unit: 'seconds' },
     genres: metadata.common.genre ?? [],
     track: metadata.common.track.no || 0,
+    cover: mediaCover,
     stream: {
       filesystem: {
         service: service,
@@ -83,18 +89,5 @@ export async function metadataToSong(
         ],
       },
     },
-  };
-
-  if (cover?.data) {
-    const fileName = generateHexHash(10);
-    const coverFs = `/opfs-${fileName}.jpeg`;
-    await writeFile(coverFs, cover.data);
-
-    const mediaCover: Cover = { thumbnailUrl: coverFs, fullUrl: coverFs };
-    mediaProps = { ...mediaProps, cover: mediaCover };
-  }
-
-  const song = new Media(mediaProps);
-
-  return song;
+  });
 }

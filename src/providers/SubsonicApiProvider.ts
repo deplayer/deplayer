@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createLogger } from "../utils/logger";
 
-import Media, { IMedia } from "../entities/Media";
+import { normalizeMedia, NormalizedMedia } from "../utils/normalizeMedia";
 import { IMusicProvider } from "./IMusicProvider";
 
 const logger = createLogger({ namespace: "SubsonicApiProvider" });
@@ -33,7 +33,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
     this.coverBase = `${settings.baseUrl}/rest/getCoverArt.view?u=${settings.user}&p=${settings.password}&c=${appName}&v=1.11.0&f=json`;
   }
 
-  mapSongs = (songs: IMedia[], albums: any[] = []): Array<any> => {
+  mapSongs = (songs: any[], albums: any[] = []): NormalizedMedia[] => {
     // Protect against empty responses
     if (!songs) {
       return [];
@@ -43,19 +43,17 @@ export default class SubsonicApiProvider implements IMusicProvider {
     return secureSongs.map((song: any) => {
       const album = albums.find((album) => album.id === song.album.id);
 
-      return new Media({
+      return normalizeMedia({
         title: song.title ? song.title : song.path,
-        artist: { name: song.artist },
         artistName: song.artist,
-        album: { name: song.album, artist: { name: song.artist } },
-        year: album?.year,
         albumName: song.album,
+        year: album?.year,
         cover: {
           thumbnailUrl: this.coverBase + "&id=" + song.coverArt + "&size=100",
           fullUrl: this.coverBase + "&id=" + song.coverArt,
         },
         genres: song.genres?.map((genre: { name: string }) => genre.name) || [],
-        duration: song.duration * 1000,
+        duration: { value: song.duration, unit: 'seconds' },
         track: song.track,
         discNumber: song.discNumber,
         filePath: song.path,
@@ -70,7 +68,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
     });
   };
 
-  search(searchTerm: string): Promise<Array<IMedia>> {
+  search(searchTerm: string): Promise<NormalizedMedia[]> {
     return new Promise((resolve, reject) => {
       axios
         .get(`${this.searchUrl}&query=${searchTerm}`)
@@ -89,10 +87,10 @@ export default class SubsonicApiProvider implements IMusicProvider {
     });
   }
 
-  async getNewestAlbumsSince(sinceDate: string): Promise<IMedia[]> {
+  async getNewestAlbumsSince(sinceDate: string): Promise<NormalizedMedia[]> {
     const PAGE_SIZE = 50
     const BATCH_SIZE = 10
-    const allSongs: IMedia[] = []
+    const allSongs: NormalizedMedia[] = []
     let offset = 0
     let done = false
 
@@ -147,13 +145,13 @@ export default class SubsonicApiProvider implements IMusicProvider {
     return allSongs
   }
 
-  async getAlbumsBatch(offset: number, size: number): Promise<{ media: IMedia[]; hasMore: boolean }> {
+  async getAlbumsBatch(offset: number, size: number): Promise<{ media: NormalizedMedia[]; hasMore: boolean }> {
     const BATCH_SIZE = 10
     const result = await axios.get(
       `${this.baseUrl}/rest/getAlbumList2.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.16.1&f=json&type=newest&size=${size}&offset=${offset}`
     )
     const albums = result.data['subsonic-response'].albumList2?.album || []
-    const allSongs: IMedia[] = []
+    const allSongs: NormalizedMedia[] = []
 
     for (let i = 0; i < albums.length; i += BATCH_SIZE) {
       const batch = albums.slice(i, i + BATCH_SIZE)
@@ -188,7 +186,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
     }
   }
 
-  async getArtistSongs(artistName: string): Promise<IMedia[]> {
+  async getArtistSongs(artistName: string): Promise<NormalizedMedia[]> {
     try {
       // 1. Search for artist by name
       const searchResult = await axios.get(
@@ -224,7 +222,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
       }
 
       // 3. Get songs from each album
-      const allSongs: IMedia[] = [];
+      const allSongs: NormalizedMedia[] = [];
 
       for (const album of albums) {
         try {

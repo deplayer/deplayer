@@ -2,7 +2,7 @@ import { Api, Jellyfin } from "@jellyfin/sdk";
 import { ItemFields } from "@jellyfin/sdk/lib/generated-client/models";
 import { getItemsApi } from "@jellyfin/sdk/lib/utils/api/items-api";
 import { getUserApi } from "@jellyfin/sdk/lib/utils/api/user-api";
-import Media from "../entities/Media";
+import { normalizeMedia, NormalizedMedia } from "../utils/normalizeMedia";
 import { IMusicProvider } from "./IMusicProvider";
 import { createLogger } from "../utils/logger";
 
@@ -59,7 +59,7 @@ export default class JellyfinProvider implements IMusicProvider {
     }
   }
 
-  private mapSongs(items: any[]): Array<Media> {
+  private mapSongs(items: any[]): NormalizedMedia[] {
     return items.map((item) => {
       const type = item.Type?.toLowerCase() === "movie" ? "video" : "audio";
 
@@ -70,15 +70,10 @@ export default class JellyfinProvider implements IMusicProvider {
       const albumName =
         type === "video" ? "Movies" : item.Album || "Unknown Album";
 
-      return new Media({
+      return normalizeMedia({
         title: item.Name,
         artistName: artistName,
         albumName: albumName,
-        artist: { name: artistName },
-        album: {
-          name: albumName,
-          artist: { name: artistName },
-        },
         track: item.IndexNumber || null,
         discNumber: item.ParentIndexNumber || null,
         cover: {
@@ -86,7 +81,7 @@ export default class JellyfinProvider implements IMusicProvider {
           fullUrl: `${this.baseUrl}/Items/${item.Id}/Images/Primary?api_key=${this.apiKey}`,
         },
         genres: item.Genres || [],
-        duration: Math.floor((item.RunTimeTicks || 0) / 10000),
+        duration: { value: item.RunTimeTicks || 0, unit: 'ticks' },
         type: type,
         stream: {
           jellyfin: {
@@ -105,7 +100,7 @@ export default class JellyfinProvider implements IMusicProvider {
     });
   }
 
-  async search(searchTerm: string): Promise<Array<Media>> {
+  async search(searchTerm: string): Promise<NormalizedMedia[]> {
     await this.initialize();
 
     if (!this.userId) {
@@ -158,7 +153,7 @@ export default class JellyfinProvider implements IMusicProvider {
     }
   }
 
-  async fullSync(): Promise<Array<any>> {
+  async fullSync(): Promise<NormalizedMedia[]> {
     await this.initialize();
 
     if (!this.userId) {
@@ -186,7 +181,7 @@ export default class JellyfinProvider implements IMusicProvider {
     }
   }
 
-  async getArtistSongs(artistName: string): Promise<Array<Media>> {
+  async getArtistSongs(artistName: string): Promise<NormalizedMedia[]> {
     await this.initialize();
 
     if (!this.userId) {

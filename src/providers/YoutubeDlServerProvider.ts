@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import Media from "../entities/Media";
+import { normalizeMedia, NormalizedMedia } from "../utils/normalizeMedia";
 import { IMusicProvider } from "./IMusicProvider";
 
 /**
@@ -19,19 +19,16 @@ export default class YoutubeDlServerProvider implements IMusicProvider {
     this.playUrl = `${settings.host}/api/play`;
   }
 
-  mapSong = (songInfo: any): Media => {
-    return new Media({
+  mapSong = (songInfo: any): NormalizedMedia => {
+    return normalizeMedia({
       title: songInfo.title,
-      artist: { name: songInfo.artist },
-      album: { name: songInfo.album, artist: { name: songInfo.artist } },
       artistName: songInfo.artist,
       albumName: songInfo.album,
       cover: {
         thumbnailUrl: songInfo.thumbnails?.[0].url,
         fullUrl: songInfo.thumbnails?.[0].url,
       },
-      genres: [""],
-      duration: 0,
+      genres: [],
       track: 0,
       filePath: "",
       type: "video",
@@ -46,7 +43,7 @@ export default class YoutubeDlServerProvider implements IMusicProvider {
     });
   };
 
-  mapSongs = (info: any): Array<any> => {
+  mapSongs = (info: any): NormalizedMedia[] => {
     if (info._type === "playlist") {
       return info.entries.map((entry: any) => {
         return this.mapSong(entry);
@@ -56,7 +53,7 @@ export default class YoutubeDlServerProvider implements IMusicProvider {
     }
   };
 
-  search(searchTerm: string): Promise<Array<any>> {
+  search(searchTerm: string): Promise<NormalizedMedia[]> {
     return axios
       .get(`${this.searchUrl}?url=${escape(searchTerm)}`)
       .then((result) => {

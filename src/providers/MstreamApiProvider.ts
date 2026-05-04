@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import Media from '../entities/Media'
+import { normalizeMedia, NormalizedMedia } from '../utils/normalizeMedia'
 import { IMusicProvider } from './IMusicProvider'
 
 /**
@@ -31,23 +31,16 @@ export default class MstreamApiProvider implements IMusicProvider {
     })
   }
 
-  mapSongs = (songs: Array<any>): Array<Media> => {
+  mapSongs = (songs: Array<any>): NormalizedMedia[] => {
     return songs.map((song: any) => {
       const songTitle = song.metadata.title ? song.metadata.title : song.filepath
 
-      return new Media({
+      return normalizeMedia({
         title: songTitle,
         artistName: song.metadata.artist,
         albumName: song.metadata.album,
         type: 'audio',
         genres: [],
-        album: {
-          name: song.metadata.album,
-          artist: { name: song.metadata.artist }
-        },
-        artist: {
-          name: song.metadata.artist
-        },
         cover: {
           thumbnailUrl: song.metadata['album-art'] ? this.baseUrl + '/album-art/' + song.metadata['album-art'] : '',
           fullUrl: song.metadata['album-art'] ? this.baseUrl + '/album-art/' + song.metadata['album-art'] : ''
@@ -62,7 +55,7 @@ export default class MstreamApiProvider implements IMusicProvider {
     })
   }
 
-  search(searchTerm: string): Promise<Array<any>> {
+  search(searchTerm: string): Promise<NormalizedMedia[]> {
     return new Promise((resolve, reject) => {
       axios.post(this.albumSongsUrl)
         .then((result) => {
@@ -75,7 +68,7 @@ export default class MstreamApiProvider implements IMusicProvider {
     })
   }
 
-  async getArtistSongs(artistName: string): Promise<Array<Media>> {
+  async getArtistSongs(artistName: string): Promise<NormalizedMedia[]> {
     // Mstream doesn't have artist-specific endpoint, use search as fallback
     return this.search(artistName)
   }

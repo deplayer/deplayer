@@ -79,8 +79,8 @@ describe('SubsonicApiProvider.getArtistSongs', () => {
     const songs = await provider.getArtistSongs('Test Artist')
 
     expect(songs).toHaveLength(2)
-    expect(songs[0].title).toBe('Song 1')
-    expect(songs[1].title).toBe('Song 2')
+    expect(songs[0].media.title).toBe('Song 1')
+    expect(songs[1].media.title).toBe('Song 2')
   })
 
   it('should return empty array when artist not found', async () => {

@@ -1,4 +1,4 @@
-import { IMedia } from '../entities/Media'
+import { NormalizedMedia } from '../utils/normalizeMedia'
 
 export interface ScanStatus {
   scanning: boolean
@@ -8,9 +8,9 @@ export interface ScanStatus {
 
 export interface IMusicProvider {
   providerKey: string;
-  search(searchTerm: string): Promise<IMedia[]>;
-  getArtistSongs?(artistName: string): Promise<IMedia[]>;
+  search(searchTerm: string): Promise<NormalizedMedia[]>;
+  getArtistSongs?(artistName: string): Promise<NormalizedMedia[]>;
   getScanStatus?(): Promise<ScanStatus>;
-  getNewestAlbumsSince?(sinceDate: string): Promise<IMedia[]>;
-  getAlbumsBatch?(offset: number, size: number): Promise<{ media: IMedia[]; hasMore: boolean }>;
+  getNewestAlbumsSince?(sinceDate: string): Promise<NormalizedMedia[]>;
+  getAlbumsBatch?(offset: number, size: number): Promise<{ media: NormalizedMedia[]; hasMore: boolean }>;
 }
