@@ -17,7 +17,6 @@ import { inSection } from '../../utils/router'
 import Icon from '../common/Icon'
 import { State as AppState } from '../../reducers/app'
 import { useLocation } from 'react-router'
-import DeplayerTitle from '../DeplayerTitle'
 import { usePlaylists, useSmartPlaylists, useQueue, useMediaCount, useArtistsCount, useSearchMediaIds } from '../../stores/livestore/hooks'
 import { useUIStore } from '../../stores/uiStore'
 
@@ -110,7 +109,7 @@ const SidebarContents = (props: ContentProps) => {
       <div className="flex justify-between bg-base-200 border-b border-base-300 py-4">
         <DeplayerLogo />
         <h4 className="text-xl text-center text-primary tracking-wider select-none">
-          <DeplayerTitle />
+          <><span className='text-primary'>d</span><span className='text-base-content'>eplayer</span></>
         </h4>
         <SwitchThemeButton />
       </div>
@@ -160,7 +159,7 @@ const SidebarContents = (props: ContentProps) => {
       </div>
 
       <section className='p-6 pt-8 text-sm text-center w-full text-base-content/70'>
-        <DeplayerTitle /> <Translate value="sidebar.openSource" />
+        <><span className='text-primary'>d</span><span className='text-base-content'>eplayer</span></> <Translate value="sidebar.openSource" />
         <a
           href={'https://gitlab.com/deplayer/deplayer'}
           rel="noreferrer"

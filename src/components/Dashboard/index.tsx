@@ -12,7 +12,6 @@ import BecauseYouListened from '../BecauseYouListened'
 import Footer from '../Footer'
 import TryDemoButton from '../Buttons/TryDemoButton'
 import DashboardCard from './DashboardCard'
-import DeplayerTitle from '../DeplayerTitle'
 import * as types from '../../constants/ActionTypes'
 import { useRecentlyPlayed, useMediaCount } from '../../stores/livestore/hooks'
 
@@ -49,7 +48,7 @@ const WelcomeCard = () => {
         <RandomIllustration />
         <div className="flex flex-col gap-3 flex-1">
           <h4 className="text-xl">
-            <Translate value="dashboard.welcome.title" dangerousHTML /> <DeplayerTitle />
+            <Translate value="dashboard.welcome.title" dangerousHTML /> <><span className='text-primary'>d</span><span className='text-base-content'>eplayer</span></>
           </h4>
           <p className="opacity-70">
             <Translate value="dashboard.welcome.description" /><br />
