@@ -13,8 +13,6 @@ import Footer from '../Footer'
 import TryDemoButton from '../Buttons/TryDemoButton'
 import DashboardCard from './DashboardCard'
 import DeplayerTitle from '../DeplayerTitle'
-import Auth from '../Auth'
-import Button from '../common/Button'
 import * as types from '../../constants/ActionTypes'
 import { useRecentlyPlayed, useMediaCount } from '../../stores/livestore/hooks'
 
@@ -43,13 +41,11 @@ const RandomIllustration = () => {
 
 const WelcomeCard = () => {
   const dispatch = useDispatch()
-  const [showAuthModal, setShowAuthModal] = React.useState(false)
   const credentials = localStorage.getItem('credentials')
 
   return (
     <DashboardCard title="Welcome" icon="faMusic" className="col-span-full">
-      {showAuthModal && <Auth />}
-      <div className="flex flex-col md:flex-row items-center gap-6 py-2">
+<div className="flex flex-col md:flex-row items-center gap-6 py-2">
         <RandomIllustration />
         <div className="flex flex-col gap-3 flex-1">
           <h4 className="text-xl">
@@ -79,11 +75,6 @@ const WelcomeCard = () => {
           </ul>
           <div className="flex flex-wrap gap-3 items-center pt-2">
             <TryDemoButton />
-            {!credentials && (
-              <Button onClick={() => setShowAuthModal(true)}>
-                <Translate value="dashboard.welcome.authButton" />
-              </Button>
-            )}
             {credentials && (
               <span className="text-sm opacity-70">
                 <Translate value="dashboard.welcome.authenticated" />
