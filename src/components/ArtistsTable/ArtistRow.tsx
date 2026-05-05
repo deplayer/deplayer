@@ -1,3 +1,4 @@
+import React from 'react'
 import { Link } from 'react-router-dom'
 import type { ArtistRow as ArtistRowType } from '../../types/media'
 import Tag from '../common/Tag'
@@ -5,8 +6,8 @@ import Icon from '../common/Icon'
 
 type Props = {
   artist: ArtistRowType,
-  songs: any,
-  style: any
+  songs: string[],
+  style: React.CSSProperties
 }
 
 const ArtistRow = (props: Props) => {

@@ -92,7 +92,7 @@ const AddMediaModal = (props: Props) => {
                 props.dispatch({ type: types.ADD_WEBTORRENT_MEDIA, magnet: magnetLink })
               }
               if (torrent) {
-                remote(torrent, (err, parsedTorrent: any) => {
+                remote(torrent, (err, parsedTorrent) => {
                   if (err) {
                     props.dispatch({
                       type: types.SEND_NOTIFICATION,
@@ -147,7 +147,7 @@ const AddMediaModal = (props: Props) => {
 }
 
 export default connect(
-  (state: any) => ({
+  (state: { app: { showAddMediaModal: boolean } }) => ({
     showAddMediaModal: state.app.showAddMediaModal
   })
 )(AddMediaModal)

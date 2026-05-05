@@ -3,7 +3,7 @@ import * as React from 'react'
 import Button from './common/Button'
 
 type Props = {
-  onLoaded: (data: any) => void
+  onLoaded: (data: string | ArrayBuffer | null) => void
 }
 
 export default class Importer extends React.Component<Props> {

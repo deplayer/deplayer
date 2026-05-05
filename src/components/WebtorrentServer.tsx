@@ -144,7 +144,7 @@ function WebtorrentServer({
       return
     }
 
-    const file = torrent.files.find((file: any) => (file as any).type?.startsWith('video/'))
+    const file = torrent.files.find((file) => (file as unknown as Record<string, unknown>).type?.toString()?.startsWith('video/'))
     if (!file) {
       const error = new Error('No video file found in torrent')
       console.error(error)
@@ -154,7 +154,7 @@ function WebtorrentServer({
 
     try {
       if (videoRef.current) {
-        (file as any).streamTo(videoRef.current)
+        (file as unknown as { streamTo: (el: HTMLVideoElement) => { on: (event: string, cb: (err?: Error) => void) => unknown } }).streamTo(videoRef.current)
           .on('ready', () => {
             console.log('Stream is ready')
             onReady?.()

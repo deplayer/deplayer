@@ -5,7 +5,7 @@ import Icon from '../common/Icon'
 
 const SearchButton = () => {
   const dispatch = useDispatch()
-  const searchToggled = useSelector((state: { search: any }) => state.search.searchToggled)
+  const searchToggled = useSelector((state: { search: { searchToggled: boolean } }) => state.search.searchToggled)
 
   const toggleSearch = () => {
     dispatch({ type: types.TOGGLE_SEARCH })

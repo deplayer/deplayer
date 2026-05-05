@@ -3,8 +3,11 @@ import HorizontalSlider from '../HorizontalSlider'
 import AlbumCover from '../common/AlbumCover'
 import { useMemo } from 'react'
 import { useRecentAlbums, useArtistsByIds } from '../../stores/livestore/hooks'
+import type { AlbumRow } from '../../types/media'
 
-const AlbumMediaSlider = ({ mediaItems, title }: { mediaItems: any[], title: React.ReactNode }) => {
+type AlbumWithArtist = AlbumRow & { artistName: string }
+
+const AlbumMediaSlider = ({ mediaItems, title }: { mediaItems: AlbumWithArtist[], title: React.ReactNode }) => {
   if (!mediaItems?.length) {
     return null
   }
@@ -17,9 +20,9 @@ const AlbumMediaSlider = ({ mediaItems, title }: { mediaItems: any[], title: Rea
         id={album.id}
         name={album.name}
         artistName={album.artistName}
-        cover={{ 
-          thumbnailUrl: album.thumbnailUrl,
-          fullUrl: album.thumbnailUrl 
+        cover={{
+          thumbnailUrl: album.thumbnailUrl || undefined,
+          fullUrl: album.thumbnailUrl || undefined
         }}
       />
     ))
@@ -39,7 +42,7 @@ const AlbumMediaSlider = ({ mediaItems, title }: { mediaItems: any[], title: Rea
 const RecentAlbums = () => {
   const recentAlbums = useRecentAlbums(10)
   const artistIds = useMemo(
-    () => [...new Set((recentAlbums as any[]).map((a: any) => a.artistId).filter(Boolean))],
+    () => [...new Set((recentAlbums as unknown as AlbumRow[]).map((a) => a.artistId).filter(Boolean))],
     [recentAlbums]
   )
   const artistsMap = useArtistsByIds(artistIds)
@@ -49,7 +52,7 @@ const RecentAlbums = () => {
   }
 
   // Map LiveStore albums to expected format with artist names
-  const albumsWithArtists = (recentAlbums as any[]).map(album => ({
+  const albumsWithArtists = (recentAlbums as unknown as AlbumRow[]).map(album => ({
     ...album,
     artistName: artistsMap[album.artistId]?.name || 'Unknown Artist'
   }))

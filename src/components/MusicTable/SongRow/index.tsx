@@ -13,7 +13,7 @@ import { State as QueueState } from '../../../reducers/queue'
 const ContextualMenu = React.lazy(() => import('./../ContextualMenu'))
 
 // Lightweight trigger that only mounts the heavy ContextualMenu on demand
-const LazyContextualMenuTrigger = (props: any) => {
+const LazyContextualMenuTrigger = (props: Props) => {
   const [opened, setOpened] = React.useState(false)
   const Icon = React.lazy(() => import('../../common/Icon'))
 

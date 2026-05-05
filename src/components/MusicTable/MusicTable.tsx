@@ -17,12 +17,16 @@ import { useMediaById, useQueue, useCurrentPlayingSongId, useFavoriteIds } from 
 import { useUIStore } from '../../stores/uiStore'
 import { useDispatch } from 'react-redux'
 import { Dispatch } from 'redux'
+import type { MediaRow } from '../../types/media'
+import { State as QueueState } from '../../reducers/queue'
+
+type QueueData = Record<string, unknown> | QueueState | null
 
 type Props = {
   error?: string,
   tableIds: Array<string>,
-  mediaMap?: Record<string, any>,  // Optional: Media lookup map for performance
-  queue?: any,  // Optional: Queue data to avoid N queries
+  mediaMap?: Record<string, MediaRow>,  // Optional: Media lookup map for performance
+  queue?: QueueData,  // Optional: Queue data to avoid N queries
   disableCurrent?: boolean,
   disableCovers?: boolean,
   disableAddButton?: boolean,
@@ -73,7 +77,7 @@ const Toolbar = ({
     )
   }
 
-const LoadingRow = ({ style, slim }: { style: any, slim: boolean }) => (
+const LoadingRow = ({ style, slim }: { style: React.CSSProperties, slim: boolean }) => (
   <div 
     style={style}
     className={classNames(
@@ -113,10 +117,10 @@ const SongRowDirect = React.memo(({
   favoriteIds,
 }: {
   songId: string
-  mediaMap: Record<string, any>
-  queue: any
+  mediaMap: Record<string, MediaRow>
+  queue: QueueData
   isCurrent: boolean
-  style: any
+  style: React.CSSProperties
   slim: boolean
   mqlMatch: boolean
   dispatch: Dispatch
@@ -138,7 +142,7 @@ const SongRowDirect = React.memo(({
   return (
     <SongRow
       song={song}
-      queue={queue}
+      queue={queue as QueueState | undefined}
       isCurrent={isCurrent}
       onClick={onClick}
       dispatch={dispatch}
@@ -176,7 +180,7 @@ const SongRowWithHooks = React.memo(({
 }: {
   songId: string
   isCurrent: boolean
-  style: any
+  style: React.CSSProperties
   slim: boolean
   mqlMatch: boolean
   dispatch: Dispatch
@@ -281,7 +285,7 @@ const MusicTable = ({
     style,       // Style object to be applied to row (to position it);
     slim
     // This must be passed through to the rendered row element.
-  }: { index: number, key: string, style: any, slim: boolean }): any => {
+  }: { index: number, key: string, style: React.CSSProperties, slim: boolean }): React.ReactNode => {
     const songId = tableIdsRef.current[index]
     const isCurrent = songId === currentSongIdRef.current
 
@@ -314,7 +318,7 @@ const MusicTable = ({
   const slimRef = React.useRef(slim)
   slimRef.current = slim
   const stableRowRenderer = React.useCallback(
-    ({ index, key, style }: { index: number, key: string, style: any }) => 
+    ({ index, key, style }: { index: number, key: string, style: React.CSSProperties }) =>
       rowRenderer({ index, key, style, slim: !!slimRef.current }),
     [rowRenderer]
   )

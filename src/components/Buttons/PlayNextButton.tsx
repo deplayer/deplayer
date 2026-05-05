@@ -77,6 +77,6 @@ const PlayNextButton = (props: Props) => {
   )
 }
 
-const RoutedButton = (props: any) => <PlayNextButton {...props} />
+const RoutedButton = (props: Props) => <PlayNextButton {...props} />
 
 export default RoutedButton

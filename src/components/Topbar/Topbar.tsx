@@ -13,7 +13,7 @@ type Props = {
   showInCenter: boolean,
   searchTerm: string,
   searchToggled: boolean,
-  dispatch: Dispatch<StartSearchAction | { type: string; [key: string]: any }>,
+  dispatch: Dispatch<StartSearchAction | { type: string; [key: string]: unknown }>,
   onSetSidebarOpen?: (open: boolean) => void,
   app?: AppState,
   children?: React.ReactNode

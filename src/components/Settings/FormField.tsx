@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Field } from 'formik'
+import { Field, FieldProps } from 'formik'
 import type { BuiltFieldSchema } from '../../types/providers'
 
 type Props = {
@@ -17,7 +17,7 @@ const FormField = ({ field }: Props) => {
     return (
       <div>
         <Field name={field.name}>
-          {({ field: f }: any) => (
+          {({ field: f }: FieldProps) => (
             <input
               type="checkbox"
               className="toggle toggle-primary"

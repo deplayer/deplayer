@@ -22,7 +22,7 @@ const Providers = () => {
   const liveStoreSettings = useSettings()
   
   // Local state for managing providers during editing (before save)
-  const [localProviders, setLocalProviders] = useState<any>(null)
+  const [localProviders, setLocalProviders] = useState<Record<string, Record<string, unknown>> | null>(null)
   
   // Save feedback state
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saved' | 'error'>('idle')
@@ -53,7 +53,7 @@ const Providers = () => {
   }, [currentProviders])
   
   // Helper to get next available provider ID
-  const getNextProviderId = useCallback((providers: any, baseKey: string) => {
+  const getNextProviderId = useCallback((providers: Record<string, unknown>, baseKey: string) => {
     const existingKeys = Object.keys(providers)
       .filter(key => key.startsWith(baseKey))
       .map(key => {
@@ -94,7 +94,7 @@ const Providers = () => {
     setLocalProviders(newProviders);
   }, [currentProviders])
 
-  const handleSubmit = async (values: any, actions: any) => {
+  const handleSubmit = async (values: { providers: Record<string, Record<string, unknown>> }, actions: { setSubmitting: (submitting: boolean) => void }) => {
     if (!liveStore) {
       console.error('LiveStore not available')
       setSaveError('LiveStore not available')

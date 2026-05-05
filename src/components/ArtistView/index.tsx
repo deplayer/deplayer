@@ -40,8 +40,8 @@ export default function ArtistView() {
   // Popular tracks sorted by playCount
   const popularTracks = React.useMemo(() => {
     return Object.values(mediaMap)
-      .filter((s: any) => s && s.playCount > 0)
-      .sort((a: any, b: any) => (b.playCount || 0) - (a.playCount || 0))
+      .filter((s) => s && (s.playCount as number) > 0)
+      .sort((a, b) => ((b.playCount as number) || 0) - ((a.playCount as number) || 0))
   }, [mediaMap])
 
   // All song IDs
@@ -50,8 +50,8 @@ export default function ArtistView() {
   // Collect genres
   const artistGenres = React.useMemo(() => {
     const genreSet = new Set<string>()
-    Object.values(mediaMap).forEach((song: any) => {
-      const genres = song.genres || (song.genresFlat ? song.genresFlat.split(',') : [])
+    Object.values(mediaMap).forEach((song) => {
+      const genres = (song.genres as string[] | undefined) || ((song.genresFlat as string | undefined) ? (song.genresFlat as string).split(',') : [])
       if (Array.isArray(genres)) genres.forEach((g: string) => g.trim() && genreSet.add(g.trim()))
     })
     return Array.from(genreSet)
@@ -143,7 +143,7 @@ export default function ArtistView() {
             <h2 className="text-xl font-semibold mb-4 px-4">
               <Translate value="titles.popularTracks" />
             </h2>
-            {visibleTracks.map((song: any) => (
+            {visibleTracks.map((song) => (
               <SongRow
                 key={song.id}
                 mqlMatch={false}

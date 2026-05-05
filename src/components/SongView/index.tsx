@@ -19,7 +19,7 @@ import { sortByPlayCount } from '../../utils/sorting'
 import Lyrics from './Lyrics'
 import BecauseYouListened from '../BecauseYouListened'
 import { getStreamUri } from '../../services/Song/StreamUriService'
-import type { AlbumRow } from '../../types/media'
+import type { AlbumRow, MediaRow, Stream } from '../../types/media'
 import { hasAnyProviderOf } from '../../utils/hasAnyProviderOf'
 import ServiceIcon from '../ServiceIcon'
 import { State as CollectionState } from '../../reducers/collection'
@@ -33,7 +33,7 @@ import { addToQueueAction, removeFromQueueAction } from '../../stores/livestore/
 const MAX_LIST_ITEMS = 25
 
 type Props = {
-  playerPortal: any,
+  playerPortal: React.ComponentProps<typeof OutPortal>['node'],
   location: Location,
   player: PlayerState,
   collection: CollectionState,
@@ -43,7 +43,7 @@ type Props = {
   className?: string | null
 }
 
-async function changeCurrentPlaying(song: any, index: number, dispatch: Dispatch) {
+async function changeCurrentPlaying(song: MediaRow, index: number, dispatch: Dispatch) {
   const streamUri = await getStreamUri(song, index)
   dispatch({ type: types.SET_CURRENT_PLAYING_URL, url: streamUri })
 }
@@ -90,7 +90,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
 
     const loadStreamUrls = async () => {
       const urls = await Promise.all(
-        Object.values(song.stream || {}).map(async (value: any, index: number) => {
+        Object.values(song.stream || {}).map(async (value: Stream & { format?: string }, index: number) => {
           const url = await getStreamUri(song, index)
           if (url instanceof Blob) {
             const blobUrl = URL.createObjectURL(url)
@@ -335,7 +335,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
               <label className='text-base-content'><Translate value='labels.providers' /></label>
               <div className='flex flex-wrap gap-2'>
                 {
-                  Object.values(song.stream).map((value: any, index: number) => {
+                  Object.values(song.stream).map((value: Stream, index: number) => {
                     const streamUrl = streamUrls.find(url => url.service === value.service)
                     return (
                       <div

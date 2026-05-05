@@ -1,8 +1,9 @@
-import Select from 'react-select'
+import Select, { StylesConfig } from 'react-select'
 import { Filter } from '../../stores/uiStore'
 import Button from '../common/Button'
 import { Dispatch } from 'redux'
 import Icon from '../common/Icon'
+import type { ArtistRow } from '../../types/media'
 import Modal from '../common/Modal'
 import { useState, useEffect } from 'react'
 import { useUIStore } from '../../stores/uiStore'
@@ -37,7 +38,7 @@ const FilterPanel = (_props: Props) => {
   }, [])
   
   // Create artists map for quick lookup
-  const artistsMap = artists.reduce((acc: Record<string, any>, artist: any) => {
+  const artistsMap = artists.reduce((acc: Record<string, ArtistRow>, artist: ArtistRow) => {
     acc[artist.id] = artist
     return acc
   }, {})
@@ -62,7 +63,7 @@ const FilterPanel = (_props: Props) => {
     },
     {
       label: 'Artists',
-      options: artists.map((artist: any) => ({
+      options: artists.map((artist: ArtistRow) => ({
         value: `artist:${artist.id}`,
         label: artist.name,
         color: '#9999ff' // Light blue for artists
@@ -94,8 +95,10 @@ const FilterPanel = (_props: Props) => {
     }))
   ]
 
-  const customStyles = {
-    control: (provided: any) => ({
+  type FilterOption = { value: string; label: string; color: string }
+
+  const customStyles: StylesConfig<FilterOption, true> = {
+    control: (provided) => ({
       ...provided,
       backgroundColor: 'var(--select-bg)',
       borderColor: 'var(--select-border)',
@@ -104,19 +107,19 @@ const FilterPanel = (_props: Props) => {
         borderColor: 'var(--select-border-hover)'
       }
     }),
-    input: (provided: any) => ({
+    input: (provided) => ({
       ...provided,
       color: 'var(--select-text)',
     }),
-    placeholder: (provided: any) => ({
+    placeholder: (provided) => ({
       ...provided,
       color: 'var(--select-text)',
     }),
-    singleValue: (provided: any) => ({
+    singleValue: (provided) => ({
       ...provided,
       color: 'var(--select-text)',
     }),
-    option: (provided: any, state: any) => ({
+    option: (provided, state) => ({
       ...provided,
       backgroundColor: state.isSelected
         ? state.data.color
@@ -130,7 +133,7 @@ const FilterPanel = (_props: Props) => {
         backgroundColor: `${state.data.color}80`
       }
     }),
-    menu: (provided: any) => ({
+    menu: (provided) => ({
       ...provided,
       backgroundColor: 'var(--select-menu-bg)',
       border: '1px solid var(--select-border)',
@@ -139,29 +142,29 @@ const FilterPanel = (_props: Props) => {
       width: '100%',
       margin: '0',
     }),
-    menuPortal: (provided: any) => ({
+    menuPortal: (provided) => ({
       ...provided,
       zIndex: 9999,
     }),
-    menuList: (provided: any) => ({
+    menuList: (provided) => ({
       ...provided,
       backgroundColor: 'var(--select-menu-bg)',
       backdropFilter: 'blur(8px)',
       maxHeight: '30vh',
       padding: '0',
     }),
-    multiValue: (provided: any, { data }: any) => ({
+    multiValue: (provided, { data }) => ({
       ...provided,
       backgroundColor: `${data.color}40`,
       border: `1px solid ${data.color}`,
     }),
-    multiValueLabel: (provided: any) => ({
+    multiValueLabel: (provided) => ({
       ...provided,
       color: 'var(--select-text)',
       fontSize: '0.85em',
       padding: '2px',
     }),
-    multiValueRemove: (provided: any, { data }: any) => ({
+    multiValueRemove: (provided, { data }) => ({
       ...provided,
       color: data.color,
       ':hover': {

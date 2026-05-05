@@ -305,7 +305,7 @@ function CommandBar({ togglePlaying, playNext, playPrev }: Props) {
         // Only dispatch search if we have no local matches and haven't searched for this term yet
         if (localItems.length === 0 && value !== lastMediaSearch.current) {
           lastMediaSearch.current = value
-          dispatch(startSearch(value, 'all', true) as any)
+          dispatch(startSearch(value, 'all', true) as unknown as { type: string })
         }
         searchTimer.current = undefined
       }, 500)

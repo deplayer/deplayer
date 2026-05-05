@@ -79,18 +79,18 @@ const Playlists = memo(() => {
   const hasQueueItems = queueTrackIds.length > 0
   const hasCollectionItems = mediaCount > 0
   const hasSearchableProviders = liveSettings?.providers ? 
-    Object.values(liveSettings.providers).some((provider: any) => provider.enabled) : 
+    Object.values(liveSettings.providers).some((provider: unknown) => (provider as Record<string, unknown>)?.enabled) :
     false
 
   // Transform LiveStore playlists to match component expectations
   const transformedPlaylists = useMemo(() => 
-    playlists.map((playlist: any) => ({
+    (playlists as unknown as Array<{ id: string; name: string; trackIds: unknown }>).map((playlist) => ({
       _id: playlist.id,
       id: playlist.id,
       name: playlist.name,
-      trackIds: typeof playlist.trackIds === 'string' 
-        ? JSON.parse(playlist.trackIds) 
-        : (playlist.trackIds || [])
+      trackIds: typeof playlist.trackIds === 'string'
+        ? JSON.parse(playlist.trackIds)
+        : (playlist.trackIds || []) as string[]
     }))
   , [playlists]);
 
@@ -112,7 +112,7 @@ const Playlists = memo(() => {
 
   // Memoize smart playlists transformation
   const transformedSmartPlaylists = useMemo(() => 
-    smartPlaylists.map((playlist: any) => ({
+    smartPlaylists.map((playlist) => ({
       _id: playlist.id,
       id: playlist.id,
       name: playlist.name,

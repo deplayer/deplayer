@@ -9,7 +9,7 @@ type Props = {
   title: React.ReactNode
 }
 
-const NextArrow = (props: any) => {
+const NextArrow = (props: { onClick?: () => void }) => {
   const { onClick } = props
   return (
     <div className='absolute right-0 top-0 bottom-0 flex items-center bg-gradient-to-l from-base-200/80 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity'>
@@ -20,7 +20,7 @@ const NextArrow = (props: any) => {
   )
 }
 
-const PrevArrow = (props: any) => {
+const PrevArrow = (props: { onClick?: () => void }) => {
   const { onClick } = props
   return (
     <div className='absolute left-0 top-0 bottom-0 flex items-center bg-gradient-to-r from-base-200/80 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity'>

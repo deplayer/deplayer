@@ -14,17 +14,17 @@ class TorrentPlayer extends React.Component<ReactPlayerProps> {
   static displayName = 'TorrentPlayer'
   static canPlay = canPlay
   static canEnablePIP = canEnablePIP
-  player: any
-  prevPlayer: any
-  client: any
+  player: HTMLVideoElement | null = null
+  prevPlayer: HTMLVideoElement | null = null
+  client: unknown = null
 
-  constructor(props: any) {
+  constructor(props: ReactPlayerProps) {
     console.log('starting torrent player')
 
     super(props)
   }
 
-  ref = (player: any) => {
+  ref = (player: HTMLVideoElement | null) => {
     if (this.player) {
       // Store previous player to be used by removeListeners()
       this.prevPlayer = this.player
@@ -41,27 +41,29 @@ class TorrentPlayer extends React.Component<ReactPlayerProps> {
   }
 
   addListeners() {
+    if (!this.player) return
     const { onReady, onPlay, onBuffer, onBufferEnd, onPause, onEnded, onError } = this.props
-    this.player.addEventListener('canplay', onReady)
-    this.player.addEventListener('play', onPlay)
-    this.player.addEventListener('waiting', onBuffer)
-    this.player.addEventListener('playing', onBufferEnd)
-    this.player.addEventListener('pause', onPause)
+    this.player.addEventListener('canplay', onReady as unknown as EventListener)
+    this.player.addEventListener('play', onPlay as unknown as EventListener)
+    this.player.addEventListener('waiting', onBuffer as unknown as EventListener)
+    this.player.addEventListener('playing', onBufferEnd as unknown as EventListener)
+    this.player.addEventListener('pause', onPause as unknown as EventListener)
     this.player.addEventListener('seeked', this.onSeek)
-    this.player.addEventListener('ended', onEnded)
-    this.player.addEventListener('error', onError)
+    this.player.addEventListener('ended', onEnded as unknown as EventListener)
+    this.player.addEventListener('error', onError as unknown as EventListener)
   }
 
   removeListeners() {
+    if (!this.player) return
     const { onReady, onPlay, onBuffer, onBufferEnd, onPause, onEnded, onError } = this.props
-    this.player.removeEventListener('canplay', onReady)
-    this.player.removeEventListener('play', onPlay)
-    this.player.removeEventListener('waiting', onBuffer)
-    this.player.removeEventListener('playing', onBufferEnd)
-    this.player.removeEventListener('pause', onPause)
+    this.player.removeEventListener('canplay', onReady as unknown as EventListener)
+    this.player.removeEventListener('play', onPlay as unknown as EventListener)
+    this.player.removeEventListener('waiting', onBuffer as unknown as EventListener)
+    this.player.removeEventListener('playing', onBufferEnd as unknown as EventListener)
+    this.player.removeEventListener('pause', onPause as unknown as EventListener)
     this.player.removeEventListener('seeked', this.onSeek)
-    this.player.removeEventListener('ended', onEnded)
-    this.player.removeEventListener('error', onError)
+    this.player.removeEventListener('ended', onEnded as unknown as EventListener)
+    this.player.removeEventListener('error', onError as unknown as EventListener)
   }
 
   onSeek = (e: Event) => {
@@ -70,6 +72,7 @@ class TorrentPlayer extends React.Component<ReactPlayerProps> {
   }
 
   play() {
+    if (!this.player) return
     const promise = this.player.play()
     if (promise) {
       promise.catch(this.props.onError)
@@ -77,14 +80,17 @@ class TorrentPlayer extends React.Component<ReactPlayerProps> {
   }
 
   pause() {
+    if (!this.player) return
     this.player.pause()
   }
 
   stop() {
+    if (!this.player) return
     this.player.removeAttribute('src')
   }
 
-  seekTo(seconds: any) {
+  seekTo(seconds: number) {
+    if (!this.player) return
     this.player.currentTime = seconds
 
     if (this.props.onSeek) {
@@ -92,19 +98,23 @@ class TorrentPlayer extends React.Component<ReactPlayerProps> {
     }
   }
 
-  setVolume(fraction: any) {
+  setVolume(fraction: number) {
+    if (!this.player) return
     this.player.volume = fraction
   }
 
   mute = () => {
+    if (!this.player) return
     this.player.muted = true
   }
 
   unmute = () => {
+    if (!this.player) return
     this.player.muted = false
   }
 
-  setPlaybackRate(rate: any) {
+  setPlaybackRate(rate: number) {
+    if (!this.player) return
     this.player.playbackRate = rate
   }
 

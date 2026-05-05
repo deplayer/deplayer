@@ -24,7 +24,7 @@ class ButterchurnVisualizer extends React.Component<Props> {
   animationId: number | null = null
   canvas: HTMLCanvasElement | null = null
   canvasId: string
-  visualizer: any
+  visualizer: { connectAudio: (node: AnalyserNode) => void; render: () => void; setRendererSize: (w: number, h: number) => void; loadPreset: (preset: unknown, blend: number) => void } | null = null
   analyser: AnalyserNode | null = null
 
   constructor(props: Props) {

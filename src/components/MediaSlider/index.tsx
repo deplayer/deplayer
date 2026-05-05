@@ -29,7 +29,7 @@ const MediaCoverWrapper = ({ media }: MediaCoverProps) => {
 
 // All items component
 // Important! add unique key
-const MediaItems = (list: Array<any>) => {
+const MediaItems = (list: Array<MediaRow>) => {
   return list
     .filter((media) => media && media.id) // Filter out null/undefined items
     .map((media) => {
@@ -44,7 +44,7 @@ const MediaItems = (list: Array<any>) => {
 }
 
 type Props = {
-  mediaItems: Array<any>,
+  mediaItems: Array<MediaRow>,
   loading?: boolean,
   title: React.ReactNode
 }

@@ -35,7 +35,7 @@ const ArtistTable = () => {
   const tableIds = Object.keys(artistsMap)
   const hasCollectionItems = mediaCount > 0
   const hasSearchableProviders = liveSettings?.providers ? 
-    Object.values(liveSettings.providers).some((provider: any) => provider?.enabled) : 
+    Object.values(liveSettings.providers).some((provider: unknown) => (provider as Record<string, unknown>)?.enabled) :
     false
 
   const { action: fallbackAction, description: fallbackDescription } = getEmptyStateFallback([
@@ -54,7 +54,7 @@ const ArtistTable = () => {
     )
   }
 
-  const rowRenderer = (props: any): any => {
+  const rowRenderer = (props: { index: number, key: string, style: React.CSSProperties }): React.ReactNode => {
     const artistId = tableIds[props.index]
     const artist = artistsMap[artistId]
 
@@ -68,7 +68,7 @@ const ArtistTable = () => {
     )
   }
 
-  const gridRenderer = (props: GridProps): any => {
+  const gridRenderer = (props: GridProps): React.ReactNode => {
     const artistId = tableIds[props.rowIndex * 4 + props.columnIndex]
     if (!artistId) return null
     
