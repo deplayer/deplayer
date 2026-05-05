@@ -9,7 +9,7 @@ export const defaultState = {
   connected: false
 }
 
-export default (state: State = defaultState, action: Action<any>) => {
+export default (state: State = defaultState, action: Action) => {
   switch (action.type) {
     case types.SET_ONLINE_CONNECTION: {
       return { ...state, connected: true }
