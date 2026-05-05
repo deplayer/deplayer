@@ -4,7 +4,7 @@ const logger = createLogger({ namespace: "WakeLock" });
 
 class WakeLock {
   private static instance: WakeLock;
-  private wakeLock: any = null;
+  private wakeLock: WakeLockSentinel | null = null;
   private visibilityChangeHandler: ((event: Event) => Promise<void>) | null = null;
 
   private constructor() {

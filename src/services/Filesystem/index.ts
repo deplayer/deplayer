@@ -1,4 +1,7 @@
-declare const window: any;
+declare const window: Window & {
+  showDirectoryPicker?: (options?: Record<string, unknown>) => Promise<FileSystemDirectoryHandle>;
+  chooseFileSystemEntries?: (options?: Record<string, unknown>) => Promise<FileSystemHandle>;
+};
 
 
 class Filesystem {
@@ -26,20 +29,21 @@ class Filesystem {
     })
   }
 
-  openDialog = (): Promise<any> => {
+  openDialog = (): Promise<FileSystemDirectoryHandle | FileSystemHandle | FileList> => {
     if (!this.hasFSAccess) {
-      return this.getFileLegacy()
+      return this.getFileLegacy() as Promise<FileList>
     }
 
-    const options = {
-      multiple: true
-    }
     // For Chrome 86 and later...
-    if ('showDirectoryPicker' in window) {
+    if ('showDirectoryPicker' in window && window.showDirectoryPicker) {
       return window.showDirectoryPicker({ mode: 'readwrite' });
     }
     // For Chrome 85 and earlier...
-    return window.chooseFileSystemEntries(options)
+    if (window.chooseFileSystemEntries) {
+      return window.chooseFileSystemEntries({ multiple: true }) as Promise<FileSystemHandle>
+    }
+
+    return this.getFileLegacy() as Promise<FileList>
   }
 }
 

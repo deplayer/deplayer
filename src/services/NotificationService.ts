@@ -2,7 +2,7 @@ import type { MediaRow } from '../types/media'
 import logger from '../utils/logger'
 
 // fix ts window typings
-declare var window: any
+declare var window: Window & { Notification?: typeof Notification; MediaMetadata?: unknown }
 
 export default class NotificationService {
   sendNotification = (media: MediaRow) => {

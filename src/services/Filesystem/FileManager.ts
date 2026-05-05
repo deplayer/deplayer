@@ -4,22 +4,27 @@ import { createLogger } from "../../utils/logger";
 
 const logger = createLogger({ namespace: "FileManager" });
 
-const FileManager = () => {
-  let directoryHandler: any;
-  const fileHandlers: Array<any> = [];
+interface ProcessedFile {
+  file: File | FileSystemHandle;
+  handler: FileSystemHandle;
+}
 
-  const openDialog = async (): Promise<any> => {
+const FileManager = () => {
+  let directoryHandler: FileSystemDirectoryHandle | FileSystemHandle | FileList | null = null;
+  const fileHandlers: Array<FileSystemHandle> = [];
+
+  const openDialog = async (): Promise<ProcessedFile[]> => {
     directoryHandler = await Filesystem.openDialog();
     set("directoryHandler", directoryHandler);
     const values =
-      (directoryHandler.values && directoryHandler.values()) ||
+      ((directoryHandler as FileSystemDirectoryHandle).values && (directoryHandler as FileSystemDirectoryHandle).values()) ||
       directoryHandler;
 
     logger.debug("directoryHandler: ", directoryHandler);
 
-    const files: Array<any> = [];
+    const files: Array<ProcessedFile> = [];
 
-    for await (const entry of values) {
+    for await (const entry of values as AsyncIterable<FileSystemHandle>) {
       fileHandlers.push(entry);
 
       const file = await processSelectedFile(entry);
@@ -31,11 +36,8 @@ const FileManager = () => {
 
   const processSelectedFile = async (
     entry: FileSystemHandle
-  ): Promise<{
-    file: any;
-    handler: any;
-  }> => {
-    let file: any;
+  ): Promise<ProcessedFile> => {
+    let file: File | FileSystemHandle;
 
     logger.debug(`saving handler ${entry.name} for later use`);
 

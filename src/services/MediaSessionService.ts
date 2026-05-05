@@ -5,12 +5,12 @@ import logger from '../utils/logger'
 import PlayerRefService from './PlayerRefService'
 
 // fix ts navigator typings
-declare var navigator: any
-declare var window: any
+declare var navigator: Navigator & { mediaSession?: MediaSession }
+declare var window: Window & { MediaMetadata?: new (init: { title: string; artist: string; album: string; artwork: Array<{ src: string; type: string; sizes: string }> }) => MediaMetadata }
 
 export default class MediaSessionService {
   updateMetadata = (media: MediaRow | null, dispatch: Dispatch) => {
-    if (this.canSetMediaSession() && media) {
+    if (this.canSetMediaSession() && media && window.MediaMetadata && navigator.mediaSession) {
       navigator.mediaSession.metadata = new window.MediaMetadata({
         title: media.title,
         artist: media.artistName,
@@ -20,7 +20,7 @@ export default class MediaSessionService {
             src: this.getThumbnail(media), type: 'image/png', sizes: '96x96'
           },
           {
-            src: this.getFullCover, type: 'image/png', sizes: '512x512'
+            src: this.getFullCover(media), type: 'image/png', sizes: '512x512'
           }
         ]
       })

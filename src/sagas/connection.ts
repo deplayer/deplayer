@@ -12,7 +12,7 @@ function* initialize(dispatch: Dispatch) {
 }
 
 // Binding actions to sagas
-function* connectionSaga(store: any) {
+function* connectionSaga(store: { dispatch: Dispatch }) {
   yield takeLatest(types.INITIALIZED, initialize, store.dispatch)
 }
 

@@ -1,4 +1,5 @@
 import { all } from "redux-saga/effects";
+import { Store } from "redux";
 
 import artistSaga from "./artist";
 import collectionSaga from "./collection";
@@ -15,7 +16,7 @@ import pinSaga from "./pin";
 import peerSaga from "./peer";
 import roomSaga from "./peer/roomSaga";
 
-function* rootSaga(store: any) {
+function* rootSaga(store: Store) {
   yield all([
     artistSaga(),
     collectionSaga(),

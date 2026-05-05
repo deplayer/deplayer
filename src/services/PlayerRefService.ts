@@ -41,7 +41,7 @@ class PlayerRefService {
     const result = liveStore.query({
       query: `SELECT currentPlaying FROM queue WHERE id = ?`,
       bindValues: { 1: 'default' }
-    }) as any[]
+    }) as Array<{ currentPlaying?: string }>
     return result[0]?.currentPlaying || null;
   }
 
@@ -57,13 +57,13 @@ class PlayerRefService {
         ) as HTMLMediaElement;
         if (media) {
           if (
-            !(media as any).captureStream &&
-            (media as any).mozCaptureStream
+            !media.captureStream &&
+            media.mozCaptureStream
           ) {
             return {
               element: media,
               captureStream: (fps?: number) =>
-                (media as any).mozCaptureStream(fps),
+                media.mozCaptureStream!(fps),
             };
           }
           return {
@@ -80,11 +80,11 @@ class PlayerRefService {
       internal instanceof HTMLVideoElement ||
       internal instanceof HTMLAudioElement
     ) {
-      if (!internal.captureStream && (internal as any).mozCaptureStream) {
+      if (!internal.captureStream && internal.mozCaptureStream) {
         return {
           element: internal,
           captureStream: (fps?: number) =>
-            (internal as any).mozCaptureStream(fps),
+            internal.mozCaptureStream!(fps),
         };
       }
       return {

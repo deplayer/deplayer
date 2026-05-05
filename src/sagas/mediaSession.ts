@@ -7,7 +7,7 @@ import logger from '../utils/logger'
 import * as types from '../constants/ActionTypes'
 
 // Handling START_PLAYING saga
-function* setCurrentPlayingMeta (dispatch: Dispatch): any {
+function* setCurrentPlayingMeta (dispatch: Dispatch): Generator<any, void, any> {
   const mediaSessionService = new MediaSessionService()
   const currentSong = yield call(getCurrentSongFromLiveStore)
   try {
@@ -18,7 +18,7 @@ function* setCurrentPlayingMeta (dispatch: Dispatch): any {
 }
 
 // Binding actions to sagas
-function* mediaSessionSaga(store: any): any {
+function* mediaSessionSaga(store: { dispatch: Dispatch }): Generator<any, void, any> {
   yield takeLatest(types.SET_CURRENT_PLAYING, setCurrentPlayingMeta, store.dispatch)
   yield takeLatest(types.PLAY_NEXT, setCurrentPlayingMeta, store.dispatch)
   yield takeLatest(types.PLAY_PREV, setCurrentPlayingMeta, store.dispatch)

@@ -5,7 +5,7 @@ import * as types from '../constants/ActionTypes'
 import { getCurrentSongFromLiveStore } from './selectors'
 
 // Handling START_PLAYING saga
-function* sendCurrentPlayingNotification(): any {
+function* sendCurrentPlayingNotification(): Generator<any, void, any> {
   const notificationService = new NotificatoinService()
   const currentSong = yield call(getCurrentSongFromLiveStore)
   
@@ -17,13 +17,13 @@ function* sendCurrentPlayingNotification(): any {
   }
 }
 
-function* setupNotifications(): any {
+function* setupNotifications(): Generator<any, void, any> {
   const notificationService = new NotificatoinService()
   yield call(notificationService.requestPermission)
 }
 
 // Binding actions to sagas
-function* notificationSaga(_store: any): any {
+function* notificationSaga(_store: unknown): Generator<any, void, any> {
   yield takeLatest(types.PLAY_NEXT, sendCurrentPlayingNotification)
   yield takeLatest(types.PLAY_PREV, sendCurrentPlayingNotification)
   yield takeLatest(types.SET_CURRENT_PLAYING, sendCurrentPlayingNotification)

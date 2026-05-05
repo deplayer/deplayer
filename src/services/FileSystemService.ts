@@ -1,4 +1,9 @@
-export async function verifyPermission(fileHandle: any, readWrite = false): Promise<boolean> {
+interface FileHandleWithPermissions {
+  queryPermission(options: Record<string, unknown>): Promise<string>;
+  requestPermission(options: Record<string, unknown>): Promise<string>;
+}
+
+export async function verifyPermission(fileHandle: FileHandleWithPermissions | null, readWrite = false): Promise<boolean> {
   const options = {};
   if (readWrite) {
     // options.mode = 'readwrite';

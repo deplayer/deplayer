@@ -15,7 +15,7 @@ import { IMusicProvider } from '../../providers/IMusicProvider'
 const logger = createLogger({ namespace: 'artist-saga' })
 
 // Simplified artist metadata fetching (no persistence for now)
-function* loadMoreArtistSongsFromProvider(action: any): any {
+function* loadMoreArtistSongsFromProvider(action: { type: string; artist: { name: string } }): Generator<any, void, any> {
   // Clear existing artist metadata first
   yield put({ type: types.CLEAR_ARTIST_METADATA })
 
@@ -42,7 +42,7 @@ function* loadMoreArtistSongsFromProvider(action: any): any {
   }
 }
 
-export function* fetchSongMetadata(action: any): any {
+export function* fetchSongMetadata(action: { type: string; songId: string }): Generator<any, void, any> {
   const song = yield call(getSongByIdFromLiveStore, action.songId)
   if (!song) {
     logger.error('Song not found:', action.songId)
@@ -80,13 +80,13 @@ export function* fetchSongMetadata(action: any): any {
       }
 
       // Save to LiveStore
-      yield call(addLyricsAction, liveStore, song.id, response.lyrics, 'lyrics.ovh')
+      yield call(() => addLyricsAction(liveStore as unknown as Parameters<typeof addLyricsAction>[0], song.id, response.lyrics, 'lyrics.ovh'))
       logger.debug('Lyrics saved to LiveStore')
-    } catch (apiError: any) {
+    } catch (apiError: unknown) {
       logger.error('API Error:', apiError)
       // Lyrics fetch failed - component will show "Loading lyrics..." or error state
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Error fetching lyrics:', error)
   }
 }
@@ -137,7 +137,7 @@ function* fetchArtistSongsFromProvider(action: { type: string; artist: { name: s
 }
 
 // Binding actions to sagas
-function* artistSaga(): any {
+function* artistSaga(): Generator<any, void, any> {
   yield takeLatest(types.LOAD_ARTIST, loadMoreArtistSongsFromProvider)
   yield takeLatest(types.FETCH_ARTIST_SONGS, fetchArtistSongsFromProvider)
   yield takeLatest(types.FETCH_LYRICS, fetchSongMetadata)

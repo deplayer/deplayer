@@ -1,6 +1,6 @@
 import merge from 'deepmerge'
 
-import type { MediaRow } from '../types/media'
+import type { MediaRow, Stream } from '../types/media'
 
 // TODO: Review the need of this util
 export default class MediaMergerService {
@@ -13,10 +13,10 @@ export default class MediaMergerService {
   }
 
   getMerged(): MediaRow {
-    const mergeStream = (streamA: any, streamB: any) => {
-      const concatStreams = { ...streamA, ...streamB }
-      return Object.values(concatStreams).filter((elem: any, index: number) => {
-        const prev = concatStreams[index - 1]
+    const mergeStream = (streamA: Record<string, Stream>, streamB: Record<string, Stream>) => {
+      const concatStreams: Record<string, Stream> = { ...streamA, ...streamB }
+      return Object.values(concatStreams).filter((elem: Stream, index: number) => {
+        const prev = Object.values(concatStreams)[index - 1]
 
         if (!prev) {
           return true

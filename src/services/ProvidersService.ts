@@ -1,11 +1,22 @@
 import { ISearchService } from './ISearchService'
 import providersIndex from '../providers'
 import { NormalizedMedia } from '../utils/normalizeMedia'
+import type { IMusicProvider } from '../providers/IMusicProvider'
+
+export interface ProviderInstance extends Partial<IMusicProvider> {
+  search(searchTerm: string): Promise<NormalizedMedia[]>;
+  providerKey?: string;
+}
+
+interface ProviderConfig {
+  providers: Record<string, Record<string, unknown> & { enabled: boolean }>
+  [key: string]: unknown
+}
 
 export default class ProvidersService implements ISearchService {
-  providers: { [key: string]: any} = {}
+  providers: Record<string, ProviderInstance> = {}
 
-  constructor(config: any) {
+  constructor(config: ProviderConfig) {
     Object.keys(config.providers).forEach((provider) => {
 
       const providerType = provider.replace(/[0-9]/g, '')
@@ -14,13 +25,14 @@ export default class ProvidersService implements ISearchService {
         const parameters = config.providers[provider]
 
         if (parameters.enabled) {
-          this.providers[provider] = new providersIndex[providerType as keyof typeof providersIndex](parameters, providerType)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          this.providers[provider] = new (providersIndex[providerType as keyof typeof providersIndex] as new (params: Record<string, unknown>, type: string) => ProviderInstance)(parameters, providerType)
         }
       }
     })
   }
 
-  search = (searchTerm: string): Array<Promise<any>> => {
+  search = (searchTerm: string): Array<Promise<NormalizedMedia[]>> => {
     return Object.keys(this.providers).map((provider) => {
       return this.searchForProvider(searchTerm, provider)
     })

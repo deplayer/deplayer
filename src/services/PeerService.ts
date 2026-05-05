@@ -17,7 +17,28 @@ const logger = createLogger({ namespace: "PeerService" });
  * Convert received peer wire data into NormalizedMedia.
  * Peer data may have nested artist/album objects (legacy IMedia shape).
  */
-function peerDataToNormalized(media: any): NormalizedMedia {
+interface PeerMediaData {
+  id?: string;
+  title: string;
+  artistId?: string;
+  albumId?: string;
+  artistName?: string;
+  albumName?: string;
+  artist?: { id?: string; name?: string };
+  album?: { id?: string; name?: string; thumbnailUrl?: string; year?: number | null };
+  type?: 'audio' | 'video';
+  duration?: number;
+  track?: number | null;
+  discNumber?: number | null;
+  stream?: Record<string, { service: string; uris: Array<{ uri: string }> }>;
+  cover?: { thumbnailUrl: string; fullUrl: string } | null;
+  genres?: string[];
+  externalId?: string | null;
+  shareUrl?: string | null;
+  filePath?: string | null;
+}
+
+function peerDataToNormalized(media: PeerMediaData): NormalizedMedia {
   return {
     media: {
       id: media.id || 'unknown',
@@ -60,7 +81,7 @@ export interface PeerStatus {
   username: string;
   peerId: string;
   isPlaying: boolean;
-  media?: any;
+  media?: MediaRow;
   roomCode: string;
   streaming: boolean;
 }
@@ -137,7 +158,7 @@ export default class PeerService {
     streamData: DataPayload
   ) => {
     logger.info("Handling media download request", streamData);
-    const mediaId = (streamData as any).mediaId;
+    const mediaId = (streamData as { mediaId: string }).mediaId;
     const media = this.collection?.rows[mediaId];
     if (!media) {
       logger.error("Media not found", mediaId);
@@ -206,7 +227,7 @@ export default class PeerService {
     peerId: string
   ) => {
     const mediaElement = PlayerRefService.getInstance().getCurrentMedia();
-    const roomCode = (data as any).roomCode;
+    const roomCode = (data as { roomCode: string; requesterId: string }).roomCode;
     const roomState = this.rooms.get(roomCode);
 
     if (!roomState || !mediaElement?.captureStream) {
@@ -239,7 +260,7 @@ export default class PeerService {
 
       // Store the stream reference and add it
       roomState.currentStream = mediaStream;
-      roomState.room.addStream(mediaStream, (data as any).requesterId, {
+      roomState.room.addStream(mediaStream, (data as { roomCode: string; requesterId: string }).requesterId, {
         media: hostMedia,
       } as unknown as JsonValue);
 
@@ -275,7 +296,7 @@ export default class PeerService {
 
         // Update the stream
         roomState.currentStream = newStream;
-        roomState.room.addStream(newStream, (data as any).requesterId, {
+        roomState.room.addStream(newStream, (data as { roomCode: string; requesterId: string }).requesterId, {
           media: updatedMedia,
         } as unknown as JsonValue);
 
@@ -326,7 +347,7 @@ export default class PeerService {
   ) => {
     if (!data || !metadata) return;
 
-    const media = (metadata as any).media as MediaRow;
+    const media = (metadata as { media: MediaRow }).media;
 
     const songFsUri = `/${media.id}`;
     await writeFile(songFsUri, data as ArrayBuffer);
@@ -396,7 +417,7 @@ export default class PeerService {
       // Update the peer stream reference
       PlayerRefService.getInstance().setPeerStream(stream);
 
-      const media = (metadata as any)?.media;
+      const media = (metadata as { media?: MediaRow & { createdAt?: unknown; updatedAt?: unknown } })?.media;
       if (!media) return;
 
       const { createdAt, updatedAt, ...mediaWithoutDates } = media;

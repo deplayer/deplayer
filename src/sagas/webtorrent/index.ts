@@ -3,7 +3,7 @@ import { takeLatest } from 'redux-saga/effects'
 import * as types from '../../constants/ActionTypes'
 import { readWebtorrentFile } from './workers'
 
-function* webtorrentSaga(): any {
+function* webtorrentSaga(): Generator<any, void, any> {
   yield takeLatest(types.ADD_WEBTORRENT_MEDIA, readWebtorrentFile)
 }
 

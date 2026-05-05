@@ -6,7 +6,7 @@ import { Store } from "redux";
 
 interface JoinRoomAction {
   type: typeof types.JOIN_ROOM_REQUESTED;
-  payload: { roomCode: string; username: string; config: any };
+  payload: { roomCode: string; username: string; config: { appId: string } };
 }
 
 function* handleJoinRoom(
@@ -22,7 +22,7 @@ function* handleJoinRoom(
     console.log("About to setup communication channels...");
     try {
       yield call(peerService.setupCommunicationChannels.bind(peerService), room, roomCode);
-    } catch (setupError: any) {
+    } catch (setupError: unknown) {
       console.error("Setup communication channels failed:", setupError);
       throw setupError;
     }
@@ -39,31 +39,36 @@ function* handleJoinRoom(
       type: types.JOIN_ROOM_SUCCESS,
       payload: { roomCode, username },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     yield put({
       type: types.JOIN_ROOM_FAILED,
       error: true,
-      payload: error.message,
+      payload: error instanceof Error ? error.message : String(error),
     });
   }
 }
 
-function* handleLeaveRoom(action: any): Generator<any, void, any> {
+interface LeaveRoomAction {
+  type: string;
+  payload: { roomCode: string };
+}
+
+function* handleLeaveRoom(action: LeaveRoomAction): Generator<any, void, any> {
   const { roomCode } = action.payload;
 
   try {
-    const roomState = yield select((state) => state.rooms.get(roomCode));
+    const roomState = yield select((state: { rooms: Map<string, { room: { leave: () => void } }> }) => state.rooms.get(roomCode));
     if (roomState) {
-      yield call(roomState.room.leave);
+      yield call((roomState as { room: { leave: () => void } }).room.leave);
       yield put({ type: types.REMOVE_ROOM, room: roomCode });
       yield put({ type: types.RESET_PEER_STATUS, roomCode });
     }
     yield put({ type: types.LEAVE_ROOM_SUCCESS });
-  } catch (error: any) {
+  } catch (error: unknown) {
     yield put({
       type: types.LEAVE_ROOM_FAILED,
       error: true,
-      payload: error.message,
+      payload: error instanceof Error ? error.message : String(error),
     });
   }
 }

@@ -4,7 +4,7 @@ type MediaItem = {
   artistName: string
   genres: string[]
   playCount: number
-  [key: string]: any
+  [key: string]: unknown
 }
 
 type RecommendationParams = {

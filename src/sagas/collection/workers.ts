@@ -7,7 +7,9 @@ import logger from "../../utils/logger";
 import * as types from "../../constants/ActionTypes";
 
 
-export function* saveToDbWorker(data: Array<any>): any {
+import { NormalizedMedia } from "../../utils/normalizeMedia";
+
+export function* saveToDbWorker(data: Array<NormalizedMedia>): Generator<any, void, any> {
   try {
     // Write to LiveStore (single source of truth)
     const liveStore = getLiveStoreInstance();
@@ -29,7 +31,7 @@ export function* saveToDbWorker(data: Array<any>): any {
 }
 
 // Handling REMOVE_FROM_COLLECTION saga
-export function* removeFromDbWorker(action: any): any {
+export function* removeFromDbWorker(action: { type: string; data: string[] }): Generator<any, void, any> {
   try {
     // Remove from LiveStore (single source of truth)
     const liveStore = getLiveStoreInstance();
@@ -57,7 +59,7 @@ export function* removeFromDbWorker(action: any): any {
   }
 }
 
-export function* deleteCollectionWorker(): any {
+export function* deleteCollectionWorker(): Generator<any, void, any> {
   try {
     // Note: This worker is kept for backward compatibility but is not implemented
     // Collection deletion should be handled via LiveStore hooks/actions in components
@@ -77,7 +79,7 @@ export function* deleteCollectionWorker(): any {
   }
 }
 
-export function* exportCollectionWorker(): any {
+export function* exportCollectionWorker(): Generator<any, void, any> {
   try {
     // Note: Export functionality temporarily disabled
     // Will be re-implemented using LiveStore queries
@@ -90,8 +92,8 @@ export function* exportCollectionWorker(): any {
 
 export function* importCollectionWorker(_action: {
   type: string;
-  data: any;
-}): any {
+  data: unknown;
+}): Generator<any, void, any> {
   try {
     // Note: Import functionality temporarily disabled
     // Will be re-implemented using LiveStore actions
@@ -106,7 +108,7 @@ export function* importCollectionWorker(_action: {
 export function* trackSongPlayed(action: {
   type: string;
   songId: string;
-}): any {
+}): Generator<any, void, any> {
   try {
     // Track in LiveStore (single source of truth)
     const liveStore = getLiveStoreInstance();

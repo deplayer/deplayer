@@ -4,7 +4,7 @@ import { getCurrentSongFromLiveStore } from './selectors';
 import * as types from '../constants/ActionTypes'
 
 // Handling setCurrentPlaying saga
-function* setCurrentPlaying(): any {
+function* setCurrentPlaying(): Generator<any, void, any> {
   // Setting current playing title
   const song = yield call(getCurrentSongFromLiveStore)
   if (song?.title) {
@@ -14,7 +14,7 @@ function* setCurrentPlaying(): any {
 }
 
 // Binding actions to sagas
-function* titleSaga(): any {
+function* titleSaga(): Generator<any, void, any> {
   yield takeLatest(types.SET_CURRENT_PLAYING, setCurrentPlaying)
   yield takeLatest(types.PLAY_NEXT, setCurrentPlaying)
   yield takeLatest(types.PLAY_PREV, setCurrentPlaying)

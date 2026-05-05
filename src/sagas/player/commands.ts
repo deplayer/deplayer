@@ -16,6 +16,9 @@
 import { call, put } from 'redux-saga/effects'
 import * as types from '../../constants/ActionTypes'
 import { getLiveStoreInstance } from '../../App'
+
+/** LiveStore instance type - the actual return type of getLiveStoreInstance() */
+type LiveStoreInstance = NonNullable<ReturnType<typeof getLiveStoreInstance>>;
 import {
   playAllAction,
   playMediaAction,
@@ -52,7 +55,7 @@ export function stopAllPlayback() {
  * Resolve a stream URI for a song and start playback.
  * Shared tail of every playback command.
  */
-function* startStream(songId: string): any {
+function* startStream(songId: string): Generator<any, void, any> {
   const media = yield call(getSongByIdFromLiveStore, songId)
   const fullUrl = yield call(getSongBgFromLiveStore)
 
@@ -103,7 +106,7 @@ export interface PlayListAction {
  *
  * Dispatched by: PlayAllButton, Album.playAlbum, Album song click, Playlist.handlePlayAll
  */
-export function* handlePlayList(action: PlayListAction): any {
+export function* handlePlayList(action: PlayListAction): Generator<any, void, any> {
   const liveStore = getLiveStoreInstance()
   if (!liveStore) {
     console.error('[handlePlayList] LiveStore not available')
@@ -120,7 +123,7 @@ export function* handlePlayList(action: PlayListAction): any {
   stopAllPlayback()
 
   // 2. Replace queue in LiveStore (sets currentPlaying: 0)
-  yield call(playAllAction, liveStore, action.trackIds)
+  yield call(() => playAllAction(liveStore as unknown as Parameters<typeof playAllAction>[0], action.trackIds))
 
   // 3. If startFromId provided, reposition to that track
   const startId = action.startFromId
@@ -130,7 +133,7 @@ export function* handlePlayList(action: PlayListAction): any {
     if (index !== -1) {
       targetTrackId = startId
       if (index > 0) {
-        yield call(playMediaAction, liveStore, startId)
+        yield call(() => playMediaAction(liveStore as unknown as Parameters<typeof playMediaAction>[0], startId))
       }
     }
   }
@@ -160,7 +163,7 @@ export interface PlaySongAction {
  *
  * Dispatched by: MusicTable row click, SongView play button, Playlist row click
  */
-export function* handlePlaySong(action: PlaySongAction): any {
+export function* handlePlaySong(action: PlaySongAction): Generator<any, void, any> {
   const liveStore = getLiveStoreInstance()
   if (!liveStore) {
     console.error('[handlePlaySong] LiveStore not available')
@@ -177,7 +180,7 @@ export function* handlePlaySong(action: PlaySongAction): any {
   stopAllPlayback()
 
   // 2. Ensure song is in queue and positioned correctly
-  yield call(ensureInQueue, liveStore, action.songId, action.contextIds)
+  yield* ensureInQueue(liveStore, action.songId, action.contextIds)
 
   // 3. Resolve stream and start playback
   yield call(startStream, action.songId)
@@ -191,7 +194,7 @@ export function* handlePlaySong(action: PlaySongAction): any {
  * Ensure a song is in the queue and set it as the current position.
  * This is the saga-owned version of the old ensureMediaInQueueAndPlay.
  */
-function* ensureInQueue(liveStore: any, mediaId: string, allMediaIds?: string[]): any {
+function* ensureInQueue(liveStore: LiveStoreInstance, mediaId: string, allMediaIds?: string[]): Generator<any, void, any> {
   // Read current queue
   const { queryDb } = yield import('@livestore/livestore')
   const { tables } = yield import('../../stores/livestore/schema')
@@ -204,10 +207,13 @@ function* ensureInQueue(liveStore: any, mediaId: string, allMediaIds?: string[])
 
   const row = Array.isArray(result) ? result[0] : null
 
-  const parseJson = (val: any): string[] => {
+  const parseJson = (val: unknown): string[] => {
     if (!val) return []
     if (Array.isArray(val)) return val as string[]
-    try { return JSON.parse(val) as string[] } catch { return [] }
+    if (typeof val === 'string') {
+      try { return JSON.parse(val) as string[] } catch { return [] }
+    }
+    return []
   }
 
   const queue = row
@@ -219,18 +225,20 @@ function* ensureInQueue(liveStore: any, mediaId: string, allMediaIds?: string[])
       }
     : null
 
+  const store = liveStore
+
   if (!queue || queue.trackIds.length === 0) {
     // No queue — create one
     if (allMediaIds && allMediaIds.length > 0) {
-      yield call(playAllAction, liveStore, allMediaIds)
+      yield call(() => playAllAction(store as unknown as Parameters<typeof playAllAction>[0], allMediaIds))
 
       // Position to clicked song if it's not the first
       const index = allMediaIds.indexOf(mediaId)
       if (index > 0) {
-        yield call(playMediaAction, liveStore, mediaId)
+        yield call(() => playMediaAction(store as unknown as Parameters<typeof playMediaAction>[0], mediaId))
       }
     } else {
-      yield call(playAllAction, liveStore, [mediaId])
+      yield call(() => playAllAction(store as unknown as Parameters<typeof playAllAction>[0], [mediaId]))
     }
   } else {
     // Queue exists
@@ -238,11 +246,11 @@ function* ensureInQueue(liveStore: any, mediaId: string, allMediaIds?: string[])
 
     if (index !== -1) {
       // Song in queue — reposition
-      yield call(playMediaAction, liveStore, mediaId)
+      yield call(() => playMediaAction(store as unknown as Parameters<typeof playMediaAction>[0], mediaId))
     } else {
       // Song not in queue — add next, then play
-      yield call(addNextAction, liveStore, [mediaId])
-      yield call(playMediaAction, liveStore, mediaId)
+      yield call(() => addNextAction(store as unknown as Parameters<typeof addNextAction>[0], [mediaId]))
+      yield call(() => playMediaAction(store as unknown as Parameters<typeof playMediaAction>[0], mediaId))
     }
   }
 }

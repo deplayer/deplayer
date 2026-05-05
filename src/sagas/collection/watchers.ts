@@ -8,7 +8,7 @@ import { createLogger } from "../../utils/logger";
 
 const logger = createLogger({ namespace: "collection-watchers" });
 
-export function* addToCollectionWatcher(): any {
+export function* addToCollectionWatcher(): Generator<any, void, any> {
   const handleChannel = yield actionChannel(types.ADD_TO_COLLECTION);
 
   while (true) {
@@ -44,7 +44,7 @@ export function* initializeWatcher(): Generator<any, void, any> {
       
       // Initialize settings via LiveStore (non-blocking)
       logger.debug("Initializing LiveStore settings...");
-      yield fork(initializeSettingsAction, liveStore);
+      yield fork(() => initializeSettingsAction(liveStore as unknown as Parameters<typeof initializeSettingsAction>[0]));
       
       // That's it! LiveStore handles:
       // - Database initialization (wa-sqlite)
@@ -59,11 +59,11 @@ export function* initializeWatcher(): Generator<any, void, any> {
       yield put({ type: types.APPLY_MOST_PLAYED_SORT });
       logger.info("Initialization complete");
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error("Initialization failed:", error);
-      yield put({ 
-        type: types.SEND_NOTIFICATION, 
-        notification: `Failed to initialize: ${error?.message || 'Unknown error'}`,
+      yield put({
+        type: types.SEND_NOTIFICATION,
+        notification: `Failed to initialize: ${error instanceof Error ? error.message : 'Unknown error'}`,
         level: "error",
         duration: 10000
       });

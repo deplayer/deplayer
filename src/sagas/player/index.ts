@@ -22,7 +22,7 @@ import PlayerRefService from '../../services/PlayerRefService'
 /**
  * Get current song ID from LiveStore queue
  */
-function* getCurrentSongIdFromLiveStore(): any {
+function* getCurrentSongIdFromLiveStore(): Generator<any, string | null, any> {
   const liveStore = getLiveStoreInstance()
   
   if (!liveStore) {
@@ -85,7 +85,7 @@ function* getCurrentSongIdFromLiveStore(): any {
 }
 
 
-function* setCurrentPlayingStream(songId: string, providerNum: number, media?: MediaRow): any {
+function* setCurrentPlayingStream(songId: string, providerNum: number, media?: MediaRow): Generator<any, void, any> {
   // Kill any playing audio FIRST — prevents dual-stream bug
   yield put({ type: types.STOP_PLAYING })
   stopAllPlayback()
@@ -140,14 +140,14 @@ export interface SetCurrentPlayingAction {
 // Handling setCurrentPlaying saga
 // Used by internal sagas (next/prev/error) and legacy callers (PeerService, TryDemoButton).
 // Queue position is already set by the caller — this only resolves the stream and plays.
-export function* setCurrentPlaying(action: SetCurrentPlayingAction): any {
+export function* setCurrentPlaying(action: SetCurrentPlayingAction): Generator<any, void, any> {
   // Redirect to song view page
   yield put({ type: types.PUSH_TO_VIEW, song: action.songId })
 
   yield call(setCurrentPlayingStream, action.songId, 0, action.media)
 }
 
-function* handleError(): any {
+function* handleError(): Generator<any, void, any> {
   yield put({ type: types.REGISTER_PLAYER_ERROR })
 
   const player = yield select(getPlayer)
@@ -162,7 +162,7 @@ function* handleError(): any {
   }
 }
 
-function* handlePlayNext(): any {
+function* handlePlayNext(): Generator<any, void, any> {
   const liveStore = getLiveStoreInstance()
   
   if (!liveStore) {
@@ -177,7 +177,7 @@ function* handlePlayNext(): any {
 
   // Call LiveStore action to move to next track
   try {
-    yield call(playNextAction, liveStore)
+    yield call(() => playNextAction(liveStore as unknown as Parameters<typeof playNextAction>[0]))
     
     // Get the new current song ID
     const currentSongId = yield call(getCurrentSongIdFromLiveStore)
@@ -192,7 +192,7 @@ function* handlePlayNext(): any {
   }
 }
 
-function* handlePlayPrev(): any {
+function* handlePlayPrev(): Generator<any, void, any> {
   const liveStore = getLiveStoreInstance()
   
   if (!liveStore) {
@@ -207,7 +207,7 @@ function* handlePlayPrev(): any {
 
   // Call LiveStore action to move to previous track
   try {
-    yield call(playPreviousAction, liveStore)
+    yield call(() => playPreviousAction(liveStore as unknown as Parameters<typeof playPreviousAction>[0]))
     
     // Get the new current song ID
     const currentSongId = yield call(getCurrentSongIdFromLiveStore)
@@ -220,7 +220,7 @@ function* handlePlayPrev(): any {
   }
 }
 
-function* goToViewPage(): any {
+function* goToViewPage(): Generator<any, void, any> {
   const state = yield select(getState)
   
   if (!state.router.location.pathname.match(/^\/song.*?$/)) {
@@ -235,7 +235,7 @@ function* goToViewPage(): any {
   }
 }
 
-function* handleFullscreen(): any {
+function* handleFullscreen(): Generator<any, void, any> {
   const player = yield select(getPlayer)
 
   if (!screenfull.isEnabled) {
@@ -252,7 +252,7 @@ function* handleFullscreen(): any {
 
 
 // Binding actions to sagas
-function* playerSaga(): any {
+function* playerSaga(): Generator<any, void, any> {
   yield takeLatest(types.SET_CURRENT_PLAYING, setCurrentPlaying)
   yield takeEvery(types.PLAY_ERROR, handleError)
   yield takeLatest(types.PLAY_NEXT, handlePlayNext)

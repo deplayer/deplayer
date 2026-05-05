@@ -7,7 +7,7 @@ import { getPlayer } from './selectors'
 import { Dispatch } from 'redux'
 
 // Handling START_PLAYING saga
-function* startWakeLock(_dispatch: Dispatch): any {
+function* startWakeLock(_dispatch: Dispatch): Generator<any, void, any> {
   const player = yield select(getPlayer)
 
   if (player.playing) {
@@ -20,7 +20,7 @@ function* startWakeLock(_dispatch: Dispatch): any {
 }
 
 // Handling START_PLAYING saga
-function* stopWakeLock(_dispatch: Dispatch): any {
+function* stopWakeLock(_dispatch: Dispatch): Generator<any, void, any> {
   const player = yield select(getPlayer)
 
   if (!player.playing) {
@@ -34,7 +34,7 @@ function* stopWakeLock(_dispatch: Dispatch): any {
 
 
 // Binding actions to sagas
-function* wakeLockSaga(store: any): any {
+function* wakeLockSaga(store: { dispatch: Dispatch }): Generator<any, void, any> {
   yield takeLatest(types.START_PLAYING, startWakeLock, store.dispatch)
   yield takeLatest(types.PAUSE_PLAYING, stopWakeLock, store.dispatch)
   yield takeLatest(types.STOP_PLAYING, stopWakeLock, store.dispatch)

@@ -9,6 +9,9 @@ import { getLiveStoreInstance } from "../../App";
 import { batchedMediaCommitter } from "../../stores/livestore/services/BatchedMediaCommitter";
 import { syncEvents } from "../../stores/livestore/events/sync";
 import { createLogger } from "../../utils/logger";
+import { ProviderInstance } from "../../services/ProvidersService";
+
+type LiveStoreInstance = NonNullable<ReturnType<typeof getLiveStoreInstance>>;
 
 import {
   deleteCollectionWorker,
@@ -27,7 +30,7 @@ interface SyncState {
   initialSyncComplete: boolean;
 }
 
-function* readSyncState(liveStore: any): Generator<any, SyncState | null, any> {
+function* readSyncState(liveStore: LiveStoreInstance): Generator<any, SyncState | null, any> {
   try {
     const result = yield call(() =>
       liveStore.query({
@@ -35,13 +38,13 @@ function* readSyncState(liveStore: any): Generator<any, SyncState | null, any> {
         bindValues: {},
       })
     );
-    const rows = (result as any)?.[0]?.values || [];
+    const rows = (result as Array<{ values: unknown[][] }>)?.[0]?.values || [];
     if (rows.length === 0) return null;
     const row = rows[0];
     return {
-      lastSyncTimestamp: row[1],
-      lastKnownCount: row[2],
-      initialSyncCursor: row[3],
+      lastSyncTimestamp: row[1] as string,
+      lastKnownCount: row[2] as number,
+      initialSyncCursor: row[3] as number,
       initialSyncComplete: row[4] === 1,
     };
   } catch {
@@ -50,7 +53,7 @@ function* readSyncState(liveStore: any): Generator<any, SyncState | null, any> {
 }
 
 function* updateSyncState(
-  liveStore: any,
+  liveStore: LiveStoreInstance,
   state: SyncState
 ): Generator<any, void, any> {
   yield call(() =>
@@ -64,8 +67,8 @@ function* updateSyncState(
 }
 
 function* progressiveHydration(
-  provider: any,
-  liveStore: any,
+  provider: ProviderInstance,
+  liveStore: LiveStoreInstance,
   syncState: SyncState | null,
   scanStatus: { lastScan: string; count: number }
 ): Generator<any, void, any> {
@@ -223,7 +226,7 @@ function* periodicSyncPoll(): Generator<any, void, any> {
   }
 }
 
-function* collectionSaga(): any {
+function* collectionSaga(): Generator<any, void, any> {
   yield takeLatest(types.REMOVE_FROM_COLLECTION, removeFromDbWorker);
   yield takeLatest(types.DELETE_COLLECTION, deleteCollectionWorker);
   yield takeLatest(types.EXPORT_COLLECTION, exportCollectionWorker);

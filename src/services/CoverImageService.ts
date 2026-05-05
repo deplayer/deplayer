@@ -1,7 +1,7 @@
 type QueueEntry = {
   url: string
   resolve: (value: string) => void
-  reject: (reason: any) => void
+  reject: (reason: unknown) => void
   consumers: Set<AbortSignal>
   fetchController: AbortController
 }

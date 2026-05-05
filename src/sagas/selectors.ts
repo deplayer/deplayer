@@ -2,12 +2,14 @@ import { call } from 'redux-saga/effects'
 import { queryDb } from '@livestore/livestore'
 import { getLiveStoreInstance } from '../App'
 import { tables } from '../stores/livestore/schema'
+import type { State } from '../reducers'
+import type { MediaRow } from '../types/media'
 
 /**
  * Get settings from LiveStore
  * Use this in sagas instead of select(getSettings)
  */
-export function* getSettingsFromLiveStore(): Generator<any, any, any> {
+export function* getSettingsFromLiveStore(): Generator<any, Record<string, unknown>, any> {
   const liveStore = getLiveStoreInstance()
   if (!liveStore) {
     console.warn('LiveStore not available, returning default settings')
@@ -26,51 +28,61 @@ export function* getSettingsFromLiveStore(): Generator<any, any, any> {
  * Transform raw LiveStore media data to include nested artist/album objects
  * and parse JSON fields. Mirrors the transformation in hooks/useMedia.ts
  */
-function transformMediaFromLiveStore(rawMedia: any): any {
+type TransformedMedia = MediaRow & {
+  artist: { id: string; name: string }
+  album: { id: string; name: string; artistId: string; artist: { id: string; name: string }; thumbnailUrl: unknown; year: unknown }
+}
+
+function transformMediaFromLiveStore(rawMedia: Record<string, unknown>): TransformedMedia | null {
   if (!rawMedia) return null
-  
+
   // Parse JSON fields if they're strings
-  const parseJson = (val: any, defaultVal: any = {}) => {
+  const parseJson = (val: unknown, defaultVal: unknown = {}) => {
     if (!val) return defaultVal
     if (typeof val === 'object') return val
-    try {
-      return JSON.parse(val)
-    } catch {
-      return defaultVal
+    if (typeof val === 'string') {
+      try {
+        return JSON.parse(val)
+      } catch {
+        return defaultVal
+      }
     }
+    return defaultVal
   }
   
   // Reconstruct nested artist object from flat fields
   const artist = {
-    id: rawMedia.artistId || '',
-    name: rawMedia.artistName || 'Unknown Artist',
+    id: (rawMedia.artistId as string) || '',
+    name: (rawMedia.artistName as string) || 'Unknown Artist',
   }
-  
+
+  const cover = parseJson(rawMedia.cover, null) as { thumbnailUrl?: string } | null
+
   // Reconstruct nested album object from flat fields
   const album = {
-    id: rawMedia.albumId || '',
-    name: rawMedia.albumName || 'Unknown Album',
-    artistId: rawMedia.artistId || '',
+    id: (rawMedia.albumId as string) || '',
+    name: (rawMedia.albumName as string) || 'Unknown Album',
+    artistId: (rawMedia.artistId as string) || '',
     artist: artist,
-    thumbnailUrl: rawMedia.cover?.thumbnailUrl || null,
+    thumbnailUrl: cover?.thumbnailUrl || null,
     year: rawMedia.year || null,
   }
-  
+
   return {
     ...rawMedia,
     stream: parseJson(rawMedia.stream, {}),
-    cover: parseJson(rawMedia.cover, null),
+    cover,
     genres: parseJson(rawMedia.genres, []),
     artist,
     album,
-  }
+  } as TransformedMedia
 }
 
 /**
  * Get media by ID from LiveStore
  * Use this in sagas instead of select(getSongById, id)
  */
-export function* getSongByIdFromLiveStore(songId: string): Generator<any, any, any> {
+export function* getSongByIdFromLiveStore(songId: string): Generator<any, TransformedMedia | null, any> {
   const liveStore = getLiveStoreInstance()
   if (!liveStore) {
     console.warn('LiveStore not available')
@@ -89,7 +101,7 @@ export function* getSongByIdFromLiveStore(songId: string): Generator<any, any, a
  * Get current playing song from LiveStore
  * Use this in sagas instead of select(getCurrentSong)
  */
-export function* getCurrentSongFromLiveStore(): Generator<any, any, any> {
+export function* getCurrentSongFromLiveStore(): Generator<any, TransformedMedia | null, any> {
   const liveStore = getLiveStoreInstance()
   if (!liveStore) {
     console.warn('LiveStore not available')
@@ -161,34 +173,34 @@ export function* getCurrentSongFromLiveStore(): Generator<any, any, any> {
  * Get song background image URL from LiveStore
  * Use this in sagas instead of select(getSongBg)
  */
-export function* getSongBgFromLiveStore(): Generator<any, any, any> {
+export function* getSongBgFromLiveStore(): Generator<any, string, any> {
   const song = yield call(getCurrentSongFromLiveStore)
   return song?.cover?.fullUrl || ''
 }
 
 // Legacy Redux selector (deprecated - use getSettingsFromLiveStore instead)
 // Extract settings from state
-export const getSettings = (state: any) => {
-  return state ? state.settings.settings : { providers: {} }
+export const getSettings = (state: State & { settings?: { settings: Record<string, unknown> } }) => {
+  return state ? state.settings?.settings : { providers: {} }
 }
 
-export const getState = (state: any) => {
+export const getState = (state: State) => {
   return state
 }
 
-export const getQueue = (state: any): any => {
+export const getQueue = (state: State & { queue?: Record<string, unknown> }) => {
   return state ? state.queue : {}
 }
 
-export const getCollection = (state: any): any => {
+export const getCollection = (state: State) => {
   return state ? state.collection : {}
 }
 
-export const getPlayer = (state: any): any => {
+export const getPlayer = (state: State) => {
   return state ? state.player : {}
 }
 
-export const getSongBg = (state: any): any => {
+export const getSongBg = (state: State & { queue: { currentPlaying: string } }) => {
   const { collection: { rows }, queue: { currentPlaying } } = state
   if (rows[currentPlaying]) {
     const song = rows[currentPlaying]
@@ -197,7 +209,7 @@ export const getSongBg = (state: any): any => {
   return ''
 }
 
-export const getCurrentSong = (state: any) => {
+export const getCurrentSong = (state: State & { queue: { currentPlaying: string } } | null) => {
   if (!state) {
     return
   }
@@ -207,6 +219,6 @@ export const getCurrentSong = (state: any) => {
   return rows[currentId]
 }
 
-export const getSongById = (state: any, id: string) => {
+export const getSongById = (state: State, id: string) => {
   return state.collection.rows[id]
 }
