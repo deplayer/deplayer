@@ -187,6 +187,7 @@ export default function ArtistView() {
             <h2 className="text-xl font-semibold mb-4">
               <Translate value="titles.about" />
             </h2>
+            {/* Safe: artistSummary is HTML from a trusted music metadata API (Last.fm bio), not user input */}
             <p className="opacity-80 leading-relaxed" dangerouslySetInnerHTML={{ __html: artistSummary }} />
           </div>
         )}
