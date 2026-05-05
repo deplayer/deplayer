@@ -35,6 +35,7 @@ const ContinueListeningCard = () => {
         <Button
           onClick={() => dispatch({ type: types.PLAY_SONG, songId: song.id })}
           className="btn-circle btn-primary btn-sm"
+          aria-label="Play"
         >
           <Icon icon="faPlay" />
         </Button>

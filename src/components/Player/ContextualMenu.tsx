@@ -13,8 +13,7 @@ import AddNewMediaButton from '../Buttons/AddNewMediaButton'
 import VolumeControl from './VolumeControl'
 import * as types from '../../constants/ActionTypes'
 import Controls from './Controls'
-import { State as AppState } from '../../reducers/app'
-import { State as PlayerState } from '../../reducers/player'
+import { State } from '../../reducers'
 import { useQueue } from '../../stores/livestore/hooks'
 import { toggleRepeatAction, toggleShuffleAction } from '../../stores/livestore/actions'
 import PlayerRefService from '../../services/PlayerRefService'
@@ -22,8 +21,8 @@ import PlayerRefService from '../../services/PlayerRefService'
 const MENU_ID = 'context-menu-player'
 
 const ContextualMenu = () => {
-  const app = useSelector((state: any) => state.app) as AppState
-  const player = useSelector((state: any) => state.player) as PlayerState
+  const app = useSelector((state: State) => state.app)
+  const player = useSelector((state: State) => state.player)
   const dispatch = useDispatch()
   // Get queue and store from LiveStore
   const liveQueue = useQueue('default')
@@ -73,7 +72,7 @@ const ContextualMenu = () => {
     id: MENU_ID,
   })
 
-  function handleContextMenu(event: any) {
+  function handleContextMenu(event: React.MouseEvent) {
     show({
       event,
       props: {
@@ -93,6 +92,7 @@ const ContextualMenu = () => {
           zIndex: 103,
         }}
         onClick={handleContextMenu}
+        aria-label="Player menu"
       >
         <div className='flex justify-center items-center w-100 h-full'>
           <Icon

@@ -352,6 +352,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
                           <Button
                             onClick={() => changeCurrentPlaying(song, index, dispatch)}
                             className='btn-sm bg-primary hover:bg-primary-focus text-primary-content border-0 min-w-[2.5rem]'
+                            aria-label={`Play from ${value.service}`}
                           >
                             <Icon icon='faPlay' className='text-lg' />
                           </Button>
@@ -362,6 +363,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
                               download={streamUrl.isBlob ? `${song.title}.${streamUrl.format || 'mp3'}` : undefined}
                               target={streamUrl.isBlob ? undefined : "_blank"}
                               rel={streamUrl.isBlob ? undefined : "noopener noreferrer"}
+                              aria-label={`Download from ${value.service}`}
                               onClick={() => {
                                 if (streamUrl.isBlob) {
                                   URL.revokeObjectURL(streamUrl.url)

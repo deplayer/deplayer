@@ -35,6 +35,7 @@ const FullscreenButton = ({ onClick, dispatch }: FullscreenButtonProps) => {
       transparent
       size='2xl'
       onClick={handleClick}
+      aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
     >
       {isFullscreen ? <Icon icon='faCompress' /> : <Icon icon='faExpand' />}
     </Button>

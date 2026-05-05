@@ -26,6 +26,7 @@ const Controls = (props: ControlProps) => {
             size='lg'
             className='w-12 h-10 bg-base-content/40 hover:bg-base-content/80 rounded-full hover:text-secondary-focus text-secondary'
             onClick={props.playPrev}
+            aria-label="Previous track"
           >
             <Icon icon='faStepBackward' />
           </Button>
@@ -39,6 +40,7 @@ const Controls = (props: ControlProps) => {
           roundedFull
           className='hover:bg-secondary-content hover:text-secondary text-primary-content bg-secondary rounded-[var(--player-btn-radius)] border-[var(--player-btn-border)] mx-1 w-14 h-14 p-0'
           onClick={props.playPause}
+          aria-label={props.isPlaying ? "Pause" : "Play"}
         >
           {props.isPlaying ? <Icon icon='faPauseCircle' /> : <Icon icon='faPlayCircle' />}
         </Button>
@@ -50,6 +52,7 @@ const Controls = (props: ControlProps) => {
           size='lg'
           className='w-12 h-10 bg-base-content/40 hover:bg-base-content/80 rounded-full hover:text-secondary-focus text-secondary'
           onClick={props.playNext}
+          aria-label="Next track"
         >
           <Icon icon='faStepForward' />
         </Button>
