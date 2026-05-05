@@ -18,9 +18,10 @@ const Modal = ({ isOpen, onClose, children, title, className }: Props) => {
   return ReactDOM.createPortal(
     <div className="modal modal-open">
       <div className={`modal-box relative ${className || ''}`}>
-        <button 
-          className="btn btn-sm btn-circle absolute right-2 top-2" 
+        <button
+          className="btn btn-sm btn-circle absolute right-2 top-2"
           onClick={onClose}
+          aria-label="Close"
         >
           <Icon icon="faTimes" />
         </button>

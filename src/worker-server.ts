@@ -55,10 +55,10 @@ async function serve(request: Request) {
     }
   });
 
-  let timeOut: any = null;
+  let timeOut: ReturnType<typeof setTimeout> | null = null;
   const cleanup = () => {
     port.postMessage(false); // send a cancel request
-    clearTimeout(timeOut);
+    if (timeOut !== null) clearTimeout(timeOut);
     port.onmessage = null;
   };
 
@@ -83,7 +83,7 @@ async function serve(request: Request) {
           if (!cancellable) {
             // firefox doesn't support cancelling of Readable Streams in service workers,
             // so we just empty it after 5s of inactivity, the browser will request another port anyways
-            clearTimeout(timeOut);
+            if (timeOut !== null) clearTimeout(timeOut);
             if (destination !== "document") {
               timeOut = setTimeout(() => {
                 cleanup();

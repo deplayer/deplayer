@@ -17,8 +17,17 @@ export const defaultState = {
   searchResults: [],
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SearchAction = StartSearchAction | { type: string; [key: string]: any };
+interface SearchActionFields {
+  type: string;
+  searchTerm?: string;
+  searchType?: string;
+  noRedirect?: boolean;
+  searchResults?: string[];
+  message?: string;
+  data?: Array<{ id: string }>;
+}
+
+type SearchAction = StartSearchAction | SearchActionFields;
 
 export default (state: State = defaultState, action: SearchAction = { type: '' }) => {
   switch (action.type) {

@@ -1,15 +1,15 @@
 import type { MediaRow, ArtistRow, AlbumRow, Stream } from "../types/media";
 
 interface ArtistOverrides extends Partial<ArtistRow> {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface AlbumOverrides extends Partial<AlbumRow> {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface MediaOverrides extends Partial<MediaRow> {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export const createTestArtist = (overrides: ArtistOverrides = {}): ArtistRow => {

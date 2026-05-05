@@ -467,6 +467,8 @@ const materializers = State.SQLite.materializers(events, {
     }
     
     return operations
+    // Type assertion: LiveStore can't infer the bulk operation's polymorphic return type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   }) as any,
 
   'v1.MediaBulkRemoved': (event: { readonly mediaIds: readonly string[] }) => {

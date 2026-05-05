@@ -122,7 +122,7 @@ describe('Cover', () => {
     expect(screen.getByText('Test Album')).toBeInTheDocument()
 
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: '' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Close' }))
     })
     expect(screen.queryByText('Test Album')).not.toBeInTheDocument()
   })

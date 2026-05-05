@@ -1,5 +1,6 @@
 import { I18n } from "react-redux-i18n";
 import { toast, ToastOptions } from 'react-toastify';
+import type { Dispatch } from 'redux';
 
 
 import * as types from "../../constants/ActionTypes";
@@ -11,7 +12,7 @@ type Action = {
   duration?: number
 };
 
-const alerts = () => (next: any) => (action: Action) => {
+const alerts = () => (next: Dispatch) => (action: Action) => {
   if (action.type === types.SEND_NOTIFICATION) {
     const options = {
       effect: "stackslide",

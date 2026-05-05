@@ -203,7 +203,7 @@ const SongRowWithHooks = React.memo(({
   return (
     <SongRow
       song={song}
-      queue={liveQueue}
+      queue={liveQueue as unknown as import('../../reducers/queue').State | undefined}
       isCurrent={isCurrent}
       onClick={onClick}
       dispatch={dispatch}

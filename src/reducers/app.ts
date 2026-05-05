@@ -29,8 +29,13 @@ export const defaultState = {
   ready: false,
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default (state: State = defaultState, action: { type?: string; [key: string]: any }) => {
+interface AppAction {
+  type?: string;
+  value?: boolean;
+  backgroundImage?: string;
+}
+
+export default (state: State = defaultState, action: AppAction = {}) => {
   switch (action.type) {
     case types.TOGGLE_SIDEBAR: {
       return {

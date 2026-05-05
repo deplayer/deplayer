@@ -45,7 +45,7 @@ const Social = () => {
     <div className="p-4 flex flex-col">
       <h2 className="text-2xl font-bold mb-4 flex items-center justify-between text-base-content">
         Social
-        <button onClick={handleCloseRightPanel} className="btn btn-ghost btn-circle btn-sm">
+        <button onClick={handleCloseRightPanel} className="btn btn-ghost btn-circle btn-sm" aria-label="Close panel">
           <Icon icon="faTimes" />
         </button>
       </h2>

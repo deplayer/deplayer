@@ -178,8 +178,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
     for (let i = 0; i < albums.length; i += BATCH_SIZE) {
       const batch = albums.slice(i, i + BATCH_SIZE)
       const batchResults = await Promise.allSettled(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        batch.map(async (album: any) => {
+        batch.map(async (album: SubsonicAlbum) => {
           const albumDetails = await axios.get(
             `${this.baseUrl}/rest/getAlbum.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.16.1&f=json&id=${album.id}`
           )

@@ -17,8 +17,12 @@ export const defaultState = {
   artistMetadata: {}
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default (state: State = defaultState, action: { type?: string; [key: string]: any }): State => {
+interface ArtistAction {
+  type?: string;
+  data?: ArtistMetadata;
+}
+
+export default (state: State = defaultState, action: ArtistAction = {}): State => {
   switch (action.type) {
     case types.RECEIVE_ARTIST_METADATA:
       return { ...state, artistMetadata: action.data as ArtistMetadata }

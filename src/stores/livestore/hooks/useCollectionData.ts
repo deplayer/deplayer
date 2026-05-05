@@ -9,26 +9,37 @@ import type { TransformedMedia } from './useMedia'
 /**
  * Transform raw LiveStore media data to include nested artist/album objects
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function transformMediaFromLiveStore(rawMedia: any): TransformedMedia | null {
+interface RawMediaRow {
+  id: string;
+  artistId: string;
+  artistName: string;
+  albumId: string;
+  albumName: string;
+  cover?: { thumbnailUrl?: string } | null;
+  year?: number | null;
+  [key: string]: unknown;
+}
+
+function transformMediaFromLiveStore(rawMedia: RawMediaRow | Record<string, unknown>): TransformedMedia | null {
   if (!rawMedia) return null
+  const media = rawMedia as RawMediaRow
 
   const artist = {
-    id: rawMedia.artistId || '',
-    name: rawMedia.artistName || 'Unknown Artist',
+    id: media.artistId || '',
+    name: media.artistName || 'Unknown Artist',
   }
 
   const album = {
-    id: rawMedia.albumId || '',
-    name: rawMedia.albumName || 'Unknown Album',
-    artistId: rawMedia.artistId || '',
+    id: media.albumId || '',
+    name: media.albumName || 'Unknown Album',
+    artistId: media.artistId || '',
     artist: artist,
-    thumbnailUrl: rawMedia.cover?.thumbnailUrl || null,
-    year: rawMedia.year || null,
+    thumbnailUrl: media.cover?.thumbnailUrl || null,
+    year: media.year || null,
   }
 
   return {
-    ...rawMedia,
+    ...(media as unknown as TransformedMedia),
     artist,
     album,
   }

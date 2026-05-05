@@ -224,7 +224,7 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
             </Button>
 
             <div className="dropdown dropdown-end">
-              <Button className="btn-ghost px-3">
+              <Button className="btn-ghost px-3" aria-label="Playlist options">
                 <Icon icon="faEllipsisV" />
               </Button>
               <ul className="dropdown-content z-[1] menu p-2 shadow-lg bg-base-200 rounded-box w-52">

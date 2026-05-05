@@ -18,7 +18,7 @@ interface AppSettings {
   spectrum: { enabled: boolean };
   lastfm: { enabled: boolean; apikey: string };
   language: { code: string; useSystemLanguage: boolean };
-  notifications: { enabled: boolean };
+  notifications: { enabled: boolean; showTrackChanges: boolean; showErrors: boolean };
   sync?: { enabled: boolean; serverUrl: string };
   [key: string]: unknown;
 }
@@ -38,8 +38,7 @@ interface SettingsShape {
  * return <div>Language: {settings.app.language?.code}</div>
  * ```
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const useSettings = (settingsId = 'default'): any => {
+export const useSettings = (settingsId = 'default'): SettingsShape | null => {
   const store = useAppStore()
   const result = store.useQuery(
     queryDb(

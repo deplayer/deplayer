@@ -259,6 +259,7 @@ const FilterPanel = (_props: Props) => {
           transparent
           onClick={() => setIsModalOpen(true)}
           className="md:hidden"
+          aria-label="Filters"
         >
           <Icon icon="faFilter" className='px-1' />
           {Object.values(activeFilters).some(arr => Array.isArray(arr) && arr.length > 0) && (

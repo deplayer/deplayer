@@ -52,7 +52,7 @@ describe('Lyrics', () => {
     const onClose = vi.fn()
     render(<Lyrics {...defaultProps} onClose={onClose} />)
     
-    const closeButton = screen.getByRole('button', { name: '' })
+    const closeButton = screen.getByRole('button', { name: 'Close' })
     fireEvent.click(closeButton)
     
     expect(onClose).toHaveBeenCalled()

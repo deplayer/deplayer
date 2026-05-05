@@ -16,7 +16,7 @@ const SearchButton = () => {
   }
 
   return (
-    <Button inverted transparent onClick={toggleSearch}>
+    <Button inverted transparent onClick={toggleSearch} aria-label="Search">
       <Icon icon='faSearch' />
     </Button>
   )

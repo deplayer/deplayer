@@ -23,17 +23,18 @@ export const useFavorites = () => {
   const store = useAppStore()
   // Get favorite records with media joined
   // Using raw SQL for the JOIN
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // Raw SQL query for JOIN - requires type assertion since queryDb expects QueryBuilder
+  const rawQuery = {
+    query: `
+      SELECT m.*, f.createdAt as favorited_at
+      FROM favorites f
+      JOIN media m ON f.mediaId = m.id
+      ORDER BY f.createdAt DESC
+    `,
+    bindValues: {}
+  }
   return store.useQuery(
-    queryDb({
-      query: `
-        SELECT m.*, f.createdAt as favorited_at
-        FROM favorites f
-        JOIN media m ON f.mediaId = m.id
-        ORDER BY f.createdAt DESC
-      `,
-      bindValues: {}
-    } as any)
+    queryDb(rawQuery as unknown as Parameters<typeof queryDb>[0])
   )
 }
 

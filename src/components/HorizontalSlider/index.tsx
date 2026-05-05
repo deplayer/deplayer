@@ -13,7 +13,7 @@ const NextArrow = (props: { onClick?: () => void }) => {
   const { onClick } = props
   return (
     <div className='absolute right-0 top-0 bottom-0 flex items-center bg-gradient-to-l from-base-200/80 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity'>
-      <Button onClick={onClick} transparent className='mr-2'>
+      <Button onClick={onClick} transparent className='mr-2' aria-label="Scroll right">
         <Icon icon='faArrowCircleRight' className='text-primary hover:text-primary-focus w-8 h-8' />
       </Button>
     </div>
@@ -24,7 +24,7 @@ const PrevArrow = (props: { onClick?: () => void }) => {
   const { onClick } = props
   return (
     <div className='absolute left-0 top-0 bottom-0 flex items-center bg-gradient-to-r from-base-200/80 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity'>
-      <Button onClick={onClick} transparent className='ml-2'>
+      <Button onClick={onClick} transparent className='ml-2' aria-label="Scroll left">
         <Icon icon='faArrowCircleLeft' className='text-primary hover:text-primary-focus w-8 h-8' />
       </Button>
     </div>

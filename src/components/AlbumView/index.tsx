@@ -113,7 +113,7 @@ export default function AlbumView() {
       {/* Track list */}
       <div className="w-full md:p-4">
         <Album
-          queue={queue}
+          queue={queue as unknown as import('../../reducers/queue').State}
           album={album}
           dispatch={dispatch}
           songs={songIds}

@@ -50,7 +50,7 @@ const SwitchThemeButton = () => {
   return (
     <>
       <div className="mr-2">
-        <button onClick={() => setIsModalOpen(true)} className="btn btn-ghost btn-circle btn-sm">
+        <button onClick={() => setIsModalOpen(true)} className="btn btn-ghost btn-circle btn-sm" aria-label="Change theme">
           <Icon icon='faPalette' className='text-lg text-base-content/40' />
         </button>
       </div>

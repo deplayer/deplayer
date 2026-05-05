@@ -22,8 +22,20 @@ import { resolveCurrentSongId, resolveQueueNavigation } from './queueUtils'
  * return <div>{queue.trackIds.length} tracks in queue</div>
  * ```
  */
+export interface QueueRecord {
+  id: string;
+  trackIds: string | string[];
+  randomTrackIds: string | string[];
+  currentPlaying: number | null;
+  shuffle: boolean;
+  repeat: boolean;
+  nextSongId: string | null;
+  prevSongId: string | null;
+  [key: string]: unknown;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const useQueue = (queueId = 'default'): any => {
+export const useQueue = (queueId = 'default'): QueueRecord | null => {
   const store = useAppStore()
   const result = store.useQuery(
     queryDb(
@@ -33,7 +45,7 @@ export const useQueue = (queueId = 'default'): any => {
         .limit(1)
     )
   )
-  return (result as unknown as Record<string, unknown>[])[0] || null
+  return (result as unknown as QueueRecord[])[0] || null
 }
 
 /**

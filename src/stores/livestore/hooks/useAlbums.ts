@@ -179,28 +179,28 @@ export const useSongsByAlbum = () => {
  * Transform raw LiveStore media data to include nested artist/album objects
  * (Same transformation as useMedia.ts to ensure consistent data shape)
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function transformMediaFromLiveStore(rawMedia: any): TransformedMedia | null {
+function transformMediaFromLiveStore(rawMedia: MediaRecord | Record<string, unknown>): TransformedMedia | null {
   if (!rawMedia) return null
-  
+  const media = rawMedia as MediaRecord
+
   // Reconstruct nested artist object from flat fields
   const artist = {
-    id: rawMedia.artistId || '',
-    name: rawMedia.artistName || 'Unknown Artist',
+    id: media.artistId || '',
+    name: media.artistName || 'Unknown Artist',
   }
-  
+
   // Reconstruct nested album object from flat fields
   const album = {
-    id: rawMedia.albumId || '',
-    name: rawMedia.albumName || 'Unknown Album',
-    artistId: rawMedia.artistId || '',
+    id: media.albumId || '',
+    name: media.albumName || 'Unknown Album',
+    artistId: media.artistId || '',
     artist: artist,
-    thumbnailUrl: rawMedia.cover?.thumbnailUrl || null,
-    year: rawMedia.year || null,
+    thumbnailUrl: media.cover?.thumbnailUrl || null,
+    year: media.year || null,
   }
-  
+
   return {
-    ...rawMedia,
+    ...(media as unknown as TransformedMedia),
     artist,
     album,
   }

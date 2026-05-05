@@ -68,13 +68,25 @@ export const defaultState: State = {
  * - Components use LiveStore hooks (useFilteredMedia, useMediaMapForIds, etc.)
  * - This reducer now primarily handles legacy Redux actions
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default (state: State = defaultState, action: { type?: string; [key: string]: any } = {}) => {
+interface CollectionAction {
+  type?: string;
+  searchTerm?: string;
+  data?: MediaRow[];
+  settings?: { providers: Record<string, { enabled: boolean }> };
+  media?: MediaRow;
+  filterType?: string;
+  values?: string[];
+  state?: Set<string>;
+  searchResults?: MediaRow[];
+  albums?: MediaRow[];
+}
+
+export default (state: State = defaultState, action: CollectionAction = {}) => {
   switch (action.type) {
     case types.SET_SEARCH_TERM:
       return {
         ...state,
-        searchTerm: action.searchTerm,
+        searchTerm: action.searchTerm!,
       };
 
     case types.START_SEARCH:
@@ -88,7 +100,7 @@ export default (state: State = defaultState, action: { type?: string; [key: stri
       return {
         ...state,
         loading: false,
-        searchResults: action.data
+        searchResults: action.data && action.data.length > 0
           ? Array.from(new Set(action.data.map((item: MediaRow) => item.id)))
           : [],
       };
@@ -104,8 +116,8 @@ export default (state: State = defaultState, action: { type?: string; [key: stri
     case types.RECEIVE_SETTINGS:
       const enabledProviders = Array.from(
         new Set(
-          Object.keys(action.settings.providers).filter(
-            (key) => action.settings.providers[key].enabled
+          Object.keys(action.settings!.providers).filter(
+            (key) => action.settings!.providers[key].enabled
           )
         )
       );
@@ -136,7 +148,7 @@ export default (state: State = defaultState, action: { type?: string; [key: stri
       return state;
 
     case types.UPDATE_MEDIA:
-      const media = action.media;
+      const media = action.media!;
       return {
         ...state,
         rows: {
@@ -148,8 +160,8 @@ export default (state: State = defaultState, action: { type?: string; [key: stri
     case types.SET_COLLECTION_FILTER:
       const newFilters = {
         ...state.activeFilters,
-        [action.filterType]: action.filterType === 'favorites' 
-          ? action.values.length > 0 
+        [action.filterType!]: action.filterType === 'favorites'
+          ? action.values!.length > 0
           : action.values,
       };
 
@@ -180,7 +192,7 @@ export default (state: State = defaultState, action: { type?: string; [key: stri
     case types.FETCH_RECENT_ALBUMS_SUCCESS:
       return {
         ...state,
-        recentAlbums: action.albums
+        recentAlbums: action.albums || []
       }
 
     default:

@@ -32,28 +32,28 @@ export interface TransformedMedia extends MediaRow {
  * @param rawMedia - Raw media object from LiveStore SQLite query
  * @returns Transformed media with nested artist/album objects
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function transformMediaFromLiveStore(rawMedia: any): TransformedMedia | null {
+function transformMediaFromLiveStore(rawMedia: MediaRow | Record<string, unknown>): TransformedMedia | null {
   if (!rawMedia) return null
-  
+  const media = rawMedia as MediaRow & { cover?: { thumbnailUrl?: string } | null }
+
   // Reconstruct nested artist object from flat fields
   const artist = {
-    id: rawMedia.artistId || '',
-    name: rawMedia.artistName || 'Unknown Artist',
+    id: media.artistId || '',
+    name: media.artistName || 'Unknown Artist',
   }
-  
+
   // Reconstruct nested album object from flat fields
   const album = {
-    id: rawMedia.albumId || '',
-    name: rawMedia.albumName || 'Unknown Album',
-    artistId: rawMedia.artistId || '',
+    id: media.albumId || '',
+    name: media.albumName || 'Unknown Album',
+    artistId: media.artistId || '',
     artist: artist, // Album also references its artist
-    thumbnailUrl: rawMedia.cover?.thumbnailUrl || null,
+    thumbnailUrl: media.cover?.thumbnailUrl || null,
     year: null,
   }
-  
+
   return {
-    ...rawMedia, // Preserve all original flat fields (artistName, albumName, etc.)
+    ...media, // Preserve all original flat fields (artistName, albumName, etc.)
     artist,      // Add nested artist object
     album,       // Add nested album object
   }

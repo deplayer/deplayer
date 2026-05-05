@@ -37,6 +37,7 @@ import JoinRoom from './pages/JoinRoom';
 import { useLanguage } from './hooks/useLanguage'
 import { setLiveStoreInstance } from './middleware/livestore'
 import { Store } from '@livestore/livestore'
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type LiveStore = Store<any, any>
 
 
@@ -82,7 +83,7 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
   // Initialize FTS5 full-text search and database indexes on mount
   // OPTIMIZED: Defer to idle time to avoid blocking first paint
   React.useEffect(() => {
-    if (!(liveStore as any)?.sqliteDbWrapper) return
+    if (!(liveStore as unknown as { sqliteDbWrapper?: unknown })?.sqliteDbWrapper) return
     
     const setupDatabase = () => {
       try {

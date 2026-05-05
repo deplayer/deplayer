@@ -128,6 +128,7 @@ const RoomList = ({ peers, rooms, dispatch, onJoinRoom }: Props) => {
                     <button
                       className="text-gray-400 hover:text-white transition-colors"
                       onClick={() => toggleRoomExpansion(room.id)}
+                      aria-label="Toggle room details"
                     >
                       <Icon 
                         icon={expandedRooms.includes(room.id) ? "faChevronDown" : "faChevronRight"} 

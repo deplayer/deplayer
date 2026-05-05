@@ -74,7 +74,8 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
   }
   
   const trackIds = parseTrackIds(liveQueue?.trackIds)
-  const currentPlaying = liveQueue?.currentPlaying || null
+  const currentPlayingIndex = liveQueue?.currentPlaying
+  const currentPlaying = (typeof currentPlayingIndex === 'number' && trackIds[currentPlayingIndex]) || null
 
   const { rows, albums, albumsByArtist, songsByGenre } = collection
 
