@@ -4,6 +4,7 @@ import Icon from '../common/Icon'
 import { Translate } from 'react-redux-i18n'
 import { memo, useMemo } from 'react'
 import { useDispatch } from 'react-redux'
+import { Dispatch } from 'redux'
 import { useMediaCount, useSongsByGenre, usePlaylists, useSmartPlaylists, useQueue, useSettings } from '../../stores/livestore/hooks'
 import { getEmptyStateFallback, queueStep, searchStep } from '../common/EmptyState/emptyStateFallback'
 import EmptyStateAction from '../common/EmptyState/EmptyStateAction'
@@ -16,10 +17,10 @@ type PlaylistType = {
   name?: string;
 }
 
-const PlaylistSection = memo(({ title, playlists, dispatch }: { 
-  title?: string, 
-  playlists: PlaylistType[], 
-  dispatch: any 
+const PlaylistSection = memo(({ title, playlists, dispatch }: {
+  title?: string,
+  playlists: PlaylistType[],
+  dispatch: Dispatch
 }) => {
   if (!playlists.length) return null;
 

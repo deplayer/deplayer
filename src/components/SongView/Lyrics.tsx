@@ -7,7 +7,7 @@ import { useLyrics } from '../../stores/livestore/hooks'
 type Props = {
   onClose: () => void
   songId: string,
-  dispatch: Dispatch<any>,
+  dispatch: Dispatch,
   isOpen: boolean,
   currentPlayingSongId?: string
 }

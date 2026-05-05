@@ -16,6 +16,7 @@ import FilterPanel from '../Collection/FilterPanel'
 import { useMediaById, useQueue, useCurrentPlayingSongId, useFavoriteIds } from '../../stores/livestore/hooks'
 import { useUIStore } from '../../stores/uiStore'
 import { useDispatch } from 'react-redux'
+import { Dispatch } from 'redux'
 
 type Props = {
   error?: string,
@@ -35,13 +36,13 @@ const Toolbar = ({
   tableIds, 
   actions,
   dispatch,
-}: { 
-  isToolbarVisible: boolean, 
-  isToolbarHidden: boolean, 
-  handleTransitionEnd: () => void, 
-  tableIds: Array<string>, 
+}: {
+  isToolbarVisible: boolean,
+  isToolbarHidden: boolean,
+  handleTransitionEnd: () => void,
+  tableIds: Array<string>,
   actions: React.ReactNode,
-  dispatch: any,
+  dispatch: Dispatch,
 }) => {
   const location = useLocation()
   
@@ -118,7 +119,7 @@ const SongRowDirect = React.memo(({
   style: any
   slim: boolean
   mqlMatch: boolean
-  dispatch: any
+  dispatch: Dispatch
   disableAddButton?: boolean
   disableCovers?: boolean
   visibleIds: string[]
@@ -178,7 +179,7 @@ const SongRowWithHooks = React.memo(({
   style: any
   slim: boolean
   mqlMatch: boolean
-  dispatch: any
+  dispatch: Dispatch
   disableAddButton?: boolean
   disableCovers?: boolean
   visibleIds: string[]

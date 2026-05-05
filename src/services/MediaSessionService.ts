@@ -1,4 +1,5 @@
 import type { MediaRow } from '../types/media'
+import { Dispatch } from 'redux'
 import * as actions from '../constants/ActionTypes'
 import logger from '../utils/logger'
 import PlayerRefService from './PlayerRefService'
@@ -8,7 +9,7 @@ declare var navigator: any
 declare var window: any
 
 export default class MediaSessionService {
-  updateMetadata = (media: MediaRow | null, dispatch: any) => {
+  updateMetadata = (media: MediaRow | null, dispatch: Dispatch) => {
     if (this.canSetMediaSession() && media) {
       navigator.mediaSession.metadata = new window.MediaMetadata({
         title: media.title,
