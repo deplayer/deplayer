@@ -42,6 +42,7 @@ const { createReduxHistory, routerMiddleware, routerReducer } =
   });
 
 function configureStore() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const testingMiddlewares: Array<any> = [];
 
   if (process.env.NODE_ENV === "development") {
