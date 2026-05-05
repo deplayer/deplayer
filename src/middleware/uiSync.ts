@@ -6,25 +6,26 @@ import * as types from '../constants/ActionTypes'
  * Redux middleware that syncs app-related actions to the Zustand UI store.
  * Transitional bridge — once sagas call Zustand directly, remove this.
  */
-export const uiSyncMiddleware: Middleware = () => (next) => (action: any) => {
+export const uiSyncMiddleware: Middleware = () => (next) => (action: unknown) => {
   const result = next(action)
+  const typedAction = action as { type: string; value?: boolean; backgroundImage?: string }
   const store = useUIStore.getState()
 
-  switch (action.type) {
+  switch (typedAction.type) {
     case types.SET_MQL:
-      store.setMqlMatch(action.value)
+      store.setMqlMatch(typedAction.value as boolean)
       break
     case types.SET_HEIGHT_MQL:
-      store.setHeightMqlMatch(action.value)
+      store.setHeightMqlMatch(typedAction.value as boolean)
       break
     case types.INITIALIZED:
       store.setLoading(false)
       break
     case types.TOGGLE_SIDEBAR:
-      store.toggleSidebar(action.value)
+      store.toggleSidebar(typedAction.value)
       break
     case types.TOGGLE_RIGHT_PANEL:
-      store.toggleRightPanel(action.value)
+      store.toggleRightPanel(typedAction.value)
       break
     case types.TOGGLE_SPECTRUM:
       store.toggleSpectrum()
@@ -42,7 +43,7 @@ export const uiSyncMiddleware: Middleware = () => (next) => (action: any) => {
       store.toggleMiniQueue()
       break
     case types.SET_BACKGROUND_IMAGE:
-      store.setBackgroundImage(action.backgroundImage)
+      store.setBackgroundImage(typedAction.backgroundImage as string)
       break
     case types.APP_READY:
       store.setReady(true)

@@ -39,7 +39,7 @@ export const useRecommendations = (
   return useMemo(() => {
     if (!artistId || !genres.length || !Array.isArray(library)) return []
 
-    const parsedLibrary = library.map((item: any) => ({
+    const parsedLibrary = library.map((item: { id: string; title: string; artistId: string; artistName: string; genresFlat: string; playCount: number; cover: unknown }) => ({
       ...item,
       genres: item.genresFlat ? item.genresFlat.split(',').map((g: string) => g.trim()) : [],
     }))

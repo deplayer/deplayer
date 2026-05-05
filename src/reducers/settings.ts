@@ -7,7 +7,7 @@ import type { FormField } from '../types/providers';
 
 type ProviderSettings = {
   enabled: boolean;
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 export type State = {

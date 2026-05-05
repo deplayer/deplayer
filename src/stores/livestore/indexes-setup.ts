@@ -67,12 +67,13 @@ export const indexesSetup = `
  * }, [store])
  * ```
  */
-export const setupIndexes = (store: any) => {
+export const setupIndexes = (store: unknown) => {
   if (!store) {
     throw new Error('[LiveStore] Store is not initialized')
   }
-  
-  if (!store.sqliteDbWrapper) {
+
+  const storeWithDb = store as { sqliteDbWrapper?: { execute: (sql: string) => void } }
+  if (!storeWithDb.sqliteDbWrapper) {
     throw new Error('[LiveStore] Store.sqliteDbWrapper is not available')
   }
   
@@ -90,11 +91,12 @@ export const setupIndexes = (store: any) => {
   for (const statement of statements) {
     try {
       // Execute each CREATE INDEX statement
-      store.sqliteDbWrapper.execute(statement + ';')
+      storeWithDb.sqliteDbWrapper!.execute(statement + ';')
       successCount++
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Check if error is due to missing table
-      const errorMessage = error?.message || error?.cause?.message || String(error)
+      const err = error as { message?: string; cause?: { message?: string } }
+      const errorMessage = err?.message || err?.cause?.message || String(error)
       if (errorMessage.includes('no such table')) {
         // Extract table name from error for logging
         const tableMatch = errorMessage.match(/table: (?:main\.)?(\w+)/)

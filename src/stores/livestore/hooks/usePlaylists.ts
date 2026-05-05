@@ -48,7 +48,7 @@ export const usePlaylistById = (id: string | null | undefined) => {
         : tables.playlists.select().where('id', '=', '__NONE__').limit(1)
     )
   )
-  return (result as any[])[0] || null
+  return (result as unknown as Record<string, unknown>[])[0] || null
 }
 
 /**
@@ -68,15 +68,15 @@ export const usePlaylistTracks = (playlistId: string | null | undefined) => {
   // First get the playlist to access trackIds
   const playlist = usePlaylistById(playlistId)
   
-  if (!playlist || !playlist.trackIds || (playlist.trackIds as any[]).length === 0) {
+  if (!playlist || !playlist.trackIds || (playlist.trackIds as string[]).length === 0) {
     return []
   }
-  
+
   // Parse trackIds (it's a JSON array)
-  const trackIds = typeof playlist.trackIds === 'string' 
-    ? JSON.parse(playlist.trackIds)
+  const trackIds = typeof playlist.trackIds === 'string'
+    ? JSON.parse(playlist.trackIds as string)
     : playlist.trackIds
-  
+
   // Get media items by their IDs
   // Note: This might not maintain playlist order - we'll need to sort manually
   const media = store.useQuery(
@@ -86,10 +86,10 @@ export const usePlaylistTracks = (playlistId: string | null | undefined) => {
         .where('id', 'IN', trackIds)
     )
   )
-  
+
   // Sort media by playlist order
-  const mediaMap = new Map((media as any[]).map(m => [m.id, m]))
+  const mediaMap = new Map((media as unknown as Array<{ id: string }>).map(m => [m.id, m]))
   return trackIds
     .map((id: string) => mediaMap.get(id))
-    .filter((m: any) => m !== undefined)
+    .filter((m: unknown) => m !== undefined)
 }

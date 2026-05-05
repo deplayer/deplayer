@@ -1,21 +1,18 @@
-import { queryDb } from '@livestore/livestore'
+import { queryDb, Store } from '@livestore/livestore'
 import { events, tables } from '../schema'
 import { queueEvents } from '../events/queue'
 
 /**
  * LiveStore Queue Actions
- * 
+ *
  * These actions handle playback queue operations.
  * Side effects (audio playback, notifications) remain in Redux saga.
- * 
+ *
  * All actions require a store parameter from useStore() hook.
  */
 
-type LiveStore = {
-  commit: (event: Record<string, unknown>) => void
-  query: (query: any) => Promise<any>
-  [key: string]: any
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LiveStore = Store<any>
 
 const QUEUE_ID = 'default'
 
@@ -42,11 +39,11 @@ const getCurrentQueue = async (store: LiveStore) => {
     }
     
     // Parse JSON fields if they're strings
-    const parseJson = (val: any, defaultVal: string[] = []): string[] => {
+    const parseJson = (val: unknown, defaultVal: string[] = []): string[] => {
       if (!val) return defaultVal
       if (Array.isArray(val)) return val as string[]
       try {
-        return JSON.parse(val) as string[]
+        return JSON.parse(val as string) as string[]
       } catch {
         return defaultVal
       }

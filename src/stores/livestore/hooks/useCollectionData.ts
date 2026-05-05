@@ -4,18 +4,20 @@ import { tables } from '../schema'
 import { useMemo } from 'react'
 import { useUIStore } from '../../uiStore'
 import { useFavoriteIds } from './useFavorites'
+import type { TransformedMedia } from './useMedia'
 
 /**
  * Transform raw LiveStore media data to include nested artist/album objects
  */
-function transformMediaFromLiveStore(rawMedia: any): any {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function transformMediaFromLiveStore(rawMedia: any): TransformedMedia | null {
   if (!rawMedia) return null
-  
+
   const artist = {
     id: rawMedia.artistId || '',
     name: rawMedia.artistName || 'Unknown Artist',
   }
-  
+
   const album = {
     id: rawMedia.albumId || '',
     name: rawMedia.albumName || 'Unknown Album',
@@ -24,7 +26,7 @@ function transformMediaFromLiveStore(rawMedia: any): any {
     thumbnailUrl: rawMedia.cover?.thumbnailUrl || null,
     year: rawMedia.year || null,
   }
-  
+
   return {
     ...rawMedia,
     artist,
@@ -103,28 +105,28 @@ export const useCollectionData = () => {
   // Transform and filter in-memory (fast for typical collection sizes)
   return useMemo(() => {
     const ids: string[] = []
-    const map: Record<string, any> = {}
+    const map: Record<string, TransformedMedia> = {}
     
     if (!Array.isArray(rawMedia)) {
       return { ids, map }
     }
     
     // Apply client-side filters that can't be done in SQL
-    const filtered = rawMedia.filter((item: any) => {
+    const filtered = rawMedia.filter((item: { genresFlat?: string; providersFlat?: string; title?: string; artistName?: string; albumName?: string }) => {
       // Genres filter (JSON array, requires client-side check)
       if (filters.genres.length > 0) {
         const itemGenres = item.genresFlat ? item.genresFlat.split(',') : []
         const hasMatchingGenre = filters.genres.some((g: string) => itemGenres.includes(g))
         if (!hasMatchingGenre) return false
       }
-      
+
       // Providers filter (JSON object, requires client-side check)
       if (filters.providers.length > 0) {
         const itemProviders = item.providersFlat ? item.providersFlat.split(',') : []
         const hasMatchingProvider = filters.providers.some((p: string) => itemProviders.includes(p))
         if (!hasMatchingProvider) return false
       }
-      
+
       // Search term filter (client-side for now, could be moved to SQL with FTS)
       if (searchTerm && searchTerm.length >= 3) {
         const lowerSearch = searchTerm.toLowerCase()
@@ -133,15 +135,17 @@ export const useCollectionData = () => {
         const matchesAlbum = item.albumName?.toLowerCase().includes(lowerSearch)
         if (!matchesTitle && !matchesArtist && !matchesAlbum) return false
       }
-      
+
       return true
     })
-    
+
     // Build IDs array and map
-    filtered.forEach((item: any) => {
+    filtered.forEach((item) => {
       const media = transformMediaFromLiveStore(item)
-      ids.push(media.id)
-      map[media.id] = media
+      if (media) {
+        ids.push(media.id)
+        map[media.id] = media
+      }
     })
     
     return { ids, map }

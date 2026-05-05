@@ -5,7 +5,7 @@ import { createLogger } from "../utils/logger";
 const logger = createLogger({ namespace: "LyricsovhProvider" });
 
 export default class LyricsovhProvider {
-  async searchLyrics(song: MediaRow): Promise<any> {
+  async searchLyrics(song: MediaRow): Promise<{ lyrics: string }> {
     const baseUrl = "https://api.lyrics.ovh/v1";
     const artist = encodeURIComponent(song.artistName);
     const title = encodeURIComponent(song.title);
@@ -22,13 +22,14 @@ export default class LyricsovhProvider {
       }
 
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Handle specific error cases
-      if (error.response) {
-        if (error.response.status === 404) {
+      const axiosError = error as { response?: { status: number } };
+      if (axiosError.response) {
+        if (axiosError.response.status === 404) {
           throw new Error("Lyrics not found");
         }
-        throw new Error(`API error: ${error.response.status}`);
+        throw new Error(`API error: ${axiosError.response.status}`);
       }
       logger.error("Error fetching lyrics:", error);
       throw error;

@@ -1,5 +1,5 @@
 import * as types from "../constants/ActionTypes";
-import type { MediaRow, ArtistRow } from "../types/media";
+import type { MediaRow, ArtistRow, AlbumRow } from "../types/media";
 import { applyFilters } from "../utils/apply-filters";
 import type { Filter } from "../types/collection";
 
@@ -14,7 +14,7 @@ export type { Filter };
 
 export type State = {
   rows: { [key: string]: MediaRow };
-  albums: { [key: string]: any };
+  albums: { [key: string]: AlbumRow };
   artists: { [key: string]: ArtistRow };
   songsByArtist: { [key: string]: string[] };
   songsByGenre: { [key: string]: string[] };
@@ -68,7 +68,8 @@ export const defaultState: State = {
  * - Components use LiveStore hooks (useFilteredMedia, useMediaMapForIds, etc.)
  * - This reducer now primarily handles legacy Redux actions
  */
-export default (state: State = defaultState, action: any = {}) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default (state: State = defaultState, action: { type?: string; [key: string]: any } = {}) => {
   switch (action.type) {
     case types.SET_SEARCH_TERM:
       return {

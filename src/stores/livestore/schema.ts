@@ -17,7 +17,7 @@ import { syncEvents } from './events/sync'
 // Settings structure types
 type ProviderSettings = {
   enabled: boolean;
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 type AppSettings = {
@@ -40,7 +40,7 @@ type AppSettings = {
   sync?: {
     enabled: boolean;
     serverUrl: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
 };
 
@@ -235,22 +235,24 @@ export const events = {
 
 const materializers = State.SQLite.materializers(events, {
   // Settings materializers
-  'v1.SettingsUpdated': ({ id, settings }: { id: string; settings: any }) => {
+  'v1.SettingsUpdated': ({ id, settings: rawSettings }: { id: string; settings: unknown }) => {
     const now = Date.now()
+    const settings = rawSettings as SettingsData
     return tables.settings
       .insert({ id, settings, createdAt: now, updatedAt: now })
       .onConflict('id', 'update', { settings, updatedAt: now })
   },
 
-  'v1.SettingsInitialized': ({ id, settings }: { id: string; settings: any }) => {
+  'v1.SettingsInitialized': ({ id, settings: rawSettings }: { id: string; settings: unknown }) => {
     const now = Date.now()
+    const settings = rawSettings as SettingsData
     return tables.settings
       .insert({ id, settings, createdAt: now, updatedAt: now })
       .onConflict('id', 'update', { settings, updatedAt: now })
   },
 
   // Media materializers
-  'v1.MediaAdded': (event: Record<string, any>) => {
+  'v1.MediaAdded': (event: { readonly id: string; readonly title: string; readonly artist: { readonly id: string; readonly name: string }; readonly album: { readonly id: string; readonly name: string; readonly artistId: string; readonly thumbnailUrl?: string; readonly year?: number }; readonly type: string; readonly duration?: number; readonly track?: number; readonly discNumber?: number; readonly stream: unknown; readonly cover?: unknown; readonly genres: readonly string[]; readonly externalId?: string; readonly shareUrl?: string; readonly filePath?: string }) => {
     const now = Date.now()
     const { id, title, artist, album, type, duration, track, discNumber, stream, cover, genres, externalId, shareUrl, filePath } = event
     
@@ -331,9 +333,9 @@ const materializers = State.SQLite.materializers(events, {
     ]
   },
 
-  'v1.MediaUpdated': ({ id, title, duration, stream, cover, genres }: any) => {
+  'v1.MediaUpdated': ({ id, title, duration, stream, cover, genres }: { readonly id: string; readonly title?: string; readonly duration?: number; readonly stream?: unknown; readonly cover?: unknown; readonly genres?: readonly string[] }) => {
     const now = Date.now()
-    const updates: any = { updatedAt: now }
+    const updates: Record<string, unknown> = { updatedAt: now }
     if (title !== undefined) updates.title = title
     if (duration !== undefined) updates.duration = duration
     if (stream !== undefined) {
@@ -362,9 +364,10 @@ const materializers = State.SQLite.materializers(events, {
       .where('id', '=', id)
   },
 
-  'v1.MediaBulkAdded': (event: Record<string, any>) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  'v1.MediaBulkAdded': ((event: { readonly media: readonly { readonly id: string; readonly title: string; readonly artist: { readonly id: string; readonly name: string }; readonly album: { readonly id: string; readonly name: string; readonly artistId: string; readonly thumbnailUrl?: string; readonly year?: number }; readonly type: string; readonly duration?: number; readonly track?: number; readonly discNumber?: number; readonly stream: unknown; readonly cover?: unknown; readonly genres: readonly string[]; readonly externalId?: string; readonly shareUrl?: string; readonly filePath?: string }[] }) => {
     const now = Date.now()
-    const operations: any[] = []
+    const operations: unknown[] = []
     
     // PERFORMANCE OPTIMIZATION: Pre-deduplicate artists and albums
     // Instead of inserting 3 ops per media item (artist + album + media),
@@ -374,7 +377,7 @@ const materializers = State.SQLite.materializers(events, {
     //   After:  10 + 50 + 500 = 560 operations
     
     const uniqueArtists = new Map<string, { id: string; name: string }>()
-    const uniqueAlbums = new Map<string, any>()
+    const uniqueAlbums = new Map<string, { id: string; name: string; artistId: string; thumbnailUrl: string | null; year: number | null }>()
     
     // First pass: collect unique artists and albums
     for (const item of event.media) {
@@ -464,10 +467,10 @@ const materializers = State.SQLite.materializers(events, {
     }
     
     return operations
-  },
+  }) as any,
 
-  'v1.MediaBulkRemoved': (event: Record<string, any>) => {
-    return event.mediaIds.map((id: string) => 
+  'v1.MediaBulkRemoved': (event: { readonly mediaIds: readonly string[] }) => {
+    return event.mediaIds.map((id: string) =>
       tables.media.delete().where('id', '=', id)
     )
   },
@@ -493,7 +496,7 @@ const materializers = State.SQLite.materializers(events, {
       .onConflict('id', 'ignore')
   },
 
-  'v1.PlaylistRenamed': ({ playlistId, name }: any) => {
+  'v1.PlaylistRenamed': ({ playlistId, name }: { playlistId: string; name: string }) => {
     const now = Date.now()
     return tables.playlists
       .update({ name, updatedAt: now })
@@ -524,7 +527,7 @@ const materializers = State.SQLite.materializers(events, {
       .where('id', '=', playlistId)
   },
 
-  'v1.PlaylistReordered': ({ playlistId, trackIds }: any) => {
+  'v1.PlaylistReordered': ({ playlistId, trackIds }: { readonly playlistId: string; readonly trackIds: readonly string[] }) => {
     const now = Date.now()
     return tables.playlists
       .update({ trackIds, updatedAt: now })
@@ -535,14 +538,14 @@ const materializers = State.SQLite.materializers(events, {
     return tables.playlists.delete().where('id', '=', playlistId)
   },
 
-  'v1.PlaylistShuffleToggled': ({ playlistId, shuffle }: any) => {
+  'v1.PlaylistShuffleToggled': ({ playlistId, shuffle }: { playlistId: string; shuffle: boolean }) => {
     const now = Date.now()
     return tables.playlists
       .update({ shuffle, updatedAt: now })
       .where('id', '=', playlistId)
   },
 
-  'v1.PlaylistRepeatToggled': ({ playlistId, repeat }: any) => {
+  'v1.PlaylistRepeatToggled': ({ playlistId, repeat }: { playlistId: string; repeat: boolean }) => {
     const now = Date.now()
     return tables.playlists
       .update({ repeat, updatedAt: now })
@@ -550,7 +553,7 @@ const materializers = State.SQLite.materializers(events, {
   },
 
   // Queue materializers
-  'v1.QueueUpdated': ({ id, trackIds, randomTrackIds, currentPlaying, shuffle, repeat }: any) => {
+  'v1.QueueUpdated': ({ id, trackIds, randomTrackIds, currentPlaying, shuffle, repeat }: { readonly id: string; readonly trackIds: readonly string[]; readonly randomTrackIds?: readonly string[]; readonly currentPlaying?: number; readonly shuffle: boolean; readonly repeat: boolean }) => {
     const now = Date.now()
     return tables.queue
       .insert({
@@ -606,21 +609,21 @@ const materializers = State.SQLite.materializers(events, {
       .where('id', '=', queueId)
   },
 
-  'v1.QueueShuffleToggled': ({ queueId, shuffle }: any) => {
+  'v1.QueueShuffleToggled': ({ queueId, shuffle }: { queueId: string; shuffle: boolean }) => {
     const now = Date.now()
     return tables.queue
       .update({ shuffle, updatedAt: now })
       .where('id', '=', queueId)
   },
 
-  'v1.QueueRepeatToggled': ({ queueId, repeat }: any) => {
+  'v1.QueueRepeatToggled': ({ queueId, repeat }: { queueId: string; repeat: boolean }) => {
     const now = Date.now()
     return tables.queue
       .update({ repeat, updatedAt: now })
       .where('id', '=', queueId)
   },
 
-  'v1.QueuePositionChanged': ({ queueId, position }: any) => {
+  'v1.QueuePositionChanged': ({ queueId, position }: { queueId: string; position: number }) => {
     const now = Date.now()
     return tables.queue
       .update({ currentPlaying: position, updatedAt: now })
@@ -644,7 +647,7 @@ const materializers = State.SQLite.materializers(events, {
   },
 
   // Lyrics materializers
-  'v1.LyricsAdded': ({ id, mediaId, lyricsText, source }: any) => {
+  'v1.LyricsAdded': ({ id, mediaId, lyricsText, source }: { id: string; mediaId: string; lyricsText: string; source?: string }) => {
     const now = Date.now()
     return tables.lyrics
       .insert({
@@ -658,7 +661,7 @@ const materializers = State.SQLite.materializers(events, {
       .onConflict('id', 'ignore')
   },
 
-  'v1.LyricsUpdated': ({ mediaId, lyricsText }: any) => {
+  'v1.LyricsUpdated': ({ mediaId, lyricsText }: { mediaId: string; lyricsText: string }) => {
     const now = Date.now()
     return tables.lyrics
       .update({ lyricsText, updatedAt: now })
@@ -670,7 +673,7 @@ const materializers = State.SQLite.materializers(events, {
   },
 
   // Smart Playlist materializers
-  'v1.SmartPlaylistCreated': ({ id, name, filters }: any) => {
+  'v1.SmartPlaylistCreated': ({ id, name, filters }: { readonly id: string; readonly name: string; readonly filters: { readonly genres: readonly string[]; readonly types: readonly string[]; readonly artists: readonly string[]; readonly providers: readonly string[] } }) => {
     const now = Date.now()
     return tables.smartPlaylists
       .insert({
@@ -687,7 +690,7 @@ const materializers = State.SQLite.materializers(events, {
   },
 
   // Playback materializers (LOCAL - not synced)
-  'v1.PlaybackUpdated': ({ id, currentTrackId, streamUri, playing, volume, duration, position }: any) => {
+  'v1.PlaybackUpdated': ({ id, currentTrackId, streamUri, playing, volume, duration, position }: { id: string; currentTrackId?: string | null; streamUri?: string | null; playing: boolean; volume: number; duration?: number; position?: number }) => {
     const now = Date.now()
     return tables.playback
       .insert({
@@ -711,28 +714,28 @@ const materializers = State.SQLite.materializers(events, {
       })
   },
 
-  'v1.PlaybackPlayingChanged': ({ id, playing }: any) => {
+  'v1.PlaybackPlayingChanged': ({ id, playing }: { id: string; playing: boolean }) => {
     const now = Date.now()
     return tables.playback
       .update({ playing, updatedAt: now })
       .where('id', '=', id)
   },
 
-  'v1.PlaybackVolumeChanged': ({ id, volume }: any) => {
+  'v1.PlaybackVolumeChanged': ({ id, volume }: { id: string; volume: number }) => {
     const now = Date.now()
     return tables.playback
       .update({ volume, updatedAt: now })
       .where('id', '=', id)
   },
 
-  'v1.PlaybackPositionChanged': ({ id, position }: any) => {
+  'v1.PlaybackPositionChanged': ({ id, position }: { id: string; position: number }) => {
     const now = Date.now()
     return tables.playback
       .update({ position, updatedAt: now })
       .where('id', '=', id)
   },
 
-  'v1.PlaybackTrackChanged': ({ id, currentTrackId, streamUri, duration }: any) => {
+  'v1.PlaybackTrackChanged': ({ id, currentTrackId, streamUri, duration }: { id: string; currentTrackId: string; streamUri: string; duration?: number }) => {
     const now = Date.now()
     return tables.playback
       .update({
@@ -747,7 +750,7 @@ const materializers = State.SQLite.materializers(events, {
   },
 
   // Sync State materializer
-  'v1.SyncStateUpdated': ({ id, lastSyncTimestamp, lastKnownCount, initialSyncCursor, initialSyncComplete }: any) => {
+  'v1.SyncStateUpdated': ({ id, lastSyncTimestamp, lastKnownCount, initialSyncCursor, initialSyncComplete }: { id: string; lastSyncTimestamp: string; lastKnownCount: number; initialSyncCursor: number; initialSyncComplete: boolean }) => {
     const now = Date.now()
     return tables.syncState
       .insert({
@@ -767,7 +770,7 @@ const materializers = State.SQLite.materializers(events, {
       })
   },
 
-  'v1.PlaybackCleared': ({ id }: any) => {
+  'v1.PlaybackCleared': ({ id }: { id: string }) => {
     const now = Date.now()
     return tables.playback
       .update({

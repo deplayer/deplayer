@@ -5,6 +5,15 @@ import { useMemo } from 'react'
 import type { Filter } from '../../uiStore'
 import { useFavoriteIds } from './useFavorites'
 
+import type { MediaRow } from '../../../types/media'
+
+/** Transformed media extends MediaRow with nested artist/album objects */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface TransformedMedia extends MediaRow {
+  artist: { id: string; name: string }
+  album: { id: string; name: string; artistId: string; artist: { id: string; name: string }; thumbnailUrl: string | null; year: number | null }
+}
+
 /**
  * Media Query Hooks
  * 
@@ -23,7 +32,8 @@ import { useFavoriteIds } from './useFavorites'
  * @param rawMedia - Raw media object from LiveStore SQLite query
  * @returns Transformed media with nested artist/album objects
  */
-function transformMediaFromLiveStore(rawMedia: any): any {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function transformMediaFromLiveStore(rawMedia: any): TransformedMedia | null {
   if (!rawMedia) return null
   
   // Reconstruct nested artist object from flat fields
@@ -39,7 +49,7 @@ function transformMediaFromLiveStore(rawMedia: any): any {
     artistId: rawMedia.artistId || '',
     artist: artist, // Album also references its artist
     thumbnailUrl: rawMedia.cover?.thumbnailUrl || null,
-    year: rawMedia.year || null,
+    year: null,
   }
   
   return {
@@ -87,10 +97,10 @@ export const useMediaMap = () => {
   const media = useMediaLibrary()
   
   return useMemo(() => {
-    const map: Record<string, any> = {}
+    const map: Record<string, TransformedMedia> = {}
     if (Array.isArray(media)) {
-      media.forEach((item: any) => {
-        map[item.id] = item
+      media.forEach((item) => {
+        if (item) map[item.id] = item
       })
     }
     return map
@@ -116,7 +126,7 @@ export const useMediaById = (id: string | null | undefined) => {
         : tables.media.select().where('id', '=', '__NONE__').limit(1) // Return empty if no id
     )
   )
-  const rawMedia = (result as any[])[0] || null
+  const rawMedia = (result as unknown as Record<string, unknown>[])[0] || null
   return transformMediaFromLiveStore(rawMedia)
 }
 
@@ -241,7 +251,7 @@ export const useSearchMedia = (searchTerm: string | undefined | null, limit = 10
     const artistResults = Array.isArray(artistMatches) ? artistMatches : []
     
     const seenIds = new Set<string>()
-    const mergedResults: any[] = []
+    const mergedResults: TransformedMedia[] = []
     
     // Add title matches first (prioritize exact title matches)
     // Guard against undefined/null IDs
@@ -249,16 +259,18 @@ export const useSearchMedia = (searchTerm: string | undefined | null, limit = 10
       const id = media?.id
       if (id && typeof id === 'string' && !seenIds.has(id)) {
         seenIds.add(id)
-        mergedResults.push(transformMediaFromLiveStore(media))
+        const transformed = transformMediaFromLiveStore(media)
+        if (transformed) mergedResults.push(transformed)
       }
     }
-    
+
     // Add artist matches
     for (const media of artistResults) {
       const id = media?.id
       if (id && typeof id === 'string' && !seenIds.has(id)) {
         seenIds.add(id)
-        mergedResults.push(transformMediaFromLiveStore(media))
+        const transformed = transformMediaFromLiveStore(media)
+        if (transformed) mergedResults.push(transformed)
       }
     }
     
@@ -332,7 +344,7 @@ export const useSearchMediaIds = (searchTerm: string | undefined | null, limit =
     // Filter out any undefined/null IDs to prevent downstream query errors
     if (Array.isArray(titleMatches)) {
       for (const result of titleMatches) {
-        const id = (result as any)?.id
+        const id = (result as { id?: string })?.id
         // Guard against undefined/null IDs
         if (id && typeof id === 'string' && !seenIds.has(id)) {
           seenIds.add(id)
@@ -344,7 +356,7 @@ export const useSearchMediaIds = (searchTerm: string | undefined | null, limit =
     // Add artist match IDs
     if (Array.isArray(artistMatches)) {
       for (const result of artistMatches) {
-        const id = (result as any)?.id
+        const id = (result as { id?: string })?.id
         // Guard against undefined/null IDs
         if (id && typeof id === 'string' && !seenIds.has(id)) {
           seenIds.add(id)
@@ -531,7 +543,7 @@ export const useFilteredMedia = (filters: Filter) => {
     // If using efficient database query, return those results
     if (canUseDbQuery && Array.isArray(dbResults)) {
       // dbResults contains objects with just 'id' property: [{ id: 'xxx' }, { id: 'yyy' }]
-      return dbResults.map((m: any) => m.id as string)
+      return dbResults.map((m: { id: string }) => m.id)
     }
     
     // Check if no filters at all
@@ -543,21 +555,21 @@ export const useFilteredMedia = (filters: Filter) => {
       filters.favorites
     
     if (!hasAnyFilter) {
-      return Array.isArray(allMediaForFiltering) ? allMediaForFiltering.map((m: any) => m.id as string) : []
+      return Array.isArray(allMediaForFiltering) ? allMediaForFiltering.map((m: { id: string }) => m.id) : []
     }
     
     // Complex filtering: client-side but optimized (only loading minimal columns)
     const filtered = Array.isArray(allMediaForFiltering)
-      ? allMediaForFiltering.filter((media: any) => {
+      ? allMediaForFiltering.filter((media: { id: string; artistId?: string; type?: string; genresFlat?: string; providersFlat?: string }) => {
           let matches = false
           
           // Check artists
-          if (filters.artists.length > 0 && filters.artists.includes(media.artistId)) {
+          if (filters.artists.length > 0 && media.artistId && filters.artists.includes(media.artistId)) {
             matches = true
           }
-          
+
           // Check types
-          if (filters.types.length > 0 && filters.types.includes(media.type)) {
+          if (filters.types.length > 0 && media.type && filters.types.includes(media.type)) {
             matches = true
           }
           
@@ -586,7 +598,7 @@ export const useFilteredMedia = (filters: Filter) => {
         })
       : []
     
-    return filtered.map((m: any) => m.id as string)
+    return filtered.map((m) => m.id)
   }, [canUseDbQuery, dbResults, allMediaForFiltering, filters, favoriteIds])
 }
 
@@ -635,11 +647,11 @@ export const useMediaMapForIds = (ids: string[]) => {
   const rawMedia = store.useQuery(query)
   
   return useMemo(() => {
-    const map: Record<string, any> = {}
+    const map: Record<string, TransformedMedia> = {}
     if (Array.isArray(rawMedia)) {
-      rawMedia.forEach((item: any) => {
+      rawMedia.forEach((item: Record<string, unknown>) => {
         const media = transformMediaFromLiveStore(item)
-        map[media.id] = media
+        if (media) map[media.id] = media
       })
     }
     return map
@@ -671,7 +683,7 @@ export const useMediaByType = () => {
   return useMemo(() => {
     const grouped: Record<string, string[]> = {}
     if (Array.isArray(allMedia)) {
-      allMedia.forEach((item: any) => {
+      allMedia.forEach((item: { id: string; type?: string }) => {
         const type = item.type || 'audio'
         if (!grouped[type]) {
           grouped[type] = []

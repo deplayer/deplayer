@@ -4,14 +4,33 @@ import { tables } from '../schema'
 
 /**
  * Settings Query Hooks
- * 
+ *
  * These hooks provide reactive access to application settings from LiveStore.
  * They automatically update when the underlying data changes.
  */
 
+interface ProviderSettings {
+  enabled: boolean;
+  [key: string]: unknown;
+}
+
+interface AppSettings {
+  spectrum: { enabled: boolean };
+  lastfm: { enabled: boolean; apikey: string };
+  language: { code: string; useSystemLanguage: boolean };
+  notifications: { enabled: boolean };
+  sync?: { enabled: boolean; serverUrl: string };
+  [key: string]: unknown;
+}
+
+interface SettingsShape {
+  providers: { [key: string]: ProviderSettings };
+  app: AppSettings;
+}
+
 /**
  * Get application settings
- * 
+ *
  * @example
  * ```tsx
  * const settings = useSettings()
@@ -19,7 +38,8 @@ import { tables } from '../schema'
  * return <div>Language: {settings.app.language?.code}</div>
  * ```
  */
-export const useSettings = (settingsId = 'default') => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const useSettings = (settingsId = 'default'): any => {
   const store = useAppStore()
   const result = store.useQuery(
     queryDb(
@@ -29,8 +49,8 @@ export const useSettings = (settingsId = 'default') => {
         .limit(1)
     )
   )
-  
-  const settingsRecord = (result as any[])[0]
+
+  const settingsRecord = (result as unknown as Array<{ settings: SettingsShape }>)[0]
   return settingsRecord ? settingsRecord.settings : null
 }
 

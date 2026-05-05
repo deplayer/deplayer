@@ -1,4 +1,4 @@
-import { IMusicMetadataProvider } from "./IMusicMetadataProvider";
+import { IMusicMetadataProvider, ArtistInfo } from "./IMusicMetadataProvider";
 import axios from "axios";
 import { createLogger } from "../utils/logger";
 
@@ -12,7 +12,7 @@ export default class LastfmProvider implements IMusicMetadataProvider {
   artistInfoUrl: string;
   similarArtistsUrl: string;
 
-  constructor(settings: any, providerKey: string) {
+  constructor(settings: { enabled: boolean; apikey: string }, providerKey: string) {
     this.providerKey = providerKey;
     this.enabled = settings.enabled;
     this.apikey = settings.apikey;
@@ -20,9 +20,9 @@ export default class LastfmProvider implements IMusicMetadataProvider {
     this.similarArtistsUrl = `${this.baseUrl}?method=artist.getsimilar&api_key=${this.apikey}&format=json&limit=20`;
   }
 
-  searchArtistInfo(searchTerm: string): Promise<any> {
+  searchArtistInfo(searchTerm: string): Promise<ArtistInfo | null | undefined> {
     if (!this.enabled) {
-      return Promise.resolve();
+      return Promise.resolve(null);
     }
 
     return new Promise((resolve, reject) => {
@@ -48,7 +48,7 @@ export default class LastfmProvider implements IMusicMetadataProvider {
       .get(`${this.similarArtistsUrl}&artist=${encodeURIComponent(artistName)}`)
       .then((result) => {
         const artists = result.data?.similarartists?.artist || [];
-        return artists.map((a: any) => a.name as string);
+        return artists.map((a: { name: string }) => a.name);
       })
       .catch((err) => {
         logger.error("Error fetching similar artists:", err);

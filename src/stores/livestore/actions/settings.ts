@@ -1,18 +1,18 @@
 import { updateSettings, initializeSettings, defaultSettings, getSettingsData } from '../settingsStore'
-import { queryDb } from '@livestore/livestore'
+import { queryDb, Store } from '@livestore/livestore'
 import { tables } from '../schema'
 
 
 const SETTINGS_STORAGE_KEY = 'deplayer-settings'
 
 // Stub for removed sync settings functionality
-const storeSyncSettings = async (_settings: any) => {}
+const storeSyncSettings = async (_settings: Record<string, unknown>) => {}
 
 /**
  * localStorage fallback for settings persistence.
  * Used when LiveStore is running with the in-memory adapter (no SharedWorker).
  */
-const saveSettingsToLocalStorage = (settings: any) => {
+const saveSettingsToLocalStorage = (settings: Record<string, unknown>) => {
   try {
     localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings))
   } catch (e) {
@@ -20,7 +20,7 @@ const saveSettingsToLocalStorage = (settings: any) => {
   }
 }
 
-const loadSettingsFromLocalStorage = (): any | null => {
+const loadSettingsFromLocalStorage = (): Record<string, unknown> | null => {
   try {
     const raw = localStorage.getItem(SETTINGS_STORAGE_KEY)
     if (raw) {
@@ -44,10 +44,8 @@ const loadSettingsFromLocalStorage = (): any | null => {
  * All actions require a store parameter from useStore() hook.
  */
 
-type LiveStore = {
-  commit: (event: Record<string, unknown>) => void
-  [key: string]: any
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LiveStore = Store<any>
 
 /**
  * Initialize settings - Create defaults if they don't exist
@@ -63,7 +61,7 @@ export const initializeSettingsAction = async (store: LiveStore) => {
   )
   
   const result = await store.query(query)
-  const settingsRecord = (result as any[])[0]
+  const settingsRecord = (result as unknown[])[0] as Record<string, unknown> | undefined
 
   if (!settingsRecord) {
     // No settings exist in LiveStore — check localStorage fallback
@@ -84,7 +82,7 @@ export const initializeSettingsAction = async (store: LiveStore) => {
  * 
  * @returns Object with prevSettings and newSettings for saga to check reconnection
  */
-export const saveSettingsAction = async (store: LiveStore, settingsPayload: any) => {
+export const saveSettingsAction = async (store: LiveStore, settingsPayload: Record<string, unknown>) => {
   // Query for existing settings
   const query = queryDb(
     tables.settings
@@ -94,7 +92,7 @@ export const saveSettingsAction = async (store: LiveStore, settingsPayload: any)
   )
   
   const result = await store.query(query)
-  const settingsRecord = (result as any[])[0]
+  const settingsRecord = (result as unknown[])[0] as Record<string, unknown> | undefined
   
   const prevSettings = settingsRecord ? getSettingsData(settingsRecord) : defaultSettings
 
@@ -117,7 +115,8 @@ export const saveSettingsAction = async (store: LiveStore, settingsPayload: any)
   }
 
   // Store sync settings in localStorage if provided
-  const newSync = settingsToSave.app.sync
+  const appSettings = settingsToSave.app as Record<string, unknown>
+  const newSync = appSettings.sync as Record<string, unknown> | undefined
   if (newSync) {
     storeSyncSettings(newSync)
   }
@@ -134,10 +133,8 @@ export const saveSettingsAction = async (store: LiveStore, settingsPayload: any)
  * Resets sync settings in localStorage to defaults
  */
 export const deleteSettingsAction = async (store: LiveStore) => {
-  // Use raw SQL to delete settings
-  await store.mutate((tx: any) => {
-    return tx.exec(`DELETE FROM settings WHERE id = 'default'`)
-  })
+  // Reset settings to defaults by overwriting with default values
+  store.commit(initializeSettings('default', defaultSettings))
 
   // Reset sync settings in localStorage to defaults
   storeSyncSettings({ enabled: false, serverUrl: 'http://localhost:3000' })

@@ -2,6 +2,10 @@ import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 import { useMemo } from 'react'
+import type { TransformedMedia } from './useMedia'
+
+type AlbumRecord = { id: string; name: string; artistId: string; artistName?: string; thumbnailUrl?: string; year?: number; createdAt: number; updatedAt: number; [key: string]: unknown }
+type MediaRecord = { id: string; albumId: string; artistId?: string; artistName?: string; albumName?: string; cover?: { thumbnailUrl?: string } | null; year?: number | null; [key: string]: unknown }
 
 /**
  * Album Query Hooks
@@ -43,9 +47,9 @@ export const useAlbumsMap = () => {
   const albums = useAlbums()
   
   return useMemo(() => {
-    const map: Record<string, any> = {}
+    const map: Record<string, AlbumRecord> = {}
     if (Array.isArray(albums)) {
-      albums.forEach((album: any) => {
+      albums.forEach((album: AlbumRecord) => {
         map[album.id] = album
       })
     }
@@ -72,7 +76,7 @@ export const useAlbumById = (id: string | null | undefined) => {
         : tables.albums.select().where('id', '=', '__NONE__').limit(1) // Return empty if no id
     )
   )
-  return (result as any[])[0] || null
+  return (result as AlbumRecord[])[0] || null
 }
 
 /**
@@ -119,7 +123,7 @@ export const useAlbumIdsByArtist = () => {
   return useMemo(() => {
     const map: Record<string, string[]> = {}
     if (Array.isArray(albums)) {
-      albums.forEach((album: any) => {
+      albums.forEach((album: AlbumRecord) => {
         if (album.artistId) {
           if (!map[album.artistId]) {
             map[album.artistId] = []
@@ -158,7 +162,7 @@ export const useSongsByAlbum = () => {
   return useMemo(() => {
     const map: Record<string, string[]> = {}
     if (Array.isArray(media)) {
-      media.forEach((song: any) => {
+      media.forEach((song: { id: string; albumId: string }) => {
         if (song.albumId) {
           if (!map[song.albumId]) {
             map[song.albumId] = []
@@ -175,7 +179,8 @@ export const useSongsByAlbum = () => {
  * Transform raw LiveStore media data to include nested artist/album objects
  * (Same transformation as useMedia.ts to ensure consistent data shape)
  */
-function transformMediaFromLiveStore(rawMedia: any): any {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function transformMediaFromLiveStore(rawMedia: any): TransformedMedia | null {
   if (!rawMedia) return null
   
   // Reconstruct nested artist object from flat fields
@@ -235,14 +240,15 @@ export const useSongsByAlbumForArtist = (artistId: string | null | undefined) =>
   
   return useMemo(() => {
     const songsByAlbum: Record<string, string[]> = {}
-    const mediaMap: Record<string, any> = {}
+    const mediaMap: Record<string, TransformedMedia> = {}
     const allSongIds: string[] = []
-    
+
     if (Array.isArray(media)) {
-      media.forEach((rawSong: any) => {
+      media.forEach((rawSong: MediaRecord) => {
         // Transform to include nested artist/album objects
         const song = transformMediaFromLiveStore(rawSong)
-        
+        if (!song) return
+
         // Build mediaMap for quick lookups
         mediaMap[song.id] = song
         allSongIds.push(song.id)

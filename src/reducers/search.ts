@@ -17,6 +17,7 @@ export const defaultState = {
   searchResults: [],
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SearchAction = StartSearchAction | { type: string; [key: string]: any };
 
 export default (state: State = defaultState, action: SearchAction = { type: '' }) => {
@@ -70,7 +71,7 @@ export default (state: State = defaultState, action: SearchAction = { type: '' }
         ...state,
         loading: false,
         error: '',
-        searchResults: action.data ? action.data.map((item: any) => item.id) : []
+        searchResults: action.data ? (action.data as Array<{ id: string }>).map((item) => item.id) : []
       };
     }
 

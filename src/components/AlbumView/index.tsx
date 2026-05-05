@@ -34,7 +34,8 @@ export default function AlbumView() {
     const genreSet = new Set<string>()
 
     if (Array.isArray(mediaItems)) {
-      mediaItems.forEach((item: Record<string, unknown>) => {
+      mediaItems.forEach((item) => {
+        if (!item) return
         map[item.id as string] = item
         ids.push(item.id as string)
         duration += (item.duration as number) || 0

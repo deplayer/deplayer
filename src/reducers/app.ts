@@ -29,7 +29,8 @@ export const defaultState = {
   ready: false,
 };
 
-export default (state: State = defaultState, action: any) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default (state: State = defaultState, action: { type?: string; [key: string]: any }) => {
   switch (action.type) {
     case types.TOGGLE_SIDEBAR: {
       return {

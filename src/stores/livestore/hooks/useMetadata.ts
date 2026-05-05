@@ -38,7 +38,7 @@ export const useAvailableGenres = (): string[] => {
     const genres = new Set<string>()
     
     if (Array.isArray(result)) {
-      result.forEach((row: any) => {
+      result.forEach((row: { genresFlat?: string }) => {
         if (row.genresFlat) {
           row.genresFlat.split(',').forEach((g: string) => {
             const trimmed = g.trim()
@@ -74,7 +74,7 @@ export const useAvailableProviders = (): string[] => {
     const providers = new Set<string>()
     
     if (Array.isArray(result)) {
-      result.forEach((row: any) => {
+      result.forEach((row: { providersFlat?: string }) => {
         if (row.providersFlat) {
           row.providersFlat.split(',').forEach((p: string) => {
             const trimmed = p.trim()
@@ -110,7 +110,7 @@ export const useAvailableTypes = (): string[] => {
     const types = new Set<string>()
     
     if (Array.isArray(result)) {
-      result.forEach((row: any) => {
+      result.forEach((row: { type?: string }) => {
         if (row.type) {
           types.add(row.type)
         }

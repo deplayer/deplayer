@@ -5,7 +5,7 @@ import { NormalizedMedia } from '../../../utils/normalizeMedia'
 /**
  * Convert NormalizedMedia to the shape expected by LiveStore media events
  */
-function toEventPayload(item: NormalizedMedia): any {
+function toEventPayload(item: NormalizedMedia) {
   const { media, artist, album } = item
   return {
     id: media.id,
@@ -74,8 +74,8 @@ export async function addMediaBulkAction(
   })
 
   const existingIds = new Set<string>()
-  const rows = (result as any)?.[0]?.values || []
-  rows.forEach((row: any) => existingIds.add(row[0]))
+  const rows = (result as Array<{ values?: string[][] }>)?.[0]?.values || []
+  rows.forEach((row: string[]) => existingIds.add(row[0]))
 
   // 2. Filter to only new media items
   const newMedia = mediaItems.filter(m => !existingIds.has(m.media.id))
@@ -98,7 +98,7 @@ export async function updateMediaAction(
   await store.commit(mediaEvents.mediaUpdated({
     id: mediaId,
     ...updates
-  } as any))
+  }))
 }
 
 /**

@@ -1,19 +1,18 @@
 import { IMusicProvider } from './IMusicProvider'
+import { NormalizedMedia } from '../utils/normalizeMedia'
 
 export default class DummyProvider implements IMusicProvider {
   providerKey: string
   enabled: boolean
 
-  constructor(settings: any, providerKey: string) {
+  constructor(settings: { enabled: boolean }, providerKey: string) {
     this.providerKey = providerKey
     this.enabled = settings.enabled
   }
 
-  search(_searchTerm: string): Promise<any> {
+  search(_searchTerm: string): Promise<NormalizedMedia[]> {
     return new Promise((resolve) => {
-      resolve([
-        { title: 'Highway to hell' }
-      ])
+      resolve([] as NormalizedMedia[])
     })
   }
 }

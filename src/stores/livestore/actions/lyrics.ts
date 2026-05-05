@@ -1,19 +1,17 @@
+import { Store } from '@livestore/livestore'
 import { events } from '../schema'
 
 /**
  * LiveStore Lyrics Actions
- * 
+ *
  * These actions handle lyrics management for media tracks.
  * Lyrics can be fetched from external APIs and stored locally.
- * 
+ *
  * All actions require a store parameter from useStore() hook.
  */
 
-type LiveStore = {
-  commit: (event: Record<string, unknown>) => void
-  query: (query: any) => Promise<any>
-  [key: string]: any
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LiveStore = Store<any>
 
 /**
  * Add lyrics for a media track

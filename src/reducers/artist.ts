@@ -1,17 +1,27 @@
 import * as types from '../constants/ActionTypes'
 
+export type ArtistMetadata = {
+  'life-span'?: { begin?: string; end?: string; ended?: boolean }
+  country?: string
+  relations?: Array<{ type: string; url: { resource: string } }>
+  artist?: { bio?: { content: string } }
+  [key: string]: unknown
+}
+
 export type State = {
-  artistMetadata: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  artistMetadata: Record<string, any>
 }
 
 export const defaultState = {
   artistMetadata: {}
 }
 
-export default (state: State = defaultState, action: any): State => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default (state: State = defaultState, action: { type?: string; [key: string]: any }): State => {
   switch (action.type) {
     case types.RECEIVE_ARTIST_METADATA:
-      return { ...state, artistMetadata: action.data }
+      return { ...state, artistMetadata: action.data as ArtistMetadata }
 
     case types.CLEAR_ARTIST_METADATA:
       return { ...state, artistMetadata: {} }

@@ -1,4 +1,4 @@
-import { IMusicMetadataProvider } from "./IMusicMetadataProvider";
+import { IMusicMetadataProvider, ArtistInfo } from "./IMusicMetadataProvider";
 import axios from "axios";
 import { createLogger } from "../utils/logger";
 
@@ -8,11 +8,11 @@ export default class MusicbrainzProvider implements IMusicMetadataProvider {
   baseUrl: string = "https://musicbrainz.org/ws/2";
   providerKey: string;
 
-  constructor(_settings: any, providerKey: string) {
+  constructor(_settings: Record<string, unknown>, providerKey: string) {
     this.providerKey = providerKey;
   }
 
-  async searchArtistInfo(searchTerm: string): Promise<any> {
+  async searchArtistInfo(searchTerm: string): Promise<ArtistInfo | null | undefined> {
     try {
       // First search for the artist
       const searchResponse = await axios.get(
@@ -47,8 +47,8 @@ export default class MusicbrainzProvider implements IMusicMetadataProvider {
           "life-span": artist["life-span"],
           country: artist.country,
           relations: artist.relations
-            .filter((rel: any) => rel.url)
-            .map((rel: any) => ({
+            .filter((rel: { url?: { resource: string }; type: string }) => rel.url)
+            .map((rel: { url: { resource: string }; type: string }) => ({
               type: rel.type,
               url: { resource: rel.url.resource },
             })),
@@ -56,7 +56,7 @@ export default class MusicbrainzProvider implements IMusicMetadataProvider {
             bio: {
               content:
                 artist.disambiguation ||
-                artist.aliases?.map((a: any) => a.name).join(", ") ||
+                artist.aliases?.map((a: { name: string }) => a.name).join(", ") ||
                 "",
             },
           },
@@ -67,6 +67,6 @@ export default class MusicbrainzProvider implements IMusicMetadataProvider {
       return null;
     }
 
-    return Promise.resolve();
+    return null;
   }
 }

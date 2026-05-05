@@ -19,7 +19,7 @@ const ContinueListeningCard = () => {
       <div className="flex items-center gap-4">
         <Link to={`/song/${song.id}`} className="w-16 h-16 flex-shrink-0">
           <CoverImage
-            cover={song.cover}
+            cover={song.cover || undefined}
             size="thumbnail"
             albumName={song.album?.name || ''}
           />

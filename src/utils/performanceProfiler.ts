@@ -119,5 +119,5 @@ export const profiler = new PerformanceProfiler()
 
 // Make available globally for debugging
 if (typeof window !== 'undefined') {
-  (window as any).__profiler = profiler
+  (window as unknown as { __profiler: typeof profiler }).__profiler = profiler
 }

@@ -3,6 +3,8 @@ import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 import { useMemo } from 'react'
 
+type ArtistRecord = { id: string; name: string; createdAt: number; updatedAt: number }
+
 /**
  * Artist Query Hooks
  * 
@@ -43,9 +45,9 @@ export const useArtistsMap = () => {
   const artists = useArtists()
   
   return useMemo(() => {
-    const map: Record<string, any> = {}
+    const map: Record<string, ArtistRecord> = {}
     if (Array.isArray(artists)) {
-      artists.forEach((artist: any) => {
+      artists.forEach((artist: ArtistRecord) => {
         map[artist.id] = artist
       })
     }
@@ -67,9 +69,9 @@ export const useArtistsByIds = (ids: string[]) => {
   const result = store.useQuery(queryDb(query))
   
   return useMemo(() => {
-    const map: Record<string, any> = {}
+    const map: Record<string, ArtistRecord> = {}
     if (Array.isArray(result)) {
-      result.forEach((artist: any) => { map[artist.id] = artist })
+      result.forEach((artist: ArtistRecord) => { map[artist.id] = artist })
     }
     return map
   }, [result])
@@ -94,7 +96,7 @@ export const useArtistById = (id: string | null | undefined) => {
         : tables.artists.select().where('id', '=', '__NONE__').limit(1) // Return empty if no id
     )
   )
-  return (result as any[])[0] || null
+  return (result as ArtistRecord[])[0] || null
 }
 
 /**
@@ -123,7 +125,7 @@ export const useSongsByArtist = () => {
   return useMemo(() => {
     const map: Record<string, string[]> = {}
     if (Array.isArray(media)) {
-      media.forEach((song: any) => {
+      media.forEach((song: { id: string; artistId: string }) => {
         if (song.artistId) {
           if (!map[song.artistId]) {
             map[song.artistId] = []

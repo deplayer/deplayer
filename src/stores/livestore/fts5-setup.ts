@@ -174,7 +174,7 @@ export const allFtsSetup = [
  * }, [store])
  * ```
  */
-export const setupFts5 = (_store: any) => {
+export const setupFts5 = (_store: unknown) => {
   // FTS5 is disabled - wa-sqlite doesn't have FTS5 extension compiled in
   console.warn('[LiveStore] FTS5 full-text search is not available in wa-sqlite. Using regular SQL search instead.')
   

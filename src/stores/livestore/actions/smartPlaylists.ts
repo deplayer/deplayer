@@ -1,20 +1,18 @@
+import { Store } from '@livestore/livestore'
 import { events } from '../schema'
 
 /**
  * LiveStore Smart Playlists Actions
- * 
+ *
  * These actions handle smart playlist CRUD operations.
  * Smart playlists are filter-based and dynamically generate
  * their track lists based on genres, artists, types, and providers.
- * 
+ *
  * All actions require a store parameter from useStore() hook.
  */
 
-type LiveStore = {
-  commit: (event: Record<string, unknown>) => void
-  query: (query: any) => Promise<any>
-  [key: string]: any
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LiveStore = Store<any>
 
 type SmartPlaylistFilters = {
   genres: string[]

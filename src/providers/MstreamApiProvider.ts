@@ -3,6 +3,16 @@ import axios from 'axios'
 import { normalizeMedia, NormalizedMedia } from '../utils/normalizeMedia'
 import { IMusicProvider } from './IMusicProvider'
 
+type MstreamSong = {
+  filepath: string
+  metadata: {
+    artist: string
+    album: string
+    title: string
+    'album-art'?: string
+  }
+}
+
 /**
  * It should implement the API documented here: https://github.com/IrosTheBeggar/mStream/blob/master/docs/API/db_search.md
  */
@@ -11,13 +21,13 @@ export default class MstreamApiProvider implements IMusicProvider {
   albumSongsUrl: string
   providerKey: string
 
-  constructor(settings: any, providerKey: string) {
+  constructor(settings: { baseUrl: string }, providerKey: string) {
     this.albumSongsUrl = settings.baseUrl + '/db/album-songs'
     this.baseUrl = settings.baseUrl
     this.providerKey = providerKey
   }
 
-  matchSearch = (song: any, searchTerm: string) => {
+  matchSearch = (song: MstreamSong, searchTerm: string) => {
     const re = new RegExp(searchTerm.toLowerCase(), 'gi')
     return re.test(song.filepath)
       || re.test(song.metadata.artist)
@@ -25,14 +35,14 @@ export default class MstreamApiProvider implements IMusicProvider {
       || re.test(song.metadata.title)
   }
 
-  filterSongs = (result: Array<any>, searchTerm: string): Array<any> => {
+  filterSongs = (result: Array<MstreamSong>, searchTerm: string): Array<MstreamSong> => {
     return result.filter((resultSong) => {
       return this.matchSearch(resultSong, searchTerm)
     })
   }
 
-  mapSongs = (songs: Array<any>): NormalizedMedia[] => {
-    return songs.map((song: any) => {
+  mapSongs = (songs: Array<MstreamSong>): NormalizedMedia[] => {
+    return songs.map((song: MstreamSong) => {
       const songTitle = song.metadata.title ? song.metadata.title : song.filepath
 
       return normalizeMedia({

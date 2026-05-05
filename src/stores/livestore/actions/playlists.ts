@@ -1,22 +1,20 @@
+import { Store } from '@livestore/livestore'
 import { events } from '../schema'
 
 /**
  * LiveStore Playlists Actions
- * 
+ *
  * These actions handle playlist CRUD operations and track management.
  * For track add/remove operations, we follow the pattern established in schema.ts:
  * 1. Read current trackIds from the playlist
  * 2. Modify the array (add/remove/reorder)
  * 3. Dispatch PlaylistReordered event with the updated trackIds
- * 
+ *
  * All actions require a store parameter from useStore() hook.
  */
 
-type LiveStore = {
-  commit: (event: Record<string, unknown>) => void
-  query: (query: any) => Promise<any>
-  [key: string]: any
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LiveStore = Store<any>
 
 /**
  * Create a new playlist
@@ -66,7 +64,7 @@ export const addTrackToPlaylistAction = async (
     bindValues: [playlistId]
   })
   
-  const rows = (result as any)?.[0]?.values || []
+  const rows = (result as Array<{ values?: string[][] }>)?.[0]?.values || []
   if (rows.length === 0) {
     console.warn(`Playlist ${playlistId} not found`)
     return
@@ -114,7 +112,7 @@ export const removeTrackFromPlaylistAction = async (
     bindValues: [playlistId]
   })
   
-  const rows = (result as any)?.[0]?.values || []
+  const rows = (result as Array<{ values?: string[][] }>)?.[0]?.values || []
   if (rows.length === 0) {
     console.warn(`Playlist ${playlistId} not found`)
     return

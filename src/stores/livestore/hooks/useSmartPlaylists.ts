@@ -50,5 +50,5 @@ export const useSmartPlaylistById = (smartPlaylistId: string | null | undefined)
         : tables.smartPlaylists.select().where('id', '=', '__NONE__').limit(1)
     )
   )
-  return (result as any[])[0] || null
+  return (result as SmartPlaylist[])[0] || null
 }

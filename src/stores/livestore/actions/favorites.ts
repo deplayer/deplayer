@@ -1,20 +1,17 @@
-import { queryDb } from '@livestore/livestore'
+import { queryDb, Store } from '@livestore/livestore'
 import { events, tables } from '../schema'
 
 /**
  * LiveStore Favorites Actions
- * 
+ *
  * These actions handle favoriting/unfavoriting media tracks.
  * No side effects needed - favorites are pure data operations.
- * 
+ *
  * All actions require a store parameter from useStore() hook.
  */
 
-type LiveStore = {
-  commit: (event: Record<string, unknown>) => void
-  query: (query: any) => any
-  [key: string]: any
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LiveStore = Store<any>
 
 /**
  * Toggle favorite status for a media track

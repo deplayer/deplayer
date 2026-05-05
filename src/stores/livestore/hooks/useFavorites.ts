@@ -23,6 +23,7 @@ export const useFavorites = () => {
   const store = useAppStore()
   // Get favorite records with media joined
   // Using raw SQL for the JOIN
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return store.useQuery(
     queryDb({
       query: `
@@ -58,7 +59,7 @@ export const useIsFavorite = (mediaId: string | null | undefined) => {
     )
   )
   
-  return (result as any[]).length > 0
+  return (result as unknown[]).length > 0
 }
 
 /**
@@ -85,7 +86,7 @@ export const useFavoriteIds = (skip = false): Set<string> => {
   
   return useMemo(() => {
     if (skip) return new Set<string>()
-    const records = favoriteRecords as any[] | undefined
+    const records = favoriteRecords as unknown as Array<{ mediaId: string }> | undefined
     if (!records || !Array.isArray(records)) return new Set<string>()
     return new Set<string>(records.map(f => f.mediaId))
   }, [favoriteRecords, skip])

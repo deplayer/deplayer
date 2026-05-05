@@ -4,6 +4,28 @@ import { createLogger } from "../utils/logger";
 import { normalizeMedia, NormalizedMedia } from "../utils/normalizeMedia";
 import { IMusicProvider } from "./IMusicProvider";
 
+type SubsonicAlbum = {
+  id: string;
+  name?: string;
+  year?: number;
+  created?: string;
+  song?: SubsonicSong[];
+};
+
+type SubsonicSong = {
+  id: string;
+  title?: string;
+  path?: string;
+  artist?: string;
+  album?: string;
+  albumId?: string;
+  coverArt?: string;
+  genres?: Array<{ name: string }>;
+  duration?: number;
+  track?: number;
+  discNumber?: number;
+};
+
 const logger = createLogger({ namespace: "SubsonicApiProvider" });
 
 /**
@@ -19,7 +41,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
   coverBase: string;
   providerKey: string;
 
-  constructor(settings: any, providerKey: string) {
+  constructor(settings: { baseUrl: string; user: string; password: string }, providerKey: string) {
     const appName = "deplayer";
     const songCount = 1000;
     const artistCount = 1000;
@@ -33,15 +55,15 @@ export default class SubsonicApiProvider implements IMusicProvider {
     this.coverBase = `${settings.baseUrl}/rest/getCoverArt.view?u=${settings.user}&p=${settings.password}&c=${appName}&v=1.11.0&f=json`;
   }
 
-  mapSongs = (songs: any[], albums: any[] = []): NormalizedMedia[] => {
+  mapSongs = (songs: SubsonicSong[], albums: SubsonicAlbum[] = []): NormalizedMedia[] => {
     // Protect against empty responses
     if (!songs) {
       return [];
     }
 
     const secureSongs = songs instanceof Array ? songs : [songs];
-    return secureSongs.map((song: any) => {
-      const album = albums.find((album) => album.id === song.album.id);
+    return secureSongs.map((song: SubsonicSong) => {
+      const album = albums.find((a) => a.id === song.albumId);
 
       return normalizeMedia({
         title: song.title ? song.title : song.path,
@@ -53,7 +75,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
           fullUrl: this.coverBase + "&id=" + song.coverArt,
         },
         genres: song.genres?.map((genre: { name: string }) => genre.name) || [],
-        duration: { value: song.duration, unit: 'seconds' },
+        duration: song.duration !== undefined ? { value: song.duration, unit: 'seconds' } : undefined,
         track: song.track,
         discNumber: song.discNumber,
         filePath: song.path,
@@ -119,7 +141,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
       for (let i = 0; i < newAlbums.length; i += BATCH_SIZE) {
         const batch = newAlbums.slice(i, i + BATCH_SIZE)
         const batchResults = await Promise.allSettled(
-          batch.map(async (album: any) => {
+          batch.map(async (album: SubsonicAlbum) => {
             const albumDetails = await axios.get(
               `${this.baseUrl}/rest/getAlbum.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.16.1&f=json&id=${album.id}`
             )
@@ -156,6 +178,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
     for (let i = 0; i < albums.length; i += BATCH_SIZE) {
       const batch = albums.slice(i, i + BATCH_SIZE)
       const batchResults = await Promise.allSettled(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         batch.map(async (album: any) => {
           const albumDetails = await axios.get(
             `${this.baseUrl}/rest/getAlbum.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.16.1&f=json&id=${album.id}`

@@ -65,7 +65,7 @@ export const useGenres = (): Array<{ name: string; count: number }> => {
  * @param limit - Max number of results (default 25)
  * @returns Array of media objects matching the genre
  */
-export const useMediaByGenre = (genre: string | undefined | null, limit = 25): any[] => {
+export const useMediaByGenre = (genre: string | undefined | null, limit = 25): Record<string, unknown>[] => {
   const store = useAppStore()
   const result = store.useQuery(
     queryDb(

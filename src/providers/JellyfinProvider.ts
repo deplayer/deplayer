@@ -1,5 +1,5 @@
 import { Api, Jellyfin } from "@jellyfin/sdk";
-import { ItemFields } from "@jellyfin/sdk/lib/generated-client/models";
+import { BaseItemDto, ItemFields } from "@jellyfin/sdk/lib/generated-client/models";
 import { getItemsApi } from "@jellyfin/sdk/lib/utils/api/items-api";
 import { getUserApi } from "@jellyfin/sdk/lib/utils/api/user-api";
 import { normalizeMedia, NormalizedMedia } from "../utils/normalizeMedia";
@@ -17,7 +17,7 @@ export default class JellyfinProvider implements IMusicProvider {
   public providerKey: string;
   private userId: string | null = null;
 
-  constructor(settings: any, providerKey: string) {
+  constructor(settings: { baseUrl: string; apiKey: string; username: string; password: string }, providerKey: string) {
     this.baseUrl = settings.baseUrl.replace(/\/$/, "");
     this.apiKey = settings.apiKey;
     this.username = settings.username;
@@ -59,7 +59,7 @@ export default class JellyfinProvider implements IMusicProvider {
     }
   }
 
-  private mapSongs(items: any[]): NormalizedMedia[] {
+  private mapSongs(items: BaseItemDto[]): NormalizedMedia[] {
     return items.map((item) => {
       const type = item.Type?.toLowerCase() === "movie" ? "video" : "audio";
 
@@ -71,7 +71,7 @@ export default class JellyfinProvider implements IMusicProvider {
         type === "video" ? "Movies" : item.Album || "Unknown Album";
 
       return normalizeMedia({
-        title: item.Name,
+        title: item.Name || undefined,
         artistName: artistName,
         albumName: albumName,
         track: item.IndexNumber || null,
@@ -108,7 +108,7 @@ export default class JellyfinProvider implements IMusicProvider {
     }
 
     try {
-      let allItems: any[] = [];
+      let allItems: BaseItemDto[] = [];
       let startIndex = 0;
       const limit = 100;
 
@@ -207,7 +207,7 @@ export default class JellyfinProvider implements IMusicProvider {
       const items = results.data.Items || [];
 
       // Filter to only include songs where artist matches (case-insensitive)
-      const artistItems = items.filter((item: any) => {
+      const artistItems = items.filter((item: BaseItemDto) => {
         const itemArtist = item.AlbumArtist || item.Artists?.[0] || "";
         return itemArtist.toLowerCase() === artistName.toLowerCase();
       });

@@ -22,7 +22,8 @@ import { resolveCurrentSongId, resolveQueueNavigation } from './queueUtils'
  * return <div>{queue.trackIds.length} tracks in queue</div>
  * ```
  */
-export const useQueue = (queueId = 'default') => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const useQueue = (queueId = 'default'): any => {
   const store = useAppStore()
   const result = store.useQuery(
     queryDb(
@@ -32,7 +33,7 @@ export const useQueue = (queueId = 'default') => {
         .limit(1)
     )
   )
-  return (result as any[])[0] || null
+  return (result as unknown as Record<string, unknown>[])[0] || null
 }
 
 /**
@@ -48,15 +49,15 @@ export const useQueueTracks = (queueId = 'default') => {
   const store = useAppStore()
   const queue = useQueue(queueId)
   
-  if (!queue || !queue.trackIds || (queue.trackIds as any[]).length === 0) {
+  if (!queue || !queue.trackIds || (queue.trackIds as string[]).length === 0) {
     return []
   }
-  
+
   // Parse trackIds (it's a JSON array)
   const trackIds = typeof queue.trackIds === 'string'
     ? JSON.parse(queue.trackIds)
     : queue.trackIds
-  
+
   // Get media items by their IDs
   const media = store.useQuery(
     queryDb(
@@ -65,12 +66,12 @@ export const useQueueTracks = (queueId = 'default') => {
         .where('id', 'IN', trackIds)
     )
   )
-  
+
   // Sort media by queue order
-  const mediaMap = new Map((media as any[]).map(m => [m.id, m]))
+  const mediaMap = new Map((media as unknown as Array<{ id: string }>).map(m => [m.id, m]))
   return trackIds
     .map((id: string) => mediaMap.get(id))
-    .filter((m: any) => m !== undefined)
+    .filter((m: unknown) => m !== undefined)
 }
 
 /**
@@ -103,7 +104,7 @@ export const useCurrentTrack = (queueId = 'default') => {
     )
   )
   
-  return (result as any[])[0] || null
+  return (result as unknown as Record<string, unknown>[])[0] || null
 }
 
 /**
