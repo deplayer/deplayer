@@ -64,9 +64,9 @@ class TorrentPlayer extends React.Component<ReactPlayerProps> {
     this.player.removeEventListener('error', onError)
   }
 
-  onSeek = (e: any) => {
+  onSeek = (e: Event) => {
     if (this.props.onSeek === undefined) return;
-    this.props.onSeek(e.target.currentTime)
+    this.props.onSeek((e.target as HTMLMediaElement).currentTime)
   }
 
   play() {

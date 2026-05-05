@@ -12,7 +12,7 @@ import { queueEvents } from '../events/queue'
  */
 
 type LiveStore = {
-  commit: (event: any) => void
+  commit: (event: Record<string, unknown>) => void
   query: (query: any) => Promise<any>
   [key: string]: any
 }

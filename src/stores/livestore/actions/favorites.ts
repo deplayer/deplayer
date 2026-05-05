@@ -11,7 +11,7 @@ import { events, tables } from '../schema'
  */
 
 type LiveStore = {
-  commit: (event: any) => void
+  commit: (event: Record<string, unknown>) => void
   query: (query: any) => any
   [key: string]: any
 }

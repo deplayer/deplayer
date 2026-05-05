@@ -10,7 +10,7 @@ import { events } from '../schema'
  */
 
 type LiveStore = {
-  commit: (event: any) => void
+  commit: (event: Record<string, unknown>) => void
   query: (query: any) => Promise<any>
   [key: string]: any
 }

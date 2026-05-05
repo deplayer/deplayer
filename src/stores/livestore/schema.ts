@@ -250,7 +250,7 @@ const materializers = State.SQLite.materializers(events, {
   },
 
   // Media materializers
-  'v1.MediaAdded': (event: any) => {
+  'v1.MediaAdded': (event: Record<string, any>) => {
     const now = Date.now()
     const { id, title, artist, album, type, duration, track, discNumber, stream, cover, genres, externalId, shareUrl, filePath } = event
     
@@ -362,7 +362,7 @@ const materializers = State.SQLite.materializers(events, {
       .where('id', '=', id)
   },
 
-  'v1.MediaBulkAdded': (event: any) => {
+  'v1.MediaBulkAdded': (event: Record<string, any>) => {
     const now = Date.now()
     const operations: any[] = []
     
@@ -466,7 +466,7 @@ const materializers = State.SQLite.materializers(events, {
     return operations
   },
 
-  'v1.MediaBulkRemoved': (event: any) => {
+  'v1.MediaBulkRemoved': (event: Record<string, any>) => {
     return event.mediaIds.map((id: string) => 
       tables.media.delete().where('id', '=', id)
     )

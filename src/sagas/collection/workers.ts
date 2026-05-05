@@ -22,9 +22,9 @@ export function* saveToDbWorker(data: Array<any>): any {
     }
     
     yield put({ type: types.SAVE_COLLECTION_FULLFILLED });
-  } catch (e: any) {
+  } catch (e: unknown) {
     logger.log("settings-saga", "addToCollection", e);
-    yield put({ type: types.SAVE_COLLECTION_FAILED, error: e.message });
+    yield put({ type: types.SAVE_COLLECTION_FAILED, error: e instanceof Error ? e.message : String(e) });
   }
 }
 
@@ -49,10 +49,10 @@ export function* removeFromDbWorker(action: any): any {
       type: types.REMOVE_FROM_COLLECTION_FULFILLED,
       data: action.data,
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
     yield put({
       type: types.REMOVE_FROM_COLLECTION_REJECTED,
-      message: e.message,
+      message: e instanceof Error ? e.message : String(e),
     });
   }
 }
@@ -69,10 +69,10 @@ export function* deleteCollectionWorker(): any {
       type: types.SEND_NOTIFICATION,
       notification: "notifications.collection_deleted",
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
     yield put({
       type: types.REMOVE_FROM_COLLECTION_REJECTED,
-      message: e.message,
+      message: e instanceof Error ? e.message : String(e),
     });
   }
 }
@@ -83,8 +83,8 @@ export function* exportCollectionWorker(): any {
     // Will be re-implemented using LiveStore queries
     logger.warn("exportCollectionWorker is not yet implemented for LiveStore");
     throw new Error("Export collection is temporarily unavailable");
-  } catch (e: any) {
-    yield put({ type: types.EXPORT_COLLECTION_REJECTED, message: e.message });
+  } catch (e: unknown) {
+    yield put({ type: types.EXPORT_COLLECTION_REJECTED, message: e instanceof Error ? e.message : String(e) });
   }
 }
 
@@ -97,9 +97,9 @@ export function* importCollectionWorker(_action: {
     // Will be re-implemented using LiveStore actions
     logger.warn("importCollectionWorker is not yet implemented for LiveStore");
     throw new Error("Import collection is temporarily unavailable");
-  } catch (e: any) {
+  } catch (e: unknown) {
     logger.log("settings-saga", "importingCollection", e);
-    yield put({ type: types.IMPORT_COLLECTION_FINISHED, result: { error: e.message } });
+    yield put({ type: types.IMPORT_COLLECTION_FINISHED, result: { error: e instanceof Error ? e.message : String(e) } });
   }
 }
 
@@ -120,7 +120,7 @@ export function* trackSongPlayed(action: {
     
     yield put({ type: "SONG_SAVED" });
     // Note: UPDATE_MEDIA dispatch removed - LiveStore handles reactive updates
-  } catch (e: any) {
+  } catch (e: unknown) {
     logger.error(`Failed to track song play for ${action.songId}:`, e);
   }
 }

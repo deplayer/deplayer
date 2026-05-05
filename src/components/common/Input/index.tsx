@@ -1,7 +1,9 @@
+import React from 'react'
+
 type Props = {
   type: 'text',
   value: string,
-  onChange: (event: any) => void,
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
   placeholder?: string,
   className?: string
 }

@@ -47,9 +47,9 @@ function* performSingleProviderSearch(
         yield call([batchedMediaCommitter, 'add'], searchResults);
       }
     }
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error(`[Search Saga] Error searching provider ${provider}:`, e);
-    yield put({ type: types.SEARCH_REJECTED, message: e.message });
+    yield put({ type: types.SEARCH_REJECTED, message: e instanceof Error ? e.message : String(e) });
   }
 }
 

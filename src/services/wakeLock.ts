@@ -22,9 +22,8 @@ class WakeLock {
 
   async requestWakeLock() {
     try {
-      // @ts-ignore
       this.wakeLock = await navigator.wakeLock.request("screen");
-      
+
       this.wakeLock.addEventListener("release", () => {
         logger.info("Wake Lock was released");
         this.wakeLock = null;
@@ -39,11 +38,11 @@ class WakeLock {
       this.visibilityChangeHandler = async () => {
         if (document.visibilityState === "visible" && !this.wakeLock) {
           try {
-            // @ts-ignore
             this.wakeLock = await navigator.wakeLock.request("screen");
             logger.info("Wake Lock is active");
-          } catch (e: any) {
-            logger.error(`${e.name}, ${e.message}`);
+          } catch (e: unknown) {
+            const error = e instanceof Error ? e : new Error(String(e));
+            logger.error(`${error.name}, ${error.message}`);
           }
         }
       };

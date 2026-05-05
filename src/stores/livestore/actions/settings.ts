@@ -45,7 +45,7 @@ const loadSettingsFromLocalStorage = (): any | null => {
  */
 
 type LiveStore = {
-  commit: (event: any) => void
+  commit: (event: Record<string, unknown>) => void
   [key: string]: any
 }
 
