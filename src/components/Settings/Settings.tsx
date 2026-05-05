@@ -29,8 +29,9 @@ const Settings: React.FC = () => {
     dispatch({ type: types.EXPORT_COLLECTION })
   }
 
-  const importCollection = (data: string) => {
+  const importCollection = (data: string | ArrayBuffer | null) => {
     try {
+      if (typeof data !== 'string') return
       const collectionImport = JSON.parse(data) as CollectionData
       dispatch({ type: types.IMPORT_COLLECTION, data: collectionImport })
     } catch (error: unknown) {

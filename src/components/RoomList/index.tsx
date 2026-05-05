@@ -85,7 +85,7 @@ const RoomList = ({ peers, rooms, dispatch, onJoinRoom }: Props) => {
         <div>
           {peer.media && (
             <span className="text-sm opacity-70">
-              {peer.isPlaying ? '▶' : '⏸'} {peer.media.title} - {peer.media.artist.name}
+              {peer.isPlaying ? '▶' : '⏸'} {peer.media.title} - {peer.media.artistName}
             </span>
           )}
         </div>

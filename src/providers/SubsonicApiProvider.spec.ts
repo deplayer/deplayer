@@ -21,7 +21,7 @@ mock.onGet(/rest\/search/).reply(200, {
 )
 
 describe('SubsonicApiProvider', () => {
-  const mstreamRepo = new SubsonicApiProvider({ baseUrl: '' }, 'subsonic')
+  const mstreamRepo = new SubsonicApiProvider({ baseUrl: '', user: 'test', password: 'test' }, 'subsonic')
 
   it('should handle song search', async () => {
     expect.assertions(3)

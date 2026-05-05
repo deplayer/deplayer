@@ -41,7 +41,7 @@ describe("collection workers", () => {
 
   describe("removeFromDbWorker", () => {
     it("works", () => {
-      const action = { data: [] };
+      const action = { type: 'REMOVE_FROM_COLLECTION', data: [] as string[] };
       return expectSaga(removeFromDbWorker, action)
         .put({ type: types.REMOVE_FROM_COLLECTION_FULFILLED, data: [] })
         .run(100);

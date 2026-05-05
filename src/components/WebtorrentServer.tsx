@@ -154,7 +154,7 @@ function WebtorrentServer({
 
     try {
       if (videoRef.current) {
-        (file as unknown as { streamTo: (el: HTMLVideoElement) => { on: (event: string, cb: (err?: Error) => void) => unknown } }).streamTo(videoRef.current)
+        (file as unknown as { streamTo: (el: HTMLVideoElement) => { on: (event: string, cb: (err?: Error) => void) => ReturnType<typeof Object.create> } }).streamTo(videoRef.current)
           .on('ready', () => {
             console.log('Stream is ready')
             onReady?.()

@@ -21,7 +21,7 @@ const BecauseYouListened = ({ artistId, artistName, genres, limit = 15 }: Props)
       <MediaCover
         key={item.id}
         id={item.id}
-        name={item.title || item.name || 'Unknown'}
+        name={String(item.title || item.name || 'Unknown')}
         artistName={item.artistName}
         cover={item.cover || { thumbnailUrl: '', fullUrl: '' }}
         type="song"

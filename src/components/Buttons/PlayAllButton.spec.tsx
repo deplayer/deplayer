@@ -61,7 +61,7 @@ const renderComponent = (pathname: string) => {
   return render(
     <Provider store={store}>
       <MemoryRouter>
-        <PlayAllButton dispatch={store.dispatch} />
+        <PlayAllButton />
       </MemoryRouter>
     </Provider>
   )

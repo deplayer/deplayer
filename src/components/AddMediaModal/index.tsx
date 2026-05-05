@@ -102,7 +102,7 @@ const AddMediaModal = (props: Props) => {
                     return
                   }
                   console.log('parsedTorrent', parsedTorrent)
-                  const magnet = toMagnetURI(parsedTorrent)
+                  const magnet = toMagnetURI(parsedTorrent!)
                   props.dispatch({ type: types.ADD_WEBTORRENT_MEDIA, magnet: magnet })
                 })
               }
