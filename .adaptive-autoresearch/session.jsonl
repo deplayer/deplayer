@@ -1,0 +1,1 @@
+{"iteration":0,"type":"baseline","timestamp":"2026-05-05","metrics":{"typescript-any-count":371,"typescript-ts-ignore-count":2,"dangerous-innerhtml-count":1,"large-components":5,"unlabeled-icon-buttons":28,"bundle-size-js-kb":4663,"source-maps-in-prod":0,"unused-exports":35},"total_issues":442}

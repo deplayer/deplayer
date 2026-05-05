@@ -1,0 +1,64 @@
+created_at: 2026-05-05
+last_evaluated_at: 2026-05-05
+
+groups:
+  - name: type-safety-easy
+    domain: types
+    metric: typescript-any-count
+    source_skill: typescript-advanced-types
+    status: pending
+    description: "Fix easy any types: useSelector state, Dispatch, event handlers (31 issues)"
+    parallel: true
+    blocked_by: []
+
+  - name: type-safety-casts
+    domain: types
+    metric: typescript-any-count
+    source_skill: typescript-advanced-types
+    status: pending
+    description: "Fix as-any casts (46 issues)"
+    parallel: false
+    blocked_by: [type-safety-easy]
+
+  - name: type-safety-props
+    domain: types
+    metric: typescript-any-count
+    source_skill: typescript-advanced-types
+    status: pending
+    description: "Fix props typed as any (294 issues) - batch by module"
+    parallel: false
+    blocked_by: [type-safety-easy]
+
+  - name: accessibility
+    domain: accessibility
+    metric: unlabeled-icon-buttons
+    source_skill: addyosmani/web-quality-skills/accessibility
+    status: pending
+    description: "Add aria-labels to icon buttons (28 issues)"
+    parallel: true
+    blocked_by: []
+
+  - name: dead-code
+    domain: code-health
+    metric: unused-exports
+    source_skill: knip
+    status: pending
+    description: "Delete unused files identified by knip (35 files)"
+    parallel: true
+    blocked_by: []
+
+  - name: small-fixes
+    domain: code-health
+    metric: typescript-ts-ignore-count
+    source_skill: typescript-advanced-types
+    status: pending
+    description: "Fix ts-ignore (2), dangerouslySetInnerHTML (1)"
+    parallel: true
+    blocked_by: []
+
+execution:
+  parallel_waves:
+    - [type-safety-easy, accessibility, dead-code, small-fixes]
+    - [type-safety-casts, type-safety-props]
+  max_parallel_agents: 3
+  re_evaluate_after_groups: 2

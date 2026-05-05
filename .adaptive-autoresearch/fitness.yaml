@@ -1,0 +1,89 @@
+project:
+  name: deplayer
+  type: frontend
+  stack: React 19, Vite, Tailwind, Redux, LiveStore, TypeScript
+  detected_at: 2026-05-05
+
+sources:
+  - skill: "addyosmani/web-quality-skills/performance"
+    installs: 11300
+    contributed: [bundle_size_js, source_maps_in_prod, tree_shaking_violations]
+  - skill: "addyosmani/web-quality-skills/accessibility"
+    installs: 20500
+    contributed: [unlabeled_icon_buttons, missing_keyboard_handlers, aria_issues]
+  - skill: "agent-knowledge/typescript"
+    installs: 0
+    contributed: [typescript_any_count, typescript_strict_violations, unused_imports]
+  - skill: "agent-knowledge/react"
+    installs: 0
+    contributed: [dangerous_innerhtml, large_components, missing_key_props]
+
+loop:
+  budget_seconds: 300
+  max_iterations: 50
+  max_no_improvement: 10
+
+metrics:
+  # TypeScript quality
+  - name: typescript-any-count
+    source: typescript-advanced-types
+    script: .adaptive-autoresearch/metrics/metric-typescript-any-count.sh
+    target: 0
+    direction: lower
+
+  - name: typescript-ts-ignore-count
+    source: typescript-advanced-types
+    script: .adaptive-autoresearch/metrics/metric-typescript-ts-ignore-count.sh
+    target: 0
+    direction: lower
+
+  # React quality
+  - name: dangerous-innerhtml-count
+    source: react-best-practices
+    script: .adaptive-autoresearch/metrics/metric-dangerous-innerhtml-count.sh
+    target: 0
+    direction: lower
+
+  - name: large-components
+    source: react-best-practices
+    script: .adaptive-autoresearch/metrics/metric-large-components.sh
+    target: 0
+    direction: lower
+
+  # Accessibility
+  - name: unlabeled-icon-buttons
+    source: addyosmani/web-quality-skills/accessibility
+    script: .adaptive-autoresearch/metrics/metric-unlabeled-icon-buttons.sh
+    target: 0
+    direction: lower
+
+  # Performance / Build
+  - name: bundle-size-js-kb
+    source: addyosmani/web-quality-skills/performance
+    script: .adaptive-autoresearch/metrics/metric-bundle-size-js-kb.sh
+    target: 5000
+    direction: lower
+
+  - name: source-maps-in-prod
+    source: addyosmani/web-quality-skills/performance
+    script: .adaptive-autoresearch/metrics/metric-source-maps-in-prod.sh
+    target: 0
+    direction: lower
+
+  # Code health
+  - name: unused-exports
+    source: knip
+    script: .adaptive-autoresearch/metrics/metric-unused-exports.sh
+    target: 0
+    direction: lower
+
+constraints:
+  - name: build_succeeds
+    command: "npm run build"
+  - name: tests_pass
+    command: "npm run test"
+
+guardrails:
+  - "Changes must not remove user-facing functionality"
+  - "Metric improvement must not game checks"
+  - "Component refactoring must preserve visual output"
