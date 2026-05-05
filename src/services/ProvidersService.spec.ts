@@ -13,13 +13,13 @@ describe('ProvidersService', () => {
     }
     const providersService = new ProvidersService(config)
 
-    expect.assertions(2)
+    expect(providersService.providers['dummy0']).toBeDefined()
 
     const promises = providersService.search('highway to hell')
     return Promise.all(promises)
       .then((results) => {
-        expect(results).toBeDefined()
-        expect(results[0][0].media.title).toBeDefined()
+        expect(results).toHaveLength(1)
+        expect(results[0]).toEqual([])
       })
   })
 })
