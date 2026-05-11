@@ -238,19 +238,11 @@ class PlayerControls extends React.Component<Props, State> {
       this.props.dispatch({ type: types.CLEAR_PLAYER_ERRORS })
     }
 
-    // Update local state with progress information
     this.setState({
       played: state.played,
       loaded: state.loaded,
       playedSeconds: state.playedSeconds,
       loadedSeconds: state.loadedSeconds
-    }, () => {
-      console.log('Progress state updated:', {
-        played: this.state.played,
-        loaded: this.state.loaded,
-        playedSeconds: this.state.playedSeconds,
-        loadedSeconds: this.state.loadedSeconds
-      });
     });
   }
 

@@ -85,6 +85,7 @@ export const queueEvents = {
     schema: Schema.Struct({
       queueId: Schema.String,
       position: Schema.Number,
+      trackId: Schema.optional(Schema.String),
     }),
   }),
 }

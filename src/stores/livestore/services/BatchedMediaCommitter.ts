@@ -111,8 +111,23 @@ class BatchedMediaCommitter {
       if ('scheduler' in window && 'yield' in (window as unknown as { scheduler: { yield: () => Promise<void> } }).scheduler) {
         (window as unknown as { scheduler: { yield: () => Promise<void> } }).scheduler.yield().then(resolve)
       } else {
-        // Use rAF to yield at frame boundary (better for animations)
         requestAnimationFrame(() => resolve())
+      }
+    })
+  }
+
+  /**
+   * Wait until the browser is idle before proceeding.
+   * This ensures expensive reactive refreshes don't block user interactions.
+   * Falls back to a 100ms delay if requestIdleCallback is unavailable.
+   */
+  private waitForIdle(): Promise<void> {
+    return new Promise(resolve => {
+      if ('requestIdleCallback' in window) {
+        (window as unknown as { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => void })
+          .requestIdleCallback(() => resolve(), { timeout: 2000 })
+      } else {
+        setTimeout(resolve, 100)
       }
     })
   }
@@ -198,12 +213,16 @@ class BatchedMediaCommitter {
         chunkIndex++
       }
 
-      // Trigger a single refresh after all data is committed.
-      await this.yieldToMain()
+      // Trigger reactive refresh only when the browser is idle.
+      // This prevents the expensive O(N) query re-execution from blocking
+      // scroll/animations when the collection is open with thousands of items.
+      //
+      // manualRefresh is a LiveStore client-side API: it re-runs subscribed
+      // queries without appending a no-op event to the log (previous impl
+      // committed mediaBulkAdded({ media: [] }) just to force this).
+      await this.waitForIdle()
       profiler.start('final-refresh')
-      await this.store.commit(
-        mediaEvents.mediaBulkAdded({ media: [] })
-      )
+      this.store.manualRefresh({ label: 'BatchedMediaCommitter.flush' })
       profiler.end('final-refresh')
 
       profiler.mark('flush-end')

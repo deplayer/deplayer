@@ -8,6 +8,7 @@ import CoverImage from './../CoverImage'
 import type { MediaRow, Cover } from '../../../types/media'
 import Tag from '../../common/Tag'
 import ServiceIcon from '../../ServiceIcon'
+import Icon from '../../common/Icon'
 import { State as QueueState } from '../../../reducers/queue'
 
 const ContextualMenu = React.lazy(() => import('./../ContextualMenu'))
@@ -15,7 +16,6 @@ const ContextualMenu = React.lazy(() => import('./../ContextualMenu'))
 // Lightweight trigger that only mounts the heavy ContextualMenu on demand
 const LazyContextualMenuTrigger = (props: Props) => {
   const [opened, setOpened] = React.useState(false)
-  const Icon = React.lazy(() => import('../../common/Icon'))
 
   if (!opened) {
     return (
@@ -26,9 +26,7 @@ const LazyContextualMenuTrigger = (props: Props) => {
         aria-label="Open context menu"
         className='cursor-pointer p-2 menu-trigger focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset rounded'
       >
-        <React.Suspense fallback={<span>⋮</span>}>
-          <Icon icon='faEllipsisV' className='text-blue-400' />
-        </React.Suspense>
+        <Icon icon='faEllipsisV' className='text-blue-400' />
       </div>
     )
   }

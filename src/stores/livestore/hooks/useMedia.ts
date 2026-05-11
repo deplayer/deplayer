@@ -7,6 +7,11 @@ import { useFavoriteIds } from './useFavorites'
 
 import type { MediaRow } from '../../../types/media'
 
+// No-op query for idle hook states. Targets sync_state because it mutates
+// rarely (during initial hydration only) — picking media or playback_history
+// would re-invalidate every idle subscriber on common writes.
+const NOOP_QUERY = queryDb(tables.syncState.select('id').where('id', '=', '__NONE__'))
+
 /** Transformed media extends MediaRow with nested artist/album objects */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface TransformedMedia extends MediaRow {
@@ -297,15 +302,12 @@ export const useSearchMedia = (searchTerm: string | undefined | null, limit = 10
  */
 export const useSearchMediaIds = (searchTerm: string | undefined | null, limit = 100) => {
   const store = useAppStore()
-  // Normalize search term - ensure it's always a valid string
   const term = (searchTerm ?? '').trim()
   const hasSearch = term.length > 0
-  
-  // Use useMemo to create stable query objects
-  // This prevents LiveStore from re-parsing identical queries on every render
+
   const titleQuery = useMemo(() => {
     if (!hasSearch || !term) {
-      return queryDb(tables.media.select('id').where('id', '=', '__NONE__'))
+      return NOOP_QUERY
     }
     return queryDb(
       tables.media
@@ -314,10 +316,10 @@ export const useSearchMediaIds = (searchTerm: string | undefined | null, limit =
         .limit(limit)
     )
   }, [hasSearch, term, limit])
-  
+
   const artistQuery = useMemo(() => {
     if (!hasSearch || !term) {
-      return queryDb(tables.media.select('id').where('id', '=', '__NONE__'))
+      return NOOP_QUERY
     }
     return queryDb(
       tables.media
@@ -370,31 +372,44 @@ export const useSearchMediaIds = (searchTerm: string | undefined | null, limit =
 }
 
 /**
- * Get recently played media (sorted by updatedAt, which is updated on play)
- * 
- * @param limit - Number of items to return (default 20)
- * 
- * @example
- * ```tsx
- * const recent = useRecentlyPlayed(10)
- * return <div>Last 10 played tracks</div>
- * ```
+ * Get recently played media from the playback_history table.
+ *
+ * Uses a separate table so that playing a track doesn't invalidate
+ * all media-table reactive queries (which caused O(4K) re-renders).
  */
 export const useRecentlyPlayed = (limit = 20) => {
   const store = useAppStore()
-  const rawMedia = store.useQuery(
+
+  const recentIds = store.useQuery(
     queryDb(
-      tables.media
-        .select()
-        .orderBy('updatedAt', 'desc')
+      tables.playbackHistory
+        .select('mediaId')
+        .orderBy('playedAt', 'desc')
         .limit(limit)
     )
   )
-  
+
+  const mediaIds = useMemo(() => {
+    if (!Array.isArray(recentIds)) return []
+    const seen = new Set<string>()
+    const ids: string[] = []
+    for (const row of recentIds) {
+      const id = (row as { mediaId: string }).mediaId
+      if (!seen.has(id)) {
+        seen.add(id)
+        ids.push(id)
+      }
+    }
+    return ids
+  }, [recentIds])
+
+  const mediaMap = useMediaMapForIds(mediaIds)
+
   return useMemo(() => {
-    if (!Array.isArray(rawMedia)) return []
-    return rawMedia.map(transformMediaFromLiveStore)
-  }, [rawMedia])
+    return mediaIds
+      .map(id => mediaMap[id])
+      .filter(Boolean) as TransformedMedia[]
+  }, [mediaIds, mediaMap])
 }
 
 /**
@@ -632,10 +647,9 @@ export const useMediaMapForIds = (ids: string[]) => {
   // Only query if we have valid IDs
   const shouldQuery = validIds.length > 0
   
-  // Use useMemo for stable query object
   const query = useMemo(() => {
     if (!shouldQuery) {
-      return queryDb(tables.media.select().where('id', '=', '__NONE__'))
+      return NOOP_QUERY
     }
     return queryDb(
       tables.media

@@ -237,11 +237,11 @@ const MusicTable = ({
   slim 
 }: Props) => {
   
-  // Only fetch queue as fallback if not provided (for backwards compatibility)
-  // Using conditional to avoid hook rules violation
-  const shouldFetchQueue = !queueProp
-  const liveQueueFallback = useQueue(shouldFetchQueue ? 'default' : undefined)
-  const liveQueue = queueProp ?? liveQueueFallback
+  // ContextualMenu reads queue.trackIds / queue.currentPlaying, so the real row
+  // must be available. We always subscribe; queueProp (if supplied) wins to let
+  // parents share an existing subscription.
+  const liveQueueFetched = useQueue('default')
+  const liveQueue = queueProp ?? liveQueueFetched
   
   // Get data from LiveStore hooks
   const currentSongId = useCurrentPlayingSongId('default')
@@ -278,6 +278,8 @@ const MusicTable = ({
   mediaMapRef.current = mediaMap
   const favoriteIdsRef = React.useRef(favoriteIds)
   favoriteIdsRef.current = favoriteIds
+  const liveQueueRef = React.useRef(liveQueue)
+  liveQueueRef.current = liveQueue
 
   const rowRenderer = React.useCallback(({
     index,       // Index of row
@@ -290,7 +292,7 @@ const MusicTable = ({
     const isCurrent = songId === currentSongIdRef.current
 
     const currentMediaMap = mediaMapRef.current
-    const currentQueue = liveQueue
+    const currentQueue = liveQueueRef.current
     const sharedProps = {
       key,
       songId,

@@ -1,5 +1,5 @@
 // Binding actions to sagas
-import { takeLatest, fork, call, put, delay } from "redux-saga/effects";
+import { takeLatest, fork, call, put, delay, take } from "redux-saga/effects";
 import * as types from "../../constants/ActionTypes";
 import { addToCollectionWatcher, initializeWatcher } from "./watchers";
 import { NormalizedMedia } from "../../utils/normalizeMedia";
@@ -74,8 +74,10 @@ function* progressiveHydration(
 ): Generator<any, void, any> {
   const BATCH_SIZE = 50;
   const MAX_BATCHES_PER_SESSION = 10;
+  const BATCHES_PER_REFRESH = 5;
   let cursor = syncState?.initialSyncCursor || 0;
   let batchesProcessed = 0;
+  let batchesSinceRefresh = 0;
 
   batchedMediaCommitter.setStore(liveStore);
 
@@ -88,13 +90,14 @@ function* progressiveHydration(
 
     if (batch.media.length > 0) {
       yield call([batchedMediaCommitter, "add"], batch.media);
-      yield call([batchedMediaCommitter, "flush"]);
+      batchesSinceRefresh++;
     }
 
     cursor += BATCH_SIZE;
     batchesProcessed++;
 
     if (!batch.hasMore) {
+      yield call([batchedMediaCommitter, "flush"]);
       yield call(updateSyncState, liveStore, {
         lastSyncTimestamp: scanStatus.lastScan,
         lastKnownCount: scanStatus.count,
@@ -105,14 +108,24 @@ function* progressiveHydration(
       return;
     }
 
+    // Only flush every N batches to reduce reactive cascades
+    if (batchesSinceRefresh >= BATCHES_PER_REFRESH) {
+      yield call([batchedMediaCommitter, "flush"]);
+      batchesSinceRefresh = 0;
+      yield delay(500);
+    }
+
     yield call(updateSyncState, liveStore, {
       lastSyncTimestamp: scanStatus.lastScan,
       lastKnownCount: scanStatus.count,
       initialSyncCursor: cursor,
       initialSyncComplete: false,
     });
+  }
 
-    yield delay(100);
+  // Flush any remaining items
+  if (batchesSinceRefresh > 0) {
+    yield call([batchedMediaCommitter, "flush"]);
   }
 
   logger.debug(`Hydration paused at cursor ${cursor}, will resume next session`);
@@ -226,13 +239,22 @@ function* periodicSyncPoll(): Generator<any, void, any> {
   }
 }
 
+function* deferredSync(): Generator<any, void, any> {
+  // Wait for INITIALIZED, then give the UI ~5s to finish first paint and
+  // hydrate visible rows before kicking off the heavy media library scan.
+  // Empirical — shorter delays cause visible jank on cold start.
+  yield take(types.INITIALIZED);
+  yield delay(5000);
+  yield call(syncMediaLibrary);
+}
+
 function* collectionSaga(): Generator<any, void, any> {
   yield takeLatest(types.REMOVE_FROM_COLLECTION, removeFromDbWorker);
   yield takeLatest(types.DELETE_COLLECTION, deleteCollectionWorker);
   yield takeLatest(types.EXPORT_COLLECTION, exportCollectionWorker);
   yield takeLatest(types.IMPORT_COLLECTION, importCollectionWorker);
   yield takeLatest(types.SONG_PLAYED, trackSongPlayed);
-  yield takeLatest(types.INITIALIZED, syncMediaLibrary);
+  yield fork(deferredSync);
   yield fork(periodicSyncPoll);
   yield fork(initializeWatcher);
   yield fork(addToCollectionWatcher);

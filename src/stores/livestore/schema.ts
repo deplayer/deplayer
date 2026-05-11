@@ -144,6 +144,7 @@ export const tables = {
       trackIds: State.SQLite.json({ default: [] }),
       randomTrackIds: State.SQLite.json({ default: [] }),
       currentPlaying: State.SQLite.integer({ nullable: true }),
+      currentTrackId: State.SQLite.text({ nullable: true }),
       shuffle: State.SQLite.boolean({ default: false }),
       repeat: State.SQLite.boolean({ default: false }),
       updatedAt: State.SQLite.integer({}),
@@ -197,6 +198,19 @@ export const tables = {
       filters: State.SQLite.json({}), // { genres: [], types: [], artists: [], providers: [] }
       createdAt: State.SQLite.integer({}),
     },
+  }),
+
+  // Playback history table (decoupled from media table to avoid reactive cascade)
+  playbackHistory: State.SQLite.table({
+    name: 'playback_history',
+    columns: {
+      id: State.SQLite.text({ primaryKey: true }),
+      mediaId: State.SQLite.text({}),
+      playedAt: State.SQLite.integer({}),
+    },
+    indexes: [
+      { name: 'idx_playback_history_played_at', columns: ['playedAt'] },
+    ],
   }),
 
   // Sync State table (tracks incremental sync progress)
@@ -354,14 +368,14 @@ const materializers = State.SQLite.materializers(events, {
   },
 
   'v1.MediaPlayed': ({ id }: { id: string }) => {
-    // Note: PlayCount is tracked in the application layer, and when significant,
-    // a MediaUpdated event with the new playCount value should be dispatched.
-    // This event only updates the timestamp to track when the media was played.
-    // Alternative approach: Dispatch MediaUpdated({ id, playCount: currentPlayCount + 1 })
-    // from the application layer after reading current value.
-    return tables.media
-      .update({ updatedAt: Date.now() })
-      .where('id', '=', id)
+    // Write to a separate table to avoid invalidating all media-table reactive queries.
+    // Previously this updated media.updatedAt, which caused a full reactive cascade
+    // across all 49+ hooks subscribed to the media table (O(4K) re-renders per play event).
+    const now = Date.now()
+    // Suffix random component to avoid PK collisions on rapid successive plays (same ms).
+    const rowId = `${id}-${now}-${Math.random().toString(36).slice(2, 8)}`
+    return tables.playbackHistory
+      .insert({ id: rowId, mediaId: id, playedAt: now })
   },
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -557,12 +571,17 @@ const materializers = State.SQLite.materializers(events, {
   // Queue materializers
   'v1.QueueUpdated': ({ id, trackIds, randomTrackIds, currentPlaying, shuffle, repeat }: { readonly id: string; readonly trackIds: readonly string[]; readonly randomTrackIds?: readonly string[]; readonly currentPlaying?: number; readonly shuffle: boolean; readonly repeat: boolean }) => {
     const now = Date.now()
+    const activeIds = shuffle ? (randomTrackIds ?? trackIds) : trackIds
+    const currentTrackId = (currentPlaying != null && currentPlaying < activeIds.length)
+      ? activeIds[currentPlaying]
+      : null
     return tables.queue
       .insert({
         id,
         trackIds,
         randomTrackIds: randomTrackIds ?? [],
         currentPlaying: currentPlaying ?? null,
+        currentTrackId,
         shuffle,
         repeat,
         updatedAt: now,
@@ -571,6 +590,7 @@ const materializers = State.SQLite.materializers(events, {
         trackIds,
         randomTrackIds: randomTrackIds ?? [],
         currentPlaying: currentPlaying ?? null,
+        currentTrackId,
         shuffle,
         repeat,
         updatedAt: now,
@@ -606,6 +626,7 @@ const materializers = State.SQLite.materializers(events, {
         trackIds: [],
         randomTrackIds: [],
         currentPlaying: null,
+        currentTrackId: null,
         updatedAt: now,
       })
       .where('id', '=', queueId)
@@ -625,10 +646,12 @@ const materializers = State.SQLite.materializers(events, {
       .where('id', '=', queueId)
   },
 
-  'v1.QueuePositionChanged': ({ queueId, position }: { queueId: string; position: number }) => {
+  'v1.QueuePositionChanged': ({ queueId, position, trackId }: { queueId: string; position: number; trackId?: string }) => {
     const now = Date.now()
+    const updates: Record<string, unknown> = { currentPlaying: position, updatedAt: now }
+    if (trackId !== undefined) updates.currentTrackId = trackId
     return tables.queue
-      .update({ currentPlaying: position, updatedAt: now })
+      .update(updates)
       .where('id', '=', queueId)
   },
 

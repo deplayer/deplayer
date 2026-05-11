@@ -76,10 +76,15 @@ export const useCollectionData = () => {
   const favoriteIdsArray = useMemo(() => Array.from(favoriteIds), [favoriteIds])
   
   // Build optimized SQL query based on active filters
-  // This runs at database level for maximum performance
+  // Only select columns needed by SongRow + filtering — skip expensive JSON blobs
+  // that aren't rendered (genres, externalId, shareUrl, filePath, playCount, etc.)
   const query = useMemo(() => {
-    let baseQuery = tables.media.select()
-    
+    let baseQuery = tables.media.select(
+      'id', 'title', 'track', 'artistId', 'artistName',
+      'albumId', 'albumName', 'duration', 'cover', 'stream',
+      'type', 'genresFlat', 'providersFlat'
+    )
+
     // Apply filters using SQL WHERE clauses
     const hasArtists = filters.artists.length > 0
     const hasTypes = filters.types.length > 0
@@ -112,33 +117,28 @@ export const useCollectionData = () => {
   const rawMedia = store.useQuery(
     queryDb(query)
   )
-  
-  // Transform and filter in-memory (fast for typical collection sizes)
+
   return useMemo(() => {
     const ids: string[] = []
     const map: Record<string, TransformedMedia> = {}
-    
+
     if (!Array.isArray(rawMedia)) {
       return { ids, map }
     }
-    
-    // Apply client-side filters that can't be done in SQL
+
     const filtered = rawMedia.filter((item: { genresFlat?: string; providersFlat?: string; title?: string; artistName?: string; albumName?: string }) => {
-      // Genres filter (JSON array, requires client-side check)
       if (filters.genres.length > 0) {
         const itemGenres = item.genresFlat ? item.genresFlat.split(',') : []
         const hasMatchingGenre = filters.genres.some((g: string) => itemGenres.includes(g))
         if (!hasMatchingGenre) return false
       }
 
-      // Providers filter (JSON object, requires client-side check)
       if (filters.providers.length > 0) {
         const itemProviders = item.providersFlat ? item.providersFlat.split(',') : []
         const hasMatchingProvider = filters.providers.some((p: string) => itemProviders.includes(p))
         if (!hasMatchingProvider) return false
       }
 
-      // Search term filter (client-side for now, could be moved to SQL with FTS)
       if (searchTerm && searchTerm.length >= 3) {
         const lowerSearch = searchTerm.toLowerCase()
         const matchesTitle = item.title?.toLowerCase().includes(lowerSearch)
@@ -150,7 +150,6 @@ export const useCollectionData = () => {
       return true
     })
 
-    // Build IDs array and map
     filtered.forEach((item) => {
       const media = transformMediaFromLiveStore(item)
       if (media) {
@@ -158,7 +157,7 @@ export const useCollectionData = () => {
         map[media.id] = media
       }
     })
-    
+
     return { ids, map }
   }, [rawMedia, filters.genres, filters.providers, searchTerm])
 }

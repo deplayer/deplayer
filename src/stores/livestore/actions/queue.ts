@@ -387,6 +387,7 @@ export async function playNextAction(
     await store.commit(queueEvents.queuePositionChanged({
       queueId,
       position: newPosition,
+      trackId: trackIds[newPosition],
     }))
   }
 }
@@ -394,7 +395,7 @@ export async function playNextAction(
 /**
  * Play previous song in queue
  * Decrements currentPlaying index or loops if repeat is on
- * 
+ *
  * @param store - LiveStore instance
  * @param queueId - Queue ID (default: 'default')
  */
@@ -428,6 +429,7 @@ export async function playPreviousAction(
   await store.commit(queueEvents.queuePositionChanged({
     queueId,
     position: newPosition,
+    trackId: trackIds[newPosition],
   }))
 }
 
@@ -463,5 +465,6 @@ export async function playMediaAction(
   await store.commit(queueEvents.queuePositionChanged({
     queueId,
     position: index,
+    trackId: mediaId,
   }))
 }

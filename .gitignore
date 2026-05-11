@@ -26,6 +26,11 @@ dist-ssr
 
 .vitest/cache
 
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+
 # Added by Claude Task Master
 dev-debug.log
 # Dependency directories

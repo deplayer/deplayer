@@ -1,7 +1,7 @@
 import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
-import { resolveCurrentSongId, resolveQueueNavigation } from './queueUtils'
+import { resolveQueueNavigation } from './queueUtils'
 
 /**
  * Queue Query Hooks
@@ -98,24 +98,20 @@ export const useQueueTracks = (queueId = 'default') => {
  */
 export const useCurrentTrack = (queueId = 'default') => {
   const store = useAppStore()
-  const queue = useQueue(queueId)
-  
-  const currentTrackId = resolveCurrentSongId(queue)
-  
-  if (!currentTrackId) {
-    return null
-  }
-  
-  // Get the current track
+  // Read the authoritative currentTrackId column to stay aligned with
+  // useCurrentPlayingSongId — avoids split-brain between derived and stored value.
+  const currentTrackId = useCurrentPlayingSongId(queueId)
+
   const result = store.useQuery(
     queryDb(
       tables.media
         .select()
-        .where('id', '=', currentTrackId)
+        .where('id', '=', currentTrackId ?? '__NONE__')
         .limit(1)
     )
   )
-  
+
+  if (!currentTrackId) return null
   return (result as unknown as Record<string, unknown>[])[0] || null
 }
 
@@ -130,9 +126,17 @@ export const useCurrentTrack = (queueId = 'default') => {
  * ```
  */
 export const useCurrentPlayingSongId = (queueId = 'default'): string | null => {
-  const queue = useQueue(queueId)
-  
-  return resolveCurrentSongId(queue)
+  const store = useAppStore()
+  const result = store.useQuery(
+    queryDb(
+      tables.queue
+        .select('currentTrackId')
+        .where('id', '=', queueId)
+        .limit(1)
+    )
+  )
+  const row = (result as unknown as Array<{ currentTrackId: string | null }>)?.[0]
+  return row?.currentTrackId ?? null
 }
 
 /**
