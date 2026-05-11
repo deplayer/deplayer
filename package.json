@@ -133,6 +133,9 @@
     "workbox-window": "^7.1.0"
   },
   "overrides": {
-    "node-datachannel": "file:./scripts/node-datachannel-stub"
+    "node-datachannel": "file:./scripts/node-datachannel-stub",
+    "react-redux-i18n": {
+      "react": "$react"
+    }
   }
 }

@@ -3,7 +3,6 @@ import { configureStore as confStore } from "@reduxjs/toolkit";
 import { combineReducers } from "redux";
 import createSagaMiddleware from "redux-saga";
 import { createBrowserHistory } from "history";
-import { thunk } from "redux-thunk";
 import promise from "redux-promise";
 import perflogger from "redux-perf-middleware";
 import { createReduxHistoryContext } from "redux-first-history";
@@ -54,7 +53,6 @@ function configureStore() {
   const middlewares = [
     ...testingMiddlewares,
     promise,
-    thunk,
     alerts,
     livestoreMiddleware, // NEW: LiveStore sync middleware
     uiSyncMiddleware, // Syncs Redux app actions → Zustand UI store
