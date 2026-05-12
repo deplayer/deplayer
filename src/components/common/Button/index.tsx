@@ -18,7 +18,8 @@ type Props = {
   type?: 'submit' | 'button',
   roundedFull?: boolean,
   className?: string,
-  'data-testid'?: string
+  'data-testid'?: string,
+  'aria-label'?: string
 }
 
 const Button = (props: Props) => {
@@ -102,6 +103,7 @@ const Button = (props: Props) => {
       title={props.title}
       onClick={props.onClick}
       data-testid={props['data-testid']}
+      aria-label={props['aria-label']}
     >
       <span className={`inline-flex items-center gap-2 truncate${props.fullWidth ? ' w-full' : ''}`}>
         {props.children}

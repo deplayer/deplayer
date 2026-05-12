@@ -17,6 +17,7 @@ type Props = {
   isSmartPlaylist: boolean
   chips?: FilterChip[]
   onPlayAll: () => void
+  onShuffle: () => void
   onShowSongs: () => void
   onAddToQueue: () => void
   onApplyFilters: () => void
@@ -41,6 +42,7 @@ const PlaylistCard = memo(({
   isSmartPlaylist,
   chips,
   onPlayAll,
+  onShuffle,
   onShowSongs,
   onAddToQueue,
   onApplyFilters,
@@ -111,6 +113,14 @@ const PlaylistCard = memo(({
           <Button onClick={onPlayAll} className="flex-1 btn-primary">
             <Icon icon="faPlay" className="mr-2" />
             <Translate value="buttons.playAll" />
+          </Button>
+
+          <Button
+            onClick={onShuffle}
+            className="btn-ghost px-3"
+            aria-label="Shuffle"
+          >
+            <Icon icon="faRandom" />
           </Button>
 
           <div className="dropdown dropdown-end">

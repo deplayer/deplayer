@@ -175,7 +175,7 @@ describe('Playlist', () => {
     )
 
     // Open dropdown menu
-    fireEvent.click(screen.getByRole('button', { name: '' })) // Ellipsis button
+    fireEvent.click(screen.getByRole('button', { name: 'Playlist options' }))
     fireEvent.click(screen.getByText('buttons.addToQueue'))
 
     await waitFor(() => {
@@ -201,7 +201,7 @@ describe('Playlist', () => {
     )
 
     // Open dropdown menu
-    fireEvent.click(screen.getByRole('button', { name: '' })) // Ellipsis button
+    fireEvent.click(screen.getByRole('button', { name: 'Playlist options' }))
     fireEvent.click(screen.getByText('buttons.addToQueue'))
 
     // With empty trackIds, handler returns early - action should not be called
@@ -230,7 +230,7 @@ describe('Playlist', () => {
     )
 
     // Open dropdown menu
-    fireEvent.click(screen.getByRole('button', { name: '' })) // Ellipsis button
+    fireEvent.click(screen.getByRole('button', { name: 'Playlist options' }))
     fireEvent.click(screen.getByText('buttons.addToQueue'))
 
     // useFilteredMedia returns [] so effectiveTrackIds is empty, handler returns early
@@ -245,7 +245,7 @@ describe('Playlist', () => {
     )
 
     // Open dropdown menu
-    fireEvent.click(screen.getByRole('button', { name: '' })) // Ellipsis button
+    fireEvent.click(screen.getByRole('button', { name: 'Playlist options' }))
     expect(screen.queryByText('buttons.delete')).not.toBeInTheDocument()
 
     rerender(
@@ -255,7 +255,7 @@ describe('Playlist', () => {
     )
 
     // Open dropdown menu
-    fireEvent.click(screen.getByRole('button', { name: '' })) // Ellipsis button
+    fireEvent.click(screen.getByRole('button', { name: 'Playlist options' }))
     expect(screen.getByText('buttons.delete')).toBeInTheDocument()
   })
 

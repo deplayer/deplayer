@@ -58,6 +58,12 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
     dispatch({ type: types.PLAY_LIST, trackIds: effectiveTrackIds })
   }, [effectiveTrackIds, dispatch])
 
+  const handleShuffle = useCallback(() => {
+    if (effectiveTrackIds.length === 0) return
+    dispatch({ type: types.PLAY_LIST, trackIds: effectiveTrackIds })
+    dispatch({ type: types.SHUFFLE })
+  }, [effectiveTrackIds, dispatch])
+
   const handleAddToQueue = useCallback(async () => {
     if (!liveStore || effectiveTrackIds.length === 0) return
     try {
@@ -140,6 +146,7 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
         isSmartPlaylist={isSmartPlaylist}
         chips={chips}
         onPlayAll={handlePlayAll}
+        onShuffle={handleShuffle}
         onShowSongs={() => setShowSongs(true)}
         onAddToQueue={handleAddToQueue}
         onApplyFilters={handleApplyFilters}
