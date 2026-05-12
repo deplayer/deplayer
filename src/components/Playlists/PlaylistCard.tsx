@@ -3,6 +3,11 @@ import { Translate } from 'react-redux-i18n'
 import Icon from '../common/Icon'
 import Button from '../common/Button'
 
+export type FilterChip = {
+  labelKey: string // e.g. "filters.genre"
+  value: string
+}
+
 type Props = {
   name: string
   trackCount: number
@@ -10,6 +15,7 @@ type Props = {
   duration: number
   firstCover: string | undefined
   isSmartPlaylist: boolean
+  chips?: FilterChip[]
   onPlayAll: () => void
   onShowSongs: () => void
   onAddToQueue: () => void
@@ -33,6 +39,7 @@ const PlaylistCard = memo(({
   duration,
   firstCover,
   isSmartPlaylist,
+  chips,
   onPlayAll,
   onShowSongs,
   onAddToQueue,
@@ -83,6 +90,21 @@ const PlaylistCard = memo(({
           </div>
         )}
       </div>
+
+      {chips && chips.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-2">
+          {chips.map((chip, idx) => (
+            <span
+              key={`${chip.labelKey}-${chip.value}-${idx}`}
+              className="badge badge-outline badge-sm gap-1"
+            >
+              <Translate value={chip.labelKey} />
+              <span className="opacity-70">·</span>
+              <span className="truncate max-w-[8rem]">{chip.value}</span>
+            </span>
+          ))}
+        </div>
+      )}
 
       <div className="card-actions flex-wrap justify-end mt-4 gap-2">
         <div className="flex w-full gap-2">

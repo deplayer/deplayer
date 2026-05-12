@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo, memo } from 'react'
 import { AutoSizer, List } from 'react-virtualized'
 import Modal from '../common/Modal'
 import SongRow from '../MusicTable/SongRow'
-import PlaylistCard from './PlaylistCard'
+import PlaylistCard, { type FilterChip } from './PlaylistCard'
 import { usePlaylistStats } from './usePlaylistStats'
 import * as types from '../../constants/ActionTypes'
 
@@ -110,6 +110,25 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
 
   const displayName = playlist.name || (playlist.filters?.genres?.[0] || 'Untitled Playlist')
 
+  const chips: FilterChip[] | undefined = useMemo(() => {
+    if (!isSmartPlaylist || !playlist.filters) return undefined
+    const out: FilterChip[] = []
+    const f = playlist.filters
+    const pairs: Array<[string[] | undefined, string]> = [
+      [f.genres, 'filters.genre'],
+      [f.artists, 'filters.artist'],
+      [f.types, 'filters.type'],
+      [f.providers, 'filters.provider'],
+    ]
+    for (const [values, labelKey] of pairs) {
+      values?.forEach(v => out.push({ labelKey, value: v }))
+    }
+    if (f.favorites?.[0] === 'true') {
+      out.push({ labelKey: 'filters.favorites', value: '★' })
+    }
+    return out.slice(0, 3) // cap to keep cards compact
+  }, [isSmartPlaylist, playlist.filters])
+
   return (
     <>
       <PlaylistCard
@@ -119,6 +138,7 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
         duration={stats.duration}
         firstCover={stats.firstCover}
         isSmartPlaylist={isSmartPlaylist}
+        chips={chips}
         onPlayAll={handlePlayAll}
         onShowSongs={() => setShowSongs(true)}
         onAddToQueue={handleAddToQueue}

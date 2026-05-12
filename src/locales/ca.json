@@ -1,4 +1,11 @@
 {
+  "filters": {
+    "genre": "Gènere",
+    "artist": "Artista",
+    "type": "Tipus",
+    "provider": "Proveïdor",
+    "favorites": "Preferits"
+  },
   "menu": {
     "home": "Inici",
     "search": "Cerca",

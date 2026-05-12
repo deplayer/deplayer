@@ -1,4 +1,11 @@
 {
+  "filters": {
+    "genre": "Genre",
+    "artist": "Artist",
+    "type": "Type",
+    "provider": "Provider",
+    "favorites": "Favorites"
+  },
   "menu": {
     "home": "Home",
     "search": "Search",

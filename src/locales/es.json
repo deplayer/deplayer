@@ -1,4 +1,11 @@
 {
+  "filters": {
+    "genre": "Género",
+    "artist": "Artista",
+    "type": "Tipo",
+    "provider": "Proveedor",
+    "favorites": "Favoritos"
+  },
   "menu": {
     "home": "Inicio",
     "search": "Buscar",
