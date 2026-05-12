@@ -5,12 +5,13 @@ import Icon, { IconType } from '../common/Icon'
 type Props = {
   title?: string
   icon?: IconType
+  actions?: React.ReactNode
   children: React.ReactNode
 }
 
 const CARD_SCROLL_STEP = 272 // w-64 card + gap-4
 
-const PlaylistRow = memo(({ title, icon, children }: Props) => {
+const PlaylistRow = memo(({ title, icon, actions, children }: Props) => {
   const scrollerRef = useRef<HTMLDivElement>(null)
 
   const scrollBy = useCallback((delta: number) => {
@@ -35,7 +36,8 @@ const PlaylistRow = memo(({ title, icon, children }: Props) => {
             {icon && <Icon icon={icon} />}
             <Translate value={title} />
           </h2>
-          <div className="flex gap-1">
+          <div className="flex items-center gap-1">
+            {actions}
             <button
               type="button"
               className="btn btn-ghost btn-sm btn-circle"

@@ -1,10 +1,11 @@
 import Playlist from './Playlist'
 import PlaylistRow from './PlaylistRow'
+import PlaylistRowSortMenu, { type SortMode } from './PlaylistRowSortMenu'
 import FeaturedHero from './FeaturedHero'
 import GenreWall from './GenreWall'
 import { usePickFeatured } from './usePickFeatured'
 import EmptyState from '../common/EmptyState/index'
-import { memo, useMemo } from 'react'
+import { memo, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Dispatch } from 'redux'
 import { useMediaCount, useSongsByGenre, usePlaylists, useSmartPlaylists, useQueue, useSettings } from '../../stores/livestore/hooks'
@@ -20,16 +21,29 @@ type PlaylistType = {
   name?: string;
 }
 
+const sortPlaylists = (list: PlaylistType[], mode: SortMode): PlaylistType[] => {
+  if (mode === 'default') return list
+  const copy = [...list]
+  if (mode === 'alphabetical') {
+    copy.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+  } else if (mode === 'trackCount') {
+    copy.sort((a, b) => b.trackIds.length - a.trackIds.length)
+  }
+  return copy
+}
+
 const PlaylistRowSection = memo(({ title, icon, playlists, dispatch }: {
   title?: string,
   icon?: IconType,
   playlists: PlaylistType[],
   dispatch: Dispatch
 }) => {
-  if (!playlists.length) return null
+  const [sort, setSort] = useState<SortMode>('default')
+
+  const sorted = useMemo(() => sortPlaylists(playlists, sort), [playlists, sort])
 
   const items = useMemo(() =>
-    playlists.map((playlist) => (
+    sorted.map((playlist) => (
       <div
         key={playlist.id || playlist._id}
         className="snap-start shrink-0 w-64"
@@ -37,10 +51,16 @@ const PlaylistRowSection = memo(({ title, icon, playlists, dispatch }: {
         <Playlist dispatch={dispatch} playlist={playlist} />
       </div>
     ))
-  , [playlists, dispatch])
+  , [sorted, dispatch])
+
+  if (!playlists.length) return null
 
   return (
-    <PlaylistRow title={title} icon={icon}>
+    <PlaylistRow
+      title={title}
+      icon={icon}
+      actions={<PlaylistRowSortMenu value={sort} onChange={setSort} />}
+    >
       {items}
     </PlaylistRow>
   )

@@ -1,4 +1,9 @@
 {
+  "sort": {
+    "default": "Orden por defecto",
+    "alphabetical": "Alfabético",
+    "trackCount": "Nº de canciones"
+  },
   "filters": {
     "genre": "Género",
     "artist": "Artista",

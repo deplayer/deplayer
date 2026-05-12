@@ -1,4 +1,9 @@
 {
+  "sort": {
+    "default": "Default order",
+    "alphabetical": "Alphabetical",
+    "trackCount": "Track count"
+  },
   "filters": {
     "genre": "Genre",
     "artist": "Artist",

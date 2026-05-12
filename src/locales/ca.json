@@ -1,4 +1,9 @@
 {
+  "sort": {
+    "default": "Ordre per defecte",
+    "alphabetical": "Alfabètic",
+    "trackCount": "Nº de cançons"
+  },
   "filters": {
     "genre": "Gènere",
     "artist": "Artista",
