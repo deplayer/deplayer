@@ -1,6 +1,7 @@
 import Playlist from './Playlist'
 import PlaylistRow from './PlaylistRow'
 import FeaturedHero from './FeaturedHero'
+import GenreWall from './GenreWall'
 import { usePickFeatured } from './usePickFeatured'
 import EmptyState from '../common/EmptyState/index'
 import { memo, useMemo } from 'react'
@@ -151,12 +152,7 @@ const Playlists = memo(() => {
         playlists={transformedSmartPlaylists}
         dispatch={dispatch}
       />
-      <PlaylistRowSection
-        title="titles.genrePlaylists"
-        icon="faCompactDisc"
-        playlists={genrePlaylists}
-        dispatch={dispatch}
-      />
+      <GenreWall genres={Object.keys(songsByGenre || {})} />
     </div>
   )
 })
