@@ -24,7 +24,12 @@ export function usePlaylistStats(trackIds: string[]): PlaylistStats {
     const albumIds = new Set(
       tracks.map(t => t.albumId).filter((id): id is string => Boolean(id))
     )
-    const duration = tracks.reduce((acc, t) => acc + (t.duration || 0), 0)
+    // track.duration is stored in milliseconds (see types/media.ts). Convert
+    // once here so consumers can format as seconds without each duplicating
+    // the divide-by-1000 (previous code dropped the conversion and rendered
+    // wildly wrong totals).
+    const durationMs = tracks.reduce((acc, t) => acc + (t.duration || 0), 0)
+    const duration = Math.round(durationMs / 1000)
 
     return {
       firstCover,

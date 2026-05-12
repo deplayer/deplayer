@@ -24,12 +24,9 @@ type Props = {
   onDelete: () => void
 }
 
-// NOTE: matches the existing (buggy) duration formatting in Playlist.tsx —
-// track.duration is stored in ms but treated here as seconds. Keeping parity
-// with the current behavior so this refactor is purely visual; fix separately.
-const formatDuration = (durationLikeSeconds: number) => {
-  const minutes = Math.floor(durationLikeSeconds / 60)
-  const remainingSeconds = Math.floor(durationLikeSeconds % 60)
+const formatDuration = (durationSeconds: number) => {
+  const minutes = Math.floor(durationSeconds / 60)
+  const remainingSeconds = Math.floor(durationSeconds % 60)
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
 }
 
@@ -48,14 +45,14 @@ const PlaylistCard = memo(({
   onApplyFilters,
   onDelete,
 }: Props) => (
-  <div className="card bg-base-200 shadow-xl hover:shadow-2xl transition-shadow duration-200">
+  <div className="card group bg-base-200 shadow-xl hover:shadow-2xl transition-shadow duration-200">
     <figure className="relative aspect-square w-full overflow-hidden bg-base-300 rounded-box rounded-b-none">
       {firstCover ? (
         <>
           <img
             src={firstCover}
             alt={name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]"
             loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
