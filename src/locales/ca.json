@@ -110,6 +110,9 @@
     "saveSettings": "Desa la configuració"
   },
   "message": {
+    "featuredFromLibrary": "De la teva biblioteca",
+    "featuredFromSmart": "Suggerit per a tu",
+    "featuredFromGenre": "Tret de la teva col·lecció",
     "noCollectionItems": "La col·lecció està buida, aquí veuràs tot el contingut descobert per Deplayer.\nPer començar a omplir la teva col·lecció necessites afegir contingut o afegir un proveïdor i començar a cercar.",
     "queueEmpty": "La cua està buida. Afegeix algunes cançons per començar a reproduir!",
     "noMostPlayed": "Encara no has reproduït cap cançó",

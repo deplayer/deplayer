@@ -1,5 +1,7 @@
 import Playlist from './Playlist'
 import PlaylistRow from './PlaylistRow'
+import FeaturedHero from './FeaturedHero'
+import { usePickFeatured } from './usePickFeatured'
 import EmptyState from '../common/EmptyState/index'
 import { memo, useMemo } from 'react'
 import { useDispatch } from 'react-redux'
@@ -126,8 +128,17 @@ const Playlists = memo(() => {
     )
   }
 
+  const featured = usePickFeatured(transformedPlaylists, transformedSmartPlaylists, genrePlaylists)
+
   return (
     <div className='playlists z-10 flex flex-col w-full overflow-y-auto h-full py-6'>
+      {featured && (
+        <FeaturedHero
+          playlist={featured.playlist}
+          reasonKey={featured.reasonKey}
+          dispatch={dispatch}
+        />
+      )}
       <PlaylistRowSection
         title="titles.yourLibrary"
         icon="faMusic"

@@ -127,6 +127,9 @@
     "delete": "Delete"
   },
   "message": {
+    "featuredFromLibrary": "From your library",
+    "featuredFromSmart": "Suggested for you",
+    "featuredFromGenre": "Pulled from your collection",
     "noCollectionItems": "Collection is empty, here you will see all discovered media by Deplayer.\nIn order to start filling your collection you need to either Add media or Add a provider and start searching.",
     "queueEmpty": "Queue is empty. Add some songs to start playing!",
     "noMostPlayed": "You didn't played any song yet",

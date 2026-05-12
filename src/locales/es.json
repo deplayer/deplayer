@@ -109,6 +109,9 @@
     "saveSettings": "Guardar configuración"
   },
   "message": {
+    "featuredFromLibrary": "De tu biblioteca",
+    "featuredFromSmart": "Sugerido para ti",
+    "featuredFromGenre": "Sacado de tu colección",
     "noCollectionItems": "La colección está vacía, aquí verás todo el contenido descubierto por Deplayer.\nPara empezar a llenar tu colección necesitas añadir contenido o añadir un proveedor y comenzar a buscar.",
     "queueEmpty": "La cola está vacía. ¡Añade algunas canciones para empezar a reproducir!",
     "noMostPlayed": "Aún no has reproducido ninguna canción",
