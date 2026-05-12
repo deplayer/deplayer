@@ -1,13 +1,13 @@
 import Playlist from './Playlist'
+import PlaylistRow from './PlaylistRow'
 import EmptyState from '../common/EmptyState/index'
-import Icon from '../common/Icon'
-import { Translate } from 'react-redux-i18n'
 import { memo, useMemo } from 'react'
 import { useDispatch } from 'react-redux'
 import { Dispatch } from 'redux'
 import { useMediaCount, useSongsByGenre, usePlaylists, useSmartPlaylists, useQueue, useSettings } from '../../stores/livestore/hooks'
 import { getEmptyStateFallback, queueStep, searchStep } from '../common/EmptyState/emptyStateFallback'
 import EmptyStateAction from '../common/EmptyState/EmptyStateAction'
+import type { IconType } from '../common/Icon'
 
 type PlaylistType = {
   _id: string;
@@ -17,51 +17,42 @@ type PlaylistType = {
   name?: string;
 }
 
-const PlaylistSection = memo(({ title, playlists, dispatch }: {
+const PlaylistRowSection = memo(({ title, icon, playlists, dispatch }: {
   title?: string,
+  icon?: IconType,
   playlists: PlaylistType[],
   dispatch: Dispatch
 }) => {
-  if (!playlists.length) return null;
+  if (!playlists.length) return null
 
-  const memoizedPlaylists = useMemo(() => 
+  const items = useMemo(() =>
     playlists.map((playlist) => (
-      <Playlist
-        dispatch={dispatch}
+      <div
         key={playlist.id || playlist._id}
-        playlist={playlist}
-      />
+        className="snap-start shrink-0 w-64"
+      >
+        <Playlist dispatch={dispatch} playlist={playlist} />
+      </div>
     ))
-  , [playlists, dispatch]);
+  , [playlists, dispatch])
 
   return (
-    <div className="mb-8">
-      {title && (
-        <h2 className="text-xl font-semibold mb-6 px-4">
-          <Icon icon="faMusic" className="mr-2" />
-          <Translate value={title} />
-        </h2>
-      )}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4">
-        {memoizedPlaylists}
-      </div>
-    </div>
-  );
-});
+    <PlaylistRow title={title} icon={icon}>
+      {items}
+    </PlaylistRow>
+  )
+})
 
 const Playlists = memo(() => {
   const dispatch = useDispatch()
-  // LiveStore hooks - get playlists, smart playlists, queue, and settings
   const playlists = usePlaylists()
   const smartPlaylists = useSmartPlaylists()
   const songsByGenre = useSongsByGenre()
   const liveQueue = useQueue('default')
   const liveSettings = useSettings()
-  
-  // PERF: Use count hook instead of loading entire library
+
   const mediaCount = useMediaCount()
-  
-  // Parse trackIds from LiveStore queue (can be JSON string or array)
+
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
     if (!ids) return []
     if (Array.isArray(ids)) return ids
@@ -71,19 +62,18 @@ const Playlists = memo(() => {
       return []
     }
   }
-  
-  const queueTrackIds = liveQueue?.shuffle 
+
+  const queueTrackIds = liveQueue?.shuffle
     ? parseTrackIds(liveQueue.randomTrackIds)
     : parseTrackIds(liveQueue?.trackIds)
-  
+
   const hasQueueItems = queueTrackIds.length > 0
   const hasCollectionItems = mediaCount > 0
-  const hasSearchableProviders = liveSettings?.providers ? 
-    Object.values(liveSettings.providers).some((provider: unknown) => (provider as Record<string, unknown>)?.enabled) :
-    false
+  const hasSearchableProviders = liveSettings?.providers
+    ? Object.values(liveSettings.providers).some((provider: unknown) => (provider as Record<string, unknown>)?.enabled)
+    : false
 
-  // Transform LiveStore playlists to match component expectations
-  const transformedPlaylists = useMemo(() => 
+  const transformedPlaylists = useMemo(() =>
     (playlists as unknown as Array<{ id: string; name: string; trackIds: unknown }>).map((playlist) => ({
       _id: playlist.id,
       id: playlist.id,
@@ -92,10 +82,9 @@ const Playlists = memo(() => {
         ? JSON.parse(playlist.trackIds)
         : (playlist.trackIds || []) as string[]
     }))
-  , [playlists]);
+  , [playlists])
 
-  // Memoize genre playlists generation
-  const genrePlaylists: PlaylistType[] = useMemo(() => 
+  const genrePlaylists: PlaylistType[] = useMemo(() =>
     Object.keys(songsByGenre || {}).map(genre => ({
       _id: `genre-${genre}`,
       id: `genre-${genre}`,
@@ -108,10 +97,9 @@ const Playlists = memo(() => {
         providers: []
       }
     }))
-  , [songsByGenre]);
+  , [songsByGenre])
 
-  // Memoize smart playlists transformation
-  const transformedSmartPlaylists = useMemo(() => 
+  const transformedSmartPlaylists = useMemo(() =>
     smartPlaylists.map((playlist) => ({
       _id: playlist.id,
       id: playlist.id,
@@ -119,7 +107,7 @@ const Playlists = memo(() => {
       trackIds: songsByGenre[playlist.filters.genres[0]] || [],
       filters: playlist.filters
     }))
-  , [smartPlaylists, songsByGenre]);
+  , [smartPlaylists, songsByGenre])
 
   const { action: fallbackAction, description: fallbackDescription } = getEmptyStateFallback([
     queueStep(hasQueueItems),
@@ -140,23 +128,26 @@ const Playlists = memo(() => {
 
   return (
     <div className='playlists z-10 flex flex-col w-full overflow-y-auto h-full py-6'>
-      <PlaylistSection 
-        playlists={transformedPlaylists} 
+      <PlaylistRowSection
+        title="titles.yourLibrary"
+        icon="faMusic"
+        playlists={transformedPlaylists}
         dispatch={dispatch}
       />
-      <PlaylistSection 
-        playlists={transformedSmartPlaylists} 
+      <PlaylistRowSection
+        title="titles.smartPlaylists"
+        icon="faMagic"
+        playlists={transformedSmartPlaylists}
         dispatch={dispatch}
       />
-      {genrePlaylists.length > 0 && (
-        <PlaylistSection 
-          title="titles.genrePlaylists"
-          playlists={genrePlaylists} 
-          dispatch={dispatch}
-        />
-      )}
+      <PlaylistRowSection
+        title="titles.genrePlaylists"
+        icon="faCompactDisc"
+        playlists={genrePlaylists}
+        dispatch={dispatch}
+      />
     </div>
   )
-});
+})
 
 export default Playlists
