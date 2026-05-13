@@ -70,8 +70,7 @@ const Social = () => {
                 name="username"
                 className="input input-bordered w-full"
                 placeholder="Enter username"
-                autoFocus
-              />
+                />
               <div className="mt-4 flex justify-end gap-2">
                 <button
                   type="button"

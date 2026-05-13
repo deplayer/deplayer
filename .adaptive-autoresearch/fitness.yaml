@@ -17,6 +17,8 @@ sources:
   - skill: "agent-knowledge/react"
     installs: 0
     contributed: [dangerous_innerhtml, large_components, missing_key_props]
+  - tool: "react-doctor@0.1.6 (react.doctor)"
+    contributed: [react_doctor_issues]
 
 loop:
   budget_seconds: 300
@@ -74,6 +76,13 @@ metrics:
   - name: unused-exports
     source: knip
     script: .adaptive-autoresearch/metrics/metric-unused-exports.sh
+    target: 0
+    direction: lower
+
+  # React anti-patterns & best practices
+  - name: react-doctor-issues
+    source: react.doctor (react-doctor@0.1.6)
+    script: .adaptive-autoresearch/metrics/metric-react-doctor-issues.sh
     target: 0
     direction: lower
 

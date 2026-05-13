@@ -168,6 +168,9 @@ const Album = React.memo((props: AlbumProps) => {
     >
       <div className='sticky backdrop-blur-sm bg-black/30 md:bg-transparent shadow-lg md:shadow-none py-4 top-0 mt-0 w-full md:w-56 flex md:flex-col items-center md:mx-8 z-10'>
         <div
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") playAlbum(); }}
           className='h-56 w-56 mb-2 p-4 md:h-56 md:w-56 cursor-pointer md:mr-4'
           onClick={playAlbum}
         >

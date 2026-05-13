@@ -25,7 +25,7 @@ const Tag = (props: Props) => {
   }, props.className)
 
   return (
-    <div className={classes} onClick={props.onClick}>
+    <div role="button" tabIndex={0} onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && props.onClick) props.onClick() }} className={classes} onClick={props.onClick}>
       {props.children}
     </div>
   )

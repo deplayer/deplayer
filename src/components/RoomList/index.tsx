@@ -137,6 +137,9 @@ const RoomList = ({ peers, rooms, dispatch, onJoinRoom }: Props) => {
                     </button>
                   )}
                   <h4 
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && handleShareRoom) handleShareRoom(room.id) }}
                     className="text-lg font-semibold cursor-pointer hover:text-blue-500"
                     onClick={() => handleShareRoom(room.id)}
                   >

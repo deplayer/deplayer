@@ -20,9 +20,10 @@ const LazyContextualMenuTrigger = (props: Props) => {
   if (!opened) {
     return (
       <div
-        onClick={(e) => { e.stopPropagation(); setOpened(true) }}
         role="button"
         tabIndex={0}
+        onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && setOpened) setOpened(true) }}
+        onClick={(e) => { e.stopPropagation(); setOpened(true) }}
         aria-label="Open context menu"
         className='cursor-pointer p-2 menu-trigger focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset rounded'
       >

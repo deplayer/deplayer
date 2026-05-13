@@ -1,64 +1,99 @@
-created_at: 2026-05-05
-last_evaluated_at: 2026-05-05
+created_at: 2026-05-13
+last_evaluated_at: 2026-05-13
+tool: react-doctor@0.1.6
+baseline_value: 313
 
 groups:
-  - name: type-safety-easy
-    domain: types
-    metric: typescript-any-count
-    source_skill: typescript-advanced-types
+  - name: dead-code-exports
+    domain: dead-code
+    metric: react-doctor-issues
+    source_skill: "react-doctor (react.doctor)"
     status: pending
-    description: "Fix easy any types: useSelector state, Dispatch, event handlers (31 issues)"
+    description: "Remove unused exports, types, and orphaned files flagged by react-doctor (133 issues)"
     parallel: true
     blocked_by: []
+    issue_count: 133
+    file_count: 39
+    notes: "Only 4 shared files with perf group (stores/livestore), 2 with arch. Run first to reduce noise."
 
-  - name: type-safety-casts
-    domain: types
-    metric: typescript-any-count
-    source_skill: typescript-advanced-types
-    status: pending
-    description: "Fix as-any casts (46 issues)"
-    parallel: false
-    blocked_by: [type-safety-easy]
-
-  - name: type-safety-props
-    domain: types
-    metric: typescript-any-count
-    source_skill: typescript-advanced-types
-    status: pending
-    description: "Fix props typed as any (294 issues) - batch by module"
-    parallel: false
-    blocked_by: [type-safety-easy]
-
-  - name: accessibility
+  - name: accessibility-fixes
     domain: accessibility
-    metric: unlabeled-icon-buttons
-    source_skill: addyosmani/web-quality-skills/accessibility
+    metric: react-doctor-issues
+    source_skill: "react-doctor (react.doctor)"
     status: pending
-    description: "Add aria-labels to icon buttons (28 issues)"
+    description: "Fix click-events-have-key-events, no-static-element-interactions, label-has-associated-control, no-autofocus, anchor-is-valid (35 issues)"
     parallel: true
     blocked_by: []
+    issue_count: 35
+    file_count: 19
+    notes: "0 shared files with dead-code. Moderate overlap with arch (9), correctness (3). Can run in wave 1."
 
-  - name: dead-code
-    domain: code-health
-    metric: unused-exports
-    source_skill: knip
+  - name: correctness-hooks
+    domain: correctness
+    metric: react-doctor-issues
+    source_skill: "react-doctor (react.doctor)"
     status: pending
-    description: "Delete unused files identified by knip (35 files)"
-    parallel: true
-    blocked_by: []
+    description: "Fix rules-of-hooks, no-array-index-as-key, conditional-render, nested-components, danger/preventDefault (26 issues)"
+    parallel: false
+    blocked_by: [accessibility-fixes]
+    issue_count: 26
+    file_count: 14
+    notes: "3 shared files with accessibility (Social.tsx, FormSchema.tsx, SongView/index.tsx). Must run after."
 
-  - name: small-fixes
-    domain: code-health
-    metric: typescript-ts-ignore-count
-    source_skill: typescript-advanced-types
+  - name: state-effects
+    domain: state-and-effects
+    metric: react-doctor-issues
+    source_skill: "react-doctor (react.doctor)"
     status: pending
-    description: "Fix ts-ignore (2), dangerouslySetInnerHTML (1)"
-    parallel: true
-    blocked_by: []
+    description: "Fix rerender-state-only-in-handlers, cascading-set-state, effect-event-handler, mutable-deps, prop-callback-in-effect (11 issues)"
+    parallel: false
+    blocked_by: [correctness-hooks]
+    issue_count: 11
+    file_count: 10
+    notes: "Shares files with performance-js (3) and architecture-design (4). Run after correctness."
+
+  - name: performance-js
+    domain: performance
+    metric: react-doctor-issues
+    source_skill: "react-doctor (react.doctor)"
+    status: pending
+    description: "Fix js-combine-iterations, async-await-in-loop, flatmap-filter, cache-property-access, tosorted-immutable, set-map-lookups, min-max-loop (50 issues)"
+    parallel: false
+    blocked_by: [state-effects]
+    issue_count: 50
+    file_count: 36
+    notes: "High overlap with arch-design (8 files). Run after state-effects to avoid conflicts."
+
+  - name: architecture-design
+    domain: architecture
+    metric: react-doctor-issues
+    source_skill: "react-doctor (react.doctor)"
+    status: pending
+    description: "Fix design-no-redundant-size-axes, z-index-9999, bold-headings, default-tailwind-palette, barrel-imports, generic-handlers, giant-components (58 issues)"
+    parallel: false
+    blocked_by: [performance-js]
+    issue_count: 58
+    file_count: 39
+    notes: "Largest group. Overlaps with ALL other groups. Must run last to avoid merge conflicts."
 
 execution:
   parallel_waves:
-    - [type-safety-easy, accessibility, dead-code, small-fixes]
-    - [type-safety-casts, type-safety-props]
-  max_parallel_agents: 3
-  re_evaluate_after_groups: 2
+    - [dead-code-exports, accessibility-fixes]   # wave 1: zero shared files between these two
+    - [correctness-hooks]                        # wave 2: shares files with arch + accessibility
+    - [state-effects]                            # wave 3: small group, unblocks perf
+    - [performance-js]                           # wave 4: high overlap with arch
+    - [architecture-design]                      # wave 5: last pass, overlaps everything
+  max_parallel_agents: 2
+  re_evaluate_after_groups: 1
+
+dependency_graph: |
+    dead-code-exports ──→ (no deps)
+    accessibility-fixes ──→ (no deps)
+                                ↓ (wave 1 done)
+                        correctness-hooks ←── shares files with accessibility
+                                ↓
+                          state-effects ←── shares files with perf, arch
+                                ↓
+                           performance-js ←── 8 shared files with arch
+                                ↓
+                       architecture-design (last — overlaps all groups)

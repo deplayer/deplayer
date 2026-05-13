@@ -39,7 +39,6 @@ const SearchInput = (props: Props) => {
     >
       <input
         className={classes}
-        autoFocus={props.searchToggled}
         onChange={props.onSearchChange}
         onFocus={props.onFocus}
         onBlur={props.onBlur}

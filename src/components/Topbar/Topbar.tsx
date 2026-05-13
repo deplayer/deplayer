@@ -101,14 +101,14 @@ const Topbar = (props: Props) => {
           setSearchOff={handleSearchOff}
         />
         {!props.searchToggled && props.title && (
-          <div onClick={() => props.dispatch({ type: types.TOGGLE_SEARCH })} className="text-center">{props.title}</div>
+          <div role="button" tabIndex={0} onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && props.dispatch) props.dispatch({ type: types.TOGGLE_SEARCH }) }} onClick={() => props.dispatch({ type: types.TOGGLE_SEARCH })} className="text-center">{props.title}</div>
         )}
       </div>
 
       <div className='flex items-center absolute right-5'>
         {props.children}
         <button
-          onClick={() => props.dispatch({ type: types.TOGGLE_RIGHT_PANEL })}
+          role="button" tabIndex={0} onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && props.dispatch) props.dispatch({ type: types.TOGGLE_RIGHT_PANEL }) }} onClick={() => props.dispatch({ type: types.TOGGLE_RIGHT_PANEL })}
           className="btn btn-ghost btn-circle"
           title="Share room"
         >

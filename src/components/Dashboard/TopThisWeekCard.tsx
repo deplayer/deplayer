@@ -15,6 +15,9 @@ const TopThisWeekCard = () => {
       <div className="flex flex-col gap-2">
         {topSongs.filter((s): s is NonNullable<typeof s> => s !== null).map((song, index) => (
           <div
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") dispatch({ type: types.PLAY_SONG, songId: song.id }) }}
             key={song.id}
             className="flex items-center gap-3 py-1 hover:bg-base-300 rounded-lg px-2 cursor-pointer group"
             onClick={() => dispatch({ type: types.PLAY_SONG, songId: song.id })}

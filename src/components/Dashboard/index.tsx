@@ -61,10 +61,14 @@ const WelcomeCard = () => {
               </Link>
             </li>
             <li>
-              <a onClick={() => dispatch({ type: types.SHOW_ADD_MEDIA_MODAL })} className="text-primary hover:text-primary-focus cursor-pointer">
-                <Translate value="dashboard.welcome.addMedia" />
-              </a>{' '}
-              <Translate value="dashboard.welcome.addMediaDescription" />
+              <span
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") dispatch({ type: types.SHOW_ADD_MEDIA_MODAL }) }}
+                onClick={() => dispatch({ type: types.SHOW_ADD_MEDIA_MODAL })}
+                className="text-primary hover:text-primary-focus cursor-pointer"
+              >                <Translate value="dashboard.welcome.addMedia" />
+              </span>{' '}              <Translate value="dashboard.welcome.addMediaDescription" />
             </li>
             <li>
               <Link to="/collection" className="text-primary hover:text-primary-focus">

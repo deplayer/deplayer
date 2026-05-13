@@ -518,7 +518,6 @@ function CommandBar({ togglePlaying, playNext, playPrev }: Props) {
           <div className="w-full flex bg-transparent border-b-4 border-accent items-center">
             <input
               type="text"
-              autoFocus
               value={search}
               onChange={handleSearchChange}
               placeholder={I18n.t('menu.searchPlaceholder')}

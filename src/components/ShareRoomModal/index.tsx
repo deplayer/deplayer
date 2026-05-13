@@ -48,11 +48,12 @@ const ShareRoomModal = ({ isOpen, roomCode, onClose, dispatch }: Props) => {
         </div>
 
         <div className="w-full">
-          <label className="block text-sm mb-2 text-base-content/70">
+          <label className="block text-sm mb-2 text-base-content/70" htmlFor="room-link">
             <Translate value="peer.roomLink" />
           </label>
           <div className="flex gap-2">
             <input
+              id="room-link"
               readOnly
               value={`${window.location.origin}/join/${roomCode}`}
               className="input input-bordered w-full"

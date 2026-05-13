@@ -31,6 +31,9 @@ const Cover = (props: Props) => {
   return (
     <>
       <div
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && handleClick) handleClick() }}
         className='relative text-lg hidden md:block cursor-pointer w-16 h-16 aspect-square'
         onClick={handleClick}
         onMouseEnter={() => setIsHovered(true)}

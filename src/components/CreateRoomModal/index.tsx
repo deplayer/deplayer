@@ -35,10 +35,11 @@ const CreateRoomModal = ({ isOpen, onClose, onCreateRoom }: Props) => {
       <div className="p-4">
         <p className="mb-4">Create a room to share your current playing song with your friends.</p>
         <div className="mb-4">
-          <label className="block text-sm mb-2">
+          <label className="block text-sm mb-2" htmlFor="room-code">
             <Translate value="peer.enterRoomCode" />
           </label>
           <input
+            id="room-code"
             type="text"
             value={roomCode}
             onChange={(e) => setRoomCode(e.target.value)}
@@ -47,10 +48,11 @@ const CreateRoomModal = ({ isOpen, onClose, onCreateRoom }: Props) => {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-sm mb-2">
+          <label className="block text-sm mb-2" htmlFor="username">
             <Translate value="peer.enterUsername" />
           </label>
           <input
+            id="username"
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}

@@ -28,7 +28,13 @@ const Modal = ({ isOpen, onClose, children, title, className }: Props) => {
         {title && <h3 className="font-bold text-lg pr-8">{title}</h3>}
         {children}
       </div>
-      <div className="modal-backdrop" onClick={onClose}></div>
+      <div
+          className="modal-backdrop"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && onClose) onClose() }}
+          onClick={onClose}
+        ></div>
     </div>,
     modalRoot
   )
