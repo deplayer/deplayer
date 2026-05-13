@@ -395,15 +395,17 @@ const materializers = State.SQLite.materializers(events, {
     
     // First pass: collect unique artists and albums
     for (const item of event.media) {
-      if (!uniqueArtists.has(item.artist.id)) {
-        uniqueArtists.set(item.artist.id, {
-          id: item.artist.id,
+      const artistId = item.artist.id
+      const albumId = item.album.id
+      if (!uniqueArtists.has(artistId)) {
+        uniqueArtists.set(artistId, {
+          id: artistId,
           name: item.artist.name,
         })
       }
-      
-      if (!uniqueAlbums.has(item.album.id)) {
-        uniqueAlbums.set(item.album.id, {
+
+      if (!uniqueAlbums.has(albumId)) {
+        uniqueAlbums.set(albumId, {
           id: item.album.id,
           name: item.album.name,
           artistId: item.album.artistId,
