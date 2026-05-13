@@ -186,7 +186,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
               <CoverImage
                 useImage
                 cover={song.cover || undefined}
-                size='thumbnail'
+                size='full'
                 albumName={song.albumName || 'N/A'}
               />
             }

@@ -71,7 +71,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
         albumName: song.album,
         year: album?.year,
         cover: {
-          thumbnailUrl: this.coverBase + "&id=" + song.coverArt + "&size=100",
+          thumbnailUrl: this.coverBase + "&id=" + song.coverArt + "&size=600",
           fullUrl: this.coverBase + "&id=" + song.coverArt,
         },
         genres: song.genres?.map((genre: { name: string }) => genre.name) || [],
