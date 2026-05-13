@@ -122,20 +122,21 @@ class SpectrumVisualizer extends React.Component<Props> {
           capYPositionArray.push(value)
         }
 
+        const { meterWidth, gap, capHeight } = this.props
         ctx.fillStyle = this.props.capColor || '#FFF'
         if (value < capYPositionArray[i]) {
           const preValue = --capYPositionArray[i]
           const y = (270 - preValue) * cheight / 270
-          ctx.fillRect(i * (this.props.meterWidth + this.props.gap), y, this.props.meterWidth, this.props.capHeight)
+          ctx.fillRect(i * (meterWidth + gap), y, meterWidth, capHeight)
         } else {
           const y = (270 - value) * cheight / 270
-          ctx.fillRect(i * (this.props.meterWidth + this.props.gap), y, this.props.meterWidth, this.props.capHeight)
+          ctx.fillRect(i * (meterWidth + gap), y, meterWidth, capHeight)
           capYPositionArray[i] = value
         }
 
         ctx.fillStyle = gradient
-        const y = (270 - value) * (cheight) / 270 + this.props.capHeight
-        ctx.fillRect(i * (this.props.meterWidth + this.props.gap), y, this.props.meterWidth, cheight)
+        const y = (270 - value) * (cheight) / 270 + capHeight
+        ctx.fillRect(i * (meterWidth + gap), y, meterWidth, cheight)
       }
       this.animationId = requestAnimationFrame(drawMeter)
     }

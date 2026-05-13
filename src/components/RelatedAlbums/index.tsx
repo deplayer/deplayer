@@ -7,32 +7,29 @@ type Props = {
   albums: Array<AlbumRow>
 }
 
-const RelatedAlbums = (props: Props) => {
-  const title = <Translate value='titles.albums' />
+const TITLE = <Translate value='titles.albums' />
 
+const RelatedAlbums = (props: Props) => {
   if (!props.albums) return null;
 
-  const Albums = props.albums
-    ?.filter((album) => {
-      return album.name !== "" // We don't want empty titles
-    })
-    .map((album) => {
-      return (
-        <AlbumCover
-          key={album.id}
-          id={album.id}
-          name={album.name}
-          cover={{
-            thumbnailUrl: album.thumbnailUrl || '',
-            fullUrl: album.thumbnailUrl || ''
-          }}
-        />
-      )
-    })
+  const Albums = props.albums.flatMap((album) => {
+    if (album.name === "") return []
+    return [
+      <AlbumCover
+        key={album.id}
+        id={album.id}
+        name={album.name}
+        cover={{
+          thumbnailUrl: album.thumbnailUrl || '',
+          fullUrl: album.thumbnailUrl || ''
+        }}
+      />
+    ]
+  })
 
   return (
     <HorizontalSlider
-      title={title}
+      title={TITLE}
       items={Albums}
     />
   )
