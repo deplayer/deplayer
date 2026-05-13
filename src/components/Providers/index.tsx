@@ -171,7 +171,7 @@ const Providers = () => {
         <div className='w-full pb-24'>
           <div className='my-3 flex flex-col'>
             <h2 className='py-4 text-xl'><Translate value="labels.lazyProviders" /></h2>
-            <p>Loading settings...</p>
+            <p>Loading settings…</p>
           </div>
         </div>
       </MainContainer>

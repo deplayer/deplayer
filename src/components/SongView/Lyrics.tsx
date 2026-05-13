@@ -54,7 +54,7 @@ const Lyrics = (props: Props) => {
           </pre>
         ) : (
           <div className='text-center'>
-            Loading lyrics...
+            Loading lyrics…
           </div>
         )}
       </div>

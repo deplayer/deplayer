@@ -138,13 +138,13 @@ const FilterPanel = (_props: Props) => {
       backgroundColor: 'var(--select-menu-bg)',
       border: '1px solid var(--select-border)',
       backdropFilter: 'blur(8px)',
-      zIndex: 9999,
+      zIndex: 100,
       width: '100%',
       margin: '0',
     }),
     menuPortal: (provided) => ({
       ...provided,
-      zIndex: 9999,
+      zIndex: 100,
     }),
     menuList: (provided) => ({
       ...provided,
