@@ -62,11 +62,12 @@ const SongCover = React.memo(({ cover, onClick, albumName }: { cover: Cover, onC
 
   return (
     <div
-      role='row'
+      role='button'
+      tabIndex={0}
+      onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && handleClick) handleClick(e as unknown as React.MouseEvent) }}
       className='media-thumb relative mr-3 overflow-hidden'
       style={{ minWidth: '80px', height: '80px' }}
       onClick={handleClick}
-      tabIndex={0}
       data-testid="song-cover"
     >
       <CoverImage
@@ -105,7 +106,7 @@ const SongRow = React.memo((props: Props) => {
   const shouldShowCover = !disableCovers && !slim && song.cover && mqlMatch
 
   return (
-    <div
+    <div role="button" tabIndex={0} onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && onClick) onClick() }}
       data-testid="song-row"
       className={`song-row p-2 flex justify-between ${props.isCurrent ? 'bg-base-200' : ''} hover:bg-base-200/50`}
       style={props.style}
