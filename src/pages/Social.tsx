@@ -24,7 +24,14 @@ const Social = () => {
     })
   }
 
-  const handleUsernameSubmit = (username: string) => {
+  const handleFormSubmit = (e: React.FormEvent) => {
+  e.preventDefault()
+  const form = e.currentTarget as HTMLFormElement
+  const input = form.elements.namedItem('username') as HTMLInputElement
+  handleUsernameSubmit(input.value)
+}
+
+const handleUsernameSubmit = (username: string) => {
     localStorage.setItem('username', username)
     if (pendingRoomCode) {
       dispatch({
@@ -60,11 +67,7 @@ const Social = () => {
         <div className="fixed inset-0 bg-base-100/50 backdrop-blur flex items-center justify-center">
           <div className="bg-base-200 p-6 rounded-lg shadow-lg">
             <h3 className="text-xl mb-4 text-base-content">Enter Your Username</h3>
-            <form onSubmit={(e) => {
-              e.preventDefault()
-              const input = e.currentTarget.elements.namedItem('username') as HTMLInputElement
-              handleUsernameSubmit(input.value)
-            }}>
+            <form onSubmit={handleFormSubmit}>
               <input
                 type="text"
                 name="username"

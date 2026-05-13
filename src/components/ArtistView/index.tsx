@@ -89,7 +89,7 @@ export default function ArtistView() {
       {/* Netflix-style Hero */}
       <HeroSection backgroundImage={backgroundImage}>
         <div className="flex flex-col gap-2">
-          <h1 className="text-4xl md:text-5xl font-bold">{artist.name}</h1>
+          <h1 className="text-4xl md:text-5xl">{artist.name}</h1>
           <div className="flex items-center gap-2 text-sm opacity-80 flex-wrap">
             {artistMetadata?.country && <span>{artistMetadata.country}</span>}
             {artistMetadata?.['life-span']?.begin && (

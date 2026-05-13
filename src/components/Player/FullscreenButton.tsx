@@ -13,15 +13,15 @@ const FullscreenButton = ({ onClick, dispatch }: FullscreenButtonProps) => {
   const [isFullscreen, setIsFullscreen] = useState(false)
 
   useEffect(() => {
-    const handleFullscreenChange = () => {
+    const onFullscreenChange = () => {
       const fullscreenState = !!document.fullscreenElement
       setIsFullscreen(fullscreenState)
       dispatch({ type: types.TOGGLE_FULL_SCREEN, payload: fullscreenState })
     }
 
-    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    document.addEventListener('fullscreenchange', onFullscreenChange)
     return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange)
+      document.removeEventListener('fullscreenchange', onFullscreenChange)
     }
   }, [dispatch])
 

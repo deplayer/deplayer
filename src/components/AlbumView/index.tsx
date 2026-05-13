@@ -86,7 +86,7 @@ export default function AlbumView() {
           />
         </div>
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl md:text-4xl font-bold">{album.name}</h1>
+          <h1 className="text-3xl md:text-4xl">{album.name}</h1>
           <div className="flex items-center gap-2 text-sm opacity-80 flex-wrap">
             {album.artistId && (
               <Link to={`/artist/${album.artistId}`} className="hover:underline font-medium">

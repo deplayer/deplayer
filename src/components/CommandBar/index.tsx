@@ -504,7 +504,7 @@ function CommandBar({ togglePlaying, playNext, playPrev }: Props) {
         data-testid="search-button"
       >
         <Icon icon="faSearch" className="mr-2" />
-        <span>Search...</span>
+        <span>Search…</span>
         <kbd className="ml-2 px-2 py-1 text-xs bg-base-200 rounded">⌘K</kbd>
       </Button>
 

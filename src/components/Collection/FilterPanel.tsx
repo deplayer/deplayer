@@ -230,7 +230,7 @@ const FilterPanel = (_props: Props) => {
       <Button
         size='xs'
         onClick={() => setFilter('favorites', !activeFilters.favorites)}
-        className={`ml-2 ${activeFilters.favorites ? 'text-red-500' : 'text-base-content/70'}`}
+        className={`ml-2 ${activeFilters.favorites ? 'text-error0' : 'text-base-content/70'}`}
         transparent
         title={activeFilters.favorites ? "Remove favorites filter" : "Show favorites only"}
       >

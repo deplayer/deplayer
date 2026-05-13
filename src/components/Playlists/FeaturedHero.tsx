@@ -87,7 +87,7 @@ const FeaturedHero = memo(({ playlist, reasonKey, dispatch }: Props) => {
           <p className="text-xs uppercase tracking-widest text-base-content/60 mb-2">
             <Translate value={reasonKey} />
           </p>
-          <h1 className="text-3xl md:text-5xl font-bold truncate mb-3">
+          <h1 className="text-3xl md:text-5xl truncate mb-3">
             {displayName}
           </h1>
           <p className="text-sm text-base-content/70 mb-5">
