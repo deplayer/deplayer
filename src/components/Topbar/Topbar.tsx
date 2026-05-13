@@ -108,7 +108,7 @@ const Topbar = (props: Props) => {
       <div className='flex items-center absolute right-5'>
         {props.children}
         <button
-          role="button" tabIndex={0} onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && props.dispatch) props.dispatch({ type: types.TOGGLE_RIGHT_PANEL }) }} onClick={() => props.dispatch({ type: types.TOGGLE_RIGHT_PANEL })}
+          onClick={() => props.dispatch({ type: types.TOGGLE_RIGHT_PANEL })}
           className="btn btn-ghost btn-circle"
           title="Share room"
         >

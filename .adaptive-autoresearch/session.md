@@ -78,3 +78,15 @@ See `.adaptive-autoresearch/plan.yaml` for full details.
 - src/components/Settings/FormSchema.tsx (label htmlFor)
 - src/components/ShareRoomModal/index.tsx (label htmlFor)
 - src/pages/Social.tsx (removed autoFocus)
+
+## Wave 2 Plan (next)
+- correctness-hooks group: fix rules-of-hooks, no-array-index-as-key, conditional-render issues
+- state-effects group: fix rerender-state-only-in-handlers, cascading-set-state, effect-event-handler  
+- These groups share files with wave 1 changes - need sequential execution
+
+Current metrics status:
+| Metric | Baseline | Now | Target | Direction |
+|--------|----------|-----|--------|-----------|
+| react-doctor-issues | 313 | 286 | 0 | lower |
+| typescript-any-count | 9 | 9 | 0 | lower |
+| bundle-size-js-kb | 4663 | 5053 | 5000 | lower (over by ~5%) |

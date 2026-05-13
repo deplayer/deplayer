@@ -5,13 +5,10 @@ export function useCoverImage(url: string | undefined): string | undefined {
   const [objectUrl, setObjectUrl] = useState<string | undefined>(undefined)
   const currentUrlRef = useRef<string | undefined>(undefined)
   const objectUrlRef = useRef<string | undefined>(undefined)
+  const [, forceUpdate] = useState(0)
 
   useEffect(() => {
-    if (!url) {
-      setObjectUrl(undefined)
-      objectUrlRef.current = undefined
-      return
-    }
+    if (!url) return
 
     currentUrlRef.current = url
     const controller = new AbortController()
@@ -34,9 +31,9 @@ export function useCoverImage(url: string | undefined): string | undefined {
         URL.revokeObjectURL(objectUrlRef.current)
         objectUrlRef.current = undefined
       }
-      setObjectUrl(undefined)
+      forceUpdate(v => v + 1)
     }
   }, [url])
 
-  return objectUrl
+  return url ? objectUrl : undefined
 }

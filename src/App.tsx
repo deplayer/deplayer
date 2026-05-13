@@ -66,21 +66,19 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
   const liveStore = useAppStore()
   
   // Set LiveStore instance for middleware (once on mount)
-  React.useEffect(() => {
-    if (liveStore) {
-      setLiveStoreInstance(liveStore)
-      liveStoreInstance = liveStore  // Also store for saga access
-      if (typeof window !== 'undefined' && (import.meta.env.DEV || import.meta.env.MODE === 'test')) {
-        // Exposed for Playwright e2e + devtools. Dev/test only.
-        (window as Window & { __liveStore?: typeof liveStore }).__liveStore = liveStore
-      }
-      
-      // Now that LiveStore is ready, dispatch INITIALIZE action
-      // This was moved from configureStore.ts to prevent the
-      // "Cannot access 'getLiveStoreInstance' before initialization" error
-      store.dispatch({ type: 'INITIALIZE' })
+  if (liveStore) {
+    setLiveStoreInstance(liveStore)
+    liveStoreInstance = liveStore  // Also store for saga access
+    if (typeof window !== 'undefined' && (import.meta.env.DEV || import.meta.env.MODE === 'test')) {
+      // Exposed for Playwright e2e + devtools. Dev/test only.
+      (window as Window & { __liveStore?: typeof liveStore }).__liveStore = liveStore
     }
-  }, [liveStore])
+    
+    // Now that LiveStore is ready, dispatch INITIALIZE action
+    // This was moved from configureStore.ts to prevent the
+    // "Cannot access 'getLiveStoreInstance' before initialization" error
+    store.dispatch({ type: 'INITIALIZE' })
+  }
   
   // Redux→Zustand sync is handled by uiSyncMiddleware — no bridge needed here
   

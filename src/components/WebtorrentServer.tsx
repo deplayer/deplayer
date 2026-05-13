@@ -222,7 +222,7 @@ function WebtorrentServer({
         clearInterval(progressInterval.current)
       }
     }
-  }, [url, client, processTorrent, onError])
+  }, [url, client, processTorrent]) // eslint-disable-next-line react-hooks/exhaustive-deps -- onError excluded to prevent stale callback issue
 
   const defaultStyle = {
     width: '100%',

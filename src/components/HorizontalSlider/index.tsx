@@ -48,7 +48,7 @@ const HorizontalSlider = (props: Props) => {
       <div className='relative group h-52'>
         <Slider {...settings}>
           {props.items.map((item, index) => (
-            <div key={index} className='h-full' style={{ width: '170px', padding: '0' }}>
+            <div key={`slider-${index}`} className='h-full' style={{ width: '170px', padding: '0' }}>
               {item}
             </div>
           ))}

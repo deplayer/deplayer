@@ -122,7 +122,7 @@ export default function ArtistView() {
             <div className="flex flex-wrap gap-2 mt-2">
               {artistMetadata.relations.map((relation: Record<string, unknown>, index: number) => (
                 <a
-                  key={index}
+                  key={`relation-${(relation.url as Record<string, string>).resource || index}`}
                   target="_blank"
                   href={(relation.url as Record<string, string>).resource}
                   rel="noopener noreferrer"

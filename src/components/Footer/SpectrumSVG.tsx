@@ -19,7 +19,7 @@ const SpectrumSVG = () => {
     >
       {heights.map((height, index) => (
         <rect
-          key={index}
+          key={`bar-${index}`}
           x={index * (BAR_WIDTH + GAP)}
           y={MAX_HEIGHT - height}
           width={BAR_WIDTH}

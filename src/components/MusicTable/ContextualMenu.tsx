@@ -116,7 +116,7 @@ const ContextualMenu = (props: MenuProps) => {
   useEffect(() => {
     const updateInstance = () => {
       const shouldBeOpen = activeMenuId === song.id
-      setIsOpen(shouldBeOpen)
+      setIsOpen(prev => prev === shouldBeOpen ? prev : shouldBeOpen)
       if (!shouldBeOpen) {
         setClickPosition(null)
         setFocusedIndex(0)

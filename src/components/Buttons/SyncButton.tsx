@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Translate } from 'react-redux-i18n';
 import Button from '../common/Button';
@@ -11,23 +11,29 @@ interface Props {
 
 const SyncButton: React.FC<Props> = ({ providerKey }) => {
   const dispatch = useDispatch();
-  const [syncing, setSyncing] = React.useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const syncingRef = React.useRef(syncing);
+  syncingRef.current = syncing;
+
+  useEffect(() => {
+    const handleFinished = () => {
+      if (syncingRef.current) {
+        setSyncing(false);
+      }
+    };
+    window.addEventListener(types.PROVIDER_SYNC_FINISHED, handleFinished);
+    window.addEventListener(types.PROVIDER_SYNC_FAILED, handleFinished);
+    
+    return () => {
+      window.removeEventListener(types.PROVIDER_SYNC_FINISHED, handleFinished);
+      window.removeEventListener(types.PROVIDER_SYNC_FAILED, handleFinished);
+    };
+  }, [providerKey]);
 
   const handleSync = () => {
     setSyncing(true);
     dispatch({ type: types.START_PROVIDER_SYNC, providerKey });
   };
-
-  React.useEffect(() => {
-    const handleSyncFinished = () => setSyncing(false);
-    window.addEventListener(types.PROVIDER_SYNC_FINISHED, handleSyncFinished);
-    window.addEventListener(types.PROVIDER_SYNC_FAILED, handleSyncFinished);
-    
-    return () => {
-      window.removeEventListener(types.PROVIDER_SYNC_FINISHED, handleSyncFinished);
-      window.removeEventListener(types.PROVIDER_SYNC_FAILED, handleSyncFinished);
-    };
-  }, []);
 
   return (
     <Button
@@ -41,4 +47,4 @@ const SyncButton: React.FC<Props> = ({ providerKey }) => {
   );
 };
 
-export default SyncButton; 
+export default SyncButton;

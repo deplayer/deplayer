@@ -333,14 +333,14 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
               <Translate value='song.label.played' /> {song.playCount ?? 0} <Translate value='song.label.times' />
             </div>
             <div className='mt-2 flex flex-col gap-2'>
-              <label className='text-base-content'><Translate value='labels.providers' /></label>
-              <div className='flex flex-wrap gap-2'>
+              <label className='text-base-content' htmlFor='providers-section'><Translate value='labels.providers' /></label>
+              <div className='flex flex-wrap gap-2' id='providers-section'>
                 {
                   Object.values(song.stream).map((value: Stream, index: number) => {
                     const streamUrl = streamUrls.find(url => url.service === value.service)
                     return (
                       <div
-                        key={`${value.service}_${index}`}
+                        key={`service-${value.service}-${index}`}
                         className='flex items-center w-full sm:w-auto bg-base-300 rounded-lg overflow-hidden'
                       >
                         <div className='flex items-center gap-2 px-3 py-2 bg-base-200'>

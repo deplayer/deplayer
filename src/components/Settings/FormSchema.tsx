@@ -13,7 +13,7 @@ const FormSchema = ({ schema }: Props) => {
       {schema.fields.map((field, index) => {
         if (field.type === 'title') {
           return (
-            <h3 key={`title-${index}`} className="text-2xl leading-loose py-2 uppercase tracking-wide pt-4 pb-2">
+            <h3 key={typeof field.label === "string" ? `title-${field.label}` : `title-field-${index}`} className="text-2xl leading-loose py-2 uppercase tracking-wide pt-4 pb-2">
               <Translate value={field.label} />
             </h3>
           )
