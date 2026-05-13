@@ -20,6 +20,16 @@ import PlayerRefService from '../../services/PlayerRefService'
 
 const MENU_ID = 'context-menu-player'
 
+// Extracted from ContextualMenu to avoid nested component definition
+const TogglePlayer = ({ onHide }: { onHide: () => void }) => {
+  return (
+    <Button alignLeft transparent fullWidth onClick={onHide}>
+      <Icon icon='faEyeSlash' className='mr-2' />
+      <Translate value='buttons.hidePlayer' />
+    </Button>
+  )
+}
+
 const ContextualMenu = () => {
   const app = useSelector((state: State) => state.app)
   const player = useSelector((state: State) => state.player)
@@ -42,18 +52,6 @@ const ContextualMenu = () => {
   const trackIds = liveQueue?.shuffle 
     ? parseTrackIds(liveQueue.randomTrackIds)
     : parseTrackIds(liveQueue?.trackIds)
-  
-  const TogglePlayer = () => {
-    return (
-      <Button alignLeft transparent fullWidth onClick={() => dispatch({ type: types.HIDE_PLAYER })}>
-        <Icon
-          icon='faEyeSlash'
-          className='mr-2'
-        />
-        <Translate value='buttons.hidePlayer' />
-      </Button>
-    )
-  }
 
   const setVolume = (value: number | number[]) => {
     dispatch({ type: types.VOLUME_SET, value: value })
@@ -118,7 +116,7 @@ const ContextualMenu = () => {
         {showVisibilityCons &&
           <>
             <Item className={itemClasses}>
-              <TogglePlayer />
+              <TogglePlayer onHide={() => dispatch({ type: types.HIDE_PLAYER })} />
             </Item>
             <Item className={itemClasses}>
               <ToggleMiniQueueButton />
