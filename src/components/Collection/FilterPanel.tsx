@@ -263,7 +263,7 @@ const FilterPanel = (_props: Props) => {
         >
           <Icon icon="faFilter" className='px-1' />
           {Object.values(activeFilters).some(arr => Array.isArray(arr) && arr.length > 0) && (
-            <span className="ml-1 text-xs bg-blue-500 text-white rounded-full px-2">
+            <span className="ml-1 text-xs bg-primary text-white rounded-full px-2">
               {Object.values(activeFilters).reduce((acc, arr) => acc + (Array.isArray(arr) ? arr.length : 0), 0)}
             </span>
           )}

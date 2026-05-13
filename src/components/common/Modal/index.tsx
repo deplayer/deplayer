@@ -25,7 +25,7 @@ const Modal = ({ isOpen, onClose, children, title, className }: Props) => {
         >
           <Icon icon="faTimes" />
         </button>
-        {title && <h3 className="font-bold text-lg pr-8">{title}</h3>}
+        {title && <h3 className="text-lg pr-8">{title}</h3>}
         {children}
       </div>
       <div

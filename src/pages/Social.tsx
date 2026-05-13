@@ -43,7 +43,7 @@ const Social = () => {
 
   return (
     <div className="p-4 flex flex-col">
-      <h2 className="text-2xl font-bold mb-4 flex items-center justify-between text-base-content">
+      <h2 className="text-2xl mb-4 flex items-center justify-between text-base-content">
         Social
         <button onClick={handleCloseRightPanel} className="btn btn-ghost btn-circle btn-sm" aria-label="Close panel">
           <Icon icon="faTimes" />
@@ -59,7 +59,7 @@ const Social = () => {
       {showUsernameModal && (
         <div className="fixed inset-0 bg-base-100/50 backdrop-blur flex items-center justify-center">
           <div className="bg-base-200 p-6 rounded-lg shadow-lg">
-            <h3 className="text-xl font-bold mb-4 text-base-content">Enter Your Username</h3>
+            <h3 className="text-xl mb-4 text-base-content">Enter Your Username</h3>
             <form onSubmit={(e) => {
               e.preventDefault()
               const input = e.currentTarget.elements.namedItem('username') as HTMLInputElement

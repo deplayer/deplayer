@@ -140,7 +140,7 @@ const RoomList = ({ peers, rooms, dispatch, onJoinRoom }: Props) => {
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && handleShareRoom) handleShareRoom(room.id) }}
-                    className="text-lg font-semibold cursor-pointer hover:text-blue-500"
+                    className="text-lg font-semibold cursor-pointer hover:text-primary"
                     onClick={() => handleShareRoom(room.id)}
                   >
                     Room: {room.id}
