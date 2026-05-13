@@ -39,7 +39,7 @@ function getInitialTheme() {
 }
 
 const SwitchThemeButton = () => {
-  const [theme, setTheme] = React.useState(getInitialTheme())
+  const [theme, setTheme] = React.useState(() => getInitialTheme())
   const [isModalOpen, setIsModalOpen] = React.useState(false)
 
   React.useEffect(() => {

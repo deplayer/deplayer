@@ -20,7 +20,7 @@ const FilterPanel = (_props: Props) => {
   const setFilter = useUIStore(s => s.setFilter)
   const liveStore = useAppStore()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768)
   
   // Get metadata from lightweight LiveStore hooks
   // These query only the necessary columns, not full media objects

@@ -22,7 +22,10 @@ export function usePlaylistStats(trackIds: string[]): PlaylistStats {
 
     const firstCover = tracks.find(t => t.cover?.thumbnailUrl)?.cover?.thumbnailUrl
     const albumIds = new Set(
-      tracks.map(t => t.albumId).filter((id): id is string => Boolean(id))
+      tracks.flatMap(t => {
+      const albumId = t.albumId
+      return albumId ? [albumId] : []
+    })
     )
     // track.duration is stored in milliseconds (see types/media.ts). Convert
     // once here so consumers can format as seconds without each duplicating
