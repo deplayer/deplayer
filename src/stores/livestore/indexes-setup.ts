@@ -78,10 +78,10 @@ export const setupIndexes = (store: unknown) => {
   }
   
   // Split into individual CREATE INDEX statements
-  const statements = indexesSetup
-    .split(';')
-    .map(s => s.trim())
-    .filter(s => s.length > 0)
+  const statements = indexesSetup.split(';').flatMap((s: string) => {
+    const trimmed = s.trim()
+    return trimmed.length > 0 ? [trimmed] : []
+})
   
   console.log(`[LiveStore] Creating ${statements.length} database indexes...`)
   

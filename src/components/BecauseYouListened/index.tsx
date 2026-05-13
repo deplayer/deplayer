@@ -15,9 +15,9 @@ const BecauseYouListened = ({ artistId, artistName, genres, limit = 15 }: Props)
 
   if (!recommendations.length) return null
 
-  const items = recommendations
-    .filter(item => item && item.id)
-    .map(item => (
+  const items = recommendations.flatMap((item) => {
+    if (!item || !item.id) return []
+    return [
       <MediaCover
         key={item.id}
         id={item.id}
@@ -26,7 +26,8 @@ const BecauseYouListened = ({ artistId, artistName, genres, limit = 15 }: Props)
         cover={item.cover || { thumbnailUrl: '', fullUrl: '' }}
         type="song"
       />
-    ))
+    ]
+  })
 
   if (!items.length) return null
 

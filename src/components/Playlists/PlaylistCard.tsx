@@ -92,9 +92,9 @@ const PlaylistCard = memo(({
 
       {chips && chips.length > 0 && (
         <div className="flex flex-wrap gap-1 mt-2">
-          {chips.map((chip, idx) => (
+          {chips.map((chip) => (
             <span
-              key={`${chip.labelKey}-${chip.value}-${idx}`}
+              key={`${chip.labelKey}-${chip.value}`}
               className="badge badge-outline badge-sm gap-1"
             >
               <Translate value={chip.labelKey} />

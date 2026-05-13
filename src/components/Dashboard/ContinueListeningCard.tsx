@@ -28,7 +28,7 @@ const ContinueListeningCard = () => {
           <Link to={`/song/${song.id}`}>
             <p className="font-medium truncate">{song.title}</p>
             <p className="text-sm opacity-70 truncate">
-              {song.artist?.name || song.artistName} — {song.album?.name || song.albumName}
+              {song.artist?.name || song.artistName} – {song.album?.name || song.albumName}
             </p>
           </Link>
         </div>

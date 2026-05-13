@@ -340,7 +340,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
                     const streamUrl = streamUrls.find(url => url.service === value.service)
                     return (
                       <div
-                        key={`service-${value.service}-${index}`}
+                        key={value.service}
                         className='flex items-center w-full sm:w-auto bg-base-300 rounded-lg overflow-hidden'
                       >
                         <div className='flex items-center gap-2 px-3 py-2 bg-base-200'>

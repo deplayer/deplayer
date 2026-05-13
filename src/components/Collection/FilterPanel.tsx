@@ -214,9 +214,10 @@ const FilterPanel = (_props: Props) => {
           const selectedItems = selected || []
           const filterTypes = ['genre', 'type', 'artist', 'provider'] as const
           filterTypes.forEach(type => {
-            const values = selectedItems
-              .filter(item => item.value.startsWith(`${type}:`))
-              .map(item => item.value.replace(`${type}:`, ''))
+            const values = selectedItems.flatMap((item) => {
+              if (!item.value.startsWith(`${type}:`)) return []
+              return [item.value.replace(`${type}:`, '')]
+            })
             handleFilterChange(`${type}s` as keyof Filter, values)
           })
         }}
@@ -288,7 +289,7 @@ const FilterPanel = (_props: Props) => {
   return (
     <div className="filter-panel hidden md:flex items-center w-full">
       {filterContent}
-      <div className="vertical-divider border-l border-gray-500 mx-2" />
+      <div className="vertical-divider border-l border-base-300 mx-2" />
     </div>
   )
 }

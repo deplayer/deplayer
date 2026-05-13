@@ -55,10 +55,10 @@ const Providers = () => {
   // Helper to get next available provider ID
   const getNextProviderId = useCallback((providers: Record<string, unknown>, baseKey: string) => {
     const existingKeys = Object.keys(providers)
-      .filter(key => key.startsWith(baseKey))
-      .map(key => {
+      .flatMap(key => {
+        if (!key.startsWith(baseKey)) return []
         const num = key.replace(baseKey, '');
-        return num ? parseInt(num, 10) : 0;
+        return [num ? parseInt(num, 10) : 0];
       })
       .sort((a, b) => a - b);
 

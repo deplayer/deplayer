@@ -126,7 +126,7 @@ const RoomList = ({ peers, rooms, dispatch, onJoinRoom }: Props) => {
                 <div className="flex items-center gap-2">
                   {Object.keys(peers[room.id] || {}).length > 0 && (
                     <button
-                      className="text-gray-400 hover:text-white transition-colors"
+                      className="text-base-content/60 hover:text-base-content transition-colors"
                       onClick={() => toggleRoomExpansion(room.id)}
                       aria-label="Toggle room details"
                     >
@@ -144,7 +144,7 @@ const RoomList = ({ peers, rooms, dispatch, onJoinRoom }: Props) => {
                     onClick={() => handleShareRoom(room.id)}
                   >
                     Room: {room.id}
-                    <span className="text-sm text-gray-400 ml-2">
+                    <span className="text-sm text-base-content/60 ml-2">
                       ({Object.keys(peers[room.id] || {}).length} {Object.keys(peers[room.id] || {}).length === 1 ? 'peer' : 'peers'})
                     </span>
                   </h4>

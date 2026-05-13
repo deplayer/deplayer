@@ -30,17 +30,16 @@ const MediaCoverWrapper = ({ media }: MediaCoverProps) => {
 // All items component
 // Important! add unique key
 const MediaItems = (list: Array<MediaRow>) => {
-  return list
-    .filter((media) => media && media.id) // Filter out null/undefined items
-    .map((media) => {
-      return (
-        <MediaCoverWrapper
-          itemId={media.id}
-          key={media.id}
-          media={media}
-        />
-      )
-    })
+  return list.flatMap((media) => {
+    if (!media || !media.id) return []
+    return [
+      <MediaCoverWrapper
+        itemId={media.id}
+        key={media.id}
+        media={media}
+      />
+    ]
+  })
 }
 
 type Props = {

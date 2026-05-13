@@ -89,7 +89,8 @@ export const usePlaylistTracks = (playlistId: string | null | undefined) => {
 
   // Sort media by playlist order
   const mediaMap = new Map((media as unknown as Array<{ id: string }>).map(m => [m.id, m]))
-  return trackIds
-    .map((id: string) => mediaMap.get(id))
-    .filter((m: unknown) => m !== undefined)
+  return trackIds.flatMap((id: string) => {
+      const m = mediaMap.get(id)
+      return m ? [m] : []
+    })
 }

@@ -28,7 +28,10 @@ type ThemeContextValue = {
   setTheme: (theme: Theme) => void
 }
 
-const ThemeContext = createContext<ThemeContextValue | undefined>(undefined)
+const ThemeContext = createContext<ThemeContextValue>({
+  theme: DEFAULT_THEME,
+  setTheme: () => {},
+})
 
 type Props = {
   children: ReactNode
@@ -69,9 +72,5 @@ export const ThemeProvider = ({ children }: Props) => {
  * @throws Error if used outside ThemeProvider
  */
 export const useTheme = (): ThemeContextValue => {
-  const context = useContext(ThemeContext)
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider')
-  }
-  return context
+  return useContext(ThemeContext)
 }

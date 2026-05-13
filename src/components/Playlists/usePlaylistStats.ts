@@ -16,9 +16,10 @@ export function usePlaylistStats(trackIds: string[]): PlaylistStats {
   const mediaMap = useMediaMapForIds(previewIds)
 
   return useMemo(() => {
-    const tracks = previewIds
-      .map(id => mediaMap[id] as MediaRow | undefined)
-      .filter((t): t is MediaRow => Boolean(t))
+    const tracks = previewIds.flatMap((id) => {
+        const t = mediaMap[id] as MediaRow | undefined
+        return t ? [t] : []
+    })
 
     const firstCover = tracks.find(t => t.cover?.thumbnailUrl)?.cover?.thumbnailUrl
     const albumIds = new Set(

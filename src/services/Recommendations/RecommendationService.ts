@@ -32,19 +32,17 @@ export const getLocalRecommendations = ({
 
   const sourceGenreSet = new Set(sourceGenres)
 
-  const scored = library
-    .filter(item => item.artistId !== sourceArtistId)
-    .map(item => {
-      const itemGenres = Array.isArray(item.genres)
-        ? item.genres
-        : typeof item.genres === 'string'
-          ? JSON.parse(item.genres)
-          : []
-      const overlap = itemGenres.filter((g: string) => sourceGenreSet.has(g)).length
-      return { item, overlap }
-    })
-    .filter(({ overlap }) => overlap > 0)
-    .sort((a, b) => {
+  const scored = library.flatMap((item) => {
+    if (item.artistId === sourceArtistId) return []
+    const itemGenres = Array.isArray(item.genres)
+      ? item.genres
+      : typeof item.genres === 'string'
+        ? JSON.parse(item.genres)
+        : []
+    const overlap = itemGenres.filter((g: string) => sourceGenreSet.has(g)).length
+    return overlap > 0 ? [{ item, overlap }] : []
+  })
+  .sort((a, b) => {
       if (b.overlap !== a.overlap) return b.overlap - a.overlap
       return (b.item.playCount || 0) - (a.item.playCount || 0)
     })

@@ -98,7 +98,7 @@ const Dashboard = () => {
   const artistGenres = React.useMemo(() => {
     if (!topArtist) return []
     const genres = topArtist.genres || (topArtist.genresFlat ? topArtist.genresFlat.split(',') : [])
-    return Array.isArray(genres) ? genres.map((g: string) => g.trim()).filter(Boolean) : []
+    return Array.isArray(genres) ? genres.flatMap((g: string) => { const trimmed = g.trim(); return trimmed ? [trimmed] : [] }) : []
   }, [topArtist])
 
   const hasLibrary = mediaCount > 0

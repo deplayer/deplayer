@@ -75,7 +75,7 @@ const AddMediaModal = (props: Props) => {
             className="w-full"
           />
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-x-2">
             <input 
               type="file" 
               name="file" 

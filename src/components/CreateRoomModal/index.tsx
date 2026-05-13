@@ -43,7 +43,7 @@ const CreateRoomModal = ({ isOpen, onClose, onCreateRoom }: Props) => {
             type="text"
             value={roomCode}
             onChange={(e) => setRoomCode(e.target.value)}
-            className="w-full p-2 rounded border dark:bg-gray-800"
+            className="w-full p-2 rounded border bg-base-200 border-base-300"
             placeholder="Enter room code"
           />
         </div>
@@ -56,7 +56,7 @@ const CreateRoomModal = ({ isOpen, onClose, onCreateRoom }: Props) => {
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full p-2 rounded border dark:bg-gray-800"
+            className="w-full p-2 rounded border bg-base-200 border-base-300"
             placeholder="Enter username"
           />
         </div>

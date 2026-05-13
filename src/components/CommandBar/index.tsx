@@ -360,17 +360,15 @@ function CommandBar({ togglePlaying, playNext, playPrev }: Props) {
     const filteredItems = filterItems(allAvailableItems, search)
 
     // Group items by type using the configuration
-    return Object.entries(GROUP_CONFIGS)
-      .map(([key, config]) => {
+    return Object.entries(GROUP_CONFIGS).flatMap(([key, config]) => {
         const items = config.filter ? config.filter(filteredItems) : []
-        return items.length > 0 ? {
+        return items.length > 0 ? [{
           title: config.title,
           items,
           icon: config.icon,
           key
-        } : null
-      })
-      .filter((group): group is (GroupedItems & { key: string }) => group !== null)
+        }] : []
+    })
       .sort((a, b) => {
         const priorityA = GROUP_CONFIGS[a.key].priority
         const priorityB = GROUP_CONFIGS[b.key].priority
@@ -589,7 +587,7 @@ function CommandBar({ togglePlaying, playNext, playPrev }: Props) {
             ))}
           </div>
 
-          <div className="border-t border-base-300 mt-2 p-4 text-sm text-base-content/70 flex items-center justify-center space-x-8">
+          <div className="border-t border-base-300 mt-2 p-4 text-sm text-base-content/70 flex items-center justify-center gap-x-8">
             <div className="flex items-center">
               <kbd className="px-2 py-1 bg-base-200 rounded mr-2">↑↓</kbd>
               <span>{I18n.t('menu.navigate')}</span>

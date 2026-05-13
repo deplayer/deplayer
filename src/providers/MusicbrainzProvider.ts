@@ -46,12 +46,15 @@ export default class MusicbrainzProvider implements IMusicMetadataProvider {
         return {
           "life-span": artist["life-span"],
           country: artist.country,
-          relations: artist.relations
-            .filter((rel: { url?: { resource: string }; type: string }) => rel.url)
-            .map((rel: { url: { resource: string }; type: string }) => ({
-              type: rel.type,
-              url: { resource: rel.url.resource },
-            })),
+          relations: (artist.relations || []).flatMap(
+              (rel: { url?: { resource: string }; type: string }) => {
+                if (!rel.url) return []
+                return [{
+                  type: rel.type,
+                  url: { resource: rel.url.resource },
+                }]
+              }
+            ),
           artist: {
             bio: {
               content:

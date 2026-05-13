@@ -12,9 +12,9 @@ const AlbumMediaSlider = ({ mediaItems, title }: { mediaItems: AlbumWithArtist[]
     return null
   }
 
-  const albumItems = mediaItems
-    .filter(album => album && album.id && album.name) // Filter out invalid albums
-    .map((album) => (
+  const albumItems = mediaItems.flatMap((album) => {
+    if (!album || !album.id || !album.name) return []
+    return [
       <AlbumCover
         key={album.id}
         id={album.id}
@@ -25,7 +25,8 @@ const AlbumMediaSlider = ({ mediaItems, title }: { mediaItems: AlbumWithArtist[]
           fullUrl: album.thumbnailUrl || undefined
         }}
       />
-    ))
+    ]
+  })
 
   if (!albumItems.length) {
     return null
@@ -42,7 +43,7 @@ const AlbumMediaSlider = ({ mediaItems, title }: { mediaItems: AlbumWithArtist[]
 const RecentAlbums = () => {
   const recentAlbums = useRecentAlbums(10)
   const artistIds = useMemo(
-    () => [...new Set((recentAlbums as unknown as AlbumRow[]).map((a) => a.artistId).filter(Boolean))],
+    () => [...new Set((recentAlbums as unknown as AlbumRow[]).flatMap((a) => a.artistId ? [a.artistId] : []))],
     [recentAlbums]
   )
   const artistsMap = useArtistsByIds(artistIds)
