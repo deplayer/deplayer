@@ -19,7 +19,7 @@ const Cover = (props: Props) => {
     return null
   }
 
-  const handleClick = () => {
+  const handleCoverClick = () => {
     setIsModalOpen(true)
     if (props.onClick) {
       props.onClick()
@@ -33,9 +33,9 @@ const Cover = (props: Props) => {
       <div
         role="button"
         tabIndex={0}
-        onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && handleClick) handleClick() }}
+        onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && handleCoverClick) handleCoverClick() }}
         className='relative text-lg hidden md:block cursor-pointer w-16 h-16 aspect-square'
-        onClick={handleClick}
+        onClick={handleCoverClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         data-testid="cover-container"

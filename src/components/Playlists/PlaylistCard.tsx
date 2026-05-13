@@ -65,7 +65,7 @@ const PlaylistCard = memo(({
     </figure>
 
     <div className="card-body p-4">
-      <h3 className="card-title text-lg font-bold truncate">{name}</h3>
+      <h3 className="card-title text-lg truncate">{name}</h3>
 
       <div className="text-sm opacity-70 space-y-1">
         <div className="flex items-center gap-2">

@@ -30,25 +30,25 @@ interface RemoveProviderBtnProps {
   onRemove: (providerKey: string) => void;
 }
 
-const ProviderForm = (props: ProviderFormProps) => {
-  const RemoveProviderBtn = ({ providerKey, onRemove }: RemoveProviderBtnProps) => {
-    const onClick = () => {
-      onRemove(providerKey)
-    }
-
-    return (
-      <Button
-        transparent
-        size='lg'
-        className='hover:text-error'
-        onClick={onClick}
-        title={providerKey}
-      >
-        <Icon icon='faTrash' />
-      </Button>
-    )
+const RemoveProviderBtn = ({ providerKey, onRemove }: RemoveProviderBtnProps) => {
+  const onClick = () => {
+    onRemove(providerKey)
   }
 
+  return (
+    <Button
+      transparent
+      size='lg'
+      className='hover:text-error'
+      onClick={onClick}
+      title={providerKey}
+    >
+      <Icon icon='faTrash' />
+    </Button>
+  )
+}
+
+const ProviderForm = (props: ProviderFormProps) => {
   // Get all instances of this provider type from the actual settings
   const providerInstances = Object.keys(props.settings.providers || {})
     .filter(key => key.startsWith(props.providerKey))

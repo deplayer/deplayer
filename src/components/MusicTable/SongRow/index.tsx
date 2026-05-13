@@ -55,7 +55,7 @@ export type Props = {
 }
 
 const SongCover = React.memo(({ cover, onClick, albumName }: { cover: Cover, onClick: () => void, albumName: string }) => {
-  const handleClick = (e: React.MouseEvent) => {
+  const handleRowClick = (e: React.MouseEvent) => {
     e.stopPropagation()
     onClick()
   }
@@ -64,10 +64,10 @@ const SongCover = React.memo(({ cover, onClick, albumName }: { cover: Cover, onC
     <div
       role='button'
       tabIndex={0}
-      onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && handleClick) handleClick(e as unknown as React.MouseEvent) }}
+      onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && handleRowClick) handleRowClick(e as unknown as React.MouseEvent) }}
       className='media-thumb relative mr-3 overflow-hidden'
       style={{ minWidth: '80px', height: '80px' }}
-      onClick={handleClick}
+      onClick={handleRowClick}
       data-testid="song-cover"
     >
       <CoverImage

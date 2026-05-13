@@ -59,6 +59,7 @@ const PlaylistRow = memo(({ title, icon, actions, children }: Props) => {
       )}
       <div
         ref={scrollerRef}
+        role="region"
         tabIndex={0}
         onKeyDown={onKeyDown}
         className="flex gap-4 overflow-x-auto snap-x snap-mandatory px-4 pb-2 scrollbar-none focus:outline-none focus:ring-2 focus:ring-primary/40 rounded-box"

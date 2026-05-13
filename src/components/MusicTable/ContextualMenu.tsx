@@ -228,7 +228,7 @@ const ContextualMenu = (props: MenuProps) => {
   }
 
   // Enhanced click handler with right-click support
-  const handleClick = (e: React.MouseEvent | React.KeyboardEvent) => {
+  const handleMenuItemClick = (e: React.MouseEvent | React.KeyboardEvent) => {
     e.preventDefault()
     e.stopPropagation()
     
@@ -278,7 +278,7 @@ const ContextualMenu = (props: MenuProps) => {
     if (!isOpen) {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault()
-        handleClick(e)
+        handleMenuItemClick(e)
       }
       return
     }
@@ -373,12 +373,12 @@ const ContextualMenu = (props: MenuProps) => {
     <>
       <div 
         ref={triggerRef}
-        onClick={handleClick}
+        onClick={handleMenuItemClick}
         onContextMenu={handleContextMenu}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault()
-            handleClick(e)
+            handleMenuItemClick(e)
           }
         }}
         role="button"

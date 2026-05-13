@@ -93,7 +93,7 @@ const LoadingRow = ({ style, slim }: { style: React.CSSProperties, slim: boolean
       <div className="h-4 bg-base-300 rounded w-1/3 mb-2" /> {/* Title placeholder */}
       <div className="h-3 bg-base-300/70 rounded w-1/4" /> {/* Subtitle placeholder */}
     </div>
-    <div className="flex space-x-2">
+    <div className="flex gap-x-2">
       <div key="btn1" className="w-8 h-8 bg-base-300 rounded" /> {/* Button placeholder */}
       <div key="btn2" className="w-8 h-8 bg-base-300 rounded" /> {/* Button placeholder */}
     </div>
