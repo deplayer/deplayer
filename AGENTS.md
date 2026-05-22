@@ -183,13 +183,6 @@ This project is migrating to LiveStore. When working with LiveStore:
 - **Documentation lookup**: When you need to look up information about LiveStore, always use the `docs` directory shipped with `@livestore/livestore` package in `node_modules/@livestore/livestore/docs`
 - LiveStore documentation is available locally in the node_modules directory
 
-### Additional Cursor Rules
-This project includes Cursor IDE rules in `.cursor/rules/`:
-- **Taskmaster integration** - Task management workflow
-- **Development workflow** - MCP server vs CLI interaction
-- **Self improvement** - Guidelines for updating rules based on patterns
-
-Review these rules when making architectural decisions or workflow improvements.
 
 <skills_system priority="1">
 
