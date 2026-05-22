@@ -28,7 +28,7 @@ export function* getSettingsFromLiveStore(): Generator<any, Record<string, unkno
  * Transform raw LiveStore media data to include nested artist/album objects
  * and parse JSON fields. Mirrors the transformation in hooks/useMedia.ts
  */
-type TransformedMedia = MediaRow & {
+export type TransformedMedia = MediaRow & {
   artist: { id: string; name: string }
   album: { id: string; name: string; artistId: string; artist: { id: string; name: string }; thumbnailUrl: unknown; year: unknown }
 }

@@ -192,13 +192,13 @@ class PlayerControls extends React.Component<Props, State> {
   onPlay = (): void => {
     this.props.dispatch({ type: types.START_PLAYING })
     // Sync media session playback state
-    new MediaSessionService().setPlaybackState('playing')
+    MediaSessionService.getInstance().setPlaybackState('playing')
   }
 
   onPause = (): void => {
     this.props.dispatch({ type: types.PAUSE_PLAYING })
     // Sync media session playback state
-    new MediaSessionService().setPlaybackState('paused')
+    MediaSessionService.getInstance().setPlaybackState('paused')
   }
 
   onSeekChange = (value: number | number[]): void => {

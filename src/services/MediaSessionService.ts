@@ -5,80 +5,98 @@ import logger from '../utils/logger'
 import PlayerRefService from './PlayerRefService'
 
 // fix ts navigator typings
+// eslint-disable-next-line no-var -- `declare var` is required for ambient global augmentation
 declare var navigator: Navigator & { mediaSession?: MediaSession }
+// eslint-disable-next-line no-var -- `declare var` is required for ambient global augmentation
 declare var window: Window & { MediaMetadata?: new (init: { title: string; artist: string; album: string; artwork: Array<{ src: string; type: string; sizes: string }> }) => MediaMetadata }
 
 export default class MediaSessionService {
-  updateMetadata = (media: MediaRow | null, dispatch: Dispatch) => {
-    if (this.canSetMediaSession() && media && window.MediaMetadata && navigator.mediaSession) {
-      navigator.mediaSession.metadata = new window.MediaMetadata({
-        title: media.title,
-        artist: media.artistName,
-        album: media.albumName,
-        artwork: [
-          {
-            src: this.getThumbnail(media), type: 'image/png', sizes: '96x96'
-          },
-          {
-            src: this.getFullCover(media), type: 'image/png', sizes: '512x512'
-          }
-        ]
-      })
+  private static instance: MediaSessionService | null = null
+  private static loggedUnsupported = false
+  private handlersRegistered = false
 
-      // Set initial playback state to playing (this is called when a track starts)
-      navigator.mediaSession.playbackState = 'playing'
+  private constructor() {}
 
-      navigator.mediaSession.setActionHandler('play', async () => {
-        logger.log('MediaSession', 'play action handler called')
-        // Use PlayerRefService for imperative playback control
-        await PlayerRefService.getInstance().play()
-        navigator.mediaSession.playbackState = 'playing'
-        dispatch({type: actions.START_PLAYING})
-      })
-      navigator.mediaSession.setActionHandler('pause', () => {
-        logger.log('MediaSession', 'pause action handler called')
-        // Use PlayerRefService for imperative playback control
-        PlayerRefService.getInstance().pause()
-        navigator.mediaSession.playbackState = 'paused'
-        dispatch({type: actions.PAUSE_PLAYING})
-      })
-      navigator.mediaSession.setActionHandler('previoustrack', () => {
-        dispatch({type: actions.PLAY_PREV})
-      })
-      navigator.mediaSession.setActionHandler('nexttrack', () => {
-        dispatch({type: actions.PLAY_NEXT})
-      })
+  static getInstance(): MediaSessionService {
+    if (!MediaSessionService.instance) {
+      MediaSessionService.instance = new MediaSessionService()
+    }
+    return MediaSessionService.instance
+  }
+
+  registerHandlers(dispatch: Dispatch): void {
+    if (this.handlersRegistered) {
+      return
+    }
+    const session = this.getSession()
+    if (!session) {
+      return
+    }
+
+    session.setActionHandler('play', async () => {
+      logger.log('MediaSession', 'play action handler called')
+      await PlayerRefService.getInstance().play()
+      session.playbackState = 'playing'
+      dispatch({ type: actions.START_PLAYING })
+    })
+    session.setActionHandler('pause', () => {
+      logger.log('MediaSession', 'pause action handler called')
+      PlayerRefService.getInstance().pause()
+      session.playbackState = 'paused'
+      dispatch({ type: actions.PAUSE_PLAYING })
+    })
+    session.setActionHandler('previoustrack', () => {
+      dispatch({ type: actions.PLAY_PREV })
+    })
+    session.setActionHandler('nexttrack', () => {
+      dispatch({ type: actions.PLAY_NEXT })
+    })
+
+    this.handlersRegistered = true
+  }
+
+  updateMetadata(media: MediaRow | null): void {
+    const session = this.getSession()
+    if (!session || !media || !window.MediaMetadata) {
+      return
+    }
+
+    session.metadata = new window.MediaMetadata({
+      title: media.title,
+      artist: media.artistName,
+      album: media.albumName,
+      artwork: [
+        { src: this.getThumbnail(media), type: 'image/png', sizes: '96x96' },
+        { src: this.getFullCover(media), type: 'image/png', sizes: '512x512' }
+      ]
+    })
+
+    session.playbackState = 'playing'
+  }
+
+  setPlaybackState(state: 'playing' | 'paused' | 'none'): void {
+    const session = this.getSession()
+    if (session) {
+      session.playbackState = state
     }
   }
 
-  /**
-   * Update playback state independently (called from player events)
-   */
-  setPlaybackState = (state: 'playing' | 'paused' | 'none') => {
-    if (this.canSetMediaSession()) {
-      navigator.mediaSession.playbackState = state
-    }
-  }
-
-  getThumbnail(media: MediaRow) {
+  private getThumbnail(media: MediaRow): string {
     return media.cover ? media.cover.thumbnailUrl : ''
   }
 
-  getFullCover(media: MediaRow) {
+  private getFullCover(media: MediaRow): string {
     return media.cover ? media.cover.fullUrl : ''
   }
 
-  canSetMediaSession () {
-    return this.getMediaSession()
-  }
-
-  getMediaSession () {
-    // Check if browser supports MediaMetadata
-    if ('mediaSession' in navigator && window.MediaMetadata) {
-      return true
+  private getSession(): MediaSession | null {
+    if ('mediaSession' in navigator && window.MediaMetadata && navigator.mediaSession) {
+      return navigator.mediaSession
     }
-
-    logger.log('MediaSession', "This browser does not support media session")
-    return
+    if (!MediaSessionService.loggedUnsupported) {
+      logger.log('MediaSession', 'This browser does not support media session')
+      MediaSessionService.loggedUnsupported = true
+    }
+    return null
   }
 }
