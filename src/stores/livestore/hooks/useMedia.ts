@@ -7,16 +7,17 @@ import { useFavoriteIds } from './useFavorites'
 
 import type { MediaRow } from '../../../types/media'
 
+// No-op query for idle hook states. Targets sync_state because it mutates
+// rarely (during initial hydration only) — picking media or playback_history
+// would re-invalidate every idle subscriber on common writes.
+const NOOP_QUERY = queryDb(tables.syncState.select('id').where('id', '=', '__NONE__'))
+
 /** Transformed media extends MediaRow with nested artist/album objects */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface TransformedMedia extends MediaRow {
   artist: { id: string; name: string }
   album: { id: string; name: string; artistId: string; artist: { id: string; name: string }; thumbnailUrl: string | null; year: number | null }
 }
-
-const EMPTY_IDS: readonly string[] = Object.freeze([])
-const EMPTY_MEDIA: readonly TransformedMedia[] = Object.freeze([])
-const EMPTY_MAP: Readonly<Record<string, TransformedMedia>> = Object.freeze({})
 
 /**
  * Media Query Hooks
@@ -210,42 +211,51 @@ export const useMediaByAlbum = (albumId: string | null | undefined) => {
  * return <div>Found {results.length} matches</div>
  * ```
  */
-export const useSearchMedia = (searchTerm: string | undefined | null, limit = 100): TransformedMedia[] => {
-  const term = (searchTerm ?? '').trim()
-  // Empty input branches around the inner hook so we don't subscribe at all
-  // when no search term is provided. The condition is derived from input so
-  // each callsite consistently picks the same branch.
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  return term ? useSearchMediaInner(term, limit) : (EMPTY_MEDIA as TransformedMedia[])
-}
-
-const useSearchMediaInner = (term: string, limit: number): TransformedMedia[] => {
+export const useSearchMedia = (searchTerm: string | undefined | null, limit = 100) => {
   const store = useAppStore()
-
-  const titleQuery = useMemo(() => queryDb(
-    tables.media
-      .select()
-      .where('title', 'LIKE', `%${term}%`)
-      .limit(limit)
-  ), [term, limit])
-
-  const artistQuery = useMemo(() => queryDb(
-    tables.media
-      .select()
-      .where('artistName', 'LIKE', `%${term}%`)
-      .limit(limit)
-  ), [term, limit])
-
+  // Normalize search term - ensure it's always a valid string
+  const term = (searchTerm ?? '').trim()
+  const hasSearch = term.length > 0
+  
+  // Use useMemo to create stable query objects
+  const titleQuery = useMemo(() => {
+    if (!hasSearch || !term) return NOOP_QUERY
+    return queryDb(
+      tables.media
+        .select()
+        .where('title', 'LIKE', `%${term}%`)
+        .limit(limit)
+    )
+  }, [hasSearch, term, limit])
+  
+  const artistQuery = useMemo(() => {
+    if (!hasSearch || !term) return NOOP_QUERY
+    return queryDb(
+      tables.media
+        .select()
+        .where('artistName', 'LIKE', `%${term}%`)
+        .limit(limit)
+    )
+  }, [hasSearch, term, limit])
+  
+  // Search by title
   const titleMatches = store.useQuery(titleQuery)
+  
+  // Search by artist name
   const artistMatches = store.useQuery(artistQuery)
-
+  
   return useMemo(() => {
+    if (!hasSearch) return []
+    
+    // Merge results and deduplicate by ID
     const titleResults = Array.isArray(titleMatches) ? titleMatches : []
     const artistResults = Array.isArray(artistMatches) ? artistMatches : []
-
+    
     const seenIds = new Set<string>()
     const mergedResults: TransformedMedia[] = []
-
+    
+    // Add title matches first (prioritize exact title matches)
+    // Guard against undefined/null IDs
     for (const media of titleResults) {
       const id = media?.id
       if (id && typeof id === 'string' && !seenIds.has(id)) {
@@ -255,6 +265,7 @@ const useSearchMediaInner = (term: string, limit: number): TransformedMedia[] =>
       }
     }
 
+    // Add artist matches
     for (const media of artistResults) {
       const id = media?.id
       if (id && typeof id === 'string' && !seenIds.has(id)) {
@@ -263,9 +274,10 @@ const useSearchMediaInner = (term: string, limit: number): TransformedMedia[] =>
         if (transformed) mergedResults.push(transformed)
       }
     }
-
+    
+    // Limit total results
     return mergedResults.slice(0, limit)
-  }, [titleMatches, artistMatches, limit])
+  }, [titleMatches, artistMatches, hasSearch, limit])
 }
 
 /**
@@ -284,58 +296,75 @@ const useSearchMediaInner = (term: string, limit: number): TransformedMedia[] =>
  * return <MusicTable mediaIds={mediaIds} />
  * ```
  */
-export const useSearchMediaIds = (searchTerm: string | undefined | null, limit = 100): string[] => {
-  const term = (searchTerm ?? '').trim()
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  return term ? useSearchMediaIdsInner(term, limit) : (EMPTY_IDS as string[])
-}
-
-const useSearchMediaIdsInner = (term: string, limit: number): string[] => {
+export const useSearchMediaIds = (searchTerm: string | undefined | null, limit = 100) => {
   const store = useAppStore()
+  const term = (searchTerm ?? '').trim()
+  const hasSearch = term.length > 0
 
-  const titleQuery = useMemo(() => queryDb(
-    tables.media
-      .select('id')
-      .where('title', 'LIKE', `%${term}%`)
-      .limit(limit)
-  ), [term, limit])
+  const titleQuery = useMemo(() => {
+    if (!hasSearch || !term) {
+      return NOOP_QUERY
+    }
+    return queryDb(
+      tables.media
+        .select('id')
+        .where('title', 'LIKE', `%${term}%`)
+        .limit(limit)
+    )
+  }, [hasSearch, term, limit])
 
-  const artistQuery = useMemo(() => queryDb(
-    tables.media
-      .select('id')
-      .where('artistName', 'LIKE', `%${term}%`)
-      .limit(limit)
-  ), [term, limit])
-
+  const artistQuery = useMemo(() => {
+    if (!hasSearch || !term) {
+      return NOOP_QUERY
+    }
+    return queryDb(
+      tables.media
+        .select('id')
+        .where('artistName', 'LIKE', `%${term}%`)
+        .limit(limit)
+    )
+  }, [hasSearch, term, limit])
+  
+  // Search by title - only select ID
   const titleMatches = store.useQuery(titleQuery)
+  
+  // Search by artist name - only select ID
   const artistMatches = store.useQuery(artistQuery)
-
+  
   return useMemo(() => {
+    // Early return for no search - most common case on /collection page
+    if (!hasSearch) return []
+    
     const seenIds = new Set<string>()
     const mergedIds: string[] = []
-
+    
+    // Add title match IDs (objects with { id: string })
+    // Filter out any undefined/null IDs to prevent downstream query errors
     if (Array.isArray(titleMatches)) {
       for (const result of titleMatches) {
         const id = (result as { id?: string })?.id
+        // Guard against undefined/null IDs
         if (id && typeof id === 'string' && !seenIds.has(id)) {
           seenIds.add(id)
           mergedIds.push(id)
         }
       }
     }
-
+    
+    // Add artist match IDs
     if (Array.isArray(artistMatches)) {
       for (const result of artistMatches) {
         const id = (result as { id?: string })?.id
+        // Guard against undefined/null IDs
         if (id && typeof id === 'string' && !seenIds.has(id)) {
           seenIds.add(id)
           mergedIds.push(id)
         }
       }
     }
-
+    
     return mergedIds.slice(0, limit)
-  }, [titleMatches, artistMatches, limit])
+  }, [titleMatches, artistMatches, hasSearch, limit])
 }
 
 /**
@@ -603,28 +632,30 @@ export const useFilteredMedia = (filters: Filter) => {
  * const mediaMap = useMediaMapForIds(visibleIds) // Only load first 50
  * ```
  */
-export const useMediaMapForIds = (ids: string[]): Record<string, TransformedMedia> => {
-  const validIds = ids.filter((id): id is string => typeof id === 'string' && id.length > 0)
-  return validIds.length === 0
-    ? (EMPTY_MAP as Record<string, TransformedMedia>)
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    : useMediaMapForIdsInner(validIds)
-}
-
-const useMediaMapForIdsInner = (validIds: string[]): Record<string, TransformedMedia> => {
+export const useMediaMapForIds = (ids: string[]) => {
   const store = useAppStore()
-
-  // Stabilize on joined ids so callers passing a fresh array each render don't re-create the query.
-  const idsKey = validIds.join(',')
-  const query = useMemo(() => queryDb(
-    tables.media
-      .select()
-      .where({ id: { op: 'IN', value: validIds } })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  ), [idsKey])
-
+  // Filter out any undefined/null values and ensure we have valid string IDs
+  const validIds = useMemo(() => 
+    ids.filter((id): id is string => typeof id === 'string' && id.length > 0),
+    [ids]
+  )
+  
+  // Only query if we have valid IDs
+  const shouldQuery = validIds.length > 0
+  
+  const query = useMemo(() => {
+    if (!shouldQuery) {
+      return NOOP_QUERY
+    }
+    return queryDb(
+      tables.media
+        .select()
+        .where({ id: { op: 'IN', value: validIds } })
+    )
+  }, [shouldQuery, validIds])
+  
   const rawMedia = store.useQuery(query)
-
+  
   return useMemo(() => {
     const map: Record<string, TransformedMedia> = {}
     if (Array.isArray(rawMedia)) {
