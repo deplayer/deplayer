@@ -92,11 +92,18 @@ class BatchedMediaCommitter {
 
       const before = this.pendingMedia.length
       await this.flush()
-      // If flush() failed and re-queued, pendingMedia.length stays at MAX_BATCH_SIZE
-      // (room === 0 forever). Bail out so the caller doesn't loop infinitely; the
-      // trailing debounce setTimeout below still gives the next add() a chance to
-      // drain once conditions improve.
-      if (this.pendingMedia.length >= before && i < mediaItems.length) break
+      // No-progress guard: if flush() couldn't drain (re-queued on error, or
+      // returned early because another flush was already in-flight), don't
+      // spin and don't silently drop the rest of the input. Throw so the
+      // caller (the sync saga) sees the failure and can decide policy. The
+      // trailing debounce setTimeout below is intentionally NOT scheduled in
+      // this path: there is nothing useful for it to do.
+      if (this.pendingMedia.length >= before && i < mediaItems.length) {
+        throw new Error(
+          `BatchedMediaCommitter.add: flush() did not drain ${this.pendingMedia.length} items; ` +
+          `${mediaItems.length - i} input items not buffered. Inspect prior flush errors.`,
+        )
+      }
     }
 
     if (this.flushTimeout) clearTimeout(this.flushTimeout)

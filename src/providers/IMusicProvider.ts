@@ -8,8 +8,14 @@ export interface ScanStatus {
 
 export interface AlbumPage {
   media: NormalizedMedia[]
-  /** Opaque cursor for the next page (provider-specific). null when done. */
-  nextCursor: string | null
+  /**
+   * Numeric offset for the next page. null when the stream is exhausted.
+   * Kept as a number (not an opaque token) so SyncState.initialSyncCursor
+   * can persist it without lossy coercion. Providers that need richer
+   * resumption state should encode it elsewhere (e.g. another sync_state
+   * column) rather than smuggle it through this field.
+   */
+  nextCursor: number | null
   hasMore: boolean
 }
 
@@ -24,6 +30,6 @@ export interface IMusicProvider {
    */
   streamAlbumsSince?(
     since: string | null,
-    opts?: { cursor?: string | null; pageSize?: number },
+    opts?: { cursor?: number | null; pageSize?: number },
   ): AsyncGenerator<AlbumPage, void, void>
 }

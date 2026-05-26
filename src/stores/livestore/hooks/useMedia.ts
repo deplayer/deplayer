@@ -7,9 +7,13 @@ import { useFavoriteIds } from './useFavorites'
 
 import type { MediaRow } from '../../../types/media'
 
-// No-op query for idle hook states. Targets sync_state because it mutates
-// rarely (during initial hydration only) — picking media or playback_history
-// would re-invalidate every idle subscriber on common writes.
+// No-op query for idle hook states. Targets sync_state because it is written
+// only once per sync page (see MAX_PAGES_PER_SESSION in
+// sagas/collection/index.ts), which keeps idle subscribers cheap.
+// IMPORTANT: any change that increases sync_state write frequency (e.g.
+// per-batch progress writes) will re-invalidate every idle subscriber on
+// every write and degrade renderer performance during hydration. Pick a
+// different rarely-written table before doing that.
 const NOOP_QUERY = queryDb(tables.syncState.select('id').where('id', '=', '__NONE__'))
 
 /** Transformed media extends MediaRow with nested artist/album objects */

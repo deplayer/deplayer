@@ -111,12 +111,11 @@ export default class SubsonicApiProvider implements IMusicProvider {
 
   async *streamAlbumsSince(
     since: string | null,
-    opts: { cursor?: string | null; pageSize?: number } = {},
-  ): AsyncGenerator<{ media: NormalizedMedia[]; nextCursor: string | null; hasMore: boolean }, void, void> {
+    opts: { cursor?: number | null; pageSize?: number } = {},
+  ): AsyncGenerator<{ media: NormalizedMedia[]; nextCursor: number | null; hasMore: boolean }, void, void> {
     const pageSize = opts.pageSize ?? 50
     const ALBUM_FETCH_PARALLELISM = 10
-    const initialCursor = Number(opts.cursor)
-    let offset = Number.isFinite(initialCursor) ? initialCursor : 0
+    let offset = opts.cursor ?? 0
     const sinceMs = since ? new Date(since).getTime() : -Infinity
 
     while (true) {
@@ -126,7 +125,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
       )
       const albums: SubsonicAlbum[] = list.data['subsonic-response'].albumList2?.album || []
       if (albums.length === 0) {
-        yield { media: [], nextCursor: String(offset), hasMore: false }
+        yield { media: [], nextCursor: null, hasMore: false }
         return
       }
 
@@ -170,7 +169,7 @@ export default class SubsonicApiProvider implements IMusicProvider {
 
       const hasMore = !crossedBoundary && albums.length === pageSize
       offset += pageSize
-      yield { media: pageMedia, nextCursor: hasMore ? String(offset) : null, hasMore }
+      yield { media: pageMedia, nextCursor: hasMore ? offset : null, hasMore }
       if (!hasMore) return
     }
   }

@@ -36,7 +36,7 @@ describe('BatchedMediaCommitter.add', () => {
     expect(Math.max(...peeks)).toBeLessThanOrEqual(500)
   })
 
-  it('does not spin forever when flush() keeps failing', async () => {
+  it('throws (does not spin or silently drop) when flush() keeps failing', async () => {
     const store = {
       query: vi.fn(async () => [{ values: [] as string[][] }]),
       commit: vi.fn(async () => { throw new Error('boom') }),
@@ -46,14 +46,16 @@ describe('BatchedMediaCommitter.add', () => {
     batchedMediaCommitter.setStore(store)
     const flushSpy = vi.spyOn(batchedMediaCommitter, 'flush')
 
-    const timeout = new Promise<'timeout'>((_, reject) =>
+    const timeout = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error('add() hung')), 2000)
     )
     await expect(
       Promise.race([batchedMediaCommitter.add(makeMedia(2000)), timeout])
-    ).resolves.not.toBe('timeout')
+    ).rejects.toThrow(/did not drain/)
 
     expect(flushSpy.mock.calls.length).toBeLessThanOrEqual(8)
+    // Drained input that made it in is still pending; the unbuffered tail
+    // is surfaced via the thrown error rather than silently dropped.
     expect(batchedMediaCommitter.getPendingCount()).toBeGreaterThan(0)
   })
 })

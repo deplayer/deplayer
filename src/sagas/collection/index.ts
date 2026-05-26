@@ -1,5 +1,6 @@
 // Binding actions to sagas
 import { takeLatest, fork, call, put, delay, take } from "redux-saga/effects";
+import type { SagaIterator } from "redux-saga";
 import * as types from "../../constants/ActionTypes";
 import { addToCollectionWatcher, initializeWatcher } from "./watchers";
 import { getSettingsFromLiveStore } from "../selectors";
@@ -31,7 +32,7 @@ interface SyncState {
   initialSyncComplete: boolean;
 }
 
-function* readSyncState(liveStore: LiveStoreInstance): Generator<any, SyncState | null, any> {
+function* readSyncState(liveStore: LiveStoreInstance): SagaIterator<SyncState | null> {
   try {
     const result = yield call(() =>
       liveStore.query({
@@ -56,7 +57,7 @@ function* readSyncState(liveStore: LiveStoreInstance): Generator<any, SyncState 
 function* updateSyncState(
   liveStore: LiveStoreInstance,
   state: SyncState,
-): Generator<any, void, any> {
+): SagaIterator<void> {
   yield call(() =>
     liveStore.commit(
       syncEvents.syncStateUpdated({ id: "default", ...state }),
@@ -64,11 +65,11 @@ function* updateSyncState(
   );
 }
 
-export function* syncMediaLibrary(): Generator<any, void, any> {
+export function* syncMediaLibrary(): SagaIterator<void> {
   try {
     const liveStore = getLiveStoreInstance();
     if (!liveStore) {
-      console.warn("LiveStore not available");
+      logger.warn("LiveStore not available");
       return;
     }
 
@@ -76,11 +77,19 @@ export function* syncMediaLibrary(): Generator<any, void, any> {
     if (!settings?.providers) return;
 
     const providersService = new ProvidersService(settings);
-    const providers = Object.values(providersService.providers).filter(
-      (p) => p.getScanStatus && p.streamAlbumsSince,
-    );
+    const allProviders = Object.values(providersService.providers);
+    const providers: typeof allProviders = [];
+    for (const p of allProviders) {
+      if (p.getScanStatus && p.streamAlbumsSince) {
+        providers.push(p);
+      } else {
+        logger.debug(
+          `Provider ${p.providerKey} skipped: missing ${!p.getScanStatus ? "getScanStatus" : "streamAlbumsSince"}`,
+        );
+      }
+    }
     if (providers.length === 0) {
-      console.warn("No providers support streaming sync");
+      logger.warn("No providers support streaming sync");
       return;
     }
 
@@ -92,25 +101,32 @@ export function* syncMediaLibrary(): Generator<any, void, any> {
         const scanStatus: { scanning: boolean; count: number; lastScan: string } =
           yield call([provider, provider.getScanStatus!]);
         if (scanStatus.scanning) {
-          logger.debug("Server is scanning, skipping this cycle");
+          logger.debug(`Server ${provider.providerKey} is scanning, skipping this cycle`);
           continue;
         }
 
-        // Cursor-regression guard: if the server's lastScan is older than ours,
-        // OR the count dropped, restart from scratch. This handles server
-        // rescans / DB swaps that would otherwise leave us with a stale cursor.
+        // Cursor-regression guard. Reset cursor + since to null (full re-sync)
+        // when any of these hold:
+        //   - server's lastScan is missing/invalid (no scan ever recorded);
+        //   - server's lastScan is OLDER than the one we persisted (server DB
+        //     swap or restore-from-backup);
+        //   - server's row count dropped (library wipe / partial restore).
+        // Without the explicit lastScan-presence check, an invalid Date would
+        // make the comparison return false and we'd advance with a stale cursor.
+        const serverScanMs = scanStatus.lastScan ? new Date(scanStatus.lastScan).getTime() : NaN;
+        const localScanMs = syncState ? new Date(syncState.lastSyncTimestamp).getTime() : NaN;
         const regressed =
           !!syncState &&
-          (new Date(scanStatus.lastScan) < new Date(syncState.lastSyncTimestamp) ||
+          (!Number.isFinite(serverScanMs) ||
+            !Number.isFinite(localScanMs) ||
+            serverScanMs < localScanMs ||
             scanStatus.count < syncState.lastKnownCount);
         const since = regressed ? null : (syncState?.lastSyncTimestamp ?? null);
-        const cursor = regressed ? null : (syncState?.initialSyncCursor ?? null);
+        const cursor: number | null = regressed ? null : (syncState?.initialSyncCursor ?? null);
 
-        const stream = provider.streamAlbumsSince!(since, {
-          cursor: cursor != null ? String(cursor) : null,
-        });
+        const stream = provider.streamAlbumsSince!(since, { cursor });
         let pages = 0;
-        let lastCursor: string | null = cursor != null ? String(cursor) : null;
+        let nextCursor: number | null = cursor;
         let complete = false;
 
         for (;;) {
@@ -125,14 +141,14 @@ export function* syncMediaLibrary(): Generator<any, void, any> {
             yield call([batchedMediaCommitter, "add"], page.media);
             yield call([batchedMediaCommitter, "flush"]);
           }
-          lastCursor = page.nextCursor;
+          nextCursor = page.nextCursor;
           complete = !page.hasMore;
           pages++;
 
           yield call(updateSyncState, liveStore, {
             lastSyncTimestamp: scanStatus.lastScan,
             lastKnownCount: scanStatus.count,
-            initialSyncCursor: Number(lastCursor) || 0,
+            initialSyncCursor: nextCursor ?? 0,
             initialSyncComplete: complete,
           });
 
@@ -140,38 +156,46 @@ export function* syncMediaLibrary(): Generator<any, void, any> {
         }
 
         if (!complete) {
-          // Tell the generator we're done pulling so it can release resources.
-          yield call(() => stream.return?.());
+          // Best-effort cleanup; the provider generator currently has no
+          // finally block, but a future impl might. Swallow cleanup errors
+          // so they don't poison the outer catch.
+          yield call(async () => {
+            try {
+              await stream.return?.();
+            } catch (cleanupError) {
+              logger.error(`stream.return failed for ${provider.providerKey}`, cleanupError);
+            }
+          });
           logger.debug(
-            `Sync paused for ${provider.providerKey} at cursor ${lastCursor} (page cap reached)`,
+            `Sync paused for ${provider.providerKey} at cursor ${nextCursor} (page cap reached)`,
           );
         } else {
           logger.debug(`Sync complete for ${provider.providerKey}`);
         }
       } catch (error) {
-        console.error("[Sync] Provider sync failed:", error);
+        logger.error(`Provider sync failed (${provider.providerKey})`, error);
       }
     }
   } catch (error) {
-    console.error("[Sync] syncMediaLibrary failed:", error);
+    logger.error("syncMediaLibrary failed", error);
     yield put({ type: types.FETCH_RECENT_ALBUMS_ERROR, error });
   }
 }
 
-function* periodicSyncPoll(): Generator<any, void, any> {
+function* periodicSyncPoll(): SagaIterator<void> {
   while (true) {
     yield delay(5 * 60 * 1000);
     yield call(syncMediaLibrary);
   }
 }
 
-function* deferredSync(): Generator<any, void, any> {
+function* deferredSync(): SagaIterator<void> {
   yield take(types.INITIALIZED);
   yield delay(5000);
   yield call(syncMediaLibrary);
 }
 
-function* collectionSaga(): Generator<any, void, any> {
+function* collectionSaga(): SagaIterator<void> {
   yield takeLatest(types.REMOVE_FROM_COLLECTION, removeFromDbWorker);
   yield takeLatest(types.DELETE_COLLECTION, deleteCollectionWorker);
   yield takeLatest(types.EXPORT_COLLECTION, exportCollectionWorker);
