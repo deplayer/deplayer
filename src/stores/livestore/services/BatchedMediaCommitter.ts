@@ -79,22 +79,22 @@ class BatchedMediaCommitter {
   async add(mediaItems: NormalizedMedia[]): Promise<void> {
     if (!mediaItems || mediaItems.length === 0) return
 
-    this.pendingMedia.push(...mediaItems)
-
-    // Force flush if batch too large (prevents memory buildup for large imports)
-    if (this.pendingMedia.length >= this.MAX_BATCH_SIZE) {
-      await this.flush()
-      return
+    let i = 0
+    while (i < mediaItems.length) {
+      const room = this.MAX_BATCH_SIZE - this.pendingMedia.length
+      const take = Math.min(room, mediaItems.length - i)
+      if (take > 0) {
+        // slice to avoid push(...) stack-overflow on huge arrays
+        for (let k = 0; k < take; k++) this.pendingMedia.push(mediaItems[i + k])
+        i += take
+      }
+      if (this.pendingMedia.length >= this.MAX_BATCH_SIZE) {
+        await this.flush()
+      }
     }
 
-    // Debounce: reset timer on each add
-    if (this.flushTimeout) {
-      clearTimeout(this.flushTimeout)
-    }
-
-    this.flushTimeout = window.setTimeout(() => {
-      this.flush()
-    }, this.THROTTLE_MS)
+    if (this.flushTimeout) clearTimeout(this.flushTimeout)
+    this.flushTimeout = window.setTimeout(() => { this.flush() }, this.THROTTLE_MS)
   }
 
   // Chunk size for processing - smaller chunks = less main thread blocking
