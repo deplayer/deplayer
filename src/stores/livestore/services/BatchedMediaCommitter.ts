@@ -82,15 +82,21 @@ class BatchedMediaCommitter {
     let i = 0
     while (i < mediaItems.length) {
       const room = this.MAX_BATCH_SIZE - this.pendingMedia.length
-      const take = Math.min(room, mediaItems.length - i)
-      if (take > 0) {
+      if (room > 0) {
+        const take = Math.min(room, mediaItems.length - i)
         // slice to avoid push(...) stack-overflow on huge arrays
         for (let k = 0; k < take; k++) this.pendingMedia.push(mediaItems[i + k])
         i += take
       }
-      if (this.pendingMedia.length >= this.MAX_BATCH_SIZE) {
-        await this.flush()
-      }
+      if (this.pendingMedia.length < this.MAX_BATCH_SIZE) break
+
+      const before = this.pendingMedia.length
+      await this.flush()
+      // If flush() failed and re-queued, pendingMedia.length stays at MAX_BATCH_SIZE
+      // (room === 0 forever). Bail out so the caller doesn't loop infinitely; the
+      // trailing debounce setTimeout below still gives the next add() a chance to
+      // drain once conditions improve.
+      if (this.pendingMedia.length >= before && i < mediaItems.length) break
     }
 
     if (this.flushTimeout) clearTimeout(this.flushTimeout)

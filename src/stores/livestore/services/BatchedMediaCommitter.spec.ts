@@ -35,4 +35,25 @@ describe('BatchedMediaCommitter.add', () => {
 
     expect(Math.max(...peeks)).toBeLessThanOrEqual(500)
   })
+
+  it('does not spin forever when flush() keeps failing', async () => {
+    const store = {
+      query: vi.fn(async () => [{ values: [] as string[][] }]),
+      commit: vi.fn(async () => { throw new Error('boom') }),
+      manualRefresh: vi.fn(),
+    }
+    // @ts-expect-error test seam
+    batchedMediaCommitter.setStore(store)
+    const flushSpy = vi.spyOn(batchedMediaCommitter, 'flush')
+
+    const timeout = new Promise<'timeout'>((_, reject) =>
+      setTimeout(() => reject(new Error('add() hung')), 2000)
+    )
+    await expect(
+      Promise.race([batchedMediaCommitter.add(makeMedia(2000)), timeout])
+    ).resolves.not.toBe('timeout')
+
+    expect(flushSpy.mock.calls.length).toBeLessThanOrEqual(8)
+    expect(batchedMediaCommitter.getPendingCount()).toBeGreaterThan(0)
+  })
 })
