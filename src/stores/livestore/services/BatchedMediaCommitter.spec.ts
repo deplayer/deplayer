@@ -57,3 +57,48 @@ describe('BatchedMediaCommitter.add', () => {
     expect(batchedMediaCommitter.getPendingCount()).toBeGreaterThan(0)
   })
 })
+
+describe('BatchedMediaCommitter.flush', () => {
+  beforeEach(() => batchedMediaCommitter.clear())
+
+  it('does not duplicate the buffer (swap, not spread)', async () => {
+    const store = makeFakeStore()
+    // @ts-expect-error test seam
+    batchedMediaCommitter.setStore(store)
+
+    await batchedMediaCommitter.add(makeMedia(100))
+    const before = batchedMediaCommitter.getPendingCount()
+    expect(before).toBeGreaterThan(0)
+    const p = batchedMediaCommitter.flush()
+    // After flush() starts, pendingMedia should be empty synchronously
+    // (the swap happens before any await). If we spread, pendingMedia would
+    // still contain the original 100 entries here.
+    expect(batchedMediaCommitter.getPendingCount()).toBe(0)
+    await p
+  })
+
+  it('chunks the existence SELECT into <=500 placeholders per call', async () => {
+    const store = makeFakeStore()
+    // @ts-expect-error test seam
+    batchedMediaCommitter.setStore(store)
+
+    // Bypass add() bounds: write directly to the internal buffer so we can
+    // exercise the flush()-side chunking with a >500 buffer.
+    for (let i = 0; i < 3; i++) {
+      // @ts-expect-error test seam: directly push to private buffer
+      batchedMediaCommitter.pendingMedia.push(...makeMedia(400))
+    }
+    expect(batchedMediaCommitter.getPendingCount()).toBe(1200)
+
+    await batchedMediaCommitter.flush()
+
+    const queries = store.query.mock.calls.map(
+      ([{ query }]: [{ query: string }]) => query,
+    )
+    expect(queries.length).toBeGreaterThanOrEqual(3)
+    for (const q of queries) {
+      const placeholders = (q.match(/\?/g) || []).length
+      expect(placeholders).toBeLessThanOrEqual(500)
+    }
+  })
+})

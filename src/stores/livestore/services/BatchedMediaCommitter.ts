@@ -158,29 +158,32 @@ class BatchedMediaCommitter {
     }
 
     this.isCommitting = true
-    const mediaToCommit = [...this.pendingMedia]
+    const mediaToCommit = this.pendingMedia
     this.pendingMedia = []
 
     profiler.mark(`flush-start (${mediaToCommit.length} items)`)
 
     try {
-      // Query existing IDs to avoid redundant inserts
+      // Query existing IDs to avoid redundant inserts (chunked to keep the
+      // SQL parameter list bounded — SQLite has a SQLITE_MAX_VARIABLE_NUMBER
+      // limit and binding thousands of placeholders in one SELECT can blow
+      // memory on constrained devices).
       profiler.start('query-existing-ids')
-      const placeholders = mediaToCommit.map(() => '?').join(',')
-      const bindValues = mediaToCommit.reduce((acc, m, i) => {
-        acc[i + 1] = m.media.id
-        return acc
-      }, {} as Record<number, string>)
-
-      const result = await this.store.query({
-        query: `SELECT id FROM media WHERE id IN (${placeholders})`,
-        bindValues
-      })
-      profiler.end('query-existing-ids')
-
+      const EXISTENCE_CHUNK = 500
       const existingIds = new Set<string>()
-      const rows = (result as Array<{ values?: string[][] }>)?.[0]?.values || []
-      rows.forEach((row: string[]) => existingIds.add(row[0]))
+      for (let off = 0; off < mediaToCommit.length; off += EXISTENCE_CHUNK) {
+        const slice = mediaToCommit.slice(off, off + EXISTENCE_CHUNK)
+        const placeholders = slice.map(() => '?').join(',')
+        const bindValues: Record<number, string> = {}
+        for (let k = 0; k < slice.length; k++) bindValues[k + 1] = slice[k].media.id
+        const result = await this.store!.query({
+          query: `SELECT id FROM media WHERE id IN (${placeholders})`,
+          bindValues,
+        })
+        const rows = (result as Array<{ values?: string[][] }>)?.[0]?.values || []
+        for (const row of rows) existingIds.add(row[0])
+      }
+      profiler.end('query-existing-ids')
 
       // Filter to only new items
       const newMedia = mediaToCommit.filter(m => !existingIds.has(m.media.id))
