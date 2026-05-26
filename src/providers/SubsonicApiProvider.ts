@@ -133,7 +133,12 @@ export default class SubsonicApiProvider implements IMusicProvider {
       let crossedBoundary = false
       const fresh: SubsonicAlbum[] = []
       for (const album of albums) {
-        if (new Date(album.created!).getTime() > sinceMs) {
+        // Missing `created` → treat as fresh (Infinity > anything). Protects
+        // first-sync from stopping early on Subsonic servers that omit the
+        // timestamp, and biases delta-sync toward over-including rather than
+        // silently truncating.
+        const createdMs = album.created ? new Date(album.created).getTime() : Infinity
+        if (createdMs > sinceMs) {
           fresh.push(album)
         } else {
           crossedBoundary = true
