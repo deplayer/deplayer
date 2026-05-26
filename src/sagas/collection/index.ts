@@ -2,14 +2,13 @@
 import { takeLatest, fork, call, put, delay, take } from "redux-saga/effects";
 import * as types from "../../constants/ActionTypes";
 import { addToCollectionWatcher, initializeWatcher } from "./watchers";
-import { NormalizedMedia } from "../../utils/normalizeMedia";
 import { getSettingsFromLiveStore } from "../selectors";
 import ProvidersService from "../../services/ProvidersService";
 import { getLiveStoreInstance } from "../../App";
 import { batchedMediaCommitter } from "../../stores/livestore/services/BatchedMediaCommitter";
 import { syncEvents } from "../../stores/livestore/events/sync";
 import { createLogger } from "../../utils/logger";
-import { ProviderInstance } from "../../services/ProvidersService";
+import type { AlbumPage } from "../../providers/IMusicProvider";
 
 type LiveStoreInstance = NonNullable<ReturnType<typeof getLiveStoreInstance>>;
 
@@ -22,6 +21,8 @@ import {
 } from "./workers";
 
 const logger = createLogger({ namespace: "SyncSaga" });
+
+const MAX_PAGES_PER_SESSION = 10;
 
 interface SyncState {
   lastSyncTimestamp: string;
@@ -54,82 +55,13 @@ function* readSyncState(liveStore: LiveStoreInstance): Generator<any, SyncState 
 
 function* updateSyncState(
   liveStore: LiveStoreInstance,
-  state: SyncState
+  state: SyncState,
 ): Generator<any, void, any> {
   yield call(() =>
     liveStore.commit(
-      syncEvents.syncStateUpdated({
-        id: "default",
-        ...state,
-      })
-    )
+      syncEvents.syncStateUpdated({ id: "default", ...state }),
+    ),
   );
-}
-
-function* progressiveHydration(
-  provider: ProviderInstance,
-  liveStore: LiveStoreInstance,
-  syncState: SyncState | null,
-  scanStatus: { lastScan: string; count: number }
-): Generator<any, void, any> {
-  const BATCH_SIZE = 50;
-  const MAX_BATCHES_PER_SESSION = 10;
-  const BATCHES_PER_REFRESH = 5;
-  let cursor = syncState?.initialSyncCursor || 0;
-  let batchesProcessed = 0;
-  let batchesSinceRefresh = 0;
-
-  batchedMediaCommitter.setStore(liveStore);
-
-  while (batchesProcessed < MAX_BATCHES_PER_SESSION) {
-    const batch: { media: NormalizedMedia[]; hasMore: boolean } = yield call(
-      // @ts-expect-error TODO Task 6: replace with streamAlbumsSince
-      [provider, provider.getAlbumsBatch!],
-      cursor,
-      BATCH_SIZE
-    );
-
-    if (batch.media.length > 0) {
-      yield call([batchedMediaCommitter, "add"], batch.media);
-      batchesSinceRefresh++;
-    }
-
-    cursor += BATCH_SIZE;
-    batchesProcessed++;
-
-    if (!batch.hasMore) {
-      yield call([batchedMediaCommitter, "flush"]);
-      yield call(updateSyncState, liveStore, {
-        lastSyncTimestamp: scanStatus.lastScan,
-        lastKnownCount: scanStatus.count,
-        initialSyncCursor: cursor,
-        initialSyncComplete: true,
-      });
-      logger.debug("Initial hydration complete");
-      return;
-    }
-
-    // Only flush every N batches to reduce reactive cascades
-    if (batchesSinceRefresh >= BATCHES_PER_REFRESH) {
-      yield call([batchedMediaCommitter, "flush"]);
-      batchesSinceRefresh = 0;
-      yield delay(500);
-    }
-
-    yield call(updateSyncState, liveStore, {
-      lastSyncTimestamp: scanStatus.lastScan,
-      lastKnownCount: scanStatus.count,
-      initialSyncCursor: cursor,
-      initialSyncComplete: false,
-    });
-  }
-
-  // Flush any remaining items
-  if (batchesSinceRefresh > 0) {
-    yield call([batchedMediaCommitter, "flush"]);
-  }
-
-  logger.debug(`Hydration paused at cursor ${cursor}, will resume next session`);
 }
 
 export function* syncMediaLibrary(): Generator<any, void, any> {
@@ -145,12 +77,10 @@ export function* syncMediaLibrary(): Generator<any, void, any> {
 
     const providersService = new ProvidersService(settings);
     const providers = Object.values(providersService.providers).filter(
-      // @ts-expect-error TODO Task 6: replace with streamAlbumsSince
-      (p) => p.getScanStatus && p.getNewestAlbumsSince
+      (p) => p.getScanStatus && p.streamAlbumsSince,
     );
-
     if (providers.length === 0) {
-      console.warn("No providers support incremental sync");
+      console.warn("No providers support streaming sync");
       return;
     }
 
@@ -159,75 +89,64 @@ export function* syncMediaLibrary(): Generator<any, void, any> {
 
     for (const provider of providers) {
       try {
-        // Step 1: Check if anything changed
         const scanStatus: { scanning: boolean; count: number; lastScan: string } =
           yield call([provider, provider.getScanStatus!]);
-
         if (scanStatus.scanning) {
           logger.debug("Server is scanning, skipping this cycle");
           continue;
         }
 
-        if (
-          syncState &&
-          syncState.lastSyncTimestamp === scanStatus.lastScan &&
-          syncState.lastKnownCount === scanStatus.count
-        ) {
-          logger.debug("Nothing changed, skipping");
+        // Cursor-regression guard: if the server's lastScan is older than ours,
+        // OR the count dropped, restart from scratch. This handles server
+        // rescans / DB swaps that would otherwise leave us with a stale cursor.
+        const regressed =
+          !!syncState &&
+          (new Date(scanStatus.lastScan) < new Date(syncState.lastSyncTimestamp) ||
+            scanStatus.count < syncState.lastKnownCount);
+        const since = regressed ? null : (syncState?.lastSyncTimestamp ?? null);
+        const cursor = regressed ? null : (syncState?.initialSyncCursor ?? null);
 
-          // Still do initial hydration if incomplete
-      // @ts-expect-error TODO Task 6: replace with streamAlbumsSince
-          if (!syncState.initialSyncComplete && provider.getAlbumsBatch) {
-            yield call(progressiveHydration, provider, liveStore, syncState, scanStatus);
-          }
-          continue;
-        }
-
-        // Step 2: Fetch only new albums (or initial batch on first sync)
-        if (syncState?.lastSyncTimestamp) {
-          logger.debug(`Fetching albums newer than ${syncState.lastSyncTimestamp}`);
-          const newMedia: NormalizedMedia[] = yield call(
-          // @ts-expect-error TODO Task 6: replace with streamAlbumsSince
-            [provider, provider.getNewestAlbumsSince!],
-            syncState.lastSyncTimestamp
-          );
-
-          if (newMedia.length > 0) {
-            yield call([batchedMediaCommitter, "add"], newMedia);
-            yield call([batchedMediaCommitter, "flush"]);
-            logger.debug(`Added ${newMedia.length} new songs`);
-          }
-        // @ts-expect-error TODO Task 6: replace with streamAlbumsSince
-        } else if (provider.getAlbumsBatch) {
-          // First sync ever — fetch initial batch for immediate UI
-          logger.debug("First sync — fetching initial batch");
-          const batch: { media: NormalizedMedia[]; hasMore: boolean } = yield call(
-          // @ts-expect-error TODO Task 6: replace with streamAlbumsSince
-            [provider, provider.getAlbumsBatch!],
-            0,
-            50
-          );
-          if (batch.media.length > 0) {
-            yield call([batchedMediaCommitter, "add"], batch.media);
-            yield call([batchedMediaCommitter, "flush"]);
-          }
-        }
-
-        // Step 3: Update sync state
-        const currentCursor = syncState?.initialSyncCursor || 50;
-        const isComplete = syncState?.initialSyncComplete || false;
-        yield call(updateSyncState, liveStore, {
-          lastSyncTimestamp: scanStatus.lastScan,
-          lastKnownCount: scanStatus.count,
-          initialSyncCursor: currentCursor,
-          initialSyncComplete: isComplete,
+        const stream = provider.streamAlbumsSince!(since, {
+          cursor: cursor != null ? String(cursor) : null,
         });
+        let pages = 0;
+        let lastCursor: string | null = cursor != null ? String(cursor) : null;
+        let complete = false;
 
-        // Step 4: Progressive hydration if not complete
-        // @ts-expect-error TODO Task 6: replace with streamAlbumsSince
-        if (!isComplete && provider.getAlbumsBatch) {
-          const updatedSyncState: SyncState | null = yield call(readSyncState, liveStore);
-          yield call(progressiveHydration, provider, liveStore, updatedSyncState, scanStatus);
+        for (;;) {
+          const next: IteratorResult<AlbumPage, void> = yield call(() => stream.next());
+          if (next.done) {
+            complete = true;
+            break;
+          }
+          const page = next.value;
+
+          if (page.media.length > 0) {
+            yield call([batchedMediaCommitter, "add"], page.media);
+            yield call([batchedMediaCommitter, "flush"]);
+          }
+          lastCursor = page.nextCursor;
+          complete = !page.hasMore;
+          pages++;
+
+          yield call(updateSyncState, liveStore, {
+            lastSyncTimestamp: scanStatus.lastScan,
+            lastKnownCount: scanStatus.count,
+            initialSyncCursor: Number(lastCursor) || 0,
+            initialSyncComplete: complete,
+          });
+
+          if (complete || pages >= MAX_PAGES_PER_SESSION) break;
+        }
+
+        if (!complete) {
+          // Tell the generator we're done pulling so it can release resources.
+          yield call(() => stream.return?.());
+          logger.debug(
+            `Sync paused for ${provider.providerKey} at cursor ${lastCursor} (page cap reached)`,
+          );
+        } else {
+          logger.debug(`Sync complete for ${provider.providerKey}`);
         }
       } catch (error) {
         console.error("[Sync] Provider sync failed:", error);
@@ -241,15 +160,12 @@ export function* syncMediaLibrary(): Generator<any, void, any> {
 
 function* periodicSyncPoll(): Generator<any, void, any> {
   while (true) {
-    yield delay(5 * 60 * 1000); // 5 minutes
+    yield delay(5 * 60 * 1000);
     yield call(syncMediaLibrary);
   }
 }
 
 function* deferredSync(): Generator<any, void, any> {
-  // Wait for INITIALIZED, then give the UI ~5s to finish first paint and
-  // hydrate visible rows before kicking off the heavy media library scan.
-  // Empirical — shorter delays cause visible jank on cold start.
   yield take(types.INITIALIZED);
   yield delay(5000);
   yield call(syncMediaLibrary);
