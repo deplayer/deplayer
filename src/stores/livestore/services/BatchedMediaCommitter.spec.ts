@@ -92,8 +92,8 @@ describe('BatchedMediaCommitter.flush', () => {
 
     await batchedMediaCommitter.flush()
 
-    const queries = store.query.mock.calls.map(
-      ([{ query }]: [{ query: string }]) => query,
+    const queries = (store.query.mock.calls as unknown as Array<[{ query: string }]>).map(
+      ([{ query }]) => query,
     )
     expect(queries.length).toBeGreaterThanOrEqual(3)
     for (const q of queries) {
