@@ -109,91 +109,65 @@ export default class SubsonicApiProvider implements IMusicProvider {
     });
   }
 
-  async getNewestAlbumsSince(sinceDate: string): Promise<NormalizedMedia[]> {
-    const PAGE_SIZE = 50
-    const BATCH_SIZE = 10
-    const allSongs: NormalizedMedia[] = []
-    let offset = 0
-    let done = false
+  async *streamAlbumsSince(
+    since: string | null,
+    opts: { cursor?: string | null; pageSize?: number } = {},
+  ): AsyncGenerator<{ media: NormalizedMedia[]; nextCursor: string | null; hasMore: boolean }, void, void> {
+    const pageSize = opts.pageSize ?? 50
+    const ALBUM_FETCH_PARALLELISM = 10
+    const initialCursor = Number(opts.cursor)
+    let offset = Number.isFinite(initialCursor) ? initialCursor : 0
+    const sinceMs = since ? new Date(since).getTime() : -Infinity
 
-    while (!done) {
-      const result = await axios.get(
-        `${this.baseUrl}/rest/getAlbumList2.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.16.1&f=json&type=newest&size=${PAGE_SIZE}&offset=${offset}`
+    while (true) {
+      const list = await axios.get(
+        `${this.baseUrl}/rest/getAlbumList2.view?u=${this.user}&p=${this.password}` +
+        `&c=deplayer&v=1.16.1&f=json&type=newest&size=${pageSize}&offset=${offset}`,
       )
-      const albums = result.data['subsonic-response'].albumList2?.album || []
-
+      const albums: SubsonicAlbum[] = list.data['subsonic-response'].albumList2?.album || []
       if (albums.length === 0) {
-        done = true
-        break
+        yield { media: [], nextCursor: String(offset), hasMore: false }
+        return
       }
 
-      const newAlbums = []
+      let crossedBoundary = false
+      const fresh: SubsonicAlbum[] = []
       for (const album of albums) {
-        if (new Date(album.created) > new Date(sinceDate)) {
-          newAlbums.push(album)
+        if (new Date(album.created!).getTime() > sinceMs) {
+          fresh.push(album)
         } else {
-          done = true
+          crossedBoundary = true
           break
         }
       }
 
-      // Fetch songs for new albums in parallel batches
-      for (let i = 0; i < newAlbums.length; i += BATCH_SIZE) {
-        const batch = newAlbums.slice(i, i + BATCH_SIZE)
-        const batchResults = await Promise.allSettled(
-          batch.map(async (album: SubsonicAlbum) => {
-            const albumDetails = await axios.get(
-              `${this.baseUrl}/rest/getAlbum.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.16.1&f=json&id=${album.id}`
+      const pageMedia: NormalizedMedia[] = []
+      for (let i = 0; i < fresh.length; i += ALBUM_FETCH_PARALLELISM) {
+        const slice = fresh.slice(i, i + ALBUM_FETCH_PARALLELISM)
+        const results = await Promise.allSettled(
+          slice.map(async (album) => {
+            const detail = await axios.get(
+              `${this.baseUrl}/rest/getAlbum.view?u=${this.user}&p=${this.password}` +
+              `&c=deplayer&v=1.16.1&f=json&id=${album.id}`,
             )
-            const songs = albumDetails.data['subsonic-response'].album?.song || []
+            const songs = detail.data['subsonic-response'].album?.song || []
             return { songs, album }
-          })
+          }),
         )
-
-        for (const result of batchResults) {
-          if (result.status === 'fulfilled') {
-            allSongs.push(...this.mapSongs(result.value.songs, [result.value.album]))
+        for (const r of results) {
+          if (r.status === 'fulfilled') {
+            for (const m of this.mapSongs(r.value.songs, [r.value.album])) pageMedia.push(m)
           } else {
-            logger.error('Error fetching album songs:', result.reason)
+            logger.error('Error fetching album songs:', r.reason)
           }
         }
       }
 
-      if (!done) {
-        offset += PAGE_SIZE
-      }
+      const hasMore = !crossedBoundary && albums.length === pageSize
+      offset += pageSize
+      yield { media: pageMedia, nextCursor: hasMore ? String(offset) : null, hasMore }
+      if (!hasMore) return
     }
-
-    return allSongs
-  }
-
-  async getAlbumsBatch(offset: number, size: number): Promise<{ media: NormalizedMedia[]; hasMore: boolean }> {
-    const BATCH_SIZE = 10
-    const result = await axios.get(
-      `${this.baseUrl}/rest/getAlbumList2.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.16.1&f=json&type=newest&size=${size}&offset=${offset}`
-    )
-    const albums = result.data['subsonic-response'].albumList2?.album || []
-    const allSongs: NormalizedMedia[] = []
-
-    for (let i = 0; i < albums.length; i += BATCH_SIZE) {
-      const batch = albums.slice(i, i + BATCH_SIZE)
-      const batchResults = await Promise.allSettled(
-        batch.map(async (album: SubsonicAlbum) => {
-          const albumDetails = await axios.get(
-            `${this.baseUrl}/rest/getAlbum.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.16.1&f=json&id=${album.id}`
-          )
-          const songs = albumDetails.data['subsonic-response'].album?.song || []
-          return { songs, album }
-        })
-      )
-      for (const result of batchResults) {
-        if (result.status === 'fulfilled') {
-          allSongs.push(...this.mapSongs(result.value.songs, [result.value.album]))
-        }
-      }
-    }
-
-    return { media: allSongs, hasMore: albums.length === size }
   }
 
   async getScanStatus(): Promise<{ scanning: boolean; count: number; lastScan: string }> {
