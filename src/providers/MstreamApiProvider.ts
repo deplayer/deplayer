@@ -2,6 +2,7 @@ import axios from 'axios'
 
 import { normalizeMedia, NormalizedMedia } from '../utils/normalizeMedia'
 import { IMusicProvider } from './IMusicProvider'
+import type { HealthCheckResult } from '../types/providers'
 
 type MstreamSong = {
   filepath: string
@@ -81,5 +82,22 @@ export default class MstreamApiProvider implements IMusicProvider {
   async getArtistSongs(artistName: string): Promise<NormalizedMedia[]> {
     // Mstream doesn't have artist-specific endpoint, use search as fallback
     return this.search(artistName)
+  }
+
+  async healthcheck(): Promise<HealthCheckResult> {
+    const t0 = Date.now()
+    try {
+      await axios.post(`${this.baseUrl}/api/v1/ping`, {}, { timeout: 5000 })
+      const checkedAt = Date.now()
+      return { status: 'connected', checkedAt, latencyMs: checkedAt - t0 }
+    } catch (e) {
+      const checkedAt = Date.now()
+      return {
+        status: 'unreachable',
+        error: e instanceof Error ? e.message : String(e),
+        checkedAt,
+        latencyMs: checkedAt - t0,
+      }
+    }
   }
 }

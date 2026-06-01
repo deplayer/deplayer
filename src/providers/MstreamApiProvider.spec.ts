@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import MockAdapter from 'axios-mock-adapter'
 
 import exampleSongs from './mstreamExampleSongs.json'
@@ -27,5 +27,25 @@ describe('MstreamApiProvider', () => {
     const results = await mstreamRepo.search('Commando 9mm')
     expect(results).toBeInstanceOf(Array)
     expect(results.length).toBe(1)
+  })
+})
+
+describe('MstreamApiProvider.healthcheck', () => {
+  beforeEach(() => { vi.restoreAllMocks() })
+
+  const make = () => new MstreamApiProvider({ baseUrl: 'https://mstream.example.com' }, 'mstream')
+
+  it('returns connected when ping succeeds', async () => {
+    vi.spyOn(axios, 'post').mockResolvedValue({ status: 200, data: {} } as never)
+    const res = await make().healthcheck!()
+    expect(res.status).toBe('connected')
+    expect(typeof res.latencyMs).toBe('number')
+  })
+
+  it('returns unreachable on network error', async () => {
+    vi.spyOn(axios, 'post').mockRejectedValue(new Error('ECONNREFUSED'))
+    const res = await make().healthcheck!()
+    expect(res.status).toBe('unreachable')
+    expect(res.error).toContain('ECONNREFUSED')
   })
 })
