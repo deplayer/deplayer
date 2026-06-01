@@ -185,15 +185,29 @@ describe('SubsonicApiProvider.healthcheck', () => {
 
 **Step 3: Implement**
 
-Add to `SubsonicApiProvider` class (use the existing `appName = 'deplayer'` and Subsonic API version `1.16.1`):
+Add to `SubsonicApiProvider` class (use the existing `appName = 'deplayer'` and Subsonic API version `1.16.1`).
+
+Add the type import: `import type { HealthCheckResult } from '../types/providers'`.
+
+Declare a local response type near the existing `SubsonicAlbum` / `SubsonicSong` types (do not export):
+
+```ts
+type SubsonicPingResponse = {
+  status: 'ok' | 'failed'
+  version?: string
+  error?: { code: number; message: string }
+}
+```
+
+The method:
 
 ```ts
 async healthcheck(): Promise<HealthCheckResult> {
-  const url = `${this.baseUrl}/rest/ping.view?u=${this.user}&p=${this.password}&c=deplayer&v=1.16.1&f=json`
+  const url = `${this.baseUrl}/rest/ping.view?u=${encodeURIComponent(this.user)}&p=${encodeURIComponent(this.password)}&c=deplayer&v=1.16.1&f=json`
   const t0 = Date.now()
   try {
     const { data } = await axios.get(url, { timeout: 5000 })
-    const r = data['subsonic-response']
+    const r: SubsonicPingResponse | undefined = data?.['subsonic-response']
     const checkedAt = Date.now()
     const latencyMs = checkedAt - t0
     if (r?.status === 'ok') return { status: 'connected', latencyMs, checkedAt }
@@ -202,12 +216,18 @@ async healthcheck(): Promise<HealthCheckResult> {
     }
     return { status: 'unreachable', error: r?.error?.message ?? 'Unknown', checkedAt, latencyMs }
   } catch (e) {
-    return { status: 'unreachable', error: e instanceof Error ? e.message : String(e), checkedAt: Date.now() }
+    const checkedAt = Date.now()
+    return {
+      status: 'unreachable',
+      error: e instanceof Error ? e.message : String(e),
+      checkedAt,
+      latencyMs: checkedAt - t0,
+    }
   }
 }
 ```
 
-Add the import at the top: `import type { HealthCheckResult } from '../types/providers'`.
+**Always return `latencyMs`** — including on `catch`. This is a template defect that propagates to Tasks 4–6 if missed.
 
 **Step 4: Run to confirm green**
 
