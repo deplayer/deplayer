@@ -18,6 +18,7 @@ import { playNextAction, playPreviousAction } from '../../stores/livestore/actio
 import { tables } from '../../stores/livestore/schema'
 import { handlePlayList, handlePlaySong, stopAllPlayback } from './commands'
 import PlayerRefService from '../../services/PlayerRefService'
+import { useUIStore } from '../../stores/uiStore'
 
 /**
  * Get current song ID from LiveStore queue
@@ -123,10 +124,7 @@ function* setCurrentPlayingStream(songId: string, providerNum: number, media?: M
   yield call(() => PlayerRefService.getInstance().play())
 
   if (fullUrl) {
-    yield put({
-      type: types.SET_BACKGROUND_IMAGE,
-      backgroundImage: fullUrl
-    })
+    yield call(() => useUIStore.getState().setBackgroundImage(fullUrl))
   }
 }
 
@@ -243,7 +241,7 @@ function* handleFullscreen(): Generator<any, void, any> {
   }
 
   if (player.fullscreen) {
-    yield put({ type: types.TOGGLE_SIDEBAR, value: false })
+    yield call(() => useUIStore.getState().toggleSidebar(false))
     yield screenfull.request()
   } else {
     yield screenfull.exit()

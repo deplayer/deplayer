@@ -15,6 +15,7 @@
  */
 import { call, put } from 'redux-saga/effects'
 import * as types from '../../constants/ActionTypes'
+import { useUIStore } from '../../stores/uiStore'
 import { getLiveStoreInstance } from '../../App'
 
 /** LiveStore instance type - the actual return type of getLiveStoreInstance() */
@@ -86,7 +87,7 @@ function* startStream(songId: string): Generator<any, void, any> {
   yield call(() => PlayerRefService.getInstance().play())
 
   if (fullUrl) {
-    yield put({ type: types.SET_BACKGROUND_IMAGE, backgroundImage: fullUrl })
+    yield call(() => useUIStore.getState().setBackgroundImage(fullUrl))
   }
 }
 
