@@ -3,6 +3,7 @@ import { createLogger } from "../utils/logger";
 
 import { normalizeMedia, NormalizedMedia } from "../utils/normalizeMedia";
 import { IMusicProvider } from "./IMusicProvider";
+import type { HealthCheckResult } from "../types/providers";
 
 type SubsonicAlbum = {
   id: string;
@@ -24,6 +25,12 @@ type SubsonicSong = {
   duration?: number;
   track?: number;
   discNumber?: number;
+};
+
+type SubsonicPingResponse = {
+  status: "ok" | "failed";
+  version?: string;
+  error?: { code: number; message: string };
 };
 
 const logger = createLogger({ namespace: "SubsonicApiProvider" });
@@ -245,6 +252,32 @@ export default class SubsonicApiProvider implements IMusicProvider {
     } catch (error) {
       logger.error(`Error fetching artist songs for ${artistName}:`, error);
       return [];
+    }
+  }
+
+  async healthcheck(): Promise<HealthCheckResult> {
+    const url = `${this.baseUrl}/rest/ping.view?u=${encodeURIComponent(this.user)}&p=${encodeURIComponent(this.password)}&c=deplayer&v=1.16.1&f=json`;
+    const t0 = Date.now();
+    try {
+      const { data } = await axios.get(url, { timeout: 5000 });
+      const r: SubsonicPingResponse | undefined = data?.["subsonic-response"];
+      const checkedAt = Date.now();
+      const latencyMs = checkedAt - t0;
+      if (r?.status === "ok") {
+        return { status: "connected", latencyMs, checkedAt };
+      }
+      if (r?.error?.code === 40) {
+        return { status: "authFailed", error: r.error.message, checkedAt, latencyMs };
+      }
+      return { status: "unreachable", error: r?.error?.message ?? "Unknown", checkedAt, latencyMs };
+    } catch (e) {
+      const checkedAt = Date.now();
+      return {
+        status: "unreachable",
+        error: e instanceof Error ? e.message : String(e),
+        checkedAt,
+        latencyMs: checkedAt - t0,
+      };
     }
   }
 }

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import MockAdapter from 'axios-mock-adapter'
 
 import exampleSongs from './mstreamExampleSongs.json'
@@ -32,5 +32,39 @@ describe('SubsonicApiProvider', () => {
       expect(results).toBeInstanceOf(Array)
       expect(results.length).toBe(2)
     })
+  })
+})
+
+describe('SubsonicApiProvider.healthcheck', () => {
+  beforeEach(() => { vi.restoreAllMocks() })
+
+  const make = () => new SubsonicApiProvider(
+    { baseUrl: 'https://nav.example.com', user: 'u', password: 'p' },
+    'subsonic',
+  )
+
+  it('returns connected when ping responds with status="ok"', async () => {
+    vi.spyOn(axios, 'get').mockResolvedValue({
+      data: { 'subsonic-response': { status: 'ok', version: '1.16.1' } },
+    })
+    const res = await make().healthcheck!()
+    expect(res.status).toBe('connected')
+    expect(typeof res.checkedAt).toBe('number')
+  })
+
+  it('returns authFailed on error code 40', async () => {
+    vi.spyOn(axios, 'get').mockResolvedValue({
+      data: { 'subsonic-response': { status: 'failed', error: { code: 40, message: 'wrong password' } } },
+    })
+    const res = await make().healthcheck!()
+    expect(res.status).toBe('authFailed')
+    expect(res.error).toBe('wrong password')
+  })
+
+  it('returns unreachable on network error', async () => {
+    vi.spyOn(axios, 'get').mockRejectedValue(new Error('ECONNREFUSED'))
+    const res = await make().healthcheck!()
+    expect(res.status).toBe('unreachable')
+    expect(res.error).toContain('ECONNREFUSED')
   })
 })
