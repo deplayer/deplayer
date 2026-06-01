@@ -4,8 +4,7 @@ import { render, fireEvent, act, cleanup } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import Topbar from './Topbar'
 import * as types from '../../constants/ActionTypes'
-import { State as AppState } from '../../reducers/app'
-import { State as PeersState } from '../../reducers/peers'
+import { useUIStore } from '../../stores/uiStore'
 
 // We only mock I18n since it's an external dependency
 vi.mock('react-redux-i18n', () => ({
@@ -47,28 +46,20 @@ describe('Topbar', () => {
     searchTerm: '',
     searchToggled: true,
     dispatch: mockDispatch,
-    app: {
-      backgroundImage: '',
-      sidebarToggled: false,
-      showAddMediaModal: false,
-      mqlMatch: false,
-      heightMqlMatch: false,
-      loading: false,
-      displayMiniQueue: true,
-      showSpectrum: false,
-      showVisuals: false,
-      rightPanelToggled: false,
-      ready: false,
-    } satisfies AppState,
-    peers: {
-      peers: {}
-    } satisfies PeersState
   }
 
   beforeEach(() => {
     mockDispatch.mockClear()
     vi.clearAllTimers()
     mockClipboard.writeText.mockClear()
+
+    // Reset uiStore slices touched by Topbar tests
+    useUIStore.setState({
+      searchToggled: false,
+      searchTerm: '',
+      rightPanelToggled: false,
+      sidebarToggled: false,
+    })
 
     // Add modal container
     const modalRoot = document.createElement('div')
@@ -96,17 +87,15 @@ describe('Topbar', () => {
   }
 
   describe('Share room button', () => {
-    it('should dispatch TOGGLE_RIGHT_PANEL when share button is clicked', () => {
+    it('should toggle the right panel via uiStore when share button is clicked', () => {
+      expect(useUIStore.getState().rightPanelToggled).toBe(false)
       const { getByTitle } = renderTopbar()
-      
+
       // Click share button
       const shareButton = getByTitle('Share room')
       fireEvent.click(shareButton)
 
-      // Should dispatch TOGGLE_RIGHT_PANEL action
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: types.TOGGLE_RIGHT_PANEL
-      })
+      expect(useUIStore.getState().rightPanelToggled).toBe(true)
     })
   })
 
@@ -199,7 +188,8 @@ describe('Topbar', () => {
       )
     })
 
-    it('should clear timeout when search is closed', async () => {
+    it('should clear timeout and toggle search off via uiStore when search is closed', async () => {
+      useUIStore.setState({ searchToggled: true })
       const { getByTestId } = renderTopbar({ searchToggled: true })
       const input = getByTestId('search-input')
 
@@ -227,9 +217,7 @@ describe('Topbar', () => {
           searchTerm: 'test'
         })
       )
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: types.TOGGLE_SEARCH_OFF
-      })
+      expect(useUIStore.getState().searchToggled).toBe(false)
     })
   })
 }) 

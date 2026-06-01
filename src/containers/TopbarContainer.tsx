@@ -1,13 +1,11 @@
-import { connect } from 'react-redux'
+import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
-import { Dispatch } from 'redux'
 
 import { State as RootState } from '../reducers'
 import Icon from '../components/common/Icon'
 import Topbar from '../components/Topbar/Topbar'
-import { State as SearchState } from '../reducers/search'
-import { State as AppState } from '../reducers/app'
-import * as types from '../constants/ActionTypes'
+import { useUIStore } from '../stores/uiStore'
 import { useQueue, useMediaById, useArtistById, useAlbumById } from '../stores/livestore/hooks'
 
 // Extract ID from route path
@@ -120,29 +118,26 @@ const staticTitle = (pathname: string, searchTerm: string = ''): React.ReactNode
   }
 }
 
-interface TopbarWrapperProps {
-  search: SearchState,
-  app: AppState,
-  dispatch: Dispatch,
-  children?: React.ReactNode,
-  onSetSidebarOpen?: (open: boolean) => void
-}
-
-// Create a new wrapper component to handle hooks
-const TopbarWrapper = (props: TopbarWrapperProps) => {
+const TopbarContainer = ({ children }: { children?: React.ReactNode }) => {
+  const dispatch = useDispatch()
   const location = useLocation()
-  
+
   // Get queue from LiveStore (lightweight query)
   const liveQueue = useQueue('default')
-  
+
+  const searchTerm = useUIStore((s) => s.searchTerm)
+  const searchToggled = useUIStore((s) => s.searchToggled)
+  const toggleSidebar = useUIStore((s) => s.toggleSidebar)
+  const loading = useSelector((state: RootState) => state.search.loading)
+
   // OPTIMIZED: Check if we're on a detail page that needs dynamic title
   const { type: detailType, id: detailId } = extractIdFromPath(location.pathname)
-  
+
   // Build title: either static or dynamic detail component
-  const title = detailType && detailId 
+  const title = detailType && detailId
     ? <DynamicDetailTitle type={detailType} id={detailId} />
-    : staticTitle(location.pathname, props.search.searchTerm)
-  
+    : staticTitle(location.pathname, searchTerm)
+
   // Parse trackIds from LiveStore queue (can be JSON string or array)
   const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
     if (!ids) return []
@@ -153,36 +148,27 @@ const TopbarWrapper = (props: TopbarWrapperProps) => {
       return []
     }
   }
-  
-  const queueTrackIds = liveQueue?.shuffle 
+
+  const queueTrackIds = liveQueue?.shuffle
     ? parseTrackIds(liveQueue.randomTrackIds)
     : parseTrackIds(liveQueue?.trackIds)
-  
+
   const hasResults = queueTrackIds && queueTrackIds.length ? true : false
   const inHome = location.pathname === '/' ? true : false
-
-  const handleSidebarToggle = (open: boolean) => {
-    props.dispatch({ type: types.TOGGLE_SIDEBAR, value: open })
-  }
 
   return (
     <Topbar
       title={title}
-      loading={props.search.loading}
+      loading={loading}
       showInCenter={!hasResults && inHome}
-      searchTerm={props.search.searchTerm}
-      searchToggled={props.search.searchToggled}
-      dispatch={props.dispatch}
-      onSetSidebarOpen={handleSidebarToggle}
-      app={props.app}
+      searchTerm={searchTerm}
+      searchToggled={searchToggled}
+      dispatch={dispatch}
+      onSetSidebarOpen={(open: boolean) => toggleSidebar(open)}
     >
-      {props.children}
+      {children}
     </Topbar>
   )
 }
 
-// Connect the wrapper component instead
-export default connect((state: RootState) => ({
-  search: state.search,
-  app: state.app
-}))(TopbarWrapper)
+export default TopbarContainer

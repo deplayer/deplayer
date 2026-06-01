@@ -1,15 +1,10 @@
-import { useDispatch, useSelector } from 'react-redux'
 import Button from '../common/Button'
-import * as types from '../../constants/ActionTypes'
 import Icon from '../common/Icon'
+import { useUIStore } from '../../stores/uiStore'
 
 const SearchButton = () => {
-  const dispatch = useDispatch()
-  const searchToggled = useSelector((state: { search: { searchToggled: boolean } }) => state.search.searchToggled)
-
-  const toggleSearch = () => {
-    dispatch({ type: types.TOGGLE_SEARCH })
-  }
+  const searchToggled = useUIStore((s) => s.searchToggled)
+  const toggleSearch = useUIStore((s) => s.toggleSearch)
 
   if (searchToggled) {
     return null

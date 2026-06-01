@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { Dispatch } from 'redux'
 import SearchInput from './SearchInput'
 import Icon from '../common/Icon'
-import { State as AppState } from '../../reducers/app'
 import * as types from '../../constants/ActionTypes'
 import { startSearch, StartSearchAction } from '../../types/search'
 import { useUIStore } from '../../stores/uiStore'
@@ -15,13 +14,16 @@ type Props = {
   searchToggled: boolean,
   dispatch: Dispatch<StartSearchAction | { type: string; [key: string]: unknown }>,
   onSetSidebarOpen?: (open: boolean) => void,
-  app?: AppState,
   children?: React.ReactNode
 }
 
 const Topbar = (props: Props) => {
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null)
   const setSearchTerm = useUIStore(s => s.setSearchTerm)
+  const toggleSearch = useUIStore(s => s.toggleSearch)
+  const toggleSearchOff = useUIStore(s => s.toggleSearchOff)
+  const toggleRightPanel = useUIStore(s => s.toggleRightPanel)
+  const sidebarToggled = useUIStore(s => s.sidebarToggled)
 
   const handleSearchChange = (event: React.FormEvent<HTMLInputElement>) => {
     const searchTerm = event.currentTarget.value
@@ -56,18 +58,18 @@ const Topbar = (props: Props) => {
   }
 
   const handleSearchBlur = () => {
-    props.dispatch({ type: types.TOGGLE_SEARCH })
+    toggleSearch()
   }
 
   const handleSearchOff = () => {
     if (searchTimeout) {
       clearTimeout(searchTimeout)
     }
-    props.dispatch({ type: types.TOGGLE_SEARCH_OFF })
+    toggleSearchOff()
   }
 
   const handleToggleSidebar = () => {
-    props.onSetSidebarOpen?.(!props.app?.sidebarToggled)
+    props.onSetSidebarOpen?.(!sidebarToggled)
   }
 
   // Clean up timeout on unmount
@@ -101,14 +103,14 @@ const Topbar = (props: Props) => {
           setSearchOff={handleSearchOff}
         />
         {!props.searchToggled && props.title && (
-          <div role="button" tabIndex={0} onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && props.dispatch) props.dispatch({ type: types.TOGGLE_SEARCH }) }} onClick={() => props.dispatch({ type: types.TOGGLE_SEARCH })} className="text-center">{props.title}</div>
+          <div role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") toggleSearch() }} onClick={toggleSearch} className="text-center">{props.title}</div>
         )}
       </div>
 
       <div className='flex items-center absolute right-5'>
         {props.children}
         <button
-          onClick={() => props.dispatch({ type: types.TOGGLE_RIGHT_PANEL })}
+          onClick={() => toggleRightPanel()}
           className="btn btn-ghost btn-circle"
           title="Share room"
         >
