@@ -325,11 +325,24 @@ const MusicTable = ({
     [rowRenderer]
   )
 
-  // Only scroll to current song on initial mount, not on every re-render
+  // Scroll to the currently playing track on mount AND whenever the active
+  // track changes (next/prev/error). The 100ms clear-effect below releases
+  // the grip so user scrolling isn't permanently overridden.
   const initialScrollIndex = React.useRef(
     !disableCurrent ? tableIds.indexOf(currentSongId || '') : -1
   )
   const [scrollToIndex, setScrollToIndex] = React.useState(initialScrollIndex.current)
+  const didMountRef = React.useRef(false)
+  React.useEffect(() => {
+    if (!didMountRef.current) {
+      // useState already seeded scrollToIndex with the mount-time index.
+      didMountRef.current = true
+      return
+    }
+    if (disableCurrent) return
+    const idx = tableIdsRef.current.indexOf(currentSongId || '')
+    if (idx >= 0) setScrollToIndex(idx)
+  }, [currentSongId, disableCurrent])
 
   const getActions = () => {
     if (location.pathname.match(/\/song\/.*/)) {
