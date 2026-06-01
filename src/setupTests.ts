@@ -74,18 +74,6 @@ vi.mock('./services/ID3Tag/ID3TagService', () => {
   }
 })
 
-// Mock fflate module
-vi.mock('./utils/fflate-wrapper', () => {
-  const mockFn = vi.fn()
-  return {
-    deflate: mockFn,
-    inflate: mockFn,
-    gzip: mockFn,
-    ungzip: mockFn,
-    strToU8: mockFn,
-    strFromU8: mockFn
-  }
-})
 
 // Mock music-metadata module
 const mockMetadata = {
