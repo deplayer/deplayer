@@ -32,16 +32,6 @@ const providerRegistry: Record<string, ProviderSchema> = {
     ],
     capabilities: ['search'],
   },
-  'youtube-dl-server': {
-    key: 'youtube-dl-server',
-    label: 'labels.youtube-dl-server',
-    repeatable: true,
-    fields: [
-      { key: 'enabled', type: 'boolean', label: 'labels.enabled' },
-      { key: 'url', type: 'url', label: 'labels.url', required: true },
-    ],
-    capabilities: ['stream'],
-  },
   jellyfin: {
     key: 'jellyfin',
     label: 'labels.jellyfin',

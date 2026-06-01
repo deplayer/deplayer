@@ -9,13 +9,6 @@ const sectionRegistry: Record<string, SectionSchema> = {
       { key: 'apikey', type: 'text', label: 'labels.lastfm.apikey' },
     ],
   },
-  'youtube-dl-server': {
-    key: 'youtube-dl-server',
-    label: 'labels.youtube-dl-server',
-    fields: [
-      { key: 'host', type: 'text', label: 'labels.youtube-dl-server.host', default: 'http://localhost' },
-    ],
-  },
 }
 
 export { sectionRegistry }

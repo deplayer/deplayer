@@ -278,20 +278,11 @@ Mock `axios.get` to dispatch on the URL substring (`'/System/Info/Public'` vs `'
 **Step 5: Commit:** `feat(providers): mstream healthcheck via /api/v1/ping`.
 
 ---
+## Task 6: ~~YoutubeDlServerProvider.healthcheck()~~ *(dropped)*
 
-## Task 6: YoutubeDlServerProvider.healthcheck()
+`youtube-dl-server` was registered in the settings registry but had no implementing provider class — dead code. Removed in the same commit that closes this task (`src/services/settings/providers.ts`, `src/services/settings/sections.ts`, locale strings). The picker will surface five tiles instead of six.
 
-**Files:**
-- Modify: `src/providers/YoutubeDlServerProvider.ts` *(or whatever the existing file is — check `src/providers/` first)*
-- Test: companion `.spec.ts`
-
-**Step 1–4:** `GET {url}/api/info?url=https://example.com`. 200 OR 4xx → `connected` (server responded). Network rejection → `unreachable`.
-
-**Step 5: Commit:** `feat(providers): youtube-dl-server healthcheck via /api/info`.
-
----
-
-## Task 7: useProviderHealth hook
+No implementation; no commit beyond the cleanup. Skip to Task 7.
 
 **Files:**
 - Create: `src/stores/livestore/hooks/useProviderHealth.ts`
@@ -405,8 +396,8 @@ Pure presentational component. Use Tailwind utility classes with `bg-[oklch(...)
 describe('AddSourceModal', () => {
   it('renders one tile per registered provider type', () => {
     render(<AddSourceModal isOpen open configuredKeys={[]} onPick={vi.fn()} onClose={vi.fn()} />)
-    // Six tiles: subsonic, mstream, itunes, youtube-dl-server, jellyfin, musicbrainz
-    expect(screen.getAllByRole('button', { name: /add|connected/i })).toHaveLength(6)
+    // Five tiles: subsonic, mstream, itunes, jellyfin, musicbrainz
+    expect(screen.getAllByRole('button', { name: /add|connected/i })).toHaveLength(5)
   })
 
   it('shows capability chips per tile', () => {
@@ -634,7 +625,7 @@ describe('Providers page', () => {
   it('shows the empty-state picker when no providers are configured', () => {
     renderWithProviders(<Providers />, { initialState: settingsState({}) })
     expect(screen.getByText(/Connect a music source to get started/i)).toBeInTheDocument()
-    expect(screen.getAllByRole('button', { name: /add|connected/i })).toHaveLength(6)
+    expect(screen.getAllByRole('button', { name: /add|connected/i })).toHaveLength(5)
   })
 
   it('shows a single + Add source button when at least one provider is configured', () => {

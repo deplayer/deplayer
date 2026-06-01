@@ -184,7 +184,7 @@
       "steps": "To start playing some content follow one of the steps below:",
       "setupProviders": "Setup your media providers (Subsonic API, mstream or ITunes)",
       "addMedia": "Add new media to your collection",
-      "addMediaDescription": "Webtorrent, Filesystem or youtube-dl-server",
+      "addMediaDescription": "Webtorrent, Filesystem",
       "goToCollection": "Or go to your collection",
       "authenticated": "You are authenticated with your passkey",
       "authNeeded": "Access social capabilities by authenticating with your passkey",
