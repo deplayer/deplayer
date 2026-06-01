@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Formik, Form, Field, type FormikHelpers } from 'formik'
 import { Translate } from 'react-redux-i18n'
 import classNames from 'classnames'
@@ -72,17 +72,13 @@ export const ConnectionCard = ({
     [config, schema],
   )
 
-  const [userExpanded, setUserExpanded] = useState<boolean | null>(null)
-  const expanded = userExpanded ?? shouldAutoExpand(health, requiredEmpty)
-
-  // Re-collapse when a card resolves to connected and the user hasn't explicitly opened it.
-  const prevStatus = useRef(health.status)
-  useEffect(() => {
-    if (prevStatus.current !== 'connected' && health.status === 'connected' && userExpanded === null) {
-      setUserExpanded(false)
-    }
-    prevStatus.current = health.status
-  }, [health.status, userExpanded])
+  // 'auto' lets shouldAutoExpand decide. Once the user clicks the row, the
+  // choice sticks until they click again. Status changes do not override it.
+  const [userToggle, setUserToggle] = useState<'auto' | 'open' | 'closed'>('auto')
+  const expanded = userToggle === 'auto'
+    ? shouldAutoExpand(health, requiredEmpty)
+    : userToggle === 'open'
+  const toggleExpanded = () => setUserToggle(expanded ? 'closed' : 'open')
 
   const enabled = config.enabled !== false
   const title = titleFor(config, schema)
@@ -121,7 +117,7 @@ export const ConnectionCard = ({
         <StatusDot status={enabled ? health.status : 'disabled'} />
         <button
           type="button"
-          onClick={() => setUserExpanded(v => !(v ?? expanded))}
+          onClick={toggleExpanded}
           className="flex-1 min-w-0 text-left"
           aria-expanded={expanded}
           aria-controls={`connection-card-body-${instanceKey}`}

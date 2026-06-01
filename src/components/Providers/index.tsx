@@ -15,6 +15,7 @@ import type { ProviderSchema } from '../../types/providers'
 
 import MainContainer from '../common/MainContainer'
 import AddSourceModal from './AddSourceModal'
+import AddSourcePicker from './AddSourcePicker'
 import ConnectionCard from './ConnectionCard'
 import RemoveConnectionDialog from './RemoveConnectionDialog'
 import providerFactory from './providerFactory'
@@ -153,12 +154,9 @@ const Providers = () => {
           <p className="opacity-70 mb-6">
             <Translate value="providers.empty.subtitle" />
           </p>
-          <AddSourceModal
-            open
-            variant="inline"
+          <AddSourcePicker
             configuredKeys={[]}
             onPick={addOne}
-            onClose={() => { /* inline variant cannot close */ }}
           />
         </div>
       </MainContainer>
@@ -201,7 +199,6 @@ const Providers = () => {
 
         <AddSourceModal
           open={pickerOpen}
-          variant="modal"
           configuredKeys={configuredTypes}
           onPick={addOne}
           onClose={() => setPickerOpen(false)}

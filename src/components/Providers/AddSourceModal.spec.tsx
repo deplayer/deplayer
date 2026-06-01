@@ -1,10 +1,9 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest'
-import { render, screen, within } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { AddSourceModal } from './AddSourceModal'
 
-// Ensure the portal target exists.
 beforeAll(() => {
   const root = document.createElement('div')
   root.id = 'modal-root'
@@ -21,60 +20,26 @@ describe('AddSourceModal', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('renders one tile per registered provider type (inline variant)', () => {
-    render(
-      <AddSourceModal open variant="inline" configuredKeys={[]} onPick={noop} onClose={noop} />,
-    )
-    // Five tiles: subsonic, mstream, itunes, jellyfin, musicbrainz
-    expect(screen.getAllByTestId(/^add-source-tile-/)).toHaveLength(5)
-  })
-
-  it('shows capability chips per tile', () => {
-    render(
-      <AddSourceModal open variant="inline" configuredKeys={[]} onPick={noop} onClose={noop} />,
-    )
-    const subsonicTile = screen.getByTestId('add-source-tile-subsonic')
-    expect(within(subsonicTile).getByText(/sync/i)).toBeInTheDocument()
-    expect(within(subsonicTile).getByText(/search/i)).toBeInTheDocument()
-    expect(within(subsonicTile).getByText(/stream/i)).toBeInTheDocument()
-  })
-
-  it('disables singleton tiles already configured', () => {
-    render(
-      <AddSourceModal open variant="inline" configuredKeys={['itunes']} onPick={noop} onClose={noop} />,
-    )
-    const tile = screen.getByTestId('add-source-tile-itunes')
-    expect(tile).toBeDisabled()
-    expect(within(tile).getByText(/connected/i)).toBeInTheDocument()
-  })
-
-  it('does NOT disable repeatable tiles already configured', () => {
-    render(
-      <AddSourceModal open variant="inline" configuredKeys={['subsonic']} onPick={noop} onClose={noop} />,
-    )
-    expect(screen.getByTestId('add-source-tile-subsonic')).toBeEnabled()
+  it('renders the picker when open', () => {
+    render(<AddSourceModal open configuredKeys={[]} onPick={noop} onClose={noop} />)
+    expect(screen.getByTestId('add-source-tile-subsonic')).toBeInTheDocument()
   })
 
   it('calls onPick then onClose when a tile is clicked', async () => {
-    const onPick = vi.fn()
-    const onClose = vi.fn()
+    const onPick = vi.fn(); const onClose = vi.fn()
     const user = userEvent.setup()
-    render(
-      <AddSourceModal open variant="inline" configuredKeys={[]} onPick={onPick} onClose={onClose} />,
-    )
+    render(<AddSourceModal open configuredKeys={[]} onPick={onPick} onClose={onClose} />)
     await user.click(screen.getByTestId('add-source-tile-jellyfin'))
     expect(onPick).toHaveBeenCalledWith('jellyfin')
     expect(onClose).toHaveBeenCalled()
   })
 
-  it('does not call onPick when a disabled tile is clicked', async () => {
-    const onPick = vi.fn()
+  it('clicking the backdrop fires onClose', async () => {
     const onClose = vi.fn()
     const user = userEvent.setup()
-    render(
-      <AddSourceModal open variant="inline" configuredKeys={['itunes']} onPick={onPick} onClose={onClose} />,
-    )
-    await user.click(screen.getByTestId('add-source-tile-itunes'))
-    expect(onPick).not.toHaveBeenCalled()
+    render(<AddSourceModal open configuredKeys={[]} onPick={noop} onClose={onClose} />)
+    const backdrop = document.querySelector('.modal-backdrop') as HTMLElement
+    await user.click(backdrop)
+    expect(onClose).toHaveBeenCalled()
   })
 })
