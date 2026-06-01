@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux'
 
-import * as types from '../../constants/ActionTypes'
 import SidebarContents from './SidebarContents'
 import Sidebar from 'react-sidebar'
 import { State } from '../../reducers'
@@ -14,20 +13,19 @@ function MSidebar({ children }: Props) {
   const dispatch = useDispatch()
   const sidebarToggled = useUIStore(s => s.sidebarToggled)
   const mqlMatch = useUIStore(s => s.mqlMatch)
-  const app = useSelector((state: State) => state.app)
+  const toggleSidebar = useUIStore(s => s.toggleSidebar)
   const player = useSelector((state: State) => state.player)
-  
+
   const docked = mqlMatch && sidebarToggled
 
   const onSetSidebarOpen = (open: boolean) => {
     if (!docked) {
-      dispatch({ type: types.TOGGLE_SIDEBAR, value: open })
+      toggleSidebar(open)
     }
   }
 
   const contents = (
     <SidebarContents
-      app={app}
       onSetSidebarOpen={onSetSidebarOpen}
       dispatch={dispatch}
       className={(player.playing && player.streamUri) ? 'pb-20' : ''}

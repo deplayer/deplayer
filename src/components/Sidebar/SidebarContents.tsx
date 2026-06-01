@@ -15,7 +15,6 @@ import ThemeModal from './ThemeModal'
 
 import { inSection } from '../../utils/router'
 import Icon from '../common/Icon'
-import { State as AppState } from '../../reducers/app'
 import { useLocation } from 'react-router'
 import { usePlaylists, useSmartPlaylists, useQueue, useMediaCount, useArtistsCount, useSearchMediaIds } from '../../stores/livestore/hooks'
 import { useUIStore } from '../../stores/uiStore'
@@ -25,7 +24,6 @@ import PlayerRefService from '../../services/PlayerRefService'
 
 type ContentProps = {
   dispatch: Dispatch,
-  app: AppState,
   onSetSidebarOpen: Function,
   className?: string
 }
