@@ -114,9 +114,7 @@ export const START_SCAN_SOURCES = "START_SCAN_SOURCES";
 // Notifications
 export const SEND_NOTIFICATION = "SEND_NOTIFICATION";
 
-// Connection
-export const SET_ONLINE_CONNECTION = "SET_ONLINE_CONNECTION";
-export const SET_OFFLINE_CONNECTION = "SET_OFFLINE_CONNECTION";
+
 
 // Artist
 export const LOAD_ARTIST = "LOAD_ARTIST";

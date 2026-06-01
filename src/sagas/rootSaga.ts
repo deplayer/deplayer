@@ -3,7 +3,6 @@ import { Store } from "redux";
 
 import artistSaga from "./artist";
 import collectionSaga from "./collection";
-import connectionSaga from "./connection";
 import mediaSessionSaga from "./mediaSession";
 import wakeLock from "./wakeLock";
 import notificationsSaga from "./notifications";
@@ -16,7 +15,6 @@ function* rootSaga(store: Store) {
   yield all([
     artistSaga(),
     collectionSaga(),
-    connectionSaga(store),
     mediaSessionSaga(store),
     wakeLock(store),
     notificationsSaga(store),
