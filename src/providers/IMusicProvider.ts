@@ -1,4 +1,6 @@
 import { NormalizedMedia } from '../utils/normalizeMedia'
+import type { HealthCheckResult } from '../types/providers'
+
 
 export interface ScanStatus {
   scanning: boolean
@@ -32,4 +34,10 @@ export interface IMusicProvider {
     since: string | null,
     opts?: { cursor?: number | null; pageSize?: number },
   ): AsyncGenerator<AlbumPage, void, void>
+  /**
+   * Probe the underlying service. Optional — providers without remote config
+   * (itunes, musicbrainz) omit it; the UI treats absence as 'unknown'.
+   * Implementations must resolve within ~5s; callers do not enforce a timeout.
+   */
+  healthcheck?(): Promise<HealthCheckResult>
 }
