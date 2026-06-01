@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Sidebar from '../components/Sidebar/Sidebar'
-import TopbarContainer from './TopbarContainer'
+import Topbar from '../components/Topbar/Topbar'
 import SearchButton from '../components/Buttons/SearchButton'
 import Placeholder from '../components/Player/Placeholder'
 import ReloadPrompt from '../components/ReloadPrompt'
@@ -50,9 +50,9 @@ const Layout = ({ children }: LayoutProps) => {
       <ToastContainer theme='dark' />
       <Sidebar>
         <ReloadPrompt />
-        <TopbarContainer>
+        <Topbar>
           <SearchButton />
-        </TopbarContainer>
+        </Topbar>
         <div className='layout-contents z-10'>
           {children}
         </div>
