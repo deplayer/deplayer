@@ -4,6 +4,7 @@ import PlayerControls from '../components/Player/PlayerControls'
 import { useLocation } from 'react-router'
 import { State } from '../reducers'
 import { useQueue, useSettings, useMediaById } from '../stores/livestore/hooks'
+import { useUIStore } from '../stores/uiStore'
 import { defaultState as queueDefaultState } from '../reducers/queue'
 import { defaultState as settingsDefaultState } from '../reducers/settings'
 import { createHtmlPortalNode } from 'react-reverse-portal'
@@ -14,8 +15,11 @@ type Props = {
 
 const PlayerContainer = ({ playerPortal }: Props) => {
   const dispatch = useDispatch()
-  const app = useSelector((state: State) => state.app)
   const player = useSelector((state: State) => state.player)
+
+  const showVisuals = useUIStore((s) => s.showVisuals)
+  const showSpectrum = useUIStore((s) => s.showSpectrum)
+  const mqlMatch = useUIStore((s) => s.mqlMatch)
 
   const location = useLocation()
   const liveQueue = useQueue('default')
@@ -81,7 +85,9 @@ const PlayerContainer = ({ playerPortal }: Props) => {
 
   return (
     <PlayerControls
-      app={app}
+      showVisuals={showVisuals}
+      showSpectrum={showSpectrum}
+      mqlMatch={mqlMatch}
       slim={false}
       player={player}
       playerPortal={playerPortal}

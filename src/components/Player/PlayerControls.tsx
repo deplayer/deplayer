@@ -9,7 +9,6 @@ import SpectrumVisualizer from '../SpectrumVisualizer'
 import { State as PlayerState } from '../../reducers/player'
 import { State as SettingsState } from '../../reducers/settings'
 import { State as QueueState } from '../../reducers/queue'
-import { State as AppState } from '../../reducers/app'
 import Controls from './Controls'
 import Cover from './Cover'
 import ProgressBar from './ProgressBar'
@@ -26,7 +25,9 @@ ReactPlayer.addCustomPlayer(WebtorrentPlayer as unknown as ReactPlayer)
 ReactPlayer.addCustomPlayer(PeerStreamPlayer as unknown as ReactPlayer)
 
 interface Props {
-  app: AppState
+  showVisuals: boolean
+  showSpectrum: boolean
+  mqlMatch: boolean
   queue: QueueState
   location: Location
   slim: boolean
@@ -356,7 +357,7 @@ class PlayerControls extends React.Component<Props, State> {
       config.file.attributes['crossOrigin'] = 'anonymous'
     }
 
-    const showFullscreen = this.props.app.showVisuals || mediaType === 'video'
+    const showFullscreen = this.props.showVisuals || mediaType === 'video'
     const playerControlsClassnames = classNames({
       'flex': true,
       'justify-between': true,
@@ -447,7 +448,7 @@ class PlayerControls extends React.Component<Props, State> {
                           repeat={this.props.queue.repeat}
                           shuffle={this.props.queue.shuffle}
                         />
-                        {(internalPlayer && this.props.app.showSpectrum) && (
+                        {(internalPlayer && this.props.showSpectrum) && (
                           <div className='mr-4 hidden md:block'>
                             <SpectrumVisualizer
                               width={100}
@@ -469,7 +470,7 @@ class PlayerControls extends React.Component<Props, State> {
                       </div>
                       <div className='player-tools flex justify-center items-center'>
                         <Controls
-                          mqlMatch={this.props.app.mqlMatch}
+                          mqlMatch={this.props.mqlMatch}
                           playPrev={this.playPrev}
                           isPlaying={this.props.player.playing}
                           playPause={this.playPause}
