@@ -24,7 +24,7 @@ This redesign reframes the screen as a **Connections panel**: a live, scannable 
 ### `src/types/providers.ts` *(schema additions)*
 
 - Add `name?: string` to a provider instance's stored settings (orthogonal to the registry schema).
-- Add a `HealthStatus` union: `'connected' | 'checking' | 'unreachable' | 'auth_failed' | 'disabled' | 'unknown'`.
+- Add a `HealthStatus` union: `'connected' | 'checking' | 'unreachable' | 'authFailed' | 'disabled' | 'unknown'`.
 - Add a `HealthCheckResult` type: `{ status: HealthStatus; error?: string; latencyMs?: number; checkedAt: number }`.
 
 ### `src/providers/IMusicProvider.ts` *(interface)*
@@ -41,13 +41,13 @@ Optional so existing providers don't break compilation; the UI treats `undefined
 
 | Provider | Implementation |
 |---|---|
-| `SubsonicApiProvider` | `GET {baseUrl}/rest/ping.view?u=&p=&v=1.16.1&c=deplayer&f=json` — parses `status` field, `failed` with `code=40` → `auth_failed`. |
+| `SubsonicApiProvider` | `GET {baseUrl}/rest/ping.view?u=&p=&v=1.16.1&c=deplayer&f=json` — parses `status` field, `failed` with `code=40` → `authFailed`. |
 | `JellyfinProvider` | `GET {baseUrl}/System/Info/Public` for reachability, then `GET /Users/Me` with `X-Emby-Token` for auth. |
 | `MstreamApiProvider` | `POST {baseUrl}/api/v1/ping` (no auth needed for current usage). |
 | `youtube-dl-server` | `GET {url}/api/info?url=https://example.com` → 200/4xx both mean reachable. |
 | `itunes`, `musicbrainz` | No config, no `healthcheck` — UI shows `enabled` / `disabled` only. |
 
-All checks have a 5-second timeout. Network errors → `unreachable`. HTTP 401/403 → `auth_failed`.
+All checks have a 5-second timeout. Network errors → `unreachable`. HTTP 401/403 → `authFailed`.
 
 ### `src/components/Providers/index.tsx` *(rewrite)*
 
@@ -57,7 +57,7 @@ Becomes a thin shell: panel header (`Sources` title, `+ Add source` button when 
 
 The card itself. Two visual states (collapsed row / expanded form), driven by:
 
-- `isExpanded` local state, true by default if `status === 'auth_failed' | 'unreachable'` or if the card is dirty.
+- `isExpanded` local state, true by default if `status === 'authFailed' | 'unreachable'` or if the card is dirty.
 - A single click anywhere on the collapsed row toggles expansion.
 
 Collapsed row (one line, ~48px tall):
@@ -97,13 +97,13 @@ Singleton tiles whose type already has one configured instance render with a gre
 
 ### New: `src/components/Providers/StatusDot.tsx`
 
-Stateless presentational component. Renders the 6 states (`connected` / `checking` / `unreachable` / `auth_failed` / `disabled` / `unknown`) as a 8px dot. `checking` pulses (CSS keyframe, opacity only — never animates layout properties per impeccable's motion law). `disabled` is a hollow ring; `unknown` is a neutral filled dot.
+Stateless presentational component. Renders the 6 states (`connected` / `checking` / `unreachable` / `authFailed` / `disabled` / `unknown`) as a 8px dot. `checking` pulses (CSS keyframe, opacity only — never animates layout properties per impeccable's motion law). `disabled` is a hollow ring; `unknown` is a neutral filled dot.
 
 Colors (OKLCH, tinted toward the existing daisyUI theme — actual values land during implementation):
 
 - `connected` → `oklch(0.72 0.16 145)` (green, base-tinted)
 - `checking` → `oklch(0.78 0.14 75)` (amber)
-- `auth_failed`, `unreachable` → `oklch(0.65 0.20 25)` (red)
+- `authFailed`, `unreachable` → `oklch(0.65 0.20 25)` (red)
 - `disabled` → hollow ring at `oklch(0.55 0.01 250)` (neutral)
 - `unknown` → `oklch(0.55 0.01 250)` filled
 
@@ -157,7 +157,7 @@ Status is **not** persisted to LiveStore — it's session-only ephemeral state. 
 
 1. Fresh install with zero configured providers shows the tile picker as the empty state, not a row of `+` buttons over a blank panel.
 2. Configured Navidrome with valid creds shows a green dot, collapsed row, hostname as title, capability chips, and a "synced Nm ago" line driven by the existing Subsonic sync timestamp.
-3. Same Navidrome with wrong password shows a red dot, `auth_failed`, auto-expanded card with the error inline above the password field.
+3. Same Navidrome with wrong password shows a red dot, `authFailed`, auto-expanded card with the error inline above the password field.
 4. Same Navidrome offline shows a red dot, `unreachable`, auto-expanded card.
 5. Two Navidrome instances are distinguishable in the collapsed list by their hostnames (default) or labels (when set).
 6. Adding `itunes` after one already exists: the tile is disabled in the picker with a "Connected" badge.

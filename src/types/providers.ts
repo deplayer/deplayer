@@ -44,7 +44,7 @@ export type HealthStatus =
   | 'connected'
   | 'checking'
   | 'unreachable'
-  | 'auth_failed'
+  | 'authFailed'
   | 'disabled'
   | 'unknown'
 

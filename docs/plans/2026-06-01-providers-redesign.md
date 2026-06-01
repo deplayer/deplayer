@@ -40,14 +40,14 @@ import type { HealthStatus, HealthCheckResult } from './providers'
 describe('provider health types', () => {
   it('HealthStatus accepts the six documented states', () => {
     const states: HealthStatus[] = [
-      'connected', 'checking', 'unreachable', 'auth_failed', 'disabled', 'unknown',
+      'connected', 'checking', 'unreachable', 'authFailed', 'disabled', 'unknown',
     ]
     expect(states).toHaveLength(6)
   })
 
   it('HealthCheckResult carries status, optional error, optional latency, and checkedAt', () => {
     const ok: HealthCheckResult = { status: 'connected', latencyMs: 42, checkedAt: 0 }
-    const bad: HealthCheckResult = { status: 'auth_failed', error: 'wrong password', checkedAt: 0 }
+    const bad: HealthCheckResult = { status: 'authFailed', error: 'wrong password', checkedAt: 0 }
     expect(ok.status).toBe('connected')
     expect(bad.error).toBe('wrong password')
   })
@@ -68,7 +68,7 @@ export type HealthStatus =
   | 'connected'
   | 'checking'
   | 'unreachable'
-  | 'auth_failed'
+  | 'authFailed'
   | 'disabled'
   | 'unknown'
 
@@ -161,12 +161,12 @@ describe('SubsonicApiProvider.healthcheck', () => {
     expect(typeof res.checkedAt).toBe('number')
   })
 
-  it('returns auth_failed on error code 40', async () => {
+  it('returns authFailed on error code 40', async () => {
     vi.spyOn(axios, 'get').mockResolvedValue({
       data: { 'subsonic-response': { status: 'failed', error: { code: 40, message: 'wrong password' } } },
     })
     const res = await make().healthcheck!()
-    expect(res.status).toBe('auth_failed')
+    expect(res.status).toBe('authFailed')
     expect(res.error).toBe('wrong password')
   })
 
@@ -198,7 +198,7 @@ async healthcheck(): Promise<HealthCheckResult> {
     const latencyMs = checkedAt - t0
     if (r?.status === 'ok') return { status: 'connected', latencyMs, checkedAt }
     if (r?.error?.code === 40) {
-      return { status: 'auth_failed', error: r.error.message, checkedAt, latencyMs }
+      return { status: 'authFailed', error: r.error.message, checkedAt, latencyMs }
     }
     return { status: 'unreachable', error: r?.error?.message ?? 'Unknown', checkedAt, latencyMs }
   } catch (e) {
@@ -232,7 +232,7 @@ git commit -m "feat(providers): subsonic healthcheck via /rest/ping.view"
 
 Three cases, same shape as Task 3:
 - `connected` — `/System/Info/Public` returns 200 AND `/Users/Me` returns 200 with the configured user.
-- `auth_failed` — `/System/Info/Public` returns 200 but `/Users/Me` returns 401.
+- `authFailed` — `/System/Info/Public` returns 200 but `/Users/Me` returns 401.
 - `unreachable` — `/System/Info/Public` rejects.
 
 Mock `axios.get` to dispatch on the URL substring (`'/System/Info/Public'` vs `'/Users/Me'`).
@@ -341,7 +341,7 @@ describe('StatusDot', () => {
     ['connected', 'Connected'],
     ['checking', 'Checking…'],
     ['unreachable', 'Unreachable'],
-    ['auth_failed', 'Authentication failed'],
+    ['authFailed', 'Authentication failed'],
     ['disabled', 'Disabled'],
     ['unknown', 'Status unknown'],
   ] as const)('renders %s with aria-label %s', (status, label) => {
@@ -497,8 +497,8 @@ describe('ConnectionCard — visual shell', () => {
     expect(screen.queryByLabelText(/Server URL/i)).not.toBeInTheDocument()
   })
 
-  it('starts expanded when health is auth_failed', () => {
-    render(<ConnectionCard {...defaultProps} health={{ status: 'auth_failed', error: 'wrong password', checkedAt: 0 }} />)
+  it('starts expanded when health is authFailed', () => {
+    render(<ConnectionCard {...defaultProps} health={{ status: 'authFailed', error: 'wrong password', checkedAt: 0 }} />)
     expect(screen.getByLabelText(/Server URL/i)).toBeInTheDocument()
     expect(screen.getByText(/wrong password/i)).toBeInTheDocument()
   })
@@ -796,7 +796,7 @@ git commit -m "chore(providers): remove obsolete ProviderButton"
     "connected": "Connected",
     "checking": "Checking…",
     "unreachable": "Unreachable",
-    "auth_failed": "Authentication failed",
+    "authFailed": "Authentication failed",
     "disabled": "Disabled",
     "unknown": "Status unknown"
   },
