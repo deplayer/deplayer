@@ -42,7 +42,7 @@ describe('Topbar', () => {
     mockClipboard.writeText.mockClear()
 
     useUIStore.setState({
-      searchToggled: true,
+      searchOpen: true,
       searchTerm: '',
       rightPanelToggled: false,
       sidebarToggled: false,
@@ -118,7 +118,7 @@ describe('Topbar', () => {
     })
 
     it('clears the pending timeout and toggles search off via uiStore when Escape is pressed', async () => {
-      useUIStore.setState({ searchToggled: true })
+      useUIStore.setState({ searchOpen: true })
       const { getByTestId } = renderTopbar()
       const input = getByTestId('search-input')
 
@@ -132,7 +132,7 @@ describe('Topbar', () => {
       expect(mockDispatch).not.toHaveBeenCalledWith(
         expect.objectContaining({ type: types.START_SEARCH, searchTerm: 'test' })
       )
-      expect(useUIStore.getState().searchToggled).toBe(false)
+      expect(useUIStore.getState().searchOpen).toBe(false)
     })
   })
 })

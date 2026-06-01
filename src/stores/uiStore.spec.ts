@@ -1,31 +1,31 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { useUIStore } from './uiStore'
 
-describe('useUIStore searchToggled', () => {
+describe('useUIStore searchOpen', () => {
   beforeEach(() => {
     useUIStore.setState({
-      searchToggled: false,
+      searchOpen: false,
       searchResults: [],
       searchTerm: '',
       searchActive: false,
     })
   })
 
-  it('toggleSearch flips searchToggled', () => {
-    expect(useUIStore.getState().searchToggled).toBe(false)
+  it('toggleSearch flips searchOpen', () => {
+    expect(useUIStore.getState().searchOpen).toBe(false)
     useUIStore.getState().toggleSearch()
-    expect(useUIStore.getState().searchToggled).toBe(true)
+    expect(useUIStore.getState().searchOpen).toBe(true)
     useUIStore.getState().toggleSearch()
-    expect(useUIStore.getState().searchToggled).toBe(false)
+    expect(useUIStore.getState().searchOpen).toBe(false)
   })
 
-  it('toggleSearchOff forces searchToggled false', () => {
-    useUIStore.setState({ searchToggled: true })
-    useUIStore.getState().toggleSearchOff()
-    expect(useUIStore.getState().searchToggled).toBe(false)
+  it('closeSearch forces searchOpen false', () => {
+    useUIStore.setState({ searchOpen: true })
+    useUIStore.getState().closeSearch()
+    expect(useUIStore.getState().searchOpen).toBe(false)
     // Idempotent
-    useUIStore.getState().toggleSearchOff()
-    expect(useUIStore.getState().searchToggled).toBe(false)
+    useUIStore.getState().closeSearch()
+    expect(useUIStore.getState().searchOpen).toBe(false)
   })
 
   it('setSearchResults replaces the result ids', () => {

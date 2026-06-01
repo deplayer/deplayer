@@ -32,7 +32,7 @@ type UIState = {
   activeFilters: Filter
   searchTerm: string
   searchActive: boolean
-  searchToggled: boolean
+  searchOpen: boolean
   searchResults: string[]
 }
 
@@ -52,7 +52,7 @@ type UIActions = {
   clearFilters: () => void
   setSearchTerm: (term: string) => void
   toggleSearch: () => void
-  toggleSearchOff: () => void
+  closeSearch: () => void
   setSearchResults: (ids: string[]) => void
   clearSearch: () => void
 }
@@ -81,7 +81,7 @@ export const useUIStore = create<UIState & UIActions>((set) => ({
   activeFilters: emptyFilters,
   searchTerm: '',
   searchActive: false,
-  searchToggled: false,
+  searchOpen: false,
   searchResults: [],
 
   // Actions
@@ -102,8 +102,8 @@ export const useUIStore = create<UIState & UIActions>((set) => ({
     set((s) => ({ activeFilters: { ...s.activeFilters, [filterType]: values } })),
   clearFilters: () => set({ activeFilters: emptyFilters }),
   setSearchTerm: (term) => set({ searchTerm: term, searchActive: term.trim().length > 0 }),
-  toggleSearch: () => set((s) => ({ searchToggled: !s.searchToggled })),
-  toggleSearchOff: () => set({ searchToggled: false }),
+  toggleSearch: () => set((s) => ({ searchOpen: !s.searchOpen })),
+  closeSearch: () => set({ searchOpen: false }),
   setSearchResults: (ids) => set({ searchResults: ids }),
   clearSearch: () =>
     set({ searchTerm: '', searchActive: false, searchResults: [] }),

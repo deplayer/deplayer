@@ -71,11 +71,11 @@ const Topbar = ({ children }: Props) => {
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null)
 
   const searchTerm = useUIStore((s) => s.searchTerm)
-  const searchToggled = useUIStore((s) => s.searchToggled)
+  const searchOpen = useUIStore((s) => s.searchOpen)
   const sidebarToggled = useUIStore((s) => s.sidebarToggled)
   const setSearchTerm = useUIStore((s) => s.setSearchTerm)
   const toggleSearch = useUIStore((s) => s.toggleSearch)
-  const toggleSearchOff = useUIStore((s) => s.toggleSearchOff)
+  const closeSearch = useUIStore((s) => s.closeSearch)
   const toggleRightPanel = useUIStore((s) => s.toggleRightPanel)
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
   const loading = useSelector((state: RootState) => state.search.loading)
@@ -116,7 +116,7 @@ const Topbar = ({ children }: Props) => {
     if (searchTimeout) {
       clearTimeout(searchTimeout)
     }
-    toggleSearchOff()
+    closeSearch()
   }
 
   const handleToggleSidebar = () => {
@@ -150,12 +150,12 @@ const Topbar = ({ children }: Props) => {
         <SearchInput
           loading={loading}
           value={searchTerm}
-          searchToggled={searchToggled}
+          searchOpen={searchOpen}
           onSearchChange={handleSearchChange}
           onBlur={handleSearchBlur}
           setSearchOff={handleSearchOff}
         />
-        {!searchToggled && title && (
+        {!searchOpen && title && (
           <div role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") toggleSearch() }} onClick={toggleSearch} className="text-center">{title}</div>
         )}
       </div>

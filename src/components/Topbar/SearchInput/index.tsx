@@ -5,7 +5,7 @@ import Icon from '../../common/Icon'
 
 type Props = {
   loading: boolean,
-  searchToggled: boolean,
+  searchOpen: boolean,
   setSearchOff: () => void,
   onSearchChange: (event: React.FormEvent<HTMLInputElement>) => void,
   onFocus?: () => void,
@@ -17,7 +17,7 @@ type Props = {
 // If any search provider returns media it's automatically added to the local collection and included in the search results.
 // Whenever this input is not being used (focused) it's automatically hidden and the regular topbar title is shown.
 const SearchInput = (props: Props) => {
-  if (!props.searchToggled) {
+  if (!props.searchOpen) {
     return null;
   }
 

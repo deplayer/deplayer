@@ -3,10 +3,10 @@ import Icon from '../common/Icon'
 import { useUIStore } from '../../stores/uiStore'
 
 const SearchButton = () => {
-  const searchToggled = useUIStore((s) => s.searchToggled)
+  const searchOpen = useUIStore((s) => s.searchOpen)
   const toggleSearch = useUIStore((s) => s.toggleSearch)
 
-  if (searchToggled) {
+  if (searchOpen) {
     return null
   }
 
