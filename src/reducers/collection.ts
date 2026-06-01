@@ -21,7 +21,6 @@ export type State = {
   albumsByArtist: { [key: string]: string[] };
   songsByAlbum: { [key: string]: string[] };
   mediaByType: { [key: string]: string[] };
-  searchTerm: string;
   searchResults: string[];
   enabledProviders: string[];
   loading: boolean;
@@ -41,7 +40,6 @@ export const defaultState: State = {
   songsByAlbum: {},
   mediaByType: {},
   albumsByArtist: {},
-  searchTerm: "",
   searchResults: [],
   enabledProviders: [],
   loading: false, // CHANGED: No longer manages loading state
@@ -70,7 +68,6 @@ export const defaultState: State = {
  */
 interface CollectionAction {
   type?: string;
-  searchTerm?: string;
   data?: MediaRow[];
   settings?: { providers: Record<string, { enabled: boolean }> };
   media?: MediaRow;
@@ -83,12 +80,6 @@ interface CollectionAction {
 
 export default (state: State = defaultState, action: CollectionAction = {}) => {
   switch (action.type) {
-    case types.SET_SEARCH_TERM:
-      return {
-        ...state,
-        searchTerm: action.searchTerm!,
-      };
-
     case types.START_SEARCH:
       return {
         ...state,

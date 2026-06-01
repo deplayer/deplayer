@@ -77,7 +77,6 @@ export const ADD_TO_QUEUE_NEXT = "ADD_TO_QUEUE_NEXT";
 export const ADD_ALBUM_TO_QUEUE = "ADD_ALBUM_TO_QUEUE";
 
 // Search
-export const SET_SEARCH_TERM = "SET_SEARCH_TERM";
 export const START_SEARCH = "START_SEARCH";
 export const SEARCH_REJECTED = "SEARCH_REJECTED";
 export const PUSH_TO_VIEW = "PUSH_TO_VIEW";

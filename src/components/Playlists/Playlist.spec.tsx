@@ -88,7 +88,6 @@ describe('Playlist', () => {
     albumsByArtist: {},
     songsByAlbum: {},
     mediaByType: {},
-    searchTerm: '',
     searchResults: [],
     enabledProviders: [],
     loading: false,
