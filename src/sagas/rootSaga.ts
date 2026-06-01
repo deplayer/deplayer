@@ -8,12 +8,8 @@ import mediaSessionSaga from "./mediaSession";
 import wakeLock from "./wakeLock";
 import notificationsSaga from "./notifications";
 import playerSaga from "./player";
-import providersSaga from "./providers";
 import searchSaga from "./search";
 import titleSaga from "./title";
-import webtorrentSaga from "./webtorrent";
-import pinSaga from "./pin";
-import peerSaga from "./peer";
 import roomSaga from "./peer/roomSaga";
 
 function* rootSaga(store: Store) {
@@ -25,12 +21,8 @@ function* rootSaga(store: Store) {
     wakeLock(store),
     notificationsSaga(store),
     playerSaga(),
-    providersSaga(),
     searchSaga(),
-    pinSaga(),
     titleSaga(),
-    webtorrentSaga(),
-    peerSaga(store),
     roomSaga(store),
   ]);
 }
