@@ -137,11 +137,21 @@ export const useCollectionData = () => {
 
   return useMemo(() => {
     if (!needsRowData) {
+      // LiveStore returns a single-column select as a flat array of values,
+      // not row objects. Guard for both shapes just in case the builder API
+      // changes; either way we end up with string ids.
       const ids: string[] = Array.isArray(idsRaw)
-        ? (idsRaw as Array<{ id: string }>).map(r => r.id)
+        ? (idsRaw as unknown[]).flatMap((r) => {
+            if (typeof r === 'string') return [r]
+            if (r && typeof r === 'object' && typeof (r as { id?: unknown }).id === 'string') {
+              return [(r as { id: string }).id]
+            }
+            return []
+          })
         : []
       return { ids, map: undefined as Record<string, TransformedMedia> | undefined }
     }
+
 
     const ids: string[] = []
     const map: Record<string, TransformedMedia> = {}
