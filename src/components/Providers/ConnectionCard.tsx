@@ -208,7 +208,11 @@ export const ConnectionCard = ({
                     />
                   </div>
                   {fields.map(field => (
-                    <div key={field.key} className="flex items-center gap-3">
+                    <div
+                      key={field.key}
+                      data-testid={`field-row-${instanceKey}-${field.key}`}
+                      className="flex items-center gap-3"
+                    >
                       <label className="w-32 text-sm opacity-70 capitalize" htmlFor={`${instanceKey}-${field.key}`}>
                         <Translate value={field.label} />
                       </label>

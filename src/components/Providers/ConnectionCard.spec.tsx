@@ -64,7 +64,7 @@ describe('ConnectionCard — visual shell', () => {
 
   it('auto-expands when health is authFailed and shows the error inline', () => {
     render(<ConnectionCard {...defaultProps} health={healthAuth} />)
-    expect(screen.getByText(/^baseUrl$/i)).toBeInTheDocument()
+    expect(screen.getByTestId('field-row-subsonic-baseUrl')).toBeInTheDocument()
     expect(screen.getByText(/wrong password/i)).toBeInTheDocument()
   })
 
@@ -75,13 +75,13 @@ describe('ConnectionCard — visual shell', () => {
         config={{ enabled: true, baseUrl: '', user: '', password: '' }}
       />,
     )
-    expect(screen.getByText(/^baseUrl$/i)).toBeInTheDocument()
+    expect(screen.getByTestId('field-row-subsonic-baseUrl')).toBeInTheDocument()
   })
   it('expands when the header row is clicked', async () => {
     const user = userEvent.setup()
     render(<ConnectionCard {...defaultProps} />)
     await user.click(screen.getByTestId('card-title-subsonic'))
-    expect(screen.getByText(/^baseUrl$/i)).toBeInTheDocument()
+    expect(screen.getByTestId('field-row-subsonic-baseUrl')).toBeInTheDocument()
   })
 
   it('renders the disabled status dot when config.enabled is false', () => {
