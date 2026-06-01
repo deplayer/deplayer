@@ -1,8 +1,6 @@
 import Sidebar from 'react-sidebar'
-import { useDispatch, useSelector } from 'react-redux'
-import { State as RootState } from '../reducers'
 import Social from '../pages/Social'
-import * as types from '../constants/ActionTypes'
+import { useUIStore } from '../stores/uiStore'
 
 const SidebarContents = () => {
   return <div className='w-full h-full'>
@@ -11,19 +9,15 @@ const SidebarContents = () => {
 }
 
 const RightPanelContainer = () => {
-  const dispatch = useDispatch()
-  const rightPanelToggled = useSelector((state: RootState) => state.app.rightPanelToggled)
-
-  const handleSetSidebarOpen = (open: boolean) => {
-    dispatch({ type: types.TOGGLE_RIGHT_PANEL, value: open })
-  }
+  const rightPanelToggled = useUIStore((s) => s.rightPanelToggled)
+  const toggleRightPanel = useUIStore((s) => s.toggleRightPanel)
 
   return (
     <Sidebar
       sidebar={<SidebarContents />}
       open={rightPanelToggled}
       pullRight={true}
-      onSetOpen={handleSetSidebarOpen}
+      onSetOpen={(open: boolean) => toggleRightPanel(open)}
       sidebarId='right-sidebar'
       sidebarClassName='w-64 bg-base-200/70 backdrop-blur fixed'
       overlayId='right-sidebar-overlay'
