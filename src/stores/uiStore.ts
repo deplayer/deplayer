@@ -32,6 +32,8 @@ type UIState = {
   activeFilters: Filter
   searchTerm: string
   searchActive: boolean
+  searchToggled: boolean
+  searchResults: string[]
 }
 
 type UIActions = {
@@ -49,6 +51,9 @@ type UIActions = {
   setFilter: (filterType: keyof Filter, values: string[] | boolean) => void
   clearFilters: () => void
   setSearchTerm: (term: string) => void
+  toggleSearch: () => void
+  toggleSearchOff: () => void
+  setSearchResults: (ids: string[]) => void
   clearSearch: () => void
 }
 
@@ -76,6 +81,8 @@ export const useUIStore = create<UIState & UIActions>((set) => ({
   activeFilters: emptyFilters,
   searchTerm: '',
   searchActive: false,
+  searchToggled: false,
+  searchResults: [],
 
   // Actions
   toggleSidebar: (value) =>
@@ -95,5 +102,9 @@ export const useUIStore = create<UIState & UIActions>((set) => ({
     set((s) => ({ activeFilters: { ...s.activeFilters, [filterType]: values } })),
   clearFilters: () => set({ activeFilters: emptyFilters }),
   setSearchTerm: (term) => set({ searchTerm: term, searchActive: term.trim().length > 0 }),
-  clearSearch: () => set({ searchTerm: '', searchActive: false }),
+  toggleSearch: () => set((s) => ({ searchToggled: !s.searchToggled })),
+  toggleSearchOff: () => set({ searchToggled: false }),
+  setSearchResults: (ids) => set({ searchResults: ids }),
+  clearSearch: () =>
+    set({ searchTerm: '', searchActive: false, searchResults: [] }),
 }))
