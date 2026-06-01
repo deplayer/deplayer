@@ -1,5 +1,4 @@
-import { connect } from 'react-redux'
-import { Dispatch } from 'redux'
+import { useDispatch } from 'react-redux'
 import React from 'react'
 import { toMagnetURI, remote } from 'parse-torrent'
 
@@ -7,30 +6,29 @@ import Button from '../common/Button'
 import Input from '../common/Input'
 import Modal from '../common/Modal'
 import * as types from '../../constants/ActionTypes'
+import { useUIStore } from '../../stores/uiStore'
 
 import fileManager from '../../services/Filesystem/FileManager'
 
-type Props = {
-  showAddMediaModal: boolean,
-  dispatch: Dispatch
-}
+const AddMediaModal = () => {
+  const dispatch = useDispatch()
+  const showAddMediaModal = useUIStore((s) => s.showAddMediaModal)
+  const setShowAddMediaModal = useUIStore((s) => s.setShowAddMediaModal)
+  const closeModal = () => setShowAddMediaModal(false)
 
-const AddMediaModal = (props: Props) => {
   const [magnetLink, setMagnetLink] = React.useState('')
   const [torrent, setTorrent] = React.useState<File>()
   const [youtubeLink, setYoutubeLink] = React.useState('')
 
-  if (!props.showAddMediaModal) {
+  if (!showAddMediaModal) {
     return null
   }
 
   return (
     <Modal
       title='Select media to add'
-      isOpen={props.showAddMediaModal}
-      onClose={() => {
-        props.dispatch({ type: types.HIDE_ADD_MEDIA_MODAL })
-      }}
+      isOpen={showAddMediaModal}
+      onClose={closeModal}
       className="w-[800px] max-w-[90vw]"
     >
       <div className="p-4">
@@ -51,7 +49,7 @@ const AddMediaModal = (props: Props) => {
             type='submit'
             onClick={async () => {
               const files = await fileManager.openDialog()
-              props.dispatch({
+              dispatch({
                 type: types.START_FILESYSTEM_FILES_PROCESSING,
                 files: files
               })
@@ -89,12 +87,12 @@ const AddMediaModal = (props: Props) => {
             type='submit'
             onClick={() => {
               if (magnetLink !== '') {
-                props.dispatch({ type: types.ADD_WEBTORRENT_MEDIA, magnet: magnetLink })
+                dispatch({ type: types.ADD_WEBTORRENT_MEDIA, magnet: magnetLink })
               }
               if (torrent) {
                 remote(torrent, (err, parsedTorrent) => {
                   if (err) {
-                    props.dispatch({
+                    dispatch({
                       type: types.SEND_NOTIFICATION,
                       notification: 'Error parsing torrent file',
                       level: 'error'
@@ -103,10 +101,10 @@ const AddMediaModal = (props: Props) => {
                   }
                   console.log('parsedTorrent', parsedTorrent)
                   const magnet = toMagnetURI(parsedTorrent!)
-                  props.dispatch({ type: types.ADD_WEBTORRENT_MEDIA, magnet: magnet })
+                  dispatch({ type: types.ADD_WEBTORRENT_MEDIA, magnet: magnet })
                 })
               }
-              props.dispatch({ type: types.HIDE_ADD_MEDIA_MODAL })
+              closeModal()
             }}
             className="btn-primary"
           >
@@ -129,12 +127,12 @@ const AddMediaModal = (props: Props) => {
             fullWidth
             type='submit'
             onClick={() => {
-              props.dispatch({
+              dispatch({
                 type: types.START_YOUTUBE_DL_SERVER_SCAN,
                 key: 'youtube',
                 data: { url: youtubeLink }
               })
-              props.dispatch({ type: types.HIDE_ADD_MEDIA_MODAL })
+              closeModal()
             }}
             className="btn-primary"
           >
@@ -146,8 +144,4 @@ const AddMediaModal = (props: Props) => {
   )
 }
 
-export default connect(
-  (state: { app: { showAddMediaModal: boolean } }) => ({
-    showAddMediaModal: state.app.showAddMediaModal
-  })
-)(AddMediaModal)
+export default AddMediaModal
