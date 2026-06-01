@@ -79,9 +79,7 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
     // "Cannot access 'getLiveStoreInstance' before initialization" error
     store.dispatch({ type: 'INITIALIZE' })
   }
-  
-  // Redux→Zustand sync is handled by uiSyncMiddleware — no bridge needed here
-  
+
   // Initialize FTS5 full-text search and database indexes on mount
   // OPTIMIZED: Defer to idle time to avoid blocking first paint
   React.useEffect(() => {
