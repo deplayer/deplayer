@@ -54,9 +54,11 @@ export function* initializeWatcher(): Generator<any, void, any> {
       // - Reactive queries
       // Components will load data via LiveStore hooks as needed
       
-      // Dispatch INITIALIZED immediately
+      // Flip uiStore flags before the action stream so saga consumers and
+      // ready-gated UI (JoinRoom) react with the store already settled.
       logger.info("Dispatching INITIALIZED action");
       useUIStore.getState().setLoading(false);
+      useUIStore.getState().setReady(true);
       yield put({ type: types.INITIALIZED });
       yield put({ type: types.APPLY_MOST_PLAYED_SORT });
       logger.info("Initialization complete");
