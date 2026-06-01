@@ -5,6 +5,7 @@ import { Translate } from 'react-redux-i18n'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useAppStore } from '../../stores/livestore/store'
+import { useUIStore } from '../../stores/uiStore'
 
 import Button from '../common/Button'
 import Icon from '../common/Icon'
@@ -31,7 +32,10 @@ const TogglePlayer = ({ onHide }: { onHide: () => void }) => {
 }
 
 const ContextualMenu = () => {
-  const app = useSelector((state: State) => state.app)
+  const showVisuals = useUIStore((s) => s.showVisuals)
+  const showSpectrum = useUIStore((s) => s.showSpectrum)
+  const toggleVisuals = useUIStore((s) => s.toggleVisuals)
+  const toggleSpectrum = useUIStore((s) => s.toggleSpectrum)
   const player = useSelector((state: State) => state.player)
   const dispatch = useDispatch()
   // Get queue and store from LiveStore
@@ -149,7 +153,7 @@ const ContextualMenu = () => {
             transparent
             alignLeft
             fullWidth
-            onClick={() => dispatch({ type: types.TOGGLE_VISUALS })}
+            onClick={() => toggleVisuals()}
           >
             <div className='flex items-center justify-between w-full gap-2'>
               <div className='flex items-center'>
@@ -161,7 +165,7 @@ const ContextualMenu = () => {
               </div>
               <input
                 type="checkbox"
-                checked={app.showVisuals}
+                checked={showVisuals}
                 readOnly
                 className="toggle toggle-primary toggle-sm"
               />
@@ -173,7 +177,7 @@ const ContextualMenu = () => {
             transparent
             alignLeft
             fullWidth
-            onClick={() => dispatch({ type: types.TOGGLE_SPECTRUM })}
+            onClick={() => toggleSpectrum()}
           >
             <div className='flex items-center justify-between w-full gap-2'>
               <div className='flex items-center'>
@@ -185,7 +189,7 @@ const ContextualMenu = () => {
               </div>
               <input
                 type="checkbox"
-                checked={app.showSpectrum}
+                checked={showSpectrum}
                 readOnly
                 className="toggle toggle-primary toggle-sm"
               />
