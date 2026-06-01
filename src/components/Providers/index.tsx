@@ -18,6 +18,7 @@ import AddSourceModal from './AddSourceModal'
 import ConnectionCard from './ConnectionCard'
 import RemoveConnectionDialog from './RemoveConnectionDialog'
 import providerFactory from './providerFactory'
+import { titleFor } from './title'
 
 type ProviderConfig = Record<string, unknown> & { enabled?: boolean; name?: string }
 type ProvidersMap = Record<string, ProviderConfig>
@@ -40,20 +41,6 @@ const emptyConfigFor = (schema: ProviderSchema): ProviderConfig => {
   return out
 }
 
-const hostnameOf = (url: unknown): string | null => {
-  if (typeof url !== 'string' || url.length === 0) return null
-  try { return new URL(url).host || null } catch { return null }
-}
-
-const titleFor = (config: ProviderConfig, schema: ProviderSchema): string => {
-  if (typeof config.name === 'string' && config.name.trim()) return config.name.trim()
-  const urlField = schema.fields.find(f => f.type === 'url')
-  if (urlField) {
-    const host = hostnameOf(config[urlField.key])
-    if (host) return host
-  }
-  return schema.label
-}
 
 type ConnectionCardConnectedProps = {
   instanceKey: string
@@ -69,7 +56,6 @@ const ConnectionCardConnected = (props: ConnectionCardConnectedProps) => {
   return (
     <ConnectionCard
       instanceKey={props.instanceKey}
-      providerKey={getProviderType(props.instanceKey)}
       schema={props.schema}
       config={props.config}
       health={result}

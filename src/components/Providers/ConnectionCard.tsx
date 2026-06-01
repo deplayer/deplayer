@@ -4,6 +4,7 @@ import { Translate } from 'react-redux-i18n'
 import classNames from 'classnames'
 
 import type { HealthCheckResult, ProviderSchema, BuiltFieldSchema } from '../../types/providers'
+import { hostnameOf, titleFor } from './title'
 import FormFieldRow from '../Settings/FormField'
 import StatusDot from './StatusDot'
 import Icon from '../common/Icon'
@@ -12,7 +13,6 @@ type ProviderConfig = Record<string, unknown> & { enabled?: boolean; name?: stri
 
 type Props = {
   instanceKey: string
-  providerKey: string
   schema: ProviderSchema
   config: ProviderConfig
   health: HealthCheckResult
@@ -22,24 +22,6 @@ type Props = {
   onTestConnection?: (instanceKey: string) => void
 }
 
-const hostnameOf = (url: unknown): string | null => {
-  if (typeof url !== 'string' || url.length === 0) return null
-  try {
-    return new URL(url).host || null
-  } catch {
-    return null
-  }
-}
-
-const titleFor = (config: ProviderConfig, schema: ProviderSchema): string => {
-  if (typeof config.name === 'string' && config.name.trim()) return config.name.trim()
-  const urlField = schema.fields.find(f => f.type === 'url')
-  if (urlField) {
-    const host = hostnameOf(config[urlField.key])
-    if (host) return host
-  }
-  return schema.label
-}
 
 const buildFields = (schema: ProviderSchema): BuiltFieldSchema[] =>
   schema.fields

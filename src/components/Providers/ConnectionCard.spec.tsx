@@ -27,7 +27,6 @@ const healthAuth: HealthCheckResult = { status: 'authFailed', error: 'wrong pass
 
 const defaultProps = {
   instanceKey: 'subsonic',
-  providerKey: 'subsonic',
   schema: subsonicSchema,
   config: baseConfig,
   health: healthOk,
@@ -169,7 +168,6 @@ describe('ConnectionCard — form behavior', () => {
       <ConnectionCard
         {...defaultProps}
         instanceKey="itunes"
-        providerKey="itunes"
         schema={itunesSchema}
         config={{ enabled: true }}
         health={{ status: 'unknown', checkedAt: 0 }}
