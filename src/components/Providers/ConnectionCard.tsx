@@ -3,7 +3,7 @@ import { Formik, Form, Field, type FormikHelpers } from 'formik'
 import { Translate } from 'react-redux-i18n'
 import classNames from 'classnames'
 
-import type { HealthCheckResult, ProviderSchema, FieldSchema, BuiltFieldSchema } from '../../types/providers'
+import type { HealthCheckResult, ProviderSchema, BuiltFieldSchema } from '../../types/providers'
 import FormFieldRow from '../Settings/FormField'
 import StatusDot from './StatusDot'
 import Icon from '../common/Icon'
@@ -69,19 +69,11 @@ const validate = (values: Record<string, unknown>, schema: ProviderSchema) => {
   return errors
 }
 
-const labelField: FieldSchema = {
-  key: 'name',
-  type: 'text',
-  label: 'providers.labelField',
-  placeholder: '',
-}
-
 const shouldAutoExpand = (health: HealthCheckResult, hasRequiredEmpty: boolean) =>
   health.status === 'authFailed' || health.status === 'unreachable' || hasRequiredEmpty
 
 export const ConnectionCard = ({
   instanceKey,
-  providerKey,
   schema,
   config,
   health,
@@ -91,7 +83,6 @@ export const ConnectionCard = ({
   onTestConnection,
 }: Props) => {
   const fields = useMemo(() => buildFields(schema), [schema])
-  const labelFieldBuilt: BuiltFieldSchema = { ...labelField, name: 'name' }
 
   const initial = useMemo(() => initialValuesFor(config, schema), [config, schema])
   const requiredEmpty = useMemo(

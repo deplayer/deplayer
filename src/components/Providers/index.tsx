@@ -1,236 +1,242 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
-import { Formik, Form } from 'formik'
+import { useCallback, useMemo, useState } from 'react'
 import { Translate } from 'react-redux-i18n'
-import { useAppStore } from '../../stores/livestore/store'
 import { useDispatch } from 'react-redux'
 
-import * as types from '../../constants/ActionTypes'
-import { saveSettingsAction, initializeSettingsAction } from '../../stores/livestore/actions/settings'
+import { useAppStore } from '../../stores/livestore/store'
 import { useSettings } from '../../stores/livestore/hooks'
-import SettingsBuilder from '../../services/settings/SettingsBuilder'
+import { useProviderHealth } from '../../stores/livestore/hooks/useProviderHealth'
+import * as types from '../../constants/ActionTypes'
+import {
+  saveSettingsAction,
+  initializeSettingsAction,
+} from '../../stores/livestore/actions/settings'
 import providerRegistry from '../../services/settings/providers'
+import type { ProviderSchema } from '../../types/providers'
+
 import MainContainer from '../common/MainContainer'
-import ProviderButton from './ProviderButton'
-import ProviderForm from '../Settings/ProviderForm'
-import Icon from '../common/Icon'
+import AddSourceModal from './AddSourceModal'
+import ConnectionCard from './ConnectionCard'
+import RemoveConnectionDialog from './RemoveConnectionDialog'
+import providerFactory from './providerFactory'
+
+type ProviderConfig = Record<string, unknown> & { enabled?: boolean; name?: string }
+type ProvidersMap = Record<string, ProviderConfig>
+
+const getProviderType = (instanceKey: string) => instanceKey.replace(/[0-9]+$/, '')
+
+const nextRepeatableKey = (providers: ProvidersMap, base: string) => {
+  if (!providers[base]) return base
+  let i = 1
+  while (providers[`${base}${i}`]) i += 1
+  return `${base}${i}`
+}
+
+const emptyConfigFor = (schema: ProviderSchema): ProviderConfig => {
+  const out: ProviderConfig = { enabled: true }
+  for (const f of schema.fields) {
+    if (f.key === 'enabled') continue
+    out[f.key] = f.type === 'boolean' ? (f.default ?? false) : ''
+  }
+  return out
+}
+
+const hostnameOf = (url: unknown): string | null => {
+  if (typeof url !== 'string' || url.length === 0) return null
+  try { return new URL(url).host || null } catch { return null }
+}
+
+const titleFor = (config: ProviderConfig, schema: ProviderSchema): string => {
+  if (typeof config.name === 'string' && config.name.trim()) return config.name.trim()
+  const urlField = schema.fields.find(f => f.type === 'url')
+  if (urlField) {
+    const host = hostnameOf(config[urlField.key])
+    if (host) return host
+  }
+  return schema.label
+}
+
+type ConnectionCardConnectedProps = {
+  instanceKey: string
+  config: ProviderConfig
+  schema: ProviderSchema
+  onSave: (instanceKey: string, slice: ProviderConfig) => void | Promise<void>
+  onRemove: (instanceKey: string) => void
+  onToggleEnabled: (instanceKey: string, enabled: boolean) => void
+}
+
+const ConnectionCardConnected = (props: ConnectionCardConnectedProps) => {
+  const { result, refresh } = useProviderHealth(props.instanceKey, props.config, providerFactory)
+  return (
+    <ConnectionCard
+      instanceKey={props.instanceKey}
+      providerKey={getProviderType(props.instanceKey)}
+      schema={props.schema}
+      config={props.config}
+      health={result}
+      onSave={async (key, slice) => { await props.onSave(key, slice); refresh() }}
+      onRemove={props.onRemove}
+      onToggleEnabled={props.onToggleEnabled}
+      onTestConnection={() => refresh()}
+    />
+  )
+}
 
 const Providers = () => {
-  const liveStore = useAppStore()
+  const store = useAppStore()
   const dispatch = useDispatch()
-  
-  // Read settings from LiveStore (single source of truth for saved data)
-  const liveStoreSettings = useSettings()
-  
-  // Local state for managing providers during editing (before save)
-  const [localProviders, setLocalProviders] = useState<Record<string, Record<string, unknown>> | null>(null)
-  
-  // Save feedback state
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saved' | 'error'>('idle')
-  const [saveError, setSaveError] = useState<string>('')
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  
-  // Auto-dismiss save feedback after 3 seconds
-  useEffect(() => {
-    if (saveStatus !== 'idle') {
-      if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
-      saveTimerRef.current = setTimeout(() => setSaveStatus('idle'), 3000)
-    }
-    return () => {
-      if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
-    }
-  }, [saveStatus])
+  const settings = useSettings()
 
-  // Use local state if set, otherwise use LiveStore settings
-  const currentProviders = useMemo(
-    () => localProviders ?? liveStoreSettings?.providers ?? {},
-    [localProviders, liveStoreSettings?.providers]
-  )
-  
-  // Generate form schema based on current providers
-  const settingsForm = useMemo(() => {
-    const builder = new SettingsBuilder()
-    return builder.getFormSchema(currentProviders)
-  }, [currentProviders])
-  
-  // Helper to get next available provider ID
-  const getNextProviderId = useCallback((providers: Record<string, unknown>, baseKey: string) => {
-    const existingKeys = Object.keys(providers)
-      .flatMap(key => {
-        if (!key.startsWith(baseKey)) return []
-        const num = key.replace(baseKey, '');
-        return [num ? parseInt(num, 10) : 0];
-      })
-      .sort((a, b) => a - b);
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [removeTarget, setRemoveTarget] = useState<string | null>(null)
 
-    const nextNum = existingKeys.length > 0 ? existingKeys[existingKeys.length - 1] + 1 : 0;
-    return `${baseKey}${nextNum}`;
-  }, [])
-  
-  // Handle adding a provider
-  const handleAddProvider = useCallback((providerKey: string) => {
-    const schema = providerRegistry[providerKey];
-    if (!schema) {
-      console.warn(`Provider ${providerKey} not found`)
-      return;
-    }
-
-    // For non-repeatable providers, use the base key
-    const providerId = schema.repeatable ? 
-      getNextProviderId(currentProviders, providerKey) : 
-      providerKey;
-    
-    setLocalProviders({
-      ...currentProviders,
-      [providerId]: {
-        enabled: false
-      }
-    });
-  }, [currentProviders, getNextProviderId])
-  
-  // Handle removing a provider
-  const handleRemoveProvider = useCallback((providerKey: string) => {
-    const newProviders = { ...currentProviders };
-    delete newProviders[providerKey];
-    setLocalProviders(newProviders);
-  }, [currentProviders])
-
-  const handleSubmit = async (values: { providers: Record<string, Record<string, unknown>> }, actions: { setSubmitting: (submitting: boolean) => void }) => {
-    if (!liveStore) {
-      console.error('LiveStore not available')
-      setSaveError('LiveStore not available')
-      setSaveStatus('error')
-      actions.setSubmitting(false)
-      return
-    }
-
-    // Ensure settings are initialized in LiveStore first
-    try {
-      await initializeSettingsAction(liveStore)
-    } catch (error) {
-      console.error('Failed to initialize settings:', error)
-      setSaveError(error instanceof Error ? error.message : String(error))
-      setSaveStatus('error')
-      actions.setSubmitting(false)
-      return
-    }
-
-    const settingsPayload = {
-      ...(liveStoreSettings || { providers: {}, app: {} }),
-      providers: values.providers
-    }
-    
-    try {
-      // Save via LiveStore
-      const result = await saveSettingsAction(liveStore, settingsPayload)
-      
-      // Reset local state to match saved data
-      setLocalProviders(values.providers)
-      
-      // Dispatch Redux action for side effects (notifications, etc.)
-      dispatch({ 
-        type: types.SETTINGS_SAVED, 
-        prevSettings: result.prevSettings,
-        newSettings: result.newSettings
-      })
-      
-      setSaveStatus('saved')
-      actions.setSubmitting(false)
-    } catch (error) {
-      console.error('Failed to save settings:', error)
-      setSaveError(error instanceof Error ? error.message : String(error))
-      setSaveStatus('error')
-      actions.setSubmitting(false)
-    }
-  }
-
-  // Get unique provider types (remove numeric suffixes)
-  const getProviderType = (key: string) => key.replace(/[0-9]+$/, '')
-  const uniqueProviders = Array.from(
-    new Set(
-      Object.keys(settingsForm.providers)
-        .map(getProviderType)
-    )
+  const providers: ProvidersMap = useMemo(
+    () => ((settings?.providers as ProvidersMap | undefined) ?? {}),
+    [settings],
   )
 
-  const providers = uniqueProviders.map((providerKey) => {
-    return (
-      <ProviderForm
-        key={providerKey}
-        settings={{ providers: currentProviders }}
-        settingsForm={settingsForm}
-        onRemove={handleRemoveProvider}
-        providerKey={providerKey}
-      />
-    )
-  })
+  const instanceKeys = useMemo(() => Object.keys(providers), [providers])
+  const configuredTypes = useMemo(
+    () => Array.from(new Set(instanceKeys.map(getProviderType))),
+    [instanceKeys],
+  )
 
-  // Show loading state while settings are being fetched
-  if (!liveStoreSettings) {
+  const persist = useCallback(async (nextProviders: ProvidersMap) => {
+    if (!store) return
+    await initializeSettingsAction(store)
+    const payload = { ...(settings ?? { providers: {}, app: {} }), providers: nextProviders }
+    const result = await saveSettingsAction(store, payload)
+    dispatch({
+      type: types.SETTINGS_SAVED,
+      prevSettings: result.prevSettings,
+      newSettings: result.newSettings,
+    })
+  }, [store, settings, dispatch])
+
+  const saveOne = useCallback(async (instanceKey: string, slice: ProviderConfig) => {
+    const next: ProvidersMap = {
+      ...providers,
+      [instanceKey]: { ...(providers[instanceKey] ?? {}), ...slice },
+    }
+    await persist(next)
+  }, [providers, persist])
+
+  const removeOne = useCallback(async (instanceKey: string) => {
+    const next: ProvidersMap = { ...providers }
+    delete next[instanceKey]
+    await persist(next)
+  }, [providers, persist])
+
+  const toggleEnabled = useCallback(async (instanceKey: string, enabled: boolean) => {
+    const current = providers[instanceKey] ?? {}
+    const next: ProvidersMap = { ...providers, [instanceKey]: { ...current, enabled } }
+    await persist(next)
+  }, [providers, persist])
+
+  const addOne = useCallback(async (providerKey: string) => {
+    const schema = providerRegistry[providerKey]
+    if (!schema) return
+    const newKey = schema.repeatable
+      ? nextRepeatableKey(providers, providerKey)
+      : providerKey
+    if (!schema.repeatable && providers[providerKey]) {
+      setPickerOpen(false)
+      return
+    }
+    const next: ProvidersMap = { ...providers, [newKey]: emptyConfigFor(schema) }
+    await persist(next)
+    setPickerOpen(false)
+  }, [providers, persist])
+
+  if (!settings) {
     return (
       <MainContainer centerContents>
-        <div className='w-full pb-24'>
-          <div className='my-3 flex flex-col'>
-            <h2 className='py-4 text-xl'><Translate value="labels.lazyProviders" /></h2>
-            <p>Loading settings…</p>
-          </div>
+        <p className="opacity-70 py-8">Loading settings…</p>
+      </MainContainer>
+    )
+  }
+
+  const isEmpty = instanceKeys.length === 0
+
+  if (isEmpty) {
+    return (
+      <MainContainer>
+        <div className="max-w-3xl mx-auto py-8 pb-24">
+          <h1 className="text-2xl mb-1">
+            <Translate value="providers.empty.title" />
+          </h1>
+          <p className="opacity-70 mb-6">
+            <Translate value="providers.empty.subtitle" />
+          </p>
+          <AddSourceModal
+            open
+            variant="inline"
+            configuredKeys={[]}
+            onPick={addOne}
+            onClose={() => { /* inline variant cannot close */ }}
+          />
         </div>
       </MainContainer>
     )
   }
 
   return (
-    <MainContainer centerContents>
-        <div className='w-full pb-24'>
-          <div className='my-3 flex flex-col'>
-            <h2 className='py-4 text-xl'><Translate value="labels.lazyProviders" /></h2>
-
-            Select one of the providers below to configure it.
-
-            <div className='flex flex-wrap gap-2 pt-2'>
-              {Object.keys(providerRegistry).map(key => (
-                <ProviderButton key={key} providerKey={key} onAdd={handleAddProvider} />
-              ))}
-            </div>
-          </div>
-
-          <Formik
-            initialValues={{
-              providers: currentProviders
-            }}
-            onSubmit={handleSubmit}
-            enableReinitialize
+    <MainContainer>
+      <div className="max-w-3xl mx-auto py-8 pb-24">
+        <header className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl">
+            <Translate value="providers.title" />
+          </h1>
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            onClick={() => setPickerOpen(true)}
           >
-            {() => (
-              <Form
-                className='settings-form'
-              >
-                <div className='flex flex-wrap'>
-                  {providers}
-                </div>
+            <Translate value="providers.addSource" />
+          </button>
+        </header>
 
-                <div className='w-full flex justify-end items-center gap-4 mt-12'>
-                  {saveStatus === 'saved' && (
-                    <div className="alert alert-success shadow-lg py-2 px-4 w-auto">
-                      <Icon icon="faCheck" />
-                      <span><Translate value="notifications.settings.saved" /></span>
-                    </div>
-                  )}
-                  {saveStatus === 'error' && (
-                    <div className="alert alert-error shadow-lg py-2 px-4 w-auto">
-                      <Icon icon="faExclamationTriangle" />
-                      <span>{saveError || 'Error saving settings'}</span>
-                    </div>
-                  )}
-                  {!!providers.length && (
-                    <div className="flex justify-end">
-                      <button type="submit" className="btn btn-primary"><Translate value="buttons.saveSettings" /> </button>
-                    </div>
-                  )}
-                </div>
-              </Form>
-            )}
-          </Formik>
+        <div className="flex flex-col gap-3">
+          {instanceKeys.map(instanceKey => {
+            const schema = providerRegistry[getProviderType(instanceKey)]
+            if (!schema) return null
+            return (
+              <ConnectionCardConnected
+                key={instanceKey}
+                instanceKey={instanceKey}
+                config={providers[instanceKey]}
+                schema={schema}
+                onSave={saveOne}
+                onRemove={key => setRemoveTarget(key)}
+                onToggleEnabled={toggleEnabled}
+              />
+            )
+          })}
         </div>
+
+        <AddSourceModal
+          open={pickerOpen}
+          variant="modal"
+          configuredKeys={configuredTypes}
+          onPick={addOne}
+          onClose={() => setPickerOpen(false)}
+        />
+
+        {removeTarget && (
+          <RemoveConnectionDialog
+            instanceKey={removeTarget}
+            name={titleFor(
+              providers[removeTarget] ?? {},
+              providerRegistry[getProviderType(removeTarget)],
+            )}
+            onConfirm={async () => {
+              const key = removeTarget
+              setRemoveTarget(null)
+              await removeOne(key)
+            }}
+            onClose={() => setRemoveTarget(null)}
+          />
+        )}
+      </div>
     </MainContainer>
   )
 }
