@@ -167,7 +167,7 @@
       "steps": "Per començar a reproduir contingut, segueix un dels passos següents:",
       "setupProviders": "Configura els teus proveïdors de mitjans (Subsonic API, mstream o ITunes)",
       "addMedia": "Afegeix nous mitjans a la teva col·lecció",
-      "addMediaDescription": "Webtorrent, Sistema de fitxers, IPFS o youtube-dl-server",
+      "addMediaDescription": "Webtorrent, Sistema de fitxers o youtube-dl-server",
       "goToCollection": "O ves a la teva col·lecció",
       "authenticated": "Estàs autenticat amb la teva clau d'accés",
       "authNeeded": "Accedeix a les funcionalitats socials autenticant-te amb la teva clau d'accés",

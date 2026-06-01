@@ -32,16 +32,6 @@ const providerRegistry: Record<string, ProviderSchema> = {
     ],
     capabilities: ['search'],
   },
-  ipfs: {
-    key: 'ipfs',
-    label: 'labels.ipfs',
-    repeatable: true,
-    fields: [
-      { key: 'enabled', type: 'boolean', label: 'labels.enabled' },
-      { key: 'hash', type: 'text', label: 'labels.hash', required: true },
-    ],
-    capabilities: ['stream'],
-  },
   'youtube-dl-server': {
     key: 'youtube-dl-server',
     label: 'labels.youtube-dl-server',

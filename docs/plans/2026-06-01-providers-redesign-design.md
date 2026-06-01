@@ -45,7 +45,6 @@ Optional so existing providers don't break compilation; the UI treats `undefined
 | `JellyfinProvider` | `GET {baseUrl}/System/Info/Public` for reachability, then `GET /Users/Me` with `X-Emby-Token` for auth. |
 | `MstreamApiProvider` | `POST {baseUrl}/api/v1/ping` (no auth needed for current usage). |
 | `youtube-dl-server` | `GET {url}/api/info?url=https://example.com` → 200/4xx both mean reachable. |
-| `ipfs` | `HEAD https://ipfs.io/ipfs/{hash}` (gateway probe, since browser can't talk to a daemon). |
 | `itunes`, `musicbrainz` | No config, no `healthcheck` — UI shows `enabled` / `disabled` only. |
 
 All checks have a 5-second timeout. Network errors → `unreachable`. HTTP 401/403 → `auth_failed`.
@@ -84,7 +83,7 @@ Expanded card adds:
 
 ### New: `src/components/Providers/AddSourceModal.tsx`
 
-The picker, reused in both the empty state (rendered inline, full-bleed) and the populated state (rendered as a daisyUI modal). Tile grid of all 7 provider types:
+The picker, reused in both the empty state (rendered inline, full-bleed) and the populated state (rendered as a daisyUI modal). Tile grid of all 6 provider types:
 
 ```
 ┌──────────────────────────┐
@@ -152,7 +151,7 @@ Status is **not** persisted to LiveStore — it's session-only ephemeral state. 
 - **No persisted health state.** Stale "last known status" lies more than it helps; we probe on mount.
 - **No drag-to-reorder.** Order doesn't affect playback behavior (providers are matched by capability, not order).
 - **No "import / export connections" feature.** Out of scope; addressable later.
-- **No per-provider branding logos beyond what's already in `Icon`.** The existing `Icon` component's set covers Subsonic, Jellyfin, IPFS, YouTube; the rest get a generic server icon. Custom SVGs are a polish pass, not a redesign blocker.
+- **No per-provider branding logos beyond what's already in `Icon`.** The existing `Icon` component's set covers Subsonic, Jellyfin, and YouTube; the rest get a generic server icon. Custom SVGs are a polish pass, not a redesign blocker.
 
 ## Acceptance criteria
 

@@ -53,15 +53,7 @@ describe('setCurrentPlaying', async () => {
       },
       queue: {},
       settings: {
-        settings: {
-          app: {
-            ipfs: {
-              port: 0,
-              host: '',
-              proto: ''
-            }
-          }
-        }
+        app: {}
       }
     }
     const action = {

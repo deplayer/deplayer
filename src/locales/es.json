@@ -166,7 +166,7 @@
       "steps": "Para empezar a reproducir contenido, sigue uno de los siguientes pasos:",
       "setupProviders": "Configura tus proveedores de medios (Subsonic API, mstream o ITunes)",
       "addMedia": "Añade nuevos medios a tu colección",
-      "addMediaDescription": "Webtorrent, Sistema de archivos, IPFS o youtube-dl-server",
+      "addMediaDescription": "Webtorrent, Sistema de archivos o youtube-dl-server",
       "goToCollection": "O ve a tu colección",
       "authenticated": "Estás autenticado con tu clave de acceso",
       "authNeeded": "Accede a las funcionalidades sociales autenticándote con tu clave de acceso",
