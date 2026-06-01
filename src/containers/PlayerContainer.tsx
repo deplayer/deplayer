@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import PlayerControls from '../components/Player/PlayerControls'
 import { useLocation } from 'react-router'
 import { State } from '../reducers'
-import { useQueue, useSettings, useMediaMapForIds } from '../stores/livestore/hooks'
+import { useQueue, useSettings, useMediaById } from '../stores/livestore/hooks'
 import { defaultState as queueDefaultState } from '../reducers/queue'
 import { defaultState as settingsDefaultState } from '../reducers/settings'
 import { createHtmlPortalNode } from 'react-reverse-portal'
@@ -40,16 +40,21 @@ const PlayerContainer = ({ playerPortal }: Props) => {
     ? parseTrackIds(liveQueue.randomTrackIds)
     : parseTrackIds(liveQueue?.trackIds)
 
-  // ====== OPTIMIZATION: Only load media for queue tracks (not entire library) ======
-  // This is much more efficient: load 10-50 queue items instead of 1000+ library items
-  const mediaMap = useMediaMapForIds(trackIds)
+  // Get the active track id (LiveStore stores currentPlaying as INDEX).
+  // We resolve it BEFORE fetching media so we only subscribe to the single
+  // currently-playing row instead of every queue track. PlayAll on a large
+  // collection used to queue thousands of IDs and reactively materialize them
+  // all into JS on every sync write — that's the OOM trigger.
+  const rawCurrentPlayingId =
+    liveQueue?.currentPlaying !== null && liveQueue?.currentPlaying !== undefined
+      ? (trackIds[liveQueue.currentPlaying] ?? null)
+      : null
+  const currentMedia = useMediaById(rawCurrentPlayingId)
 
-  // Convert LiveStore queue to Redux-compatible format for PlayerControls
-  // IMPORTANT: LiveStore stores currentPlaying as INDEX, but PlayerControls expects TRACK ID
-  let currentPlayingId: string | null = null
-  if (liveQueue?.currentPlaying !== null && liveQueue?.currentPlaying !== undefined) {
-    currentPlayingId = trackIds[liveQueue.currentPlaying] || null
-  }
+  // Defensive: if currentPlayingId is temporarily undefined during a state
+  // transition (e.g., shuffle toggle), keep the last known valid ID so the UI
+  // doesn't flicker.
+  let currentPlayingId: string | null = rawCurrentPlayingId
 
   // DEFENSIVE: If currentPlayingId is temporarily undefined during a state transition
   // (e.g., shuffle toggle), use the last known valid ID to prevent UI flickering
@@ -78,9 +83,13 @@ const PlayerContainer = ({ playerPortal }: Props) => {
     settings: liveSettings,
   } : settingsDefaultState
 
-  // Create collection object with rows (mediaMap) for PlayerControls
+  // PlayerControls only reads `collection.rows[currentPlayingId]` — give it a
+  // single-entry map keyed by the active track so we never materialize the
+  // full queue.
   const collection = {
-    rows: mediaMap
+    rows: currentMedia && currentPlayingId
+      ? { [currentPlayingId]: currentMedia }
+      : {}
   }
 
   return (

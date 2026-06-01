@@ -2,7 +2,7 @@ import MusicTable from './MusicTable/MusicTable'
 import Spinner from './Spinner'
 import EmptyState from './common/EmptyState/index'
 import classNames from 'classnames'
-import { useQueue, useMediaMapForIds, useMediaCount } from '../stores/livestore/hooks'
+import { useQueue, useMediaCount } from '../stores/livestore/hooks'
 import { useSettings } from '../stores/livestore/hooks'
 import { useUIStore } from '../stores/uiStore'
 import { getEmptyStateFallback, collectionStep, searchStep } from './common/EmptyState/emptyStateFallback'
@@ -40,11 +40,14 @@ const Queue = (props: Props) => {
   // PERF: Use count hook instead of loading entire library
   const mediaCount = useMediaCount()
   const hasCollectionItems = mediaCount > 0
-  
-  // PERF: Only load media for tracks actually in queue (not entire library)
-  const mediaMap = useMediaMapForIds(trackIds)
-  const hasSearchableProviders = liveSettings?.providers ? 
-    Object.values(liveSettings.providers).some((provider) => (provider as { enabled?: boolean })?.enabled) : 
+
+  // PERF: Do NOT materialize a full mediaMap for the queue — MusicTable's
+  // virtualized rows fall back to per-row `useMediaById` when no map is
+  // provided. After PlayAll on a large collection the queue may hold 10k
+  // tracks; the map subscription used to OOM the renderer on every sync
+  // write. Per-row subscriptions only fetch the ~20 visible rows.
+  const hasSearchableProviders = liveSettings?.providers ?
+    Object.values(liveSettings.providers).some((provider) => (provider as { enabled?: boolean })?.enabled) :
     false
 
   const { action: fallbackAction, description: fallbackDescription } = getEmptyStateFallback([
@@ -94,7 +97,6 @@ const Queue = (props: Props) => {
     <div className={classNames('queue z-10 resize-x', className)}>
       <MusicTable
         tableIds={trackIds}
-        mediaMap={mediaMap}
         queue={liveQueue}
         disableCovers={slim}
         disableAddButton
