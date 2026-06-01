@@ -24,7 +24,6 @@ import rootSaga from "../sagas/rootSaga";
 // import exports from './middlewares/exports'
 import alerts from "./middlewares/alerts";
 import { livestoreMiddleware } from "../middleware/livestore";
-import { uiSyncMiddleware } from "../middleware/uiSync";
 
 const mql = window.matchMedia(`(min-width: 800px)`);
 const heightMql = window.matchMedia(`(min-height: 300px)`);
@@ -55,7 +54,6 @@ function configureStore() {
     promise,
     alerts,
     livestoreMiddleware, // NEW: LiveStore sync middleware
-    uiSyncMiddleware, // Syncs Redux app actions → Zustand UI store
     sagaMiddleware,
     routerMiddleware,
   ];
