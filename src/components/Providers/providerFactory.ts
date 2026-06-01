@@ -1,14 +1,6 @@
-/**
- * Lightweight provider factory used by `useProviderHealth`.
- *
- * Returns an object exposing `healthcheck()` for the four provider types that
- * implement it (subsonic, jellyfin, mstream). itunes / musicbrainz return
- * `undefined` — the hook surfaces `'unknown'` for them.
- *
- * Kept separate from `src/providers/index.ts` so the health-check path does
- * not pay the full constructor cost (e.g. Jellyfin SDK initialization) for
- * providers we only need to probe.
- */
+// Resolves an IMusicProvider for a given instance key + config, used by
+// useProviderHealth. itunes / musicbrainz have no remote config to probe and
+// return undefined here so the hook surfaces 'unknown'.
 import SubsonicApiProvider from '../../providers/SubsonicApiProvider'
 import JellyfinProvider from '../../providers/JellyfinProvider'
 import MstreamApiProvider from '../../providers/MstreamApiProvider'

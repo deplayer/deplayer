@@ -47,5 +47,6 @@ describe('MstreamApiProvider.healthcheck', () => {
     const res = await make().healthcheck!()
     expect(res.status).toBe('unreachable')
     expect(res.error).toContain('ECONNREFUSED')
+    expect(typeof res.latencyMs).toBe('number')
   })
 })

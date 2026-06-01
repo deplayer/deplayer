@@ -40,6 +40,7 @@ describe('JellyfinProvider.healthcheck', () => {
     const res = await make().healthcheck!()
     expect(res.status).toBe('unreachable')
     expect(res.error).toContain('ECONNREFUSED')
+    expect(typeof res.latencyMs).toBe('number')
   })
 
   it('returns unreachable when Users/Me returns a non-401 error', async () => {
@@ -50,5 +51,6 @@ describe('JellyfinProvider.healthcheck', () => {
     })
     const res = await make().healthcheck!()
     expect(res.status).toBe('unreachable')
+    expect(typeof res.latencyMs).toBe('number')
   })
 })

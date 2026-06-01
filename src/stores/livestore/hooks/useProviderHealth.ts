@@ -39,11 +39,10 @@ export const useProviderHealth = (
   factory: ProviderHealthFactory,
 ): UseProviderHealthReturn => {
   const enabled = config.enabled !== false
-  const provider = factory(providerKey, config)
-  const hasHealthcheck = typeof provider?.healthcheck === 'function'
+  const probe = factory(providerKey, config)?.healthcheck
 
   const [result, setResult] = useState<HealthCheckResult>(() =>
-    !enabled ? makeDisabled() : !hasHealthcheck ? makeUnknown() : makeChecking(),
+    !enabled ? makeDisabled() : !probe ? makeUnknown() : makeChecking(),
   )
   const [refreshCounter, setRefreshCounter] = useState(0)
   const lastRefreshRef = useRef(0)
@@ -58,39 +57,27 @@ export const useProviderHealth = (
   const configKey = JSON.stringify(config)
 
   useEffect(() => {
-    if (!enabled) {
-      setResult(makeDisabled())
-      return
-    }
-    if (!hasHealthcheck || !provider?.healthcheck) {
-      setResult(makeUnknown())
-      return
-    }
+    if (!enabled) { setResult(makeDisabled()); return }
+    if (!probe) { setResult(makeUnknown()); return }
     setResult(makeChecking())
     let cancelled = false
-    const probe = provider.healthcheck
     void probe().then(
-      r => {
-        if (!cancelled) setResult(r)
-      },
+      r => { if (!cancelled) setResult(r) },
       e => {
         if (cancelled) return
         setResult({
           status: 'unreachable',
           error: e instanceof Error ? e.message : String(e),
           checkedAt: Date.now(),
-          latencyMs: undefined,
         })
       },
     )
-    return () => {
-      cancelled = true
-    }
-    // `provider` and `factory` are intentionally excluded — callers pass a new
-    // factory reference every render, but the probe must only refire when the
-    // *inputs* (providerKey, config, refresh counter) change.
+    return () => { cancelled = true }
+    // `probe` and `factory` are intentionally excluded. Callers pass a new
+    // factory reference every render; the probe must only refire when the
+    // inputs (providerKey, config, refresh counter, enabled) change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [providerKey, configKey, refreshCounter, enabled, hasHealthcheck])
+  }, [providerKey, configKey, refreshCounter, enabled])
 
   return { result, refresh }
 }
