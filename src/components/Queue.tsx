@@ -40,12 +40,8 @@ const Queue = (props: Props) => {
   // PERF: Use count hook instead of loading entire library
   const mediaCount = useMediaCount()
   const hasCollectionItems = mediaCount > 0
-
-  // PERF: Do NOT materialize a full mediaMap for the queue — MusicTable's
-  // virtualized rows fall back to per-row `useMediaById` when no map is
-  // provided. After PlayAll on a large collection the queue may hold 10k
-  // tracks; the map subscription used to OOM the renderer on every sync
-  // write. Per-row subscriptions only fetch the ~20 visible rows.
+  // MusicTable falls back to per-row useMediaById when no mediaMap is passed;
+  // avoids materializing 10k-track queues.
   const hasSearchableProviders = liveSettings?.providers ?
     Object.values(liveSettings.providers).some((provider) => (provider as { enabled?: boolean })?.enabled) :
     false

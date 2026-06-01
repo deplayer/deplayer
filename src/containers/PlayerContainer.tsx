@@ -40,32 +40,20 @@ const PlayerContainer = ({ playerPortal }: Props) => {
     ? parseTrackIds(liveQueue.randomTrackIds)
     : parseTrackIds(liveQueue?.trackIds)
 
-  // Get the active track id (LiveStore stores currentPlaying as INDEX).
-  // We resolve it BEFORE fetching media so we only subscribe to the single
-  // currently-playing row instead of every queue track. PlayAll on a large
-  // collection used to queue thousands of IDs and reactively materialize them
-  // all into JS on every sync write — that's the OOM trigger.
-  const rawCurrentPlayingId =
+  // Resolve the active track id from the queue index. Falling back to the
+  // last valid id (when streamUri is live but the index briefly goes null
+  // during a shuffle toggle) keeps the UI stable. Resolve BEFORE fetching
+  // media so we subscribe to one row, not the entire queue.
+  const queueId =
     liveQueue?.currentPlaying !== null && liveQueue?.currentPlaying !== undefined
       ? (trackIds[liveQueue.currentPlaying] ?? null)
       : null
-  const currentMedia = useMediaById(rawCurrentPlayingId)
-
-  // Defensive: if currentPlayingId is temporarily undefined during a state
-  // transition (e.g., shuffle toggle), keep the last known valid ID so the UI
-  // doesn't flicker.
-  let currentPlayingId: string | null = rawCurrentPlayingId
-
-  // DEFENSIVE: If currentPlayingId is temporarily undefined during a state transition
-  // (e.g., shuffle toggle), use the last known valid ID to prevent UI flickering
-  if (!currentPlayingId && lastValidCurrentPlayingIdRef.current && player?.streamUri) {
-    currentPlayingId = lastValidCurrentPlayingIdRef.current
-  }
-
-  // Update the ref when we have a valid ID
+  const currentPlayingId =
+    queueId ?? (player?.streamUri ? lastValidCurrentPlayingIdRef.current : null)
   if (currentPlayingId) {
     lastValidCurrentPlayingIdRef.current = currentPlayingId
   }
+  const currentMedia = useMediaById(currentPlayingId)
 
   const queue = liveQueue ? {
     trackIds,
@@ -83,9 +71,8 @@ const PlayerContainer = ({ playerPortal }: Props) => {
     settings: liveSettings,
   } : settingsDefaultState
 
-  // PlayerControls only reads `collection.rows[currentPlayingId]` — give it a
-  // single-entry map keyed by the active track so we never materialize the
-  // full queue.
+  // PlayerControls only reads collection.rows[currentPlayingId]. Single-entry
+  // map keyed by the active track avoids materializing the queue.
   const collection = {
     rows: currentMedia && currentPlayingId
       ? { [currentPlayingId]: currentMedia }

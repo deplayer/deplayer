@@ -72,81 +72,104 @@ export const useCollectionData = () => {
   const filters = useUIStore(s => s.activeFilters)
   const searchTerm = useUIStore(s => s.searchTerm)
   const favoriteIds = useFavoriteIds()
-  // Convert Set to Array for type compatibility
   const favoriteIdsArray = useMemo(() => Array.from(favoriteIds), [favoriteIds])
-  
-  // Build optimized SQL query based on active filters
-  // Only select columns needed by SongRow + filtering — skip expensive JSON blobs
-  // that aren't rendered (genres, externalId, shareUrl, filePath, playCount, etc.)
-  const query = useMemo(() => {
-    let baseQuery = tables.media.select(
+
+  // Anything that requires client-side post-filtering (JSON arrays, OR across
+  // columns) forces us to pull rows. Anything that's purely SQL-expressible
+  // (artists / types / favorites / no filter at all) gets the cheap path:
+  // SELECT id, let MusicTable's slow path fetch per visible row.
+  const needsRowData =
+    filters.genres.length > 0 ||
+    filters.providers.length > 0 ||
+    (searchTerm != null && searchTerm.length >= 3)
+
+  // Build the SQL filter clauses once. Both paths share them.
+  const applySqlFilters = <T extends { where: (clause: object) => T }>(q: T): T => {
+    let out = q
+    if (filters.artists.length > 0) {
+      out = out.where({ artistId: { op: 'IN', value: filters.artists } })
+    }
+    if (filters.types.length > 0) {
+      out = out.where({ type: { op: 'IN', value: filters.types } })
+    }
+    if (filters.favorites && favoriteIdsArray.length > 0) {
+      out = out.where({ id: { op: 'IN', value: favoriteIdsArray } })
+    }
+    return out
+  }
+
+  // Fast-path query: ids only.
+  const idsQuery = useMemo(() => {
+    return applySqlFilters(tables.media.select('id')).orderBy('title', 'asc')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.artists, filters.types, filters.favorites, favoriteIdsArray])
+
+  // Slow-path query: ids + columns needed for client-side filtering.
+  const rowsQuery = useMemo(() => {
+    return applySqlFilters(
+      tables.media.select(
+        'id', 'title', 'track', 'artistId', 'artistName',
+        'albumId', 'albumName', 'duration', 'cover', 'stream',
+        'type', 'genresFlat', 'providersFlat',
+      ),
+    ).orderBy('title', 'asc')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.artists, filters.types, filters.favorites, favoriteIdsArray])
+
+  // Subscribe to exactly ONE of the two queries. We still call both useQuery
+  // hooks (Rules of Hooks) but the inactive one targets an impossible-id
+  // filter so it returns []. Each NOOP keeps the same column shape as its
+  // active twin so the union type stays consistent.
+  const idsNoopQuery = useMemo(
+    () => tables.media.select('id').where('id', '=', '__NONE__'),
+    [],
+  )
+  const rowsNoopQuery = useMemo(
+    () => tables.media.select(
       'id', 'title', 'track', 'artistId', 'artistName',
       'albumId', 'albumName', 'duration', 'cover', 'stream',
-      'type', 'genresFlat', 'providersFlat'
-    )
-
-    // Apply filters using SQL WHERE clauses
-    const hasArtists = filters.artists.length > 0
-    const hasTypes = filters.types.length > 0
-    const hasFavorites = filters.favorites
-    
-    // Artists filter: Use IN operator for multiple artists
-    if (hasArtists) {
-      baseQuery = baseQuery.where({ artistId: { op: 'IN', value: filters.artists } })
-    }
-    
-    // Types filter: Use IN operator for multiple types
-    if (hasTypes) {
-      baseQuery = baseQuery.where({ type: { op: 'IN', value: filters.types } })
-    }
-    
-    // Favorites filter: Use IN operator with favorite IDs
-    if (hasFavorites && favoriteIdsArray.length > 0) {
-      baseQuery = baseQuery.where({ id: { op: 'IN', value: favoriteIdsArray } })
-    }
-    
-    // Note: Genres and Providers require client-side filtering due to JSON arrays
-    // Search also requires client-side filtering (needs OR across title/artist/album,
-    // but LiveStore query builder only supports AND)
-    // These are filtered in the useMemo below
-    
-    return baseQuery.orderBy('title', 'asc')
-  }, [filters.artists, filters.types, filters.favorites, favoriteIdsArray])
-  
-  // Execute single reactive query
-  const rawMedia = store.useQuery(
-    queryDb(query)
+      'type', 'genresFlat', 'providersFlat',
+    ).where('id', '=', '__NONE__'),
+    [],
   )
+  const idsRaw = store.useQuery(queryDb(needsRowData ? idsNoopQuery : idsQuery))
+  const rowsRaw = store.useQuery(queryDb(needsRowData ? rowsQuery : rowsNoopQuery))
 
   return useMemo(() => {
-    const ids: string[] = []
-    const map: Record<string, TransformedMedia> = {}
-
-    if (!Array.isArray(rawMedia)) {
-      return { ids, map }
+    if (!needsRowData) {
+      const ids: string[] = Array.isArray(idsRaw)
+        ? (idsRaw as Array<{ id: string }>).map(r => r.id)
+        : []
+      return { ids, map: undefined as Record<string, TransformedMedia> | undefined }
     }
 
-    const filtered = rawMedia.filter((item: { genresFlat?: string; providersFlat?: string; title?: string; artistName?: string; albumName?: string }) => {
+    const ids: string[] = []
+    const map: Record<string, TransformedMedia> = {}
+    if (!Array.isArray(rowsRaw)) return { ids, map }
+
+    const filtered = (rowsRaw as Array<{
+      genresFlat?: string
+      providersFlat?: string
+      title?: string
+      artistName?: string
+      albumName?: string
+    } & Record<string, unknown>>).filter((item) => {
       if (filters.genres.length > 0) {
         const itemGenres = item.genresFlat ? item.genresFlat.split(',') : []
-        const hasMatchingGenre = filters.genres.some((g: string) => itemGenres.includes(g))
-        if (!hasMatchingGenre) return false
+        if (!filters.genres.some((g: string) => itemGenres.includes(g))) return false
       }
-
       if (filters.providers.length > 0) {
         const itemProviders = item.providersFlat ? item.providersFlat.split(',') : []
-        const hasMatchingProvider = filters.providers.some((p: string) => itemProviders.includes(p))
-        if (!hasMatchingProvider) return false
+        if (!filters.providers.some((p: string) => itemProviders.includes(p))) return false
       }
-
       if (searchTerm && searchTerm.length >= 3) {
-        const lowerSearch = searchTerm.toLowerCase()
-        const matchesTitle = item.title?.toLowerCase().includes(lowerSearch)
-        const matchesArtist = item.artistName?.toLowerCase().includes(lowerSearch)
-        const matchesAlbum = item.albumName?.toLowerCase().includes(lowerSearch)
-        if (!matchesTitle && !matchesArtist && !matchesAlbum) return false
+        const q = searchTerm.toLowerCase()
+        const hit =
+          item.title?.toLowerCase().includes(q) ||
+          item.artistName?.toLowerCase().includes(q) ||
+          item.albumName?.toLowerCase().includes(q)
+        if (!hit) return false
       }
-
       return true
     })
 
@@ -157,7 +180,6 @@ export const useCollectionData = () => {
         map[media.id] = media
       }
     })
-
     return { ids, map }
-  }, [rawMedia, filters.genres, filters.providers, searchTerm])
+  }, [needsRowData, idsRaw, rowsRaw, filters.genres, filters.providers, searchTerm])
 }

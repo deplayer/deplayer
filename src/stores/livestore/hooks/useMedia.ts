@@ -636,17 +636,36 @@ export const useFilteredMedia = (filters: Filter) => {
  * const mediaMap = useMediaMapForIds(visibleIds) // Only load first 50
  * ```
  */
+/**
+ * Soft ceiling on caller-supplied id lists. Above this, the IN-list query
+ * and the materialized JS map dominate render cost (see the OOM postmortem
+ * in docs/plans/2026-05-26-pwa-install-oom-design.md). PlayerContainer's
+ * always-mounted subscription to the whole queue was the symptom; the cap
+ * is a structural tripwire so the next caller can't slip past silently.
+ */
+const MEDIA_MAP_SOFT_CAP = 500
+let mediaMapOverCapWarned = false
+
 export const useMediaMapForIds = (ids: string[]) => {
   const store = useAppStore()
   // Filter out any undefined/null values and ensure we have valid string IDs
-  const validIds = useMemo(() => 
-    ids.filter((id): id is string => typeof id === 'string' && id.length > 0),
-    [ids]
+  const validIds = useMemo(
+    () => ids.filter((id): id is string => typeof id === 'string' && id.length > 0),
+    [ids],
   )
-  
+
+  if (validIds.length > MEDIA_MAP_SOFT_CAP && !mediaMapOverCapWarned) {
+    mediaMapOverCapWarned = true
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[useMediaMapForIds] subscribed to ${validIds.length} ids (cap ${MEDIA_MAP_SOFT_CAP}). ` +
+        `Use useMediaById per row or paginate.`,
+    )
+  }
+
   // Only query if we have valid IDs
   const shouldQuery = validIds.length > 0
-  
+
   const query = useMemo(() => {
     if (!shouldQuery) {
       return NOOP_QUERY
