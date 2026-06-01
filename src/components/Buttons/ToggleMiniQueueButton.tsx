@@ -1,14 +1,10 @@
-import { useDispatch } from 'react-redux'
 import { I18n } from 'react-redux-i18n'
-import { TOGGLE_MINI_QUEUE } from '../../constants/ActionTypes'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
+import { useUIStore } from '../../stores/uiStore'
 
 const ToggleMiniQueueButton = () => {
-  const dispatch = useDispatch()
-  const toggleMiniQueue = () => {
-    dispatch({ type: TOGGLE_MINI_QUEUE })
-  }
+  const toggleMiniQueue = useUIStore((s) => s.toggleMiniQueue)
 
   return (
     <Button

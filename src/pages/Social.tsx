@@ -3,9 +3,11 @@ import RoomList from '../components/RoomList'
 import * as types from '../constants/ActionTypes'
 import Icon from '../components/common/Icon'
 import { useState } from 'react'
+import { useUIStore } from '../stores/uiStore'
 
 const Social = () => {
   const dispatch = useDispatch()
+  const toggleRightPanel = useUIStore((s) => s.toggleRightPanel)
   const [showUsernameModal, setShowUsernameModal] = useState(false)
   const [pendingRoomCode, setPendingRoomCode] = useState<string | null>(null)
 
@@ -44,9 +46,7 @@ const handleUsernameSubmit = (username: string) => {
     setPendingRoomCode(null)
   }
 
-  const handleCloseRightPanel = () => {
-    dispatch({ type: types.TOGGLE_RIGHT_PANEL })
-  }
+  const handleCloseRightPanel = () => toggleRightPanel()
 
   return (
     <div className="p-4 flex flex-col">

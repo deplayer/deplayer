@@ -20,7 +20,7 @@ const JoinRoom = () => {
       });
 
       // Open the right panel to show the social section
-      dispatch({ type: types.TOGGLE_RIGHT_PANEL, value: true });
+      useUIStore.getState().toggleRightPanel(true);
 
       // Redirect to dashboard after joining
       navigate("/");

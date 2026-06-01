@@ -13,11 +13,13 @@ import SongRow from '../MusicTable/SongRow'
 import * as types from '../../constants/ActionTypes'
 import { State } from '../../reducers'
 import { useArtistById, useAlbumsByArtist, useSongsByAlbumForArtist } from '../../stores/livestore/hooks'
+import { useUIStore } from '../../stores/uiStore'
 import type { AlbumRow } from '../../types/media'
 
 export default function ArtistView() {
   const params = useParams()
   const dispatch = useDispatch()
+  const setBackgroundImage = useUIStore((s) => s.setBackgroundImage)
   const artistId = params.id || ''
   const [showAllTracks, setShowAllTracks] = React.useState(false)
 
@@ -65,9 +67,9 @@ export default function ArtistView() {
     if (artist?.name) {
       dispatch({ type: types.LOAD_ARTIST, artist })
       dispatch({ type: types.FETCH_ARTIST_SONGS, artist })
-      dispatch({ type: types.SET_BACKGROUND_IMAGE, backgroundImage })
+      setBackgroundImage(backgroundImage ?? '')
     }
-  }, [artist, backgroundImage, dispatch])
+  }, [artist, backgroundImage, dispatch, setBackgroundImage])
 
   if (!artist) return null
 

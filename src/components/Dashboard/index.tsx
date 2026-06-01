@@ -1,7 +1,7 @@
 import React, { FunctionComponent, SVGProps } from 'react'
 import { Translate } from 'react-redux-i18n'
 import { Link } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useUIStore } from '../../stores/uiStore'
 
 import ContinueListeningCard from './ContinueListeningCard'
 import StatsCard from './StatsCard'
@@ -12,7 +12,6 @@ import BecauseYouListened from '../BecauseYouListened'
 import Footer from '../Footer'
 import TryDemoButton from '../Buttons/TryDemoButton'
 import DashboardCard from './DashboardCard'
-import * as types from '../../constants/ActionTypes'
 import { useRecentlyPlayed, useMediaCount } from '../../stores/livestore/hooks'
 
 import RecordPlayerSvg from './record-player.svg?react'
@@ -39,7 +38,7 @@ const RandomIllustration = () => {
 }
 
 const WelcomeCard = () => {
-  const dispatch = useDispatch()
+  const setShowAddMediaModal = useUIStore((s) => s.setShowAddMediaModal)
   const credentials = localStorage.getItem('credentials')
 
   return (
@@ -64,8 +63,8 @@ const WelcomeCard = () => {
               <span
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") dispatch({ type: types.SHOW_ADD_MEDIA_MODAL }) }}
-                onClick={() => dispatch({ type: types.SHOW_ADD_MEDIA_MODAL })}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setShowAddMediaModal(true) }}
+                onClick={() => setShowAddMediaModal(true)}
                 className="text-primary hover:text-primary-focus cursor-pointer"
               >                <Translate value="dashboard.welcome.addMedia" />
               </span>{' '}              <Translate value="dashboard.welcome.addMediaDescription" />

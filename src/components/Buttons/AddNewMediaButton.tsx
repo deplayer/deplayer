@@ -1,8 +1,7 @@
 import { Translate } from 'react-redux-i18n'
-import { useDispatch } from 'react-redux'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
-import * as types from '../../constants/ActionTypes'
+import { useUIStore } from '../../stores/uiStore'
 
 type Props = {
   fullWidth?: boolean
@@ -11,10 +10,8 @@ type Props = {
 }
 
 const AddNewMediaButton = (props: Props) => {
-  const dispatch = useDispatch()
-  const openModal = () => {
-    dispatch({ type: types.SHOW_ADD_MEDIA_MODAL })
-  }
+  const setShowAddMediaModal = useUIStore((s) => s.setShowAddMediaModal)
+  const openModal = () => setShowAddMediaModal(true)
 
   return (
     <Button
