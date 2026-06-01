@@ -1,3 +1,4 @@
+import axios from "axios";
 import { Api, Jellyfin } from "@jellyfin/sdk";
 import { BaseItemDto, ItemFields } from "@jellyfin/sdk/lib/generated-client/models";
 import { getItemsApi } from "@jellyfin/sdk/lib/utils/api/items-api";
@@ -5,6 +6,10 @@ import { getUserApi } from "@jellyfin/sdk/lib/utils/api/user-api";
 import { normalizeMedia, NormalizedMedia } from "../utils/normalizeMedia";
 import { IMusicProvider } from "./IMusicProvider";
 import { createLogger } from "../utils/logger";
+import type { HealthCheckResult } from "../types/providers";
+
+const isAxiosError = (e: unknown): e is { response?: { status?: number } } =>
+  typeof e === "object" && e !== null && "response" in e;
 
 const logger = createLogger({ namespace: "JellyfinProvider" });
 
@@ -219,6 +224,41 @@ export default class JellyfinProvider implements IMusicProvider {
     } catch (error) {
       logger.error(`Error fetching artist songs for ${artistName}:`, error);
       return [];
+    }
+  }
+
+  async healthcheck(): Promise<HealthCheckResult> {
+    const t0 = Date.now();
+    try {
+      await axios.get(`${this.baseUrl}/System/Info/Public`, { timeout: 5000 });
+    } catch (e) {
+      const checkedAt = Date.now();
+      return {
+        status: "unreachable",
+        error: e instanceof Error ? e.message : String(e),
+        checkedAt,
+        latencyMs: checkedAt - t0,
+      };
+    }
+    try {
+      await axios.get(`${this.baseUrl}/Users/Me`, {
+        timeout: 5000,
+        headers: { "X-Emby-Token": this.apiKey },
+      });
+      const checkedAt = Date.now();
+      return { status: "connected", checkedAt, latencyMs: checkedAt - t0 };
+    } catch (e) {
+      const checkedAt = Date.now();
+      const status =
+        isAxiosError(e) && (e.response?.status === 401 || e.response?.status === 403)
+          ? "authFailed"
+          : "unreachable";
+      return {
+        status,
+        error: e instanceof Error ? e.message : String(e),
+        checkedAt,
+        latencyMs: checkedAt - t0,
+      };
     }
   }
 }
