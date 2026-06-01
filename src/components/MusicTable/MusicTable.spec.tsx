@@ -4,6 +4,7 @@ import MusicTable from './MusicTable'
 import { renderWithProviders } from '../../test-utils/render'
 import { createTestMediaList } from '../../test-utils/factories'
 import { createDefaultState } from '../../test-utils/store'
+import * as livestoreHooks from '../../stores/livestore/hooks'
 
 // Mock LiveStore hooks since tests provide data via props
 vi.mock('../../stores/livestore/store', () => ({
@@ -151,5 +152,59 @@ describe('MusicTable', () => {
     const grid = screen.getByRole('grid')
     expect(grid).toBeInTheDocument()
     expect(within(grid).queryByRole('row')).not.toBeInTheDocument()
+  })
+
+  describe('current track highlight', () => {
+    const mockUseCurrent = vi.mocked(livestoreHooks.useCurrentPlayingSongId)
+    const isHighlighted = (row: HTMLElement) => row.classList.contains('bg-base-200')
+
+    afterEach(() => {
+      mockUseCurrent.mockReturnValue(null)
+    })
+
+    it('marks the current song row with bg-base-200', async () => {
+      mockUseCurrent.mockReturnValue('song2')
+      setup()
+
+      await waitFor(() => {
+        expect(screen.getAllByTestId('song-row')).toHaveLength(2)
+      })
+
+      const [row1, row2] = screen.getAllByTestId('song-row')
+      expect(isHighlighted(row1)).toBe(false)
+      expect(isHighlighted(row2)).toBe(true)
+    })
+
+    it('moves the highlight when the active track changes', async () => {
+      mockUseCurrent.mockReturnValue('song1')
+      const { rerender, props } = setup()
+
+      await waitFor(() => {
+        const [row1] = screen.getAllByTestId('song-row')
+        expect(isHighlighted(row1)).toBe(true)
+      })
+
+      mockUseCurrent.mockReturnValue('song2')
+      rerender(<MusicTable {...props} />)
+
+      await waitFor(() => {
+        const [row1, row2] = screen.getAllByTestId('song-row')
+        expect(isHighlighted(row1)).toBe(false)
+        expect(isHighlighted(row2)).toBe(true)
+      })
+    })
+
+    it('does not highlight any row when no current track', async () => {
+      mockUseCurrent.mockReturnValue(null)
+      setup()
+
+      await waitFor(() => {
+        expect(screen.getAllByTestId('song-row')).toHaveLength(2)
+      })
+
+      for (const row of screen.getAllByTestId('song-row')) {
+        expect(isHighlighted(row)).toBe(false)
+      }
+    })
   })
 })
