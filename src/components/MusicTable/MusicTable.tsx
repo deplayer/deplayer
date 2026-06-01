@@ -269,11 +269,12 @@ const MusicTable = ({
     )
   }
 
-  // Use refs for values that change frequently but shouldn't cause rowRenderer to be recreated
+  // Refs for values that change frequently but shouldn't recreate rowRenderer.
+  // currentSongId is intentionally NOT a ref: it must be in rowRenderer's
+  // closure so the React-virtualized List re-renders visible rows (with a
+  // fresh isCurrent) when the active track changes.
   const tableIdsRef = React.useRef(tableIds)
   tableIdsRef.current = tableIds
-  const currentSongIdRef = React.useRef(currentSongId)
-  currentSongIdRef.current = currentSongId
   const mediaMapRef = React.useRef(mediaMap)
   mediaMapRef.current = mediaMap
   const favoriteIdsRef = React.useRef(favoriteIds)
@@ -289,7 +290,7 @@ const MusicTable = ({
     // This must be passed through to the rendered row element.
   }: { index: number, key: string, style: React.CSSProperties, slim: boolean }): React.ReactNode => {
     const songId = tableIdsRef.current[index]
-    const isCurrent = songId === currentSongIdRef.current
+    const isCurrent = songId === currentSongId
 
     const currentMediaMap = mediaMapRef.current
     const currentQueue = liveQueueRef.current
@@ -314,7 +315,7 @@ const MusicTable = ({
 
     // Slow path: use LiveStore hooks
     return <SongRowWithHooks {...sharedProps} />
-  }, [liveQueue, mqlMatch, dispatch, disableAddButton, disableCovers])
+  }, [liveQueue, mqlMatch, dispatch, disableAddButton, disableCovers, currentSongId])
 
   // Stable rowRenderer wrapper that includes slim without creating new function refs
   const slimRef = React.useRef(slim)
