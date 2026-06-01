@@ -77,9 +77,7 @@ describe('CommandBar', () => {
     const initialState = {
       search: {
         error: '',
-        searchTerm: '',
         loading: false,
-        searchToggled: false,
         searchResults: []
       },
       collection: {
@@ -166,9 +164,7 @@ describe('CommandBar', () => {
       },
       search: {
         error: '',
-        searchTerm: 'test query',
         loading: false,
-        searchToggled: true,
         searchResults: []
       }
     })

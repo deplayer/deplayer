@@ -100,18 +100,17 @@ describe('Topbar', () => {
   })
 
   describe('Search functionality', () => {
-    it('should update search term immediately but debounce the search action', async () => {
+    it('should update uiStore search term immediately but debounce the search action', async () => {
       const { getByTestId } = renderTopbar({ searchToggled: true })
       const input = getByTestId('search-input')
 
       // Type in search
       fireEvent.change(input, { target: { value: 'test' } })
 
-      // Should have dispatched SET_SEARCH_TERM immediately
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: types.SET_SEARCH_TERM,
-        searchTerm: 'test'
-      })
+      // uiStore should be updated immediately
+      expect(useUIStore.getState().searchTerm).toBe('test')
+      // Redux SET_SEARCH_TERM dispatch has been removed
+      expect(mockDispatch).not.toHaveBeenCalled()
 
       // Wait for debounce
       await act(async () => {
@@ -133,21 +132,11 @@ describe('Topbar', () => {
 
       // Type 'test'
       fireEvent.change(input, { target: { value: 'test' } })
-
-      // Should have dispatched SET_SEARCH_TERM immediately
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: types.SET_SEARCH_TERM,
-        searchTerm: 'test'
-      })
+      expect(useUIStore.getState().searchTerm).toBe('test')
 
       // Type 'testing' before debounce timeout
       fireEvent.change(input, { target: { value: 'testing' } })
-
-      // Should have dispatched SET_SEARCH_TERM immediately
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: types.SET_SEARCH_TERM,
-        searchTerm: 'testing'
-      })
+      expect(useUIStore.getState().searchTerm).toBe('testing')
 
       // Wait for debounce
       await act(async () => {
@@ -159,6 +148,12 @@ describe('Topbar', () => {
         expect.objectContaining({
           type: types.START_SEARCH,
           searchTerm: 'testing'
+        })
+      )
+      expect(mockDispatch).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: types.START_SEARCH,
+          searchTerm: 'test'
         })
       )
     })
@@ -175,11 +170,8 @@ describe('Topbar', () => {
         vi.advanceTimersByTime(800)
       })
 
-      // Should have updated search term but not triggered search
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: types.SET_SEARCH_TERM,
-        searchTerm: 'te'
-      })
+      // Should have updated uiStore term but not triggered START_SEARCH
+      expect(useUIStore.getState().searchTerm).toBe('te')
       expect(mockDispatch).not.toHaveBeenCalledWith(
         expect.objectContaining({
           type: types.START_SEARCH,
@@ -195,12 +187,7 @@ describe('Topbar', () => {
 
       // Type "test"
       fireEvent.change(input, { target: { value: 'test' } })
-
-      // Should dispatch SET_SEARCH_TERM
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: types.SET_SEARCH_TERM,
-        searchTerm: 'test'
-      })
+      expect(useUIStore.getState().searchTerm).toBe('test')
 
       // Close search before timeout
       fireEvent.keyUp(input, { key: 'Escape' })
@@ -220,4 +207,4 @@ describe('Topbar', () => {
       expect(useUIStore.getState().searchToggled).toBe(false)
     })
   })
-}) 
+})

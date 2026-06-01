@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { Dispatch } from 'redux'
 import SearchInput from './SearchInput'
 import Icon from '../common/Icon'
-import * as types from '../../constants/ActionTypes'
 import { startSearch, StartSearchAction } from '../../types/search'
 import { useUIStore } from '../../stores/uiStore'
 
@@ -27,15 +26,9 @@ const Topbar = (props: Props) => {
 
   const handleSearchChange = (event: React.FormEvent<HTMLInputElement>) => {
     const searchTerm = event.currentTarget.value
-    
-    // Update UIContext with search term (replaces Redux SET_SEARCH_TERM)
+
+    // Update uiStore with search term
     setSearchTerm(searchTerm)
-    
-    // Also update Redux for backward compatibility (can be removed later)
-    props.dispatch({
-      type: types.SET_SEARCH_TERM,
-      searchTerm
-    })
 
     // Clear any existing timeout
     if (searchTimeout) {
