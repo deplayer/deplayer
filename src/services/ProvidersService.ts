@@ -1,4 +1,4 @@
-import { ISearchService } from './ISearchService'
+
 import providersIndex from '../providers'
 import { NormalizedMedia } from '../utils/normalizeMedia'
 import type { IMusicProvider } from '../providers/IMusicProvider'
@@ -13,7 +13,7 @@ interface ProviderConfig {
   [key: string]: unknown
 }
 
-export default class ProvidersService implements ISearchService {
+export default class ProvidersService {
   providers: Record<string, ProviderInstance> = {}
 
   constructor(config: ProviderConfig) {
