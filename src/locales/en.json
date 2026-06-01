@@ -1,4 +1,38 @@
 {
+  "providers": {
+    "title": "Sources",
+    "addSource": "Add source",
+    "empty": {
+      "title": "No sources connected yet",
+      "subtitle": "Connect a music source to get started."
+    },
+    "status": {
+      "connected": "Connected",
+      "checking": "Checking…",
+      "unreachable": "Unreachable",
+      "authFailed": "Authentication failed",
+      "disabled": "Disabled",
+      "unknown": "Status unknown"
+    },
+    "capabilities": { "sync": "Sync", "search": "Search", "stream": "Stream" },
+    "descriptions": {
+      "subsonic": "Self-hosted music server (Subsonic, Navidrome, Airsonic).",
+      "mstream": "Lightweight self-hosted music streaming.",
+      "itunes": "Search the public iTunes catalogue.",
+      "jellyfin": "Self-hosted media server with a music library.",
+      "musicbrainz": "Open music metadata lookup."
+    },
+    "testConnection": "Test connection",
+    "remove": {
+      "menuItem": "Remove…",
+      "title": "Remove %{name}?",
+      "body": "The connection's credentials will be deleted. This cannot be undone.",
+      "confirm": "Remove",
+      "cancel": "Cancel"
+    },
+    "labelField": "Label",
+    "connectedBadge": "Connected"
+  },
   "sort": {
     "default": "Default order",
     "alphabetical": "Alphabetical",

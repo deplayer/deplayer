@@ -1,4 +1,38 @@
 {
+  "providers": {
+    "title": "Orígenes",
+    "addSource": "Añadir origen",
+    "empty": {
+      "title": "Aún no hay orígenes conectados",
+      "subtitle": "Conecta un origen de música para empezar."
+    },
+    "status": {
+      "connected": "Conectado",
+      "checking": "Comprobando…",
+      "unreachable": "Inaccesible",
+      "authFailed": "Fallo de autenticación",
+      "disabled": "Desactivado",
+      "unknown": "Estado desconocido"
+    },
+    "capabilities": { "sync": "Sincronizar", "search": "Buscar", "stream": "Reproducir" },
+    "descriptions": {
+      "subsonic": "Servidor de música autoalojado (Subsonic, Navidrome, Airsonic).",
+      "mstream": "Streaming de música autoalojado ligero.",
+      "itunes": "Buscar en el catálogo público de iTunes.",
+      "jellyfin": "Servidor de medios autoalojado con biblioteca de música.",
+      "musicbrainz": "Búsqueda abierta de metadatos musicales."
+    },
+    "testConnection": "Probar conexión",
+    "remove": {
+      "menuItem": "Eliminar…",
+      "title": "¿Eliminar %{name}?",
+      "body": "Se eliminarán las credenciales de la conexión. Esta acción no se puede deshacer.",
+      "confirm": "Eliminar",
+      "cancel": "Cancelar"
+    },
+    "labelField": "Etiqueta",
+    "connectedBadge": "Conectado"
+  },
   "sort": {
     "default": "Orden por defecto",
     "alphabetical": "Alfabético",

@@ -1,4 +1,38 @@
 {
+  "providers": {
+    "title": "Orígens",
+    "addSource": "Afegir origen",
+    "empty": {
+      "title": "Encara no hi ha orígens connectats",
+      "subtitle": "Connecta un origen de música per començar."
+    },
+    "status": {
+      "connected": "Connectat",
+      "checking": "Comprovant…",
+      "unreachable": "Inaccessible",
+      "authFailed": "Error d'autenticació",
+      "disabled": "Desactivat",
+      "unknown": "Estat desconegut"
+    },
+    "capabilities": { "sync": "Sincronitzar", "search": "Cercar", "stream": "Reproduir" },
+    "descriptions": {
+      "subsonic": "Servidor de música autoallotjat (Subsonic, Navidrome, Airsonic).",
+      "mstream": "Streaming de música autoallotjat lleuger.",
+      "itunes": "Cerca al catàleg públic d'iTunes.",
+      "jellyfin": "Servidor de mèdia autoallotjat amb biblioteca de música.",
+      "musicbrainz": "Cerca oberta de metadades musicals."
+    },
+    "testConnection": "Provar connexió",
+    "remove": {
+      "menuItem": "Eliminar…",
+      "title": "Eliminar %{name}?",
+      "body": "Les credencials de la connexió s'eliminaran. Aquesta acció no es pot desfer.",
+      "confirm": "Eliminar",
+      "cancel": "Cancel·lar"
+    },
+    "labelField": "Etiqueta",
+    "connectedBadge": "Connectat"
+  },
   "sort": {
     "default": "Ordre per defecte",
     "alphabetical": "Alfabètic",
