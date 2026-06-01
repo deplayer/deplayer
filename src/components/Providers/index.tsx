@@ -14,6 +14,7 @@ import providerRegistry from '../../services/settings/providers'
 import type { ProviderSchema } from '../../types/providers'
 
 import MainContainer from '../common/MainContainer'
+import Icon from '../common/Icon'
 import AddSourceModal from './AddSourceModal'
 import AddSourcePicker from './AddSourcePicker'
 import ConnectionCard from './ConnectionCard'
@@ -137,7 +138,10 @@ const Providers = () => {
   if (!settings) {
     return (
       <MainContainer centerContents>
-        <p className="opacity-70 py-8">Loading settings…</p>
+        <div className="flex items-center gap-3 opacity-70 py-8">
+          <Icon icon="faSpinner" className="animate-spin motion-reduce:animate-none" />
+          <span><Translate value="providers.loading" /></span>
+        </div>
       </MainContainer>
     )
   }
@@ -147,17 +151,19 @@ const Providers = () => {
   if (isEmpty) {
     return (
       <MainContainer>
-        <div className="max-w-3xl mx-auto py-8 pb-24">
-          <h1 className="text-2xl mb-1">
-            <Translate value="providers.empty.title" />
-          </h1>
-          <p className="opacity-70 mb-6">
-            <Translate value="providers.empty.subtitle" />
-          </p>
-          <AddSourcePicker
-            configuredKeys={[]}
-            onPick={addOne}
-          />
+        <div className="max-w-3xl mx-auto py-8 pb-24 px-4 sm:px-6">
+          <div className="text-center mb-8 space-y-2">
+            <div className="flex justify-center">
+              <Icon icon="faPlug" className="w-12 h-12 text-base-content/30" />
+            </div>
+            <h1 className="text-xl sm:text-2xl font-semibold">
+              <Translate value="providers.empty.title" />
+            </h1>
+            <p className="text-sm sm:text-base text-base-content/70 max-w-prose mx-auto">
+              <Translate value="providers.empty.subtitle" />
+            </p>
+          </div>
+          <AddSourcePicker configuredKeys={[]} onPick={addOne} />
         </div>
       </MainContainer>
     )

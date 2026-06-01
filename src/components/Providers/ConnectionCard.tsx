@@ -109,8 +109,10 @@ export const ConnectionCard = ({
     <article
       data-testid={`connection-card-${instanceKey}`}
       className={classNames(
-        'rounded-lg border border-base-300 bg-base-100',
-        health.status === 'authFailed' || health.status === 'unreachable' ? 'border-error/40' : '',
+        'rounded-lg border bg-base-100 transition-colors',
+        health.status === 'authFailed' || health.status === 'unreachable'
+          ? 'border-error/40'
+          : 'border-base-300',
       )}
     >
       <div className="flex items-center gap-3 px-4 py-3">
@@ -118,7 +120,11 @@ export const ConnectionCard = ({
         <button
           type="button"
           onClick={toggleExpanded}
-          className="flex-1 min-w-0 text-left"
+          className={classNames(
+            'flex-1 min-w-0 text-left rounded-sm',
+            'hover:opacity-80 transition-opacity',
+            'focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary',
+          )}
           aria-expanded={expanded}
           aria-controls={`connection-card-body-${instanceKey}`}
         >
@@ -203,8 +209,9 @@ export const ConnectionCard = ({
                       id={`${instanceKey}-name`}
                       name="name"
                       type="text"
+                      data-testid={`label-input-${instanceKey}`}
                       className="input input-bordered input-sm flex-1"
-                      placeholder={subtitle || title}
+                      placeholder={subtitle}
                     />
                   </div>
                   {fields.map(field => (
@@ -246,7 +253,7 @@ export const ConnectionCard = ({
                         className="btn btn-primary btn-sm"
                         disabled={!isValid || isSubmitting}
                       >
-                        <Translate value="buttons.saveSettings" />
+                        <Translate value="providers.save" />
                       </button>
                     </>
                   )}

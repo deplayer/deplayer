@@ -104,7 +104,7 @@ describe('ConnectionCard — form behavior', () => {
   it('shows Save and Cancel after a field is edited', async () => {
     const user = userEvent.setup()
     renderExpanded()
-    const labelInput = screen.getAllByPlaceholderText(/nav\.example\.com/i)[0]
+    const labelInput = screen.getByTestId('label-input-subsonic')
     await user.type(labelInput, 'Home')
     expect(screen.getByRole('button', { name: /saveSettings|save/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument()
@@ -114,7 +114,7 @@ describe('ConnectionCard — form behavior', () => {
     const onSave = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()
     renderExpanded({ onSave })
-    const labelInput = screen.getAllByPlaceholderText(/nav\.example\.com/i)[0]
+    const labelInput = screen.getByTestId('label-input-subsonic')
     await user.type(labelInput, 'Home')
     await user.click(screen.getByRole('button', { name: /saveSettings|save/i }))
     expect(onSave).toHaveBeenCalledTimes(1)
@@ -124,7 +124,7 @@ describe('ConnectionCard — form behavior', () => {
   it('Cancel reverts dirty edits and hides the footer', async () => {
     const user = userEvent.setup()
     renderExpanded()
-    const labelInput = screen.getAllByPlaceholderText(/nav\.example\.com/i)[0] as HTMLInputElement
+    const labelInput = screen.getByTestId('label-input-subsonic') as HTMLInputElement
     await user.type(labelInput, 'Home')
     await user.click(screen.getByRole('button', { name: /cancel/i }))
     expect(labelInput.value).toBe('')
@@ -140,7 +140,7 @@ describe('ConnectionCard — form behavior', () => {
         config={{ enabled: true, baseUrl: '', user: '', password: '' }}
       />,
     )
-    const labelInput = screen.getAllByPlaceholderText(/Subsonic|subsonic/i)[0]
+    const labelInput = screen.getByTestId('label-input-subsonic')
     await user.type(labelInput, 'Home')
     expect(screen.getByRole('button', { name: /saveSettings|save/i })).toBeDisabled()
   })

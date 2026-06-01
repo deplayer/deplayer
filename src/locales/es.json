@@ -31,7 +31,9 @@
       "cancel": "Cancelar"
     },
     "labelField": "Etiqueta",
-    "connectedBadge": "Conectado"
+    "connectedBadge": "Conectado",
+    "loading": "Cargando ajustes…",
+    "save": "Guardar"
   },
   "sort": {
     "default": "Orden por defecto",

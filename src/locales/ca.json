@@ -31,7 +31,9 @@
       "cancel": "Cancel·lar"
     },
     "labelField": "Etiqueta",
-    "connectedBadge": "Connectat"
+    "connectedBadge": "Connectat",
+    "loading": "Carregant ajustaments…",
+    "save": "Desar"
   },
   "sort": {
     "default": "Ordre per defecte",
