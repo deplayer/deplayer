@@ -4,14 +4,12 @@ import { State as RootState } from "../reducers";
 import { State as CollectionState, defaultState as collectionDefaultState } from "../reducers/collection";
 import { State as SearchState, defaultState as searchDefaultState } from "../reducers/search";
 import { State as PlayerState, defaultState as playerDefaultState } from "../reducers/player";
-import { State as AppState, defaultState as appDefaultState } from "../reducers/app";
 import { State as ArtistState, defaultState as artistDefaultState } from "../reducers/artist";
 
 import { State as PeerState } from "../reducers/peers";
 import { State as RoomsState, defaultState as roomsDefaultState } from "../reducers/rooms";
 
 export const createDefaultState = (): RootState => ({
-  app: appDefaultState as AppState,
   artist: artistDefaultState as ArtistState,
   collection: collectionDefaultState as CollectionState,
 

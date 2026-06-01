@@ -1,7 +1,6 @@
 import { i18nReducer } from 'react-redux-i18n'
 import { State as PlayerState } from './player'
 
-import app, { State as AppState } from './app'
 import artist, { State as ArtistState } from './artist'
 import player from './player'
 import collection, { State as CollectionState } from './collection'
@@ -10,7 +9,6 @@ import peers, { State as PeerState } from "./peers";
 import rooms, { State as RoomsState } from "./rooms";
 
 export type State = {
-  app: AppState
   artist: ArtistState
   collection: CollectionState
   player: PlayerState
@@ -20,7 +18,6 @@ export type State = {
 }
 
 const reducers = {
-  app,
   artist,
   collection,
   player,
