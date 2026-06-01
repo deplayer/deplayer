@@ -13,7 +13,7 @@ import {
   syncTranslationWithStore,
 } from "react-redux-i18n";
 
-import * as types from "../constants/ActionTypes";
+import { useUIStore } from "../stores/uiStore";
 import translationsObject from "../locales";
 import rootReducer from "../reducers";
 
@@ -82,13 +82,13 @@ function configureStore() {
   sagaMiddleware.run(rootSaga, store);
 
   // Set breakpoint matching for responsive utilities
-  store.dispatch({ type: types.SET_MQL, value: mql.matches });
-  store.dispatch({ type: types.SET_HEIGHT_MQL, value: heightMql.matches });
+  useUIStore.getState().setMqlMatch(mql.matches);
+  useUIStore.getState().setHeightMqlMatch(heightMql.matches);
   mql.addListener(() => {
-    store.dispatch({ type: types.SET_MQL, value: mql.matches });
+    useUIStore.getState().setMqlMatch(mql.matches);
   });
   heightMql.addListener(() => {
-    store.dispatch({ type: types.SET_HEIGHT_MQL, value: heightMql.matches });
+    useUIStore.getState().setHeightMqlMatch(heightMql.matches);
   });
 
   // NOTE: INITIALIZE action is now dispatched from App.tsx after LiveStore is ready

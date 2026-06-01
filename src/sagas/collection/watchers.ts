@@ -5,6 +5,7 @@ import { getLiveStoreInstance } from "../../App";
 import { initializeSettingsAction } from "../../stores/livestore/actions/settings";
 import * as types from "../../constants/ActionTypes";
 import { createLogger } from "../../utils/logger";
+import { useUIStore } from "../../stores/uiStore";
 
 const logger = createLogger({ namespace: "collection-watchers" });
 
@@ -55,6 +56,7 @@ export function* initializeWatcher(): Generator<any, void, any> {
       
       // Dispatch INITIALIZED immediately
       logger.info("Dispatching INITIALIZED action");
+      useUIStore.getState().setLoading(false);
       yield put({ type: types.INITIALIZED });
       yield put({ type: types.APPLY_MOST_PLAYED_SORT });
       logger.info("Initialization complete");
