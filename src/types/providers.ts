@@ -39,3 +39,18 @@ export type SectionSchema = {
   label: string
   fields: FieldSchema[]
 }
+
+export type HealthStatus =
+  | 'connected'
+  | 'checking'
+  | 'unreachable'
+  | 'auth_failed'
+  | 'disabled'
+  | 'unknown'
+
+export type HealthCheckResult = {
+  status: HealthStatus
+  error?: string
+  latencyMs?: number
+  checkedAt: number
+}
