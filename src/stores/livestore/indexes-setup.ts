@@ -21,51 +21,49 @@ export const indexesSetup = `
   CREATE INDEX IF NOT EXISTS idx_media_type ON media(type);
   CREATE INDEX IF NOT EXISTS idx_media_playCount ON media(playCount DESC);
   CREATE INDEX IF NOT EXISTS idx_media_createdAt ON media(createdAt DESC);
-  
+
   -- Denormalized columns for fast filtering (used by Collection filters)
   CREATE INDEX IF NOT EXISTS idx_media_genresFlat ON media(genresFlat);
   CREATE INDEX IF NOT EXISTS idx_media_providersFlat ON media(providersFlat);
   CREATE INDEX IF NOT EXISTS idx_media_artistName ON media(artistName);
   CREATE INDEX IF NOT EXISTS idx_media_title ON media(title);
-  
+
   -- Compound indexes for common filter combinations
   CREATE INDEX IF NOT EXISTS idx_media_artist_album ON media(artistId, albumId);
   CREATE INDEX IF NOT EXISTS idx_media_artist_type ON media(artistId, type);
-  
+
   -- Album table indexes
   CREATE INDEX IF NOT EXISTS idx_albums_artistId ON albums(artistId);
   CREATE INDEX IF NOT EXISTS idx_albums_name ON albums(name);
   CREATE INDEX IF NOT EXISTS idx_albums_year ON albums(year DESC);
-  
+
   -- Favorites table index for fast lookups
   CREATE INDEX IF NOT EXISTS idx_favorites_mediaId ON favorites(mediaId);
-  
+
   -- Lyrics table index
   CREATE INDEX IF NOT EXISTS idx_lyrics_mediaId ON lyrics(mediaId);
-  
+
   -- Smart playlists table index
   CREATE INDEX IF NOT EXISTS idx_smartPlaylists_name ON smartPlaylists(name);
+
+  -- Backfill media_genres from existing media.genres JSON array (idempotent)
+  INSERT OR IGNORE INTO media_genres (id, mediaId, genre, createdAt)
+    SELECT DISTINCT
+      '["' || replace(m.id, '"', '\\"') || '","' || replace(g.value, '"', '\\"') || '"]',
+      m.id,
+      TRIM(g.value),
+      m.createdAt
+    FROM media m
+    CROSS JOIN json_each(m.genres) AS g
+    WHERE LENGTH(TRIM(g.value)) > 0;
 `;
 
 /**
  * Setup database indexes
  * 
- * Call this function once when the LiveStore instance is ready.
- * This creates all necessary indexes for optimal query performance.
- * 
- * @param store - LiveStore instance with sqliteDbWrapper
- * 
- * @example
- * ```typescript
- * import { setupIndexes } from './indexes-setup'
- * import { useStore } from '@livestore/react'
- * 
- * const { store } = useStore()
- * useEffect(() => {
- *   if (!store?.sqliteDbWrapper) return
- *   setupIndexes(store)
- * }, [store])
- * ```
+ * Executes CREATE INDEX statements for all performance-critical queries.
+ * Uses IF NOT EXISTS to be safe on repeated runs.
+ * Also backfills the media_genres derived table from existing data.
  */
 export const setupIndexes = (store: unknown) => {
   if (!store) {
@@ -77,34 +75,30 @@ export const setupIndexes = (store: unknown) => {
     throw new Error('[LiveStore] Store.sqliteDbWrapper is not available')
   }
   
-  // Split into individual CREATE INDEX statements
+  // Split into individual statements
   const statements = indexesSetup.split(';').flatMap((s: string) => {
     const trimmed = s.trim()
     return trimmed.length > 0 ? [trimmed] : []
-})
+  })
   
-  console.log(`[LiveStore] Creating ${statements.length} database indexes...`)
+  console.log(`[LiveStore] Creating ${statements.length} database indexes and backfilling media_genres...`)
   
   let successCount = 0
   let skipCount = 0
   
   for (const statement of statements) {
     try {
-      // Execute each CREATE INDEX statement
       storeWithDb.sqliteDbWrapper!.execute(statement + ';')
       successCount++
     } catch (error: unknown) {
-      // Check if error is due to missing table
       const err = error as { message?: string; cause?: { message?: string } }
       const errorMessage = err?.message || err?.cause?.message || String(error)
       if (errorMessage.includes('no such table')) {
-        // Extract table name from error for logging
         const tableMatch = errorMessage.match(/table: (?:main\.)?(\w+)/)
         const tableName = tableMatch ? tableMatch[1] : 'unknown'
         console.log(`[LiveStore] Skipping index creation for non-existent table: ${tableName}`)
         skipCount++
       } else {
-        // Log other errors but don't stop - indexes are optional for performance
         console.warn('[LiveStore] Failed to create index (non-critical):', errorMessage)
         skipCount++
       }

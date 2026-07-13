@@ -1,10 +1,23 @@
 import { useAppStore } from '../store'
-import { queryDb } from '@livestore/livestore'
+import { queryDb, Schema } from '@livestore/livestore'
 import { tables } from '../schema'
 import { useMemo } from 'react'
 import { useUIStore } from '../../uiStore'
 import { useFavoriteIds } from './useFavorites'
 import type { TransformedMedia } from './useMedia'
+// Parse raw query results into string IDs. Handles both flat string arrays
+// (LiveStore select('id') shape) and row-object arrays ({ id: string }).
+function parseIds(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return []
+  const ids: string[] = []
+  for (const r of raw) {
+    if (typeof r === 'string') { ids.push(r); continue }
+    if (r && typeof r === 'object' && 'id' in r && typeof (r as Record<string, unknown>).id === 'string') {
+      ids.push((r as Record<string, string>).id)
+    }
+  }
+  return ids
+}
 
 /**
  * Transform raw LiveStore media data to include nested artist/album objects
@@ -78,10 +91,11 @@ export const useCollectionData = () => {
   // columns) forces us to pull rows. Anything that's purely SQL-expressible
   // (artists / types / favorites / no filter at all) gets the cheap path:
   // SELECT id, let MusicTable's slow path fetch per visible row.
-  const needsRowData =
-    filters.genres.length > 0 ||
-    filters.providers.length > 0 ||
-    (searchTerm != null && searchTerm.length >= 3)
+  const hasSearch = searchTerm != null && searchTerm.length >= 3
+  const hasProviderFilter = filters.providers.length > 0
+  const hasGenreFilter = filters.genres.length > 0
+  const canUseGenreReadModel = hasGenreFilter && !hasProviderFilter && !hasSearch
+  const needsRowData = hasProviderFilter || hasSearch
 
   // Build the SQL filter clauses once. Both paths share them.
   const applySqlFilters = <T extends { where: (clause: object) => T }>(q: T): T => {
@@ -132,26 +146,61 @@ export const useCollectionData = () => {
     ).where('id', '=', '__NONE__'),
     [],
   )
-  const idsRaw = store.useQuery(queryDb(needsRowData ? idsNoopQuery : idsQuery))
+  // Genre-only filters use the indexed media_genres join instead of full-row client-side filtering.
+  const genreIdsQuery = useMemo(() => {
+    if (!canUseGenreReadModel) return idsNoopQuery
+
+    const clauses = ['mg.genre IN (' + filters.genres.map(() => '?').join(',') + ')']
+    const bindValues: Record<number, string> = {}
+    let idx = 1
+    for (const genre of filters.genres) bindValues[idx++] = genre
+
+    if (filters.artists.length > 0) {
+      clauses.push('m.artistId IN (' + filters.artists.map(() => '?').join(',') + ')')
+      for (const artistId of filters.artists) bindValues[idx++] = artistId
+    }
+
+    if (filters.types.length > 0) {
+      clauses.push('m.type IN (' + filters.types.map(() => '?').join(',') + ')')
+      for (const type of filters.types) bindValues[idx++] = type
+    }
+
+    if (filters.favorites && favoriteIdsArray.length > 0) {
+      clauses.push('m.id IN (' + favoriteIdsArray.map(() => '?').join(',') + ')')
+      for (const id of favoriteIdsArray) bindValues[idx++] = id
+    }
+
+    return queryDb({
+      query: `
+        SELECT DISTINCT m.id AS id
+        FROM media m
+        INNER JOIN media_genres mg ON mg.mediaId = m.id
+        WHERE ${clauses.join(' AND ')}
+        ORDER BY m.title ASC
+      `,
+      bindValues,
+      schema: Schema.Array(Schema.Struct({ id: Schema.String })),
+    })
+  }, [canUseGenreReadModel, filters.genres, filters.artists, filters.types, filters.favorites, favoriteIdsArray, idsNoopQuery])
+
+  const activeIdsQuery = canUseGenreReadModel ? genreIdsQuery : (needsRowData ? idsNoopQuery : idsQuery)
+  const idsRaw = store.useQuery(activeIdsQuery as Parameters<typeof store.useQuery>[0])
   const rowsRaw = store.useQuery(queryDb(needsRowData ? rowsQuery : rowsNoopQuery))
 
   return useMemo(() => {
-    if (!needsRowData) {
+    if (!needsRowData && !canUseGenreReadModel) {
       // LiveStore returns a single-column select as a flat array of values,
       // not row objects. Guard for both shapes just in case the builder API
       // changes; either way we end up with string ids.
-      const ids: string[] = Array.isArray(idsRaw)
-        ? (idsRaw as unknown[]).flatMap((r) => {
-            if (typeof r === 'string') return [r]
-            if (r && typeof r === 'object' && typeof (r as { id?: unknown }).id === 'string') {
-              return [(r as { id: string }).id]
-            }
-            return []
-          })
-        : []
+      const ids = parseIds(idsRaw)
       return { ids, map: undefined as Record<string, TransformedMedia> | undefined }
     }
 
+    if (canUseGenreReadModel) {
+      // Genre-only path: idsRaw is already the result of the media_genres join query.
+      const ids = parseIds(idsRaw)
+      return { ids, map: undefined as Record<string, TransformedMedia> | undefined }
+    }
 
     const ids: string[] = []
     const map: Record<string, TransformedMedia> = {}
@@ -164,10 +213,6 @@ export const useCollectionData = () => {
       artistName?: string
       albumName?: string
     } & Record<string, unknown>>).filter((item) => {
-      if (filters.genres.length > 0) {
-        const itemGenres = item.genresFlat ? item.genresFlat.split(',') : []
-        if (!filters.genres.some((g: string) => itemGenres.includes(g))) return false
-      }
       if (filters.providers.length > 0) {
         const itemProviders = item.providersFlat ? item.providersFlat.split(',') : []
         if (!filters.providers.some((p: string) => itemProviders.includes(p))) return false
@@ -191,5 +236,5 @@ export const useCollectionData = () => {
       }
     })
     return { ids, map }
-  }, [needsRowData, idsRaw, rowsRaw, filters.genres, filters.providers, searchTerm])
+  }, [needsRowData, canUseGenreReadModel, idsRaw, rowsRaw, filters.providers, searchTerm])
 }

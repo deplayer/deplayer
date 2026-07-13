@@ -1,3 +1,13 @@
+// ============================================================================
+// SCHEMA VERSION HISTORY
+// ============================================================================
+// v0.4  (2026-07-13) Added media_genres indexed read model table.
+//         - Maintained by media materializers (normalizeGenreRows helper).
+//         - Backfilled at boot from media.genres JSON array via setupIndexes.
+//         - Replaces unbounded genre-to-track-ID map allocations in useGenres
+//           and useCollectionData that caused V8 OOM during provider sync.
+// v0.3  Added playback_history table (decoupled from media to avoid reactive cascade).
+// v0.2  Initial LiveStore schema migration.
 import { makeSchema, State } from '@livestore/livestore'
 // Import event definitions
 import { mediaEvents } from './events/media'
@@ -120,7 +130,20 @@ export const tables = {
       updatedAt: State.SQLite.integer({}),
     },
   }),
-
+  // Media-genre join table (indexed read model for genre queries)
+  mediaGenres: State.SQLite.table({
+    name: 'media_genres',
+    columns: {
+      id: State.SQLite.text({ primaryKey: true }),
+      mediaId: State.SQLite.text({}),
+      genre: State.SQLite.text({}),
+      createdAt: State.SQLite.integer({}),
+    },
+    indexes: [
+      { name: 'idx_media_genres_genre', columns: ['genre'] },
+      { name: 'idx_media_genres_mediaId', columns: ['mediaId'] },
+    ],
+  }),
   // Playlists table
   playlists: State.SQLite.table({
     name: 'playlists',
@@ -247,6 +270,21 @@ export const events = {
 // MATERIALIZERS - Map events to SQLite operations
 // ============================================================================
 
+// Normalize genre array into media_genres insert-or-ignore operations.
+const normalizeGenreRows = (mediaId: string, genres: readonly string[] | undefined, now: number) =>
+  Array.from(new Set((Array.isArray(genres) ? genres : [])
+    .map((genre) => genre.trim())
+    .filter(Boolean)))
+    .map((genre) =>
+      tables.mediaGenres
+        .insert({
+          id: JSON.stringify([mediaId, genre]),
+          mediaId,
+          genre,
+          createdAt: now,
+        })
+        .onConflict('id', 'ignore'),
+    )
 const materializers = State.SQLite.materializers(events, {
   // Settings materializers
   'v1.SettingsUpdated': ({ id, settings: rawSettings }: { id: string; settings: unknown }) => {
@@ -344,6 +382,7 @@ const materializers = State.SQLite.materializers(events, {
           providersFlat,
           updatedAt: now,
         }),
+      ...normalizeGenreRows(id, genres, now),
     ]
   },
 
@@ -364,7 +403,13 @@ const materializers = State.SQLite.materializers(events, {
       updates.genresFlat = Array.isArray(genres) ? genres.join(',') : ''
     }
 
-    return tables.media.update(updates).where('id', '=', id)
+    const mediaUpdate = tables.media.update(updates).where('id', '=', id)
+    if (genres === undefined) return mediaUpdate
+    return [
+      mediaUpdate,
+      tables.mediaGenres.delete().where('mediaId', '=', id),
+      ...normalizeGenreRows(id, genres, now),
+    ]
   },
 
   'v1.MediaPlayed': ({ id }: { id: string }) => {
@@ -480,6 +525,7 @@ const materializers = State.SQLite.materializers(events, {
           })
           .onConflict('id', 'ignore')
       )
+      operations.push(...normalizeGenreRows(item.id, item.genres, now))
     }
     
     return operations
@@ -488,13 +534,17 @@ const materializers = State.SQLite.materializers(events, {
   }) as any,
 
   'v1.MediaBulkRemoved': (event: { readonly mediaIds: readonly string[] }) => {
-    return event.mediaIds.map((id: string) =>
-      tables.media.delete().where('id', '=', id)
-    )
+    return event.mediaIds.flatMap((id: string) => [
+      tables.mediaGenres.delete().where('mediaId', '=', id),
+      tables.media.delete().where('id', '=', id),
+    ])
   },
 
   'v1.MediaRemoved': ({ id }: { id: string }) => {
-    return tables.media.delete().where('id', '=', id)
+    return [
+      tables.mediaGenres.delete().where('mediaId', '=', id),
+      tables.media.delete().where('id', '=', id),
+    ]
   },
 
   // Playlist materializers
