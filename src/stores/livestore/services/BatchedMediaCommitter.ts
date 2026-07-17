@@ -36,22 +36,30 @@ function toEventPayload(item: NormalizedMedia) {
 }
 
 /**
+ * Options for add/flush that control when reactive refresh occurs.
+ * When `skipRefresh` is true, the caller owns refresh via `refresh()`.
+ */
+export type FlushOptions = { readonly skipRefresh?: boolean }
+
+/**
  * BatchedMediaCommitter - Throttled commit service for LiveStore
  *
  * Batches multiple provider results into fewer commits to reduce UI refreshes.
- * All chunks except the last use skipRefresh; the last chunk commits normally
- * so LiveStore's natural reactivity handles the refresh incrementally.
+ * All chunks use skipRefresh; callers invoke `refresh()` for the reactive cascade.
  *
- * Performance improvement:
- * - Before: 5 providers = 5 commits = 5 UI refreshes
- * - After: 5 providers within 100ms = 1 commit = 1 UI refresh
- *
- * @example
+ * Deferred mode (caller owns refresh):
  * ```ts
  * batchedMediaCommitter.setStore(liveStore)
- * await batchedMediaCommitter.add(providerAResults)
- * await batchedMediaCommitter.add(providerBResults)
- * // Both batched into single commit after 100ms
+ * await batchedMediaCommitter.add(page.media, { skipRefresh: true })
+ * await batchedMediaCommitter.flush({ skipRefresh: true })
+ * // ... more pages ...
+ * await batchedMediaCommitter.refresh('SyncSaga')
+ * ```
+ *
+ * Default mode (backward-compatible, refresh on flush):
+ * ```ts
+ * await batchedMediaCommitter.add(results)
+ * await batchedMediaCommitter.flush()
  * ```
  */
 
@@ -60,6 +68,7 @@ class BatchedMediaCommitter {
   private flushTimeout: number | null = null
   private store: Store | null = null
   private isCommitting = false
+  private refreshPending = false
 
   // Configurable thresholds
   private readonly THROTTLE_MS = 100      // Batch window in milliseconds
@@ -73,31 +82,27 @@ class BatchedMediaCommitter {
   }
 
   /**
-   * Add media items to the pending batch
-   * Items will be committed after THROTTLE_MS of inactivity or when MAX_BATCH_SIZE is reached
+   * Add media items to the pending batch.
+   * Items are committed immediately (in chunks) when MAX_BATCH_SIZE is reached,
+   * or after THROTTLE_MS of inactivity. Options propagate to forced and debounced flushes.
    */
-  async add(mediaItems: NormalizedMedia[]): Promise<void> {
+  async add(mediaItems: NormalizedMedia[], options?: FlushOptions): Promise<void> {
     if (!mediaItems || mediaItems.length === 0) return
+
+    const skipRefresh = options?.skipRefresh ?? false
 
     let i = 0
     while (i < mediaItems.length) {
       const room = this.MAX_BATCH_SIZE - this.pendingMedia.length
       if (room > 0) {
         const take = Math.min(room, mediaItems.length - i)
-        // slice to avoid push(...) stack-overflow on huge arrays
         for (let k = 0; k < take; k++) this.pendingMedia.push(mediaItems[i + k])
         i += take
       }
       if (this.pendingMedia.length < this.MAX_BATCH_SIZE) break
 
       const before = this.pendingMedia.length
-      await this.flush()
-      // No-progress guard: if flush() couldn't drain (re-queued on error, or
-      // returned early because another flush was already in-flight), don't
-      // spin and don't silently drop the rest of the input. Throw so the
-      // caller (the sync saga) sees the failure and can decide policy. The
-      // trailing debounce setTimeout below is intentionally NOT scheduled in
-      // this path: there is nothing useful for it to do.
+      await this.flush({ skipRefresh })
       if (this.pendingMedia.length >= before && i < mediaItems.length) {
         throw new Error(
           `BatchedMediaCommitter.add: flush() did not drain ${this.pendingMedia.length} items; ` +
@@ -106,8 +111,11 @@ class BatchedMediaCommitter {
       }
     }
 
-    if (this.flushTimeout) clearTimeout(this.flushTimeout)
-    this.flushTimeout = window.setTimeout(() => { this.flush() }, this.THROTTLE_MS)
+    // Deferred mode: caller controls flush timing, no debounce needed.
+    if (!skipRefresh) {
+      clearTimeout(this.flushTimeout as number | undefined)
+      this.flushTimeout = window.setTimeout(() => { this.flush() }, this.THROTTLE_MS)
+    }
   }
 
   // Chunk size for processing - smaller chunks = less main thread blocking
@@ -148,11 +156,13 @@ class BatchedMediaCommitter {
 
 
   /**
-   * Immediately flush all pending media to LiveStore
-   * Uses skipRefresh for the commit, then calls manualRefresh() once
-   * Processes in chunks to avoid blocking main thread
+   * Immediately flush all pending media to LiveStore.
+   * When `skipRefresh` is true, sets refreshPending without calling manualRefresh.
+   * Default (no options) calls `refresh()` at the end.
    */
-  async flush(): Promise<void> {
+  async flush(options?: FlushOptions): Promise<void> {
+    const skipRefresh = options?.skipRefresh ?? false
+
     // Clear timeout if called manually
     if (this.flushTimeout) {
       clearTimeout(this.flushTimeout)
@@ -161,6 +171,10 @@ class BatchedMediaCommitter {
 
     // Guard against concurrent flushes or empty batches
     if (this.isCommitting || !this.store || this.pendingMedia.length === 0) {
+      // Deferred path still needs to honour the refresh decision.
+      if (!skipRefresh && this.refreshPending) {
+        await this.refresh('BatchedMediaCommitter.flush')
+      }
       return
     }
 
@@ -171,10 +185,6 @@ class BatchedMediaCommitter {
     profiler.mark(`flush-start (${mediaToCommit.length} items)`)
 
     try {
-      // Query existing IDs to avoid redundant inserts (chunked to keep the
-      // SQL parameter list bounded — SQLite has a SQLITE_MAX_VARIABLE_NUMBER
-      // limit and binding thousands of placeholders in one SELECT can blow
-      // memory on constrained devices).
       profiler.start('query-existing-ids')
       const EXISTENCE_CHUNK = 500
       const existingIds = new Set<string>()
@@ -192,65 +202,72 @@ class BatchedMediaCommitter {
       }
       profiler.end('query-existing-ids')
 
-      // Filter to only new items
       const newMedia = mediaToCommit.filter(m => !existingIds.has(m.media.id))
 
       profiler.mark(`filtered: ${newMedia.length} new of ${mediaToCommit.length}`)
 
       if (newMedia.length === 0) {
         profiler.mark('flush-end (no new items)')
-        return
-      }
+      } else {
+        const totalChunks = Math.ceil(newMedia.length / this.CHUNK_SIZE)
+        let chunkIndex = 0
+        for (let i = 0; i < newMedia.length; i += this.CHUNK_SIZE) {
+          const chunk = newMedia.slice(i, i + this.CHUNK_SIZE)
 
-      // Process ALL chunks with skipRefresh to avoid blocking the main thread.
-      const totalChunks = Math.ceil(newMedia.length / this.CHUNK_SIZE)
-      let chunkIndex = 0
-      for (let i = 0; i < newMedia.length; i += this.CHUNK_SIZE) {
-        const chunk = newMedia.slice(i, i + this.CHUNK_SIZE)
+          profiler.start(`chunk-${chunkIndex}-normalize`)
+          const normalizedChunk = chunk.map(toEventPayload)
+          profiler.end(`chunk-${chunkIndex}-normalize`)
 
-        profiler.start(`chunk-${chunkIndex}-normalize`)
-        const normalizedChunk = chunk.map(toEventPayload)
-        profiler.end(`chunk-${chunkIndex}-normalize`)
+          profiler.start(`chunk-${chunkIndex}-commit`)
+          await this.store.commit(
+            { skipRefresh: true },
+            mediaEvents.mediaBulkAdded({ media: normalizedChunk }),
+          )
+          profiler.end(`chunk-${chunkIndex}-commit`)
 
-        profiler.start(`chunk-${chunkIndex}-commit`)
-        await this.store.commit(
-          { skipRefresh: true },
-          mediaEvents.mediaBulkAdded({ media: normalizedChunk })
-        )
-        profiler.end(`chunk-${chunkIndex}-commit`)
+          if (chunkIndex < totalChunks - 1) {
+            profiler.start(`chunk-${chunkIndex}-yield`)
+            await this.yieldToMain()
+            profiler.end(`chunk-${chunkIndex}-yield`)
+          }
 
-        // Yield to main thread between chunks to allow UI updates
-        if (chunkIndex < totalChunks - 1) {
-          profiler.start(`chunk-${chunkIndex}-yield`)
-          await this.yieldToMain()
-          profiler.end(`chunk-${chunkIndex}-yield`)
+          chunkIndex++
         }
 
-        chunkIndex++
+        // Successful non-empty commit sets refreshPending so refresh() has work to do.
+        this.refreshPending = true
+
+        profiler.mark('flush-end')
+        profiler.report()
       }
-
-      // Trigger reactive refresh only when the browser is idle.
-      // This prevents the expensive O(N) query re-execution from blocking
-      // scroll/animations when the collection is open with thousands of items.
-      //
-      // manualRefresh is a LiveStore client-side API: it re-runs subscribed
-      // queries without appending a no-op event to the log (previous impl
-      // committed mediaBulkAdded({ media: [] }) just to force this).
-      await this.waitForIdle()
-      profiler.start('final-refresh')
-      this.store.manualRefresh({ label: 'BatchedMediaCommitter.flush' })
-      profiler.end('final-refresh')
-
-      profiler.mark('flush-end')
-      profiler.report()
-
     } catch (error) {
       console.error('[BatchedMediaCommitter] Flush failed:', error)
-      // Re-add failed items to pending for retry
       this.pendingMedia.push(...mediaToCommit)
     } finally {
       this.isCommitting = false
     }
+
+    // Default mode: refresh now. Deferred mode: caller invokes refresh() later.
+    if (!skipRefresh) {
+      await this.refresh('BatchedMediaCommitter.flush')
+    }
+  }
+
+  /**
+   * Trigger reactive refresh of all subscribed queries.
+   * No-op when no store is set or refreshPending is false.
+   * Defers to browser idle time before calling manualRefresh.
+   */
+  async refresh(label: string): Promise<void> {
+    if (!this.store || !this.refreshPending) return
+
+    // Clear immediately so concurrent flushes don't double-refresh.
+    this.refreshPending = false
+
+    await this.waitForIdle()
+    profiler.start('final-refresh')
+    this.store.manualRefresh({ label })
+    profiler.end('final-refresh')
   }
 
   /**
@@ -264,11 +281,12 @@ class BatchedMediaCommitter {
    * Clear all pending items without committing (for testing/reset)
    */
   clear(): void {
-    if (this.flushTimeout) {
-      clearTimeout(this.flushTimeout)
-      this.flushTimeout = null
-    }
+    clearTimeout(this.flushTimeout as number | undefined)
+    this.flushTimeout = null
     this.pendingMedia = []
+    this.refreshPending = false
+    this.isCommitting = false
+    this.store = null
   }
 }
 

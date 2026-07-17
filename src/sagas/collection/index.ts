@@ -94,87 +94,92 @@ export function* syncMediaLibrary(): SagaIterator<void> {
     }
 
     const syncState: SyncState | null = yield call(readSyncState, liveStore);
-    batchedMediaCommitter.setStore(liveStore);
+    batchedMediaCommitter.setStore(liveStore)
 
-    for (const provider of providers) {
-      try {
-        const scanStatus: { scanning: boolean; count: number; lastScan: string } =
-          yield call([provider, provider.getScanStatus!]);
-        if (scanStatus.scanning) {
-          logger.debug(`Server ${provider.providerKey} is scanning, skipping this cycle`);
-          continue;
-        }
-
-        // Cursor-regression guard. Reset cursor + since to null (full re-sync)
-        // when any of these hold:
-        //   - server's lastScan is missing/invalid (no scan ever recorded);
-        //   - server's lastScan is OLDER than the one we persisted (server DB
-        //     swap or restore-from-backup);
-        //   - server's row count dropped (library wipe / partial restore).
-        // Without the explicit lastScan-presence check, an invalid Date would
-        // make the comparison return false and we'd advance with a stale cursor.
-        const serverScanMs = scanStatus.lastScan ? new Date(scanStatus.lastScan).getTime() : NaN;
-        const localScanMs = syncState ? new Date(syncState.lastSyncTimestamp).getTime() : NaN;
-        const regressed =
-          !!syncState &&
-          (!Number.isFinite(serverScanMs) ||
-            !Number.isFinite(localScanMs) ||
-            serverScanMs < localScanMs ||
-            scanStatus.count < syncState.lastKnownCount);
-        const since = regressed ? null : (syncState?.lastSyncTimestamp ?? null);
-        const cursor: number | null = regressed ? null : (syncState?.initialSyncCursor ?? null);
-
-        const stream = provider.streamAlbumsSince!(since, { cursor });
-        let pages = 0;
-        let nextCursor: number | null = cursor;
-        let complete = false;
-
-        for (;;) {
-          const next: IteratorResult<AlbumPage, void> = yield call(() => stream.next());
-          if (next.done) {
-            complete = true;
-            break;
+    try {
+      for (const provider of providers) {
+        try {
+          const scanStatus: { scanning: boolean; count: number; lastScan: string } =
+            yield call([provider, provider.getScanStatus!]);
+          if (scanStatus.scanning) {
+            logger.debug(`Server ${provider.providerKey} is scanning, skipping this cycle`);
+            continue;
           }
-          const page = next.value;
 
-          if (page.media.length > 0) {
-            yield call([batchedMediaCommitter, "add"], page.media);
-            yield call([batchedMediaCommitter, "flush"]);
-          }
-          nextCursor = page.nextCursor;
-          complete = !page.hasMore;
-          pages++;
+          // Cursor-regression guard. Reset cursor + since to null (full re-sync)
+          // when any of these hold:
+          //   - server's lastScan is missing/invalid (no scan ever recorded);
+          //   - server's lastScan is OLDER than the one we persisted (server DB
+          //     swap or restore-from-backup);
+          //   - server's row count dropped (library wipe / partial restore).
+          // Without the explicit lastScan-presence check, an invalid Date would
+          // make the comparison return false and we'd advance with a stale cursor.
+          const serverScanMs = scanStatus.lastScan ? new Date(scanStatus.lastScan).getTime() : NaN;
+          const localScanMs = syncState ? new Date(syncState.lastSyncTimestamp).getTime() : NaN;
+          const regressed =
+            !!syncState &&
+            (!Number.isFinite(serverScanMs) ||
+              !Number.isFinite(localScanMs) ||
+              serverScanMs < localScanMs ||
+              scanStatus.count < syncState.lastKnownCount);
+          const since = regressed ? null : (syncState?.lastSyncTimestamp ?? null);
+          const cursor: number | null = regressed ? null : (syncState?.initialSyncCursor ?? null);
 
-          yield call(updateSyncState, liveStore, {
-            lastSyncTimestamp: scanStatus.lastScan,
-            lastKnownCount: scanStatus.count,
-            initialSyncCursor: nextCursor ?? 0,
-            initialSyncComplete: complete,
-          });
+          const stream = provider.streamAlbumsSince!(since, { cursor });
+          let pages = 0;
+          let nextCursor: number | null = cursor;
+          let complete = false;
 
-          if (complete || pages >= MAX_PAGES_PER_SESSION) break;
-        }
-
-        if (!complete) {
-          // Best-effort cleanup; the provider generator currently has no
-          // finally block, but a future impl might. Swallow cleanup errors
-          // so they don't poison the outer catch.
-          yield call(async () => {
-            try {
-              await stream.return?.();
-            } catch (cleanupError) {
-              logger.error(`stream.return failed for ${provider.providerKey}`, cleanupError);
+          for (;;) {
+            const next: IteratorResult<AlbumPage, void> = yield call(() => stream.next());
+            if (next.done) {
+              complete = true;
+              break;
             }
-          });
-          logger.debug(
-            `Sync paused for ${provider.providerKey} at cursor ${nextCursor} (page cap reached)`,
-          );
-        } else {
-          logger.debug(`Sync complete for ${provider.providerKey}`);
+            const page = next.value;
+
+            if (page.media.length > 0) {
+              yield call([batchedMediaCommitter, "add"], page.media, { skipRefresh: true });
+              yield call([batchedMediaCommitter, "flush"], { skipRefresh: true });
+            }
+            nextCursor = page.nextCursor;
+            complete = !page.hasMore;
+            pages++;
+
+            yield call(updateSyncState, liveStore, {
+              lastSyncTimestamp: scanStatus.lastScan,
+              lastKnownCount: scanStatus.count,
+              initialSyncCursor: nextCursor ?? 0,
+              initialSyncComplete: complete,
+            });
+
+            if (complete || pages >= MAX_PAGES_PER_SESSION) break;
+          }
+
+          if (!complete) {
+            // Best-effort cleanup; the provider generator currently has no
+            // finally block, but a future impl might. Swallow cleanup errors
+            // so they don't poison the outer catch.
+            yield call(async () => {
+              try {
+                await stream.return?.();
+              } catch (cleanupError) {
+                logger.error(`stream.return failed for ${provider.providerKey}`, cleanupError);
+              }
+            });
+            logger.debug(
+              `Sync paused for ${provider.providerKey} at cursor ${nextCursor} (page cap reached)`,
+            );
+          } else {
+            logger.debug(`Sync complete for ${provider.providerKey}`);
+          }
+        } catch (error) {
+          logger.error(`Provider sync failed (${provider.providerKey})`, error);
         }
-      } catch (error) {
-        logger.error(`Provider sync failed (${provider.providerKey})`, error);
       }
+    } finally {
+      // Ensure already-committed media becomes visible even after errors.
+      yield call([batchedMediaCommitter, "refresh"], "SyncSaga.syncMediaLibrary");
     }
   } catch (error) {
     logger.error("syncMediaLibrary failed", error);

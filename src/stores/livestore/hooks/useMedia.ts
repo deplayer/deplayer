@@ -472,7 +472,7 @@ export const useMostPlayed = (limit = 20) => {
  * - Still 10-50x faster than loading full Media objects
  * 
  * **Performance improvements over old implementation:**
- * - ✅ Uses database indexes created in indexes-setup.ts
+ * - ✅ Uses declarative database indexes from LiveStore schema
  * - ✅ IN operator for multi-value filters (instead of single-value only)
  * - ✅ Minimal column selection (5 columns vs ~20)
  * - ✅ Database-level sorting via orderBy()

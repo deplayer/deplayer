@@ -16,7 +16,7 @@ const makeFakeStore = () => ({
 })
 
 describe('BatchedMediaCommitter.add', () => {
-  beforeEach(() => batchedMediaCommitter.clear())
+  beforeEach(() => { vi.restoreAllMocks(); batchedMediaCommitter.clear() })
 
   it('never lets pendingMedia exceed MAX_BATCH_SIZE before flushing', async () => {
     const store = makeFakeStore()
@@ -54,15 +54,12 @@ describe('BatchedMediaCommitter.add', () => {
     ).rejects.toThrow(/did not drain/)
 
     expect(flushSpy.mock.calls.length).toBeLessThanOrEqual(8)
-    // Drained input that made it in is still pending; the unbuffered tail
-    // is surfaced via the thrown error rather than silently dropped.
     expect(batchedMediaCommitter.getPendingCount()).toBeGreaterThan(0)
   })
 })
 
 describe('BatchedMediaCommitter.flush', () => {
-  beforeEach(() => batchedMediaCommitter.clear())
-
+  beforeEach(() => { vi.restoreAllMocks(); batchedMediaCommitter.clear() })
   it('does not duplicate the buffer (swap, not spread)', async () => {
     const store = makeFakeStore()
     // @ts-expect-error test seam
@@ -73,8 +70,6 @@ describe('BatchedMediaCommitter.flush', () => {
     expect(before).toBeGreaterThan(0)
     const p = batchedMediaCommitter.flush()
     // After flush() starts, pendingMedia should be empty synchronously
-    // (the swap happens before any await). If we spread, pendingMedia would
-    // still contain the original 100 entries here.
     expect(batchedMediaCommitter.getPendingCount()).toBe(0)
     await p
   })
@@ -84,8 +79,6 @@ describe('BatchedMediaCommitter.flush', () => {
     // @ts-expect-error test seam
     batchedMediaCommitter.setStore(store)
 
-    // Bypass add() bounds: write directly to the internal buffer so we can
-    // exercise the flush()-side chunking with a >500 buffer.
     for (let i = 0; i < 3; i++) {
       // @ts-expect-error test seam: directly push to private buffer
       batchedMediaCommitter.pendingMedia.push(...makeMedia(400))
@@ -102,5 +95,100 @@ describe('BatchedMediaCommitter.flush', () => {
       const placeholders = (q.match(/\?/g) || []).length
       expect(placeholders).toBeLessThanOrEqual(500)
     }
+  })
+})
+
+describe('BatchedMediaCommitter deferred refresh', () => {
+  beforeEach(() => { vi.restoreAllMocks(); batchedMediaCommitter.clear() })
+
+  it('default flush() calls manualRefresh once', async () => {
+    const store = makeFakeStore()
+    // @ts-expect-error test seam
+    batchedMediaCommitter.setStore(store)
+
+    await batchedMediaCommitter.add(makeMedia(100))
+    await batchedMediaCommitter.flush()
+
+    expect(store.manualRefresh).toHaveBeenCalledTimes(1)
+  })
+
+  it('flush({ skipRefresh: true }) never calls manualRefresh', async () => {
+    const store = makeFakeStore()
+    // @ts-expect-error test seam
+    batchedMediaCommitter.setStore(store)
+
+    await batchedMediaCommitter.add(makeMedia(100), { skipRefresh: true })
+    await batchedMediaCommitter.flush({ skipRefresh: true })
+
+    expect(store.manualRefresh).not.toHaveBeenCalled()
+  })
+
+  it('1200 deferred items produce exactly one refresh via explicit refresh()', async () => {
+    const store = makeFakeStore()
+    // @ts-expect-error test seam
+    batchedMediaCommitter.setStore(store)
+
+    // Three batches of 400 each, all deferred.
+    await batchedMediaCommitter.add(makeMedia(400), { skipRefresh: true })
+    await batchedMediaCommitter.flush({ skipRefresh: true })
+
+    await batchedMediaCommitter.add(makeMedia(400), { skipRefresh: true })
+    await batchedMediaCommitter.flush({ skipRefresh: true })
+
+    await batchedMediaCommitter.add(makeMedia(400), { skipRefresh: true })
+    await batchedMediaCommitter.flush({ skipRefresh: true })
+
+    // No refresh calls during deferred path.
+    expect(store.manualRefresh).not.toHaveBeenCalled()
+
+    // One explicit refresh.
+    await batchedMediaCommitter.refresh('test-1200')
+
+    expect(store.manualRefresh).toHaveBeenCalledTimes(1)
+    expect(store.manualRefresh).toHaveBeenCalledWith({ label: 'test-1200' })
+  })
+
+  it('second refresh() with no new deferred commits is a no-op', async () => {
+    const store = makeFakeStore()
+    // @ts-expect-error test seam
+    batchedMediaCommitter.setStore(store)
+
+    await batchedMediaCommitter.add(makeMedia(10), { skipRefresh: true })
+    await batchedMediaCommitter.flush({ skipRefresh: true })
+
+    await batchedMediaCommitter.refresh('first')
+    expect(store.manualRefresh).toHaveBeenCalledTimes(1)
+
+    // No new commits — second refresh should not call manualRefresh again.
+    await batchedMediaCommitter.refresh('second-noop')
+    expect(store.manualRefresh).toHaveBeenCalledTimes(1)
+  })
+
+  it('empty flush does not set refreshPending', async () => {
+    const store = makeFakeStore()
+    // @ts-expect-error test seam
+    batchedMediaCommitter.setStore(store)
+
+    // Flush with no items added — should not trigger a refresh.
+    await batchedMediaCommitter.flush({ skipRefresh: true })
+    await batchedMediaCommitter.refresh('empty')
+
+    expect(store.manualRefresh).not.toHaveBeenCalled()
+  })
+
+  it('add with deferred options forces intermediate flushes to use skipRefresh too', async () => {
+    const store = makeFakeStore()
+    // @ts-expect-error test seam
+    batchedMediaCommitter.setStore(store)
+
+    // Add more than MAX_BATCH_SIZE in one call to force intermediate flushes.
+    // The forced flushes should also be deferred.
+    await batchedMediaCommitter.add(makeMedia(800), { skipRefresh: true })
+
+    expect(store.manualRefresh).not.toHaveBeenCalled()
+
+    // Final explicit refresh.
+    await batchedMediaCommitter.refresh('large-batch')
+    expect(store.manualRefresh).toHaveBeenCalledTimes(1)
   })
 })

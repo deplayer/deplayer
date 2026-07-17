@@ -1,9 +1,10 @@
 // ============================================================================
 // SCHEMA VERSION HISTORY
 // ============================================================================
+// v0.5  (2026-07-17) Moved performance-critical indexes to declarative table
+//         definitions. Removed boot-time index/backfill setup.
 // v0.4  (2026-07-13) Added media_genres indexed read model table.
 //         - Maintained by media materializers (normalizeGenreRows helper).
-//         - Backfilled at boot from media.genres JSON array via setupIndexes.
 //         - Replaces unbounded genre-to-track-ID map allocations in useGenres
 //           and useCollectionData that caused V8 OOM during provider sync.
 // v0.3  Added playback_history table (decoupled from media to avoid reactive cascade).
@@ -100,6 +101,11 @@ export const tables = {
       createdAt: State.SQLite.integer({}),
       updatedAt: State.SQLite.integer({}),
     },
+    indexes: [
+      { name: 'idx_albums_artistId', columns: ['artistId'] },
+      { name: 'idx_albums_name', columns: ['name'] },
+      { name: 'idx_albums_year', columns: ['year'] },
+    ],
   }),
 
   // Media table (tracks)
@@ -129,6 +135,19 @@ export const tables = {
       createdAt: State.SQLite.integer({}),
       updatedAt: State.SQLite.integer({}),
     },
+    indexes: [
+      { name: 'idx_media_artistId', columns: ['artistId'] },
+      { name: 'idx_media_albumId', columns: ['albumId'] },
+      { name: 'idx_media_type', columns: ['type'] },
+      { name: 'idx_media_playCount', columns: ['playCount'] },
+      { name: 'idx_media_createdAt', columns: ['createdAt'] },
+      { name: 'idx_media_genresFlat', columns: ['genresFlat'] },
+      { name: 'idx_media_providersFlat', columns: ['providersFlat'] },
+      { name: 'idx_media_artistName', columns: ['artistName'] },
+      { name: 'idx_media_title', columns: ['title'] },
+      { name: 'idx_media_artist_album', columns: ['artistId', 'albumId'] },
+      { name: 'idx_media_artist_type', columns: ['artistId', 'type'] },
+    ],
   }),
   // Media-genre join table (indexed read model for genre queries)
   mediaGenres: State.SQLite.table({
@@ -197,6 +216,9 @@ export const tables = {
       mediaId: State.SQLite.text({}),
       createdAt: State.SQLite.integer({}),
     },
+    indexes: [
+      { name: 'idx_favorites_mediaId', columns: ['mediaId'] },
+    ],
   }),
 
   // Lyrics table
@@ -210,6 +232,9 @@ export const tables = {
       createdAt: State.SQLite.integer({}),
       updatedAt: State.SQLite.integer({}),
     },
+    indexes: [
+      { name: 'idx_lyrics_mediaId', columns: ['mediaId'] },
+    ],
   }),
 
   // Smart Playlists table
@@ -221,6 +246,9 @@ export const tables = {
       filters: State.SQLite.json({}), // { genres: [], types: [], artists: [], providers: [] }
       createdAt: State.SQLite.integer({}),
     },
+    indexes: [
+      { name: 'idx_smartPlaylists_name', columns: ['name'] },
+    ],
   }),
 
   // Playback history table (decoupled from media table to avoid reactive cascade)
@@ -423,7 +451,6 @@ const materializers = State.SQLite.materializers(events, {
       .insert({ id: rowId, mediaId: id, playedAt: now })
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   'v1.MediaBulkAdded': ((event: { readonly media: readonly { readonly id: string; readonly title: string; readonly artist: { readonly id: string; readonly name: string }; readonly album: { readonly id: string; readonly name: string; readonly artistId: string; readonly thumbnailUrl?: string; readonly year?: number }; readonly type: string; readonly duration?: number; readonly track?: number; readonly discNumber?: number; readonly stream: unknown; readonly cover?: unknown; readonly genres: readonly string[]; readonly externalId?: string; readonly shareUrl?: string; readonly filePath?: string }[] }) => {
     const now = Date.now()
     const operations: unknown[] = []

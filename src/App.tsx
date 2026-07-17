@@ -12,8 +12,6 @@ import { store, history } from './store/configureStore'
 import { StoreRegistry, StoreRegistryProvider } from '@livestore/react'
 import { useAppStore } from './stores/livestore/store'
 import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck'
-import { setupFts5 } from './stores/livestore/fts5-setup'
-import { setupIndexes } from './stores/livestore/indexes-setup'
 import { ThemeProvider } from './contexts'
 
 
@@ -80,33 +78,6 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
     store.dispatch({ type: 'INITIALIZE' })
   }
 
-  // Initialize FTS5 full-text search and database indexes on mount
-  // OPTIMIZED: Defer to idle time to avoid blocking first paint
-  React.useEffect(() => {
-    if (!(liveStore as unknown as { sqliteDbWrapper?: unknown })?.sqliteDbWrapper) return
-    
-    const setupDatabase = () => {
-      try {
-        // Setup FTS5 (currently disabled due to wa-sqlite limitations)
-        setupFts5(liveStore)
-        
-        // Setup database indexes for performance
-        setupIndexes(liveStore)
-      } catch (error) {
-        console.error('[App] Failed to setup database:', error)
-      }
-    }
-    
-    // Use requestIdleCallback to defer index creation until browser is idle
-    // Falls back to setTimeout for browsers that don't support it
-    if ('requestIdleCallback' in window) {
-      const idleId = requestIdleCallback(setupDatabase, { timeout: 2000 })
-      return () => cancelIdleCallback(idleId)
-    } else {
-      const timeoutId = setTimeout(setupDatabase, 100)
-      return () => clearTimeout(timeoutId)
-    }
-  }, [liveStore])
 
   return (
     <>
