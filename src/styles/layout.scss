@@ -136,13 +136,16 @@
 // Responsive constraints
 @media (max-width: 767px) {
   .visualizer-panel-container {
-    width: calc(100vw - 16px);
+    // 12px margins both sides (right: 12px default balances calc(100vw - 24px))
+    width: calc(100vw - 24px);
     bottom: calc(104px + env(safe-area-inset-bottom));
   }
 }
 
 @media (max-height: 500px) {
   .visualizer-panel-container {
+    // Keep 16:9 within the reduced max-height so the canvas doesn't distort
+    width: min(calc(100vw - 24px), calc((100vh - 96px) * 16 / 9));
     max-height: calc(100vh - 80px);
     bottom: calc(60px + env(safe-area-inset-bottom));
   }

@@ -11,6 +11,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import RightPanelContainer from './RightPanelContainer'
 import ButterchurnVisualizer from '../components/ButterchurnVisualizer'
 import VisualizerPanel from '../components/Player/VisualizerPanel'
+import { panelContainerStyleFromPosition } from '../components/Player/panelPosition'
 import PlayerRefService from '../services/PlayerRefService'
 import { useUIStore } from '../stores/uiStore'
 import { CSSTransition } from 'react-transition-group'
@@ -27,6 +28,7 @@ const Layout = ({ children }: LayoutProps) => {
   const setVisualsMode = useUIStore((s) => s.setVisualsMode)
   const panelPositionRight = useUIStore((s) => s.panelPositionRight)
   const panelPositionBottom = useUIStore((s) => s.panelPositionBottom)
+  const panelPositionTop = useUIStore((s) => s.panelPositionTop)
   const setPanelPosition = useUIStore((s) => s.setPanelPosition)
   const fullscreen = useSelector((state: State) => state.player.fullscreen)
   // RTG 4.4.5 calls ReactDOM.findDOMNode unless nodeRef is provided; React 19
@@ -43,18 +45,11 @@ const Layout = ({ children }: LayoutProps) => {
 
   const internalPlayer = getInternalPlayer()
 
-  // Panel position: number = right-anchored, null = left-anchored (12px)
-  const panelContainerStyle: React.CSSProperties = {}
-  if (panelPositionRight !== null) {
-    panelContainerStyle.right = `${panelPositionRight}px`
-    panelContainerStyle.left = 'auto'
-  } else {
-    panelContainerStyle.left = '12px'
-    panelContainerStyle.right = 'auto'
-  }
-  if (panelPositionBottom !== 0) {
-    panelContainerStyle.bottom = `${panelPositionBottom}px`
-  }
+  const panelContainerStyle = panelContainerStyleFromPosition(
+    panelPositionRight,
+    panelPositionBottom,
+    panelPositionTop
+  )
 
   const background = backgroundImage && (
     <>
@@ -106,7 +101,7 @@ const Layout = ({ children }: LayoutProps) => {
                 playerRef={internalPlayer}
                 pixelRatio={0.75}
                 onClose={() => setVisualsMode('off')}
-                onPositionChange={(right, bottom) => setPanelPosition(right, bottom)}
+                onPositionChange={(right, bottom, top) => setPanelPosition(right, bottom, top)}
               />
             </div>
           </CSSTransition>

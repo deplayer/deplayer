@@ -7,13 +7,20 @@ import { Translate } from 'react-redux-i18n'
 import AudioContextService from '../../services/AudioContextService'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
+import {
+  MOBILE_MAX_WIDTH,
+  clampPanelPosition,
+  nextSnappedPosition,
+  panelContainerStyleFromPosition,
+  type PanelPosition,
+} from './panelPosition'
 
 type Props = {
   playerRef: HTMLAudioElement
   className?: string
   pixelRatio?: number
   onClose: () => void
-  onPositionChange?: (right: number | null, bottom: number) => void
+  onPositionChange?: (right: number | null, bottom: number, top: number | null) => void
 }
 const PANEL_WIDTH = 720
 const PANEL_HEIGHT = 405
@@ -21,10 +28,6 @@ const PANEL_HEIGHT = 405
 type PanelState = {
   isPresented: boolean
   isCssPresentation: boolean
-  canvasWidth: number
-  canvasHeight: number
-  positionRight: number | null // null = left-anchored (left: 12px); number = right offset
-  positionBottom: number // bottom offset from viewport edge
 }
 
 class VisualizerPanel extends React.Component<Props, PanelState> {
@@ -46,8 +49,6 @@ class VisualizerPanel extends React.Component<Props, PanelState> {
   dragStartY: number = 0
   dragging: boolean = false
   dragMoved: boolean = false
-  pointerMoveHandler: ((e: PointerEvent) => void) | null = null
-  pointerUpHandler: ((e: PointerEvent) => void) | null = null
 
   constructor(props: Props) {
     super(props)
@@ -55,10 +56,6 @@ class VisualizerPanel extends React.Component<Props, PanelState> {
     this.state = {
       isPresented: false,
       isCssPresentation: false,
-      canvasWidth: PANEL_WIDTH,
-      canvasHeight: PANEL_HEIGHT,
-      positionRight: 12, // matches CSS default (right: 12px)
-      positionBottom: 0,
     }
   }
 
@@ -87,15 +84,13 @@ class VisualizerPanel extends React.Component<Props, PanelState> {
         for (const entry of entries) {
           const { width, height } = entry.contentRect
           if (width > 0 && height > 0) {
-            this.setState({ canvasWidth: width, canvasHeight: height }, () => {
-              if (this.canvas) {
-                this.canvas.width = width
-                this.canvas.height = height
-              }
-              if (this.visualizer) {
-                this.visualizer.setRendererSize(width, height)
-              }
-            })
+            if (this.canvas) {
+              this.canvas.width = width
+              this.canvas.height = height
+            }
+            if (this.visualizer) {
+              this.visualizer.setRendererSize(width, height)
+            }
           }
         }
       })
@@ -180,6 +175,8 @@ class VisualizerPanel extends React.Component<Props, PanelState> {
     const btn = (e.target as HTMLElement).closest('button')
     if (btn) return
 
+    // Capturing keeps move/up/cancel retargeted to the header for the whole
+    // gesture; the React handlers below receive them.
     e.currentTarget.setPointerCapture(e.pointerId)
 
     this.dragStartX = e.clientX
@@ -189,30 +186,9 @@ class VisualizerPanel extends React.Component<Props, PanelState> {
 
     // Visual cursor feedback via direct DOM class toggle (no React re-render)
     this.windowRef.current?.classList.add('is-dragging')
-
-    const rect = this.windowRef.current?.getBoundingClientRect()
-    if (rect) {
-      const currentRight = window.innerWidth - rect.right
-      const currentBottom = window.innerHeight - rect.bottom
-
-      this.setState({
-        positionRight: currentRight,
-        positionBottom: currentBottom,
-      })
-    }
-
-    // Bind pointer move/up listeners to header (pointer capture keeps events here)
-    this.pointerMoveHandler = this.handlePointerMove.bind(this)
-    this.pointerUpHandler = this.handlePointerUp.bind(this)
-
-    const el = e.currentTarget
-    // 'pointermove'/'pointerup' are not in ElementEventMap; the native events
-    // delivered here are PointerEvents, matching the handler signatures.
-    el.addEventListener('pointermove', this.pointerMoveHandler as EventListener)
-    el.addEventListener('pointerup', this.pointerUpHandler as EventListener)
   }
 
-  handlePointerMove = (e: PointerEvent) => {
+  handlePointerMove = (e: React.PointerEvent) => {
     if (!this.dragging || !this.windowRef.current) return
 
     const dx = e.clientX - this.dragStartX
@@ -225,18 +201,21 @@ class VisualizerPanel extends React.Component<Props, PanelState> {
     const container = this.windowRef.current.closest('.visualizer-panel-container') as HTMLElement | null
     if (!container) return
 
-    const rect = container.getBoundingClientRect()
-    const newRight = window.innerWidth - rect.right - dx
-    const newBottom = window.innerHeight - rect.bottom - dy
+    const { right, bottom } = clampPanelPosition(
+      container.getBoundingClientRect(),
+      { width: window.innerWidth, height: window.innerHeight },
+      dx,
+      dy,
+      window.innerWidth <= MOBILE_MAX_WIDTH
+    )
 
-    // Clamp within viewport bounds (8px margin)
-    const clampedRight = Math.max(8, Math.min(newRight, window.innerWidth - rect.width - 8))
-    const clampedBottom = Math.max(8, Math.min(newBottom, window.innerHeight - rect.height - 160))
-
-    // Anchor to the right edge while dragging; clear left so a left-anchored panel can move
+    // Anchor to the right edge while dragging; clear left/top so a
+    // left- or top-anchored panel can move. Safe-area insets keep the panel
+    // clear of notches.
     container.style.left = 'auto'
-    container.style.right = `${clampedRight}px`
-    container.style.bottom = `${clampedBottom}px`
+    container.style.top = 'auto'
+    container.style.right = `calc(${right}px + env(safe-area-inset-right))`
+    container.style.bottom = `calc(${bottom}px + env(safe-area-inset-bottom))`
 
     // Reset delta anchor for next frame
     this.dragStartX = e.clientX
@@ -251,26 +230,44 @@ class VisualizerPanel extends React.Component<Props, PanelState> {
     this.dragging = false
     this.windowRef.current?.classList.remove('is-dragging')
 
-    // Clean up pointer listeners
-    const header = this.windowRef.current?.querySelector('.visualizer-panel-header')
-    const { pointerMoveHandler, pointerUpHandler } = this
-    if (header && pointerMoveHandler && pointerUpHandler) {
-      header.removeEventListener('pointermove', pointerMoveHandler as EventListener)
-      header.removeEventListener('pointerup', pointerUpHandler as EventListener)
-    }
-
     // A click without real movement must not reposition the panel
     if (!this.dragMoved || !rect) return
 
-    const rightEdge = window.innerWidth - rect.right
-    const leftEdge = rect.left
+    this.commitPosition(nextSnappedPosition(
+      rect,
+      { width: window.innerWidth, height: window.innerHeight },
+      window.innerWidth <= MOBILE_MAX_WIDTH
+    ))
+  }
 
-    // Snap to nearest horizontal edge: null means "left" (anchored at 12px), value means "right"
-    const snapRight = leftEdge < rightEdge ? null : rightEdge
-    const finalBottom = window.innerHeight - rect.bottom
+  handlePointerCancel = () => {
+    // The browser took over the pointer (gesture interruption, system
+    // back-swipe): drop the drag without committing a position.
+    this.dragging = false
+    this.windowRef.current?.classList.remove('is-dragging')
+  }
 
-    this.setState({ positionRight: snapRight, positionBottom: finalBottom })
-    this.props.onPositionChange?.(snapRight, finalBottom)
+  // Applies the committed anchored styles to the DOM directly (mirroring what
+  // the store-driven render will produce) so no stale drag-time inline styles
+  // survive when React's style diff skips an unchanged property, then commits
+  // to the store. Pointer capture + React handlers keep the DOM mutation and
+  // the store write in the same gesture.
+  commitPosition = (position: PanelPosition) => {
+    this.applyCommittedPosition(position.right, position.bottom, position.top)
+    this.props.onPositionChange?.(position.right, position.bottom, position.top)
+  }
+
+  // Writes the committed anchored styles to the DOM directly (mirroring what
+  // the store-driven render will produce) so no stale drag-time inline styles
+  // survive when React's style diff skips an unchanged property.
+  applyCommittedPosition = (right: number | null, bottom: number, top: number | null) => {
+    const container = this.windowRef.current?.closest('.visualizer-panel-container') as HTMLElement | null
+    if (!container) return
+    const s = panelContainerStyleFromPosition(right, bottom, top)
+    container.style.right = String(s.right ?? '')
+    container.style.left = String(s.left ?? '')
+    container.style.top = String(s.top ?? '')
+    container.style.bottom = String(s.bottom ?? '')
   }
 
   initializeVisualizer = (audioContext: AudioContext) => {
@@ -407,6 +404,9 @@ class VisualizerPanel extends React.Component<Props, PanelState> {
         <div
           className="visualizer-panel-header flex items-center justify-between border-b border-base-300 shrink-0"
           onPointerDown={this.handleHeaderPointerDown}
+          onPointerMove={this.handlePointerMove}
+          onPointerUp={this.handlePointerUp}
+          onPointerCancel={this.handlePointerCancel}
           style={{ touchAction: 'none', userSelect: 'none' }}
         >
           <span className="font-medium text-base-content/80">

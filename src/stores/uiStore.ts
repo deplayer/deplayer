@@ -29,6 +29,7 @@ type UIState = {
   backgroundImage: string
   panelPositionRight: number | null // null = left-anchored; number = right offset from viewport edge
   panelPositionBottom: number
+  panelPositionTop: number | null // null = bottom-anchored (CSS default bottom); number = top offset
 
   // App state
   ready: boolean
@@ -53,7 +54,7 @@ type UIActions = {
   toggleVisuals: () => void
   cycleVisualsMode: () => void
   setVisualsMode: (mode: VisualsMode) => void
-  setPanelPosition: (right: number | null, bottom: number) => void
+  setPanelPosition: (right: number | null, bottom: number, top: number | null) => void
   setBackgroundImage: (url: string) => void
   setReady: (ready: boolean) => void
   setFilter: (filterType: keyof Filter, values: string[] | boolean) => void
@@ -88,6 +89,7 @@ export const useUIStore = create<UIState & UIActions>((set) => ({
   backgroundImage: '',
   panelPositionRight: 12, // matches CSS default (right: 12px); null = left-anchored after drag
   panelPositionBottom: 0, // 0 = neutral, CSS default bottom applies until dragged
+  panelPositionTop: null, // null = bottom-anchored; set on mobile top-snap
   ready: false,
   activeFilters: emptyFilters,
   searchTerm: '',
@@ -114,8 +116,8 @@ export const useUIStore = create<UIState & UIActions>((set) => ({
       return { visualsMode: next }
     }),
   setVisualsMode: (mode) => set({ visualsMode: mode }),
-  setPanelPosition: (right, bottom) =>
-    set({ panelPositionRight: right, panelPositionBottom: bottom }),
+  setPanelPosition: (right, bottom, top) =>
+    set({ panelPositionRight: right, panelPositionBottom: bottom, panelPositionTop: top }),
   setBackgroundImage: (url) => set({ backgroundImage: url }),
   setReady: (ready) => set({ ready }),
   setFilter: (filterType, values) =>

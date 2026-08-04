@@ -52,9 +52,14 @@ class ButterchurnVisualizer extends React.Component<Props> {
     if (audioContext && this.analyser) {
       this.initializeVisualizer(audioContext)
     }
+
+    // Mobile viewport changes (URL bar collapse, orientation) need the canvas
+    // and renderer to track the new size.
+    window.addEventListener('resize', this.handleResize)
   }
 
   componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize)
     if (this.visualizer) {
       this.visualizer = null
     }
@@ -84,6 +89,16 @@ class ButterchurnVisualizer extends React.Component<Props> {
     } catch (err) {
       console.error('Error cycling preset:', err)
     }
+  }
+
+  handleResize = () => {
+    if (!this.canvas) return
+    const w = window.innerWidth
+    const h = window.innerHeight
+    // Track the viewport even before/without a renderer (e.g. WebGL failed)
+    this.canvas.width = w
+    this.canvas.height = h
+    this.visualizer?.setRendererSize(w, h)
   }
 
   initializeVisualizer = (audioContext: AudioContext) => {
@@ -142,10 +157,20 @@ class ButterchurnVisualizer extends React.Component<Props> {
   drawVisuals = () => {
     if (!this.visualizer) return
 
+    // Under prefers-reduced-motion, throttle the ambient render loop to a calm
+    // cadence (~10fps) instead of a full 60fps animation.
+    const reducedMotion = typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const frameSkip = reducedMotion ? 5 : 0
+    let frame = 0
+
     const startRender = () => {
       if (this.visualizer) {
         try {
-          this.visualizer.render()
+          if (frame === 0) {
+            this.visualizer.render()
+          }
+          frame = (frame + 1) % (frameSkip + 1)
           this.animationId = requestAnimationFrame(startRender)
         } catch (err) {
           console.error('Error in visualization render:', err)
