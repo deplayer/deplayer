@@ -25,6 +25,9 @@ const Layout = ({ children }: LayoutProps) => {
   const mqlMatch = useUIStore((s) => s.mqlMatch)
   const visualsMode = useUIStore((s) => s.visualsMode)
   const setVisualsMode = useUIStore((s) => s.setVisualsMode)
+  const panelPositionRight = useUIStore((s) => s.panelPositionRight)
+  const panelPositionBottom = useUIStore((s) => s.panelPositionBottom)
+  const setPanelPosition = useUIStore((s) => s.setPanelPosition)
   const fullscreen = useSelector((state: State) => state.player.fullscreen)
   // RTG 4.4.5 calls ReactDOM.findDOMNode unless nodeRef is provided; React 19
   // removed findDOMNode, so the ref is mandatory here.
@@ -39,6 +42,19 @@ const Layout = ({ children }: LayoutProps) => {
   }
 
   const internalPlayer = getInternalPlayer()
+
+  // Panel position: number = right-anchored, null = left-anchored (12px)
+  const panelContainerStyle: React.CSSProperties = {}
+  if (panelPositionRight !== null) {
+    panelContainerStyle.right = `${panelPositionRight}px`
+    panelContainerStyle.left = 'auto'
+  } else {
+    panelContainerStyle.left = '12px'
+    panelContainerStyle.right = 'auto'
+  }
+  if (panelPositionBottom !== 0) {
+    panelContainerStyle.bottom = `${panelPositionBottom}px`
+  }
 
   const background = backgroundImage && (
     <>
@@ -76,7 +92,7 @@ const Layout = ({ children }: LayoutProps) => {
       )}
 
       {internalPlayer && visualsMode === 'panel' && (
-        <div className='visualizer-panel-container'>
+        <div className='visualizer-panel-container' style={panelContainerStyle}>
           <CSSTransition
             in={true}
             appear={true}
@@ -90,6 +106,7 @@ const Layout = ({ children }: LayoutProps) => {
                 playerRef={internalPlayer}
                 pixelRatio={0.75}
                 onClose={() => setVisualsMode('off')}
+                onPositionChange={(right, bottom) => setPanelPosition(right, bottom)}
               />
             </div>
           </CSSTransition>

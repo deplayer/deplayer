@@ -194,9 +194,9 @@ class ButterchurnVisualizer extends React.Component<Props> {
 
     // Ambient background: subtle atmosphere while keeping content readable
     const canvasStyle: React.CSSProperties = {
-      opacity: 0.4,
+      opacity: 0.5,
       mixBlendMode: 'screen',
-      filter: 'blur(0.5px) saturate(1.1)',
+      filter: 'blur(1px) saturate(1.3) brightness(1.1)',
       pointerEvents: 'none',
     }
 

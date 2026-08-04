@@ -32,9 +32,9 @@ const TogglePlayer = ({ onHide }: { onHide: () => void }) => {
 }
 
 const ContextualMenu = () => {
-  const showVisuals = useUIStore((s) => s.showVisuals)
+  const visualsMode = useUIStore((s) => s.visualsMode)
   const showSpectrum = useUIStore((s) => s.showSpectrum)
-  const toggleVisuals = useUIStore((s) => s.toggleVisuals)
+  const cycleVisualsMode = useUIStore((s) => s.cycleVisualsMode)
   const toggleSpectrum = useUIStore((s) => s.toggleSpectrum)
   const player = useSelector((state: State) => state.player)
   const dispatch = useDispatch()
@@ -140,7 +140,7 @@ const ContextualMenu = () => {
             transparent
             alignLeft
             fullWidth
-            onClick={() => toggleVisuals()}
+            onClick={() => cycleVisualsMode()}
           >
             <div className='flex items-center justify-between w-full gap-2'>
               <div className='flex items-center'>
@@ -150,12 +150,17 @@ const ContextualMenu = () => {
                 />
                 <Translate value='buttons.toggleVisuals' />
               </div>
-              <input
-                type="checkbox"
-                checked={showVisuals}
-                readOnly
-                className="toggle toggle-primary toggle-sm"
-              />
+              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                visualsMode === 'off' ? 'bg-base-300 text-base-content/50' :
+                visualsMode === 'ambient' ? 'bg-primary/20 text-primary' :
+                'bg-accent/20 text-accent'
+              }`}>
+                <Translate value={
+                  visualsMode === 'off' ? 'buttons.visualizerOff' :
+                  visualsMode === 'ambient' ? 'buttons.visualizerAmbient' :
+                  'buttons.visualizerPanel'
+                } />
+              </span>
             </div>
           </Button>
         </Item>

@@ -13,6 +13,7 @@ type Props = {
   className?: string
   pixelRatio?: number
   onClose: () => void
+  onPositionChange?: (right: number | null, bottom: number) => void
 }
 const PANEL_WIDTH = 720
 const PANEL_HEIGHT = 405
@@ -22,6 +23,8 @@ type PanelState = {
   isCssPresentation: boolean
   canvasWidth: number
   canvasHeight: number
+  positionRight: number | null // null = left-anchored (left: 12px); number = right offset
+  positionBottom: number // bottom offset from viewport edge
 }
 
 class VisualizerPanel extends React.Component<Props, PanelState> {
@@ -39,6 +42,12 @@ class VisualizerPanel extends React.Component<Props, PanelState> {
   windowRef = React.createRef<HTMLDivElement>()
   containerRef = React.createRef<HTMLDivElement>()
   resizeObserver: ResizeObserver | null = null
+  dragStartX: number = 0
+  dragStartY: number = 0
+  dragging: boolean = false
+  dragMoved: boolean = false
+  pointerMoveHandler: ((e: PointerEvent) => void) | null = null
+  pointerUpHandler: ((e: PointerEvent) => void) | null = null
 
   constructor(props: Props) {
     super(props)
@@ -48,6 +57,8 @@ class VisualizerPanel extends React.Component<Props, PanelState> {
       isCssPresentation: false,
       canvasWidth: PANEL_WIDTH,
       canvasHeight: PANEL_HEIGHT,
+      positionRight: 12, // matches CSS default (right: 12px)
+      positionBottom: 0,
     }
   }
 
@@ -162,6 +173,104 @@ class VisualizerPanel extends React.Component<Props, PanelState> {
       screenfull.exit()
     }
     this.props.onClose()
+  }
+
+  handleHeaderPointerDown = (e: React.PointerEvent) => {
+    if (e.button !== 0) return
+    const btn = (e.target as HTMLElement).closest('button')
+    if (btn) return
+
+    e.currentTarget.setPointerCapture(e.pointerId)
+
+    this.dragStartX = e.clientX
+    this.dragStartY = e.clientY
+    this.dragging = true
+    this.dragMoved = false
+
+    // Visual cursor feedback via direct DOM class toggle (no React re-render)
+    this.windowRef.current?.classList.add('is-dragging')
+
+    const rect = this.windowRef.current?.getBoundingClientRect()
+    if (rect) {
+      const currentRight = window.innerWidth - rect.right
+      const currentBottom = window.innerHeight - rect.bottom
+
+      this.setState({
+        positionRight: currentRight,
+        positionBottom: currentBottom,
+      })
+    }
+
+    // Bind pointer move/up listeners to header (pointer capture keeps events here)
+    this.pointerMoveHandler = this.handlePointerMove.bind(this)
+    this.pointerUpHandler = this.handlePointerUp.bind(this)
+
+    const el = e.currentTarget
+    // 'pointermove'/'pointerup' are not in ElementEventMap; the native events
+    // delivered here are PointerEvents, matching the handler signatures.
+    el.addEventListener('pointermove', this.pointerMoveHandler as EventListener)
+    el.addEventListener('pointerup', this.pointerUpHandler as EventListener)
+  }
+
+  handlePointerMove = (e: PointerEvent) => {
+    if (!this.dragging || !this.windowRef.current) return
+
+    const dx = e.clientX - this.dragStartX
+    const dy = e.clientY - this.dragStartY
+    if (Math.abs(dx) + Math.abs(dy) > 4) {
+      this.dragMoved = true
+    }
+
+    // The container is the fixed-positioned parent (.visualizer-panel-container)
+    const container = this.windowRef.current.closest('.visualizer-panel-container') as HTMLElement | null
+    if (!container) return
+
+    const rect = container.getBoundingClientRect()
+    const newRight = window.innerWidth - rect.right - dx
+    const newBottom = window.innerHeight - rect.bottom - dy
+
+    // Clamp within viewport bounds (8px margin)
+    const clampedRight = Math.max(8, Math.min(newRight, window.innerWidth - rect.width - 8))
+    const clampedBottom = Math.max(8, Math.min(newBottom, window.innerHeight - rect.height - 160))
+
+    // Anchor to the right edge while dragging; clear left so a left-anchored panel can move
+    container.style.left = 'auto'
+    container.style.right = `${clampedRight}px`
+    container.style.bottom = `${clampedBottom}px`
+
+    // Reset delta anchor for next frame
+    this.dragStartX = e.clientX
+    this.dragStartY = e.clientY
+  }
+
+  handlePointerUp = () => {
+    if (!this.dragging || !this.windowRef.current) return
+    const container = this.windowRef.current.closest('.visualizer-panel-container') as HTMLElement | null
+    const rect = container?.getBoundingClientRect()
+
+    this.dragging = false
+    this.windowRef.current?.classList.remove('is-dragging')
+
+    // Clean up pointer listeners
+    const header = this.windowRef.current?.querySelector('.visualizer-panel-header')
+    const { pointerMoveHandler, pointerUpHandler } = this
+    if (header && pointerMoveHandler && pointerUpHandler) {
+      header.removeEventListener('pointermove', pointerMoveHandler as EventListener)
+      header.removeEventListener('pointerup', pointerUpHandler as EventListener)
+    }
+
+    // A click without real movement must not reposition the panel
+    if (!this.dragMoved || !rect) return
+
+    const rightEdge = window.innerWidth - rect.right
+    const leftEdge = rect.left
+
+    // Snap to nearest horizontal edge: null means "left" (anchored at 12px), value means "right"
+    const snapRight = leftEdge < rightEdge ? null : rightEdge
+    const finalBottom = window.innerHeight - rect.bottom
+
+    this.setState({ positionRight: snapRight, positionBottom: finalBottom })
+    this.props.onPositionChange?.(snapRight, finalBottom)
   }
 
   initializeVisualizer = (audioContext: AudioContext) => {
@@ -295,7 +404,11 @@ class VisualizerPanel extends React.Component<Props, PanelState> {
         ref={this.windowRef}
         className={windowClasses}
       >
-        <div className="visualizer-panel-header flex items-center justify-between border-b border-base-300 shrink-0">
+        <div
+          className="visualizer-panel-header flex items-center justify-between border-b border-base-300 shrink-0"
+          onPointerDown={this.handleHeaderPointerDown}
+          style={{ touchAction: 'none', userSelect: 'none' }}
+        >
           <span className="font-medium text-base-content/80">
             <Translate value="buttons.visualizerTitle" />
           </span>

@@ -87,6 +87,11 @@
 .visualizer-panel-header {
   padding: 2px 8px;
   font-size: 0.75rem;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
 }
 
 .visualizer-panel-canvas-container {
@@ -116,6 +121,16 @@
   max-width: 100vw;
   max-height: 100vh;
   border-radius: 0;
+}
+
+// Dragging state: visual feedback + suppress transitions during drag
+.visualizer-panel-window.is-dragging {
+  cursor: grabbing;
+  transition: none;
+
+  .visualizer-panel-header {
+    cursor: grabbing;
+  }
 }
 
 // Responsive constraints
