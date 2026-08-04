@@ -1,6 +1,7 @@
 import type { Dispatch } from 'redux'
 import type { MediaRow } from '../types/media'
-import { queryDb, Store } from '@livestore/livestore'
+import { queryDb } from '@livestore/livestore'
+import type { LiveStore } from '../stores/livestore/accessor'
 import { tables } from '../stores/livestore/schema'
 import {
   readQueue,
@@ -390,10 +391,6 @@ async function defaultResolveStream(media: MediaRow, providerIndex: number): Pro
 
   return providers[providerIndex]
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type LiveStore = Store<any>
-
-
 /**
  * Create a PlaybackDataPort backed by LiveStore.
  *

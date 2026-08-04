@@ -9,7 +9,7 @@ const refreshSpy = vi.spyOn(batchedMediaCommitter, 'refresh').mockResolvedValue(
 
 const fakeLiveStore = { id: 'test-store' }
 
-vi.mock('../../App', () => ({
+vi.mock('../../stores/livestore/accessor', () => ({
   getLiveStoreInstance: vi.fn(() => fakeLiveStore),
 }))
 

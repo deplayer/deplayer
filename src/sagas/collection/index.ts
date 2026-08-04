@@ -5,7 +5,7 @@ import * as types from "../../constants/ActionTypes";
 import { addToCollectionWatcher, initializeWatcher } from "./watchers";
 import { getSettingsFromLiveStore } from "../selectors";
 import ProvidersService from "../../services/ProvidersService";
-import { getLiveStoreInstance } from "../../App";
+import { getLiveStoreInstance } from "../../stores/livestore/accessor";
 import { batchedMediaCommitter } from "../../stores/livestore/services/BatchedMediaCommitter";
 import { syncEvents } from "../../stores/livestore/events/sync";
 import { createLogger } from "../../utils/logger";

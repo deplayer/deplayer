@@ -4,7 +4,7 @@ import { getSongByIdFromLiveStore, getSettingsFromLiveStore } from './../selecto
 import MusicbrainzProvider from '../../providers/MusicbrainzProvider'
 import LyricsovhProvider from '../../providers/LyricsovhProvider'
 import { createLogger } from '../../utils/logger'
-import { getLiveStoreInstance } from '../../App'
+import { getLiveStoreInstance } from '../../stores/livestore/accessor'
 import { addLyricsAction } from '../../stores/livestore/actions/lyrics'
 import { addMediaBulkAction } from '../../stores/livestore/actions/media'
 import { queryDb } from '@livestore/livestore'

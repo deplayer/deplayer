@@ -10,7 +10,7 @@ import { push } from "redux-first-history";
 import * as types from "../../constants/ActionTypes";
 import ProvidersService from "../../services/ProvidersService";
 import { getSettingsFromLiveStore } from "../selectors";
-import { getLiveStoreInstance } from "../../App";
+import { getLiveStoreInstance } from "../../stores/livestore/accessor";
 import { batchedMediaCommitter } from "../../stores/livestore/services/BatchedMediaCommitter";
 import { NormalizedMedia } from "../../utils/normalizeMedia";
 

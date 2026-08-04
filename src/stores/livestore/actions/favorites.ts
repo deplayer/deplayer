@@ -1,4 +1,5 @@
-import { queryDb, Store } from '@livestore/livestore'
+import { queryDb } from '@livestore/livestore'
+import type { LiveStore } from '../accessor'
 import { events, tables } from '../schema'
 
 /**
@@ -9,9 +10,6 @@ import { events, tables } from '../schema'
  *
  * All actions require a store parameter from useStore() hook.
  */
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type LiveStore = Store<any>
 
 /**
  * Toggle favorite status for a media track

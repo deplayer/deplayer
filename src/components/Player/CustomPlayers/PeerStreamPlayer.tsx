@@ -1,6 +1,6 @@
 import React from 'react'
 import { ReactPlayerProps } from 'react-player'
-import PlayerRefService from '../../../services/PlayerRefService'
+import { PeerStreamSeam } from '../../../services/PeerStreamSeam'
 
 function canPlay(url: string) {
   return typeof url === 'string' && url.startsWith('peer://')
@@ -87,7 +87,7 @@ export default class PeerStreamPlayer extends React.Component<ReactPlayerProps> 
 
   componentDidMount() {
     console.log("PeerStreamPlayer mounted");
-    const stream = PlayerRefService.getInstance().getPeerStream();
+    const stream = PeerStreamSeam.getInstance().getStream();
     console.log("Initial stream:", stream);
     if (this.player && stream) {
       try {
@@ -104,7 +104,7 @@ export default class PeerStreamPlayer extends React.Component<ReactPlayerProps> 
   componentDidUpdate(prevProps: ReactPlayerProps) {
     if (this.props.url !== prevProps.url) {
       console.log("URL changed, updating stream");
-      const stream = PlayerRefService.getInstance().getPeerStream();
+      const stream = PeerStreamSeam.getInstance().getStream();
       console.log("Updated stream:", stream);
       if (this.player && stream) {
         console.log("Setting updated stream to player");

@@ -1,6 +1,6 @@
 import ReactPlayer from "react-player";
+import { PlaybackTransport } from "./PlaybackController";
 import { createLogger } from "../utils/logger";
-import { getLiveStoreInstance } from "../middleware/livestore";
 
 declare global {
   interface HTMLMediaElement {
@@ -11,10 +11,14 @@ declare global {
 
 const logger = createLogger({ namespace: "PlayerRefService" });
 
-class PlayerRefService {
+/**
+ * PlayerRefService handles two concerns:
+ * 1. PlaybackTransport seam — imperative play/pause/stop/toggle for the saga
+ * 2. Capture seam — provides the current media element for WebRTC peer streaming
+ */
+class PlayerRefService implements PlaybackTransport {
   private static instance: PlayerRefService;
   private playerRef: React.RefObject<ReactPlayer | null> | null = null;
-  private peerStream: MediaStream | null = null;
 
   private constructor() {}
 
@@ -33,17 +37,6 @@ class PlayerRefService {
     return this.playerRef;
   }
 
-  getCurrentPlayingId(): string | null {
-    // Get current playing from LiveStore queue
-    const liveStore = getLiveStoreInstance()
-    if (!liveStore) return null
-    
-    const result = liveStore.query({
-      query: `SELECT currentPlaying FROM queue WHERE id = ?`,
-      bindValues: { 1: 'default' }
-    }) as Array<{ currentPlaying?: string }>
-    return result[0]?.currentPlaying || null;
-  }
 
   getCurrentMedia() {
     if (!this.playerRef?.current) return null;
@@ -162,14 +155,6 @@ class PlayerRefService {
         internal.pause();
       }
     }
-  }
-
-  setPeerStream(stream: MediaStream | null) {
-    this.peerStream = stream;
-  }
-
-  getPeerStream(): MediaStream | null {
-    return this.peerStream;
   }
 }
 

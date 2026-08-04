@@ -6,9 +6,11 @@ import { State as CollectionState } from "../reducers/collection";
 import { MediaFileService } from "./MediaFileService";
 import { writeFile } from "@happy-js/happy-opfs";
 import PlayerRefService from "./PlayerRefService";
+import { PeerStreamSeam } from './PeerStreamSeam';
 import { createLogger } from "../utils/logger";
-import { getLiveStoreInstance } from "../App";
+import { getLiveStoreInstance } from "../stores/livestore/accessor";
 import { addMediaBulkAction } from "../stores/livestore/actions/media";
+import { resolveCurrentPlayingSongId } from '../stores/livestore/hooks/queueUtils';
 import { NormalizedMedia } from "../utils/normalizeMedia";
 
 const logger = createLogger({ namespace: "PeerService" });
@@ -240,8 +242,7 @@ export default class PeerService {
 
     try {
       // Get the current playing media from the host's collection
-      const currentPlayingId =
-        PlayerRefService.getInstance().getCurrentPlayingId();
+      const currentPlayingId = resolveCurrentPlayingSongId(getLiveStoreInstance);
 
       if (!currentPlayingId) {
         logger.warn("No media currently playing in host");
@@ -273,10 +274,7 @@ export default class PeerService {
       const onMediaChange = () => {
         logger.info("Media element changed, updating stream");
         if (!mediaElement.captureStream) return;
-
-        // Get the updated current playing media
-        const updatedPlayingId =
-          PlayerRefService.getInstance().getCurrentPlayingId();
+        const updatedPlayingId = resolveCurrentPlayingSongId(getLiveStoreInstance);
 
         if (!updatedPlayingId) {
           logger.warn("No media currently playing in host after change");
@@ -300,8 +298,7 @@ export default class PeerService {
           media: updatedMedia,
         } as unknown as JsonValue);
 
-        // Update the peer's stream reference
-        PlayerRefService.getInstance().setPeerStream(newStream);
+        PeerStreamSeam.getInstance().setStream(newStream);
 
         // Dispatch current playing update with a new URL to trigger component update
         this.dispatchFn({
@@ -415,7 +412,7 @@ export default class PeerService {
       logger.info("Received peer stream with metadata", metadata);
 
       // Update the peer stream reference
-      PlayerRefService.getInstance().setPeerStream(stream);
+      PeerStreamSeam.getInstance().setStream(stream);
 
       const media = (metadata as { media?: MediaRow & { createdAt?: unknown; updatedAt?: unknown } })?.media;
       if (!media) return;

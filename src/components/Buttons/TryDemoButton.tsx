@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import Button from '../common/Button'
 import * as types from '../../constants/ActionTypes'
 import { useMediaCount } from '../../stores/livestore/hooks'
-import { getLiveStoreInstance } from '../../App'
+import { getLiveStoreInstance } from '../../stores/livestore/accessor'
 import { addMediaBulkAction } from '../../stores/livestore/actions/media'
 import { normalizeMedia } from '../../utils/normalizeMedia'
 

@@ -13,7 +13,7 @@ import {
 import { getStreamUri } from '../../services/Song/StreamUriService'
 import * as routes from '../../routes'
 import * as types from '../../constants/ActionTypes'
-import { getLiveStoreInstance } from '../../middleware/livestore'
+import { getLiveStoreInstance } from '../../stores/livestore/accessor'
 import { useUIStore } from '../../stores/uiStore'
 import {
   PlaybackController,
@@ -178,12 +178,7 @@ function* playerSaga(store: Store): Generator<any, void, any> {
   // Construct the controller with production dependencies
   controller = new PlaybackController({
     data: createLiveStorePlaybackDataPort(getLiveStoreInstance),
-    transport: {
-      stop: () => PlayerRefService.getInstance().stop(),
-      play: async () => { await PlayerRefService.getInstance().play() },
-      pause: () => PlayerRefService.getInstance().pause(),
-      toggle: () => PlayerRefService.getInstance().toggle(),
-    },
+    transport: PlayerRefService.getInstance(),
     dispatch: store.dispatch as Dispatch,
     setBackgroundImage: (url: string) => useUIStore.getState().setBackgroundImage(url),
     resolveStream: getStreamUri,

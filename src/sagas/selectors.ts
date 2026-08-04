@@ -1,7 +1,7 @@
 import { call } from 'redux-saga/effects'
 import { queryDb } from '@livestore/livestore'
 import { rawToMediaRow } from '../stores/livestore/transformMedia'
-import { getLiveStoreInstance } from '../App'
+import { getLiveStoreInstance } from '../stores/livestore/accessor'
 import { tables } from '../stores/livestore/schema'
 import type { State } from '../reducers'
 import type { MediaRow } from '../types/media'

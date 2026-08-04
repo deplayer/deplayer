@@ -1,4 +1,4 @@
-import { Store } from '@livestore/livestore'
+import type { LiveStore } from '../accessor'
 import { mediaEvents } from '../events/media'
 import { NormalizedMedia } from '../../../utils/normalizeMedia'
 
@@ -38,7 +38,7 @@ function toEventPayload(item: NormalizedMedia) {
  * Add a single media item to the collection
  */
 export async function addMediaAction(
-  store: Store,
+  store: LiveStore,
   media: NormalizedMedia
 ): Promise<void> {
   const payload = toEventPayload(media)
@@ -54,7 +54,7 @@ export async function addMediaAction(
  * - Performance: 11s → 1-2s (first load), 11s → 50ms (subsequent loads)
  */
 export async function addMediaBulkAction(
-  store: Store,
+  store: LiveStore,
   mediaItems: NormalizedMedia[]
 ): Promise<void> {
   if (mediaItems.length === 0) {
@@ -91,7 +91,7 @@ export async function addMediaBulkAction(
  * Update an existing media item
  */
 export async function updateMediaAction(
-  store: Store,
+  store: LiveStore,
   mediaId: string,
   updates: Record<string, unknown>
 ): Promise<void> {
@@ -105,7 +105,7 @@ export async function updateMediaAction(
  * Remove media from collection
  */
 export async function removeMediaAction(
-  store: Store,
+  store: LiveStore,
   mediaId: string
 ): Promise<void> {
   await store.commit(mediaEvents.mediaRemoved({ id: mediaId }))
@@ -115,7 +115,7 @@ export async function removeMediaAction(
  * Remove multiple media items from collection
  */
 export async function removeMediaBulkAction(
-  store: Store,
+  store: LiveStore,
   mediaIds: string[]
 ): Promise<void> {
   await store.commit(mediaEvents.mediaBulkRemoved({ mediaIds }))
@@ -126,7 +126,7 @@ export async function removeMediaBulkAction(
  * Note: This requires querying all media IDs first
  */
 export async function clearCollectionAction(
-  _store: Store
+  _store: LiveStore
 ): Promise<void> {
   // We'll need to get all media IDs and remove them
   // This assumes you have access to the store's query capabilities
@@ -138,7 +138,7 @@ export async function clearCollectionAction(
  * Track that a song was played (increment play count)
  */
 export async function trackMediaPlayedAction(
-  store: Store,
+  store: LiveStore,
   mediaId: string
 ): Promise<void> {
   await store.commit(mediaEvents.mediaPlayed({ id: mediaId }))

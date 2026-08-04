@@ -33,16 +33,7 @@ import Wiki from './components/Wiki'
 import GlobalKeyHandlers from './components/GlobalKeyHandlers'
 import JoinRoom from './pages/JoinRoom';
 import { useLanguage } from './hooks/useLanguage'
-import { setLiveStoreInstance } from './middleware/livestore'
-import { Store } from '@livestore/livestore'
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type LiveStore = Store<any, any>
-
-
-// Export LiveStore instance for use in sagas
-let liveStoreInstance: LiveStore | null = null
-
-export const getLiveStoreInstance = () => liveStoreInstance
+import { setLiveStoreInstance } from './stores/livestore/accessor'
 
 interface SongProps {
   playerPortal: portals.HtmlPortalNode
@@ -66,7 +57,6 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
   // Set LiveStore instance for middleware (once on mount)
   if (liveStore) {
     setLiveStoreInstance(liveStore)
-    liveStoreInstance = liveStore  // Also store for saga access
     if (typeof window !== 'undefined' && (import.meta.env.DEV || import.meta.env.MODE === 'test')) {
       // Exposed for Playwright e2e + devtools. Dev/test only.
       (window as Window & { __liveStore?: typeof liveStore }).__liveStore = liveStore

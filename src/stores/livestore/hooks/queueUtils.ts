@@ -4,6 +4,7 @@
  * Extracted from hooks so the critical index→trackId logic
  * is testable without React or LiveStore.
  */
+import type { LiveStore } from '../accessor'
 
 export interface QueueState {
   trackIds: readonly string[] | string
@@ -90,4 +91,37 @@ export function resolveQueueNavigation(queue: QueueState | null | undefined): {
   }
 
   return { nextSongId, prevSongId }
+}
+
+/**
+ * Resolve the current playing song ID by querying the queue table directly.
+ * Uses resolveCurrentSongId on the fetched row so the same resolution logic
+ * (currentTrackId authority, shuffle fallback) applies everywhere.
+ */
+export function resolveCurrentPlayingSongId(
+  liveStore: () => LiveStore | null
+): string | null {
+  const store = liveStore()
+  if (!store) return null
+
+  const result = store.query({
+    query: `SELECT trackIds, randomTrackIds, currentPlaying, currentTrackId, shuffle FROM queue WHERE id = ?`,
+    bindValues: { 1: 'default' }
+  }) as Array<{
+    trackIds?: string | readonly string[]
+    randomTrackIds?: string | readonly string[]
+    currentPlaying?: number | null
+    currentTrackId?: string | null
+    shuffle?: boolean
+  }>
+
+  const row = result[0]
+  if (!row) return null
+  return resolveCurrentSongId({
+    trackIds: row.trackIds ?? [],
+    randomTrackIds: row.randomTrackIds ?? [],
+    currentPlaying: row.currentPlaying,
+    currentTrackId: row.currentTrackId,
+    shuffle: row.shuffle ?? false,
+  })
 }

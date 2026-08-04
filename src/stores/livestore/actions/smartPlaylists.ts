@@ -1,4 +1,4 @@
-import { Store } from '@livestore/livestore'
+import type { LiveStore } from '../accessor'
 import { events } from '../schema'
 
 /**
@@ -10,9 +10,6 @@ import { events } from '../schema'
  *
  * All actions require a store parameter from useStore() hook.
  */
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type LiveStore = Store<any>
 
 type SmartPlaylistFilters = {
   genres: string[]

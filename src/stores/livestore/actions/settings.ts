@@ -1,5 +1,6 @@
 import { updateSettings, initializeSettings, defaultSettings, getSettingsData } from '../settingsStore'
-import { queryDb, Store } from '@livestore/livestore'
+import { queryDb } from '@livestore/livestore'
+import type { LiveStore } from '../accessor'
 import { tables } from '../schema'
 
 
@@ -43,9 +44,6 @@ const loadSettingsFromLocalStorage = (): Record<string, unknown> | null => {
  * 
  * All actions require a store parameter from useStore() hook.
  */
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type LiveStore = Store<any>
 
 /**
  * Initialize settings - Create defaults if they don't exist

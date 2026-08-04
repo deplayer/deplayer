@@ -1,7 +1,7 @@
 // Handling ADD_TO_COLLECTION saga
 import { put, call } from "redux-saga/effects";
 
-import { getLiveStoreInstance } from "../../App";
+import { getLiveStoreInstance } from "../../stores/livestore/accessor";
 import { addMediaBulkAction, removeMediaAction, trackMediaPlayedAction } from "../../stores/livestore/actions/media";
 import logger from "../../utils/logger";
 import * as types from "../../constants/ActionTypes";

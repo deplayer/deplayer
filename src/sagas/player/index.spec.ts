@@ -5,8 +5,9 @@ import * as types from '../../constants/ActionTypes'
 
 // Mock all modules in the saga import chain to avoid triggering configureStore
 
-vi.mock('../../App', () => ({
+vi.mock('../../stores/livestore/accessor', () => ({
   getLiveStoreInstance: vi.fn().mockReturnValue(null),
+  setLiveStoreInstance: vi.fn(),
 }))
 
 vi.mock('../../stores/livestore/schema', () => ({
@@ -14,12 +15,6 @@ vi.mock('../../stores/livestore/schema', () => ({
     queue: { select: vi.fn().mockReturnValue({ where: vi.fn().mockReturnValue({ limit: vi.fn().mockReturnValue({}) }) }) },
     media: { select: vi.fn().mockReturnValue({ where: vi.fn().mockReturnValue({ limit: vi.fn().mockReturnValue({}) }) }) },
   },
-}))
-
-vi.mock('../../middleware/livestore', () => ({
-  getLiveStoreInstance: vi.fn().mockReturnValue(null),
-  setLiveStoreInstance: vi.fn(),
-  livestoreMiddleware: vi.fn(),
 }))
 
 vi.mock('../../services/PlayerRefService', () => ({

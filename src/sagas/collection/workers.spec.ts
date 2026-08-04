@@ -11,7 +11,7 @@ import {
 import * as types from "../../constants/ActionTypes";
 
 // Mock getLiveStoreInstance to return a fake store in tests
-vi.mock("../../App", () => ({
+vi.mock("../../stores/livestore/accessor", () => ({
   getLiveStoreInstance: vi.fn(() => ({
     // Minimal mock — workers call LiveStore actions via `call` effect,
     // which redux-saga-test-plan doesn't actually execute by default

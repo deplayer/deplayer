@@ -1,7 +1,7 @@
 import { actionChannel, fork, take, put } from "redux-saga/effects";
 
 import { saveToDbWorker } from "./workers";
-import { getLiveStoreInstance } from "../../App";
+import { getLiveStoreInstance } from "../../stores/livestore/accessor";
 import { initializeSettingsAction } from "../../stores/livestore/actions/settings";
 import * as types from "../../constants/ActionTypes";
 import { createLogger } from "../../utils/logger";

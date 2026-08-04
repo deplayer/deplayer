@@ -1,4 +1,4 @@
-import { Store } from '@livestore/livestore'
+import type { LiveStore } from '../accessor'
 import { mediaEvents } from '../events/media'
 import { NormalizedMedia } from '../../../utils/normalizeMedia'
 import { profiler } from '../../../utils/performanceProfiler'
@@ -66,7 +66,7 @@ export type FlushOptions = { readonly skipRefresh?: boolean }
 class BatchedMediaCommitter {
   private pendingMedia: NormalizedMedia[] = []
   private flushTimeout: number | null = null
-  private store: Store | null = null
+  private store: LiveStore | null = null
   private isCommitting = false
   private refreshPending = false
 
@@ -77,7 +77,7 @@ class BatchedMediaCommitter {
   /**
    * Set the LiveStore instance to use for commits
    */
-  setStore(store: Store): void {
+  setStore(store: LiveStore): void {
     this.store = store
   }
 

@@ -8,24 +8,10 @@
  */
 
 import { Middleware } from 'redux'
-import { Store } from '@livestore/livestore'
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type LiveStore = Store<any>
+import { getLiveStoreInstance } from '../stores/livestore/accessor'
 import { addMediaAction } from '../stores/livestore/actions'
 import { NormalizedMedia } from '../utils/normalizeMedia'
 import * as types from '../constants/ActionTypes'
-
-let liveStoreInstance: LiveStore | null = null
-
-// Call this after LiveStore is initialized
-export const setLiveStoreInstance = (store: LiveStore) => {
-  liveStoreInstance = store
-}
-
-// Get the LiveStore instance
-export const getLiveStoreInstance = (): LiveStore | null => {
-  return liveStoreInstance
-}
 
 export const livestoreMiddleware: Middleware = (store) => (next) => async (action: unknown) => {
   const typedAction = action as { type: string; media?: NormalizedMedia }
@@ -33,14 +19,15 @@ export const livestoreMiddleware: Middleware = (store) => (next) => async (actio
   const result = next(action)
 
   // Then handle LiveStore sync
-  if (!liveStoreInstance) {
+  const liveStore = getLiveStoreInstance()
+  if (!liveStore) {
     return result
   }
 
   try {
     switch (typedAction.type) {
       case types.ADD_MEDIA_TO_LIVESTORE: {
-        await addMediaAction(liveStoreInstance, typedAction.media as NormalizedMedia)
+        await addMediaAction(liveStore, typedAction.media as NormalizedMedia)
         
         // Dispatch success action
         store.dispatch({
