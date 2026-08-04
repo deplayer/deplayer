@@ -10,8 +10,10 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import RightPanelContainer from './RightPanelContainer'
 import ButterchurnVisualizer from '../components/ButterchurnVisualizer'
+import VisualizerPanel from '../components/Player/VisualizerPanel'
 import PlayerRefService from '../services/PlayerRefService'
 import { useUIStore } from '../stores/uiStore'
+import { CSSTransition } from 'react-transition-group'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -21,8 +23,12 @@ const Layout = ({ children }: LayoutProps) => {
   const dispatch = useDispatch()
   const backgroundImage = useUIStore((s) => s.backgroundImage)
   const mqlMatch = useUIStore((s) => s.mqlMatch)
-  const showVisuals = useUIStore((s) => s.showVisuals)
+  const visualsMode = useUIStore((s) => s.visualsMode)
+  const setVisualsMode = useUIStore((s) => s.setVisualsMode)
   const fullscreen = useSelector((state: State) => state.player.fullscreen)
+  // RTG 4.4.5 calls ReactDOM.findDOMNode unless nodeRef is provided; React 19
+  // removed findDOMNode, so the ref is mandatory here.
+  const panelRef = React.useRef<HTMLDivElement>(null)
 
   const getInternalPlayer = () => {
     const playerRef = PlayerRefService.getInstance().getPlayerRef()
@@ -58,14 +64,36 @@ const Layout = ({ children }: LayoutProps) => {
         </div>
         <Placeholder mqlMatch={mqlMatch} />
       </Sidebar>
-      {internalPlayer && showVisuals && (
+      {internalPlayer && visualsMode === 'ambient' && (
         <ButterchurnVisualizer
           playerRef={internalPlayer}
           fullscreen={fullscreen}
           width={window.innerWidth}
           height={window.innerHeight}
+          pixelRatio={0.75}
           dispatch={dispatch}
         />
+      )}
+
+      {internalPlayer && visualsMode === 'panel' && (
+        <div className='visualizer-panel-container'>
+          <CSSTransition
+            in={true}
+            appear={true}
+            timeout={{ enter: 300, exit: 200 }}
+            classNames='visualizerPanel'
+            unmountOnExit
+            nodeRef={panelRef}
+          >
+            <div ref={panelRef} className='w-full h-full'>
+              <VisualizerPanel
+                playerRef={internalPlayer}
+                pixelRatio={0.75}
+                onClose={() => setVisualsMode('off')}
+              />
+            </div>
+          </CSSTransition>
+        </div>
       )}
       <RightPanelContainer />
     </>

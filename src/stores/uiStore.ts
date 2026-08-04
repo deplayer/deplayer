@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 
+export type VisualsMode = 'off' | 'ambient' | 'panel'
+
 export type Filter = {
   genres: string[]
   types: string[]
@@ -23,6 +25,7 @@ type UIState = {
   // Visuals
   showSpectrum: boolean
   showVisuals: boolean
+  visualsMode: VisualsMode
   backgroundImage: string
 
   // App state
@@ -46,6 +49,8 @@ type UIActions = {
   setShowAddMediaModal: (show: boolean) => void
   toggleSpectrum: () => void
   toggleVisuals: () => void
+  cycleVisualsMode: () => void
+  setVisualsMode: (mode: VisualsMode) => void
   setBackgroundImage: (url: string) => void
   setReady: (ready: boolean) => void
   setFilter: (filterType: keyof Filter, values: string[] | boolean) => void
@@ -76,6 +81,7 @@ export const useUIStore = create<UIState & UIActions>((set) => ({
   showAddMediaModal: false,
   showSpectrum: false,
   showVisuals: false,
+  visualsMode: 'off',
   backgroundImage: '',
   ready: false,
   activeFilters: emptyFilters,
@@ -96,6 +102,13 @@ export const useUIStore = create<UIState & UIActions>((set) => ({
   setShowAddMediaModal: (show) => set({ showAddMediaModal: show }),
   toggleSpectrum: () => set((s) => ({ showSpectrum: !s.showSpectrum })),
   toggleVisuals: () => set((s) => ({ showVisuals: !s.showVisuals })),
+  cycleVisualsMode: () =>
+    set((s) => {
+      const order: VisualsMode[] = ['off', 'ambient', 'panel']
+      const next = order[(order.indexOf(s.visualsMode) + 1) % order.length]
+      return { visualsMode: next }
+    }),
+  setVisualsMode: (mode) => set({ visualsMode: mode }),
   setBackgroundImage: (url) => set({ backgroundImage: url }),
   setReady: (ready) => set({ ready }),
   setFilter: (filterType, values) =>

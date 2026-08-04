@@ -10,6 +10,7 @@ import screenfull from 'screenfull'
 type Props = {
   width?: number,
   height?: number,
+  pixelRatio?: number,
   playerRef: HTMLAudioElement,
   fullscreen: boolean,
   dispatch: Dispatch
@@ -26,6 +27,7 @@ class ButterchurnVisualizer extends React.Component<Props> {
   canvasId: string
   visualizer: { connectAudio: (node: AnalyserNode) => void; render: () => void; setRendererSize: (w: number, h: number) => void; loadPreset: (preset: unknown, blend: number) => void } | null = null
   analyser: AnalyserNode | null = null
+  lastPresetIndex: number = -1
 
   constructor(props: Props) {
     super(props)
@@ -62,6 +64,28 @@ class ButterchurnVisualizer extends React.Component<Props> {
     }
   }
 
+  componentDidUpdate(prevProps: Props) {
+    if (this.props.playerRef !== prevProps.playerRef) {
+      this.loadRandomPreset()
+    }
+  }
+
+  loadRandomPreset = () => {
+    if (!this.visualizer) return
+    try {
+      const presets = butterchurnPresets.getPresets()
+      const keys = Object.keys(presets)
+      let index: number
+      do {
+        index = Math.floor(Math.random() * keys.length)
+      } while (index === this.lastPresetIndex && keys.length > 1)
+      this.lastPresetIndex = index
+      this.visualizer.loadPreset(presets[keys[index]], 0.3)  // blend=0.3 for smooth cross-fade
+    } catch (err) {
+      console.error('Error cycling preset:', err)
+    }
+  }
+
   initializeVisualizer = (audioContext: AudioContext) => {
     if (!this.canvas) return
 
@@ -71,12 +95,12 @@ class ButterchurnVisualizer extends React.Component<Props> {
       this.canvas.height = this.props.height || 200
 
       const contextAttributes: WebGLContextAttributes = {
-        alpha: false,
+        alpha: true,
         antialias: true,
         depth: true,
         preserveDrawingBuffer: true,
         stencil: true,
-        premultipliedAlpha: false,
+        premultipliedAlpha: true,
         powerPreference: 'high-performance',
         failIfMajorPerformanceCaveat: false
       }
@@ -99,11 +123,10 @@ class ButterchurnVisualizer extends React.Component<Props> {
       gl.viewport(0, 0, width, height)
       gl.clear(gl.COLOR_BUFFER_BIT)
 
-      // Create visualizer with explicit context
       this.visualizer = butterchurn.createVisualizer(audioContext, this.canvas, {
         width,
         height,
-        pixelRatio: window.devicePixelRatio || 1,
+        pixelRatio: this.props.pixelRatio ?? Math.min(window.devicePixelRatio || 1, 1.5),
         contextAttributes
       })
 
@@ -135,12 +158,8 @@ class ButterchurnVisualizer extends React.Component<Props> {
     }
 
     try {
-      const presets = butterchurnPresets.getPresets()
-      const randomKey = Object.keys(presets)[Math.floor(Math.random() * Object.keys(presets).length)]
-      const preset = presets[randomKey]
-
       this.visualizer.setRendererSize(this.props.width || 300, this.props.height || 200)
-      this.visualizer.loadPreset(preset, 0.0)
+      this.loadRandomPreset()
 
       startRender()
     } catch (err) {
@@ -152,8 +171,9 @@ class ButterchurnVisualizer extends React.Component<Props> {
   prepareElements = () => {
     this.canvas = document.getElementById(this.canvasId) as HTMLCanvasElement
     if (this.canvas) {
-      // Remove any classes that might interfere with WebGL
-      this.canvas.className = 'fixed inset-0'
+      // Position/size come from the JSX className and props; don't mutate
+      // className here — React won't re-apply an unchanged class prop after
+      // mount, so wiping it would permanently drop 'fixed inset-0'.
       this.canvas.width = this.props.width || 300
       this.canvas.height = this.props.height || 200
     }
@@ -172,13 +192,23 @@ class ButterchurnVisualizer extends React.Component<Props> {
       'z-0': !fullscreen
     })
 
+    // Ambient background: subtle atmosphere while keeping content readable
+    const canvasStyle: React.CSSProperties = {
+      opacity: 0.4,
+      mixBlendMode: 'screen',
+      filter: 'blur(0.5px) saturate(1.1)',
+      pointerEvents: 'none',
+    }
+
     return (
       <canvas
         className={canvasClasses}
         id={this.canvasId}
         width={this.props.width}
         height={this.props.height}
+        style={canvasStyle}
         onMouseMove={onMouseMove}
+        aria-hidden='true'
       />
     )
   }

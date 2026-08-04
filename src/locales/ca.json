@@ -152,10 +152,15 @@
     "startPlaying": "Comença a reproduir",
     "toggleSpectrum": "Mostra/amaga espectre",
     "toggleVisuals": "Mostra/amaga visuals",
+    "visualizerOff": "Desactivat",
+    "visualizerAmbient": "Ambient",
+    "visualizerPanel": "Panell",
     "downloadMedia": "Descarrega contingut",
-    "pinAlbum": "Fixa àlbum",
-    "syncProvider": "Sincronitza tota la música",
-    "saveSettings": "Desa la configuració"
+    "visualizerTitle": "Visualitzador",
+    "presentVisuals": "Presenta visuals",
+    "exitVisualsPresentation": "Surt de la presentació visual",
+    "closeVisuals": "Desactiva els visuals",
+    "nextVisualPreset": "Següent preset"
   },
   "message": {
     "featuredFromLibrary": "De la teva biblioteca",

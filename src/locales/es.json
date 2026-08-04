@@ -151,10 +151,15 @@
     "startPlaying": "Comenzar reproducción",
     "toggleSpectrum": "Mostrar/ocultar espectro",
     "toggleVisuals": "Mostrar/ocultar visuales",
+    "visualizerOff": "Desactivado",
+    "visualizerAmbient": "Ambiental",
+    "visualizerPanel": "Panel",
     "downloadMedia": "Descargar contenido",
-    "pinAlbum": "Fijar álbum",
-    "syncProvider": "Sincronizar toda la música",
-    "saveSettings": "Guardar configuración"
+    "visualizerTitle": "Visualizador",
+    "presentVisuals": "Presentar visuales",
+    "exitVisualsPresentation": "Salir de la presentación visual",
+    "closeVisuals": "Desactivar visuales",
+    "nextVisualPreset": "Siguiente preset"
   },
   "message": {
     "featuredFromLibrary": "De tu biblioteca",

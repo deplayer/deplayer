@@ -28,7 +28,7 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: hsl(var(--n) / 0.8);
     pointer-events: none;
     z-index: 1;
   }
@@ -64,4 +64,125 @@
 .layout-contents {
   width: 100%;
   height: 100%;
+}
+
+.visualizer-panel-container {
+  position: fixed;
+  bottom: calc(120px + env(safe-area-inset-bottom)); // above player bar
+  right: 12px;
+  z-index: 20;
+  width: min(480px, calc(100vw - 24px));
+  aspect-ratio: 16 / 9;
+  max-height: calc(100vh - 160px);
+}
+
+.visualizer-panel-window {
+  width: 100%;
+  height: 100%;
+
+  // Ensure the window cannot create horizontal document overflow
+  max-width: 100%;
+}
+
+.visualizer-panel-header {
+  padding: 2px 8px;
+  font-size: 0.75rem;
+}
+
+.visualizer-panel-canvas-container {
+  canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+}
+
+// CSS fullscreen fallback
+.visualizer-panel-window.is-presenting {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  border-radius: 0;
+}
+
+// Native fullscreen: fill viewport, keep header, canvas fills remaining space
+.visualizer-panel-window:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  border-radius: 0;
+}
+
+// Responsive constraints
+@media (max-width: 767px) {
+  .visualizer-panel-container {
+    width: calc(100vw - 16px);
+    bottom: calc(104px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-height: 500px) {
+  .visualizer-panel-container {
+    max-height: calc(100vh - 80px);
+    bottom: calc(60px + env(safe-area-inset-bottom));
+  }
+}
+
+
+/* Enter/exit transitions */
+.visualizerPanel-appear {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.visualizerPanel-appear-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+.visualizerPanel-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.visualizerPanel-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+.visualizerPanel-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+.visualizerPanel-exit-active {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 200ms ease-in, transform 200ms ease-in;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visualizerPanel-appear,
+  .visualizerPanel-appear-active,
+  .visualizerPanel-enter,
+  .visualizerPanel-enter-active,
+  .visualizerPanel-exit,
+  .visualizerPanel-exit-active {
+    transition: none;
+    transform: none;
+  }
+
+  .visualizerPanel-appear,
+  .visualizerPanel-enter {
+    opacity: 1;
+  }
+
+  .visualizer-panel-window.is-presenting {
+    transition: none;
+  }
+  .visualizer-panel-window {
+    transition: none;
+  }
 }
