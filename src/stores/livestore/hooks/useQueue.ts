@@ -1,7 +1,7 @@
 import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
-import { resolveQueueNavigation } from './queueUtils'
+import { parseIds, resolveQueueNavigation } from './queueUtils'
 
 /**
  * Queue Query Hooks
@@ -60,15 +60,12 @@ export const useQueue = (queueId = 'default'): QueueRecord | null => {
 export const useQueueTracks = (queueId = 'default') => {
   const store = useAppStore()
   const queue = useQueue(queueId)
-  
+
   if (!queue || !queue.trackIds || (queue.trackIds as string[]).length === 0) {
     return []
   }
 
-  // Parse trackIds (it's a JSON array)
-  const trackIds = typeof queue.trackIds === 'string'
-    ? JSON.parse(queue.trackIds)
-    : queue.trackIds
+  const trackIds = parseIds(queue.trackIds)
 
   // Get media items by their IDs
   const media = store.useQuery(

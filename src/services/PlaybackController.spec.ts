@@ -1,0 +1,366 @@
+import { describe, it, expect, vi } from 'vitest'
+import {
+  PlaybackController,
+  type PlaybackDataPort,
+  type PlaybackTransport,
+  type PlaybackQueue,
+  PlaybackStoreUnavailableError,
+} from './PlaybackController'
+import type { MediaRow } from '../types/media'
+
+// ---------------------------------------------------------------------------
+// Test fakes
+// ---------------------------------------------------------------------------
+
+function fakeMedia(id: string, overrides?: Partial<MediaRow>): MediaRow {
+  return {
+    id,
+    title: `Song ${id}`,
+    artistId: 'artist-1',
+    albumId: 'album-1',
+    artistName: 'Test Artist',
+    albumName: 'Test Album',
+    type: 'audio',
+    duration: 180,
+    playCount: 0,
+    track: null,
+    discNumber: null,
+    stream: { subsonic: { service: 'subsonic', uris: [{ uri: `https://example.com/${id}.mp3` }] } },
+    cover: { fullUrl: `https://example.com/${id}.jpg` },
+    genres: [],
+    externalId: null,
+    shareUrl: null,
+    filePath: null,
+    genresFlat: '',
+    providersFlat: 'subsonic',
+    ...overrides,
+  } as unknown as MediaRow
+}
+
+function createFakeDataPort(overrides?: Partial<PlaybackDataPort>): PlaybackDataPort {
+  return {
+    readQueue: vi.fn().mockResolvedValue(null),
+    readMedia: vi.fn().mockResolvedValue(null),
+    replaceQueue: vi.fn().mockResolvedValue(undefined),
+    addNext: vi.fn().mockResolvedValue(undefined),
+    select: vi.fn().mockResolvedValue(undefined),
+    next: vi.fn().mockResolvedValue(undefined),
+    previous: vi.fn().mockResolvedValue(undefined),
+    ...overrides,
+  }
+}
+
+function createFakeTransport(overrides?: Partial<PlaybackTransport>): PlaybackTransport {
+  return {
+    stop: vi.fn(),
+    play: vi.fn().mockResolvedValue(undefined),
+    pause: vi.fn(),
+    toggle: vi.fn(),
+    ...overrides,
+  }
+}
+
+function createFakeStreamResolver(streamUri = 'https://example.com/resolved.mp3') {
+  return vi.fn().mockResolvedValue(streamUri)
+}
+
+function makeController(overrides?: {
+  data?: Partial<PlaybackDataPort>
+  transport?: Partial<PlaybackTransport>
+  streamUri?: string
+}) {
+  const data = createFakeDataPort(overrides?.data)
+  const transport = createFakeTransport(overrides?.transport)
+  const dispatch = vi.fn()
+  const setBg = vi.fn()
+  const resolveStream = createFakeStreamResolver(overrides?.streamUri)
+
+  const ctrl = new PlaybackController({
+    data,
+    transport,
+    dispatch,
+    setBackgroundImage: setBg,
+    resolveStream,
+  })
+
+  return { ctrl, data, transport, dispatch, setBg, resolveStream }
+}
+
+function queueState(overrides?: Partial<PlaybackQueue>): PlaybackQueue {
+  return {
+    trackIds: ['song-1', 'song-2', 'song-3'],
+    randomTrackIds: ['song-3', 'song-1', 'song-2'],
+    currentPlaying: 0,
+    currentTrackId: null,
+    shuffle: false,
+    repeat: false,
+    ...overrides,
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+describe('PlaybackController', () => {
+  describe('playSong', () => {
+    it('stops before queue replacement, emits stream/actions, and calls transport.play()', async () => {
+      const song1 = fakeMedia('song-1')
+      const q = queueState()
+      const { ctrl, data, transport, dispatch, setBg, resolveStream } = makeController()
+
+      // Queue is empty — playSong creates it from contextIds
+      vi.mocked(data.readQueue).mockResolvedValueOnce(null)  // ensureInQueue: no queue
+      vi.mocked(data.readQueue).mockResolvedValueOnce(q)     // after replaceQueue
+      vi.mocked(data.readMedia).mockResolvedValueOnce(song1)
+
+      const result = await ctrl.playSong('song-1', ['song-1', 'song-2'])
+
+      // Stop-before-play: STOP_PLAYING dispatched + transport stopped
+      expect(dispatch).toHaveBeenCalledWith({ type: 'STOP_PLAYING' })
+      expect(transport.stop).toHaveBeenCalled()
+
+      // Queue created from contextIds
+      expect(data.replaceQueue).toHaveBeenCalledWith(['song-1', 'song-2'])
+
+      // Stream resolved
+      expect(resolveStream).toHaveBeenCalledWith(song1, 0)
+
+      // Actions emitted
+      expect(dispatch).toHaveBeenCalledWith({ type: 'PUSH_TO_VIEW', song: 'song-1' })
+      expect(dispatch).toHaveBeenCalledWith({ type: 'SET_CURRENT_PLAYING_URL', url: 'https://example.com/resolved.mp3' })
+      expect(dispatch).toHaveBeenCalledWith({ type: 'SHOW_PLAYER' })
+
+      // Transport started
+      expect(transport.play).toHaveBeenCalled()
+
+      // Background image set
+      expect(setBg).toHaveBeenCalledWith('https://example.com/song-1.jpg')
+
+      expect(result.status).toBe('started')
+      if (result.status === "started") expect(result.songId).toBe('song-1')
+    })
+
+    it('repositions existing song in queue', async () => {
+      const song1 = fakeMedia('song-1')
+      const q = queueState()
+      const { ctrl, data, transport, dispatch } = makeController()
+
+      vi.mocked(data.readQueue).mockResolvedValueOnce(q)       // ensureInQueue: queue exists
+      vi.mocked(data.readQueue).mockResolvedValueOnce(q)       // after select
+      vi.mocked(data.readMedia).mockResolvedValueOnce(song1)
+
+      await ctrl.playSong('song-2', undefined)
+
+      // Song in queue → reposition
+      expect(data.select).toHaveBeenCalledWith('song-2')
+      expect(dispatch).toHaveBeenCalledWith({ type: 'STOP_PLAYING' })
+      expect(transport.stop).toHaveBeenCalled()
+    })
+
+    it('inserts absent song with addNext', async () => {
+      const song4 = fakeMedia('song-4')
+      const q = queueState()
+      const { ctrl, data } = makeController()
+
+      vi.mocked(data.readQueue).mockResolvedValueOnce(q)       // ensureInQueue: queue exists, song not in
+      vi.mocked(data.readQueue).mockResolvedValueOnce(q)       // after addNext+select
+      vi.mocked(data.readMedia).mockResolvedValueOnce(song4)
+
+      await ctrl.playSong('song-4', undefined)
+
+      expect(data.addNext).toHaveBeenCalledWith(['song-4'])
+      expect(data.select).toHaveBeenCalledWith('song-4')
+    })
+
+    it('returns idle for empty songId', async () => {
+      const { ctrl } = makeController()
+
+      const result = await ctrl.playSong('', undefined)
+      expect(result.status).toBe('idle')
+      expect((result as { reason: string }).reason).toBe('missing-media')
+    })
+  })
+
+  describe('shuffled queue with persisted currentTrackId', () => {
+    it('uses persisted currentTrackId over index fallback', async () => {
+      const song2 = fakeMedia('song-2')
+      // Shuffled queue: randomTrackIds = ['song-3', 'song-1', 'song-2']
+      // persisted currentTrackId = 'song-2'
+      const { ctrl, data, transport } = makeController()
+
+      // playCurrent resolves via stream, not queue mutation
+      vi.mocked(data.readMedia).mockResolvedValueOnce(song2)
+
+      const result = await ctrl.playCurrent('song-2', { media: song2 })
+
+      expect(transport.play).toHaveBeenCalled()
+      expect(result.status).toBe('started')
+    })
+  })
+
+  describe('missing media / missing stream exhausts queue', () => {
+    it('advances at most once and returns idle after exhaustion', async () => {
+      const q = queueState({ currentPlaying: 1 })
+      const q2 = queueState({ currentPlaying: 2, currentTrackId: 'song-3' })
+      const { ctrl, data } = makeController()
+
+      // readQueue calls: next() main → tryNextTrack before-next → tryNextTrack after-next
+      vi.mocked(data.readQueue).mockResolvedValueOnce(q)    // next() reads queue
+      vi.mocked(data.readQueue).mockResolvedValueOnce(q)    // tryNextTrack: before advance
+      vi.mocked(data.readQueue).mockResolvedValueOnce(q2)   // tryNextTrack: after advance
+      // readMedia calls: startStream → tryNextTrack's startStream
+      vi.mocked(data.readMedia).mockResolvedValueOnce(null)  // first song: media missing
+      vi.mocked(data.readMedia).mockResolvedValueOnce(null)  // next song: media missing too
+
+      const result = await ctrl.next()
+
+      // next() calls data.next() once for the normal advance, then
+      // tryNextTrack calls it again to skip the missing-media track.
+      expect(data.next).toHaveBeenCalledTimes(2)
+
+      expect(result.status).toBe('idle')
+      expect((result as { reason: string }).reason).toBe('missing-stream')
+    })
+
+    it('does not infinitely loop on missing stream', async () => {
+      const media = fakeMedia('song-1')
+      const q = queueState()
+      const { ctrl, data, resolveStream } = makeController()
+
+      vi.mocked(data.readQueue).mockResolvedValue(q)
+      vi.mocked(data.readMedia).mockResolvedValue(media)
+      // Stream resolver returns empty
+      resolveStream.mockResolvedValue('')
+
+      // Advance → no stream, tries next
+      // tryNextTrack → readQueue → next → readQueue → try again
+      vi.mocked(data.readQueue).mockResolvedValue(q) // before next
+      const q2 = queueState({ currentPlaying: 1, currentTrackId: 'song-2' })
+      vi.mocked(data.readQueue).mockResolvedValueOnce(q2) // after next
+      vi.mocked(data.readMedia).mockResolvedValueOnce(media) // media found but...
+      resolveStream.mockResolvedValueOnce('') // ...stream empty again
+
+      const result = await ctrl.next()
+
+      expect(result.status).toBe('idle')
+      expect((result as { reason: string }).reason).toBe('missing-stream')
+    })
+  })
+
+  describe('playCurrent with peer URL', () => {
+    it('uses supplied peer:// URL instead of invoking stream resolver', async () => {
+      const media = fakeMedia('song-1')
+      const { ctrl, dispatch, transport, resolveStream } = makeController()
+
+      const result = await ctrl.playCurrent('song-1', {
+        media,
+        streamUri: 'peer://self/song-1?t=123',
+      })
+
+      // Stream resolver NOT called
+      expect(resolveStream).not.toHaveBeenCalled()
+
+      // URL dispatched directly
+      expect(dispatch).toHaveBeenCalledWith({
+        type: 'SET_CURRENT_PLAYING_URL',
+        url: 'peer://self/song-1?t=123',
+      })
+
+      expect(transport.play).toHaveBeenCalled()
+      expect(result.status).toBe('started')
+      if (result.status === "started") expect(result.streamUri).toBe('peer://self/song-1?t=123')
+    })
+  })
+
+  describe('retry', () => {
+    it('retries with the given provider index', async () => {
+      const media = fakeMedia('song-1')
+      const { ctrl, resolveStream } = makeController()
+
+      // First playCurrent sets currentSongId internally via startStreamWithMedia
+      vi.mocked(ctrl as any).currentSongId = 'song-1'
+
+      // Mock readMedia for retry
+      const data = (ctrl as any).data
+      vi.mocked(data.readMedia).mockResolvedValueOnce(media)
+
+      const result = await ctrl.retry(1)
+
+      expect(resolveStream).toHaveBeenCalledWith(media, 1)
+      expect(result.status).toBe('started')
+    })
+
+    it('returns idle when no current song', async () => {
+      const { ctrl } = makeController()
+
+      const result = await ctrl.retry(0)
+      expect(result.status).toBe('idle')
+      expect((result as { reason: string }).reason).toBe('missing-media')
+    })
+  })
+
+  describe('playList', () => {
+    it('returns idle for empty list', async () => {
+      const { ctrl } = makeController()
+
+      const result = await ctrl.playList([])
+      expect(result.status).toBe('idle')
+      expect((result as { reason: string }).reason).toBe('empty-queue')
+    })
+
+    it('starts from the first track by default', async () => {
+      const song1 = fakeMedia('song-1')
+      const { ctrl, data, transport, dispatch } = makeController()
+      vi.mocked(data.readMedia).mockResolvedValue(song1)
+
+      const result = await ctrl.playList(['song-1', 'song-2'])
+
+      expect(dispatch).toHaveBeenCalledWith({ type: 'STOP_PLAYING' })
+      expect(transport.stop).toHaveBeenCalled()
+      expect(data.replaceQueue).toHaveBeenCalledWith(['song-1', 'song-2'])
+      expect(result.status).toBe('started')
+      if (result.status === "started") expect(result.songId).toBe('song-1')
+    })
+
+    it('handles startFromId', async () => {
+      const song2 = fakeMedia('song-2')
+      const { ctrl, data } = makeController()
+      vi.mocked(data.readMedia).mockResolvedValue(song2)
+
+      const result = await ctrl.playList(['song-1', 'song-2', 'song-3'], 'song-2')
+
+      expect(data.replaceQueue).toHaveBeenCalledWith(['song-1', 'song-2', 'song-3'])
+      expect(data.select).toHaveBeenCalledWith('song-2')
+      expect(result.status).toBe('started')
+      if (result.status === "started") expect(result.songId).toBe('song-2')
+    })
+  })
+
+  describe('play/pause/toggle', () => {
+    it('delegates to transport', async () => {
+      const { ctrl, transport } = makeController()
+
+      await ctrl.play()
+      expect(transport.play).toHaveBeenCalled()
+
+      ctrl.pause()
+      expect(transport.pause).toHaveBeenCalled()
+
+      ctrl.toggle()
+      expect(transport.toggle).toHaveBeenCalled()
+    })
+  })
+
+  describe('PlaybackStoreUnavailableError', () => {
+    it('converts to idle result', async () => {
+      const { ctrl, data } = makeController()
+
+      vi.mocked(data.readQueue).mockRejectedValue(new PlaybackStoreUnavailableError())
+
+      const result = await ctrl.next()
+      expect(result.status).toBe('idle')
+      expect((result as { reason: string }).reason).toBe('store-unavailable')
+    })
+  })
+})

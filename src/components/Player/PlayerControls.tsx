@@ -187,7 +187,7 @@ class PlayerControls extends React.Component<Props, State> {
   }
 
   playPause = (): void => {
-    PlayerRefService.getInstance().toggle()
+    this.props.dispatch({ type: types.PLAYBACK_TOGGLE_REQUESTED })
   }
 
   onPlay = (): void => {

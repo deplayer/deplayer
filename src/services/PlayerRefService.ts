@@ -97,6 +97,22 @@ class PlayerRefService {
   }
 
   /**
+   * Stop all currently playing audio/video elements in the DOM.
+   * Synchronous kill-switch — called before every queue mutation so that
+   * LiveStore reactive re-renders never encounter a playing stream.
+   */
+  stop(): void {
+    if (typeof document === 'undefined') return
+    document.querySelectorAll('audio, video').forEach((el) => {
+      const mediaEl = el as HTMLMediaElement
+      if (!mediaEl.paused) {
+        mediaEl.pause()
+        mediaEl.currentTime = 0
+      }
+    })
+  }
+
+  /**
    * Imperatively start playback on the ReactPlayer internal element.
    * This is the ONLY way audio should be started — never via the `playing` prop.
    * 

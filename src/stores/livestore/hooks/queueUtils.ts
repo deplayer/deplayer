@@ -6,9 +6,10 @@
  */
 
 export interface QueueState {
-  trackIds: string[] | string
-  randomTrackIds?: string[] | string
+  trackIds: readonly string[] | string
+  randomTrackIds?: readonly string[] | string
   currentPlaying: number | null | undefined
+  currentTrackId?: string | null
   shuffle?: boolean
   repeat?: boolean
 }
@@ -16,11 +17,11 @@ export interface QueueState {
 /**
  * Parse a trackIds field that may be a JSON string or already an array.
  */
-export function parseIds(ids: string[] | string | null | undefined): string[] {
+export function parseIds(ids: readonly string[] | string | null | undefined): string[] {
   if (!ids) return []
-  if (Array.isArray(ids)) return ids
+  if (Array.isArray(ids)) return ids as string[]
   try {
-    return JSON.parse(ids)
+    return JSON.parse(ids as string)
   } catch {
     return []
   }
@@ -41,7 +42,14 @@ export function getActiveTrackIds(queue: QueueState): string[] {
  * Returns null when there is no valid current track.
  */
 export function resolveCurrentSongId(queue: QueueState | null | undefined): string | null {
-  if (!queue || queue.currentPlaying === null || queue.currentPlaying === undefined) {
+  if (!queue) return null
+
+  // Persisted currentTrackId is authoritative when present (computed by
+  // the schema materializer from the active shuffle order). Fall back to
+  // the index-based resolution for legacy rows.
+  if (queue.currentTrackId) return queue.currentTrackId
+
+  if (queue.currentPlaying === null || queue.currentPlaying === undefined) {
     return null
   }
   const ids = getActiveTrackIds(queue)

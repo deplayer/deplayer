@@ -2,7 +2,7 @@ import type { MediaRow } from '../types/media'
 import { Dispatch } from 'redux'
 import * as actions from '../constants/ActionTypes'
 import logger from '../utils/logger'
-import PlayerRefService from './PlayerRefService'
+
 
 // fix ts navigator typings
 // eslint-disable-next-line no-var -- `declare var` is required for ambient global augmentation
@@ -33,17 +33,13 @@ export default class MediaSessionService {
       return
     }
 
-    session.setActionHandler('play', async () => {
+    session.setActionHandler('play', () => {
       logger.log('MediaSession', 'play action handler called')
-      await PlayerRefService.getInstance().play()
-      session.playbackState = 'playing'
-      dispatch({ type: actions.START_PLAYING })
+      dispatch({ type: actions.PLAYBACK_PLAY_REQUESTED })
     })
     session.setActionHandler('pause', () => {
       logger.log('MediaSession', 'pause action handler called')
-      PlayerRefService.getInstance().pause()
-      session.playbackState = 'paused'
-      dispatch({ type: actions.PAUSE_PLAYING })
+      dispatch({ type: actions.PLAYBACK_PAUSE_REQUESTED })
     })
     session.setActionHandler('previoustrack', () => {
       dispatch({ type: actions.PLAY_PREV })

@@ -1,7 +1,7 @@
 import * as types from '../constants/ActionTypes'
 
 type PlayerAction =
-  | { type: typeof types.PAUSE_PLAYING | typeof types.STOP_PLAYING | typeof types.START_PLAYING | typeof types.TOGGLE_PLAYING | typeof types.CLEAR_QUEUE | typeof types.HIDE_PLAYER | typeof types.SHOW_PLAYER | typeof types.CLEAR_PLAYER_ERRORS | typeof types.SONG_PLAYED }
+  | { type: typeof types.PAUSE_PLAYING | typeof types.STOP_PLAYING | typeof types.START_PLAYING | typeof types.CLEAR_QUEUE | typeof types.HIDE_PLAYER | typeof types.SHOW_PLAYER | typeof types.CLEAR_PLAYER_ERRORS | typeof types.SONG_PLAYED }
   | { type: typeof types.VOLUME_SET | typeof types.SET_PLAYER_DURATION | typeof types.SET_CURRENT_TIME; value: number }
   | { type: typeof types.SET_CURRENT_PLAYING_URL; url: string }
   | { type: typeof types.SET_CURRENT_PLAYING_STREAMS; streams: object }
@@ -55,8 +55,6 @@ export default (state: State = defaultState, action: PlayerAction): State => {
     case types.START_PLAYING:
       return { ...state, playing: true, showPlayer: true }
 
-    case types.TOGGLE_PLAYING:
-      return { ...state, playing: !state.playing }
 
     case types.CLEAR_QUEUE:
     case types.HIDE_PLAYER:

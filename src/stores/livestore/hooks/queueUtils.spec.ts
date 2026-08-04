@@ -95,6 +95,33 @@ describe('resolveCurrentSongId', () => {
   })
 })
 
+  it('prefers persisted currentTrackId over index-based fallback', () => {
+    // Persisted currentTrackId is authoritative
+    const q = makeQueue({ currentPlaying: 2, currentTrackId: 'persisted-id' })
+    expect(resolveCurrentSongId(q)).toBe('persisted-id')
+  })
+
+  it('persisted currentTrackId wins even with conflicting index', () => {
+    // Shuffle is on, index 0 maps to 'track-c' via randomTrackIds,
+    // but the persisted currentTrackId='track-a' should win
+    const q = makeQueue({
+      currentPlaying: 0,
+      shuffle: true,
+      currentTrackId: 'track-a',
+    })
+    expect(resolveCurrentSongId(q)).toBe('track-a')
+  })
+
+  it('falls back to index when currentTrackId is null', () => {
+    const q = makeQueue({ currentPlaying: 1, currentTrackId: null })
+    expect(resolveCurrentSongId(q)).toBe('track-b')
+  })
+
+  it('falls back to index when currentTrackId is undefined', () => {
+    const q = makeQueue({ currentPlaying: 2 })
+    expect(resolveCurrentSongId(q)).toBe('track-c')
+  })
+
 describe('resolveQueueNavigation', () => {
   it('returns nulls for null queue', () => {
     expect(resolveQueueNavigation(null)).toEqual({ nextSongId: null, prevSongId: null })

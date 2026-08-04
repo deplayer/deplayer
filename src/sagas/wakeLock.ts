@@ -38,7 +38,6 @@ function* wakeLockSaga(store: { dispatch: Dispatch }): Generator<any, void, any>
   yield takeLatest(types.START_PLAYING, startWakeLock, store.dispatch)
   yield takeLatest(types.PAUSE_PLAYING, stopWakeLock, store.dispatch)
   yield takeLatest(types.STOP_PLAYING, stopWakeLock, store.dispatch)
-  yield takeLatest(types.TOGGLE_PLAYING, stopWakeLock, store.dispatch)
 }
 
 export default wakeLockSaga

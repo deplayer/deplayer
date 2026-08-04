@@ -38,4 +38,10 @@ describe('collection reducer', () => {
     expect(result.playing).toBe(false)
     expect(result.streamUri).toBeNull()
   })
+
+  it('PLAYBACK_TOGGLE_REQUESTED leaves reducer state unchanged', () => {
+    const state = { ...defaultState, playing: true }
+    const result = reducer(state, { type: 'PLAYBACK_TOGGLE_REQUESTED' as any })
+    expect(result.playing).toBe(true) // unchanged — transport callbacks set it
+  })
 })

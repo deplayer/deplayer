@@ -1,5 +1,6 @@
 import { call } from 'redux-saga/effects'
 import { queryDb } from '@livestore/livestore'
+import { transformMediaRow } from '../stores/livestore/transformMedia'
 import { getLiveStoreInstance } from '../App'
 import { tables } from '../stores/livestore/schema'
 import type { State } from '../reducers'
@@ -34,50 +35,8 @@ export type TransformedMedia = MediaRow & {
 }
 
 function transformMediaFromLiveStore(rawMedia: Record<string, unknown>): TransformedMedia | null {
-  if (!rawMedia) return null
-
-  // Parse JSON fields if they're strings
-  const parseJson = (val: unknown, defaultVal: unknown = {}) => {
-    if (!val) return defaultVal
-    if (typeof val === 'object') return val
-    if (typeof val === 'string') {
-      try {
-        return JSON.parse(val)
-      } catch {
-        return defaultVal
-      }
-    }
-    return defaultVal
-  }
-  
-  // Reconstruct nested artist object from flat fields
-  const artist = {
-    id: (rawMedia.artistId as string) || '',
-    name: (rawMedia.artistName as string) || 'Unknown Artist',
-  }
-
-  const cover = parseJson(rawMedia.cover, null) as { thumbnailUrl?: string } | null
-
-  // Reconstruct nested album object from flat fields
-  const album = {
-    id: (rawMedia.albumId as string) || '',
-    name: (rawMedia.albumName as string) || 'Unknown Album',
-    artistId: (rawMedia.artistId as string) || '',
-    artist: artist,
-    thumbnailUrl: cover?.thumbnailUrl || null,
-    year: rawMedia.year || null,
-  }
-
-  return {
-    ...rawMedia,
-    stream: parseJson(rawMedia.stream, {}),
-    cover,
-    genres: parseJson(rawMedia.genres, []),
-    artist,
-    album,
-  } as TransformedMedia
+  return transformMediaRow(rawMedia) as TransformedMedia | null
 }
-
 /**
  * Get media by ID from LiveStore
  * Use this in sagas instead of select(getSongById, id)
@@ -98,8 +57,9 @@ export function* getSongByIdFromLiveStore(songId: string): Generator<any, Transf
 }
 
 /**
- * Get current playing song from LiveStore
- * Use this in sagas instead of select(getCurrentSong)
+ * Get current playing song from LiveStore.
+ * Uses the shared readQueue + resolveCurrentSongId so the saga and the
+ * PlaybackController resolve the same track.
  */
 export function* getCurrentSongFromLiveStore(): Generator<any, TransformedMedia | null, any> {
   const liveStore = getLiveStoreInstance()
@@ -107,66 +67,17 @@ export function* getCurrentSongFromLiveStore(): Generator<any, TransformedMedia 
     console.warn('LiveStore not available')
     return null
   }
-  
-  // Get currentPlaying ID from LiveStore queue using queryDb for consistency
-  try {
-    const query = queryDb(
-      tables.queue
-        .select()
-        .where('id', '=', 'default')
-        .limit(1)
-    )
-    
-    const result = yield call(() => liveStore.query(query))
-    
-    // queryDb returns array of objects directly
-    const row = Array.isArray(result) ? result[0] : null
-    
-    if (!row) {
-      return null
-    }
-    
-    // Parse trackIds if it's a string
-    let trackIds = row.trackIds
-    if (typeof trackIds === 'string') {
-      try {
-        trackIds = JSON.parse(trackIds)
-      } catch {
-        trackIds = []
-      }
-    }
-    
-    const currentPlaying = row.currentPlaying
-    const shuffle = Boolean(row.shuffle)
-    
-    // Use randomTrackIds if shuffle is enabled
-    if (shuffle && row.randomTrackIds) {
-      let randomTrackIds = row.randomTrackIds
-      if (typeof randomTrackIds === 'string') {
-        try {
-          randomTrackIds = JSON.parse(randomTrackIds)
-        } catch {
-          randomTrackIds = []
-        }
-      }
-      trackIds = randomTrackIds
-    }
-    
-    if (currentPlaying === null || currentPlaying === undefined || currentPlaying < 0) {
-      return null
-    }
-    
-    const currentId = trackIds[currentPlaying]
-    if (!currentId) {
-      return null
-    }
-    
-    // Get the song from LiveStore
-    return yield call(getSongByIdFromLiveStore, currentId)
-  } catch (error) {
-    console.error('[Selectors] Error getting current song:', error)
-    return null
-  }
+
+  const { readQueue } = yield import('../stores/livestore/actions/queue')
+  const { resolveCurrentSongId } = yield import('../stores/livestore/hooks/queueUtils')
+
+  const queue = yield call(() => readQueue(liveStore as any))
+  if (!queue) return null
+
+  const currentId = resolveCurrentSongId(queue)
+  if (!currentId) return null
+
+  return yield call(getSongByIdFromLiveStore, currentId)
 }
 
 /**

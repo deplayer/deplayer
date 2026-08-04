@@ -20,7 +20,6 @@ import { usePlaylists, useSmartPlaylists, useQueue, useMediaCount, useArtistsCou
 import { useUIStore } from '../../stores/uiStore'
 
 import LogoSvg from '../../logo.svg?react'
-import PlayerRefService from '../../services/PlayerRefService'
 
 type ContentProps = {
   dispatch: Dispatch,
@@ -150,7 +149,7 @@ const SidebarContents = (props: ContentProps) => {
 
       <div className='w-full'>  
         <CommandBar 
-          togglePlaying={() => PlayerRefService.getInstance().toggle()}
+          togglePlaying={() => props.dispatch({ type: 'PLAYBACK_TOGGLE_REQUESTED' })}
           playNext={() => props.dispatch({ type: 'PLAY_NEXT' })}
           playPrev={() => props.dispatch({ type: 'PLAY_PREV' })}
         />

@@ -2,7 +2,6 @@ import { connect } from 'react-redux'
 import { useEffect, useCallback } from 'react'
 import { Dispatch } from 'redux'
 import * as types from '../constants/ActionTypes'
-import PlayerRefService from '../services/PlayerRefService'
 
 type Props = {
   dispatch: Dispatch
@@ -18,7 +17,7 @@ const GlobalKeyHandlers = ({ dispatch }: Props) => {
     switch (event.key) {
       case ' ':
         event.preventDefault() // Prevent space from scrolling the page
-        PlayerRefService.getInstance().toggle()
+        dispatch({ type: types.PLAYBACK_TOGGLE_REQUESTED })
         break
       case 'ArrowRight':
       case 'j':

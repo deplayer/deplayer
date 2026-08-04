@@ -4,6 +4,7 @@ import PlayerControls from '../components/Player/PlayerControls'
 import { useLocation } from 'react-router'
 import { State } from '../reducers'
 import { useQueue, useSettings, useMediaById } from '../stores/livestore/hooks'
+import { parseIds, resolveCurrentSongId } from '../stores/livestore/hooks/queueUtils'
 import { useUIStore } from '../stores/uiStore'
 import { defaultState as queueDefaultState } from '../reducers/queue'
 import { defaultState as settingsDefaultState } from '../reducers/settings'
@@ -28,30 +29,16 @@ const PlayerContainer = ({ playerPortal }: Props) => {
   // Track the last valid currentPlayingId to prevent flickering during state transitions
   const lastValidCurrentPlayingIdRef = useRef<string | null>(null)
 
-  // Parse trackIds from LiveStore queue (can be JSON string or array)
-  const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
-    if (!ids) return []
-    if (Array.isArray(ids)) return ids
-    try {
-      return JSON.parse(ids)
-    } catch {
-      return []
-    }
-  }
-
   // Get the active track list based on shuffle state
   const trackIds = liveQueue?.shuffle
-    ? parseTrackIds(liveQueue.randomTrackIds)
-    : parseTrackIds(liveQueue?.trackIds)
+    ? parseIds(liveQueue.randomTrackIds)
+    : parseIds(liveQueue?.trackIds)
 
-  // Resolve the active track id from the queue index. Falling back to the
-  // last valid id (when streamUri is live but the index briefly goes null
-  // during a shuffle toggle) keeps the UI stable. Resolve BEFORE fetching
-  // media so we subscribe to one row, not the entire queue.
-  const queueId =
-    liveQueue?.currentPlaying !== null && liveQueue?.currentPlaying !== undefined
-      ? (trackIds[liveQueue.currentPlaying] ?? null)
-      : null
+  // Resolve the active track id using the shared persisted-ID-first resolution.
+  // Falling back to the last valid id (when streamUri is live but the index
+  // briefly goes null during a shuffle toggle) keeps the UI stable.
+  const resolvedId = liveQueue ? resolveCurrentSongId(liveQueue) : null
+  const queueId = resolvedId ?? null
   const currentPlayingId =
     queueId ?? (player?.streamUri ? lastValidCurrentPlayingIdRef.current : null)
   if (currentPlayingId) {
@@ -61,7 +48,7 @@ const PlayerContainer = ({ playerPortal }: Props) => {
 
   const queue = liveQueue ? {
     trackIds,
-    randomTrackIds: parseTrackIds(liveQueue.randomTrackIds),
+    randomTrackIds: parseIds(liveQueue.randomTrackIds),
     currentPlaying: currentPlayingId,  // Convert index to track ID
     repeat: liveQueue.repeat,
     shuffle: liveQueue.shuffle,

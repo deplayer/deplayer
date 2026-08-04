@@ -17,7 +17,6 @@ import Controls from './Controls'
 import { State } from '../../reducers'
 import { useQueue } from '../../stores/livestore/hooks'
 import { toggleRepeatAction, toggleShuffleAction } from '../../stores/livestore/actions'
-import PlayerRefService from '../../services/PlayerRefService'
 
 const MENU_ID = 'context-menu-player'
 
@@ -274,7 +273,7 @@ const ContextualMenu = () => {
               playPrev={() => dispatch({ type: types.PLAY_PREV })}
               isPlaying={player.playing}
               mqlMatch={true}
-              playPause={() => PlayerRefService.getInstance().toggle()}
+              playPause={() => dispatch({ type: types.PLAYBACK_TOGGLE_REQUESTED })}
               playNext={() => dispatch({ type: types.PLAY_NEXT })}
             />
             </div>

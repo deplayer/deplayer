@@ -17,10 +17,26 @@ type LiveStore = Store<any>
 const QUEUE_ID = 'default'
 
 /**
- * Get current queue from LiveStore
- * Uses queryDb for consistency with hooks
+ * Normalized queue shape returned by readQueue.
+ * Internal — not exported; the public contract is PlaybackQueue in the controller.
  */
-const getCurrentQueue = async (store: LiveStore) => {
+type QueueRow = {
+  id: string
+  trackIds: string[]
+  randomTrackIds: string[]
+  currentPlaying: number | null
+  currentTrackId: string | null
+  shuffle: boolean
+  repeat: boolean
+  updatedAt: unknown
+}
+
+/**
+ * Read the current queue from LiveStore.
+ * Includes the persisted currentTrackId column so callers can
+ * prefer it over the index-based fallback.
+ */
+export const readQueue = async (store: LiveStore): Promise<QueueRow | null> => {
   try {
     const query = queryDb(
       tables.queue
@@ -28,16 +44,16 @@ const getCurrentQueue = async (store: LiveStore) => {
         .where('id', '=', QUEUE_ID)
         .limit(1)
     )
-    
+
     const result = await store.query(query)
-    
+
     // queryDb returns array of objects directly
     const row = Array.isArray(result) ? result[0] : null
-    
+
     if (!row) {
       return null
     }
-    
+
     // Parse JSON fields if they're strings
     const parseJson = (val: unknown, defaultVal: string[] = []): string[] => {
       if (!val) return defaultVal
@@ -48,18 +64,19 @@ const getCurrentQueue = async (store: LiveStore) => {
         return defaultVal
       }
     }
-    
+
     return {
       id: row.id as string,
       trackIds: parseJson(row.trackIds),
       randomTrackIds: parseJson(row.randomTrackIds),
-      currentPlaying: row.currentPlaying,
+      currentPlaying: row.currentPlaying as number | null,
+      currentTrackId: (row.currentTrackId as string) || null,
       shuffle: Boolean(row.shuffle),
       repeat: Boolean(row.repeat),
       updatedAt: row.updatedAt,
     }
   } catch (error) {
-    console.error('[getCurrentQueue] Error:', error)
+    console.error('[readQueue] Error:', error)
     return null
   }
 }
@@ -99,7 +116,7 @@ export const addToQueueAction = async (store: LiveStore, trackIds: string[]) => 
     return
   }
 
-  const currentQueue = await getCurrentQueue(store)
+  const currentQueue = await readQueue(store)
   
   if (!currentQueue) {
     // No queue exists, create one
@@ -122,7 +139,7 @@ export const addToQueueAction = async (store: LiveStore, trackIds: string[]) => 
     events.queueUpdated({
       id: QUEUE_ID,
       trackIds: newTrackIds,
-      currentPlaying: currentQueue.currentPlaying,
+      currentPlaying: currentQueue.currentPlaying ?? undefined,
       shuffle: currentQueue.shuffle,
       repeat: currentQueue.repeat,
     })
@@ -141,7 +158,7 @@ export const addNextAction = async (store: LiveStore, trackIds: string[]) => {
     return null
   }
 
-  const currentQueue = await getCurrentQueue(store)
+  const currentQueue = await readQueue(store)
   
   if (!currentQueue) {
     // No queue exists, create one and start playing
@@ -172,7 +189,7 @@ export const addNextAction = async (store: LiveStore, trackIds: string[]) => {
     events.queueUpdated({
       id: QUEUE_ID,
       trackIds: newTrackIds,
-      currentPlaying: currentQueue.currentPlaying,
+      currentPlaying: currentQueue.currentPlaying ?? undefined,
       shuffle: currentQueue.shuffle,
       repeat: currentQueue.repeat,
     })
@@ -188,7 +205,7 @@ export const addNextAction = async (store: LiveStore, trackIds: string[]) => {
  * @param trackId - Media ID to remove
  */
 export const removeFromQueueAction = async (store: LiveStore, trackId: string) => {
-  const currentQueue = await getCurrentQueue(store)
+  const currentQueue = await readQueue(store)
   
   if (!currentQueue) {
     return
@@ -208,7 +225,7 @@ export const removeFromQueueAction = async (store: LiveStore, trackId: string) =
     events.queueUpdated({
       id: QUEUE_ID,
       trackIds: newTrackIds,
-      currentPlaying: newCurrentPlaying,
+      currentPlaying: newCurrentPlaying ?? undefined,
       shuffle: currentQueue.shuffle,
       repeat: currentQueue.repeat,
     })
@@ -251,7 +268,7 @@ const shuffleArray = <T>(array: T[]): T[] => {
  * @param shuffle - New shuffle state
  */
 export const toggleShuffleAction = async (store: LiveStore, shuffle: boolean) => {
-  const currentQueue = await getCurrentQueue(store)
+  const currentQueue = await readQueue(store)
   
   if (!currentQueue || currentQueue.trackIds.length === 0) {
     // No queue exists or queue is empty - nothing to shuffle
@@ -281,7 +298,7 @@ export const toggleShuffleAction = async (store: LiveStore, shuffle: boolean) =>
         id: QUEUE_ID,
         trackIds: currentQueue.trackIds,
         randomTrackIds,
-        currentPlaying: newCurrentPlaying,
+        currentPlaying: newCurrentPlaying ?? undefined,
         shuffle: true,
         repeat: currentQueue.repeat,
       })
@@ -304,7 +321,7 @@ export const toggleShuffleAction = async (store: LiveStore, shuffle: boolean) =>
         id: QUEUE_ID,
         trackIds: currentQueue.trackIds,
         randomTrackIds: [],
-        currentPlaying: newCurrentPlaying,
+        currentPlaying: newCurrentPlaying ?? undefined,
         shuffle: false,
         repeat: currentQueue.repeat,
       })
@@ -319,7 +336,7 @@ export const toggleShuffleAction = async (store: LiveStore, shuffle: boolean) =>
  * @param repeat - New repeat state
  */
 export const toggleRepeatAction = async (store: LiveStore, repeat: boolean) => {
-  const currentQueue = await getCurrentQueue(store)
+  const currentQueue = await readQueue(store)
   
   if (!currentQueue) {
     console.warn('[toggleRepeatAction] No queue exists, cannot toggle repeat')
@@ -360,7 +377,7 @@ export async function playNextAction(
   store: LiveStore,
   queueId = QUEUE_ID
 ): Promise<void> {
-  const queue = await getCurrentQueue(store)
+  const queue = await readQueue(store)
   
   if (!queue) {
     console.warn(`[playNextAction] Queue ${queueId} not found`)
@@ -403,7 +420,7 @@ export async function playPreviousAction(
   store: LiveStore,
   queueId = QUEUE_ID
 ): Promise<void> {
-  const queue = await getCurrentQueue(store)
+  const queue = await readQueue(store)
   
   if (!queue) {
     console.warn(`[playPreviousAction] Queue ${queueId} not found`)
@@ -446,7 +463,7 @@ export async function playMediaAction(
   mediaId: string,
   queueId = QUEUE_ID
 ): Promise<void> {
-  const queue = await getCurrentQueue(store)
+  const queue = await readQueue(store)
   
   if (!queue) {
     console.warn(`[playMediaAction] Queue ${queueId} not found`)
