@@ -363,4 +363,133 @@ describe('PlaybackController', () => {
       expect((result as { reason: string }).reason).toBe('store-unavailable')
     })
   })
+
+  describe('rapid row-click race', () => {
+    it('second click wins; stale first request does not restore old song', async () => {
+      const song1 = fakeMedia('song-1')
+      const song2 = fakeMedia('song-2')
+      const q = queueState({ trackIds: ['song-1', 'song-2'], currentPlaying: 0 })
+
+      const { ctrl, data, transport, dispatch, resolveStream } = makeController()
+
+      // Both songs are in the queue
+      vi.mocked(data.readQueue).mockResolvedValue(q)
+
+      // Both songs have media
+      vi.mocked(data.readMedia).mockImplementation((id: string) => {
+        if (id === 'song-1') return Promise.resolve(song1)
+        if (id === 'song-2') return Promise.resolve(song2)
+        return Promise.resolve(null)
+      })
+
+      // Defer stream resolution for song-1
+      let resolveStream1!: (value: string) => void
+      const stream1Deferred = new Promise<string>(resolve => { resolveStream1 = resolve })
+      const stream2Uri = 'https://example.com/song-2-resolved.mp3'
+
+      resolveStream.mockImplementation((media: MediaRow): Promise<string> => {
+        if (media.id === 'song-1') return stream1Deferred
+        return Promise.resolve(stream2Uri)
+      })
+
+      // Start song-1 — don't await
+      const result1Promise = ctrl.playSong('song-1')
+
+      // Wait for song-1 to reach stream resolution (hanging on deferred promise)
+      await vi.waitFor(() => {
+        expect(resolveStream).toHaveBeenCalledWith(song1, 0)
+      })
+
+      // Now start song-2 before song-1's stream resolves
+      const result2Promise = ctrl.playSong('song-2')
+
+      // Resolve song-1's stream
+      resolveStream1('https://example.com/song-1-resolved.mp3')
+
+      // Await both
+      const [result1, result2] = await Promise.all([result1Promise, result2Promise])
+
+      // First request superseded
+      expect(result1.status).toBe('idle')
+      expect((result1 as { reason: string }).reason).toBe('superseded')
+
+      // Second request wins
+      expect(result2.status).toBe('started')
+      if (result2.status === 'started') {
+        expect(result2.songId).toBe('song-2')
+        expect(result2.streamUri).toBe(stream2Uri)
+      }
+
+      // Dispatch actions should only reflect song-2
+      const dispatchCalls = dispatch.mock.calls
+      const urlDispatchArgs = dispatchCalls
+        .filter((c: unknown[]) => (c[0] as { type: string }).type === 'SET_CURRENT_PLAYING_URL')
+        .map((c: unknown[]) => (c[0] as { url: string }).url)
+      expect(urlDispatchArgs).not.toContain(expect.stringContaining('song-1'))
+      expect(urlDispatchArgs).toContain(stream2Uri)
+
+      // transport.play() called exactly once for the winner
+      expect(transport.play).toHaveBeenCalledTimes(1)
+
+      // transport.stop() called twice (once per request)
+      expect(transport.stop).toHaveBeenCalledTimes(2)
+    })
+
+    it('superseded during queue selection returns idle', async () => {
+      const song1 = fakeMedia('song-1')
+      const song2 = fakeMedia('song-2')
+      const q = queueState({ trackIds: ['song-1', 'song-2'], currentPlaying: 0 })
+
+      const { ctrl, data, transport, resolveStream } = makeController()
+
+      // Queue exists with both songs
+      vi.mocked(data.readQueue).mockResolvedValue(q)
+
+      // Defer the select call for song-1
+      let resolveSelect1!: () => void
+      const select1Deferred = new Promise<void>(resolve => { resolveSelect1 = resolve })
+      vi.mocked(data.select).mockImplementation((id: string) => {
+        if (id === 'song-1') return select1Deferred
+        return Promise.resolve()
+      })
+
+      // Media available for both
+      vi.mocked(data.readMedia).mockImplementation((id: string) => {
+        if (id === 'song-1') return Promise.resolve(song1)
+        if (id === 'song-2') return Promise.resolve(song2)
+        return Promise.resolve(null)
+      })
+
+      resolveStream.mockImplementation((media: MediaRow) =>
+        Promise.resolve(`https://example.com/${media.id}-resolved.mp3`)
+      )
+
+      // Start song-1
+      const result1Promise = ctrl.playSong('song-1')
+
+      // Wait for song-1 to reach the deferred select
+      await vi.waitFor(() => {
+        expect(data.select).toHaveBeenCalledWith('song-1')
+      })
+
+      // Start song-2 before song-1's select resolves
+      const result2Promise = ctrl.playSong('song-2')
+
+      // Resolve song-1's select
+      resolveSelect1()
+
+      const [result1, result2] = await Promise.all([result1Promise, result2Promise])
+
+      // First request superseded
+      expect(result1.status).toBe('idle')
+      expect((result1 as { reason: string }).reason).toBe('superseded')
+
+      // Second request wins
+      expect(result2.status).toBe('started')
+      if (result2.status === 'started') expect(result2.songId).toBe('song-2')
+
+      // transport.play() called exactly once
+      expect(transport.play).toHaveBeenCalledTimes(1)
+    })
+  })
 })

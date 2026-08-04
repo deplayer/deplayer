@@ -28,10 +28,15 @@ export type PlaybackQueue = {
   repeat: boolean
 }
 
+
+/** Must be called after every await in a queued track-change operation.
+ *  Returns `true` while this command is the latest; `false` once superseded. */
+export type PlaybackRequestGuard = () => boolean
 export type PlaybackResult =
   | { status: 'started'; songId: string; streamUri: string }
-  | { status: 'idle'; reason: 'store-unavailable' | 'empty-queue' | 'end-of-queue' | 'missing-media' | 'missing-stream' }
+  | { status: 'idle'; reason: 'store-unavailable' | 'empty-queue' | 'end-of-queue' | 'missing-media' | 'missing-stream' | 'superseded' }
 
+const SUPERSEDED = 'superseded' as const
 export class PlaybackStoreUnavailableError extends Error {
   constructor() {
     super('LiveStore is not available')
@@ -67,6 +72,8 @@ export class PlaybackController {
   private resolveStream: (media: MediaRow, providerIndex: number) => Promise<string | Blob>
   private objectUrl: string | null = null
   private currentSongId: string | null = null
+  private playbackRequestGeneration = 0
+  private playbackCommandTail: Promise<void> = Promise.resolve()
 
   constructor(dependencies: {
     data: PlaybackDataPort
@@ -81,6 +88,25 @@ export class PlaybackController {
     this.setBackgroundImage = dependencies.setBackgroundImage
     this.resolveStream = dependencies.resolveStream ?? defaultResolveStream
   }
+  // -----------------------------------------------------------------------
+  // Command serialization — track-changing ops queue here so a later
+  // request always wins and stale ones return 'superseded'.
+  // -----------------------------------------------------------------------
+
+  private async enqueueTrackChange<T>(
+    operation: (isCurrent: PlaybackRequestGuard) => Promise<T>
+  ): Promise<T> {
+    const generation = ++this.playbackRequestGeneration
+    const isCurrent: PlaybackRequestGuard = () => generation === this.playbackRequestGeneration
+
+    const result = this.playbackCommandTail
+      .catch(() => undefined)
+      .then(() => operation(isCurrent))
+
+    this.playbackCommandTail = result.then(() => undefined, () => undefined)
+
+    return result
+  }
 
   // -----------------------------------------------------------------------
   // Public API
@@ -91,31 +117,30 @@ export class PlaybackController {
       return { status: 'idle', reason: 'empty-queue' }
     }
 
-    try {
-      // 1. Kill audio before touching the queue
-      this.dispatch({ type: 'STOP_PLAYING' })
-      this.transport.stop()
+    return this.enqueueTrackChange((isCurrent) =>
+      this.wrapStoreUnavailable(async () => {
+        // 1. Kill audio before touching the queue
+        this.dispatch({ type: 'STOP_PLAYING' })
+        this.transport.stop()
 
-      // 2. Replace queue
-      await this.data.replaceQueue(trackIds)
+        // 2. Replace queue
+        await this.data.replaceQueue(trackIds)
+        if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
 
-      // 3. Resolve target track
-      const targetId = startFromId && trackIds.includes(startFromId)
-        ? startFromId
-        : trackIds[0]
+        // 3. Resolve target track
+        const targetId = startFromId && trackIds.includes(startFromId)
+          ? startFromId
+          : trackIds[0]
 
-      // If startFromId is not the first track, reposition
-      if (startFromId && startFromId !== trackIds[0] && trackIds.includes(startFromId)) {
-        await this.data.select(startFromId)
-      }
+        // If startFromId is not the first track, reposition
+        if (startFromId && startFromId !== trackIds[0] && trackIds.includes(startFromId)) {
+          await this.data.select(startFromId)
+          if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
+        }
 
-      return this.startStream(targetId)
-    } catch (error) {
-      if (error instanceof PlaybackStoreUnavailableError) {
-        return { status: 'idle', reason: 'store-unavailable' }
-      }
-      throw error
-    }
+        return this.startStream(targetId, 0, isCurrent)
+      })
+    )
   }
 
   async playSong(songId: string, contextIds?: readonly string[]): Promise<PlaybackResult> {
@@ -123,22 +148,20 @@ export class PlaybackController {
       return { status: 'idle', reason: 'missing-media' }
     }
 
-    try {
-      // 1. Kill audio
-      this.dispatch({ type: 'STOP_PLAYING' })
-      this.transport.stop()
+    return this.enqueueTrackChange((isCurrent) =>
+      this.wrapStoreUnavailable(async () => {
+        // 1. Kill audio
+        this.dispatch({ type: 'STOP_PLAYING' })
+        this.transport.stop()
 
-      // 2. Ensure song is in queue
-      await this.ensureInQueue(songId, contextIds)
+        // 2. Ensure song is in queue
+        const enqueued = await this.ensureInQueue(songId, contextIds, isCurrent)
+        if (!enqueued) return { status: 'idle', reason: SUPERSEDED }
 
-      // 3. Start stream
-      return this.startStream(songId)
-    } catch (error) {
-      if (error instanceof PlaybackStoreUnavailableError) {
-        return { status: 'idle', reason: 'store-unavailable' }
-      }
-      throw error
-    }
+        // 3. Start stream
+        return this.startStream(songId, 0, isCurrent)
+      })
+    )
   }
 
   async playCurrent(songId: string, options?: { media?: MediaRow; streamUri?: string }): Promise<PlaybackResult> {
@@ -165,75 +188,76 @@ export class PlaybackController {
     }
 
     // Resolve stream from providers
-    return this.startStreamWithMedia(songId, options?.media ?? null, 0)
+    return this.startStreamWithMedia(songId, options?.media ?? null, 0, () => true)
   }
 
   async next(): Promise<PlaybackResult> {
-    try {
-      this.dispatch({ type: 'STOP_PLAYING' })
-      this.transport.stop()
+    return this.enqueueTrackChange((isCurrent) =>
+      this.wrapStoreUnavailable(async () => {
+        this.dispatch({ type: 'STOP_PLAYING' })
+        this.transport.stop()
 
-      await this.data.next()
+        await this.data.next()
+        if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
 
-      const queue = await this.data.readQueue()
-      if (!queue) {
-        return { status: 'idle', reason: 'store-unavailable' }
-      }
-      const songId = resolveCurrentSongId(queue)
-      if (!songId) {
-        return { status: 'idle', reason: 'end-of-queue' }
-      }
+        const queue = await this.data.readQueue()
+        if (!queue) {
+          return { status: 'idle', reason: 'store-unavailable' }
+        }
+        if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
 
-      const result = await this.startStream(songId)
-      if (result.status === 'idle' && result.reason !== 'store-unavailable') {
-        return this.advanceFallback(songId, () => this.data.next())
-      }
-      return result
-    } catch (error) {
-      if (error instanceof PlaybackStoreUnavailableError) {
-        return { status: 'idle', reason: 'store-unavailable' }
-      }
-      throw error
-    }
+        const songId = resolveCurrentSongId(queue)
+        if (!songId) {
+          return { status: 'idle', reason: 'end-of-queue' }
+        }
+
+        const result = await this.startStream(songId, 0, isCurrent)
+        if (result.status === 'idle' && result.reason !== 'store-unavailable' && result.reason !== SUPERSEDED) {
+          return this.advanceFallback(songId, () => this.data.next(), isCurrent)
+        }
+        return result
+      })
+    )
   }
 
   async previous(): Promise<PlaybackResult> {
-    try {
-      this.dispatch({ type: 'STOP_PLAYING' })
-      this.transport.stop()
+    return this.enqueueTrackChange((isCurrent) =>
+      this.wrapStoreUnavailable(async () => {
+        this.dispatch({ type: 'STOP_PLAYING' })
+        this.transport.stop()
 
-      await this.data.previous()
+        await this.data.previous()
+        if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
 
-      const queue = await this.data.readQueue()
-      if (!queue) {
-        return { status: 'idle', reason: 'store-unavailable' }
-      }
+        const queue = await this.data.readQueue()
+        if (!queue) {
+          return { status: 'idle', reason: 'store-unavailable' }
+        }
+        if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
 
-      const songId = resolveCurrentSongId(queue)
-      if (!songId) {
-        return { status: 'idle', reason: 'end-of-queue' }
-      }
+        const songId = resolveCurrentSongId(queue)
+        if (!songId) {
+          return { status: 'idle', reason: 'end-of-queue' }
+        }
 
-      const result = await this.startStream(songId)
-      if (result.status === 'idle' && result.reason !== 'store-unavailable') {
-        return this.advanceFallback(songId, () => this.data.previous())
-      }
-      return result
-    } catch (error) {
-      if (error instanceof PlaybackStoreUnavailableError) {
-        return { status: 'idle', reason: 'store-unavailable' }
-      }
-      throw error
-    }
+        const result = await this.startStream(songId, 0, isCurrent)
+        if (result.status === 'idle' && result.reason !== 'store-unavailable' && result.reason !== SUPERSEDED) {
+          return this.advanceFallback(songId, () => this.data.previous(), isCurrent)
+        }
+        return result
+      })
+    )
   }
 
   async retry(providerIndex: number): Promise<PlaybackResult> {
-    const songId = this.currentSongId
-    if (!songId) {
-      return { status: 'idle', reason: 'missing-media' }
-    }
+    return this.enqueueTrackChange(async (isCurrent) => {
+      const songId = this.currentSongId
+      if (!songId) {
+        return { status: 'idle', reason: 'missing-media' }
+      }
 
-    return this.startStream(songId, providerIndex)
+      return this.startStream(songId, providerIndex, isCurrent)
+    })
   }
 
   async play(): Promise<void> {
@@ -252,37 +276,58 @@ export class PlaybackController {
   // Internal
   // -----------------------------------------------------------------------
 
-  private async ensureInQueue(songId: string, contextIds?: readonly string[]): Promise<void> {
+  private async wrapStoreUnavailable(fn: () => Promise<PlaybackResult>): Promise<PlaybackResult> {
+    try {
+      return await fn()
+    } catch (error) {
+      if (error instanceof PlaybackStoreUnavailableError) {
+        return { status: 'idle', reason: 'store-unavailable' }
+      }
+      throw error
+    }
+  }
+
+  private async ensureInQueue(songId: string, contextIds: readonly string[] | undefined, isCurrent: PlaybackRequestGuard): Promise<boolean> {
     const queue = await this.data.readQueue()
+    if (!isCurrent()) return false
 
     if (!queue || queue.trackIds.length === 0) {
       // No queue — create one
       if (contextIds && contextIds.length > 0) {
         await this.data.replaceQueue(contextIds)
+        if (!isCurrent()) return false
         const index = contextIds.indexOf(songId)
         if (index > 0) {
           await this.data.select(songId)
+          if (!isCurrent()) return false
         }
       } else {
         await this.data.replaceQueue([songId])
+        if (!isCurrent()) return false
       }
     } else {
       const index = queue.trackIds.indexOf(songId)
       if (index !== -1) {
         // Song in queue — reposition
         await this.data.select(songId)
+        if (!isCurrent()) return false
       } else {
         // Song not in queue — add next, then play
         await this.data.addNext([songId])
+        if (!isCurrent()) return false
         await this.data.select(songId)
+        if (!isCurrent()) return false
       }
     }
+
+    return true
   }
 
-  private async startStream(songId: string, providerIndex = 0): Promise<PlaybackResult> {
+  private async startStream(songId: string, providerIndex: number, isCurrent: PlaybackRequestGuard): Promise<PlaybackResult> {
     try {
       const media = await this.data.readMedia(songId)
-      return this.startStreamWithMedia(songId, media, providerIndex)
+      if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
+      return this.startStreamWithMedia(songId, media, providerIndex, isCurrent)
     } catch (error) {
       if (error instanceof PlaybackStoreUnavailableError) {
         return { status: 'idle', reason: 'store-unavailable' }
@@ -295,11 +340,14 @@ export class PlaybackController {
     songId: string,
     media: MediaRow | null,
     providerIndex: number,
+    isCurrent: PlaybackRequestGuard,
   ): Promise<PlaybackResult> {
     if (!media) {
       console.warn('[PlaybackController] Media not found:', songId)
       return { status: 'idle', reason: 'missing-media' }
     }
+
+    if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
 
     let streamUri: string | Blob
     try {
@@ -314,11 +362,22 @@ export class PlaybackController {
       return { status: 'idle', reason: 'missing-stream' }
     }
 
+    if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
+
     // Convert Blob to object URL
     const url = typeof streamUri === 'string' ? streamUri : URL.createObjectURL(streamUri)
     if (streamUri instanceof Blob) {
       this.revokeObjectUrl()
       this.objectUrl = url as string
+    }
+
+    if (!isCurrent()) {
+      // Revoke any object URL created for a superseded Blob result
+      if (streamUri instanceof Blob) {
+        URL.revokeObjectURL(url as string)
+        this.objectUrl = null
+      }
+      return { status: 'idle', reason: SUPERSEDED }
     }
 
     this.currentSongId = songId
@@ -329,6 +388,9 @@ export class PlaybackController {
     this.dispatch({ type: 'SHOW_PLAYER' })
     // Imperative play — waits for ReactPlayer to mount the internal element.
     // Redux `playing` state will be set by ReactPlayer's onPlay callback.
+
+    if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
+
     await this.transport.play()
 
     if (media.cover?.fullUrl) {
@@ -343,16 +405,19 @@ export class PlaybackController {
    * Used as a fallback when the current track's media/stream is missing.
    * If the next track also fails, returns idle — no recursive retry.
    */
-  private async advanceFallback(songId: string, advance: () => Promise<void>): Promise<PlaybackResult> {
+  private async advanceFallback(songId: string, advance: () => Promise<void>, isCurrent: PlaybackRequestGuard): Promise<PlaybackResult> {
     try {
       const beforeQueue = await this.data.readQueue()
+      if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
       if (!beforeQueue) {
         return { status: 'idle', reason: 'store-unavailable' }
       }
 
       await advance()
+      if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
 
       const afterQueue = await this.data.readQueue()
+      if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
       if (!afterQueue) {
         return { status: 'idle', reason: 'store-unavailable' }
       }
@@ -363,11 +428,12 @@ export class PlaybackController {
       }
 
       const media = await this.data.readMedia(nextId)
+      if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
       if (!media) {
         return { status: 'idle', reason: 'missing-stream' }
       }
 
-      return this.startStreamWithMedia(nextId, media, 0)
+      return this.startStreamWithMedia(nextId, media, 0, isCurrent)
     } catch {
       return { status: 'idle', reason: 'missing-stream' }
     }
