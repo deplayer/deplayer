@@ -16,6 +16,7 @@ import * as types from '../../constants/ActionTypes'
 import Controls from './Controls'
 import { State } from '../../reducers'
 import { useQueue } from '../../stores/livestore/hooks'
+import { getActiveTrackIds } from '../../stores/livestore/hooks/queueUtils'
 import { toggleRepeatAction, toggleShuffleAction } from '../../stores/livestore/actions'
 
 const MENU_ID = 'context-menu-player'
@@ -41,20 +42,7 @@ const ContextualMenu = () => {
   const liveQueue = useQueue('default')
   const liveStore = useAppStore()
   
-  // Parse trackIds from LiveStore queue (can be JSON string or array)
-  const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
-    if (!ids) return []
-    if (Array.isArray(ids)) return ids
-    try {
-      return JSON.parse(ids)
-    } catch {
-      return []
-    }
-  }
-  
-  const trackIds = liveQueue?.shuffle 
-    ? parseTrackIds(liveQueue.randomTrackIds)
-    : parseTrackIds(liveQueue?.trackIds)
+  const trackIds = getActiveTrackIds(liveQueue)
 
   const setVolume = (value: number | number[]) => {
     dispatch({ type: types.VOLUME_SET, value: value })

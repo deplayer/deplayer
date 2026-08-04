@@ -4,7 +4,7 @@ import PlayerControls from '../components/Player/PlayerControls'
 import { useLocation } from 'react-router'
 import { State } from '../reducers'
 import { useQueue, useSettings, useMediaById } from '../stores/livestore/hooks'
-import { parseIds, resolveCurrentSongId } from '../stores/livestore/hooks/queueUtils'
+import { parseIds, getActiveTrackIds, resolveCurrentSongId } from '../stores/livestore/hooks/queueUtils'
 import { useUIStore } from '../stores/uiStore'
 import { defaultState as queueDefaultState } from '../reducers/queue'
 import { defaultState as settingsDefaultState } from '../reducers/settings'
@@ -30,9 +30,7 @@ const PlayerContainer = ({ playerPortal }: Props) => {
   const lastValidCurrentPlayingIdRef = useRef<string | null>(null)
 
   // Get the active track list based on shuffle state
-  const trackIds = liveQueue?.shuffle
-    ? parseIds(liveQueue.randomTrackIds)
-    : parseIds(liveQueue?.trackIds)
+  const trackIds = getActiveTrackIds(liveQueue)
 
   // Resolve the active track id using the shared persisted-ID-first resolution.
   // Falling back to the last valid id (when streamUri is live but the index

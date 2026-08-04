@@ -58,6 +58,11 @@ describe('getActiveTrackIds', () => {
     const q = makeQueue({ randomTrackIds: JSON.stringify(SHUFFLED), shuffle: true })
     expect(getActiveTrackIds(q)).toEqual(SHUFFLED)
   })
+
+  it('returns empty array for null or undefined queue', () => {
+    expect(getActiveTrackIds(null)).toEqual([])
+    expect(getActiveTrackIds(undefined)).toEqual([])
+  })
 })
 
 describe('resolveCurrentSongId', () => {

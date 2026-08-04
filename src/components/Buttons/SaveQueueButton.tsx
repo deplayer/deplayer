@@ -5,6 +5,7 @@ import { useAppStore } from '../../stores/livestore/store'
 import { createPlaylistAction } from '../../stores/livestore/actions/playlists'
 import { reorderPlaylistAction } from '../../stores/livestore/actions/playlists'
 import { useQueue } from '../../stores/livestore/hooks'
+import { getActiveTrackIds } from '../../stores/livestore/hooks/queueUtils'
 
 type Props = {
   className?: string
@@ -14,20 +15,7 @@ const SaveQueueButton = (props: Props) => {
   const liveStore = useAppStore()
   const liveQueue = useQueue('default')
   
-  // Parse trackIds from LiveStore queue (can be JSON string or array)
-  const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
-    if (!ids) return []
-    if (Array.isArray(ids)) return ids
-    try {
-      return JSON.parse(ids)
-    } catch {
-      return []
-    }
-  }
-  
-  const trackIds = liveQueue?.shuffle 
-    ? parseTrackIds(liveQueue.randomTrackIds)
-    : parseTrackIds(liveQueue?.trackIds)
+  const trackIds = getActiveTrackIds(liveQueue)
   
   if (!trackIds.length) {
     return null

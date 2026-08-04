@@ -8,6 +8,7 @@ import Icon from '../common/Icon'
 import { startSearch, StartSearchAction } from '../../types/search'
 import { useUIStore } from '../../stores/uiStore'
 import { useQueue, useMediaById, useArtistById, useAlbumById } from '../../stores/livestore/hooks'
+import { getActiveTrackIds } from '../../stores/livestore/hooks/queueUtils'
 import type { State as RootState } from '../../reducers'
 
 // Extract ID from route path
@@ -54,12 +55,6 @@ const staticTitle = (pathname: string, searchTerm: string = ''): React.ReactNode
   return ''
 }
 
-const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
-  if (!ids) return []
-  if (Array.isArray(ids)) return ids
-  try { return JSON.parse(ids) } catch { return [] }
-}
-
 type Props = {
   children?: React.ReactNode
 }
@@ -85,9 +80,7 @@ const Topbar = ({ children }: Props) => {
     ? <DynamicDetailTitle type={detailType} id={detailId} />
     : staticTitle(location.pathname, searchTerm)
 
-  const queueTrackIds = liveQueue?.shuffle
-    ? parseTrackIds(liveQueue.randomTrackIds)
-    : parseTrackIds(liveQueue?.trackIds)
+  const queueTrackIds = getActiveTrackIds(liveQueue)
   const hasResults = queueTrackIds.length > 0
   const inHome = location.pathname === '/'
   const showInCenter = !hasResults && inHome

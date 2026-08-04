@@ -4,6 +4,7 @@ import EmptyState from './common/EmptyState/index'
 import classNames from 'classnames'
 import { useQueue, useMediaCount } from '../stores/livestore/hooks'
 import { useSettings } from '../stores/livestore/hooks'
+import { getActiveTrackIds } from '../stores/livestore/hooks/queueUtils'
 import { useUIStore } from '../stores/uiStore'
 import { getEmptyStateFallback, collectionStep, searchStep } from './common/EmptyState/emptyStateFallback'
 
@@ -22,20 +23,7 @@ const Queue = (props: Props) => {
   const mqlMatch = useUIStore(s => s.mqlMatch)
   const displayMiniQueue = useUIStore(s => s.displayMiniQueue)
   
-  // Parse trackIds from LiveStore queue (can be JSON string or array)
-  const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
-    if (!ids) return []
-    if (Array.isArray(ids)) return ids
-    try {
-      return JSON.parse(ids)
-    } catch {
-      return []
-    }
-  }
-  
-  const trackIds = liveQueue?.shuffle 
-    ? parseTrackIds(liveQueue.randomTrackIds)
-    : parseTrackIds(liveQueue?.trackIds)
+  const trackIds = getActiveTrackIds(liveQueue)
   
   // PERF: Use count hook instead of loading entire library
   const mediaCount = useMediaCount()

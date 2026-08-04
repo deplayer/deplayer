@@ -30,8 +30,10 @@ export function parseIds(ids: readonly string[] | string | null | undefined): st
 /**
  * Get the active track list based on shuffle state.
  * When shuffle is on, currentPlaying indexes into randomTrackIds.
+ * Returns an empty array when queue is null or undefined.
  */
-export function getActiveTrackIds(queue: QueueState): string[] {
+export function getActiveTrackIds(queue: QueueState | null | undefined): string[] {
+  if (!queue) return []
   return queue.shuffle
     ? parseIds(queue.randomTrackIds)
     : parseIds(queue.trackIds)

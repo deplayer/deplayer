@@ -26,6 +26,7 @@ import { State as CollectionState } from '../../reducers/collection'
 import { State as PlayerState } from '../../reducers/player'
 import FavoriteButton from '../common/FavoriteButton'
 import { useQueue } from '../../stores/livestore/hooks'
+import { getActiveTrackIds, resolveCurrentSongId } from '../../stores/livestore/hooks/queueUtils'
 import { useUIStore } from '../../stores/uiStore'
 import { useAppStore } from '../../stores/livestore/store'
 import { addToQueueAction, removeFromQueueAction } from '../../stores/livestore/actions'
@@ -62,20 +63,8 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
   const clearFilters = useUIStore(s => s.clearFilters)
   const liveStore = useAppStore()
   
-  // Helper to parse trackIds from LiveStore (can be JSON string or array)
-  const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
-    if (!ids) return []
-    if (Array.isArray(ids)) return ids
-    try {
-      return JSON.parse(ids)
-    } catch {
-      return []
-    }
-  }
-  
-  const trackIds = parseTrackIds(liveQueue?.trackIds)
-  const currentPlayingIndex = liveQueue?.currentPlaying
-  const currentPlaying = (typeof currentPlayingIndex === 'number' && trackIds[currentPlayingIndex]) || null
+  const trackIds = getActiveTrackIds(liveQueue)
+  const currentPlaying = resolveCurrentSongId(liveQueue)
 
   const { rows, albums, albumsByArtist, songsByGenre } = collection
 

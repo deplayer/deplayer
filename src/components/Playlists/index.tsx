@@ -9,6 +9,7 @@ import { memo, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Dispatch } from 'redux'
 import { useMediaCount, useSongsByGenre, usePlaylists, useSmartPlaylists, useQueue, useSettings } from '../../stores/livestore/hooks'
+import { getActiveTrackIds } from '../../stores/livestore/hooks/queueUtils'
 import { getEmptyStateFallback, queueStep, searchStep } from '../common/EmptyState/emptyStateFallback'
 import EmptyStateAction from '../common/EmptyState/EmptyStateAction'
 import type { IconType } from '../common/Icon'
@@ -76,19 +77,7 @@ const Playlists = memo(() => {
 
   const mediaCount = useMediaCount()
 
-  const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
-    if (!ids) return []
-    if (Array.isArray(ids)) return ids
-    try {
-      return JSON.parse(ids)
-    } catch {
-      return []
-    }
-  }
-
-  const queueTrackIds = liveQueue?.shuffle
-    ? parseTrackIds(liveQueue.randomTrackIds)
-    : parseTrackIds(liveQueue?.trackIds)
+  const queueTrackIds = getActiveTrackIds(liveQueue)
 
   const hasQueueItems = queueTrackIds.length > 0
   const hasCollectionItems = mediaCount > 0

@@ -17,6 +17,7 @@ import { inSection } from '../../utils/router'
 import Icon from '../common/Icon'
 import { useLocation } from 'react-router'
 import { usePlaylists, useSmartPlaylists, useQueue, useMediaCount, useArtistsCount, useSearchMediaIds } from '../../stores/livestore/hooks'
+import { getActiveTrackIds } from '../../stores/livestore/hooks/queueUtils'
 import { useUIStore } from '../../stores/uiStore'
 
 import LogoSvg from '../../logo.svg?react'
@@ -86,20 +87,7 @@ const SidebarContents = (props: ContentProps) => {
   // Get search results count from LiveStore
   const searchResultIds = useSearchMediaIds(searchTerm, 1000)
   
-  // Parse trackIds from LiveStore queue (can be JSON string or array)
-  const parseTrackIds = (ids: string | string[] | null | undefined): string[] => {
-    if (!ids) return []
-    if (Array.isArray(ids)) return ids
-    try {
-      return JSON.parse(ids)
-    } catch {
-      return []
-    }
-  }
-  
-  const trackIds = liveQueue?.shuffle 
-    ? parseTrackIds(liveQueue.randomTrackIds)
-    : parseTrackIds(liveQueue?.trackIds)
+  const trackIds = getActiveTrackIds(liveQueue)
 
   return (
     <div role="button" tabIndex={0} onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && props.onSetSidebarOpen) props.onSetSidebarOpen(true) }} className={`flex flex-col h-full bg-base-100 ${props.className || ''}`} onClick={() => props.onSetSidebarOpen(true)}>
