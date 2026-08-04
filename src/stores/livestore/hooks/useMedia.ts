@@ -6,6 +6,13 @@ import type { Filter } from '../../uiStore'
 import { useFavoriteIds } from './useFavorites'
 
 import type { MediaRow } from '../../../types/media'
+import { rawToMediaRow } from '../transformMedia'
+
+/** Parse raw LiveStore rows into MediaRow, dropping nulls. */
+function toRows(raw: unknown): MediaRow[] {
+  if (!Array.isArray(raw)) return []
+  return raw.flatMap((x) => rawToMediaRow(x) ?? [])
+}
 
 // No-op query for idle hook states. Targets sync_state because it is written
 // only once per sync page (see MAX_PAGES_PER_SESSION in
@@ -16,57 +23,14 @@ import type { MediaRow } from '../../../types/media'
 // different rarely-written table before doing that.
 const NOOP_QUERY = queryDb(tables.syncState.select('id').where('id', '=', '__NONE__'))
 
-/** Transformed media extends MediaRow with nested artist/album objects */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface TransformedMedia extends MediaRow {
-  artist: { id: string; name: string }
-  album: { id: string; name: string; artistId: string; artist: { id: string; name: string }; thumbnailUrl: string | null; year: number | null }
-}
-
 /**
  * Media Query Hooks
  * 
  * These hooks provide reactive access to media data from LiveStore.
  * They automatically update when the underlying data changes.
+ * 
+ * Hooks return raw MediaRow objects (flat fields, JSON fields parsed).
  */
-
-/**
- * Transform raw LiveStore media data to include nested artist/album objects
- * 
- * LiveStore stores artist/album data flat (artistId, artistName, albumId, albumName)
- * but components expect nested objects (artist.id, artist.name, album.id, album.name)
- * 
- * This transformation reconstructs the nested structure while preserving flat fields.
- * 
- * @param rawMedia - Raw media object from LiveStore SQLite query
- * @returns Transformed media with nested artist/album objects
- */
-function transformMediaFromLiveStore(rawMedia: MediaRow | Record<string, unknown>): TransformedMedia | null {
-  if (!rawMedia) return null
-  const media = rawMedia as MediaRow & { cover?: { thumbnailUrl?: string } | null }
-
-  // Reconstruct nested artist object from flat fields
-  const artist = {
-    id: media.artistId || '',
-    name: media.artistName || 'Unknown Artist',
-  }
-
-  // Reconstruct nested album object from flat fields
-  const album = {
-    id: media.albumId || '',
-    name: media.albumName || 'Unknown Album',
-    artistId: media.artistId || '',
-    artist: artist, // Album also references its artist
-    thumbnailUrl: media.cover?.thumbnailUrl || null,
-    year: null,
-  }
-
-  return {
-    ...media, // Preserve all original flat fields (artistName, albumName, etc.)
-    artist,      // Add nested artist object
-    album,       // Add nested album object
-  }
-}
 
 /**
  * Get all media from the library
@@ -87,10 +51,7 @@ export const useMediaLibrary = () => {
     )
   )
   
-  return useMemo(() => {
-    if (!Array.isArray(rawMedia)) return []
-    return rawMedia.map(transformMediaFromLiveStore)
-  }, [rawMedia])
+  return useMemo(() => toRows(rawMedia), [rawMedia])
 }
 
 /**
@@ -106,7 +67,7 @@ export const useMediaMap = () => {
   const media = useMediaLibrary()
   
   return useMemo(() => {
-    const map: Record<string, TransformedMedia> = {}
+    const map: Record<string, MediaRow> = {}
     if (Array.isArray(media)) {
       media.forEach((item) => {
         if (item) map[item.id] = item
@@ -135,8 +96,8 @@ export const useMediaById = (id: string | null | undefined) => {
         : tables.media.select().where('id', '=', '__NONE__').limit(1) // Return empty if no id
     )
   )
-  const rawMedia = (result as unknown as Record<string, unknown>[])[0] || null
-  return transformMediaFromLiveStore(rawMedia)
+  const rawMedia = (result as unknown[])[0] ?? null
+  return rawToMediaRow(rawMedia)
 }
 
 /**
@@ -161,10 +122,7 @@ export const useMediaByArtist = (artistId: string | null | undefined) => {
     )
   )
   
-  return useMemo(() => {
-    if (!Array.isArray(rawMedia)) return []
-    return rawMedia.map(transformMediaFromLiveStore)
-  }, [rawMedia])
+  return useMemo(() => toRows(rawMedia), [rawMedia])
 }
 
 /**
@@ -190,10 +148,7 @@ export const useMediaByAlbum = (albumId: string | null | undefined) => {
     )
   )
   
-  return useMemo(() => {
-    if (!Array.isArray(rawMedia)) return []
-    return rawMedia.map(transformMediaFromLiveStore)
-  }, [rawMedia])
+  return useMemo(() => toRows(rawMedia), [rawMedia])
 }
 
 /**
@@ -256,26 +211,15 @@ export const useSearchMedia = (searchTerm: string | undefined | null, limit = 10
     const artistResults = Array.isArray(artistMatches) ? artistMatches : []
     
     const seenIds = new Set<string>()
-    const mergedResults: TransformedMedia[] = []
+    const mergedResults: MediaRow[] = []
     
     // Add title matches first (prioritize exact title matches)
     // Guard against undefined/null IDs
-    for (const media of titleResults) {
-      const id = media?.id
-      if (id && typeof id === 'string' && !seenIds.has(id)) {
-        seenIds.add(id)
-        const transformed = transformMediaFromLiveStore(media)
-        if (transformed) mergedResults.push(transformed)
-      }
-    }
-
-    // Add artist matches
-    for (const media of artistResults) {
-      const id = media?.id
-      if (id && typeof id === 'string' && !seenIds.has(id)) {
-        seenIds.add(id)
-        const transformed = transformMediaFromLiveStore(media)
-        if (transformed) mergedResults.push(transformed)
+    for (const m of [...titleResults, ...artistResults]) {
+      const row = rawToMediaRow(m)
+      if (row?.id && !seenIds.has(row.id)) {
+        seenIds.add(row.id)
+        mergedResults.push(row)
       }
     }
     
@@ -408,7 +352,7 @@ export const useRecentlyPlayed = (limit = 20) => {
   return useMemo(() => {
     return mediaIds
       .map(id => mediaMap[id])
-      .filter(Boolean) as TransformedMedia[]
+      .filter((x): x is MediaRow => Boolean(x))
   }, [mediaIds, mediaMap])
 }
 
@@ -437,10 +381,7 @@ export const useMostPlayed = (limit = 20) => {
     )
   )
   
-  return useMemo(() => {
-    if (!Array.isArray(rawMedia)) return []
-    return rawMedia.map(transformMediaFromLiveStore)
-  }, [rawMedia])
+  return useMemo(() => toRows(rawMedia), [rawMedia])
 }
 
 /**
@@ -680,11 +621,11 @@ export const useMediaMapForIds = (ids: string[]) => {
   const rawMedia = store.useQuery(query)
   
   return useMemo(() => {
-    const map: Record<string, TransformedMedia> = {}
+    const map: Record<string, MediaRow> = {}
     if (Array.isArray(rawMedia)) {
       rawMedia.forEach((item: Record<string, unknown>) => {
-        const media = transformMediaFromLiveStore(item)
-        if (media) map[media.id] = media
+        const row = rawToMediaRow(item)
+        if (row) map[row.id] = row
       })
     }
     return map

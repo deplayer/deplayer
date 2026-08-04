@@ -1,6 +1,6 @@
 import { call } from 'redux-saga/effects'
 import { queryDb } from '@livestore/livestore'
-import { transformMediaRow } from '../stores/livestore/transformMedia'
+import { rawToMediaRow } from '../stores/livestore/transformMedia'
 import { getLiveStoreInstance } from '../App'
 import { tables } from '../stores/livestore/schema'
 import type { State } from '../reducers'
@@ -26,22 +26,10 @@ export function* getSettingsFromLiveStore(): Generator<any, Record<string, unkno
 }
 
 /**
- * Transform raw LiveStore media data to include nested artist/album objects
- * and parse JSON fields. Mirrors the transformation in hooks/useMedia.ts
- */
-export type TransformedMedia = MediaRow & {
-  artist: { id: string; name: string }
-  album: { id: string; name: string; artistId: string; artist: { id: string; name: string }; thumbnailUrl: unknown; year: unknown }
-}
-
-function transformMediaFromLiveStore(rawMedia: Record<string, unknown>): TransformedMedia | null {
-  return transformMediaRow(rawMedia) as TransformedMedia | null
-}
-/**
  * Get media by ID from LiveStore
  * Use this in sagas instead of select(getSongById, id)
  */
-export function* getSongByIdFromLiveStore(songId: string): Generator<any, TransformedMedia | null, any> {
+export function* getSongByIdFromLiveStore(songId: string): Generator<any, MediaRow | null, any> {
   const liveStore = getLiveStoreInstance()
   if (!liveStore) {
     console.warn('LiveStore not available')
@@ -53,7 +41,7 @@ export function* getSongByIdFromLiveStore(songId: string): Generator<any, Transf
   )
   
   const result = yield call(() => liveStore.query(query))
-  return transformMediaFromLiveStore(result[0])
+  return rawToMediaRow(result[0])
 }
 
 /**
@@ -61,7 +49,7 @@ export function* getSongByIdFromLiveStore(songId: string): Generator<any, Transf
  * Uses the shared readQueue + resolveCurrentSongId so the saga and the
  * PlaybackController resolve the same track.
  */
-export function* getCurrentSongFromLiveStore(): Generator<any, TransformedMedia | null, any> {
+export function* getCurrentSongFromLiveStore(): Generator<any, MediaRow | null, any> {
   const liveStore = getLiveStoreInstance()
   if (!liveStore) {
     console.warn('LiveStore not available')

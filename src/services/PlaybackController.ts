@@ -10,7 +10,7 @@ import {
   playNextAction,
   playPreviousAction,
 } from '../stores/livestore/actions/queue'
-import { transformMediaRow } from '../stores/livestore/transformMedia'
+import { rawToMediaRow } from '../stores/livestore/transformMedia'
 import { resolveCurrentSongId } from '../stores/livestore/hooks/queueUtils'
 
 
@@ -431,8 +431,8 @@ export function createLiveStorePlaybackDataPort(
           .limit(1)
       )
       const result = await store().query(q)
-      const row = (Array.isArray(result) ? result[0] : null) as Record<string, unknown> | null
-      return transformMediaRow(row)
+      const row = Array.isArray(result) ? result[0] : null
+      return rawToMediaRow(row)
     },
 
     async replaceQueue(trackIds: readonly string[]): Promise<void> {

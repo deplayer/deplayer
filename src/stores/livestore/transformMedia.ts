@@ -1,11 +1,14 @@
 import type { MediaRow } from '../../types/media'
 
 /**
- * Transform raw LiveStore media row into MediaRow with nested artist/album
- * and parsed JSON fields. Pure function — no side effects, no LiveStore queries.
+ * Transform raw LiveStore media row into MediaRow with parsed JSON fields.
+ * Pure function — no side effects, no LiveStore queries. This is the
+ * cheap path used by hooks at reactive boundaries.
+ * It parses JSON fields (stream, cover, genres) from raw SQLite rows.
  */
-export function transformMediaRow(raw: Record<string, unknown> | null | undefined): MediaRow | null {
-  if (!raw) return null
+export function rawToMediaRow(raw: unknown): MediaRow | null {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null
+  const r = raw as Record<string, unknown>
 
   // Parse JSON fields if they're strings
   const parseJson = (val: unknown, defaultVal: unknown = {}) => {
@@ -21,30 +24,10 @@ export function transformMediaRow(raw: Record<string, unknown> | null | undefine
     return defaultVal
   }
 
-  // Reconstruct nested artist object from flat fields
-  const artist = {
-    id: (raw.artistId as string) || '',
-    name: (raw.artistName as string) || 'Unknown Artist',
-  }
-
-  const cover = parseJson(raw.cover, null) as { thumbnailUrl?: string; fullUrl?: string } | null
-
-  // Reconstruct nested album object from flat fields
-  const album = {
-    id: (raw.albumId as string) || '',
-    name: (raw.albumName as string) || 'Unknown Album',
-    artistId: (raw.artistId as string) || '',
-    artist,
-    thumbnailUrl: cover?.thumbnailUrl || null,
-    year: raw.year || null,
-  }
-
   return {
-    ...raw,
-    stream: parseJson(raw.stream, {}),
-    cover,
-    genres: parseJson(raw.genres, []),
-    artist,
-    album,
+    ...r,
+    stream: parseJson(r.stream, {}),
+    cover: parseJson(r.cover, null) as MediaRow['cover'],
+    genres: parseJson(r.genres, []),
   } as unknown as MediaRow
 }

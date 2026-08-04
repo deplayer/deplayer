@@ -4,7 +4,8 @@ import { tables } from '../schema'
 import { useMemo } from 'react'
 import { useUIStore } from '../../uiStore'
 import { useFavoriteIds } from './useFavorites'
-import type { TransformedMedia } from './useMedia'
+import { rawToMediaRow } from '../transformMedia'
+import type { MediaRow } from '../../../types/media'
 // Parse raw query results into string IDs. Handles both flat string arrays
 // (LiveStore select('id') shape) and row-object arrays ({ id: string }).
 function parseIds(raw: unknown): string[] {
@@ -17,45 +18,6 @@ function parseIds(raw: unknown): string[] {
     }
   }
   return ids
-}
-
-/**
- * Transform raw LiveStore media data to include nested artist/album objects
- */
-interface RawMediaRow {
-  id: string;
-  artistId: string;
-  artistName: string;
-  albumId: string;
-  albumName: string;
-  cover?: { thumbnailUrl?: string } | null;
-  year?: number | null;
-  [key: string]: unknown;
-}
-
-function transformMediaFromLiveStore(rawMedia: RawMediaRow | Record<string, unknown>): TransformedMedia | null {
-  if (!rawMedia) return null
-  const media = rawMedia as RawMediaRow
-
-  const artist = {
-    id: media.artistId || '',
-    name: media.artistName || 'Unknown Artist',
-  }
-
-  const album = {
-    id: media.albumId || '',
-    name: media.albumName || 'Unknown Album',
-    artistId: media.artistId || '',
-    artist: artist,
-    thumbnailUrl: media.cover?.thumbnailUrl || null,
-    year: media.year || null,
-  }
-
-  return {
-    ...(media as unknown as TransformedMedia),
-    artist,
-    album,
-  }
 }
 
 /**
@@ -193,17 +155,17 @@ export const useCollectionData = () => {
       // not row objects. Guard for both shapes just in case the builder API
       // changes; either way we end up with string ids.
       const ids = parseIds(idsRaw)
-      return { ids, map: undefined as Record<string, TransformedMedia> | undefined }
+      return { ids, map: undefined as Record<string, MediaRow> | undefined }
     }
 
     if (canUseGenreReadModel) {
       // Genre-only path: idsRaw is already the result of the media_genres join query.
       const ids = parseIds(idsRaw)
-      return { ids, map: undefined as Record<string, TransformedMedia> | undefined }
+      return { ids, map: undefined as Record<string, MediaRow> | undefined }
     }
 
     const ids: string[] = []
-    const map: Record<string, TransformedMedia> = {}
+    const map: Record<string, MediaRow> = {}
     if (!Array.isArray(rowsRaw)) return { ids, map }
 
     const filtered = (rowsRaw as Array<{
@@ -229,11 +191,10 @@ export const useCollectionData = () => {
     })
 
     filtered.forEach((item) => {
-      const media = transformMediaFromLiveStore(item)
-      if (media) {
-        ids.push(media.id)
-        map[media.id] = media
-      }
+      const row = rawToMediaRow(item)
+      if (!row) return
+      ids.push(row.id)
+      map[row.id] = row
     })
     return { ids, map }
   }, [needsRowData, canUseGenreReadModel, idsRaw, rowsRaw, filters.providers, searchTerm])

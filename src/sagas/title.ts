@@ -8,7 +8,7 @@ function* setCurrentPlaying(): Generator<any, void, any> {
   // Setting current playing title
   const song = yield call(getCurrentSongFromLiveStore)
   if (song?.title) {
-    const artistName = song.artist?.name || song.artistName || 'Unknown Artist'
+    const artistName = song.artistName || 'Unknown Artist'
     document.title = `${song.title} - ${artistName}`
   }
 }

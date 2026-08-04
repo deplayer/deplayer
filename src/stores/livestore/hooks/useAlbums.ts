@@ -2,10 +2,10 @@ import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 import { useMemo } from 'react'
-import type { TransformedMedia } from './useMedia'
+import { rawToMediaRow } from '../transformMedia'
+import type { MediaRow } from '../../../types/media'
 
 type AlbumRecord = { id: string; name: string; artistId: string; artistName?: string; thumbnailUrl?: string; year?: number; createdAt: number; updatedAt: number; [key: string]: unknown }
-type MediaRecord = { id: string; albumId: string; artistId?: string; artistName?: string; albumName?: string; cover?: { thumbnailUrl?: string } | null; year?: number | null; [key: string]: unknown }
 
 /**
  * Album Query Hooks
@@ -176,37 +176,6 @@ export const useSongsByAlbum = () => {
 }
 
 /**
- * Transform raw LiveStore media data to include nested artist/album objects
- * (Same transformation as useMedia.ts to ensure consistent data shape)
- */
-function transformMediaFromLiveStore(rawMedia: MediaRecord | Record<string, unknown>): TransformedMedia | null {
-  if (!rawMedia) return null
-  const media = rawMedia as MediaRecord
-
-  // Reconstruct nested artist object from flat fields
-  const artist = {
-    id: media.artistId || '',
-    name: media.artistName || 'Unknown Artist',
-  }
-
-  // Reconstruct nested album object from flat fields
-  const album = {
-    id: media.albumId || '',
-    name: media.albumName || 'Unknown Album',
-    artistId: media.artistId || '',
-    artist: artist,
-    thumbnailUrl: media.cover?.thumbnailUrl || null,
-    year: media.year || null,
-  }
-
-  return {
-    ...(media as unknown as TransformedMedia),
-    artist,
-    album,
-  }
-}
-
-/**
  * OPTIMIZED: Get songs grouped by album ID for a specific artist
  * Only fetches media for the given artist, not the entire library.
  * 
@@ -222,7 +191,7 @@ function transformMediaFromLiveStore(rawMedia: MediaRecord | Record<string, unkn
  * ```tsx
  * const { songsByAlbum, mediaMap } = useSongsByAlbumForArtist('artist-123')
  * const albumSongs = songsByAlbum['album-123'] // ['song-1', 'song-2', ...]
- * const song = mediaMap['song-1'] // Full song object with nested artist/album
+ * const song = mediaMap['song-1'] // Flat MediaRow (artistName, albumName, parsed JSON fields)
  * ```
  */
 export const useSongsByAlbumForArtist = (artistId: string | null | undefined) => {
@@ -240,25 +209,25 @@ export const useSongsByAlbumForArtist = (artistId: string | null | undefined) =>
   
   return useMemo(() => {
     const songsByAlbum: Record<string, string[]> = {}
-    const mediaMap: Record<string, TransformedMedia> = {}
+    const mediaMap: Record<string, MediaRow> = {}
     const allSongIds: string[] = []
 
     if (Array.isArray(media)) {
-      media.forEach((rawSong: MediaRecord) => {
-        // Transform to include nested artist/album objects
-        const song = transformMediaFromLiveStore(rawSong)
-        if (!song) return
+      media.forEach((rawSong: Record<string, unknown>) => {
+        // Parse JSON fields (stream, cover, genres) into MediaRow.
+        const row = rawToMediaRow(rawSong)
+        if (!row) return
 
         // Build mediaMap for quick lookups
-        mediaMap[song.id] = song
-        allSongIds.push(song.id)
+        mediaMap[row.id] = row
+        allSongIds.push(row.id)
         
         // Group by album
-        if (song.albumId) {
-          if (!songsByAlbum[song.albumId]) {
-            songsByAlbum[song.albumId] = []
+        if (row.albumId) {
+          if (!songsByAlbum[row.albumId]) {
+            songsByAlbum[row.albumId] = []
           }
-          songsByAlbum[song.albumId].push(song.id)
+          songsByAlbum[row.albumId].push(row.id)
         }
       })
     }

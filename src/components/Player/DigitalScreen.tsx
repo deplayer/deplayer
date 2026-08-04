@@ -8,10 +8,8 @@ type DigitalScreenProps = {
   currentPlaying?: {
     id: string,
     title: string,
-    artist?: {
-      id: string,
-      name: string
-    }
+    artistId?: string,
+    artistName?: string
   },
   repeat?: boolean,
   shuffle?: boolean
@@ -31,10 +29,10 @@ const DigitalScreen = (props: DigitalScreenProps) => {
                     className='text-primary hover:text-primary-focus truncate pointer-events-auto text-left md:text-center'>
                 <span className='text-lg tracking-widest truncate'>{currentPlaying.title}</span>
               </Link>
-              {currentPlaying.artist && (
-                <Link to={`/artist/${currentPlaying.artist.id}`} 
+              {currentPlaying.artistId && (
+                <Link to={`/artist/${currentPlaying.artistId}`} 
                       className='text-base-content/70 hover:text-primary-focus truncate pointer-events-auto uppercase'>
-                  <span className='text-sm tracking-widest'>{currentPlaying.artist.name}</span>
+                  <span className='text-sm tracking-widest'>{currentPlaying.artistName || 'Unknown Artist'}</span>
                 </Link>
               )}
             </>

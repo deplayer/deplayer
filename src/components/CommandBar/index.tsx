@@ -157,8 +157,8 @@ function CommandBar({ togglePlaying, playNext, playPrev }: Props) {
         name: media.title,
         type: 'song' as const,
         cover: media.cover?.thumbnailUrl,
-        artist: media.artist?.name,
-        album: media.album?.name
+        artist: media.artistName,
+        album: media.albumName
       }
     }).filter(Boolean) as MediaItem[]
   }, [searchResultIds, searchResultsMedia])

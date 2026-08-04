@@ -124,8 +124,8 @@ const Dashboard = () => {
       {/* Because you listened to */}
       {topArtist && artistGenres.length > 0 && (
         <BecauseYouListened
-          artistId={topArtist.artistId || topArtist.artist?.id}
-          artistName={topArtist.artistName || topArtist.artist?.name || 'Unknown'}
+          artistId={topArtist.artistId}
+          artistName={topArtist.artistName || 'Unknown'}
           genres={artistGenres}
         />
       )}

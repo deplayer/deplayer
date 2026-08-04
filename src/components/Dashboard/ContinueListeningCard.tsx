@@ -21,14 +21,14 @@ const ContinueListeningCard = () => {
           <CoverImage
             cover={song.cover || undefined}
             size="thumbnail"
-            albumName={song.album?.name || ''}
+            albumName={song.albumName || ''}
           />
         </Link>
         <div className="flex-1 min-w-0">
           <Link to={`/song/${song.id}`}>
             <p className="font-medium truncate">{song.title}</p>
             <p className="text-sm opacity-70 truncate">
-              {song.artist?.name || song.artistName} – {song.album?.name || song.albumName}
+              {song.artistName || 'Unknown Artist'} – {song.albumName || 'Unknown Album'}
             </p>
           </Link>
         </div>

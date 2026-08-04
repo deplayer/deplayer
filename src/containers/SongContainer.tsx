@@ -41,7 +41,7 @@ const RoutedSongView = (props: RoutedSongViewProps) => {
   const song = useMediaById(songId)
 
   // Get artist's albums (only when we have the song)
-  const artistId = song?.artist?.id
+  const artistId = song?.artistId
   const albumsByArtist = useAlbumsByArtist(artistId)
 
   // Get songs by genre for recommendations (only first genre)
