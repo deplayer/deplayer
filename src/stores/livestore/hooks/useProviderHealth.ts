@@ -40,7 +40,7 @@ export const useProviderHealth = (
 ): UseProviderHealthReturn => {
   const enabled = config.enabled !== false
   const instance = factory(providerKey, config)
-  const probe = instance?.healthcheck
+  const probe = instance?.healthcheck?.bind(instance)
 
   const [result, setResult] = useState<HealthCheckResult>(() =>
     !enabled ? makeDisabled() : !probe ? makeUnknown() : makeChecking(),
