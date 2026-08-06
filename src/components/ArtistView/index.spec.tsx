@@ -1,10 +1,12 @@
 import { screen, render } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
 import { configureStore } from '@reduxjs/toolkit'
 import ArtistView from './index'
+import { useArtistById, useAlbumsByArtist, useSongsByAlbumForArtist } from '../../stores/livestore/hooks'
 
+const setBackgroundImage = vi.hoisted(() => vi.fn())
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom')
   return {
@@ -12,6 +14,9 @@ vi.mock('react-router-dom', async () => {
     useParams: () => ({ id: 'artist-1' }),
   }
 })
+vi.mock('../../stores/uiStore', () => ({
+  useUIStore: vi.fn(() => setBackgroundImage),
+}))
 
 vi.mock('../../stores/livestore/store', () => ({
  useAppStore: () => ({ commit: vi.fn() }),
@@ -50,18 +55,66 @@ const createMockStore = () => configureStore({
 
 const setup = () => {
   const store = createMockStore()
-  render(
+  const dispatchSpy = vi.spyOn(store, 'dispatch')
+  const view = render(
     <Provider store={store}>
       <BrowserRouter>
         <ArtistView />
       </BrowserRouter>
     </Provider>
   )
+  return { ...view, store, dispatchSpy }
 }
+
+beforeEach(() => {
+  vi.clearAllMocks()
+})
 
 describe('ArtisView', () => {
   it('render song without crash', () => {
     setup()
     expect(screen.getByTestId('artist-view')).toBeTruthy()
+  })
+
+  it('fetches an artist once while reactive media updates', () => {
+    vi.mocked(useArtistById)
+      .mockReturnValueOnce({ id: 'artist-1', name: 'Test Artist' })
+      .mockImplementation(() => ({ id: 'artist-1', name: 'Test Artist' }))
+    vi.mocked(useAlbumsByArtist)
+      .mockReturnValueOnce([])
+      .mockReturnValue([{ id: 'album-1' }] as never)
+    vi.mocked(useSongsByAlbumForArtist)
+      .mockReturnValueOnce({ songsByAlbum: {}, mediaMap: {} })
+      .mockReturnValue({
+        songsByAlbum: { 'album-1': ['song-1'] },
+        mediaMap: {
+          'song-1': {
+            id: 'song-1',
+            playCount: 0,
+            genres: [],
+            cover: { fullUrl: 'https://example.com/cover.jpg' },
+          },
+        },
+      } as never)
+
+    const { rerender, store, dispatchSpy } = setup()
+    rerender(
+      <Provider store={store}>
+        <BrowserRouter>
+          <ArtistView />
+        </BrowserRouter>
+      </Provider>
+    )
+
+    const dispatchedTypes = dispatchSpy.mock.calls.map(([action]) => {
+      if (typeof action === 'object' && action !== null && 'type' in action && typeof action.type === 'string') {
+        return action.type
+      }
+      return ''
+    })
+
+    expect(dispatchedTypes.filter((type) => type === 'LOAD_ARTIST')).toHaveLength(1)
+    expect(dispatchedTypes.filter((type) => type === 'FETCH_ARTIST_SONGS')).toHaveLength(1)
+    expect(setBackgroundImage).toHaveBeenLastCalledWith('https://example.com/cover.jpg')
   })
 })

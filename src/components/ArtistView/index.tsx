@@ -63,13 +63,19 @@ export default function ArtistView() {
     return artistMetadata?.artist?.bio?.content || ''
   }, [artistMetadata])
 
+  const artistName = artist?.name
+
   React.useEffect(() => {
-    if (artist?.name) {
-      dispatch({ type: types.LOAD_ARTIST, artist })
-      dispatch({ type: types.FETCH_ARTIST_SONGS, artist })
-      setBackgroundImage(backgroundImage ?? '')
-    }
-  }, [artist, backgroundImage, dispatch, setBackgroundImage])
+    if (!artistId || !artistName) return
+
+    const artistIdentity = { id: artistId, name: artistName }
+    dispatch({ type: types.LOAD_ARTIST, artist: artistIdentity })
+    dispatch({ type: types.FETCH_ARTIST_SONGS, artist: artistIdentity })
+  }, [artistId, artistName, dispatch])
+
+  React.useEffect(() => {
+    setBackgroundImage(backgroundImage ?? '')
+  }, [backgroundImage, setBackgroundImage])
 
   if (!artist) return null
 
