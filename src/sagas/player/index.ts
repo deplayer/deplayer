@@ -9,7 +9,6 @@ import type { SagaIterator } from 'redux-saga'
 import {
   getPlayer,
   getCurrentSongFromLiveStore,
-  getState,
 } from '../selectors'
 import { getStreamUri } from '../../services/Song/StreamUriService'
 import * as routes from '../../routes'
@@ -124,7 +123,7 @@ function* handleError(): Generator<any, void, any> {
 }
 
 function* goToViewPage(action: { type: string; song?: string }): Generator<any, void, any> {
-  const state = yield select(getState)
+  const state = yield select()
 
   if (!state.router.location.pathname.match(/^\/song.*?$/)) {
     return

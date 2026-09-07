@@ -79,47 +79,9 @@ export function* getSongBgFromLiveStore(): Generator<any, string, any> {
   return song?.cover?.fullUrl || ''
 }
 
-// Legacy Redux selector (deprecated - use getSettingsFromLiveStore instead)
-// Extract settings from state
-export const getSettings = (state: State & { settings?: { settings: Record<string, unknown> } }) => {
-  return state ? state.settings?.settings : { providers: {} }
-}
-
-export const getState = (state: State) => {
-  return state
-}
-
-export const getQueue = (state: State & { queue?: Record<string, unknown> }) => {
-  return state ? state.queue : {}
-}
-
-export const getCollection = (state: State) => {
-  return state ? state.collection : {}
-}
+// Legacy Redux selectors were deleted during the LiveStore migration;
+// the *FromLiveStore generators above are the only LiveStore read path.
 
 export const getPlayer = (state: State) => {
   return state ? state.player : {}
-}
-
-export const getSongBg = (state: State & { queue: { currentPlaying: string } }) => {
-  const { collection: { rows }, queue: { currentPlaying } } = state
-  if (rows[currentPlaying]) {
-    const song = rows[currentPlaying]
-    return song.cover?.fullUrl
-  }
-  return ''
-}
-
-export const getCurrentSong = (state: State & { queue: { currentPlaying: string } } | null) => {
-  if (!state) {
-    return
-  }
-
-  const rows = state.collection.rows
-  const currentId = state.queue.currentPlaying
-  return rows[currentId]
-}
-
-export const getSongById = (state: State, id: string) => {
-  return state.collection.rows[id]
 }
