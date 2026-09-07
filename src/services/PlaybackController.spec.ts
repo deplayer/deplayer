@@ -173,6 +173,22 @@ describe('PlaybackController', () => {
       expect(data.select).toHaveBeenCalledWith('song-4')
     })
 
+    it('resolves the stream from the requested provider index', async () => {
+      const song1 = fakeMedia('song-1')
+      const q = queueState()
+      const { ctrl, data, resolveStream, transport } = makeController()
+
+      vi.mocked(data.readQueue).mockResolvedValueOnce(q)       // ensureInQueue: queue exists, song in queue
+      vi.mocked(data.readQueue).mockResolvedValueOnce(q)       // after select
+      vi.mocked(data.readMedia).mockResolvedValueOnce(song1)
+
+      const result = await ctrl.playSong('song-1', undefined, { providerIndex: 2 })
+
+      expect(resolveStream).toHaveBeenCalledWith(song1, 2)
+      expect(result.status).toBe('started')
+      expect(transport.play).toHaveBeenCalled()
+    })
+
     it('returns idle for empty songId', async () => {
       const { ctrl } = makeController()
 

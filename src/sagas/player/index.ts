@@ -4,6 +4,7 @@ import { push } from "redux-first-history"
 import type { Dispatch } from 'redux'
 import type { MediaRow } from '../../types/media'
 import type { Store } from 'redux'
+import type { SagaIterator } from 'redux-saga'
 
 import {
   getPlayer,
@@ -63,6 +64,12 @@ export interface PlaySongAction {
   contextIds?: string[]
 }
 
+export interface PlaySongFromAction {
+  type: typeof types.PLAY_SONG_FROM
+  songId: string
+  providerIndex: number
+}
+
 // ---------------------------------------------------------------------------
 // Saga handlers — thin adapters around PlaybackController
 // ---------------------------------------------------------------------------
@@ -89,6 +96,13 @@ function* handlePlaySong(action: PlaySongAction): Generator<any, void, any> {
     getController().playSong(action.songId, action.contextIds)
   )
   logResult(result, 'playSong')
+}
+
+export function* handlePlaySongFrom(action: PlaySongFromAction): SagaIterator {
+  const result = yield* callController(() =>
+    getController().playSong(action.songId, undefined, { providerIndex: action.providerIndex })
+  )
+  logResult(result, 'playSongFrom')
 }
 
 function* handlePlayNext(): Generator<any, void, any> {
@@ -193,6 +207,7 @@ function* playerSaga(store: Store): Generator<any, void, any> {
   yield takeLatest(types.PUSH_TO_VIEW, goToViewPage)
   yield takeLatest(types.PLAY_LIST, handlePlayList)
   yield takeLatest(types.PLAY_SONG, handlePlaySong)
+  yield takeLatest(types.PLAY_SONG_FROM, handlePlaySongFrom)
   yield takeLatest(types.PLAYBACK_PLAY_REQUESTED, handlePlayRequest)
   yield takeLatest(types.PLAYBACK_PAUSE_REQUESTED, handlePauseRequest)
   yield takeLatest(types.PLAYBACK_TOGGLE_REQUESTED, handleToggleRequest)

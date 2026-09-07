@@ -19,6 +19,7 @@ export const SET_CURRENT_PLAYING_URL = "SET_CURRENT_PLAYING_URL";
 export const SET_CURRENT_TIME = "SET_CURRENT_TIME";
 export const PLAY_LIST = "PLAY_LIST";
 export const PLAY_SONG = "PLAY_SONG";
+export const PLAY_SONG_FROM = "PLAY_SONG_FROM";
 export const PLAY_ALL = "PLAY_ALL";
 export const PLAY_ALL_COMPLETED = "PLAY_ALL_COMPLETED"; // New: LiveStore action completed
 export const ADD_TO_QUEUE_NEXT_COMPLETED = "ADD_TO_QUEUE_NEXT_COMPLETED"; // New: LiveStore action completed

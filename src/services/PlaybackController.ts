@@ -143,7 +143,9 @@ export class PlaybackController {
     )
   }
 
-  async playSong(songId: string, contextIds?: readonly string[]): Promise<PlaybackResult> {
+  async playSong(songId: string, contextIds?: readonly string[], options?: { providerIndex?: number }): Promise<PlaybackResult> {
+    // options.providerIndex: resolve the stream from a specific provider
+    // ("Play from {service}"); default 0, the first available provider.
     if (!songId) {
       return { status: 'idle', reason: 'missing-media' }
     }
@@ -159,7 +161,7 @@ export class PlaybackController {
         if (!enqueued) return { status: 'idle', reason: SUPERSEDED }
 
         // 3. Start stream
-        return this.startStream(songId, 0, isCurrent)
+        return this.startStream(songId, options?.providerIndex ?? 0, isCurrent)
       })
     )
   }

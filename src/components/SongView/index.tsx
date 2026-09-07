@@ -19,7 +19,7 @@ import { sortByPlayCount } from '../../utils/sorting'
 import Lyrics from './Lyrics'
 import BecauseYouListened from '../BecauseYouListened'
 import { getStreamUri } from '../../services/Song/StreamUriService'
-import type { AlbumRow, MediaRow, Stream } from '../../types/media'
+import type { AlbumRow, Stream } from '../../types/media'
 import { hasAnyProviderOf } from '../../utils/hasAnyProviderOf'
 import ServiceIcon from '../ServiceIcon'
 import { State as CollectionState } from '../../reducers/collection'
@@ -42,11 +42,6 @@ type Props = {
   dispatch: Dispatch,
   loading: boolean,
   className?: string | null
-}
-
-async function changeCurrentPlaying(song: MediaRow, index: number, dispatch: Dispatch) {
-  const streamUri = await getStreamUri(song, index)
-  dispatch({ type: types.SET_CURRENT_PLAYING_URL, url: streamUri })
 }
 
 type StreamUrl = {
@@ -340,7 +335,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
                         </div>
                         <div className='flex-1 flex gap-2 px-3 py-1'>
                           <Button
-                            onClick={() => changeCurrentPlaying(song, index, dispatch)}
+                            onClick={() => dispatch({ type: types.PLAY_SONG_FROM, songId: song.id, providerIndex: index })}
                             className='btn-sm bg-primary hover:bg-primary-focus text-primary-content border-0 min-w-[2.5rem]'
                             aria-label={`Play from ${value.service}`}
                           >
