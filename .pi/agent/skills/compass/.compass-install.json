@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "compass_version": "0.3.23",
+  "scope": "project",
+  "root": "/home/genar/src/deplayer",
+  "consumers": [
+    "pi"
+  ],
+  "files": {
+    ".compass_version": "5a88f670cd699645e00f8b9c23294362d0f3361d169a278e4f3131264f6de1e0",
+    "SKILL.md": "e38612b2f1937de9d4b7922fd33d1062643ce6d4929fd840426f51c31d412572",
+    "agents/openai.yaml": "37ed1c7d85f2d6a5b93ed2efe14b1739453bf2c937c40465107d8410b4377122",
+    "references/add-watch.md": "4c03b80eb67d8ac4b3fd792ad63121598e6e4c69048d462c42137961317a583b",
+    "references/agent-graph.md": "54ccd551ba1188fb10cc4628ffa7f856b558ce1a1994ede80fb69ad4da35469f",
+    "references/command-reference.md": "f780e72a5196ef8fb2435678eee198991458cc6158f3834042f176ed4c7d4bee",
+    "references/continuous-enrichment.md": "eb3e9c16ee25bc1f80393cb15c10e59fc2c92644779b4ae535d263f7c60c1219",
+    "references/exports.md": "4d39d63dc962ea62b831789c50158697d6ef29ae09ff1c8e32c7631898af86a1",
+    "references/extraction-spec.md": "f5fb477975365f52dd43163f29e445f731630e55b5eafd3e5d2922d35b4d271f",
+    "references/github-and-merge.md": "3165f986bb5d885da28d370c8bf3c5890f7b6f8390ab3e433207eb68f6132079",
+    "references/history.md": "0fa65f865e324eb367a498d9cd9fd4ba651a47676e3d6a38ae087d3353bd733e",
+    "references/hooks.md": "fb290ee45d5332928df03d68e43655efc7649dd7cbf3f03f77f29085fb6a3b22",
+    "references/labeling.md": "c660b3c3e9e27440a4601d0e9bcc655674c2518dd6181535408a24dadafb32bb",
+    "references/operations.md": "fce30cbfde796f4e88cc6191f2b3a8edfc16431903c71f79fbc6233684970c59",
+    "references/query.md": "5d17644f565a914ac6c3ada03caaafce5a5d8c4977cc5664c5892e4077f1a2ff",
+    "references/reflections.md": "613eb9b0e27b319aaa7b75d6072ae1dd453332db1eced02ae1c997aca78bfcd5",
+    "references/security-and-boundaries.md": "5eea7800c6594305467f29ffbb7a54e71f39fc55a4ed8a5af06908f057dbbda7",
+    "references/semantic-extraction.md": "c0dc27d9a259793e3389b6181ee07bbe7160cc91c0d4fa8242109862547bc4ae",
+    "references/serve.md": "85a170ac7ea4bc972db70d4de0216530df8ae83a20b2d106deee1aa4cd101385",
+    "references/update.md": "47fd40f622cd242cc7f06acbfa7e05c174fcb9d6d85f84ec0852ceeca3d3e25e"
+  }
+}
