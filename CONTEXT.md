@@ -15,16 +15,21 @@ _Avoid_: syncable provider, sync backend
 **Sync resume state**:
 Per-Provider persisted progress of an incremental library sync: delta boundary, album-list cursor, cursor page geometry, completion flag. One `sync_state` row per Provider, owned by `SyncResumeState`.
 _Avoid_: sync state (unqualified), "default" row
+**Stream source**:
+A resolved play target (`{url, kind}`) returned by StreamUriService. Blob-kind sources pin a whole file in memory until released; remote sources need no release.
+_Avoid_: stream URI (unqualified), blob URL
+
 
 **Cursor geometry**:
 The page size a saved album-list cursor was produced with. A resume whose page size differs from the stored geometry restarts the walk instead of trusting the offset.
 _Avoid_: cursor version
 
 ## Relationships
-
 - A **Streaming provider** owns exactly one **Sync resume state** row, keyed by its provider key
 - A **Sync resume state** is written only after its page committed (BatchedMediaCommitter flush success); a failed flush must leave the row untouched
 - **Cursor geometry** is persisted alongside the cursor it describes
+- A **Stream source** of blob kind is released exactly when playback moves past it (PlaybackController), or when the SongView download list is replaced/unmounted
+
 
 ## Example dialogue
 

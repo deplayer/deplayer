@@ -18,7 +18,8 @@ import MediaSlider from '../MediaSlider'
 import { sortByPlayCount } from '../../utils/sorting'
 import Lyrics from './Lyrics'
 import BecauseYouListened from '../BecauseYouListened'
-import { getStreamUri } from '../../services/Song/StreamUriService'
+import { getStreamUri, releaseStreamSource } from '../../services/Song/StreamUriService'
+import type { StreamSource } from '../../services/Song/StreamUriService'
 import type { AlbumRow, Stream } from '../../types/media'
 import { hasAnyProviderOf } from '../../utils/hasAnyProviderOf'
 import ServiceIcon from '../ServiceIcon'
@@ -73,33 +74,36 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
   React.useEffect(() => {
     if (!song) return
 
+    let cancelled = false
+    // Sources probed for the download list; the service owns their blobs —
+    // release them all when the list is replaced or the view unmounts.
+    const loaded: StreamSource[] = []
+
     const loadStreamUrls = async () => {
       const urls = await Promise.all(
         Object.values(song.stream || {}).map(async (value: Stream & { format?: string }, index: number) => {
-          const url = await getStreamUri(song, index)
-          if (url instanceof Blob) {
-            const blobUrl = URL.createObjectURL(url)
-            return {
-              url: blobUrl,
-              isBlob: true,
-              format: value.format || undefined,
-              service: value.service
-            } as StreamUrl
-          } else if (typeof url === 'string') {
-            return {
-              url,
-              isBlob: false,
-              format: value.format || undefined,
-              service: value.service
-            } as StreamUrl
-          }
-          return null
+          const source = await getStreamUri(song, index)
+          if (!source.url) return null
+          loaded.push(source)
+          if (cancelled) return null
+          return {
+            url: source.url,
+            isBlob: source.kind === 'blob',
+            format: value.format || undefined,
+            service: value.service
+          } as StreamUrl
         })
       )
+      if (cancelled) return
       setStreamUrls(urls.filter((url): url is StreamUrl => url !== null))
     }
 
     loadStreamUrls()
+
+    return () => {
+      cancelled = true
+      loaded.forEach(releaseStreamSource)
+    }
   }, [song])
 
   if (loading) {
@@ -349,11 +353,6 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
                               target={streamUrl.isBlob ? undefined : "_blank"}
                               rel={streamUrl.isBlob ? undefined : "noopener noreferrer"}
                               aria-label={`Download from ${value.service}`}
-                              onClick={() => {
-                                if (streamUrl.isBlob) {
-                                  URL.revokeObjectURL(streamUrl.url)
-                                }
-                              }}
                             >
                               <Icon icon='faDownload' className='text-lg' />
                             </a>

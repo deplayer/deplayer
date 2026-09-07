@@ -12,6 +12,7 @@ import {
   playPreviousAction,
 } from '../stores/livestore/actions/queue'
 import { rawToMediaRow } from '../stores/livestore/transformMedia'
+import type { StreamSource } from './Song/StreamUriService'
 import { resolveCurrentSongId } from '../stores/livestore/hooks/queueUtils'
 
 
@@ -69,8 +70,8 @@ export class PlaybackController {
   private transport: PlaybackTransport
   private dispatch: Dispatch
   private setBackgroundImage: (url: string) => void
-  private resolveStream: (media: MediaRow, providerIndex: number) => Promise<string | Blob>
-  private objectUrl: string | null = null
+  private resolveStream: (media: MediaRow, providerIndex: number) => Promise<StreamSource>
+  private currentSource: StreamSource | null = null
   private currentSongId: string | null = null
   private playbackRequestGeneration = 0
   private playbackCommandTail: Promise<void> = Promise.resolve()
@@ -80,7 +81,7 @@ export class PlaybackController {
     transport: PlaybackTransport
     dispatch: Dispatch
     setBackgroundImage: (url: string) => void
-    resolveStream?: (media: MediaRow, providerIndex: number) => Promise<string | Blob>
+    resolveStream?: (media: MediaRow, providerIndex: number) => Promise<StreamSource>
   }) {
     this.data = dependencies.data
     this.transport = dependencies.transport
@@ -168,8 +169,8 @@ export class PlaybackController {
 
   async playCurrent(songId: string, options?: { media?: MediaRow; streamUri?: string }): Promise<PlaybackResult> {
     if (options?.streamUri) {
+      this.releaseCurrentSource()
       // Explicit URL (peer/demo) — use directly, skip resolver
-      this.revokeObjectUrl()
       this.currentSongId = songId
       this.dispatch({ type: 'PUSH_TO_VIEW', song: songId })
       this.dispatch({ type: 'SET_CURRENT_PLAYING_URL', url: options.streamUri })
@@ -351,36 +352,27 @@ export class PlaybackController {
 
     if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
 
-    let streamUri: string | Blob
+    let source: StreamSource
     try {
-      streamUri = await this.resolveStream(media, providerIndex)
+      source = await this.resolveStream(media, providerIndex)
     } catch (error) {
       console.error('[PlaybackController] Error resolving stream:', error)
       return { status: 'idle', reason: 'missing-stream' }
     }
 
-    if (!streamUri) {
+    if (!source || !source.url) {
       console.warn('[PlaybackController] No stream URI for:', songId)
       return { status: 'idle', reason: 'missing-stream' }
     }
 
-    if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
-
-    // Convert Blob to object URL
-    const url = typeof streamUri === 'string' ? streamUri : URL.createObjectURL(streamUri)
-    if (streamUri instanceof Blob) {
-      this.revokeObjectUrl()
-      this.objectUrl = url as string
-    }
-
     if (!isCurrent()) {
-      // Revoke any object URL created for a superseded Blob result
-      if (streamUri instanceof Blob) {
-        URL.revokeObjectURL(url as string)
-        this.objectUrl = null
-      }
+      this.releaseSource(source)
       return { status: 'idle', reason: SUPERSEDED }
     }
+
+    this.releaseCurrentSource()
+    this.currentSource = source
+    const url = source.url
 
     this.currentSongId = songId
 
@@ -441,23 +433,27 @@ export class PlaybackController {
     }
   }
 
-  private revokeObjectUrl(): void {
-    if (this.objectUrl) {
-      URL.revokeObjectURL(this.objectUrl)
-      this.objectUrl = null
-    }
+  /** Blob-kind sources pin a whole file; only those ever need revoking. */
+  private releaseSource(source: StreamSource | null): void {
+    if (source && source.kind === 'blob') URL.revokeObjectURL(source.url)
+  }
+
+  private releaseCurrentSource(): void {
+    this.releaseSource(this.currentSource)
+    this.currentSource = null
   }
 }
 
-async function defaultResolveStream(media: MediaRow, providerIndex: number): Promise<string | Blob> {
-  // This is replaced by the real getStreamUri from StreamUriService
-  const stream = media.stream as unknown as Record<string, string> | undefined
-  if (!stream) return ''
+async function defaultResolveStream(media: MediaRow, providerIndex: number): Promise<StreamSource> {
+  // Fallback resolver: first URI of the requested provider, treated as remote.
+  // Production wiring injects StreamUriService.getStreamUri instead.
+  const stream = media.stream as unknown as Record<string, { uris?: Array<{ uri?: string }> }> | undefined
+  if (!stream) return { url: '', kind: 'remote' }
 
   const providers = Object.values(stream)
-  if (providers.length === 0 || providerIndex >= providers.length) return ''
+  if (providers.length === 0 || providerIndex >= providers.length) return { url: '', kind: 'remote' }
 
-  return providers[providerIndex]
+  return { url: providers[providerIndex]?.uris?.[0]?.uri ?? '', kind: 'remote' }
 }
 /**
  * Create a PlaybackDataPort backed by LiveStore.

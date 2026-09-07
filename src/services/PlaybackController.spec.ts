@@ -7,6 +7,7 @@ import {
   PlaybackStoreUnavailableError,
 } from './PlaybackController'
 import type { MediaRow } from '../types/media'
+import type { StreamSource } from './Song/StreamUriService'
 
 // ---------------------------------------------------------------------------
 // Test fakes
@@ -61,7 +62,7 @@ function createFakeTransport(overrides?: Partial<PlaybackTransport>): PlaybackTr
 }
 
 function createFakeStreamResolver(streamUri = 'https://example.com/resolved.mp3') {
-  return vi.fn().mockResolvedValue(streamUri)
+  return vi.fn().mockResolvedValue({ url: streamUri, kind: 'remote' } satisfies StreamSource)
 }
 
 function makeController(overrides?: {
@@ -189,6 +190,79 @@ describe('PlaybackController', () => {
       expect(transport.play).toHaveBeenCalled()
     })
 
+    it('revokes the previous blob source when starting a new stream', async () => {
+      // jsdom shim: the controller only ever calls revokeObjectURL.
+      const urlApi = URL as unknown as { revokeObjectURL?: (url: string) => void }
+      if (typeof urlApi.revokeObjectURL !== 'function') urlApi.revokeObjectURL = () => {}
+      const revokeSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {})
+
+      const song1 = fakeMedia('song-1')
+      const q = queueState()
+      const data = createFakeDataPort({
+        readQueue: vi.fn().mockResolvedValue(q),
+        readMedia: vi.fn().mockResolvedValue(song1),
+      })
+      const resolver = vi.fn()
+        .mockResolvedValueOnce({ url: 'blob:first', kind: 'blob' } satisfies StreamSource)
+        .mockResolvedValueOnce({ url: 'https://example.com/second.mp3', kind: 'remote' } satisfies StreamSource)
+      const ctrl = new PlaybackController({
+        data,
+        transport: createFakeTransport(),
+        dispatch: vi.fn(),
+        setBackgroundImage: vi.fn(),
+        resolveStream: resolver,
+      })
+
+      await ctrl.playSong('song-1')
+      await ctrl.playSong('song-1')
+
+      expect(revokeSpy).toHaveBeenCalledTimes(1)
+      expect(revokeSpy).toHaveBeenCalledWith('blob:first')
+      revokeSpy.mockRestore()
+    })
+
+    it('releases a blob source superseded before dispatch', async () => {
+      const revocations: string[] = []
+      Object.defineProperty(URL, 'revokeObjectURL', {
+        value: (url: string) => revocations.push(url),
+        configurable: true,
+        writable: true,
+      })
+
+      const song1 = fakeMedia('song-1')
+      const q = queueState()
+      const data = createFakeDataPort({
+        readQueue: vi.fn().mockResolvedValue(q),
+        readMedia: vi.fn().mockResolvedValue(song1),
+      })
+      let resolveFirst!: (source: StreamSource) => void
+      const first = new Promise<StreamSource>(resolve => { resolveFirst = resolve })
+      const resolver = vi.fn()
+        .mockImplementationOnce(() => first)
+        .mockResolvedValue({ url: 'https://example.com/second.mp3', kind: 'remote' } satisfies StreamSource)
+      const ctrl = new PlaybackController({
+        data,
+        transport: createFakeTransport(),
+        dispatch: vi.fn(),
+        setBackgroundImage: vi.fn(),
+        resolveStream: resolver,
+      })
+      const p1 = ctrl.playSong('song-1')
+
+      // Let op1 suspend inside the resolver (generation 1 still current).
+      await vi.waitFor(() => {
+        expect(resolver).toHaveBeenCalledTimes(1)
+      })
+
+      // Bump the generation while op1 is suspended there — the post-resolve
+      // superseded branch is the leak-prone one.
+      const p2 = ctrl.playSong('song-1')
+      resolveFirst({ url: 'blob:slow', kind: 'blob' })
+      await Promise.all([p1, p2])
+
+      expect(revocations).toContain('blob:slow')
+
+    })
     it('returns idle for empty songId', async () => {
       const { ctrl } = makeController()
 
@@ -399,13 +473,13 @@ describe('PlaybackController', () => {
       })
 
       // Defer stream resolution for song-1
-      let resolveStream1!: (value: string) => void
-      const stream1Deferred = new Promise<string>(resolve => { resolveStream1 = resolve })
+      let resolveStream1!: (value: StreamSource) => void
+      const stream1Deferred = new Promise<StreamSource>(resolve => { resolveStream1 = resolve })
       const stream2Uri = 'https://example.com/song-2-resolved.mp3'
 
-      resolveStream.mockImplementation((media: MediaRow): Promise<string> => {
+      resolveStream.mockImplementation((media: MediaRow): Promise<StreamSource> => {
         if (media.id === 'song-1') return stream1Deferred
-        return Promise.resolve(stream2Uri)
+        return Promise.resolve({ url: stream2Uri, kind: 'remote' })
       })
 
       // Start song-1 — don't await
@@ -420,7 +494,7 @@ describe('PlaybackController', () => {
       const result2Promise = ctrl.playSong('song-2')
 
       // Resolve song-1's stream
-      resolveStream1('https://example.com/song-1-resolved.mp3')
+      resolveStream1({ url: 'https://example.com/song-1-resolved.mp3', kind: 'remote' })
 
       // Await both
       const [result1, result2] = await Promise.all([result1Promise, result2Promise])
@@ -477,7 +551,7 @@ describe('PlaybackController', () => {
       })
 
       resolveStream.mockImplementation((media: MediaRow) =>
-        Promise.resolve(`https://example.com/${media.id}-resolved.mp3`)
+        Promise.resolve({ url: `https://example.com/${media.id}-resolved.mp3`, kind: 'remote' })
       )
 
       // Start song-1

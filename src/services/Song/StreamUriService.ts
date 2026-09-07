@@ -6,9 +6,26 @@ import { createLogger } from "../../utils/logger";
 
 const logger = createLogger({ namespace: "StreamUriService" });
 
-async function handleOpfs(streamUri: string | null) {
+/**
+ * Stream source — a resolved play target. Blob-kind URLs are object URLs
+ * created by this service (whole local file in memory); the service owns
+ * them and releaseStreamSource must be called when playback moves on.
+ * Remote URLs need no release.
+ */
+export interface StreamSource {
+  url: string;
+  kind: "remote" | "blob";
+}
+
+/** Release a source's backing blob. No-op for remote sources; safe to call twice. */
+export function releaseStreamSource(source: StreamSource | null | undefined): void {
+  if (source && source.kind === "blob") {
+    URL.revokeObjectURL(source.url);
+  }
+}
+async function handleOpfs(streamUri: string | null): Promise<StreamSource> {
   if (!streamUri) {
-    return "";
+    return { url: "", kind: "remote" };
   }
 
   logger.debug("Starting OPFS reading");
@@ -20,10 +37,10 @@ async function handleOpfs(streamUri: string | null) {
 
   const blob = new Blob([fileArrayBuffer], { type: "audio/mpeg" });
 
-  return URL.createObjectURL(blob);
+  return { url: URL.createObjectURL(blob), kind: "blob" };
 }
 
-async function handleFilesystem(streamUri: string | null) {
+async function handleFilesystem(streamUri: string | null): Promise<StreamSource> {
   logger.debug("Processing filesystem streamUri", streamUri);
   const directoryHandler = await get("directoryHandler");
   await verifyPermission(directoryHandler);
@@ -31,7 +48,7 @@ async function handleFilesystem(streamUri: string | null) {
   logger.debug("directoryHandler", directoryHandler);
 
   if (!streamUri) {
-    return "";
+    return { url: "", kind: "remote" };
   }
 
   const handler = await get(streamUri);
@@ -39,11 +56,11 @@ async function handleFilesystem(streamUri: string | null) {
   if (handler instanceof File) {
     logger.debug("handler is a File", handler);
 
-    return URL.createObjectURL(handler);
+    return { url: URL.createObjectURL(handler), kind: "blob" };
   }
 
   if (!handler.getFile) {
-    return streamUri;
+    return { url: streamUri, kind: "remote" };
   }
 
   logger.debug("Verifying file permission");
@@ -54,23 +71,27 @@ async function handleFilesystem(streamUri: string | null) {
 
   logger.debug("file", file);
   if (!file) {
-    return streamUri;
+    return { url: streamUri, kind: "remote" };
   }
 
-  return URL.createObjectURL(file);
+  return { url: URL.createObjectURL(file), kind: "blob" };
 }
 
+/**
+ * Resolve the stream source for `song` from its `providerNum`-th provider.
+ * Blob-kind sources pin the whole file in memory until releaseStreamSource.
+ */
 export const getStreamUri = async (
   song: MediaRow,
   providerNum: number
-): Promise<string | Blob> => {
+): Promise<StreamSource> => {
   const service =
     song.stream &&
     Object.values(song.stream)[providerNum] &&
     Object.values(song.stream)[providerNum].service;
 
   if (!service) {
-    return "";
+    return { url: "", kind: "remote" };
   }
 
   const streamUri =
@@ -87,5 +108,5 @@ export const getStreamUri = async (
     return await handleOpfs(streamUri);
   }
 
-  return streamUri || "";
+  return { url: streamUri || "", kind: "remote" };
 };
