@@ -78,13 +78,13 @@ describe('ArtisView', () => {
 
   it('fetches an artist once while reactive media updates', () => {
     vi.mocked(useArtistById)
-      .mockReturnValueOnce({ id: 'artist-1', name: 'Test Artist' })
-      .mockImplementation(() => ({ id: 'artist-1', name: 'Test Artist' }))
+      .mockReturnValueOnce({ id: 'artist-1', name: 'Test Artist', createdAt: 0, updatedAt: 0 })
+      .mockImplementation(() => ({ id: 'artist-1', name: 'Test Artist', createdAt: 0, updatedAt: 0 }))
     vi.mocked(useAlbumsByArtist)
       .mockReturnValueOnce([])
       .mockReturnValue([{ id: 'album-1' }] as never)
     vi.mocked(useSongsByAlbumForArtist)
-      .mockReturnValueOnce({ songsByAlbum: {}, mediaMap: {} })
+      .mockReturnValueOnce({ songsByAlbum: {}, mediaMap: {}, allSongIds: [] })
       .mockReturnValue({
         songsByAlbum: { 'album-1': ['song-1'] },
         mediaMap: {
