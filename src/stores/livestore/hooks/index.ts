@@ -10,8 +10,6 @@ export { useCollectionData } from './useCollectionData'
 
 // Media hooks
 export {
-  useMediaLibrary,
-  useMediaMap,
   useMediaMapForIds,
   useMediaByType,
   useMediaById,

@@ -14,14 +14,11 @@ function toRows(raw: unknown): MediaRow[] {
   return raw.flatMap((x) => rawToMediaRow(x) ?? [])
 }
 
-// No-op query for idle hook states. Targets sync_state because it is written
-// only once per sync page (see MAX_PAGES_PER_SESSION in
-// sagas/collection/index.ts), which keeps idle subscribers cheap.
-// IMPORTANT: any change that increases sync_state write frequency (e.g.
-// per-batch progress writes) will re-invalidate every idle subscriber on
-// every write and degrade renderer performance during hydration. Pick a
-// different rarely-written table before doing that.
-const NOOP_QUERY = queryDb(tables.syncState.select('id').where('id', '=', '__NONE__'))
+// Idle-state convention: every hook's empty-input branch returns a `media`
+// query with an impossible-id filter (same pattern as useMediaById below).
+// NEVER point these at another table (e.g. sync_state): the sync saga writes
+// sync_state once per streamed page (sagas/collection/index.ts), which would
+// re-invalidate every idle subscriber on every page during hydration.
 
 /**
  * Media Query Hooks
@@ -31,51 +28,6 @@ const NOOP_QUERY = queryDb(tables.syncState.select('id').where('id', '=', '__NON
  * 
  * Hooks return raw MediaRow objects (flat fields, JSON fields parsed).
  */
-
-/**
- * Get all media from the library
- * 
- * @example
- * ```tsx
- * const media = useMediaLibrary()
- * return <div>{media.length} tracks</div>
- * ```
- */
-export const useMediaLibrary = () => {
-  const store = useAppStore()
-  const rawMedia = store.useQuery(
-    queryDb(
-      tables.media
-        .select()
-        .orderBy('title', 'asc')
-    )
-  )
-  
-  return useMemo(() => toRows(rawMedia), [rawMedia])
-}
-
-/**
- * Get all media from the library as a map indexed by ID for fast lookups
- * 
- * @example
- * ```tsx
- * const mediaMap = useMediaMap()
- * const song = mediaMap[songId]
- * ```
- */
-export const useMediaMap = () => {
-  const media = useMediaLibrary()
-  
-  return useMemo(() => {
-    const map: Record<string, MediaRow> = {}
-    if (Array.isArray(media)) {
-      media.forEach((item) => {
-        if (item) map[item.id] = item
-      })
-    }
-    return map
-  }, [media])
-}
 
 /**
  * Get a single media item by ID
@@ -178,7 +130,7 @@ export const useSearchMedia = (searchTerm: string | undefined | null, limit = 10
   
   // Use useMemo to create stable query objects
   const titleQuery = useMemo(() => {
-    if (!hasSearch || !term) return NOOP_QUERY
+    if (!hasSearch || !term) return queryDb(tables.media.select().where('id', '=', '__NONE__').limit(limit))
     return queryDb(
       tables.media
         .select()
@@ -188,7 +140,7 @@ export const useSearchMedia = (searchTerm: string | undefined | null, limit = 10
   }, [hasSearch, term, limit])
   
   const artistQuery = useMemo(() => {
-    if (!hasSearch || !term) return NOOP_QUERY
+    if (!hasSearch || !term) return queryDb(tables.media.select().where('id', '=', '__NONE__').limit(limit))
     return queryDb(
       tables.media
         .select()
@@ -251,7 +203,7 @@ export const useSearchMediaIds = (searchTerm: string | undefined | null, limit =
 
   const titleQuery = useMemo(() => {
     if (!hasSearch || !term) {
-      return NOOP_QUERY
+      return queryDb(tables.media.select('id').where('id', '=', '__NONE__').limit(limit))
     }
     return queryDb(
       tables.media
@@ -263,7 +215,7 @@ export const useSearchMediaIds = (searchTerm: string | undefined | null, limit =
 
   const artistQuery = useMemo(() => {
     if (!hasSearch || !term) {
-      return NOOP_QUERY
+      return queryDb(tables.media.select('id').where('id', '=', '__NONE__').limit(limit))
     }
     return queryDb(
       tables.media
@@ -609,7 +561,7 @@ export const useMediaMapForIds = (ids: string[]) => {
 
   const query = useMemo(() => {
     if (!shouldQuery) {
-      return NOOP_QUERY
+      return queryDb(tables.media.select().where('id', '=', '__NONE__'))
     }
     return queryDb(
       tables.media
