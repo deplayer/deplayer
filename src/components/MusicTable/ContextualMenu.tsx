@@ -109,7 +109,7 @@ const ContextualMenu = (props: MenuProps) => {
   const [clickPosition, setClickPosition] = React.useState<{ x: number, y: number } | null>(null)
   const [isOpen, setIsOpen] = React.useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
-  const triggerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
   const [focusedIndex, setFocusedIndex] = React.useState(0)
 
   // Register this instance for global state updates
@@ -371,8 +371,10 @@ const ContextualMenu = (props: MenuProps) => {
 
   return (
     <>
-      <div 
+      <button
         ref={triggerRef}
+        type="button"
+        tabIndex={0}
         onClick={handleMenuItemClick}
         onContextMenu={handleContextMenu}
         onKeyDown={(e) => {
@@ -381,15 +383,13 @@ const ContextualMenu = (props: MenuProps) => {
             handleMenuItemClick(e)
           }
         }}
-        role="button"
-        tabIndex={0}
         aria-label="Open context menu"
         aria-expanded={isOpen}
         aria-haspopup="menu"
-        className='cursor-pointer p-2 menu-trigger focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset rounded'
+        className='cursor-pointer p-2 menu-trigger focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset rounded bg-transparent'
       >
         <Icon icon='faEllipsisV' className='text-blue-400' />
-      </div>
+      </button>
       {isOpen && createPortal(
         <div 
           ref={menuRef}

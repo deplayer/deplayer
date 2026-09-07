@@ -27,11 +27,12 @@ const CoverImage = ({ cover, reflect, size, onClick, useImage, albumName, noFade
 
   if (useImage) {
     return (
-      <div role="button" tabIndex={0} onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && onClick) onClick() }} className="lazy-image w-full bg-no-repeat bg-center cursor-pointer" onClick={onClick}>
+      <div className="lazy-image w-full bg-no-repeat bg-center cursor-pointer" onClick={onClick}>
         <div className="relative w-full h-full">
           <img
             src={displayUrl}
             alt={`${albumName} cover`}
+            loading="lazy"
             className={classNames(
               "w-full h-full object-cover",
               {
@@ -58,7 +59,7 @@ const CoverImage = ({ cover, reflect, size, onClick, useImage, albumName, noFade
   )
 
   return (
-    <div role="button" tabIndex={0} onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && onClick) onClick() }}
+    <div
       data-testid='cover-image'
       className={className}
       onClick={onClick}

@@ -1,7 +1,6 @@
-import { Translate } from 'react-redux-i18n'
-import { useLocation } from 'react-router-dom'
+import { I18n, Translate } from 'react-redux-i18n'
 import { useDispatch } from 'react-redux'
-
+import { useLocation } from 'react-router-dom'
 import * as types from '../../constants/ActionTypes'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
@@ -32,7 +31,7 @@ const PlayAllButton = (props: Props) => {
   return (
     <Button
       transparent
-      className={`playall-button button ${props.className || ''}`}
+      aria-label={I18n.t('buttons.playAll')}
       onClick={playAll}
     >
       <Icon icon='faCaretRight' className='mr-2' />

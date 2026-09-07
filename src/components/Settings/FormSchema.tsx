@@ -28,7 +28,7 @@ const FormSchema = ({ schema }: Props) => {
         return (
           <div key={`field-${builtField.name}`} className="my-3">
             <div className="w-full flex items-center">
-              <label className="w-40 capitalize text-xl" htmlFor="form-field-label">
+              <label className="w-40 capitalize text-xl" htmlFor={`field-${builtField.name}`}>
                 <Translate value={field.label} />
               </label>
               <FormField field={builtField} />

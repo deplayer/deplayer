@@ -274,8 +274,8 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
           <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className="p-6 rounded-lg">
             <h2 className='text-3xl inline-block text-wrap truncate ...'>
               {song.title}
-              <Tag onClick={() => handleTypeClick(song.type)} className="cursor-pointer hover:bg-opacity-50 mr-2 mt-4 w-fit inline-block" transparent>{typeIcon} {song.type}</Tag>
             </h2>
+            <Tag onClick={() => handleTypeClick(song.type)} className="cursor-pointer hover:bg-opacity-50 mr-2 mt-4 w-fit inline-block" transparent>{typeIcon} {song.type}</Tag>
             {song.artistId && (
               <div className='text-lg mt-2'>
                 <Link to={`/artist/${song.artistId}`}>

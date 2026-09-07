@@ -9,7 +9,6 @@ function ReloadPrompt() {
   useRegisterSW({
     onRegistered(r) {
       r && setInterval(() => {
-        console.log('SW: Checking for updates...')
         r.update()
       }, intervalMS)
     }
@@ -20,12 +19,8 @@ function ReloadPrompt() {
     needRefresh: [needRefresh],
     updateServiceWorker,
   } = useRegisterSW({
-    onRegistered(r) {
-      // eslint-disable-next-line prefer-template
-      console.log('SW Registered: ' + r)
-    },
     onRegisterError(error) {
-      console.log('SW registration error', error)
+      console.error('SW registration error', error)
     },
   })
 

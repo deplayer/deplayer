@@ -38,6 +38,7 @@ const SearchInput = (props: Props) => {
       className={'w-full flex bg-transparent border-b-4 border-accent items-center'}
     >
       <input
+        data-testid='search-input'
         className={classes}
         onChange={props.onSearchChange}
         onFocus={props.onFocus}
@@ -45,8 +46,8 @@ const SearchInput = (props: Props) => {
         onKeyUp={(e) => e.key === 'Escape' && props.setSearchOff()}
         value={props.value}
         placeholder={I18n.t('placeholder.search')}
+        aria-label={I18n.t('menu.search')}
         type='text'
-        data-testid="search-input"
       />
       <div className='p-2'>
         {props.loading ? <Icon icon='faSpinner' className='fa-pulse text-primary' /> : <Icon icon='faSearch' className='text-primary' />}

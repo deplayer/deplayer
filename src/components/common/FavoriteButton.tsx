@@ -38,11 +38,12 @@ const FavoriteButton: React.FC<Props> = React.memo(({ songId, className = '', fa
   return (
     <button
       onClick={toggleFavorite}
-      className={`p-2 focus:outline-none ${className}`}
-      title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+      className={`p-2 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${className}`}
+      aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+      aria-pressed={isFavorite}
     >
       <svg
-        className={`w-5 h-5 ${isFavorite ? 'text-red-500 fill-current' : 'text-gray-400 hover:text-red-500'}`}
+        className={`w-5 h-5 ${isFavorite ? 'text-error fill-current' : 'text-base-content/50 hover:text-error'}`}
         viewBox="0 0 24 24"
         stroke="currentColor"
         strokeWidth="2"

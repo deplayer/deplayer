@@ -78,6 +78,7 @@ export default class Importer extends React.Component<Props> {
           type='file'
           name='import-playlist'
           ref={this.fileInput}
+          aria-label="Import playlist"
         />
         <Button onClick={this.startImport.bind(this)}>Start import</Button>
         {message}

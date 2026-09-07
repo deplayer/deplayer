@@ -70,13 +70,14 @@ const AddMediaModal = () => {
             value={magnetLink}
             onChange={(event) => setMagnetLink(event.target.value)}
             placeholder="Enter magnet link..."
-            className="w-full"
+            aria-label="Magnet link"
           />
 
           <div className="flex items-center gap-x-2">
             <input 
               type="file" 
               name="file" 
+              aria-label="Torrent file"
               onChange={(event) => event.target.files && setTorrent(event.target.files[0])} 
               className="file-input file-input-bordered w-full"
             />

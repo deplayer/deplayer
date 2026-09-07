@@ -23,7 +23,7 @@
     li {
       &.current {
         a {
-          color: $white;
+          color: var(--bc);
         }
       }
 

@@ -24,8 +24,20 @@ const Tag = (props: Props) => {
     'items-center': true,
   }, props.className)
 
+  if (props.onClick) {
+    return (
+      <button
+        type="button"
+        className={classes}
+        onClick={props.onClick}
+      >
+        {props.children}
+      </button>
+    )
+  }
+
   return (
-    <div role="button" tabIndex={0} onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && props.onClick) props.onClick() }} className={classes} onClick={props.onClick}>
+    <div className={classes}>
       {props.children}
     </div>
   )

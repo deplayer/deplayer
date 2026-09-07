@@ -50,7 +50,7 @@ const MenuItem = (props: MenuItemProps) => {
 
   return (
     <li className={liClasses}>
-      <Link to={props.url} className={linkClasses} title={props.title}>
+      <Link to={props.url} className={linkClasses} title={props.title} aria-current={props.current ? 'page' : undefined}>
         <span className='w-8'>{props.icon}</span>
         <span className='flex-1'>{label}</span>
         {props.totalItems !== undefined && (

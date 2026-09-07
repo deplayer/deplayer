@@ -96,7 +96,7 @@ const RoomList = ({ peers, rooms, dispatch, onJoinRoom }: Props) => {
             <Button
               size="xs"
               onClick={() => requestSongFile(peer.peerId, peer.media!, peer.roomCode)}
-              className="bg-primary hover:bg-primary-dark flex-1"
+              className="bg-primary hover:bg-primary-focus flex-1"
             >
               <Icon icon="faDownload" className="mr-2" />
               <Translate value="peer.request" />
@@ -105,7 +105,7 @@ const RoomList = ({ peers, rooms, dispatch, onJoinRoom }: Props) => {
             <Button
               size="xs"
               onClick={() => requestRealtimeStream(peer.peerId, peer.roomCode, peer.media!)}
-              className="bg-green-600 hover:bg-green-700 flex-1"
+              className="bg-success hover:bg-success-focus flex-1"
             >
               <Icon icon="faStream" className="mr-2" />
               <Translate value="peer.streamRealtime" />
@@ -136,18 +136,16 @@ const RoomList = ({ peers, rooms, dispatch, onJoinRoom }: Props) => {
                       />
                     </button>
                   )}
-                  <h4 
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && handleShareRoom) handleShareRoom(room.id) }}
-                    className="text-lg font-semibold cursor-pointer hover:text-primary"
+                  <button
+                    type="button"
+                    className="text-lg font-semibold cursor-pointer hover:text-primary bg-transparent text-left"
                     onClick={() => handleShareRoom(room.id)}
                   >
                     Room: {room.id}
                     <span className="text-sm text-base-content/60 ml-2">
                       ({Object.keys(peers[room.id] || {}).length} {Object.keys(peers[room.id] || {}).length === 1 ? 'peer' : 'peers'})
                     </span>
-                  </h4>
+                  </button>
                 </div>
                 <Button
                   onClick={() => handleLeaveRoom(room.id)}

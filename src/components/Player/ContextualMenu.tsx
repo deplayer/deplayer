@@ -1,7 +1,7 @@
 import 'react-contexify/ReactContexify.css';
 
 import { Menu, useContextMenu, Item } from 'react-contexify'
-import { Translate } from 'react-redux-i18n'
+import { I18n, Translate } from 'react-redux-i18n'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useAppStore } from '../../stores/livestore/store'
@@ -183,6 +183,7 @@ const ContextualMenu = () => {
                 type="checkbox"
                 checked={showSpectrum}
                 readOnly
+                aria-label={I18n.t('buttons.toggleSpectrum')}
                 className="toggle toggle-primary toggle-sm"
               />
             </div>
@@ -208,6 +209,7 @@ const ContextualMenu = () => {
                     type="checkbox"
                     checked={liveQueue?.shuffle || false}
                     readOnly
+                    aria-label={I18n.t('buttons.shuffle')}
                     className="toggle toggle-primary toggle-sm"
                   />
                 </div>
@@ -231,6 +233,7 @@ const ContextualMenu = () => {
                     type="checkbox"
                     checked={liveQueue?.repeat || false}
                     readOnly
+                    aria-label={I18n.t('buttons.repeat')}
                     className="toggle toggle-primary toggle-sm"
                   />
                 </div>

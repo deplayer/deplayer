@@ -319,7 +319,7 @@ describe('ContextualMenu', () => {
       const { container: container2 } = setup({}, mockSong2)
       
       // Open first menu
-      const trigger1 = container1.querySelector('[role="button"]') as HTMLElement
+      const trigger1 = container1.querySelector('button') as HTMLElement
       await user.click(trigger1)
       
       await waitFor(() => {
@@ -327,7 +327,7 @@ describe('ContextualMenu', () => {
       })
       
       // Open second menu
-      const trigger2 = container2.querySelector('[role="button"]') as HTMLElement
+      const trigger2 = container2.querySelector('button') as HTMLElement
       await user.click(trigger2)
       
       await waitFor(() => {
@@ -357,7 +357,7 @@ describe('ContextualMenu', () => {
         </Provider>
       )
       
-      const triggers = container.querySelectorAll('[role="button"]')
+      const triggers = container.querySelectorAll('button')
       
       // Open first menu
       await user.click(triggers[0] as HTMLElement)

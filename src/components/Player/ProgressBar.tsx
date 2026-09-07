@@ -15,16 +15,6 @@ const ProgressBar = (props: Props) => {
   // Calculate step as 1ms since we're working with millisecond precision
   const step = 1;
 
-  // Add debug logging
-  console.log('ProgressBar props:', {
-    totalMs: props.total,
-    currentMs: props.current,
-    bufferedMs: props.buffered,
-    totalSec: props.total / 1000,
-    currentSec: props.current / 1000,
-    bufferedSec: props.buffered / 1000,
-    step
-  });
 
   if (!props.total || props.total <= 0) {
     console.warn('Invalid total duration:', props.total);
@@ -68,7 +58,7 @@ const ProgressBar = (props: Props) => {
           handle: {
             zIndex: 11,
             border: '2px solid rgb(var(--p))',
-            backgroundColor: '#fff',
+            backgroundColor: 'var(--b1)',
             cursor: 'grab',
             opacity: 1,
             boxShadow: '0 0 2px rgba(0,0,0,0.2)',

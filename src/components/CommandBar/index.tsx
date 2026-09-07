@@ -515,12 +515,13 @@ function CommandBar({ togglePlaying, playNext, playPrev }: Props) {
         <div className="flex flex-col">
           <div className="w-full flex bg-transparent border-b-4 border-accent items-center">
             <input
+              data-testid="command-search-input"
               type="text"
               value={search}
               onChange={handleSearchChange}
               placeholder={I18n.t('menu.searchPlaceholder')}
+              aria-label={I18n.t('menu.search')}
               className="w-full p-4 bg-transparent text-2xl font-sans focus:outline-none focus:ring-0 focus:border-none action"
-              data-testid="command-search-input"
             />
             <div className="p-2">
               <Icon icon="faSearch" className="text-primary text-2xl" />

@@ -1,7 +1,6 @@
 import Select, { StylesConfig } from 'react-select'
 import { Filter } from '../../stores/uiStore'
 import Button from '../common/Button'
-import { Dispatch } from 'redux'
 import Icon from '../common/Icon'
 import type { ArtistRow } from '../../types/media'
 import Modal from '../common/Modal'
@@ -11,11 +10,8 @@ import { useAppStore } from '../../stores/livestore/store'
 import { createSmartPlaylistAction } from '../../stores/livestore/actions/smartPlaylists'
 import { useArtists, useAvailableGenres, useAvailableProviders, useAvailableTypes } from '../../stores/livestore/hooks'
 
-type Props = {
-  dispatch?: Dispatch;
-}
 
-const FilterPanel = (_props: Props) => {
+const FilterPanel = () => {
   const activeFilters = useUIStore(s => s.activeFilters)
   const setFilter = useUIStore(s => s.setFilter)
   const liveStore = useAppStore()
@@ -50,7 +46,7 @@ const FilterPanel = (_props: Props) => {
       options: genres.map(value => ({
         value: `genre:${value}`,
         label: value,
-        color: '#ff9999' // Light red for genres
+        color: 'var(--p)' // Primary for genres
       }))
     },
     {
@@ -58,7 +54,7 @@ const FilterPanel = (_props: Props) => {
       options: types.map(value => ({
         value: `type:${value}`,
         label: value,
-        color: '#99ff99' // Light green for types
+        color: 'var(--s)' // Secondary for types
       }))
     },
     {
@@ -66,7 +62,7 @@ const FilterPanel = (_props: Props) => {
       options: artists.map((artist: ArtistRow) => ({
         value: `artist:${artist.id}`,
         label: artist.name,
-        color: '#9999ff' // Light blue for artists
+        color: 'var(--a)' // Accent for artists
       }))
     },
     {
@@ -74,24 +70,24 @@ const FilterPanel = (_props: Props) => {
       options: providers.map(value => ({
         value: `provider:${value}`,
         label: value,
-        color: '#99ccff' // Light blue for providers
+        color: 'var(--nc)' // Neutral content for providers
       }))
     }
   ]
 
   // Format currently selected values
   const selectedValues = [
-    ...activeFilters.genres.map(g => ({ value: `genre:${g}`, label: g, color: '#ff9999' })),
-    ...activeFilters.types.map(t => ({ value: `type:${t}`, label: t, color: '#99ff99' })),
+    ...activeFilters.genres.map(g => ({ value: `genre:${g}`, label: g, color: 'var(--p)' })),
+    ...activeFilters.types.map(t => ({ value: `type:${t}`, label: t, color: 'var(--s)' })),
     ...activeFilters.artists.map(a => ({
       value: `artist:${a}`,
       label: artistsMap[a]?.name || a,
-      color: '#9999ff'
+      color: 'var(--a)'
     })),
     ...activeFilters.providers.map(p => ({
       value: `provider:${p}`,
       label: p,
-      color: '#99ccff'
+      color: 'var(--nc)'
     }))
   ]
 
@@ -124,13 +120,13 @@ const FilterPanel = (_props: Props) => {
       backgroundColor: state.isSelected
         ? state.data.color
         : state.isFocused
-          ? `${state.data.color}80`
+          ? `color-mix(in srgb, ${state.data.color} 50%, transparent)`
           : 'var(--select-option-bg)',
       color: state.isSelected
         ? 'white'
         : 'var(--select-text)',
       '&:hover': {
-        backgroundColor: `${state.data.color}80`
+        backgroundColor: `color-mix(in srgb, ${state.data.color} 50%, transparent)`
       }
     }),
     menu: (provided) => ({
@@ -155,7 +151,7 @@ const FilterPanel = (_props: Props) => {
     }),
     multiValue: (provided, { data }) => ({
       ...provided,
-      backgroundColor: `${data.color}40`,
+      backgroundColor: `color-mix(in srgb, ${data.color} 25%, transparent)`,
       border: `1px solid ${data.color}`,
     }),
     multiValueLabel: (provided) => ({
@@ -245,6 +241,7 @@ const FilterPanel = (_props: Props) => {
           inverted
           transparent
           title="Save as smart playlist"
+          aria-label="Save as smart playlist"
           className='cursor-pointer ml-2'
         >
           <Icon icon="faSave" className='px-1' />

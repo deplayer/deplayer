@@ -90,7 +90,7 @@ const SidebarContents = (props: ContentProps) => {
   const trackIds = getActiveTrackIds(liveQueue)
 
   return (
-    <div role="button" tabIndex={0} onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && props.onSetSidebarOpen) props.onSetSidebarOpen(true) }} className={`flex flex-col h-full bg-base-100 ${props.className || ''}`} onClick={() => props.onSetSidebarOpen(true)}>
+    <div className={`flex flex-col h-full bg-base-100 ${props.className || ''}`}>
       <div className="flex justify-between bg-base-200 border-b border-base-300 py-4">
         <DeplayerLogo />
         <h4 className="text-xl text-center text-primary tracking-wider select-none">
@@ -98,7 +98,7 @@ const SidebarContents = (props: ContentProps) => {
         </h4>
         <SwitchThemeButton />
       </div>
-      <ul className='menu menu-lg w-full flex-1 overflow-y-auto'>
+      <nav aria-label="Primary" className='menu menu-lg w-full flex-1 overflow-y-auto'>
         <ExploreMenuItem current={inSection(location, '$')} />
         {trackIds.length > 0 && (
           <QueueMenuItem
@@ -133,7 +133,7 @@ const SidebarContents = (props: ContentProps) => {
           translate={true}
         />
         <SettingsMenuItem current={inSection(location, 'settings')} />
-      </ul>
+      </nav>
 
       <div className='w-full'>  
         <CommandBar 

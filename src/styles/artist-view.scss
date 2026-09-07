@@ -4,11 +4,11 @@
 
   .main {
     margin: 0 auto;
-    color: $white;
+    color: var(--bc);
   }
 
   .card {
-    background: $greyscale-darker1;
+    background: var(--b3);
   }
 
   ul {

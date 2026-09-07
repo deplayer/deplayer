@@ -4,14 +4,7 @@ import daisyui from "daisyui";
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {
-      colors: {
-        "deplayer-dark": "#101b26",
-      },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-      },
-    },
+    extend: {},
   },
   plugins: [daisyui],
   daisyui: {
@@ -59,7 +52,7 @@ export default {
           primary: "#0ea5e9",
           secondary: "#eab308",
           accent: "#cbd5e0",
-          neutral: "#000000",
+          neutral: "#0f172a",
           "base-100": "#101b26",
           "base-200": "#1e293b",
           "base-300": "#334155",
@@ -110,7 +103,7 @@ export default {
           "--player-screen-border": "0px",
           "--player-screen-shadow": "0 0 2px rgba(0, 0, 0, 0.2)",
           "--btn-text-case": "uppercase", // Uppercase text for buttons
-          "--btn-text-color": "#FFFFFF", // White text for all buttons
+          "--btn-text-color": "#1A1A1A", // Dark text for buttons (contrast on yellow)
           "--rounded-box": "0", // Sharp corners like old IBM terminals
           "--rounded-btn": "0", // Sharp corners
           "--rounded-badge": "0", // Sharp corners
@@ -143,7 +136,7 @@ export default {
           "--player-screen-border": "0px",
           "--player-screen-shadow": "0 0 2px rgba(0, 0, 0, 0.2)",
           "--btn-text-case": "uppercase", // Uppercase text for buttons
-          "--btn-text-color": "#FFFFFF", // White text for all buttons
+          "--btn-text-color": "#262626", // Dark text for buttons (contrast on yellow)
           "--rounded-box": "0", // Sharp corners like old IBM terminals
           "--rounded-btn": "0", // Sharp corners
           "--rounded-badge": "0", // Sharp corners
@@ -177,7 +170,7 @@ export default {
           "--player-screen-border": "1px solid #4D4D4D", // Subtle screen border
           "--player-screen-shadow": "0 0 10px rgba(0, 229, 255, 0.2)", // Cyan glow
           "--btn-text-case": "uppercase", // Uppercase text for buttons
-          "--btn-text-color": "#FFFFFF", // White text for buttons
+          "--btn-text-color": "#1A1A1A", // Dark text for buttons (contrast on yellow)
           "--rounded-box": "4px", // Slightly rounded corners
           "--rounded-btn": "4px", // Slightly rounded buttons
           "--rounded-badge": "4px", // Slightly rounded badges

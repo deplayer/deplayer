@@ -14,12 +14,10 @@ const TopThisWeekCard = () => {
     <DashboardCard title="Most Played" icon="faHeart" seeAllLink="/collection">
       <div className="flex flex-col gap-2">
         {topSongs.filter((s): s is NonNullable<typeof s> => s !== null).map((song, index) => (
-          <div
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") dispatch({ type: types.PLAY_SONG, songId: song.id }) }}
+          <button
+            type="button"
             key={song.id}
-            className="flex items-center gap-3 py-1 hover:bg-base-300 rounded-lg px-2 cursor-pointer group"
+            className="flex items-center gap-3 py-1 hover:bg-base-300 rounded-lg px-2 cursor-pointer group w-full text-left bg-transparent"
             onClick={() => dispatch({ type: types.PLAY_SONG, songId: song.id })}
           >
             <span className="text-sm opacity-50 w-5 text-right">{index + 1}</span>
@@ -29,7 +27,7 @@ const TopThisWeekCard = () => {
             </div>
             <span className="text-xs opacity-50">{song.playCount as number}×</span>
             <Icon icon="faPlay" className="opacity-0 group-hover:opacity-100 text-primary text-sm" />
-          </div>
+          </button>
         ))}
       </div>
     </DashboardCard>

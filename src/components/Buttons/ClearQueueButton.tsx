@@ -1,5 +1,5 @@
 import { Dispatch } from 'redux'
-import { Translate } from 'react-redux-i18n'
+import { I18n, Translate } from 'react-redux-i18n'
 import Icon from '../common/Icon'
 
 import { CLEAR_QUEUE } from '../../constants/ActionTypes'
@@ -30,6 +30,7 @@ const ClearQueueButton = (props: Props) => {
     <Button
       transparent
       className={`clearqueue-button button ${props.className || ''}`}
+      aria-label={I18n.t('buttons.clearQueue')}
       onClick={clearQueue}
     >
       <Icon icon='faTrash' className='mr-2' />

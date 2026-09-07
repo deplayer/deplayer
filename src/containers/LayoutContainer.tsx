@@ -70,9 +70,9 @@ const Layout = ({ children }: LayoutProps) => {
         <Topbar>
           <SearchButton />
         </Topbar>
-        <div className='layout-contents z-10'>
+        <main className='layout-contents z-10'>
           {children}
-        </div>
+        </main>
         <Placeholder mqlMatch={mqlMatch} />
       </Sidebar>
       {internalPlayer && visualsMode === 'ambient' && (

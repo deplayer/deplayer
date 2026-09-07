@@ -1,4 +1,4 @@
-import { Translate } from 'react-redux-i18n'
+import { I18n, Translate } from 'react-redux-i18n'
 import Icon from '../common/Icon'
 import Button from '../common/Button'
 import { useAppStore } from '../../stores/livestore/store'
@@ -41,6 +41,7 @@ const SaveQueueButton = (props: Props) => {
     <Button
       transparent
       className={`clearqueue-button button ${props.className || ''}`}
+      aria-label={I18n.t('buttons.saveAsPlaylist')}
       onClick={saveQueue}
     >
       <Icon icon='faSave' className='mr-2' />

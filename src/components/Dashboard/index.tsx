@@ -60,14 +60,14 @@ const WelcomeCard = () => {
               </Link>
             </li>
             <li>
-              <span
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setShowAddMediaModal(true) }}
+              <button
+                type="button"
                 onClick={() => setShowAddMediaModal(true)}
-                className="text-primary hover:text-primary-focus cursor-pointer"
-              >                <Translate value="dashboard.welcome.addMedia" />
-              </span>{' '}              <Translate value="dashboard.welcome.addMediaDescription" />
+                className="text-primary hover:text-primary-focus cursor-pointer bg-transparent"
+              >
+                <Translate value="dashboard.welcome.addMedia" />
+              </button>{' '}
+              <Translate value="dashboard.welcome.addMediaDescription" />
             </li>
             <li>
               <Link to="/collection" className="text-primary hover:text-primary-focus">

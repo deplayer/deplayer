@@ -19,16 +19,14 @@ const LazyContextualMenuTrigger = (props: Props) => {
 
   if (!opened) {
     return (
-      <div
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && setOpened) setOpened(true) }}
+      <button
+        type="button"
         onClick={(e) => { e.stopPropagation(); setOpened(true) }}
         aria-label="Open context menu"
-        className='cursor-pointer p-2 menu-trigger focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset rounded'
+        className='cursor-pointer p-2 menu-trigger focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset rounded bg-transparent'
       >
         <Icon icon='faEllipsisV' className='text-blue-400' />
-      </div>
+      </button>
     )
   }
 
@@ -120,20 +118,20 @@ const SongRow = React.memo((props: Props) => {
         />
       )}
       <div className='media-info truncate w-full whitespace-no-wrap'>
-        <h4 className='text-lg -mt-1'>
+        <div className='text-lg -mt-1'>
           <Link to={`/song/${song.id}`} className="text-base-content hover:text-primary">
             {song.track && <span className='mr-1 text-primary text-xl font-bold inline-block'>{song.track}</span>}
             {song.title || nonAvailable}
           </Link>
-        </h4>
-        <h5 className='text-base-content/70 text-sm'>
+        </div>
+        <div className='text-base-content/70 text-sm'>
           {song.albumName || nonAvailable}
-        </h5>
-        <h6 className='text-sm'>
+        </div>
+        <div className='text-sm'>
           <Link to={`/artist/${song.artistId || ''}`} className="text-base-content/70 hover:text-primary">
             {song.artistName || nonAvailable}
           </Link>
-        </h6>
+        </div>
         {props.slim && (
           <div className='inline-block text-base-content/60 text-sm'>{getDurationStr(song.duration || 0)}</div>
         )}

@@ -211,13 +211,6 @@ class PlayerControls extends React.Component<Props, State> {
       playedSeconds: seekSeconds,
       played: seekSeconds / this.props.player.duration
     }, () => {
-      console.log('Seek state updated:', {
-        seekValueMs: seekValue,
-        seekSeconds,
-        playedSeconds: this.state.playedSeconds,
-        played: this.state.played,
-        duration: this.props.player.duration
-      });
       
       if (this.playerRef.current) {
         this.playerRef.current.seekTo(seekSeconds);
@@ -313,7 +306,6 @@ class PlayerControls extends React.Component<Props, State> {
     // DEFENSIVE: Don't unmount player if audio is still playing
     // This prevents flickering during state transitions (e.g., shuffle toggle)
     if (!currentPlayingId && !streamUri) {
-      console.log("No current playing id and no stream")
       return null
     }
 

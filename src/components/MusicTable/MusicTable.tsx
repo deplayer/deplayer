@@ -39,14 +39,12 @@ const Toolbar = ({
   handleTransitionEnd, 
   tableIds, 
   actions,
-  dispatch,
 }: {
   isToolbarVisible: boolean,
   isToolbarHidden: boolean,
   handleTransitionEnd: () => void,
   tableIds: Array<string>,
   actions: React.ReactNode,
-  dispatch: Dispatch,
 }) => {
   const location = useLocation()
   
@@ -64,9 +62,7 @@ const Toolbar = ({
           </div>
           {location.pathname === '/collection' && (
             <div className='flex-1 max-w-xl'>
-              <FilterPanel
-                dispatch={dispatch}
-              />
+              <FilterPanel />
             </div>
           )}
         </div>
@@ -419,7 +415,6 @@ const MusicTable = ({
         handleTransitionEnd={handleTransitionEnd}
         tableIds={tableIds}
         actions={actions}
-        dispatch={dispatch}
       />
       <AutoSizer className='music-table'>
         {({ height, width }: { height: number, width: number }) => (

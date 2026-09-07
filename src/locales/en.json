@@ -161,6 +161,7 @@
     "repeat": "Repeat",
     "fullScreen": "Fullscreen",
     "toggleMiniQueue": "Toggle queue",
+    "toggleSidebar": "Toggle menu",
     "startPlaying": "Start playing",
     "toggleSpectrum": "Toggle spectrum",
     "toggleVisuals": "Toggle visuals",

@@ -16,7 +16,7 @@
 }
 
 .rc-slider-rail {
-  background-color: $primary-color-900 !important;
+  background-color: var(--b3) !important;
 }
 
 .rc-slider-handle {
@@ -25,13 +25,13 @@
 
 .rc-slider-handle {
   z-index: 1;
-  border: solid 2px $primary-color-100;
+  border: solid 2px var(--b1);
   margin-top: -7px !important;
   width: 20px !important;
   height: 20px !important;
-  background-color: $primary-color;
+  background-color: var(--p);
 }
 
 .rc-slider-track {
-  background-color: $primary-color-400;
+  background-color: var(--p);
 }

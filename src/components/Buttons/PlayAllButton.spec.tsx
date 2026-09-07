@@ -15,6 +15,7 @@ vi.mock('react-router-dom', async () => {
 })
 
 vi.mock('react-redux-i18n', () => ({
+  I18n: { t: (key: string) => key },
   Translate: () => null
 }))
 

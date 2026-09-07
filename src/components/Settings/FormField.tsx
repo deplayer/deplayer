@@ -19,6 +19,7 @@ const FormField = ({ field }: Props) => {
         <Field name={field.name}>
           {({ field: f }: FieldProps) => (
             <input
+              id={`field-${field.name}`}
               type="checkbox"
               className="toggle toggle-primary"
               checked={f.value}
@@ -36,6 +37,7 @@ const FormField = ({ field }: Props) => {
       <div>
         <div className="flex gap-2">
           <Field
+            id={`field-${field.name}`}
             name={field.name}
             type={showPassword ? 'text' : 'password'}
             className="input input-bordered w-full"
@@ -58,8 +60,8 @@ const FormField = ({ field }: Props) => {
     return (
       <div>
         <Field
+          id={`field-${field.name}`}
           as="select"
-          name={field.name}
           className="select select-bordered w-full"
         >
           {field.options?.map((opt) => (
@@ -76,7 +78,7 @@ const FormField = ({ field }: Props) => {
   return (
     <div>
       <Field
-        name={field.name}
+        id={`field-${field.name}`}
         type={field.type}
         className="input input-bordered w-full"
         placeholder={field.placeholder}

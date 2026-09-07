@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { useSelector } from 'react-redux'
-import { useLocation } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import type { Dispatch } from 'redux'
+import { useLocation } from 'react-router-dom'
+import { I18n } from 'react-redux-i18n'
 import SearchInput from './SearchInput'
 import Icon from '../common/Icon'
 import { startSearch, StartSearchAction } from '../../types/search'
@@ -133,7 +133,7 @@ const Topbar = ({ children }: Props) => {
         <button
           onClick={handleToggleSidebar}
           className="btn btn-ghost btn-circle btn-sm"
-          title="Toggle menu"
+          aria-label={I18n.t('buttons.toggleSidebar')}
         >
           <Icon icon='faBars' />
         </button>
@@ -149,7 +149,7 @@ const Topbar = ({ children }: Props) => {
           setSearchOff={handleSearchOff}
         />
         {!searchOpen && title && (
-          <div role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") toggleSearch() }} onClick={toggleSearch} className="text-center">{title}</div>
+          <button onClick={toggleSearch} className="text-center bg-transparent">{title}</button>
         )}
       </div>
 
@@ -158,7 +158,7 @@ const Topbar = ({ children }: Props) => {
         <button
           onClick={() => toggleRightPanel()}
           className="btn btn-ghost btn-circle"
-          title="Share room"
+          aria-label={I18n.t('room.shareRoom')}
         >
           <Icon icon='faShareAlt' />
         </button>

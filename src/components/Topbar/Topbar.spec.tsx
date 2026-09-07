@@ -65,8 +65,8 @@ describe('Topbar', () => {
   describe('Share room button', () => {
     it('toggles the right panel via uiStore when share button is clicked', () => {
       expect(useUIStore.getState().rightPanelToggled).toBe(false)
-      const { getByTitle } = renderTopbar()
-      fireEvent.click(getByTitle('Share room'))
+      const { getByLabelText } = renderTopbar()
+      fireEvent.click(getByLabelText('room.shareRoom'))
       expect(useUIStore.getState().rightPanelToggled).toBe(true)
     })
   })
