@@ -2,6 +2,9 @@ import type { LiveStore } from '../accessor'
 import { mediaEvents } from '../events/media'
 import { NormalizedMedia } from '../../../utils/normalizeMedia'
 import { profiler } from '../../../utils/performanceProfiler'
+import { createLogger } from '../../../utils/logger'
+
+const logger = createLogger({ namespace: 'BatchedMediaCommitter' })
 
 /**
  * Convert NormalizedMedia to the shape expected by LiveStore media events
@@ -114,7 +117,9 @@ class BatchedMediaCommitter {
     // Deferred mode: caller controls flush timing, no debounce needed.
     if (!skipRefresh) {
       clearTimeout(this.flushTimeout as number | undefined)
-      this.flushTimeout = window.setTimeout(() => { this.flush() }, this.THROTTLE_MS)
+      this.flushTimeout = window.setTimeout(() => {
+        this.flush().catch((error) => logger.error('Debounced flush failed; batch re-queued', error))
+      }, this.THROTTLE_MS)
     }
   }
 
@@ -159,6 +164,9 @@ class BatchedMediaCommitter {
    * Immediately flush all pending media to LiveStore.
    * When `skipRefresh` is true, sets refreshPending without calling manualRefresh.
    * Default (no options) calls `refresh()` at the end.
+   * Rejects on failure AFTER re-queueing the failed batch into pendingMedia,
+   * so the next flush retries it. Callers must treat rejection as
+   * "page not synced" — the sync saga skips its cursor update on rejection.
    */
   async flush(options?: FlushOptions): Promise<void> {
     const skipRefresh = options?.skipRefresh ?? false
@@ -240,9 +248,12 @@ class BatchedMediaCommitter {
         profiler.mark('flush-end')
         profiler.report()
       }
-    } catch (error) {
-      console.error('[BatchedMediaCommitter] Flush failed:', error)
-      this.pendingMedia.push(...mediaToCommit)
+  } catch (error) {
+    // Re-queue BEFORE rejecting so the batch stays recoverable. Re-committing
+    // already-committed items is safe: the existence check filters them out.
+    logger.error('Flush failed; batch re-queued', error)
+    this.pendingMedia.push(...mediaToCommit)
+    throw error
     } finally {
       this.isCommitting = false
     }

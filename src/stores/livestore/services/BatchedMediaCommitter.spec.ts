@@ -51,10 +51,32 @@ describe('BatchedMediaCommitter.add', () => {
     )
     await expect(
       Promise.race([batchedMediaCommitter.add(makeMedia(2000)), timeout])
-    ).rejects.toThrow(/did not drain/)
+    ).rejects.toThrow(/boom/)
 
-    expect(flushSpy.mock.calls.length).toBeLessThanOrEqual(8)
+    expect(flushSpy.mock.calls.length).toBeLessThanOrEqual(2)
     expect(batchedMediaCommitter.getPendingCount()).toBeGreaterThan(0)
+  })
+
+  it('flush() rejects but re-queues the batch so a later flush retries it', async () => {
+    const failing = {
+      query: vi.fn(async () => [{ values: [] as string[][] }]),
+      commit: vi.fn(async () => { throw new Error('boom') }),
+      manualRefresh: vi.fn(),
+    }
+    // @ts-expect-error test seam
+    batchedMediaCommitter.setStore(failing)
+
+    await batchedMediaCommitter.add(makeMedia(10), { skipRefresh: true })
+    await expect(batchedMediaCommitter.flush({ skipRefresh: true })).rejects.toThrow('boom')
+    expect(batchedMediaCommitter.getPendingCount()).toBe(10)
+
+    // Store recovers: the same batch commits on the next flush.
+    const healthy = makeFakeStore()
+    // @ts-expect-error test seam
+    batchedMediaCommitter.setStore(healthy)
+    await batchedMediaCommitter.flush({ skipRefresh: true })
+    expect(batchedMediaCommitter.getPendingCount()).toBe(0)
+    expect(healthy.commit).toHaveBeenCalled()
   })
 })
 

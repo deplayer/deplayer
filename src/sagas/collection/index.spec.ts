@@ -90,4 +90,23 @@ describe('syncMediaLibrary deferred refresh', () => {
     expect(refreshSpy).toHaveBeenCalledTimes(1)
     expect(refreshSpy).toHaveBeenCalledWith('SyncSaga.syncMediaLibrary')
   })
+
+  it('does not advance sync_state when flush fails', async () => {
+    const commitSpy = vi.fn()
+    // @ts-expect-error test seam
+    fakeLiveStore.commit = commitSpy
+    flushSpy.mockRejectedValue(new Error('flush boom'))
+    registerProvider('test', [
+      { media: [{ id: 'p1' }], hasMore: true, nextCursor: 1 },
+      { media: [{ id: 'p2' }], hasMore: false, nextCursor: 2 },
+    ])
+
+    await expectSaga(syncMediaLibrary)
+      .silentRun(2000)
+
+    // No sync_state write may happen for a page whose flush failed:
+    // advancing the cursor would permanently skip those items.
+    expect(commitSpy).not.toHaveBeenCalled()
+    expect(refreshSpy).toHaveBeenCalledTimes(1)
+  })
 })
