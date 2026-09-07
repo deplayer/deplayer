@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-04T21:15:04Z",
+  "title": "Design System: deplayer",
+  "extensions": {
+    "colorMeta": {
+      "primary-sky": {
+        "role": "primary",
+        "displayName": "Listening Sky",
+        "canonical": "#0ea5e9",
+        "tonalRamp": ["#082f49", "#0c4a6e", "#075985", "#0369a1", "#0284c7", "#0ea5e9", "#38bdf8", "#bae6fd"]
+      },
+      "primary-light": {
+        "role": "primary",
+        "displayName": "Clear Sky",
+        "canonical": "#0284c7",
+        "tonalRamp": ["#082f49", "#0c4a6e", "#075985", "#0369a1", "#0284c7", "#0ea5e9", "#38bdf8", "#bae6fd"]
+      },
+      "secondary-amber": {
+        "role": "secondary",
+        "displayName": "Signal Amber",
+        "canonical": "#eab308",
+        "tonalRamp": ["#422006", "#713f12", "#854d0e", "#a16207", "#ca8a04", "#eab308", "#facc15", "#fef08a"]
+      },
+      "accent-slate": {
+        "role": "tertiary",
+        "displayName": "Theme Accent",
+        "canonical": "#cbd5e0",
+        "tonalRamp": ["#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e0", "#e2e8f0", "#f8fafc"]
+      },
+      "dark-canvas": {
+        "role": "neutral",
+        "displayName": "Deep Canvas",
+        "canonical": "#101b26",
+        "tonalRamp": ["#101b26", "#172635", "#1e293b", "#26384a", "#334155", "#475569", "#64748b", "#94a3b8"]
+      },
+      "dark-surface": {
+        "role": "neutral",
+        "displayName": "Slate Surface",
+        "canonical": "#1e293b",
+        "tonalRamp": ["#101b26", "#172635", "#1e293b", "#26384a", "#334155", "#475569", "#64748b", "#94a3b8"]
+      },
+      "dark-elevated": {
+        "role": "neutral",
+        "displayName": "Elevated Slate",
+        "canonical": "#334155",
+        "tonalRamp": ["#1e293b", "#26384a", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e0", "#e2e8f0"]
+      },
+      "dark-content": {
+        "role": "neutral",
+        "displayName": "Ice Content",
+        "canonical": "#bae6fd",
+        "tonalRamp": ["#0c4a6e", "#075985", "#0369a1", "#0284c7", "#0ea5e9", "#38bdf8", "#7dd3fc", "#bae6fd"]
+      },
+      "light-canvas": {
+        "role": "neutral",
+        "displayName": "Light Canvas",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e0", "#e2e8f0", "#f1f5f9", "#ffffff"]
+      },
+      "light-surface": {
+        "role": "neutral",
+        "displayName": "Light Surface",
+        "canonical": "#f1f5f9",
+        "tonalRamp": ["#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e0", "#e2e8f0", "#f1f5f9", "#ffffff"]
+      },
+      "light-content": {
+        "role": "neutral",
+        "displayName": "Ink Content",
+        "canonical": "#0f172a",
+        "tonalRamp": ["#020617", "#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e0"]
+      }
+    },
+    "typographyMeta": {
+      "body": {
+        "displayName": "System Sans",
+        "purpose": "Fast, familiar reading and control labels across the player and library."
+      },
+      "label": {
+        "displayName": "Compact System Label",
+        "purpose": "Small metadata, badges, and state indicators."
+      }
+    },
+    "shadows": [
+      {
+        "name": "menu-lift",
+        "value": "shadow-lg",
+        "purpose": "Transient context menus and action surfaces."
+      },
+      {
+        "name": "visualizer-lift",
+        "value": "shadow-xl",
+        "purpose": "The optional visualizer card above the player controls."
+      },
+      {
+        "name": "player-screen-depth",
+        "value": "0 0 10px rgba(0, 0, 0, 0.5)",
+        "purpose": "Default dark theme player display depth."
+      }
+    ],
+    "motion": [
+      {
+        "name": "panel-enter",
+        "value": "opacity 300ms ease-out, transform 300ms ease-out",
+        "purpose": "Functional visualizer panel appearance."
+      },
+      {
+        "name": "panel-exit",
+        "value": "opacity 200ms ease-in, transform 200ms ease-in",
+        "purpose": "Quick visualizer panel dismissal."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "transition: none",
+        "purpose": "Respect prefers-reduced-motion for the panel transition."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "A compact semantic action using the active theme's primary role.",
+      "html": "<button class=\"ds-btn-primary\">PLAY</button>",
+      "css": ".ds-btn-primary { background: #0ea5e9; color: #101b26; padding: 0.5rem 1rem; border: 0; border-radius: 9999px; font: 500 0.875rem/1.25 system-ui, sans-serif; transition: background 150ms ease-out, transform 150ms ease-out; } .ds-btn-primary:hover { background: #38bdf8; } .ds-btn-primary:focus-visible { outline: 2px solid #bae6fd; outline-offset: 2px; } .ds-btn-primary:active { transform: scale(0.98); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "A low-emphasis action that preserves the active surface hierarchy.",
+      "html": "<button class=\"ds-btn-ghost\">QUEUE</button>",
+      "css": ".ds-btn-ghost { background: transparent; color: #bae6fd; padding: 0.5rem 1rem; border: 1px solid #334155; border-radius: 0.25rem; font: 500 0.875rem/1.25 system-ui, sans-serif; transition: background 150ms ease-out, border-color 150ms ease-out; } .ds-btn-ghost:hover { background: #1e293b; border-color: #0ea5e9; } .ds-btn-ghost:focus-visible { outline: 2px solid #bae6fd; outline-offset: 2px; }"
+    },
+    {
+      "name": "Context Menu",
+      "kind": "nav",
+      "refersTo": "menu-surface",
+      "description": "A compact action surface anchored to the player control.",
+      "html": "<nav class=\"ds-menu\"><button>Toggle visuals</button><button>Fullscreen</button></nav>",
+      "css": ".ds-menu { display: grid; gap: 0.25rem; min-width: 13rem; padding: 0.75rem 1rem; background: #334155; color: #bae6fd; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.24); } .ds-menu button { padding: 0.5rem; color: inherit; background: transparent; border: 0; border-radius: 0.25rem; text-align: left; font: 400 0.875rem/1.25 system-ui, sans-serif; } .ds-menu button:hover, .ds-menu button:focus-visible { background: #1e293b; outline: none; } .ds-menu button:focus-visible { box-shadow: 0 0 0 2px #0ea5e9; }"
+    },
+    {
+      "name": "Mode Chip",
+      "kind": "chip",
+      "refersTo": "chip-mode",
+      "description": "A small state badge for Off, Ambient, and Panel visualizer modes.",
+      "html": "<span class=\"ds-chip\">Ambient</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; color: #0ea5e9; background: rgba(14,165,233,0.2); border-radius: 9999px; font: 500 0.75rem/1.25 system-ui, sans-serif; }"
+    },
+    {
+      "name": "Surface Card",
+      "kind": "card",
+      "refersTo": "surface-card",
+      "description": "A theme-owned container for content or optional player UI.",
+      "html": "<section class=\"ds-card\"><strong>Now playing</strong></section>",
+      "css": ".ds-card { padding: 1rem; background: #1e293b; color: #bae6fd; border: 1px solid #334155; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.24); } .ds-card:focus-within { border-color: #0ea5e9; }"
+    },
+    {
+      "name": "Visualizer Panel",
+      "kind": "custom",
+      "refersTo": "visualizer-panel",
+      "description": "An optional centered Butterchurn surface above the player bar.",
+      "html": "<div class=\"ds-visualizer\" aria-hidden=\"true\"><canvas></canvas></div>",
+      "css": ".ds-visualizer { width: min(640px, calc(100vw - 24px)); height: 160px; overflow: hidden; background: #1e293b; border: 1px solid #334155; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.24); } .ds-visualizer canvas { display: block; width: 100%; height: 100%; } @media (max-width: 639px) { .ds-visualizer { min-height: 112px; height: auto; aspect-ratio: 3.1 / 1; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Dark Listening Room",
+    "overview": "Deplayer is a calm, atmospheric workspace for people listening to and managing a personal music library. The interface gives content and playback priority: surfaces are dark and quiet, cool blue accents make state legible, and visualizer motion remains optional rather than competing with the library.\n\nThe product is intentionally themeable. Semantic DaisyUI roles carry the interface across the default dark theme, light theme, and expressive theme presets such as Teenage Engineering and Cassette Futurism. Theme changes may alter hue, contrast, corner treatment, and control character, but controls must remain recognizable and usable. Copy is quietly confident: direct, practical, and music-first.",
+    "keyCharacteristics": [
+      "Dark listening-room atmosphere with theme-owned surfaces.",
+      "Local-first, provider-agnostic utility for personal libraries.",
+      "Cool blue information hierarchy with theme-specific signal accents.",
+      "Subtle functional transitions; ambient visualizer motion is opt-in.",
+      "Composable Tailwind and DaisyUI primitives with narrow feature CSS."
+    ],
+    "rules": [
+      {
+        "name": "The Semantic Theme Rule",
+        "body": "Use DaisyUI semantic roles (`primary`, `secondary`, `accent`, `base-*`, and status roles) instead of hardcoding a theme-specific color in a shared component.",
+        "section": "colors"
+      },
+      {
+        "name": "The Signal Rule",
+        "body": "Accent colors communicate state or action; do not turn every surface into a colored panel.",
+        "section": "colors"
+      },
+      {
+        "name": "The Native Voice Rule",
+        "body": "Keep the system stack unless a product-wide typography decision replaces it; do not add a novelty display font to make one feature feel special.",
+        "section": "typography"
+      },
+      {
+        "name": "The Theme-Owned Depth Rule",
+        "body": "Use the active theme's surface, border, and shadow tokens before adding local elevation values.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use semantic DaisyUI roles so the same component works across all configured themes.",
+      "Do keep player controls circular and compact while preserving clear focus and touch targets.",
+      "Do keep optional visualizer motion subordinate to library content and provide a reduced-motion path.",
+      "Do localize user-facing visualizer mode labels.",
+      "Do use `calc(120px + env(safe-area-inset-bottom))` as the overlay offset above the player bar.",
+      "Do prefer composable Tailwind/DaisyUI primitives and narrow SCSS for feature geometry."
+    ],
+    "donts": [
+      "Don't hardcode default dark-theme colors into shared controls or cards.",
+      "Don't let decorative canvas output become a screen-reader announcement.",
+      "Don't use bounce or elastic easing as the default for product transitions.",
+      "Don't place transient visualizer UI flush against narrow viewport edges or safe-area insets.",
+      "Don't introduce a new visual language beside the configured theme system."
+    ]
+  }
+}
