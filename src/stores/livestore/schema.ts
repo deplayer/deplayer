@@ -273,6 +273,7 @@ export const tables = {
       lastKnownCount: State.SQLite.integer({ default: 0 }),
       initialSyncCursor: State.SQLite.integer({ default: 0 }),
       initialSyncComplete: State.SQLite.boolean({ default: false }),
+      cursorPageSize: State.SQLite.integer({ default: 0 }),
       updatedAt: State.SQLite.integer({}),
     },
   }),
@@ -313,6 +314,17 @@ const normalizeGenreRows = (mediaId: string, genres: readonly string[] | undefin
         })
         .onConflict('id', 'ignore'),
     )
+// Shared upsert for sync resume state rows (see services/SyncResumeState.ts).
+// v1 events predate per-provider cursor geometry; they replay with
+// cursorPageSize 0 ("unknown"), which the geometry guard treats as
+// "re-derive the cursor once".
+const syncStateUpsert = (id: string, s: { lastSyncTimestamp: string; lastKnownCount: number; initialSyncCursor: number; initialSyncComplete: boolean; cursorPageSize: number }) => {
+  const now = Date.now()
+  return tables.syncState
+    .insert({ id, ...s, updatedAt: now })
+    .onConflict('id', 'update', { ...s, updatedAt: now })
+}
+
 const materializers = State.SQLite.materializers(events, {
   // Settings materializers
   'v1.SettingsUpdated': ({ id, settings: rawSettings }: { id: string; settings: unknown }) => {
@@ -853,26 +865,12 @@ const materializers = State.SQLite.materializers(events, {
       .where('id', '=', id)
   },
 
-  // Sync State materializer
-  'v1.SyncStateUpdated': ({ id, lastSyncTimestamp, lastKnownCount, initialSyncCursor, initialSyncComplete }: { id: string; lastSyncTimestamp: string; lastKnownCount: number; initialSyncCursor: number; initialSyncComplete: boolean }) => {
-    const now = Date.now()
-    return tables.syncState
-      .insert({
-        id,
-        lastSyncTimestamp,
-        lastKnownCount,
-        initialSyncCursor,
-        initialSyncComplete,
-        updatedAt: now,
-      })
-      .onConflict('id', 'update', {
-        lastSyncTimestamp,
-        lastKnownCount,
-        initialSyncCursor,
-        initialSyncComplete,
-        updatedAt: now,
-      })
-  },
+  // Sync resume state materializers (per-provider rows; see SyncResumeState)
+  'v1.SyncStateUpdated': ({ id, lastSyncTimestamp, lastKnownCount, initialSyncCursor, initialSyncComplete }: { id: string; lastSyncTimestamp: string; lastKnownCount: number; initialSyncCursor: number; initialSyncComplete: boolean }) =>
+    syncStateUpsert(id, { lastSyncTimestamp, lastKnownCount, initialSyncCursor, initialSyncComplete, cursorPageSize: 0 }),
+
+  'v2.SyncStateUpdated': ({ id, lastSyncTimestamp, lastKnownCount, initialSyncCursor, initialSyncComplete, cursorPageSize }: { id: string; lastSyncTimestamp: string; lastKnownCount: number; initialSyncCursor: number; initialSyncComplete: boolean; cursorPageSize: number }) =>
+    syncStateUpsert(id, { lastSyncTimestamp, lastKnownCount, initialSyncCursor, initialSyncComplete, cursorPageSize }),
 
   'v1.PlaybackCleared': ({ id }: { id: string }) => {
     const now = Date.now()

@@ -7,11 +7,10 @@ import { getSettingsFromLiveStore } from "../selectors";
 import ProvidersService from "../../services/ProvidersService";
 import { getLiveStoreInstance } from "../../stores/livestore/accessor";
 import { batchedMediaCommitter } from "../../stores/livestore/services/BatchedMediaCommitter";
-import { syncEvents } from "../../stores/livestore/events/sync";
+import { resumeFor, save as saveResumeState } from "../../stores/livestore/services/SyncResumeState";
 import { createLogger } from "../../utils/logger";
 import type { AlbumPage } from "../../providers/IMusicProvider";
 
-type LiveStoreInstance = NonNullable<ReturnType<typeof getLiveStoreInstance>>;
 
 import {
   deleteCollectionWorker,
@@ -24,46 +23,11 @@ import {
 const logger = createLogger({ namespace: "SyncSaga" });
 
 const MAX_PAGES_PER_SESSION = 10;
+// Page geometry for streaming sync. Persisted per provider in the resume
+// state so a change here invalidates stored cursors instead of silently
+// skipping albums.
+const SYNC_PAGE_SIZE = 50;
 
-interface SyncState {
-  lastSyncTimestamp: string;
-  lastKnownCount: number;
-  initialSyncCursor: number;
-  initialSyncComplete: boolean;
-}
-
-function* readSyncState(liveStore: LiveStoreInstance): SagaIterator<SyncState | null> {
-  try {
-    const result = yield call(() =>
-      liveStore.query({
-        query: "SELECT id, lastSyncTimestamp, lastKnownCount, initialSyncCursor, initialSyncComplete FROM sync_state WHERE id = 'default'",
-        bindValues: {},
-      })
-    );
-    const rows = (result as Array<{ values: unknown[][] }>)?.[0]?.values || [];
-    if (rows.length === 0) return null;
-    const row = rows[0];
-    return {
-      lastSyncTimestamp: row[1] as string,
-      lastKnownCount: row[2] as number,
-      initialSyncCursor: row[3] as number,
-      initialSyncComplete: row[4] === 1,
-    };
-  } catch {
-    return null;
-  }
-}
-
-function* updateSyncState(
-  liveStore: LiveStoreInstance,
-  state: SyncState,
-): SagaIterator<void> {
-  yield call(() =>
-    liveStore.commit(
-      syncEvents.syncStateUpdated({ id: "default", ...state }),
-    ),
-  );
-}
 
 export function* syncMediaLibrary(): SagaIterator<void> {
   try {
@@ -77,14 +41,19 @@ export function* syncMediaLibrary(): SagaIterator<void> {
     if (!settings?.providers) return;
 
     const providersService = new ProvidersService(settings);
-    const allProviders = Object.values(providersService.providers);
-    const providers: typeof allProviders = [];
-    for (const p of allProviders) {
+    // Row identity for sync resume state = the settings record key, which is
+    // unique per configured instance (subsonic, subsonic2, ...). The class's
+    // self-reported providerKey is display-only and may collide across
+    // instances of the same type.
+    const allEntries = Object.entries(providersService.providers);
+    type StreamingEntry = { key: string; provider: (typeof allEntries)[number][1] };
+    const providers: StreamingEntry[] = [];
+    for (const [key, p] of allEntries) {
       if (p.getScanStatus && p.streamAlbumsSince) {
-        providers.push(p);
+        providers.push({ key, provider: p });
       } else {
         logger.debug(
-          `Provider ${p.providerKey} skipped: missing ${!p.getScanStatus ? "getScanStatus" : "streamAlbumsSince"}`,
+          `Provider ${key} skipped: missing ${!p.getScanStatus ? "getScanStatus" : "streamAlbumsSince"}`,
         );
       }
     }
@@ -93,39 +62,23 @@ export function* syncMediaLibrary(): SagaIterator<void> {
       return;
     }
 
-    const syncState: SyncState | null = yield call(readSyncState, liveStore);
     batchedMediaCommitter.setStore(liveStore)
 
     try {
-      for (const provider of providers) {
+      for (const { key, provider } of providers) {
         try {
           const scanStatus: { scanning: boolean; count: number; lastScan: string } =
             yield call([provider, provider.getScanStatus!]);
           if (scanStatus.scanning) {
-            logger.debug(`Server ${provider.providerKey} is scanning, skipping this cycle`);
+            logger.debug(`Server ${key} is scanning, skipping this cycle`);
             continue;
           }
 
-          // Cursor-regression guard. Reset cursor + since to null (full re-sync)
-          // when any of these hold:
-          //   - server's lastScan is missing/invalid (no scan ever recorded);
-          //   - server's lastScan is OLDER than the one we persisted (server DB
-          //     swap or restore-from-backup);
-          //   - server's row count dropped (library wipe / partial restore).
-          // Without the explicit lastScan-presence check, an invalid Date would
-          // make the comparison return false and we'd advance with a stale cursor.
-          const serverScanMs = scanStatus.lastScan ? new Date(scanStatus.lastScan).getTime() : NaN;
-          const localScanMs = syncState ? new Date(syncState.lastSyncTimestamp).getTime() : NaN;
-          const regressed =
-            !!syncState &&
-            (!Number.isFinite(serverScanMs) ||
-              !Number.isFinite(localScanMs) ||
-              serverScanMs < localScanMs ||
-              scanStatus.count < syncState.lastKnownCount);
-          const since = regressed ? null : (syncState?.lastSyncTimestamp ?? null);
-          const cursor: number | null = regressed ? null : (syncState?.initialSyncCursor ?? null);
+          const { since, cursor } = yield call(() =>
+            resumeFor(liveStore, key, scanStatus, SYNC_PAGE_SIZE)
+          );
 
-          const stream = provider.streamAlbumsSince!(since, { cursor });
+          const stream = provider.streamAlbumsSince!(since, { cursor, pageSize: SYNC_PAGE_SIZE });
           let pages = 0;
           let nextCursor: number | null = cursor;
           let complete = false;
@@ -146,12 +99,14 @@ export function* syncMediaLibrary(): SagaIterator<void> {
             complete = !page.hasMore;
             pages++;
 
-            yield call(updateSyncState, liveStore, {
-              lastSyncTimestamp: scanStatus.lastScan,
-              lastKnownCount: scanStatus.count,
-              initialSyncCursor: nextCursor ?? 0,
-              initialSyncComplete: complete,
-            });
+            yield call(() =>
+              saveResumeState(liveStore, key, {
+                scanStatus,
+                cursor: nextCursor,
+                complete,
+                pageSize: SYNC_PAGE_SIZE,
+              })
+            );
 
             if (complete || pages >= MAX_PAGES_PER_SESSION) break;
           }
