@@ -23,7 +23,7 @@ function* loadMoreArtistSongsFromProvider(action: { type: string; artist: { name
   yield put({ type: types.START_SEARCH, searchTerm: action.artist.name, noRedirect: true })
 
   // Then fetch artist metadata from MusicBrainz
-  const settings = yield call(getSettingsFromLiveStore)
+  const settings = yield* getSettingsFromLiveStore()
   const artistName = action.artist.name
 
   try {
@@ -100,7 +100,7 @@ function* fetchArtistSongsFromProvider(action: { type: string; artist: { name: s
   }
 
   try {
-    const settings = yield call(getSettingsFromLiveStore)
+    const settings = yield* getSettingsFromLiveStore()
     if (!settings?.providers) {
       logger.debug('No providers configured')
       return

@@ -26,7 +26,7 @@ function* performSingleProviderSearch(
   provider: string
 ): Generator<any, void, any> {
   try {
-    const settings = yield call(getSettingsFromLiveStore);
+    const settings = yield* getSettingsFromLiveStore();
     const providerService = new ProvidersService(settings);
     
     const searchResults: NormalizedMedia[] = yield call(
@@ -66,7 +66,7 @@ export function* search(action: SearchAction): Generator<any, void, any> {
   const redirect = !action.noRedirect;
 
   // Get settings from LiveStore
-  const settings = yield call(getSettingsFromLiveStore);
+  const settings = yield* getSettingsFromLiveStore();
   if (!settings?.providers) {
     yield put({ type: types.SEARCH_FINISHED, searchTerm });
     return;

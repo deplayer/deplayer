@@ -584,39 +584,3 @@ export const useMediaMapForIds = (ids: string[]) => {
   }, [rawMedia])
 }
 
-/**
- * Get all media grouped by type (audio, video, etc.)
- * 
- * @returns Object mapping type to array of media IDs
- * 
- * @example
- * ```tsx
- * const mediaByType = useMediaByType()
- * const audioTracks = mediaByType['audio'] || []
- * const videos = mediaByType['video'] || []
- * ```
- */
-export const useMediaByType = () => {
-  const store = useAppStore()
-  const allMedia = store.useQuery(
-    queryDb(
-      tables.media
-        .select('id', 'type')
-        .orderBy('title', 'asc')
-    )
-  )
-  
-  return useMemo(() => {
-    const grouped: Record<string, string[]> = {}
-    if (Array.isArray(allMedia)) {
-      allMedia.forEach((item: { id: string; type?: string }) => {
-        const type = item.type || 'audio'
-        if (!grouped[type]) {
-          grouped[type] = []
-        }
-        grouped[type].push(item.id)
-      })
-    }
-    return grouped
-  }, [allMedia])
-}

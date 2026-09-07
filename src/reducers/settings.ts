@@ -5,37 +5,12 @@
 import SettingsBuilder from "../services/settings/SettingsBuilder";
 import type { FormField } from '../types/providers';
 
-type ProviderSettings = {
-  enabled: boolean;
-  [key: string]: unknown;
-};
+import type { SettingsShape } from '../services/settings/shape';
 
 export type State = {
   error: string;
   saving: boolean;
-  settings: {
-    providers: {
-      [key: string]: ProviderSettings;
-    };
-    app: {
-      spectrum: {
-        enabled: boolean;
-      };
-      lastfm: {
-        enabled: boolean;
-        apikey: string;
-      };
-      language: {
-        code: string;
-        useSystemLanguage: boolean;
-      };
-      notifications: {
-        enabled: boolean;
-        showTrackChanges: boolean;
-        showErrors: boolean;
-      };
-    };
-  };
+  settings: SettingsShape;
   settingsForm: {
     providers: {
       [key: string]: {

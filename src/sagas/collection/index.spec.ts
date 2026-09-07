@@ -23,7 +23,10 @@ vi.mock('../../services/ProvidersService', () => ({
 }))
 
 vi.mock('../selectors', () => ({
-  getSettingsFromLiveStore: vi.fn().mockReturnValue({ providers: { test: { enabled: true } } }),
+  getSettingsFromLiveStore: vi.fn().mockImplementation(() =>
+    // eslint-disable-next-line require-yield -- immediate-value generator: the delegating saga resumes synchronously with the settings
+    (function* settingsMock() { return { providers: { test: { enabled: true } } } })()
+  ),
 }))
 
 function registerProvider(key: string, pages: Array<{ media: unknown[]; hasMore: boolean; nextCursor: number }>) {

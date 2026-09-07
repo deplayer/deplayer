@@ -11,7 +11,6 @@ export { useCollectionData } from './useCollectionData'
 // Media hooks
 export {
   useMediaMapForIds,
-  useMediaByType,
   useMediaById,
   useMediaByArtist,
   useMediaByAlbum,

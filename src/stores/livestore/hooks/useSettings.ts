@@ -9,24 +9,8 @@ import { tables } from '../schema'
  * They automatically update when the underlying data changes.
  */
 
-interface ProviderSettings {
-  enabled: boolean;
-  [key: string]: unknown;
-}
-
-interface AppSettings {
-  spectrum: { enabled: boolean };
-  lastfm: { enabled: boolean; apikey: string };
-  language: { code: string; useSystemLanguage: boolean };
-  notifications: { enabled: boolean; showTrackChanges: boolean; showErrors: boolean };
-  sync?: { enabled: boolean; serverUrl: string };
-  [key: string]: unknown;
-}
-
-interface SettingsShape {
-  providers: { [key: string]: ProviderSettings };
-  app: AppSettings;
-}
+import type { SettingsShape } from '../../../services/settings/shape'
+import { parseSettingsRow } from '../../../services/settings/shape'
 
 /**
  * Get application settings
@@ -49,8 +33,8 @@ export const useSettings = (settingsId = 'default'): SettingsShape | null => {
     )
   )
 
-  const settingsRecord = (result as unknown as Array<{ settings: SettingsShape }>)[0]
-  return settingsRecord ? settingsRecord.settings : null
+  const settingsRecord = (result as unknown as Array<{ settings: unknown }>)[0]
+  return settingsRecord ? parseSettingsRow(settingsRecord.settings) : null
 }
 
 /**

@@ -37,7 +37,7 @@ export function* syncMediaLibrary(): SagaIterator<void> {
       return;
     }
 
-    const settings = yield call(getSettingsFromLiveStore);
+    const settings = yield* getSettingsFromLiveStore();
     if (!settings?.providers) return;
 
     const providersService = new ProvidersService(settings);

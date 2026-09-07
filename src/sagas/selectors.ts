@@ -5,16 +5,18 @@ import { getLiveStoreInstance } from '../stores/livestore/accessor'
 import { tables } from '../stores/livestore/schema'
 import type { State } from '../reducers'
 import type { MediaRow } from '../types/media'
+import { EMPTY_SETTINGS, parseSettingsRow } from '../services/settings/shape'
+import type { SettingsShape } from '../services/settings/shape'
 
 /**
  * Get settings from LiveStore
  * Use this in sagas instead of select(getSettings)
  */
-export function* getSettingsFromLiveStore(): Generator<any, Record<string, unknown>, any> {
+export function* getSettingsFromLiveStore(): Generator<any, SettingsShape, any> {
   const liveStore = getLiveStoreInstance()
   if (!liveStore) {
     console.warn('LiveStore not available, returning default settings')
-    return { providers: {}, app: {} }
+    return EMPTY_SETTINGS
   }
   
   const query = queryDb(
@@ -22,7 +24,7 @@ export function* getSettingsFromLiveStore(): Generator<any, Record<string, unkno
   )
   
   const result = yield call(() => liveStore.query(query))
-  return result[0]?.settings || { providers: {}, app: {} }
+  return parseSettingsRow((result as Array<{ settings: unknown }>)[0]?.settings)
 }
 
 /**
