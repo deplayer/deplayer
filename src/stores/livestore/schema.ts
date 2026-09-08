@@ -18,7 +18,6 @@ import { queueEvents } from './events/queue'
 import { favoriteEvents } from './events/favorites'
 import { lyricsEvents } from './events/lyrics'
 import { settingsEvents } from './events/settings'
-import { playbackEvents } from './events/playback'
 import { syncEvents } from './events/sync'
 import { deriveCurrentTrackId } from './queueTransitions'
 
@@ -194,21 +193,6 @@ export const tables = {
     },
   }),
 
-  // Playback state table (LOCAL - not synced across devices)
-  playback: State.SQLite.table({
-    name: 'playback',
-    columns: {
-      id: State.SQLite.text({ primaryKey: true }), // 'default'
-      currentTrackId: State.SQLite.text({ nullable: true }),
-      streamUri: State.SQLite.text({ nullable: true }),
-      playing: State.SQLite.boolean({ default: false }),
-      volume: State.SQLite.integer({ default: 80 }),
-      duration: State.SQLite.real({ default: 0 }),
-      position: State.SQLite.real({ default: 0 }),
-      updatedAt: State.SQLite.integer({}),
-    },
-  }),
-
   // Favorites table
   favorites: State.SQLite.table({
     name: 'favorites',
@@ -292,7 +276,6 @@ export const events = {
   ...queueEvents,
   ...favoriteEvents,
   ...lyricsEvents,
-  ...playbackEvents,
   ...syncEvents,
 }
 
@@ -803,86 +786,12 @@ const materializers = State.SQLite.materializers(events, {
     return tables.smartPlaylists.delete().where('id', '=', smartPlaylistId)
   },
 
-  // Playback materializers (LOCAL - not synced)
-  'v1.PlaybackUpdated': ({ id, currentTrackId, streamUri, playing, volume, duration, position }: { id: string; currentTrackId?: string | null; streamUri?: string | null; playing: boolean; volume: number; duration?: number; position?: number }) => {
-    const now = Date.now()
-    return tables.playback
-      .insert({
-        id,
-        currentTrackId: currentTrackId ?? null,
-        streamUri: streamUri ?? null,
-        playing,
-        volume,
-        duration: duration ?? 0,
-        position: position ?? 0,
-        updatedAt: now,
-      })
-      .onConflict('id', 'update', {
-        currentTrackId: currentTrackId ?? null,
-        streamUri: streamUri ?? null,
-        playing,
-        volume,
-        duration: duration ?? 0,
-        position: position ?? 0,
-        updatedAt: now,
-      })
-  },
-
-  'v1.PlaybackPlayingChanged': ({ id, playing }: { id: string; playing: boolean }) => {
-    const now = Date.now()
-    return tables.playback
-      .update({ playing, updatedAt: now })
-      .where('id', '=', id)
-  },
-
-  'v1.PlaybackVolumeChanged': ({ id, volume }: { id: string; volume: number }) => {
-    const now = Date.now()
-    return tables.playback
-      .update({ volume, updatedAt: now })
-      .where('id', '=', id)
-  },
-
-  'v1.PlaybackPositionChanged': ({ id, position }: { id: string; position: number }) => {
-    const now = Date.now()
-    return tables.playback
-      .update({ position, updatedAt: now })
-      .where('id', '=', id)
-  },
-
-  'v1.PlaybackTrackChanged': ({ id, currentTrackId, streamUri, duration }: { id: string; currentTrackId: string; streamUri: string; duration?: number }) => {
-    const now = Date.now()
-    return tables.playback
-      .update({
-        currentTrackId,
-        streamUri,
-        duration: duration ?? 0,
-        position: 0,
-        playing: true,
-        updatedAt: now,
-      })
-      .where('id', '=', id)
-  },
-
   // Sync resume state materializers (per-provider rows; see SyncResumeState)
   'v1.SyncStateUpdated': ({ id, lastSyncTimestamp, lastKnownCount, initialSyncCursor, initialSyncComplete }: { id: string; lastSyncTimestamp: string; lastKnownCount: number; initialSyncCursor: number; initialSyncComplete: boolean }) =>
     syncStateUpsert(id, { lastSyncTimestamp, lastKnownCount, initialSyncCursor, initialSyncComplete, cursorPageSize: 0 }),
 
   'v2.SyncStateUpdated': ({ id, lastSyncTimestamp, lastKnownCount, initialSyncCursor, initialSyncComplete, cursorPageSize }: { id: string; lastSyncTimestamp: string; lastKnownCount: number; initialSyncCursor: number; initialSyncComplete: boolean; cursorPageSize: number }) =>
     syncStateUpsert(id, { lastSyncTimestamp, lastKnownCount, initialSyncCursor, initialSyncComplete, cursorPageSize }),
-
-  'v1.PlaybackCleared': ({ id }: { id: string }) => {
-    const now = Date.now()
-    return tables.playback
-      .update({
-        currentTrackId: null,
-        streamUri: null,
-        playing: false,
-        position: 0,
-        duration: 0,
-        updatedAt: now,
-      })
-      .where('id', '=', id)
-  },
 })
 
 const state = State.SQLite.makeState({ tables, materializers })

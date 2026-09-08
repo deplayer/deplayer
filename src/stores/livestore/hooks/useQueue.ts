@@ -1,7 +1,7 @@
 import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
-import { parseIds, resolveQueueNavigation } from './queueUtils'
+import { resolveQueueNavigation } from './queueUtils'
 
 /**
  * Queue Query Hooks
@@ -46,42 +46,6 @@ export const useQueue = (queueId = 'default'): QueueRecord | null => {
     )
   )
   return (result as unknown as QueueRecord[])[0] || null
-}
-
-/**
- * Get tracks in the current queue with full media information
- * 
- * @example
- * ```tsx
- * const tracks = useQueueTracks()
- * return <div>{tracks.length} tracks</div>
- * ```
- */
-export const useQueueTracks = (queueId = 'default') => {
-  const store = useAppStore()
-  const queue = useQueue(queueId)
-
-  if (!queue || !queue.trackIds || (queue.trackIds as string[]).length === 0) {
-    return []
-  }
-
-  const trackIds = parseIds(queue.trackIds)
-
-  // Get media items by their IDs
-  const media = store.useQuery(
-    queryDb(
-      tables.media
-        .select()
-        .where('id', 'IN', trackIds)
-    )
-  )
-
-  // Sort media by queue order
-  const mediaMap = new Map((media as unknown as Array<{ id: string }>).map(m => [m.id, m]))
-  return trackIds.flatMap((id: string) => {
-      const m = mediaMap.get(id)
-      return m ? [m] : []
-    })
 }
 
 /**

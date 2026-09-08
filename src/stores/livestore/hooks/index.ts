@@ -46,7 +46,6 @@ export {
 export {
   usePlaylists,
   usePlaylistById,
-  usePlaylistTracks,
 } from './usePlaylists'
 
 // Smart Playlist hooks
@@ -58,7 +57,6 @@ export {
 // Queue hooks
 export {
   useQueue,
-  useQueueTracks,
   useCurrentTrack,
   useCurrentPlayingSongId,
   useQueueNavigation,
