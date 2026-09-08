@@ -42,8 +42,7 @@ const FeaturedHero = memo(({ playlist, reasonKey, dispatch }: Props) => {
 
   const handleShuffle = useCallback(() => {
     if (playlist.trackIds.length === 0) return
-    dispatch({ type: types.PLAY_LIST, trackIds: playlist.trackIds })
-    dispatch({ type: types.SHUFFLE })
+    dispatch({ type: types.PLAY_LIST, trackIds: playlist.trackIds, shuffle: true })
   }, [playlist.trackIds, dispatch])
 
   const handleAddToQueue = useCallback(async () => {

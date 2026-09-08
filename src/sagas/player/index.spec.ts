@@ -110,4 +110,22 @@ describe('player saga adapter', () => {
       streamUri: 'peer://self/bar?t=1',
     })
   })
+
+  it('handlePlayList forwards the shuffle option to controller.playList', async () => {
+    const { handlePlayList } = await import('./index')
+    const mockPlayList = mockControllerInstance.playList as ReturnType<typeof vi.fn>
+
+    const saga = handlePlayList({
+      type: types.PLAY_LIST,
+      trackIds: ['a', 'b'],
+      shuffle: true,
+    })
+
+    const step1 = saga.next()
+    expect(step1.value.type).toBe('CALL')
+
+    await step1.value.payload.fn()
+
+    expect(mockPlayList).toHaveBeenCalledWith(['a', 'b'], undefined, { shuffle: true })
+  })
 })

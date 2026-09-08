@@ -212,16 +212,8 @@ const ContextualMenu = (props: MenuProps) => {
     if (!liveStore) return
     
     try {
-      const firstTrackId = await addNextAction(liveStore, [props.song.id])
+      await addNextAction(liveStore, [props.song.id])
       closeMenu()
-      
-      // Dispatch if we need to trigger playback
-      if (firstTrackId) {
-        props.dispatch({ 
-          type: types.ADD_TO_QUEUE_NEXT_COMPLETED,
-          trackId: firstTrackId 
-        })
-      }
     } catch (error) {
       console.error('Failed to add next:', error)
     }

@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, cleanup } from '@testing-library/react'
+import type { ButtonHTMLAttributes } from 'react'
 import { MemoryRouter, useLocation } from 'react-router-dom'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { Provider } from 'react-redux'
@@ -24,27 +25,13 @@ vi.mock('../common/Icon', () => ({
 }))
 
 vi.mock('../common/Button', () => ({
-  default: ({ children, onClick }: any) => (
-    <button data-testid="play-all-button" onClick={onClick}>{children}</button>
-  )
+  default: (props: ButtonHTMLAttributes<HTMLButtonElement>) => <button {...props} />
 }))
 
-vi.mock('../../stores/livestore/store', () => ({
- useAppStore: () => ({ commit: vi.fn() }),
-}))
-
-vi.mock('../../stores/livestore/actions', () => ({
-  playAllAction: vi.fn(),
-}))
-
-vi.mock('../../stores/livestore/hooks', () => ({
-  useQueue: vi.fn(() => ({ trackIds: [], currentPlaying: null })),
-}))
-
-const mockStore = configureStore<any, any>([])
+const mockStore = configureStore([])
 let store: ReturnType<typeof mockStore>
 
-const renderComponent = (pathname: string) => {
+const renderComponent = (pathname: string, mediaIds?: string[]) => {
   cleanup()
   store = mockStore({
     i18n: {
@@ -62,7 +49,7 @@ const renderComponent = (pathname: string) => {
   return render(
     <Provider store={store}>
       <MemoryRouter>
-        <PlayAllButton />
+        <PlayAllButton mediaIds={mediaIds} />
       </MemoryRouter>
     </Provider>
   )
@@ -77,34 +64,31 @@ describe('PlayAllButton', () => {
     cleanup()
   })
 
-  it('should dispatch PLAY_ALL action with collection path when on root path', () => {
-    renderComponent('/')
-    
-    const button = screen.getByTestId('play-all-button')
+  it('dispatches PLAY_LIST with the provided mediaIds when clicked', () => {
+    renderComponent('/', ['song-1', 'song-2'])
+
+    const button = screen.getByRole('button', { name: 'buttons.playAll' })
     fireEvent.click(button)
-    
+
     expect(store.getActions()).toContainEqual({
-      type: 'PLAY_ALL',
-      path: 'collection'
+      type: 'PLAY_LIST',
+      trackIds: ['song-1', 'song-2']
     })
   })
 
-  it('should dispatch PLAY_ALL action with correct path when clicked', () => {
-    renderComponent('/albums/123')
-    
-    const button = screen.getByTestId('play-all-button')
+  it('does not dispatch when no mediaIds are provided', () => {
+    renderComponent('/')
+
+    const button = screen.getByRole('button', { name: 'buttons.playAll' })
     fireEvent.click(button)
-    
-    expect(store.getActions()).toContainEqual({
-      type: 'PLAY_ALL',
-      path: 'albums/123'
-    })
+
+    expect(store.getActions()).toHaveLength(0)
   })
 
   it('should not render on settings page', () => {
-    renderComponent('/settings')
-    
-    const button = screen.queryByTestId('play-all-button')
+    renderComponent('/settings', ['song-1'])
+
+    const button = screen.queryByRole('button', { name: 'buttons.playAll' })
     expect(button).not.toBeInTheDocument()
   })
-}) 
+})

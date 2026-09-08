@@ -60,8 +60,7 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
 
   const handleShuffle = useCallback(() => {
     if (effectiveTrackIds.length === 0) return
-    dispatch({ type: types.PLAY_LIST, trackIds: effectiveTrackIds })
-    dispatch({ type: types.SHUFFLE })
+    dispatch({ type: types.PLAY_LIST, trackIds: effectiveTrackIds, shuffle: true })
   }, [effectiveTrackIds, dispatch])
 
   const handleAddToQueue = useCallback(async () => {

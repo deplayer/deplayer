@@ -257,7 +257,7 @@ describe('ContextualMenu', () => {
       expect(mockRemoveFromQueueAction).toHaveBeenCalledWith(expect.any(Object), mockSong1.id)
     })
 
-    it('should dispatch ADD_TO_QUEUE_NEXT when add next is available', async () => {
+    it('should call addNextAction when add next is available', async () => {
       setup()
       const trigger = screen.getByRole('button', { name: /open context menu/i })
       

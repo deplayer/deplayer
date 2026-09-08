@@ -43,6 +43,7 @@ function createFakeDataPort(overrides?: Partial<PlaybackDataPort>): PlaybackData
     readQueue: vi.fn().mockResolvedValue(null),
     readMedia: vi.fn().mockResolvedValue(null),
     replaceQueue: vi.fn().mockResolvedValue(undefined),
+    shuffleQueue: vi.fn().mockResolvedValue(undefined),
     addNext: vi.fn().mockResolvedValue(undefined),
     select: vi.fn().mockResolvedValue(undefined),
     next: vi.fn().mockResolvedValue(undefined),
@@ -424,6 +425,17 @@ describe('PlaybackController', () => {
       expect(data.select).toHaveBeenCalledWith('song-2')
       expect(result.status).toBe('started')
       if (result.status === "started") expect(result.songId).toBe('song-2')
+    })
+
+    it('shuffles the queue when shuffle is requested', async () => {
+      const song1 = fakeMedia('song-1')
+      const { ctrl, data } = makeController()
+      vi.mocked(data.readMedia).mockResolvedValue(song1)
+
+      const result = await ctrl.playList(['song-1', 'song-2', 'song-3'], undefined, { shuffle: true })
+      expect(data.replaceQueue).toHaveBeenCalledWith(['song-1', 'song-2', 'song-3'])
+      expect(data.shuffleQueue).toHaveBeenCalledTimes(1)
+      expect(result.status).toBe('started')
     })
   })
 

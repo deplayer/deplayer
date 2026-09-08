@@ -55,6 +55,7 @@ export interface PlayListAction {
   type: typeof types.PLAY_LIST
   trackIds: string[]
   startFromId?: string
+  shuffle?: boolean
 }
 
 export interface PlaySongAction {
@@ -83,9 +84,13 @@ export function* setCurrentPlaying(action: SetCurrentPlayingAction): Generator<a
   logResult(result, 'setCurrentPlaying')
 }
 
-function* handlePlayList(action: PlayListAction): Generator<any, void, any> {
+export function* handlePlayList(action: PlayListAction): Generator<any, void, any> {
   const result = yield* callController(() =>
-    getController().playList(action.trackIds, action.startFromId)
+    getController().playList(
+      action.trackIds,
+      action.startFromId,
+      action.shuffle ? { shuffle: true } : undefined
+    )
   )
   logResult(result, 'playList')
 }

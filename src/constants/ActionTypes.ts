@@ -20,9 +20,6 @@ export const SET_CURRENT_TIME = "SET_CURRENT_TIME";
 export const PLAY_LIST = "PLAY_LIST";
 export const PLAY_SONG = "PLAY_SONG";
 export const PLAY_SONG_FROM = "PLAY_SONG_FROM";
-export const PLAY_ALL = "PLAY_ALL";
-export const PLAY_ALL_COMPLETED = "PLAY_ALL_COMPLETED"; // New: LiveStore action completed
-export const ADD_TO_QUEUE_NEXT_COMPLETED = "ADD_TO_QUEUE_NEXT_COMPLETED"; // New: LiveStore action completed
 export const PLAY_ERROR = "PLAY_ERROR";
 export const REGISTER_PLAYER_ERROR = "REGISTER_PLAYER_ERROR";
 export const HIDE_PLAYER = "HIDE_PLAYER";
@@ -75,10 +72,6 @@ export const ADD_SONGS_TO_QUEUE = "ADD_SONGS_TO_QUEUE";
 export const PLAY_NEXT = "PLAY_NEXT";
 export const PLAY_PREV = "PLAY_PREV";
 export const CLEAR_QUEUE = "CLEAR_QUEUE";
-export const SHUFFLE = "SHUFFLE";
-export const REPEAT = "REPEAT";
-export const ADD_TO_QUEUE_NEXT = "ADD_TO_QUEUE_NEXT";
-export const ADD_ALBUM_TO_QUEUE = "ADD_ALBUM_TO_QUEUE";
 
 // Search
 export const START_SEARCH = "START_SEARCH";

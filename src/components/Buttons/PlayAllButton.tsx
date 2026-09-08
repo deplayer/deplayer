@@ -17,10 +17,6 @@ const PlayAllButton = (props: Props) => {
   const playAll = () => {
     if (props.mediaIds && props.mediaIds.length > 0) {
       dispatch({ type: types.PLAY_LIST, trackIds: props.mediaIds })
-    } else {
-      // Legacy: dispatch path-based action
-      const path = location.pathname === '/' ? 'collection' : location.pathname.replace(/^\//, '')
-      dispatch({ type: types.PLAY_ALL, path })
     }
   }
 

@@ -10,6 +10,7 @@ import {
   playMediaAction,
   playNextAction,
   playPreviousAction,
+  toggleShuffleAction,
 } from '../stores/livestore/actions/queue'
 import { rawToMediaRow } from '../stores/livestore/transformMedia'
 import type { StreamSource } from './Song/StreamUriService'
@@ -44,6 +45,7 @@ export interface PlaybackDataPort {
   replaceQueue(trackIds: readonly string[]): Promise<void>
   addNext(trackIds: readonly string[]): Promise<void>
   select(songId: string): Promise<void>
+  shuffleQueue(): Promise<void>
   next(): Promise<void>
   previous(): Promise<void>
 }
@@ -107,7 +109,7 @@ export class PlaybackController {
   // Public API
   // -----------------------------------------------------------------------
 
-  async playList(trackIds: readonly string[], startFromId?: string): Promise<PlaybackResult> {
+  async playList(trackIds: readonly string[], startFromId?: string, options?: { shuffle?: boolean }): Promise<PlaybackResult> {
     if (trackIds.length === 0) {
       return { status: 'idle', reason: 'empty-queue' }
     }
@@ -130,6 +132,12 @@ export class PlaybackController {
         // If startFromId is not the first track, reposition
         if (startFromId && startFromId !== trackIds[0] && trackIds.includes(startFromId)) {
           await this.data.select(startFromId)
+          if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
+        }
+
+        // 4. Shuffle after replacement (and repositioning) so the current track is preserved
+        if (options?.shuffle) {
+          await this.data.shuffleQueue()
           if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
         }
 
@@ -500,6 +508,13 @@ export function createLiveStorePlaybackDataPort(
 
     async select(songId: string): Promise<void> {
       await playMediaAction(store(), songId)
+    },
+
+    async shuffleQueue(): Promise<void> {
+      // Set (not toggle): the contract is "shuffle is on after this call".
+      // replaceQueue always commits shuffle:false, so callers rely on this
+      // to enable it; toggling would silently disable an already-shuffled queue.
+      await toggleShuffleAction(store(), true)
     },
 
     async next(): Promise<void> {

@@ -1,9 +1,7 @@
 import { useAppStore } from '../../stores/livestore/store'
 import { Translate } from 'react-redux-i18n'
 import { useLocation } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
 
-import * as types from '../../constants/ActionTypes'
 import { addNextAction } from '../../stores/livestore/actions'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
@@ -20,39 +18,25 @@ type Props = {
 
 const PlayNextButton = (props: Props) => {
   const liveStore = useAppStore()
-  const dispatch = useDispatch()
   const location = useLocation()
   const { songs, mediaIds, transparent = true, fullWidth = false, alignLeft = false, className = '' } = props
 
   const playNext = async () => {
     if (!liveStore) return
-    
+
     try {
       let trackIds: string[] = []
-      
+
       if (mediaIds && mediaIds.length > 0) {
         // Use provided media IDs directly
         trackIds = mediaIds
       } else if (songs && songs.length > 0) {
         // Extract IDs from Media objects
         trackIds = songs.map(s => s.id)
-      } else {
-        // Legacy: dispatch path-based action (will be handled by saga)
-        const path = location.pathname === '/' ? 'collection' : location.pathname.replace(/^\//, '')
-        dispatch({ type: types.ADD_TO_QUEUE_NEXT, path })
-        return
       }
-      
+
       if (trackIds.length > 0) {
-        const firstTrackId = await addNextAction(liveStore, trackIds)
-        
-        // Dispatch to saga if needed to trigger playback
-        if (firstTrackId) {
-          dispatch({ 
-            type: types.ADD_TO_QUEUE_NEXT_COMPLETED,
-            trackId: firstTrackId 
-          })
-        }
+        await addNextAction(liveStore, trackIds)
       }
     } catch (error) {
       console.error('Failed to add next:', error)
