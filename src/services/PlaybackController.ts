@@ -13,21 +13,15 @@ import {
 } from '../stores/livestore/actions/queue'
 import { rawToMediaRow } from '../stores/livestore/transformMedia'
 import type { StreamSource } from './Song/StreamUriService'
-import { resolveCurrentSongId } from '../stores/livestore/hooks/queueUtils'
+import { resolveCurrentSongId, parseIds } from '../stores/livestore/hooks/queueUtils'
+import type { QueueState } from '../stores/livestore/queueTransitions'
 
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export type PlaybackQueue = {
-  trackIds: readonly string[]
-  randomTrackIds: readonly string[]
-  currentPlaying: number | null
-  currentTrackId: string | null
-  shuffle: boolean
-  repeat: boolean
-}
+export type PlaybackQueue = Omit<QueueState, 'trackIds'> & { trackIds: readonly string[] }
 
 
 /** Must be called after every await in a queued track-change operation.
@@ -475,7 +469,7 @@ export function createLiveStorePlaybackDataPort(
       const q = await readQueue(store())
       if (!q) return null
       return {
-        trackIds: q.trackIds,
+        trackIds: parseIds(q.trackIds),
         randomTrackIds: q.randomTrackIds,
         currentPlaying: q.currentPlaying,
         currentTrackId: q.currentTrackId,

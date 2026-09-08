@@ -20,6 +20,7 @@ import { lyricsEvents } from './events/lyrics'
 import { settingsEvents } from './events/settings'
 import { playbackEvents } from './events/playback'
 import { syncEvents } from './events/sync'
+import { deriveCurrentTrackId } from './queueTransitions'
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -662,10 +663,7 @@ const materializers = State.SQLite.materializers(events, {
   // Queue materializers
   'v1.QueueUpdated': ({ id, trackIds, randomTrackIds, currentPlaying, shuffle, repeat }: { readonly id: string; readonly trackIds: readonly string[]; readonly randomTrackIds?: readonly string[]; readonly currentPlaying?: number; readonly shuffle: boolean; readonly repeat: boolean }) => {
     const now = Date.now()
-    const activeIds = shuffle ? (randomTrackIds ?? trackIds) : trackIds
-    const currentTrackId = (currentPlaying != null && currentPlaying < activeIds.length)
-      ? activeIds[currentPlaying]
-      : null
+    const currentTrackId = deriveCurrentTrackId(trackIds, randomTrackIds, currentPlaying, shuffle)
     return tables.queue
       .insert({
         id,

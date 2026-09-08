@@ -1,40 +1,45 @@
 import { queryDb } from '@livestore/livestore'
 import type { LiveStore } from '../accessor'
-import { events, tables } from '../schema'
+import { tables } from '../schema'
 import { queueEvents } from '../events/queue'
+import type { QueueState } from '../queueTransitions'
+import {
+  playAll,
+  addToQueue,
+  addNext,
+  removeFromQueue,
+  clearQueue,
+  toggleShuffle,
+  toggleRepeat,
+  setCurrentPlaying,
+  playNext,
+  playPrevious,
+  playMedia,
+} from '../queueTransitions'
+import { parseIds } from '../hooks/queueUtils'
 
 /**
  * LiveStore Queue Actions
  *
- * These actions handle playback queue operations.
- * Side effects (audio playback, notifications) remain in Redux saga.
+ * Thin adapters over the pure transition functions in `queueTransitions.ts`.
+ * Each action: input guard → (optional) readQueue → transition → commit the
+ * returned event only when non-null. All queue-domain logic (shuffle
+ * reordering, repeat wrap, position clamping, active-list selection) lives in
+ * the pure module so it is testable without a LiveStore.
  *
+ * Side effects (audio playback, notifications) remain in Redux saga.
  * All actions require a store parameter from useStore() hook.
  */
 
 const QUEUE_ID = 'default'
 
 /**
- * Normalized queue shape returned by readQueue.
- * Internal — not exported; the public contract is PlaybackQueue in the controller.
- */
-type QueueRow = {
-  id: string
-  trackIds: string[]
-  randomTrackIds: string[]
-  currentPlaying: number | null
-  currentTrackId: string | null
-  shuffle: boolean
-  repeat: boolean
-  updatedAt: unknown
-}
-
-/**
  * Read the current queue from LiveStore.
  * Includes the persisted currentTrackId column so callers can
  * prefer it over the index-based fallback.
+ * Returns the shared QueueState shape (raw-row tolerant).
  */
-export const readQueue = async (store: LiveStore): Promise<QueueRow | null> => {
+export const readQueue = async (store: LiveStore): Promise<QueueState | null> => {
   try {
     const query = queryDb(
       tables.queue
@@ -52,26 +57,13 @@ export const readQueue = async (store: LiveStore): Promise<QueueRow | null> => {
       return null
     }
 
-    // Parse JSON fields if they're strings
-    const parseJson = (val: unknown, defaultVal: string[] = []): string[] => {
-      if (!val) return defaultVal
-      if (Array.isArray(val)) return val as string[]
-      try {
-        return JSON.parse(val as string) as string[]
-      } catch {
-        return defaultVal
-      }
-    }
-
     return {
-      id: row.id as string,
-      trackIds: parseJson(row.trackIds),
-      randomTrackIds: parseJson(row.randomTrackIds),
+      trackIds: parseIds(row.trackIds),
+      randomTrackIds: parseIds(row.randomTrackIds),
       currentPlaying: row.currentPlaying as number | null,
       currentTrackId: (row.currentTrackId as string) || null,
       shuffle: Boolean(row.shuffle),
       repeat: Boolean(row.repeat),
-      updatedAt: row.updatedAt,
     }
   } catch (error) {
     console.error('[readQueue] Error:', error)
@@ -81,7 +73,7 @@ export const readQueue = async (store: LiveStore): Promise<QueueRow | null> => {
 
 /**
  * Replace queue with new tracks, positioned at the first track.
- * 
+ *
  * @param store - LiveStore instance
  * @param trackIds - Array of media IDs to play
  */
@@ -91,21 +83,17 @@ export const playAllAction = async (store: LiveStore, trackIds: string[]): Promi
     return
   }
 
-  // Replace entire queue
-  await store.commit(
-    events.queueUpdated({
-      id: QUEUE_ID,
-      trackIds,
-      currentPlaying: 0, // Start at first track
-      shuffle: false,
-      repeat: false,
-    })
-  )
+  // Replace entire queue. The current action does not read the queue first;
+  // the transition takes no current state, matching that.
+  const ev = playAll(trackIds)
+  if (ev) {
+    await store.commit(queueEvents.queueUpdated(ev))
+  }
 }
 
 /**
  * Add tracks to end of queue
- * 
+ *
  * @param store - LiveStore instance
  * @param trackIds - Array of media IDs to add
  */
@@ -114,39 +102,22 @@ export const addToQueueAction = async (store: LiveStore, trackIds: string[]) => 
     return
   }
 
-  const currentQueue = await readQueue(store)
-  
-  if (!currentQueue) {
-    // No queue exists, create one
-    store.commit(
-      events.queueUpdated({
-        id: QUEUE_ID,
-        trackIds,
-        currentPlaying: undefined,
-        shuffle: false,
-        repeat: false,
-      })
-    )
-    return
-  }
+  const current = await readQueue(store)
+  const ev = addToQueue(current, trackIds)
+  if (!ev) return
 
-  // Append to existing queue
-  const newTrackIds = [...currentQueue.trackIds, ...trackIds]
-  
-  await store.commit(
-    events.queueUpdated({
-      id: QUEUE_ID,
-      trackIds: newTrackIds,
-      currentPlaying: currentQueue.currentPlaying ?? undefined,
-      shuffle: currentQueue.shuffle,
-      repeat: currentQueue.repeat,
-    })
-  )
+  if (current === null) {
+    // Fresh-create path commits without await (preserved from current code).
+    store.commit(queueEvents.queueUpdated(ev))
+  } else {
+    // Append path awaits the commit (preserved from current code).
+    await store.commit(queueEvents.queueUpdated(ev))
+  }
 }
 
 /**
  * Add tracks to queue after currently playing track (Play Next)
- * 
+ *
  * @param store - LiveStore instance
  * @param trackIds - Array of media IDs to add next
  * @returns First track ID for saga to potentially start playback
@@ -156,218 +127,102 @@ export const addNextAction = async (store: LiveStore, trackIds: string[]) => {
     return null
   }
 
-  const currentQueue = await readQueue(store)
-  
-  if (!currentQueue) {
-    // No queue exists, create one and start playing
-    await store.commit(
-      events.queueUpdated({
-        id: QUEUE_ID,
-        trackIds,
-        currentPlaying: 0,
-        shuffle: false,
-        repeat: false,
-      })
-    )
-    return trackIds[0]
+  const current = await readQueue(store)
+  const r = addNext(current, trackIds)
+  if (r) {
+    await store.commit(queueEvents.queueUpdated(r.event))
+    return r.firstTrackId
   }
-
-  // Insert after current playing position
-  const insertPosition = currentQueue.currentPlaying !== null 
-    ? currentQueue.currentPlaying + 1 
-    : 0
-  
-  const newTrackIds = [
-    ...currentQueue.trackIds.slice(0, insertPosition),
-    ...trackIds,
-    ...currentQueue.trackIds.slice(insertPosition),
-  ]
-  
-  await store.commit(
-    events.queueUpdated({
-      id: QUEUE_ID,
-      trackIds: newTrackIds,
-      currentPlaying: currentQueue.currentPlaying ?? undefined,
-      shuffle: currentQueue.shuffle,
-      repeat: currentQueue.repeat,
-    })
-  )
-
   return null
 }
 
 /**
  * Remove a track from the queue
- * 
+ *
  * @param store - LiveStore instance
  * @param trackId - Media ID to remove
  */
 export const removeFromQueueAction = async (store: LiveStore, trackId: string) => {
-  const currentQueue = await readQueue(store)
-  
-  if (!currentQueue) {
-    return
+  const current = await readQueue(store)
+  // The transition commits even when the track was absent (no-op commit),
+  // matching the current action which has no absence guard.
+  const ev = removeFromQueue(current, trackId)
+  if (ev) {
+    await store.commit(queueEvents.queueUpdated(ev))
   }
-
-  // Remove all occurrences of the track
-  const newTrackIds = currentQueue.trackIds.filter((id: string) => id !== trackId)
-  
-  // Adjust currentPlaying if needed
-  let newCurrentPlaying = currentQueue.currentPlaying
-  
-  if (newCurrentPlaying !== null && newCurrentPlaying >= newTrackIds.length) {
-    newCurrentPlaying = newTrackIds.length > 0 ? newTrackIds.length - 1 : null
-  }
-  
-  await store.commit(
-    events.queueUpdated({
-      id: QUEUE_ID,
-      trackIds: newTrackIds,
-      currentPlaying: newCurrentPlaying ?? undefined,
-      shuffle: currentQueue.shuffle,
-      repeat: currentQueue.repeat,
-    })
-  )
 }
 
 /**
  * Clear the entire queue
- * 
+ *
  * @param store - LiveStore instance
  */
 export const clearQueueAction = async (store: LiveStore) => {
-  await store.commit(
-    events.queueCleared({
-      queueId: QUEUE_ID,
-    })
-  )
-}
-
-/**
- * Shuffle an array using Fisher-Yates algorithm
- */
-const shuffleArray = <T>(array: T[]): T[] => {
-  const shuffled = [...array]
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-  }
-  return shuffled
+  // The current action reads nothing and commits unconditionally; preserved.
+  await store.commit(queueEvents.queueCleared(clearQueue()))
 }
 
 /**
  * Toggle shuffle mode (Spotify-style)
- * 
+ *
  * - Current song keeps playing uninterrupted
  * - Only affects next/previous navigation order
  * - currentPlaying index updates to point to same song in new array
- * 
+ *
  * @param store - LiveStore instance
  * @param shuffle - New shuffle state
  */
 export const toggleShuffleAction = async (store: LiveStore, shuffle: boolean) => {
-  const currentQueue = await readQueue(store)
-  
-  if (!currentQueue || currentQueue.trackIds.length === 0) {
-    // No queue exists or queue is empty - nothing to shuffle
+  const current = await readQueue(store)
+
+  // Single warn path for both "no queue" and "empty queue" (the transition
+  // returns null in both cases).
+  if (!current || current.trackIds.length === 0) {
     console.warn('[toggleShuffleAction] No queue or empty queue, cannot toggle shuffle')
     return
   }
 
-  if (shuffle) {
-    // ENABLE SHUFFLE
-    // Generate randomized track order
-    const randomTrackIds = shuffleArray(currentQueue.trackIds)
-    
-    // Find current song's position in the NEW shuffled array
-    // This keeps the same song playing, just changes what "next" means
-    let newCurrentPlaying = currentQueue.currentPlaying
-    if (currentQueue.currentPlaying !== null && currentQueue.currentPlaying !== undefined) {
-      const currentTrackId = currentQueue.trackIds[currentQueue.currentPlaying]
-      const indexInShuffled = randomTrackIds.indexOf(currentTrackId)
-      if (indexInShuffled !== -1) {
-        newCurrentPlaying = indexInShuffled
-      }
-    }
-
-    // Atomic update - all fields at once
-    await store.commit(
-      events.queueUpdated({
-        id: QUEUE_ID,
-        trackIds: currentQueue.trackIds,
-        randomTrackIds,
-        currentPlaying: newCurrentPlaying ?? undefined,
-        shuffle: true,
-        repeat: currentQueue.repeat,
-      })
-    )
-  } else {
-    // DISABLE SHUFFLE
-    // Find current song's position in the ORIGINAL track order
-    let newCurrentPlaying = currentQueue.currentPlaying
-    if (currentQueue.currentPlaying !== null && currentQueue.currentPlaying !== undefined && currentQueue.randomTrackIds.length > 0) {
-      const currentTrackId = currentQueue.randomTrackIds[currentQueue.currentPlaying]
-      const indexInOriginal = currentQueue.trackIds.indexOf(currentTrackId)
-      if (indexInOriginal !== -1) {
-        newCurrentPlaying = indexInOriginal
-      }
-    }
-
-    // Atomic update - all fields at once
-    await store.commit(
-      events.queueUpdated({
-        id: QUEUE_ID,
-        trackIds: currentQueue.trackIds,
-        randomTrackIds: [],
-        currentPlaying: newCurrentPlaying ?? undefined,
-        shuffle: false,
-        repeat: currentQueue.repeat,
-      })
-    )
+  const ev = toggleShuffle(current, shuffle)
+  if (ev) {
+    await store.commit(queueEvents.queueUpdated(ev))
   }
 }
 
 /**
  * Toggle repeat mode
- * 
+ *
  * @param store - LiveStore instance
  * @param repeat - New repeat state
  */
 export const toggleRepeatAction = async (store: LiveStore, repeat: boolean) => {
-  const currentQueue = await readQueue(store)
-  
-  if (!currentQueue) {
+  const current = await readQueue(store)
+
+  if (!current) {
     console.warn('[toggleRepeatAction] No queue exists, cannot toggle repeat')
     return
   }
-  
-  await store.commit(
-    events.queueRepeatToggled({
-      queueId: QUEUE_ID,
-      repeat,
-    })
-  )
+
+  const ev = toggleRepeat(current, repeat)
+  if (ev) {
+    await store.commit(queueEvents.queueRepeatToggled(ev))
+  }
 }
 
 /**
  * Set currently playing position
- * 
+ *
  * @param store - LiveStore instance
  * @param position - Index in queue to play
  */
 export const setCurrentPlayingAction = async (store: LiveStore, position: number) => {
-  await store.commit(
-    events.queuePositionChanged({
-      queueId: QUEUE_ID,
-      position,
-    })
-  )
+  // The current action reads nothing; preserved.
+  await store.commit(queueEvents.queuePositionChanged(setCurrentPlaying(position)))
 }
 
 /**
  * Play next song in queue
  * Increments currentPlaying index or loops if repeat is on
- * 
+ *
  * @param store - LiveStore instance
  * @param queueId - Queue ID (default: 'default')
  */
@@ -376,34 +231,15 @@ export async function playNextAction(
   queueId = QUEUE_ID
 ): Promise<void> {
   const queue = await readQueue(store)
-  
+
   if (!queue) {
     console.warn(`[playNextAction] Queue ${queueId} not found`)
     return
   }
-  
-  const trackIds = queue.shuffle ? queue.randomTrackIds : queue.trackIds
-  const currentIndex = queue.currentPlaying ?? -1
-  const nextIndex = currentIndex + 1
-  
-  // Determine next position
-  let newPosition: number | undefined
-  
-  if (nextIndex < trackIds.length) {
-    newPosition = nextIndex
-  } else if (queue.repeat && trackIds.length > 0) {
-    newPosition = 0 // Loop back to start
-  } else {
-    // End of queue, no repeat
-    newPosition = undefined
-  }
-  
-  if (newPosition !== undefined) {
-    await store.commit(queueEvents.queuePositionChanged({
-      queueId,
-      position: newPosition,
-      trackId: trackIds[newPosition],
-    }))
+
+  const ev = playNext(queue)
+  if (ev) {
+    await store.commit(queueEvents.queuePositionChanged(ev))
   }
 }
 
@@ -419,39 +255,23 @@ export async function playPreviousAction(
   queueId = QUEUE_ID
 ): Promise<void> {
   const queue = await readQueue(store)
-  
+
   if (!queue) {
     console.warn(`[playPreviousAction] Queue ${queueId} not found`)
     return
   }
-  
-  const trackIds = queue.shuffle ? queue.randomTrackIds : queue.trackIds
-  const currentIndex = queue.currentPlaying ?? 0
-  const prevIndex = currentIndex - 1
-  
-  // Determine previous position
-  let newPosition: number
-  
-  if (prevIndex >= 0) {
-    newPosition = prevIndex
-  } else if (queue.repeat && trackIds.length > 0) {
-    newPosition = trackIds.length - 1 // Loop to end
-  } else {
-    // Start of queue, no repeat
-    newPosition = 0
+
+  // Always commits when a queue exists (even the stay-put case).
+  const ev = playPrevious(queue)
+  if (ev) {
+    await store.commit(queueEvents.queuePositionChanged(ev))
   }
-  
-  await store.commit(queueEvents.queuePositionChanged({
-    queueId,
-    position: newPosition,
-    trackId: trackIds[newPosition],
-  }))
 }
 
 /**
  * Play a specific song by ID
  * Finds the song in the queue and sets currentPlaying to its index
- * 
+ *
  * @param store - LiveStore instance
  * @param mediaId - Song ID to play
  * @param queueId - Queue ID (default: 'default')
@@ -462,24 +282,16 @@ export async function playMediaAction(
   queueId = QUEUE_ID
 ): Promise<void> {
   const queue = await readQueue(store)
-  
+
   if (!queue) {
     console.warn(`[playMediaAction] Queue ${queueId} not found`)
     return
   }
-  
-  // Use the active track list based on shuffle state
-  const trackIds = queue.shuffle ? queue.randomTrackIds : queue.trackIds
-  const index = trackIds.indexOf(mediaId)
-  
-  if (index === -1) {
+
+  const ev = playMedia(queue, mediaId)
+  if (ev) {
+    await store.commit(queueEvents.queuePositionChanged(ev))
+  } else {
     console.warn(`[playMediaAction] Media ${mediaId} not found in queue`)
-    return
   }
-  
-  await store.commit(queueEvents.queuePositionChanged({
-    queueId,
-    position: index,
-    trackId: mediaId,
-  }))
 }
