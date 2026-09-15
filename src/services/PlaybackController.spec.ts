@@ -389,6 +389,44 @@ describe('PlaybackController', () => {
       expect(result.status).toBe('idle')
       expect((result as { reason: string }).reason).toBe('missing-media')
     })
+
+    it('advances the queue when the stream is dead', async () => {
+      const media1 = fakeMedia('song-1')
+      const media2 = fakeMedia('song-2')
+      const q = queueState()
+      const q2 = queueState({ currentPlaying: 1, currentTrackId: 'song-2' })
+      const { ctrl, data, resolveStream } = makeController()
+
+      vi.mocked(ctrl as any).currentSongId = 'song-1'
+      vi.mocked(data.readMedia).mockResolvedValueOnce(media1).mockResolvedValueOnce(media2)
+      vi.mocked(data.readQueue).mockResolvedValueOnce(q).mockResolvedValueOnce(q2)
+      // First stream (current song) is dead; the next song resolves fine.
+      resolveStream.mockResolvedValueOnce({ url: '', kind: 'remote' })
+
+      const result = await ctrl.retry(0)
+
+      expect(data.next).toHaveBeenCalledTimes(1)
+      expect(result.status).toBe('started')
+      if (result.status === 'started') expect(result.songId).toBe('song-2')
+    })
+
+    it('stays idle when the fallback track also has no stream', async () => {
+      const media = fakeMedia('song-1')
+      const media2 = fakeMedia('song-2')
+      const q = queueState()
+      const q2 = queueState({ currentPlaying: 1, currentTrackId: 'song-2' })
+      const { ctrl, data, resolveStream } = makeController()
+
+      vi.mocked(ctrl as any).currentSongId = 'song-1'
+      vi.mocked(data.readMedia).mockResolvedValueOnce(media).mockResolvedValueOnce(media2)
+      vi.mocked(data.readQueue).mockResolvedValueOnce(q).mockResolvedValueOnce(q2)
+      resolveStream.mockResolvedValue({ url: '', kind: 'remote' })
+
+      const result = await ctrl.retry(0)
+
+      expect(result.status).toBe('idle')
+      expect((result as { reason: string }).reason).toBe('missing-stream')
+    })
   })
 
   describe('playList', () => {

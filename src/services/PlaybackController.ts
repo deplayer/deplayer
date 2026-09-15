@@ -261,7 +261,13 @@ export class PlaybackController {
         return { status: 'idle', reason: 'missing-media' }
       }
 
-      return this.startStream(songId, providerIndex, isCurrent)
+      const result = await this.startStream(songId, providerIndex, isCurrent)
+      // A dead stream (e.g. a provider URL that 404s or has no decoder) must not
+      // halt playback — advance once to the next track, mirroring next()/previous().
+      if (result.status === 'idle' && result.reason !== 'store-unavailable' && result.reason !== SUPERSEDED) {
+        return this.advanceFallback(songId, () => this.data.next(), isCurrent)
+      }
+      return result
     })
   }
 
