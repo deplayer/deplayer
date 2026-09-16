@@ -7,10 +7,12 @@ import { getSettingsFromLiveStore } from "../selectors";
 import ProvidersService from "../../services/ProvidersService";
 import { getLiveStoreInstance } from "../../stores/livestore/accessor";
 import { batchedMediaCommitter } from "../../stores/livestore/services/BatchedMediaCommitter";
-import { resumeFor, save as saveResumeState } from "../../stores/livestore/services/SyncResumeState";
+import {
+  syncProvider,
+  isStreamingProvider,
+  type StreamingProvider,
+} from "../../stores/livestore/services/ProviderSync";
 import { createLogger } from "../../utils/logger";
-import type { AlbumPage } from "../../providers/IMusicProvider";
-
 
 import {
   deleteCollectionWorker,
@@ -21,13 +23,6 @@ import {
 } from "./workers";
 
 const logger = createLogger({ namespace: "SyncSaga" });
-
-const MAX_PAGES_PER_SESSION = 10;
-// Page geometry for streaming sync. Persisted per provider in the resume
-// state so a change here invalidates stored cursors instead of silently
-// skipping albums.
-const SYNC_PAGE_SIZE = 50;
-
 
 export function* syncMediaLibrary(): SagaIterator<void> {
   try {
@@ -46,10 +41,9 @@ export function* syncMediaLibrary(): SagaIterator<void> {
     // self-reported providerKey is display-only and may collide across
     // instances of the same type.
     const allEntries = Object.entries(providersService.providers);
-    type StreamingEntry = { key: string; provider: (typeof allEntries)[number][1] };
-    const providers: StreamingEntry[] = [];
+    const providers: { key: string; provider: StreamingProvider }[] = [];
     for (const [key, p] of allEntries) {
-      if (p.getScanStatus && p.streamAlbumsSince) {
+      if (isStreamingProvider(p)) {
         providers.push({ key, provider: p });
       } else {
         logger.debug(
@@ -62,75 +56,9 @@ export function* syncMediaLibrary(): SagaIterator<void> {
       return;
     }
 
-    batchedMediaCommitter.setStore(liveStore)
-
     try {
       for (const { key, provider } of providers) {
-        try {
-          const scanStatus: { scanning: boolean; count: number; lastScan: string } =
-            yield call([provider, provider.getScanStatus!]);
-          if (scanStatus.scanning) {
-            logger.debug(`Server ${key} is scanning, skipping this cycle`);
-            continue;
-          }
-
-          const { since, cursor } = yield call(() =>
-            resumeFor(liveStore, key, scanStatus, SYNC_PAGE_SIZE)
-          );
-
-          const stream = provider.streamAlbumsSince!(since, { cursor, pageSize: SYNC_PAGE_SIZE });
-          let pages = 0;
-          let nextCursor: number | null = cursor;
-          let complete = false;
-
-          for (;;) {
-            const next: IteratorResult<AlbumPage, void> = yield call(() => stream.next());
-            if (next.done) {
-              complete = true;
-              break;
-            }
-            const page = next.value;
-
-            if (page.media.length > 0) {
-              yield call([batchedMediaCommitter, "add"], page.media, { skipRefresh: true });
-              yield call([batchedMediaCommitter, "flush"], { skipRefresh: true });
-            }
-            nextCursor = page.nextCursor;
-            complete = !page.hasMore;
-            pages++;
-
-            yield call(() =>
-              saveResumeState(liveStore, key, {
-                scanStatus,
-                cursor: nextCursor,
-                complete,
-                pageSize: SYNC_PAGE_SIZE,
-              })
-            );
-
-            if (complete || pages >= MAX_PAGES_PER_SESSION) break;
-          }
-
-          if (!complete) {
-            // Best-effort cleanup; the provider generator currently has no
-            // finally block, but a future impl might. Swallow cleanup errors
-            // so they don't poison the outer catch.
-            yield call(async () => {
-              try {
-                await stream.return?.();
-              } catch (cleanupError) {
-                logger.error(`stream.return failed for ${provider.providerKey}`, cleanupError);
-              }
-            });
-            logger.debug(
-              `Sync paused for ${provider.providerKey} at cursor ${nextCursor} (page cap reached)`,
-            );
-          } else {
-            logger.debug(`Sync complete for ${provider.providerKey}`);
-          }
-        } catch (error) {
-          logger.error(`Provider sync failed (${provider.providerKey})`, error);
-        }
+        yield call(syncProvider, liveStore, key, provider);
       }
     } finally {
       // Ensure already-committed media becomes visible even after errors.

@@ -2,15 +2,24 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { expectSaga } from 'redux-saga-test-plan'
 import { syncMediaLibrary } from './index'
 import { batchedMediaCommitter } from '../../stores/livestore/services/BatchedMediaCommitter'
+import { syncProvider } from '../../stores/livestore/services/ProviderSync'
 
-const addSpy = vi.spyOn(batchedMediaCommitter, 'add').mockResolvedValue(undefined)
-const flushSpy = vi.spyOn(batchedMediaCommitter, 'flush').mockResolvedValue(undefined)
 const refreshSpy = vi.spyOn(batchedMediaCommitter, 'refresh').mockResolvedValue(undefined)
 
 const fakeLiveStore = { id: 'test-store' }
 
 vi.mock('../../stores/livestore/accessor', () => ({
   getLiveStoreInstance: vi.fn(() => fakeLiveStore),
+}))
+
+// ProviderSync owns the per-provider streaming policy (page loop, resume
+// saves, skipRefresh commits, cursor advancement) — tested in
+// stores/livestore/services/ProviderSync.spec.ts. This spec verifies only the
+// saga-level contract: one final deferred refresh per sync run, also after a
+// provider failure.
+vi.mock('../../stores/livestore/services/ProviderSync', () => ({
+  syncProvider: vi.fn(async () => ({ status: 'synced', pages: 1 })),
+  isStreamingProvider: vi.fn(() => true),
 }))
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,87 +38,49 @@ vi.mock('../selectors', () => ({
   ),
 }))
 
-function registerProvider(key: string, pages: Array<{ media: unknown[]; hasMore: boolean; nextCursor: number }>) {
-  const p = {
+function registerProvider(key: string): void {
+  registeredProviders[key] = {
     providerKey: key,
-    getScanStatus: vi.fn().mockResolvedValue({ scanning: false, count: 100, lastScan: '2026-07-17T00:00:00Z' }),
-    streamAlbumsSince: vi.fn().mockReturnValue(
-      (async function* () { for (const page of pages) yield page })(),
-    ),
+    getScanStatus: vi.fn(),
+    streamAlbumsSince: vi.fn(),
   }
-  registeredProviders[key] = p
-  return p
 }
 
 describe('syncMediaLibrary deferred refresh', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     for (const k of Object.keys(registeredProviders)) delete registeredProviders[k]
-    addSpy.mockResolvedValue(undefined)
-    flushSpy.mockResolvedValue(undefined)
     refreshSpy.mockResolvedValue(undefined)
+    vi.mocked(syncProvider).mockResolvedValue({ status: 'synced', pages: 1 })
   })
 
   afterEach(() => {
     for (const k of Object.keys(registeredProviders)) delete registeredProviders[k]
   })
 
-  it('calls add and flush with skipRefresh, refresh once at end', async () => {
-    registerProvider('test', [
-      { media: [{ id: 't1' }], hasMore: false, nextCursor: 1 },
-    ])
+  it('runs each streaming provider through syncProvider and refreshes once at the end', async () => {
+    registerProvider('test')
 
     await expectSaga(syncMediaLibrary)
       .silentRun(2000)
 
-    expect(addSpy.mock.calls.length).toBeGreaterThanOrEqual(1)
-    for (const call of addSpy.mock.calls) {
-      expect(call[1]).toEqual({ skipRefresh: true })
-    }
-
-    for (const call of flushSpy.mock.calls) {
-      expect(call[0]).toEqual({ skipRefresh: true })
-    }
-
+    expect(syncProvider).toHaveBeenCalledTimes(1)
+    const [store, key, provider] = vi.mocked(syncProvider).mock.calls[0]
+    expect(store).toBe(fakeLiveStore)
+    expect(key).toBe('test')
+    expect(provider).toBe(registeredProviders['test'])
     expect(refreshSpy).toHaveBeenCalledTimes(1)
     expect(refreshSpy).toHaveBeenCalledWith('SyncSaga.syncMediaLibrary')
   })
 
   it('refresh is still called via finally after a provider error', async () => {
-    registeredProviders['faulty'] = {
-      providerKey: 'faulty',
-      getScanStatus: vi.fn().mockResolvedValue({ scanning: false, count: 50, lastScan: '2026-07-17T00:00:00Z' }),
-      streamAlbumsSince: vi.fn().mockReturnValue(
-        (async function* () {
-          yield { media: [{ id: 'f1' }], hasMore: true, nextCursor: 1 }
-          throw new Error('provider crash mid-stream')
-        })(),
-      ),
-    }
+    registerProvider('faulty')
+    vi.mocked(syncProvider).mockResolvedValue({ status: 'failed', pages: 0 })
 
     await expectSaga(syncMediaLibrary)
       .silentRun(2000)
 
     expect(refreshSpy).toHaveBeenCalledTimes(1)
     expect(refreshSpy).toHaveBeenCalledWith('SyncSaga.syncMediaLibrary')
-  })
-
-  it('does not advance sync_state when flush fails', async () => {
-    const commitSpy = vi.fn()
-    // @ts-expect-error test seam
-    fakeLiveStore.commit = commitSpy
-    flushSpy.mockRejectedValue(new Error('flush boom'))
-    registerProvider('test', [
-      { media: [{ id: 'p1' }], hasMore: true, nextCursor: 1 },
-      { media: [{ id: 'p2' }], hasMore: false, nextCursor: 2 },
-    ])
-
-    await expectSaga(syncMediaLibrary)
-      .silentRun(2000)
-
-    // No sync_state write may happen for a page whose flush failed:
-    // advancing the cursor would permanently skip those items.
-    expect(commitSpy).not.toHaveBeenCalled()
-    expect(refreshSpy).toHaveBeenCalledTimes(1)
   })
 })
