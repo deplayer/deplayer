@@ -7,7 +7,7 @@ import { useAppStore } from '../../stores/livestore/store'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
 import type { MediaRow } from '../../types/media'
-import { State as QueueState } from '../../reducers/queue'
+import { parseIds, type QueueState } from '../../stores/livestore/queue'
 import * as types from '../../constants/ActionTypes'
 import { addToQueueAction, addNextAction, removeFromQueueAction } from '../../stores/livestore/actions'
 
@@ -143,11 +143,11 @@ const ContextualMenu = (props: MenuProps) => {
     items.push('play')
     if (!disableAddButton) {
       items.push('addToQueue')
-      if (props.queue?.currentPlaying) {
-        items.push('addNext')
-      }
     }
-    if (props.queue && props.queue.trackIds.includes(song.id)) {
+    if (props.queue?.currentPlaying != null) {
+      items.push('addNext')
+    }
+    if (props.queue && parseIds(props.queue.trackIds).includes(song.id)) {
       items.push('removeFromQueue')
     }
     items.push('removeFromCollection')
@@ -434,7 +434,7 @@ const ContextualMenu = (props: MenuProps) => {
             </div>
           )}
 
-          {!disableAddButton && props.queue?.currentPlaying !== null && props.queue?.currentPlaying !== undefined && (
+        {!disableAddButton && props.queue?.currentPlaying != null && (
             <div role="menuitem" tabIndex={-1}>
               <Button
                 fullWidth
@@ -455,7 +455,7 @@ const ContextualMenu = (props: MenuProps) => {
             </div>
           )}
 
-          {props.queue && props.queue.trackIds.includes(song.id) && (
+        {props.queue && parseIds(props.queue.trackIds).includes(song.id) && (
             <div role="menuitem" tabIndex={-1}>
               <Button
                 fullWidth

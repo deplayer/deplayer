@@ -7,10 +7,12 @@
  * conscious decision and updated expectations here.
  */
 import { describe, it, expect } from 'vitest'
-import type { QueueState } from './hooks/queueUtils'
+import type { QueueState } from './types'
 import {
-  deriveCurrentTrackId,
   fisherYates,
+  deriveCurrentTrackId,
+} from './resolution'
+import {
   playAll,
   addToQueue,
   addNext,
@@ -22,7 +24,7 @@ import {
   playNext,
   playPrevious,
   playMedia,
-} from './queueTransitions'
+} from './transitions'
 
 const makeState = (overrides: Partial<QueueState> = {}): QueueState => ({
   trackIds: ['a', 'b', 'c'],

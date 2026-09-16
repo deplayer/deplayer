@@ -1,8 +1,23 @@
-import { queryDb } from '@livestore/livestore'
+/**
+ * LiveStore Queue Actions
+ *
+ * Thin adapters over the pure transition functions in `./transitions`.
+ * Each action: input guard → (optional) readQueue → transition → commit the
+ * returned event only when non-null. All queue-domain logic (shuffle
+ * reordering, repeat wrap, position clamping, active-list selection) lives in
+ * the pure modules so it is testable without a LiveStore.
+ *
+ * Side effects (audio playback, notifications) remain in Redux saga.
+ * All actions require a store parameter from useStore() hook.
+ *
+ * The console.warn messages and the commit-await asymmetries below are
+ * preserved VERBATIM from the original actions (including the
+ * fire-and-forget commit on the addToQueue fresh-create path).
+ */
+
 import type { LiveStore } from '../accessor'
-import { tables } from '../schema'
 import { queueEvents } from '../events/queue'
-import type { QueueState } from '../queueTransitions'
+import { readQueue } from './storeReaders'
 import {
   playAll,
   addToQueue,
@@ -15,61 +30,9 @@ import {
   playNext,
   playPrevious,
   playMedia,
-} from '../queueTransitions'
-import { parseIds } from '../hooks/queueUtils'
-
-/**
- * LiveStore Queue Actions
- *
- * Thin adapters over the pure transition functions in `queueTransitions.ts`.
- * Each action: input guard → (optional) readQueue → transition → commit the
- * returned event only when non-null. All queue-domain logic (shuffle
- * reordering, repeat wrap, position clamping, active-list selection) lives in
- * the pure module so it is testable without a LiveStore.
- *
- * Side effects (audio playback, notifications) remain in Redux saga.
- * All actions require a store parameter from useStore() hook.
- */
+} from './transitions'
 
 const QUEUE_ID = 'default'
-
-/**
- * Read the current queue from LiveStore.
- * Includes the persisted currentTrackId column so callers can
- * prefer it over the index-based fallback.
- * Returns the shared QueueState shape (raw-row tolerant).
- */
-export const readQueue = async (store: LiveStore): Promise<QueueState | null> => {
-  try {
-    const query = queryDb(
-      tables.queue
-        .select()
-        .where('id', '=', QUEUE_ID)
-        .limit(1)
-    )
-
-    const result = await store.query(query)
-
-    // queryDb returns array of objects directly
-    const row = Array.isArray(result) ? result[0] : null
-
-    if (!row) {
-      return null
-    }
-
-    return {
-      trackIds: parseIds(row.trackIds),
-      randomTrackIds: parseIds(row.randomTrackIds),
-      currentPlaying: row.currentPlaying as number | null,
-      currentTrackId: (row.currentTrackId as string) || null,
-      shuffle: Boolean(row.shuffle),
-      repeat: Boolean(row.repeat),
-    }
-  } catch (error) {
-    console.error('[readQueue] Error:', error)
-    return null
-  }
-}
 
 /**
  * Replace queue with new tracks, positioned at the first track.

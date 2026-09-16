@@ -8,7 +8,7 @@ import { InPortal, OutPortal, createHtmlPortalNode } from 'react-reverse-portal'
 import SpectrumVisualizer from '../SpectrumVisualizer'
 import { State as PlayerState } from '../../reducers/player'
 import { State as SettingsState } from '../../reducers/settings'
-import { State as QueueState } from '../../reducers/queue'
+import type { QueueState } from '../../stores/livestore/queue'
 import Controls from './Controls'
 import Cover from './Cover'
 import ProgressBar from './ProgressBar'
@@ -28,7 +28,7 @@ interface Props {
   showVisuals: boolean
   showSpectrum: boolean
   mqlMatch: boolean
-  queue: QueueState
+  queue: QueueState | null
   location: Location
   slim: boolean
   player: PlayerState
@@ -103,16 +103,17 @@ class PlayerControls extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Props): void {
     const { queue, collection, settings } = this.props
-    const { currentPlaying } = queue
+    const currentPlaying = queue?.currentPlaying
+    const currentTrackId = queue?.currentTrackId
 
     // Audio cleanup is owned by the player saga (commands.ts stopAllPlayback).
     // This lifecycle only handles non-playback concerns.
 
-    const trackChanged = prevProps.queue.currentPlaying !== currentPlaying
+    const trackChanged = prevProps.queue?.currentPlaying !== currentPlaying
 
     // Show notification for track changes if enabled
-    if (trackChanged && currentPlaying) {
-      const currentTrack = collection.rows[currentPlaying]
+    if (trackChanged && currentTrackId) {
+      const currentTrack = collection.rows[currentTrackId]
       if (currentTrack && settings.settings.app.notifications?.enabled && 
           settings.settings.app.notifications?.showTrackChanges) {
         this.showTrackNotification(currentTrack)
@@ -300,7 +301,7 @@ class PlayerControls extends React.Component<Props, State> {
       loadedSeconds
     } = this.state
 
-    const currentPlayingId = this.props.queue.currentPlaying
+    const currentPlayingId = this.props.queue?.currentTrackId
     const { streamUri } = this.props.player
     
     // DEFENSIVE: Don't unmount player if audio is still playing
@@ -437,8 +438,8 @@ class PlayerControls extends React.Component<Props, State> {
                           playedSeconds={playedSeconds}
                           duration={duration}
                           currentPlaying={currentPlaying}
-                          repeat={this.props.queue.repeat}
-                          shuffle={this.props.queue.shuffle}
+                          repeat={this.props.queue?.repeat}
+                          shuffle={this.props.queue?.shuffle}
                         />
                         {(internalPlayer && this.props.showSpectrum) && (
                           <div className='mr-4 hidden md:block'>

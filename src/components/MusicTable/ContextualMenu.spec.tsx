@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import ContextualMenu from './ContextualMenu'
 import type { MediaRow } from '../../types/media'
-import { State as QueueState } from '../../reducers/queue'
+import { type QueueState } from '../../stores/livestore/queue'
 
 // Mock createPortal to render in the same container for testing
 vi.mock('react-dom', async () => {
@@ -100,11 +100,7 @@ describe('ContextualMenu', () => {
       queue: {
         trackIds: [mockSong1.id],
         randomTrackIds: [],
-        currentPlaying: mockSong1.id,
-        repeat: false,
-        shuffle: false,
-        nextSongId: null,
-        prevSongId: null
+        currentPlaying: 0
       }
     }) => state)
 

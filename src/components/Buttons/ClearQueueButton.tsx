@@ -5,7 +5,7 @@ import Icon from '../common/Icon'
 import { CLEAR_QUEUE } from '../../constants/ActionTypes'
 import Button from '../common/Button'
 import { useQueue } from '../../stores/livestore/hooks'
-import { getActiveTrackIds } from '../../stores/livestore/hooks/queueUtils'
+import { getActiveTrackIds } from '../../stores/livestore/queue'
 import { useDispatch } from 'react-redux'
 
 type Props = {

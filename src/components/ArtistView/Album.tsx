@@ -5,8 +5,8 @@ import { Translate } from 'react-redux-i18n'
 import Icon from '../common/Icon'
 import SongRow from '../MusicTable/SongRow'
 import CoverImage from '../MusicTable/CoverImage'
-import { State as QueueState } from '../../reducers/queue'
-import { Dispatch } from 'redux'
+import type { QueueState } from '../../stores/livestore/queue'
+import type { Dispatch } from 'redux'
 import { useAppStore } from '../../stores/livestore/store'
 import { addToQueueAction, addNextAction } from '../../stores/livestore/actions'
 
@@ -18,9 +18,9 @@ interface AlbumData {
 
 type AlbumProps = {
   album: AlbumData,
-  queue: QueueState,
   songs: Array<string>,
   dispatch: Dispatch,
+  queue: QueueState | null,
   mediaMap: Record<string, any>  // Passed from parent - no hook call needed
 }
 

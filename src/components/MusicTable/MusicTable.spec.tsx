@@ -54,11 +54,10 @@ describe('MusicTable', () => {
     
     // Create mock queue
     const mockQueue = {
-      id: 'default',
       trackIds: ['song1', 'song2'],
       currentPlaying: null,
       shuffle: false,
-      repeat: 'off',
+      repeat: false,
       randomTrackIds: []
     }
     

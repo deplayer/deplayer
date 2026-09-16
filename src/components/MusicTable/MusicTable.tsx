@@ -18,9 +18,9 @@ import { useUIStore } from '../../stores/uiStore'
 import { useDispatch } from 'react-redux'
 import { Dispatch } from 'redux'
 import type { MediaRow } from '../../types/media'
-import { State as QueueState } from '../../reducers/queue'
+import type { QueueState } from '../../stores/livestore/queue'
 
-type QueueData = Record<string, unknown> | QueueState | null
+type QueueData = QueueState | null
 
 type Props = {
   error?: string,
@@ -138,7 +138,7 @@ const SongRowDirect = React.memo(({
   return (
     <SongRow
       song={song}
-      queue={queue as QueueState | undefined}
+      queue={queue ?? undefined}
       isCurrent={isCurrent}
       onClick={onClick}
       dispatch={dispatch}
@@ -199,7 +199,7 @@ const SongRowWithHooks = React.memo(({
   return (
     <SongRow
       song={song}
-      queue={liveQueue as unknown as import('../../reducers/queue').State | undefined}
+      queue={liveQueue ?? undefined}
       isCurrent={isCurrent}
       onClick={onClick}
       dispatch={dispatch}

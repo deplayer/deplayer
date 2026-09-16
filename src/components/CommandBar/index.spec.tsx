@@ -32,10 +32,6 @@ vi.mock('../../stores/livestore/hooks', () => ({
   useMediaMapForIds: vi.fn(() => ({})),
 }))
 
-vi.mock('../../stores/livestore/hooks/useQueue', () => ({
-  useQueue: vi.fn(() => ({ trackIds: [], currentPlaying: null })),
-}))
-
 vi.mock('../../stores/livestore/actions', () => ({
   playAllAction: vi.fn(),
   addToQueueAction: vi.fn(),

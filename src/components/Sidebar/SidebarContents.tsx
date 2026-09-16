@@ -17,7 +17,7 @@ import { inSection } from '../../utils/router'
 import Icon from '../common/Icon'
 import { useLocation } from 'react-router'
 import { usePlaylists, useSmartPlaylists, useQueue, useMediaCount, useArtistsCount, useSearchMediaIds } from '../../stores/livestore/hooks'
-import { getActiveTrackIds } from '../../stores/livestore/hooks/queueUtils'
+import { getActiveTrackIds } from '../../stores/livestore/queue'
 import { useUIStore } from '../../stores/uiStore'
 
 import LogoSvg from '../../logo.svg?react'

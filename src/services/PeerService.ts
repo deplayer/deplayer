@@ -10,7 +10,7 @@ import { PeerStreamSeam } from './PeerStreamSeam';
 import { createLogger } from "../utils/logger";
 import { getLiveStoreInstance } from "../stores/livestore/accessor";
 import { addMediaBulkAction } from "../stores/livestore/actions/media";
-import { resolveCurrentPlayingSongId } from '../stores/livestore/hooks/queueUtils';
+import { resolveCurrentPlayingSongId } from '../stores/livestore/queue';
 import { NormalizedMedia } from "../utils/normalizeMedia";
 
 const logger = createLogger({ namespace: "PeerService" });

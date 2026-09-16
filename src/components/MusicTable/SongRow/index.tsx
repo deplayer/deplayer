@@ -9,7 +9,7 @@ import type { MediaRow, Cover } from '../../../types/media'
 import Tag from '../../common/Tag'
 import ServiceIcon from '../../ServiceIcon'
 import Icon from '../../common/Icon'
-import { State as QueueState } from '../../../reducers/queue'
+import type { QueueState } from '../../../stores/livestore/queue'
 
 const ContextualMenu = React.lazy(() => import('./../ContextualMenu'))
 

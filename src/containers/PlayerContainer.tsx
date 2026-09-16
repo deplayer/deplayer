@@ -4,9 +4,8 @@ import PlayerControls from '../components/Player/PlayerControls'
 import { useLocation } from 'react-router'
 import { State } from '../reducers'
 import { useQueue, useSettings, useMediaById } from '../stores/livestore/hooks'
-import { parseIds, getActiveTrackIds, resolveCurrentSongId } from '../stores/livestore/hooks/queueUtils'
+import { getActiveTrackIds, resolveCurrentSongId } from '../stores/livestore/queue'
 import { useUIStore } from '../stores/uiStore'
-import { defaultState as queueDefaultState } from '../reducers/queue'
 import { defaultState as settingsDefaultState } from '../reducers/settings'
 import { createHtmlPortalNode } from 'react-reverse-portal'
 
@@ -44,15 +43,13 @@ const PlayerContainer = ({ playerPortal }: Props) => {
   }
   const currentMedia = useMediaById(currentPlayingId)
 
-  const queue = liveQueue ? {
-    trackIds,
-    randomTrackIds: parseIds(liveQueue.randomTrackIds),
-    currentPlaying: currentPlayingId,  // Convert index to track ID
-    repeat: liveQueue.repeat,
-    shuffle: liveQueue.shuffle,
-    nextSongId: liveQueue.nextSongId,
-    prevSongId: liveQueue.prevSongId
-  } : queueDefaultState
+  // Pass the module QueueState straight through, with currentTrackId pinned
+  // to the resolved active track id (persisted-id-first, with the last-valid
+  // fallback). The raw index stays untouched; PlayerControls keys off
+  // currentTrackId for its row lookup.
+  const queue = liveQueue
+    ? { ...liveQueue, currentTrackId: currentPlayingId }
+    : null
 
   // Convert LiveStore settings to Redux-compatible format
   const settings = liveSettings ? {

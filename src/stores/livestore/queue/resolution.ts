@@ -1,19 +1,16 @@
 /**
- * Pure utility functions for queue index resolution.
+ * Pure queue resolution functions.
  *
- * Extracted from hooks so the critical index→trackId logic
- * is testable without React or LiveStore.
+ * The read-side domain logic for the playback queue: parsing stored id
+ * lists, selecting the active list (shuffle-aware), resolving the
+ * current/next/previous track, and deriving the persisted currentTrackId.
+ *
+ * Purity boundary: imports ONLY from `./types`. No LiveStore, no
+ * `schema.ts`, no `events/queue.ts`, no React. Testable without any
+ * infrastructure.
  */
-import type { LiveStore } from '../accessor'
 
-export interface QueueState {
-  trackIds: readonly string[] | string
-  randomTrackIds?: readonly string[] | string
-  currentPlaying: number | null | undefined
-  currentTrackId?: string | null
-  shuffle?: boolean
-  repeat?: boolean
-}
+import type { QueueState } from './types'
 
 /**
  * Parse a trackIds field that may be a JSON string or already an array.
@@ -94,34 +91,45 @@ export function resolveQueueNavigation(queue: QueueState | null | undefined): {
 }
 
 /**
- * Resolve the current playing song ID by querying the queue table directly.
- * Uses resolveCurrentSongId on the fetched row so the same resolution logic
- * (currentTrackId authority, shuffle fallback) applies everywhere.
+ * Compute the currently-playing track ID from queue state.
+ *
+ * This is the exact formula the `v1.QueueUpdated` materializer in `schema.ts`
+ * currently owns inline: the active list is `randomTrackIds` when shuffle is
+ * on (falling back to `trackIds` when `randomTrackIds` is absent), otherwise
+ * `trackIds`. Returns `null` when there is no valid current track.
+ *
+ * NOTE: the fallback is `randomTrackIds ?? trackIds` (NOT `?? []`) to keep the
+ * materializer's behavior byte-for-byte identical. When shuffle is on but
+ * `randomTrackIds` is missing (e.g. the append path that omits it), the
+ * current song resolves against the original `trackIds` list.
  */
-export function resolveCurrentPlayingSongId(
-  liveStore: () => LiveStore | null
+export function deriveCurrentTrackId(
+  trackIds: readonly string[],
+  randomTrackIds: readonly string[] | undefined,
+  currentPlaying: number | null | undefined,
+  shuffle: boolean | undefined,
 ): string | null {
-  const store = liveStore()
-  if (!store) return null
+  const active = shuffle ? (randomTrackIds ?? trackIds) : trackIds
+  if (
+    currentPlaying == null ||
+    currentPlaying < 0 ||
+    active.length === 0 ||
+    currentPlaying >= active.length
+  ) {
+    return null
+  }
+  return active[currentPlaying]
+}
 
-  const result = store.query({
-    query: `SELECT trackIds, randomTrackIds, currentPlaying, currentTrackId, shuffle FROM queue WHERE id = ?`,
-    bindValues: { 1: 'default' }
-  }) as Array<{
-    trackIds?: string | readonly string[]
-    randomTrackIds?: string | readonly string[]
-    currentPlaying?: number | null
-    currentTrackId?: string | null
-    shuffle?: boolean
-  }>
-
-  const row = result[0]
-  if (!row) return null
-  return resolveCurrentSongId({
-    trackIds: row.trackIds ?? [],
-    randomTrackIds: row.randomTrackIds ?? [],
-    currentPlaying: row.currentPlaying,
-    currentTrackId: row.currentTrackId,
-    shuffle: row.shuffle ?? false,
-  })
+/**
+ * Fisher-Yates shuffle with an injected RNG (for deterministic tests).
+ * Port of the private `shuffleArray` from the original queue actions.
+ */
+export function fisherYates<T>(array: readonly T[], random: () => number): T[] {
+  const shuffled = [...array]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
 }

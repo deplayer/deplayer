@@ -1,12 +1,11 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import {
   parseIds,
   getActiveTrackIds,
   resolveCurrentSongId,
-  resolveCurrentPlayingSongId,
   resolveQueueNavigation,
-  QueueState,
-} from './queueUtils'
+} from './resolution'
+import type { QueueState } from './types'
 
 const TRACKS = ['track-a', 'track-b', 'track-c', 'track-d']
 const SHUFFLED = ['track-c', 'track-a', 'track-d', 'track-b']
@@ -99,7 +98,6 @@ describe('resolveCurrentSongId', () => {
     expect(resolveCurrentSongId(makeQueue({ currentPlaying: 0 }))).toBe('track-a')
     expect(resolveCurrentSongId(makeQueue({ currentPlaying: 0, shuffle: true }))).toBe('track-c')
   })
-})
 
   it('prefers persisted currentTrackId over index-based fallback', () => {
     // Persisted currentTrackId is authoritative
@@ -127,6 +125,7 @@ describe('resolveCurrentSongId', () => {
     const q = makeQueue({ currentPlaying: 2 })
     expect(resolveCurrentSongId(q)).toBe('track-c')
   })
+})
 
 describe('resolveQueueNavigation', () => {
   it('returns nulls for null queue', () => {
@@ -166,87 +165,5 @@ describe('resolveQueueNavigation', () => {
   it('wraps prev with repeat on', () => {
     const result = resolveQueueNavigation(makeQueue({ currentPlaying: 0, repeat: true }))
     expect(result.prevSongId).toBe('track-d') // wraps to last
-  })
-})
-
-// ---------------------------------------------------------------------------
-// resolveCurrentPlayingSongId
-// ---------------------------------------------------------------------------
-
-describe('resolveCurrentPlayingSongId', () => {
-  function makeLiveStoreMock(queryResult: Array<Record<string, unknown>>) {
-    return {
-      query: vi.fn().mockReturnValue(queryResult),
-    }
-  }
-
-  it('returns null when liveStore getter returns null', () => {
-    const result = resolveCurrentPlayingSongId(() => null)
-    expect(result).toBeNull()
-  })
-
-  it('returns null when queue table is empty', () => {
-    const mockStore = makeLiveStoreMock([])
-    const result = resolveCurrentPlayingSongId(() => mockStore as any)
-    expect(result).toBeNull()
-  })
-
-  it('resolves song ID using currentTrackId (authoritative)', () => {
-    const mockStore = makeLiveStoreMock([{
-      trackIds: JSON.stringify(['song-1', 'song-2', 'song-3']),
-      randomTrackIds: JSON.stringify(['song-3', 'song-1', 'song-2']),
-      currentPlaying: 0,
-      currentTrackId: 'song-authorized',
-      shuffle: false,
-    }])
-    const result = resolveCurrentPlayingSongId(() => mockStore as any)
-    expect(result).toBe('song-authorized')
-  })
-
-  it('falls back to index-based resolution when currentTrackId is null', () => {
-    const mockStore = makeLiveStoreMock([{
-      trackIds: JSON.stringify(['song-1', 'song-2', 'song-3']),
-      randomTrackIds: null,
-      currentPlaying: 2,
-      currentTrackId: null,
-      shuffle: false,
-    }])
-    const result = resolveCurrentPlayingSongId(() => mockStore as any)
-    expect(result).toBe('song-3')
-  })
-
-  it('falls back to index-based resolution when currentTrackId is undefined', () => {
-    const mockStore = makeLiveStoreMock([{
-      trackIds: JSON.stringify(['song-1', 'song-2', 'song-3']),
-      currentPlaying: 1,
-      shuffle: false,
-      // currentTrackId not in row → undefined
-    }])
-    const result = resolveCurrentPlayingSongId(() => mockStore as any)
-    expect(result).toBe('song-2')
-  })
-
-  it('uses shuffle order (randomTrackIds) when shuffle is on', () => {
-    const mockStore = makeLiveStoreMock([{
-      trackIds: JSON.stringify(['song-1', 'song-2', 'song-3']),
-      randomTrackIds: JSON.stringify(['song-3', 'song-1', 'song-2']),
-      currentPlaying: 1,
-      currentTrackId: null,
-      shuffle: true,
-    }])
-    const result = resolveCurrentPlayingSongId(() => mockStore as any)
-    // Shuffle is on, so index 1 resolves into randomTrackIds
-    expect(result).toBe('song-1')
-  })
-
-  it('returns null when currentPlaying is null', () => {
-    const mockStore = makeLiveStoreMock([{
-      trackIds: JSON.stringify(['song-1', 'song-2']),
-      currentPlaying: null,
-      currentTrackId: null,
-      shuffle: false,
-    }])
-    const result = resolveCurrentPlayingSongId(() => mockStore as any)
-    expect(result).toBeNull()
   })
 })

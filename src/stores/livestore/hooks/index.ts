@@ -54,13 +54,13 @@ export {
   useSmartPlaylistById,
 } from './useSmartPlaylists'
 
-// Queue hooks
+// Queue hooks (served from the deep queue module)
 export {
   useQueue,
   useCurrentTrack,
   useCurrentPlayingSongId,
   useQueueNavigation,
-} from './useQueue'
+} from '../queue'
 
 // Favorites hooks
 export {

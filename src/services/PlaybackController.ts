@@ -11,12 +11,12 @@ import {
   playNextAction,
   playPreviousAction,
   toggleShuffleAction,
-} from '../stores/livestore/actions/queue'
+  resolveCurrentSongId,
+  parseIds,
+  type QueueState,
+} from '../stores/livestore/queue'
 import { rawToMediaRow } from '../stores/livestore/transformMedia'
 import type { StreamSource } from './Song/StreamUriService'
-import { resolveCurrentSongId, parseIds } from '../stores/livestore/hooks/queueUtils'
-import type { QueueState } from '../stores/livestore/queueTransitions'
-
 
 // ---------------------------------------------------------------------------
 // Types

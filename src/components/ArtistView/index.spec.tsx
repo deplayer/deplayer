@@ -33,10 +33,6 @@ vi.mock('../../stores/livestore/hooks', () => ({
   useFavoriteIds: vi.fn(() => new Set()),
 }))
 
-vi.mock('../../stores/livestore/hooks/useQueue', () => ({
-  useQueue: vi.fn(() => ({ trackIds: [], currentPlaying: null })),
-}))
-
 vi.mock('../../stores/livestore/actions', () => ({
   playAllAction: vi.fn(),
   addToQueueAction: vi.fn(),

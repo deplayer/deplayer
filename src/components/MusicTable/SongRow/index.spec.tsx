@@ -65,8 +65,6 @@ const setup = (overrideProps = {}) => {
       currentPlaying: null,
       repeat: false,
       shuffle: false,
-      nextSongId: null,
-      prevSongId: null,
     },
     onClick: mockOnClick,
     isCurrent: false,

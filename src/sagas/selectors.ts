@@ -58,8 +58,8 @@ export function* getCurrentSongFromLiveStore(): Generator<any, MediaRow | null, 
     return null
   }
 
-  const { readQueue } = yield import('../stores/livestore/actions/queue')
-  const { resolveCurrentSongId } = yield import('../stores/livestore/hooks/queueUtils')
+  const { readQueue } = yield import('../stores/livestore/queue')
+  const { resolveCurrentSongId } = yield import('../stores/livestore/queue')
 
   const queue = yield call(() => readQueue(liveStore as any))
   if (!queue) return null

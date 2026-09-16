@@ -19,6 +19,11 @@ _Avoid_: sync state (unqualified), "default" row
 A resolved play target (`{url, kind}`) returned by StreamUriService. Blob-kind sources pin a whole file in memory until released; remote sources need no release.
 _Avoid_: stream URI (unqualified), blob URL
 
+**Playback queue**:
+The app's single deep module owning the playback queue domain: the ordered track lists plus the playback head (current position, shuffle, repeat), persisted as one `queue` row. Callers read the normalized `QueueState` and mutate only through the queue actions; the raw row shape (`QueueRecord`) is an implementation detail.
+_Avoid_: queue state (for the raw row), Redux queue
+
+
 
 **Cursor geometry**:
 The page size a saved album-list cursor was produced with. A resume whose page size differs from the stored geometry restarts the walk instead of trusting the offset.
@@ -29,6 +34,9 @@ _Avoid_: cursor version
 - A **Sync resume state** is written only after its page committed (BatchedMediaCommitter flush success); a failed flush must leave the row untouched
 - **Cursor geometry** is persisted alongside the cursor it describes
 - A **Stream source** of blob kind is released exactly when playback moves past it (PlaybackController), or when the SongView download list is replaced/unmounted
+- The **Playback queue** is read via `useQueue`/`readQueue`; the playback head resolves to the persisted `currentTrackId` column, falling back to the index into the active track list
+- Shuffle reorders the random list only and keeps the active track in position; the **Stream source** release on playback advance is the queue's one effect on media
+
 
 
 ## Example dialogue
@@ -38,6 +46,9 @@ _Avoid_: cursor version
 
 > **Dev:** "And the old `default` sync_state row?"
 > **Domain expert:** "Legacy single-row layout. It is adopted once by the first **Streaming provider** that reads it, then orphaned."
+> **Dev:** "Which list does `currentPlaying` index into?"
+> **Domain expert:** "The active list of the **Playback queue**: `randomTrackIds` when shuffle is on, `trackIds` otherwise. The stored `currentTrackId` always wins when present."
+
 
 ## Flagged ambiguities
 

@@ -4,13 +4,11 @@ import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
 import { configureStore } from '@reduxjs/toolkit'
 import { defaultState as collectionDefaultState, State as CollectionState } from '../reducers/collection'
-import { defaultState as queueDefaultState, State as QueueState } from '../reducers/queue'
 import { defaultState as playerDefaultState, State as PlayerState } from '../reducers/player'
 import { defaultState as settingsDefaultState, State as SettingsState } from '../reducers/settings'
 
 export interface TestState {
   collection?: CollectionState
-  queue?: QueueState
   player?: PlayerState
   settings?: SettingsState
   favorites?: {
@@ -24,7 +22,6 @@ export interface TestState {
 
 export const defaultTestState: TestState = {
   collection: collectionDefaultState,
-  queue: queueDefaultState,
   player: playerDefaultState,
   settings: settingsDefaultState,
   favorites: { favoriteIds: new Set() },
@@ -41,7 +38,6 @@ const createTestStore = (initialState: Partial<TestState> = {}) => {
   return configureStore({
     reducer: {
       collection: (state = mergedState.collection) => state,
-      queue: (state = mergedState.queue) => state,
       player: (state = mergedState.player) => state,
       favorites: (state = mergedState.favorites) => state,
       i18n: (state = mergedState.i18n) => state,

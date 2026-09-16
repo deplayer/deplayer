@@ -8,7 +8,7 @@ import Icon from '../common/Icon'
 import { startSearch, StartSearchAction } from '../../types/search'
 import { useUIStore } from '../../stores/uiStore'
 import { useQueue, useMediaById, useArtistById, useAlbumById } from '../../stores/livestore/hooks'
-import { getActiveTrackIds } from '../../stores/livestore/hooks/queueUtils'
+import { getActiveTrackIds } from '../../stores/livestore/queue'
 import type { State as RootState } from '../../reducers'
 
 // Extract ID from route path

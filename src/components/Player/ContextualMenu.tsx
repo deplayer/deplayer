@@ -16,7 +16,7 @@ import * as types from '../../constants/ActionTypes'
 import Controls from './Controls'
 import { State } from '../../reducers'
 import { useQueue } from '../../stores/livestore/hooks'
-import { getActiveTrackIds } from '../../stores/livestore/hooks/queueUtils'
+import { getActiveTrackIds } from '../../stores/livestore/queue'
 import { toggleRepeatAction, toggleShuffleAction } from '../../stores/livestore/actions'
 
 const MENU_ID = 'context-menu-player'

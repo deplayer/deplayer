@@ -29,7 +29,13 @@ const getStoreId = (): string => {
   return newId
 }
 
-export const storeId = getStoreId()
+let cachedStoreId: string | null = null
+const resolveStoreId = (): string => {
+  if (!cachedStoreId) {
+    cachedStoreId = getStoreId()
+  }
+  return cachedStoreId
+}
 
 // v0.4: makePersistedAdapter automatically falls back to single-tab mode
 // when SharedWorker is unavailable (e.g. Android Chrome).
@@ -46,7 +52,7 @@ const adapter = makePersistedAdapter({
  */
 export const useAppStore = () =>
   useStore({
-    storeId,
+    storeId: resolveStoreId(),
     schema,
     adapter,
     batchUpdates,

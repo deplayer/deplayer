@@ -19,7 +19,7 @@ import { favoriteEvents } from './events/favorites'
 import { lyricsEvents } from './events/lyrics'
 import { settingsEvents } from './events/settings'
 import { syncEvents } from './events/sync'
-import { deriveCurrentTrackId } from './queueTransitions'
+import { deriveCurrentTrackId } from './queue'
 
 // ============================================================================
 // TYPE DEFINITIONS

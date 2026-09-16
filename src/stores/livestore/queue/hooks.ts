@@ -1,20 +1,25 @@
-import { useAppStore } from '../store'
-import { queryDb } from '@livestore/livestore'
-import { tables } from '../schema'
-import { resolveQueueNavigation } from './queueUtils'
-
 /**
  * Queue Query Hooks
- * 
+ *
  * These hooks provide reactive access to playback queue data from LiveStore.
  * They automatically update when the underlying data changes.
+ *
+ * The hooks are thin adapters: `useQueue` normalizes the raw row into
+ * `QueueState` (the single canonical read shape, mirroring `readQueue`), and
+ * the navigation hook delegates to the pure `resolveQueueNavigation`.
  */
+
+import { queryDb } from '@livestore/livestore'
+import { useAppStore } from '../store'
+import { tables } from '../schema'
+import { parseIds, resolveQueueNavigation } from './resolution'
+import type { QueueRecord, QueueState } from './types'
 
 /**
  * Get the current queue state
- * 
+ *
  * Note: There should typically be only one queue with id 'default'
- * 
+ *
  * @example
  * ```tsx
  * const queue = useQueue()
@@ -22,20 +27,7 @@ import { resolveQueueNavigation } from './queueUtils'
  * return <div>{queue.trackIds.length} tracks in queue</div>
  * ```
  */
-export interface QueueRecord {
-  id: string;
-  trackIds: string | string[];
-  randomTrackIds: string | string[];
-  currentPlaying: number | null;
-  shuffle: boolean;
-  repeat: boolean;
-  nextSongId: string | null;
-  prevSongId: string | null;
-  [key: string]: unknown;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const useQueue = (queueId = 'default'): QueueRecord | null => {
+export const useQueue = (queueId = 'default'): QueueState | null => {
   const store = useAppStore()
   const result = store.useQuery(
     queryDb(
@@ -45,12 +37,21 @@ export const useQueue = (queueId = 'default'): QueueRecord | null => {
         .limit(1)
     )
   )
-  return (result as unknown as QueueRecord[])[0] || null
+  const raw = (result as unknown as QueueRecord[])?.[0]
+  if (!raw) return null
+  return {
+    trackIds: parseIds(raw.trackIds),
+    randomTrackIds: parseIds(raw.randomTrackIds),
+    currentPlaying: raw.currentPlaying,
+    currentTrackId: (raw.currentTrackId as string | null) || null,
+    shuffle: raw.shuffle,
+    repeat: raw.repeat,
+  }
 }
 
 /**
  * Get the currently playing track from the queue
- * 
+ *
  * @example
  * ```tsx
  * const currentTrack = useCurrentTrack()
@@ -80,7 +81,7 @@ export const useCurrentTrack = (queueId = 'default') => {
 /**
  * Get the ID of the currently playing song
  * Converts queue.currentPlaying (index) to actual song ID
- * 
+ *
  * @example
  * ```tsx
  * const currentSongId = useCurrentPlayingSongId()
@@ -103,7 +104,7 @@ export const useCurrentPlayingSongId = (queueId = 'default'): string | null => {
 
 /**
  * Get the next/previous song IDs based on queue state
- * 
+ *
  * @example
  * ```tsx
  * const { nextSongId, prevSongId } = useQueueNavigation()
@@ -111,6 +112,6 @@ export const useCurrentPlayingSongId = (queueId = 'default'): string | null => {
  */
 export const useQueueNavigation = (queueId = 'default') => {
   const queue = useQueue(queueId)
-  
+
   return resolveQueueNavigation(queue)
 }

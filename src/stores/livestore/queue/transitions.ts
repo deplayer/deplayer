@@ -1,14 +1,13 @@
 /**
  * Pure queue transition functions.
  *
- * These are the mutation-side domain logic for the playback queue, extracted
- * from `actions/queue.ts` so they can be tested without a LiveStore. Each
+ * These are the mutation-side domain logic for the playback queue. Each
  * function takes the current queue state (`null` = no queue row) and returns
  * the journal event payload to commit, or `null` when no commit should occur.
  *
- * Purity boundary: imports ONLY from `./hooks/queueUtils` (type + pure
- * helpers). No `events/queue.ts`, no `schema.ts`, no store access. The event
- * payload types below mirror the schemas in `events/queue.ts` so the module
+ * Purity boundary: imports ONLY from `./types` and `./resolution`. No
+ * `events/queue.ts`, no `schema.ts`, no store access. The event payload
+ * types in `./types` mirror the schemas in `events/queue.ts` so the module
  * stays decoupled from the LiveStore event factory.
  *
  * Two suspected bugs in the original actions are preserved EXACTLY and are
@@ -16,100 +15,19 @@
  * accompanying spec). The point of this refactor is behavior preservation,
  * not behavior change.
  */
-import type { QueueState } from './hooks/queueUtils'
-import { getActiveTrackIds, parseIds } from './hooks/queueUtils'
 
-export type { QueueState } from './hooks/queueUtils'
-
-// ============================================================================
-// Event payload types — mirror the schemas in `events/queue.ts` exactly.
-// ============================================================================
-
-export type QueueUpdatedEvent = {
-  id: string
-  trackIds: readonly string[]
-  randomTrackIds?: readonly string[]
-  currentPlaying?: number
-  shuffle: boolean
-  repeat: boolean
-}
-
-export type QueuePositionChangedEvent = {
-  queueId: string
-  position: number
-  trackId?: string
-}
-
-export type QueueRepeatToggledEvent = {
-  queueId: string
-  repeat: boolean
-}
-
-export type QueueClearedEvent = {
-  queueId: string
-}
-
-export type QueueTransitionEvent =
-  | QueueUpdatedEvent
-  | QueuePositionChangedEvent
-  | QueueRepeatToggledEvent
-  | QueueClearedEvent
-
-// ============================================================================
-// Derived values
-// ============================================================================
-
-/**
- * Compute the currently-playing track ID from queue state.
- *
- * This is the exact formula the `v1.QueueUpdated` materializer in `schema.ts`
- * currently owns inline: the active list is `randomTrackIds` when shuffle is
- * on (falling back to `trackIds` when `randomTrackIds` is absent), otherwise
- * `trackIds`. Returns `null` when there is no valid current track.
- *
- * NOTE: the fallback is `randomTrackIds ?? trackIds` (NOT `?? []`) to keep the
- * materializer's behavior byte-for-byte identical. When shuffle is on but
- * `randomTrackIds` is missing (e.g. the append path that omits it), the
- * current song resolves against the original `trackIds` list.
- */
-export function deriveCurrentTrackId(
-  trackIds: readonly string[],
-  randomTrackIds: readonly string[] | undefined,
-  currentPlaying: number | null | undefined,
-  shuffle: boolean | undefined,
-): string | null {
-  const active = shuffle ? (randomTrackIds ?? trackIds) : trackIds
-  if (
-    currentPlaying == null ||
-    currentPlaying < 0 ||
-    active.length === 0 ||
-    currentPlaying >= active.length
-  ) {
-    return null
-  }
-  return active[currentPlaying]
-}
-
-/**
- * Fisher-Yates shuffle with an injected RNG (for deterministic tests).
- * Port of the private `shuffleArray` from `actions/queue.ts`.
- */
-export function fisherYates<T>(array: readonly T[], random: () => number): T[] {
-  const shuffled = [...array]
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1))
-    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-  }
-  return shuffled
-}
-
-// ============================================================================
-// Transitions
-// ============================================================================
+import type {
+  QueueState,
+  QueueUpdatedEvent,
+  QueuePositionChangedEvent,
+  QueueRepeatToggledEvent,
+  QueueClearedEvent,
+} from './types'
+import { getActiveTrackIds, parseIds, fisherYates } from './resolution'
 
 /**
  * Replace the queue with new tracks, positioned at the first track.
- * The current action does not read the queue before committing, so this
+ * The original action does not read the queue before committing, so this
  * transition takes no current state.
  */
 export function playAll(trackIds: readonly string[]): QueueUpdatedEvent | null {
@@ -205,7 +123,7 @@ export function addNext(
 /**
  * Remove a track from the queue (removes ALL occurrences — current behavior).
  * Commits even when the track was absent (no-op commit), matching the
- * current action which has no absence guard.
+ * original action which has no absence guard.
  */
 export function removeFromQueue(
   current: QueueState | null,
@@ -235,7 +153,7 @@ export function removeFromQueue(
 }
 
 /**
- * Clear the entire queue. The current action reads nothing and commits
+ * Clear the entire queue. The original action reads nothing and commits
  * unconditionally, so this takes no state and never returns null.
  */
 export function clearQueue(): QueueClearedEvent {
@@ -312,7 +230,7 @@ export function toggleShuffle(
 }
 
 /**
- * Toggle repeat mode. The current action reads the queue only to warn when it
+ * Toggle repeat mode. The original action reads the queue only to warn when it
  * is missing; the event itself is a partial `queueRepeatToggled`.
  */
 export function toggleRepeat(
@@ -324,7 +242,7 @@ export function toggleRepeat(
 }
 
 /**
- * Set the currently-playing position. The current action reads nothing and
+ * Set the currently-playing position. The original action reads nothing and
  * commits a partial `queuePositionChanged`, so this takes no state and never
  * returns null.
  */

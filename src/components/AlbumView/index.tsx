@@ -15,7 +15,6 @@ import * as types from '../../constants/ActionTypes'
 import { getDurationStr } from '../../utils/timeFormatter'
 import type { AlbumRow } from '../../types/media'
 import { useAlbumById, useMediaByAlbum, useAlbumsByArtist } from '../../stores/livestore/hooks'
-import { useQueue } from '../../stores/livestore/hooks/useQueue'
 
 export default function AlbumView() {
   const match = useMatch('/album/:id')
@@ -24,7 +23,6 @@ export default function AlbumView() {
 
   const album = useAlbumById(albumId)
   const mediaItems = useMediaByAlbum(albumId)
-  const queue = useQueue('main')
   const relatedAlbumsData = useAlbumsByArtist(album?.artistId)
 
   const { songIds, mediaMap, totalDuration, genres } = useMemo(() => {
@@ -113,10 +111,10 @@ export default function AlbumView() {
       {/* Track list */}
       <div className="w-full md:p-4">
         <Album
-          queue={queue as unknown as import('../../reducers/queue').State}
           album={album}
           dispatch={dispatch}
           songs={songIds}
+          queue={null}
           mediaMap={mediaMap}
         />
       </div>

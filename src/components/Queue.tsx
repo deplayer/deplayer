@@ -4,7 +4,7 @@ import EmptyState from './common/EmptyState/index'
 import classNames from 'classnames'
 import { useQueue, useMediaCount } from '../stores/livestore/hooks'
 import { useSettings } from '../stores/livestore/hooks'
-import { getActiveTrackIds } from '../stores/livestore/hooks/queueUtils'
+import { getActiveTrackIds } from '../stores/livestore/queue'
 import { useUIStore } from '../stores/uiStore'
 import { getEmptyStateFallback, collectionStep, searchStep } from './common/EmptyState/emptyStateFallback'
 

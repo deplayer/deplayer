@@ -1,7 +1,7 @@
 /**
  * Tests for the LiveStore queue action adapters.
  *
- * The transition logic itself is covered by ../queueTransitions.spec.ts; these
+ * The transition logic itself is covered by ./transitions.spec.ts; these
  * tests verify the adapter boundary: what each action reads, which event it
  * commits (or deliberately does not), and which console warnings it emits.
  * A fake store records committed events so assertions are on observable
@@ -11,7 +11,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import type { Mock } from 'vitest'
 import type { LiveStore } from '../accessor'
 import {
-  readQueue,
   playAllAction,
   addToQueueAction,
   addNextAction,
@@ -23,7 +22,7 @@ import {
   playNextAction,
   playPreviousAction,
   playMediaAction,
-} from './queue'
+} from './actions'
 
 interface FakeStore {
   query: Mock
@@ -57,53 +56,6 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.restoreAllMocks()
-})
-
-describe('readQueue', () => {
-  it('returns null when no queue row exists', async () => {
-    expect(await readQueue(makeStore([]) as unknown as LiveStore)).toBeNull()
-  })
-
-  it('normalizes a stored row into QueueState', async () => {
-    const store = makeStore([
-      makeRow({
-        trackIds: JSON.stringify(['a', 'b']),
-        randomTrackIds: JSON.stringify(['b', 'a']),
-        currentPlaying: 1,
-        shuffle: 1,
-        repeat: 0,
-      }),
-    ])
-    expect(await readQueue(store as unknown as LiveStore)).toEqual({
-      trackIds: ['a', 'b'],
-      randomTrackIds: ['b', 'a'],
-      currentPlaying: 1,
-      currentTrackId: null,
-      shuffle: true,
-      repeat: false,
-    })
-  })
-
-  it('treats an empty-string currentTrackId as null and accepts array-typed rows', async () => {
-    const store = makeStore([
-      makeRow({ trackIds: ['x'], randomTrackIds: [], currentTrackId: '', shuffle: true, repeat: true }),
-    ])
-    expect(await readQueue(store as unknown as LiveStore)).toEqual({
-      trackIds: ['x'],
-      randomTrackIds: [],
-      currentPlaying: 0,
-      currentTrackId: null,
-      shuffle: true,
-      repeat: true,
-    })
-  })
-
-  it('returns null and logs when the query fails', async () => {
-    const store = makeStore()
-    store.query.mockRejectedValue(new Error('db closed'))
-    expect(await readQueue(store as unknown as LiveStore)).toBeNull()
-    expect(console.error).toHaveBeenCalled()
-  })
 })
 
 describe('playAllAction', () => {

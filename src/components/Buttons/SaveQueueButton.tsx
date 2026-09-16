@@ -5,7 +5,7 @@ import { useAppStore } from '../../stores/livestore/store'
 import { createPlaylistAction } from '../../stores/livestore/actions/playlists'
 import { reorderPlaylistAction } from '../../stores/livestore/actions/playlists'
 import { useQueue } from '../../stores/livestore/hooks'
-import { getActiveTrackIds } from '../../stores/livestore/hooks/queueUtils'
+import { getActiveTrackIds } from '../../stores/livestore/queue'
 
 type Props = {
   className?: string

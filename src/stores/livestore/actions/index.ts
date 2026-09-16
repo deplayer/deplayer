@@ -7,5 +7,5 @@
 
 export * from './settings'
 export * from './favorites'
-export * from './queue'
+export * from '../queue'
 export * from './media'

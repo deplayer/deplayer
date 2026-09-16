@@ -3,7 +3,6 @@ import { describe, it, expect, beforeAll, vi } from 'vitest'
 import SongView from './index'
 import type { MediaRow } from '../../types/media'
 import { renderWithProviders, defaultTestState, TestState } from '../../utils/test-utils'
-import { State as QueueState } from '../../reducers/queue'
 import { State as CollectionState } from '../../reducers/collection'
 import { State as PlayerState } from '../../reducers/player'
 import { Dispatch } from 'redux'
@@ -26,10 +25,6 @@ vi.mock('../../stores/livestore/hooks/useRecommendations', () => ({
   useRecommendations: vi.fn(() => []),
 }))
 
-vi.mock('../../stores/livestore/hooks/useQueue', () => ({
-  useQueue: vi.fn(() => ({ trackIds: [], currentPlaying: null })),
-}))
-
 vi.mock('../../stores/livestore/actions', () => ({
   addToQueueAction: vi.fn(),
   removeFromQueueAction: vi.fn(),
@@ -41,7 +36,6 @@ interface Props {
   location: Location
   player: PlayerState
   collection: CollectionState
-  queue: QueueState
   songId: string
   dispatch: Dispatch
   loading: boolean
@@ -124,11 +118,6 @@ const createTestProps = (customProps: Partial<Props> = {}): TestSetup => {
         [song.albumId]: [song.id]
       }
     },
-    queue: {
-      ...defaultTestState.queue!,
-      trackIds: [],
-      currentPlaying: null
-    },
     player: {
       ...defaultTestState.player!,
       playing: false,
@@ -147,7 +136,6 @@ const createTestProps = (customProps: Partial<Props> = {}): TestSetup => {
 const createTestState = (setup: TestSetup): Partial<TestState> => ({
   ...defaultTestState,
   collection: setup.props.collection,
-  queue: setup.props.queue,
   player: setup.props.player
 })
 
