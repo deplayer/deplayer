@@ -1,14 +1,10 @@
 import { create } from 'zustand'
+import type { Filter } from './livestore/collection/filter'
 
 export type VisualsMode = 'off' | 'ambient' | 'panel'
 
-export type Filter = {
-  genres: string[]
-  types: string[]
-  artists: string[]
-  providers: string[]
-  favorites: boolean
-}
+// Re-exported for call sites that read it from the UI store.
+export type { Filter }
 
 type UIState = {
   // Layout

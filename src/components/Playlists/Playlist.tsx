@@ -13,7 +13,7 @@ import { useAppStore } from '../../stores/livestore/store'
 import { addToQueueAction } from '../../stores/livestore/actions'
 import { deleteSmartPlaylistAction } from '../../stores/livestore/actions/smartPlaylists'
 import { useUIStore } from '../../stores/uiStore'
-import type { Filter } from '../../types/collection'
+import { parseFilter } from '../../stores/livestore/collection/filter'
 
 type Props = {
   playlist: {
@@ -35,13 +35,8 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
   const liveStore = useAppStore()
 
   // PERF: For smart playlists, use database-level filtering (not entire mediaMap)
-  const smartPlaylistFilters = useMemo(() => ({
-    genres: playlist.filters?.genres || [],
-    types: playlist.filters?.types || [],
-    artists: playlist.filters?.artists || [],
-    providers: playlist.filters?.providers || [],
-    favorites: Boolean(playlist.filters?.favorites?.[0] === 'true')
-  }), [playlist.filters])
+  // Thin adapter: the collection-filter module owns the parse.
+  const smartPlaylistFilters = useMemo(() => parseFilter(playlist.filters), [playlist.filters])
 
   const filteredTrackIds = useFilteredMedia(smartPlaylistFilters)
 
@@ -74,13 +69,13 @@ const Playlist = memo(({ playlist, dispatch }: Props) => {
 
   const handleApplyFilters = useCallback(() => {
     clearFilters()
-    Object.entries(playlist.filters || {}).forEach(([filterType, values]) => {
-      if (values.length) {
-        setFilter(filterType as keyof Filter, values)
-      }
-    })
+    const f = smartPlaylistFilters
+    if (f.genres.length) setFilter('genres', f.genres)
+    if (f.types.length) setFilter('types', f.types)
+    if (f.artists.length) setFilter('artists', f.artists)
+    if (f.providers.length) setFilter('providers', f.providers)
     navigate('/collection')
-  }, [playlist.filters, clearFilters, setFilter, navigate])
+  }, [smartPlaylistFilters, clearFilters, setFilter, navigate])
 
   const handleDeletePlaylist = useCallback(async () => {
     if (!liveStore || !playlist.id) return

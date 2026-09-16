@@ -1,10 +1,5 @@
 import * as types from "../constants/ActionTypes";
 import type { MediaRow, ArtistRow, AlbumRow } from "../types/media";
-import { applyFilters } from "../utils/apply-filters";
-import type { Filter } from "../types/collection";
-
-// Re-export Filter type for backward compatibility
-export type { Filter };
 
 /**
  * DEPRECATED: This reducer is being phased out in favor of LiveStore.
@@ -25,8 +20,6 @@ export type State = {
   enabledProviders: string[];
   loading: boolean;
   totalRows: number;
-  activeFilters: Filter;
-  filteredSongs: string[];
   recentAlbums: MediaRow[];
 };
 
@@ -44,14 +37,6 @@ export const defaultState: State = {
   enabledProviders: [],
   loading: false, // CHANGED: No longer manages loading state
   totalRows: 0,
-  activeFilters: {
-    genres: [],
-    types: [],
-    artists: [],
-    providers: [],
-    favorites: false,
-  },
-  filteredSongs: [],
   recentAlbums: [],
 };
 
@@ -71,9 +56,6 @@ interface CollectionAction {
   data?: MediaRow[];
   settings?: { providers: Record<string, { enabled: boolean }> };
   media?: MediaRow;
-  filterType?: string;
-  values?: string[];
-  state?: Set<string>;
   searchResults?: MediaRow[];
   albums?: MediaRow[];
 }
@@ -127,7 +109,6 @@ export default (state: State = defaultState, action: CollectionAction = {}) => {
         songsByArtist: {},
         songsByAlbum: {},
         albumsByArtist: {},
-        filteredSongs: [],
         searchResults: [],
         totalRows: 0,
         loading: false,
@@ -146,31 +127,6 @@ export default (state: State = defaultState, action: CollectionAction = {}) => {
           ...state.rows,
           [media.id]: media,
         },
-      };
-
-    case types.SET_COLLECTION_FILTER:
-      const newFilters = {
-        ...state.activeFilters,
-        [action.filterType!]: action.filterType === 'favorites'
-          ? action.values!.length > 0
-          : action.values,
-      };
-
-      const filteredSongsSet = new Set(
-        applyFilters(state.rows, newFilters, Object.keys(state.rows), action.state)
-      );
-
-      return {
-        ...state,
-        activeFilters: newFilters,
-        filteredSongs: Array.from(filteredSongsSet),
-      };
-
-    case types.CLEAR_COLLECTION_FILTERS:
-      return {
-        ...state,
-        activeFilters: defaultState.activeFilters,
-        filteredSongs: Object.keys(state.rows),
       };
 
     case types.SET_SEARCH_RESULTS:

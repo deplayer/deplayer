@@ -92,14 +92,6 @@ describe('Playlist', () => {
     enabledProviders: [],
     loading: false,
     totalRows: 3,
-    activeFilters: {
-      genres: [],
-      types: [],
-      artists: [],
-      providers: [],
-      favorites: false
-    },
-    filteredSongs: [],
     recentAlbums: []
   }
 

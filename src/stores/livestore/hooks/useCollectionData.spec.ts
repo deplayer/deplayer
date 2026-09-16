@@ -4,6 +4,8 @@ import { renderHook } from '@testing-library/react'
 // Capture what each useQuery call resolves to, in order.
 const useQueryReturns: unknown[] = []
 let callIndex = 0
+
+const capturedQueries: unknown[] = []
 const useQuery = vi.fn(() => {
   const value = useQueryReturns[callIndex] ?? []
   callIndex += 1
@@ -29,8 +31,6 @@ vi.mock('../../uiStore', () => ({
     }),
 }))
 
-// Capture queryDb calls for inspection.
-const capturedQueries: unknown[] = []
 vi.mock('@livestore/livestore', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()
   return {
@@ -109,11 +109,12 @@ describe('useCollectionData', () => {
   it('genre + provider filter falls back to slow row-data path', () => {
     mockFilters = { artists: [], types: [], genres: ['Rock'], providers: ['Spotify'], favorites: false }
     setup([
-      [], // idsNoopQuery (since needsRowData=true)
-      [{ id: 'm1', title: 'Song', artistName: 'Artist', albumName: 'Album', albumId: 'a1', artistId: 'ar1', providersFlat: 'Spotify' }], // rowsRaw with client-side filter
+      [{ id: 'm1', title: 'Song', artistName: 'Artist', albumName: 'Album', albumId: 'a1', artistId: 'ar1', genresFlat: 'Rock', providersFlat: 'Spotify' }], // rowsRaw (active)
+      [], // idsNoopQuery (inactive)
     ])
 
     const { result } = renderHook(() => useCollectionData())
     expect(result.current.map).toHaveProperty('m1')
+    expect(result.current.ids).toEqual(['m1'])
   })
 })

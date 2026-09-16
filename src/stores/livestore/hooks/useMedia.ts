@@ -2,7 +2,7 @@ import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 import { useMemo } from 'react'
-import type { Filter } from '../../uiStore'
+import { planCollectionQuery, parseIds, type Filter } from '../collection/filter'
 import { useFavoriteIds } from './useFavorites'
 
 import type { MediaRow } from '../../../types/media'
@@ -337,177 +337,41 @@ export const useMostPlayed = (limit = 20) => {
 }
 
 /**
- * Get filtered media based on active filters
- * Applies genre, type, artist, provider, and favorites filters to all media
- * 
- * @param filters - Active filter state from UIContext
- * 
- * @example
- * ```tsx
- * const { activeFilters } = useUI()
- * const filteredMedia = useFilteredMedia(activeFilters)
- * return <div>{filteredMedia.length} filtered tracks</div>
- * ```
- */
-/**
- * Filtered media with OPTIMIZED database-level filtering
- * 
- * Returns filtered media IDs based on active filters using a hybrid strategy:
- * 
- * **Strategy 1 - Database filtering (FAST):**
- * - Single category filter (artists OR types) with any number of values
- * - Uses SQL IN operator with indexes for maximum performance
- * - Example: "Show all tracks by Artist A, B, or C" → `WHERE artistId IN ('a', 'b', 'c')`
- * 
- * **Strategy 2 - Client-side filtering (OPTIMIZED):**
- * - Multiple categories active (e.g., artists + genres)
- * - Loads only minimal columns (id, artistId, type, genresFlat, providersFlat)
- * - Still 10-50x faster than loading full Media objects
- * 
- * **Performance improvements over old implementation:**
- * - ✅ Uses declarative database indexes from LiveStore schema
- * - ✅ IN operator for multi-value filters (instead of single-value only)
- * - ✅ Minimal column selection (5 columns vs ~20)
- * - ✅ Database-level sorting via orderBy()
- * - Expected: 50-500x faster for single-category filters, 10-50x for complex filters
- * 
- * **Limitation:**
- * LiveStore doesn't support OR conditions between categories (e.g., "artists OR genres")
- * so complex filters fall back to optimized client-side filtering.
- * 
- * @param filters - Active filters from UIContext
+ * Filtered media IDs for a collection filter.
+ *
+ * A thin adapter over the collection-filter module: plans the query and
+ * executes the plan, with no search term. All match semantics and path
+ * selection live in `collection/filter.ts`.
+ *
+ * @param filters - Collection filter value
  * @returns Array of filtered media IDs
- * 
- * @example
- * ```tsx
- * const { activeFilters } = useUI()
- * const filteredMedia = useFilteredMedia(activeFilters)
- * return <div>{filteredMedia.length} filtered tracks</div>
- * ```
  */
 export const useFilteredMedia = (filters: Filter) => {
   const store = useAppStore()
   const favoriteIds = useFavoriteIds()
-  
-  // Determine which filtering strategy to use
-  // Strategy 1: Single category with values -> Use IN operator (database-level, fast)
-  // Strategy 2: Multiple categories with values -> Client-side filtering (still faster than before)
-  
-  const hasArtists = filters.artists.length > 0
-  const hasTypes = filters.types.length > 0
-  const hasGenres = filters.genres.length > 0
-  const hasProviders = filters.providers.length > 0
-  const hasFavorites = filters.favorites
-  
-  const activeFilterCount = [hasArtists, hasTypes, hasGenres, hasProviders, hasFavorites].filter(Boolean).length
-  
-  // Check if we can use efficient database query (single category filter only)
-  const canUseDbQuery = activeFilterCount === 1 && !hasFavorites
-  
-  // Build database query for single-category filters with IN operator
-  const dbQuery = useMemo(() => {
-    if (!canUseDbQuery) return null
-    
-    // Artists filter: Use IN operator for multiple artists
-    if (hasArtists) {
-      return tables.media
-        .select('id')
-        .where({ artistId: { op: 'IN', value: filters.artists } })
-        .orderBy('title', 'asc')
-    }
-    
-    // Types filter: Use IN operator for multiple types
-    if (hasTypes) {
-      return tables.media
-        .select('id')
-        .where({ type: { op: 'IN', value: filters.types } })
-        .orderBy('title', 'asc')
-    }
-    
-    return null
-  }, [canUseDbQuery, hasArtists, hasTypes, filters.artists, filters.types])
-  
-  // Execute database query if applicable
-  const dbResults = store.useQuery(
-    dbQuery ? queryDb(dbQuery) : queryDb(tables.media.select('id').where('id', '=', '__NONE__'))
-  )
-  
-  // Complex case or no filters: Load minimal columns for client-side filtering
-  // This is still much faster than before because we only load necessary columns, not full media objects
-  // CRITICAL: Only load all media if we're NOT using the optimized DB query
-  // This prevents unnecessary large queries when single-category filters can use DB-level filtering
-  const shouldLoadAllMedia = !canUseDbQuery
-  const allMediaForFiltering = store.useQuery(
-    shouldLoadAllMedia
-      ? queryDb(
-          tables.media
-            .select('id', 'artistId', 'type', 'genresFlat', 'providersFlat')
-            .orderBy('title', 'asc')
-        )
-      : queryDb(tables.media.select('id').where('id', '=', '__NONE__'))
-  )
-  
-  return useMemo(() => {
-    // If using efficient database query, return those results
-    if (canUseDbQuery && Array.isArray(dbResults)) {
-      // dbResults contains objects with just 'id' property: [{ id: 'xxx' }, { id: 'yyy' }]
-      return dbResults.map((m: { id: string }) => m.id)
-    }
-    
-    // Check if no filters at all
-    const hasAnyFilter =
-      filters.genres.length > 0 ||
-      filters.types.length > 0 ||
-      filters.artists.length > 0 ||
-      filters.providers.length > 0 ||
-      filters.favorites
-    
-    if (!hasAnyFilter) {
-      return Array.isArray(allMediaForFiltering) ? allMediaForFiltering.map((m: { id: string }) => m.id) : []
-    }
-    
-    // Complex filtering: client-side but optimized (only loading minimal columns)
-    const filtered = Array.isArray(allMediaForFiltering)
-      ? allMediaForFiltering.filter((media: { id: string; artistId?: string; type?: string; genresFlat?: string; providersFlat?: string }) => {
-          let matches = false
-          
-          // Check artists
-          if (filters.artists.length > 0 && media.artistId && filters.artists.includes(media.artistId)) {
-            matches = true
-          }
+  const favoriteIdsArray = useMemo(() => Array.from(favoriteIds), [favoriteIds])
 
-          // Check types
-          if (filters.types.length > 0 && media.type && filters.types.includes(media.type)) {
-            matches = true
-          }
-          
-          // Check genres
-          if (filters.genres.length > 0) {
-            const genresFlat = media.genresFlat || ''
-            if (filters.genres.some((g) => genresFlat.includes(g))) {
-              matches = true
-            }
-          }
-          
-          // Check providers
-          if (filters.providers.length > 0) {
-            const providersFlat = media.providersFlat || ''
-            if (filters.providers.some((p) => providersFlat.includes(p))) {
-              matches = true
-            }
-          }
-          
-          // Check favorites
-          if (filters.favorites && favoriteIds.has(media.id)) {
-            matches = true
-          }
-          
-          return matches
-        })
-      : []
-    
-    return filtered.map((m) => m.id)
-  }, [canUseDbQuery, dbResults, allMediaForFiltering, filters, favoriteIds])
+  // Thin adapter: all match semantics and path selection live in the
+  // collection-filter module; this hook only executes the plan.
+  const plan = useMemo(
+    () => planCollectionQuery(filters, '', favoriteIdsArray),
+    [filters, favoriteIdsArray],
+  )
+
+  const activeRaw = store.useQuery(plan.activeQuery as Parameters<typeof store.useQuery>[0])
+  const inactiveRaw = store.useQuery(plan.inactiveQuery as Parameters<typeof store.useQuery>[0])
+  void inactiveRaw // subscription only: keeps the twin slot mounted and empty
+
+  return useMemo(() => {
+    const ids = parseIds(activeRaw)
+    if (plan.kind !== 'rows') return ids
+
+    const rows = Array.isArray(activeRaw) ? activeRaw : []
+    return rows
+      .filter((raw: Record<string, unknown>) => plan.postFilter(raw))
+      .map((raw: Record<string, unknown>) => String((raw as { id?: unknown }).id ?? ''))
+      .filter(Boolean)
+  }, [plan, activeRaw])
 }
 
 /**

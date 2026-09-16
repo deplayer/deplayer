@@ -1,5 +1,6 @@
 import type { LiveStore } from '../accessor'
 import { events } from '../schema'
+import type { SmartPlaylistFilters } from '../collection/filter'
 
 /**
  * LiveStore Smart Playlists Actions
@@ -10,13 +11,6 @@ import { events } from '../schema'
  *
  * All actions require a store parameter from useStore() hook.
  */
-
-type SmartPlaylistFilters = {
-  genres: string[]
-  types: string[]
-  artists: string[]
-  providers: string[]
-}
 
 /**
  * Create a new smart playlist
