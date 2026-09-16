@@ -291,7 +291,6 @@ const MusicTable = ({
     const currentMediaMap = mediaMapRef.current
     const currentQueue = liveQueueRef.current
     const sharedProps = {
-      key,
       songId,
       isCurrent,
       style, 
@@ -306,11 +305,11 @@ const MusicTable = ({
 
     // Fast path: skip LiveStore hooks when data is provided via props
     if (currentMediaMap && currentQueue) {
-      return <SongRowDirect {...sharedProps} mediaMap={currentMediaMap} queue={currentQueue} />
+      return <SongRowDirect key={key} {...sharedProps} mediaMap={currentMediaMap} queue={currentQueue} />
     }
 
     // Slow path: use LiveStore hooks
-    return <SongRowWithHooks {...sharedProps} />
+    return <SongRowWithHooks key={key} {...sharedProps} />
   }, [liveQueue, mqlMatch, dispatch, disableAddButton, disableCovers, currentSongId])
 
   // Stable rowRenderer wrapper that includes slim without creating new function refs
