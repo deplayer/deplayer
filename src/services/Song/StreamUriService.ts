@@ -23,6 +23,26 @@ export function releaseStreamSource(source: StreamSource | null | undefined): vo
     URL.revokeObjectURL(source.url);
   }
 }
+
+/**
+ * Strip `f=json` from a remote stream URI.
+ *
+ * Legacy persisted rows carry `f=json` on stream.view URIs (from before the
+ * provider stopped appending it); Subsonic then answers the audio element
+ * with application/json and no decoder exists. Apply wherever a stored
+ * remote URI is consumed.
+ */
+export function sanitizeStreamUri(uri: string): string {
+  if (!uri.includes("f=json")) return uri;
+  return (
+    uri
+      .replace(/&f=json&/, "&")
+      .replace(/&f=json$/, "")
+      .replace(/\?f=json&/, "?")
+      .replace(/\?f=json$/, "")
+  );
+}
+
 async function handleOpfs(streamUri: string | null): Promise<StreamSource> {
   if (!streamUri) {
     return { url: "", kind: "remote" };
@@ -108,5 +128,5 @@ export const getStreamUri = async (
     return await handleOpfs(streamUri);
   }
 
-  return { url: streamUri || "", kind: "remote" };
+  return { url: streamUri ? sanitizeStreamUri(streamUri) : "", kind: "remote" };
 };

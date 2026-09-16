@@ -48,6 +48,28 @@ describe('getStreamUri', () => {
     expect(source).toEqual({ url: 'https://srv/stream', kind: 'remote' })
     expect(createObjectURL).not.toHaveBeenCalled()
   })
+
+  it('strips f=json from legacy persisted subsonic stream URIs', async () => {
+    const source = await getStreamUri(
+      song('subsonic', 'https://srv/rest/stream.view?u=a&p=b&c=deplayer&v=1.11.0&f=json&id=song-1'),
+      0
+    )
+
+    expect(source.url).toBe('https://srv/rest/stream.view?u=a&p=b&c=deplayer&v=1.11.0&id=song-1')
+    expect(source.kind).toBe('remote')
+  })
+
+  it('strips f=json when it is the trailing query param', async () => {
+    const source = await getStreamUri(song('subsonic', 'https://srv/stream?v=1.11.0&f=json'), 0)
+
+    expect(source.url).toBe('https://srv/stream?v=1.11.0')
+  })
+
+  it('leaves clean URIs untouched', async () => {
+    const source = await getStreamUri(song('subsonic', 'https://srv/stream?v=1.11.0&id=x'), 0)
+
+    expect(source.url).toBe('https://srv/stream?v=1.11.0&id=x')
+  })
 })
 
 describe('releaseStreamSource', () => {

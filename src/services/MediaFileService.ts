@@ -2,6 +2,7 @@ import axios from "axios";
 import { readFile } from "@happy-js/happy-opfs";
 import { get } from "idb-keyval";
 import type { MediaRow } from "../types/media";
+import { sanitizeStreamUri } from "./Song/StreamUriService";
 import { hasAnyProviderOf } from "../utils/hasAnyProviderOf";
 import { verifyPermission } from "./FileSystemService";
 import { createLogger } from "../utils/logger";
@@ -59,7 +60,7 @@ export class MediaFileService {
   }
 
   private static async handleRemoteMedia(media: MediaRow): Promise<Blob | null> {
-    const streamUrl = Object.values(media.stream)[0].uris[0].uri;
+    const streamUrl = sanitizeStreamUri(Object.values(media.stream)[0].uris[0].uri);
     if (!streamUrl) {
       logger.error("No stream URL found for media", media);
       return null;
