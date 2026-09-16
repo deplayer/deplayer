@@ -217,10 +217,7 @@ export class PlaybackController {
         }
 
         const result = await this.startStream(songId, 0, isCurrent)
-        if (result.status === 'idle' && result.reason !== 'store-unavailable' && result.reason !== SUPERSEDED) {
-          return this.advanceFallback(songId, () => this.data.next(), isCurrent)
-        }
-        return result
+        return this.onDeadStream(result, songId, () => this.data.next(), isCurrent)
       })
     )
   }
@@ -246,10 +243,7 @@ export class PlaybackController {
         }
 
         const result = await this.startStream(songId, 0, isCurrent)
-        if (result.status === 'idle' && result.reason !== 'store-unavailable' && result.reason !== SUPERSEDED) {
-          return this.advanceFallback(songId, () => this.data.previous(), isCurrent)
-        }
-        return result
+        return this.onDeadStream(result, songId, () => this.data.previous(), isCurrent)
       })
     )
   }
@@ -262,12 +256,7 @@ export class PlaybackController {
       }
 
       const result = await this.startStream(songId, providerIndex, isCurrent)
-      // A dead stream (e.g. a provider URL that 404s or has no decoder) must not
-      // halt playback — advance once to the next track, mirroring next()/previous().
-      if (result.status === 'idle' && result.reason !== 'store-unavailable' && result.reason !== SUPERSEDED) {
-        return this.advanceFallback(songId, () => this.data.next(), isCurrent)
-      }
-      return result
+      return this.onDeadStream(result, songId, () => this.data.next(), isCurrent)
     })
   }
 
@@ -400,6 +389,23 @@ export class PlaybackController {
     }
 
     return { status: 'started', songId, streamUri: url }
+  }
+
+  /**
+   * A dead stream (e.g. a provider URL that 404s or has no decoder) must not
+   * halt playback — advance once to the next track, mirroring next()/previous().
+   * Only applies to idle results that are not store-unavailable or superseded.
+   */
+  private async onDeadStream(
+    result: PlaybackResult,
+    songId: string,
+    advance: () => Promise<void>,
+    isCurrent: PlaybackRequestGuard,
+  ): Promise<PlaybackResult> {
+    if (result.status === 'idle' && result.reason !== 'store-unavailable' && result.reason !== SUPERSEDED) {
+      return this.advanceFallback(songId, advance, isCurrent)
+    }
+    return result
   }
 
   /**

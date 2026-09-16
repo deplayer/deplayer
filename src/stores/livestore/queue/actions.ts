@@ -32,8 +32,6 @@ import {
   playMedia,
 } from './transitions'
 
-const QUEUE_ID = 'default'
-
 /**
  * Replace queue with new tracks, positioned at the first track.
  *
@@ -187,16 +185,12 @@ export const setCurrentPlayingAction = async (store: LiveStore, position: number
  * Increments currentPlaying index or loops if repeat is on
  *
  * @param store - LiveStore instance
- * @param queueId - Queue ID (default: 'default')
  */
-export async function playNextAction(
-  store: LiveStore,
-  queueId = QUEUE_ID
-): Promise<void> {
+export async function playNextAction(store: LiveStore): Promise<void> {
   const queue = await readQueue(store)
 
   if (!queue) {
-    console.warn(`[playNextAction] Queue ${queueId} not found`)
+    console.warn(`[playNextAction] Queue default not found`)
     return
   }
 
@@ -211,16 +205,12 @@ export async function playNextAction(
  * Decrements currentPlaying index or loops if repeat is on
  *
  * @param store - LiveStore instance
- * @param queueId - Queue ID (default: 'default')
  */
-export async function playPreviousAction(
-  store: LiveStore,
-  queueId = QUEUE_ID
-): Promise<void> {
+export async function playPreviousAction(store: LiveStore): Promise<void> {
   const queue = await readQueue(store)
 
   if (!queue) {
-    console.warn(`[playPreviousAction] Queue ${queueId} not found`)
+    console.warn(`[playPreviousAction] Queue default not found`)
     return
   }
 
@@ -237,17 +227,15 @@ export async function playPreviousAction(
  *
  * @param store - LiveStore instance
  * @param mediaId - Song ID to play
- * @param queueId - Queue ID (default: 'default')
  */
 export async function playMediaAction(
   store: LiveStore,
-  mediaId: string,
-  queueId = QUEUE_ID
+  mediaId: string
 ): Promise<void> {
   const queue = await readQueue(store)
 
   if (!queue) {
-    console.warn(`[playMediaAction] Queue ${queueId} not found`)
+    console.warn(`[playMediaAction] Queue default not found`)
     return
   }
 

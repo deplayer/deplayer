@@ -1,5 +1,6 @@
 import type { LiveStore } from '../accessor'
 import { syncEvents } from '../events/sync'
+import type { ScanStatus } from '../../../providers/IMusicProvider'
 import { createLogger } from '../../../utils/logger'
 
 const logger = createLogger({ namespace: 'SyncResumeState' })
@@ -24,12 +25,6 @@ export interface SyncResume {
   initialSyncComplete: boolean
   /** Page size that produced initialSyncCursor. 0 = unknown (legacy row). */
   cursorPageSize: number
-}
-
-export interface ScanStatus {
-  scanning: boolean
-  count: number
-  lastScan: string
 }
 
 export interface ResumeDecision {

@@ -105,26 +105,19 @@ export const getStreamUri = async (
   song: MediaRow,
   providerNum: number
 ): Promise<StreamSource> => {
-  const service =
-    song.stream &&
-    Object.values(song.stream)[providerNum] &&
-    Object.values(song.stream)[providerNum].service;
+  const entry = Object.values(song.stream)[providerNum];
 
-  if (!service) {
+  if (!entry || !entry.service) {
     return { url: "", kind: "remote" };
   }
 
-  const streamUri =
-    song && Object.values(song.stream).length
-      ? Object.values(song.stream)[providerNum] &&
-        Object.values(song.stream)[providerNum].uris[0].uri
-      : null;
+  const streamUri = entry.uris[0].uri;
 
-  if (service === "filesystem") {
+  if (entry.service === "filesystem") {
     return await handleFilesystem(streamUri);
   }
 
-  if (service === "opfs") {
+  if (entry.service === "opfs") {
     return await handleOpfs(streamUri);
   }
 
