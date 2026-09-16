@@ -57,9 +57,7 @@ export {
 // Queue hooks (served from the deep queue module)
 export {
   useQueue,
-  useCurrentTrack,
   useCurrentPlayingSongId,
-  useQueueNavigation,
 } from '../queue'
 
 // Favorites hooks

@@ -102,7 +102,7 @@ describe('resolveCurrentPlayingSongId', () => {
 
   it('returns null when queue table is empty', () => {
     const mockStore = makeLiveStoreMock([])
-    const result = resolveCurrentPlayingSongId(() => mockStore as any)
+    const result = resolveCurrentPlayingSongId(() => mockStore as unknown as LiveStore)
     expect(result).toBeNull()
   })
 
@@ -114,7 +114,7 @@ describe('resolveCurrentPlayingSongId', () => {
       currentTrackId: 'song-authorized',
       shuffle: false,
     }])
-    const result = resolveCurrentPlayingSongId(() => mockStore as any)
+    const result = resolveCurrentPlayingSongId(() => mockStore as unknown as LiveStore)
     expect(result).toBe('song-authorized')
   })
 
@@ -126,7 +126,7 @@ describe('resolveCurrentPlayingSongId', () => {
       currentTrackId: null,
       shuffle: false,
     }])
-    const result = resolveCurrentPlayingSongId(() => mockStore as any)
+    const result = resolveCurrentPlayingSongId(() => mockStore as unknown as LiveStore)
     expect(result).toBe('song-3')
   })
 
@@ -137,7 +137,7 @@ describe('resolveCurrentPlayingSongId', () => {
       shuffle: false,
       // currentTrackId not in row → undefined
     }])
-    const result = resolveCurrentPlayingSongId(() => mockStore as any)
+    const result = resolveCurrentPlayingSongId(() => mockStore as unknown as LiveStore)
     expect(result).toBe('song-2')
   })
 
@@ -149,7 +149,7 @@ describe('resolveCurrentPlayingSongId', () => {
       currentTrackId: null,
       shuffle: true,
     }])
-    const result = resolveCurrentPlayingSongId(() => mockStore as any)
+    const result = resolveCurrentPlayingSongId(() => mockStore as unknown as LiveStore)
     // Shuffle is on, so index 1 resolves into randomTrackIds
     expect(result).toBe('song-1')
   })
@@ -161,7 +161,7 @@ describe('resolveCurrentPlayingSongId', () => {
       currentTrackId: null,
       shuffle: false,
     }])
-    const result = resolveCurrentPlayingSongId(() => mockStore as any)
+    const result = resolveCurrentPlayingSongId(() => mockStore as unknown as LiveStore)
     expect(result).toBeNull()
   })
 })

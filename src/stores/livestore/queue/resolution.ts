@@ -56,39 +56,6 @@ export function resolveCurrentSongId(queue: QueueState | null | undefined): stri
   return ids[queue.currentPlaying] || null
 }
 
-/**
- * Compute next/previous song IDs from queue state.
- */
-export function resolveQueueNavigation(queue: QueueState | null | undefined): {
-  nextSongId: string | null
-  prevSongId: string | null
-} {
-  if (!queue || queue.currentPlaying === null || queue.currentPlaying === undefined) {
-    return { nextSongId: null, prevSongId: null }
-  }
-
-  const activeTrackIds = getActiveTrackIds(queue)
-  const currentIndex = queue.currentPlaying
-  const nextIndex = currentIndex + 1
-  const prevIndex = currentIndex - 1
-
-  let nextSongId: string | null = null
-  let prevSongId: string | null = null
-
-  if (nextIndex < activeTrackIds.length) {
-    nextSongId = activeTrackIds[nextIndex]
-  } else if (queue.repeat && activeTrackIds.length > 0) {
-    nextSongId = activeTrackIds[0]
-  }
-
-  if (prevIndex >= 0) {
-    prevSongId = activeTrackIds[prevIndex]
-  } else if (queue.repeat && activeTrackIds.length > 0) {
-    prevSongId = activeTrackIds[activeTrackIds.length - 1]
-  }
-
-  return { nextSongId, prevSongId }
-}
 
 /**
  * Compute the currently-playing track ID from queue state.

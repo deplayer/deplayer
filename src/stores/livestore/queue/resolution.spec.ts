@@ -3,7 +3,6 @@ import {
   parseIds,
   getActiveTrackIds,
   resolveCurrentSongId,
-  resolveQueueNavigation,
 } from './resolution'
 import type { QueueState } from './types'
 
@@ -127,43 +126,3 @@ describe('resolveCurrentSongId', () => {
   })
 })
 
-describe('resolveQueueNavigation', () => {
-  it('returns nulls for null queue', () => {
-    expect(resolveQueueNavigation(null)).toEqual({ nextSongId: null, prevSongId: null })
-  })
-
-  it('returns next and prev in normal order', () => {
-    const result = resolveQueueNavigation(makeQueue({ currentPlaying: 1 }))
-    expect(result.nextSongId).toBe('track-c')
-    expect(result.prevSongId).toBe('track-a')
-  })
-
-  it('uses randomTrackIds for navigation when shuffle is on', () => {
-    const result = resolveQueueNavigation(makeQueue({ currentPlaying: 1, shuffle: true }))
-    // SHUFFLED = ['track-c', 'track-a', 'track-d', 'track-b']
-    expect(result.nextSongId).toBe('track-d') // SHUFFLED[2]
-    expect(result.prevSongId).toBe('track-c') // SHUFFLED[0]
-  })
-
-  it('returns null next at end of queue without repeat', () => {
-    const result = resolveQueueNavigation(makeQueue({ currentPlaying: 3 }))
-    expect(result.nextSongId).toBeNull()
-    expect(result.prevSongId).toBe('track-c')
-  })
-
-  it('wraps around with repeat on', () => {
-    const result = resolveQueueNavigation(makeQueue({ currentPlaying: 3, repeat: true }))
-    expect(result.nextSongId).toBe('track-a') // wraps to 0
-  })
-
-  it('returns null prev at start without repeat', () => {
-    const result = resolveQueueNavigation(makeQueue({ currentPlaying: 0 }))
-    expect(result.prevSongId).toBeNull()
-    expect(result.nextSongId).toBe('track-b')
-  })
-
-  it('wraps prev with repeat on', () => {
-    const result = resolveQueueNavigation(makeQueue({ currentPlaying: 0, repeat: true }))
-    expect(result.prevSongId).toBe('track-d') // wraps to last
-  })
-})

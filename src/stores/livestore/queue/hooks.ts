@@ -4,15 +4,14 @@
  * These hooks provide reactive access to playback queue data from LiveStore.
  * They automatically update when the underlying data changes.
  *
- * The hooks are thin adapters: `useQueue` normalizes the raw row into
- * `QueueState` (the single canonical read shape, mirroring `readQueue`), and
- * the navigation hook delegates to the pure `resolveQueueNavigation`.
+ * `useQueue` normalizes the raw row into `QueueState` (the single canonical
+ * read shape, mirroring `readQueue`).
  */
 
 import { queryDb } from '@livestore/livestore'
 import { useAppStore } from '../store'
 import { tables } from '../schema'
-import { parseIds, resolveQueueNavigation } from './resolution'
+import { parseIds } from './resolution'
 import type { QueueRecord, QueueState } from './types'
 
 /**
@@ -50,37 +49,8 @@ export const useQueue = (queueId = 'default'): QueueState | null => {
 }
 
 /**
- * Get the currently playing track from the queue
- *
- * @example
- * ```tsx
- * const currentTrack = useCurrentTrack()
- * if (!currentTrack) return <div>Nothing playing</div>
- * return <div>Now playing: {currentTrack.title}</div>
- * ```
- */
-export const useCurrentTrack = (queueId = 'default') => {
-  const store = useAppStore()
-  // Read the authoritative currentTrackId column to stay aligned with
-  // useCurrentPlayingSongId — avoids split-brain between derived and stored value.
-  const currentTrackId = useCurrentPlayingSongId(queueId)
-
-  const result = store.useQuery(
-    queryDb(
-      tables.media
-        .select()
-        .where('id', '=', currentTrackId ?? '__NONE__')
-        .limit(1)
-    )
-  )
-
-  if (!currentTrackId) return null
-  return (result as unknown as Record<string, unknown>[])[0] || null
-}
-
-/**
  * Get the ID of the currently playing song
- * Converts queue.currentPlaying (index) to actual song ID
+ * Reads the persisted currentTrackId column
  *
  * @example
  * ```tsx
@@ -100,18 +70,4 @@ export const useCurrentPlayingSongId = (queueId = 'default'): string | null => {
   )
   const row = (result as unknown as Array<{ currentTrackId: string | null }>)?.[0]
   return row?.currentTrackId ?? null
-}
-
-/**
- * Get the next/previous song IDs based on queue state
- *
- * @example
- * ```tsx
- * const { nextSongId, prevSongId } = useQueueNavigation()
- * ```
- */
-export const useQueueNavigation = (queueId = 'default') => {
-  const queue = useQueue(queueId)
-
-  return resolveQueueNavigation(queue)
 }

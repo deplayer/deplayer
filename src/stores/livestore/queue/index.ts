@@ -5,25 +5,21 @@
  * interface:
  *
  * - **Read**: `useQueue` (reactive, normalized `QueueState`), `readQueue`
- *   (async, normalized), `useCurrentTrack`, `useCurrentPlayingSongId`,
- *   `useQueueNavigation`, `resolveCurrentPlayingSongId` (non-reactive).
+ *   (async, normalized), `useCurrentPlayingSongId`,
+ *   `resolveCurrentPlayingSongId` (non-reactive).
  * - **Mutate**: the async actions (`playAllAction`, `addToQueueAction`,
  *   `addNextAction`, `removeFromQueueAction`, `clearQueueAction`,
  *   `toggleShuffleAction`, `toggleRepeatAction`, `setCurrentPlayingAction`,
  *   `playNextAction`, `playPreviousAction`, `playMediaAction`).
  * - **Pure rules**: `parseIds`, `getActiveTrackIds`, `resolveCurrentSongId`,
- *   `resolveQueueNavigation`, `deriveCurrentTrackId`, `fisherYates`, and the
+ *   `deriveCurrentTrackId`, `fisherYates`, and the
  *   transition functions — the read/write domain logic the above are built
  *   from. Testable with no LiveStore and no React.
  *
- * The raw LiveStore row shape (`QueueRecord`) is an implementation detail:
- * the only public shapes are `QueueState` (normalized) and the event payload
- * types (which mirror `events/queue.ts`).
  */
 
 export type {
   QueueState,
-  QueueRecord,
   QueueUpdatedEvent,
   QueuePositionChangedEvent,
   QueueRepeatToggledEvent,
@@ -35,7 +31,6 @@ export {
   parseIds,
   getActiveTrackIds,
   resolveCurrentSongId,
-  resolveQueueNavigation,
   deriveCurrentTrackId,
   fisherYates,
 } from './resolution'
@@ -72,7 +67,5 @@ export {
 
 export {
   useQueue,
-  useCurrentTrack,
   useCurrentPlayingSongId,
-  useQueueNavigation,
 } from './hooks'
