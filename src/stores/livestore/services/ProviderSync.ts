@@ -153,9 +153,12 @@ export async function syncProvider(
 
       // Per-page reactive refresh: with the collection window unsubscribed,
       // a tick only re-runs the cheap aggregates (live count, favorites,
-      // queue), so freshly committed pages become visible immediately. The
-      // committer's waitForIdle keeps this off interaction-critical frames.
-      await batchedMediaCommitter.refresh('SyncProvider.progress')
+      // queue), so freshly committed pages become visible immediately.
+      // Fire-and-forget on purpose: refresh() awaits the browser's idle
+      // callback, and serializing that wait with page consumption would let
+      // a busy main thread throttle sync throughput. refreshPending
+      // coalesces overlapping calls; the saga's final refresh closes out.
+      void batchedMediaCommitter.refresh('SyncProvider.progress')
 
       if (complete) break
     }

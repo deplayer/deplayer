@@ -1,5 +1,5 @@
 import { useAppStore } from '../store'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useUIStore } from '../../uiStore'
 import { useFavoriteIds } from './useFavorites'
 import {
@@ -10,7 +10,10 @@ import {
   parseIds,
 } from '../collection/filter'
 import { rawToMediaRow } from '../transformMedia'
+import { createLogger } from '../../../utils/logger'
 import type { MediaRow } from '../../../types/media'
+
+const logger = createLogger({ namespace: 'useCollectionData' })
 
 /** Rows in the first window (and the growth step for subsequent windows). */
 export const COLLECTION_WINDOW_STEP = 250
@@ -50,6 +53,12 @@ export interface CollectionData {
  */
 export const useCollectionData = (): CollectionData => {
   const store = useAppStore()
+  // LiveStore's store instance is fixed once booted (the provider suspends
+  // until ready). Capture it in a ref: the snapshot effect below keys on
+  // query identity only, so a hypothetical unstable useAppStore return can
+  // never turn it into a fetch loop.
+  const storeRef = useRef(store)
+  storeRef.current = store
   const filters = useUIStore(s => s.activeFilters)
   const searchTerm = useUIStore(s => s.searchTerm)
   const favoriteIds = useFavoriteIds()
@@ -71,7 +80,6 @@ export const useCollectionData = (): CollectionData => {
   const windowQuery = useMemo(() => collectionWindowQuery(clauses, limit), [clauses, limit])
   const countQuery = useMemo(() => collectionCountQuery(clauses), [clauses])
   const allIdsQuery = useMemo(() => collectionAllIdsQuery(clauses), [clauses])
-
   // Snapshot fetch: cancellation-guarded so a rapid filter change can never
   // land a stale window over a newer one.
   useEffect(() => {
@@ -81,7 +89,7 @@ export const useCollectionData = (): CollectionData => {
     // so await inside an IIFE instead of chaining .then on a maybe-promise.
     void (async () => {
       try {
-        const raw: unknown = await store.query(windowQuery)
+        const raw: unknown = await storeRef.current.query(windowQuery)
         if (cancelled) return
         const next: MediaRow[] = []
         const list = Array.isArray(raw) ? raw : []
@@ -91,7 +99,8 @@ export const useCollectionData = (): CollectionData => {
         }
         setRows(next)
         setFetching(false)
-      } catch {
+      } catch (error) {
+        logger.error('Window fetch failed', error)
         if (cancelled) return
         setRows([])
         setFetching(false)
@@ -100,27 +109,17 @@ export const useCollectionData = (): CollectionData => {
     return () => {
       cancelled = true
     }
-  }, [store, windowQuery])
+  }, [windowQuery])
 
   // Live count — the only subscribed query, so sync ticks stay O(aggregate).
   const countRaw = store.useQuery(countQuery as Parameters<typeof store.useQuery>[0])
   const count = useMemo(() => {
-    // The count schema decodes to [{ count }]; tolerate a bare row or a
-    // plain number in case LiveStore's decoding shape shifts.
-    if (typeof countRaw === 'number') return countRaw
-    if (Array.isArray(countRaw)) {
-      const first = countRaw[0]
-      if (first && typeof first === 'object' && 'count' in first) {
-        const value = first.count
-        return typeof value === 'number' ? value : undefined
-      }
-      return undefined
-    }
-    if (countRaw && typeof countRaw === 'object' && 'count' in countRaw) {
-      const value = countRaw.count
-      return typeof value === 'number' ? value : undefined
-    }
-    return undefined
+    // The count schema pins the shape to [{ count }].
+    if (!Array.isArray(countRaw)) return undefined
+    const first = countRaw[0]
+    if (!first || typeof first !== 'object' || !('count' in first)) return undefined
+    const value = first.count
+    return typeof value === 'number' ? value : undefined
   }, [countRaw])
 
   const ids = useMemo(() => rows.map(r => r.id), [rows])
@@ -134,13 +133,17 @@ export const useCollectionData = (): CollectionData => {
 
   const resolveAllIds = useCallback(async (): Promise<string[]> => {
     try {
-      return parseIds(await store.query(allIdsQuery))
-    } catch {
+      return parseIds(await storeRef.current.query(allIdsQuery))
+    } catch (error) {
+      logger.error('All-ids resolution failed', error)
       return []
     }
-  }, [store, allIdsQuery])
+  }, [allIdsQuery])
 
-  const hasMore = count !== undefined ? ids.length < count : false
+  // Growth oracle: the live count when it has landed; otherwise a full
+  // window page implies more (the standard infinite-scroll heuristic), so a
+  // failed count query can never freeze growth at the first window.
+  const hasMore = count !== undefined ? count > ids.length : ids.length >= limit
 
   return { ids, map, count, fetching, hasMore, grow, resolveAllIds }
 }

@@ -122,6 +122,27 @@ describe('useCollectionData', () => {
     expect(result.current.hasMore).toBe(false)
   })
 
+  it('a full window page implies more pages when the count never lands', async () => {
+    // Count query fails to produce a value: growth must fall back to the
+    // full-page heuristic instead of freezing at the first window.
+    useQuery.mockReturnValue(undefined)
+    const fullPage = Array.from({ length: COLLECTION_WINDOW_STEP }, (_, i) => rawRow(`m${i}`))
+    queueQueryResults([[...fullPage, rawRow('extra')].slice(0, COLLECTION_WINDOW_STEP), [...fullPage, rawRow('extra')]])
+
+    const { result } = renderHook(() => useCollectionData())
+    await waitFor(() => expect(result.current.ids.length).toBe(COLLECTION_WINDOW_STEP))
+    expect(result.current.count).toBeUndefined()
+    expect(result.current.hasMore).toBe(true)
+
+    await act(async () => {
+      result.current.grow()
+    })
+
+    await waitFor(() => expect(result.current.ids.length).toBe(COLLECTION_WINDOW_STEP + 1))
+    // Partial second page with no count: growth stops honestly.
+    expect(result.current.hasMore).toBe(false)
+  })
+
   it('resolveAllIds() returns every matching id as a one-shot query', async () => {
     setup([[rawRow('m1')]], [{ count: 2 }])
     storeQuery.mockImplementation((query: { label?: string }) =>

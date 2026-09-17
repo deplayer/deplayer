@@ -22,6 +22,11 @@ import type { QueueState } from '../../stores/livestore/queue'
 
 type QueueData = QueueState | null
 
+/** Rows rendered beyond the viewport by react-virtualized's overscan. */
+const OVERSCAN_ROWS = 10
+/** Grow the data window this many rows before the loaded edge (2x overscan). */
+const GROW_AHEAD_OF_ROWS = OVERSCAN_ROWS * 2
+
 type Props = {
   error?: string,
   tableIds: Array<string>,
@@ -268,10 +273,11 @@ const MusicTable = ({
   const [isToolbarHidden, setIsToolbarHidden] = React.useState(false)
 
   // Window growth: react-virtualized reports rendered ranges; grow the data
-  // window when the viewport approaches the loaded edge (2x overscan buffer).
+  // window when the viewport approaches the loaded edge. The threshold is
+  // derived from OVERSCAN so the two can't silently desync.
   // Declared before the loading early return so hook order stays uniform.
   const handleRowsRendered = React.useCallback(({ stopIndex }: { stopIndex: number }) => {
-    if (hasMore && onLoadMore && stopIndex >= tableIds.length - 1 - 20) onLoadMore()
+    if (hasMore && onLoadMore && stopIndex >= tableIds.length - 1 - GROW_AHEAD_OF_ROWS) onLoadMore()
   }, [hasMore, onLoadMore, tableIds.length])
 
   const errors = error && <div>{error}</div>
@@ -445,7 +451,7 @@ const MusicTable = ({
             rowHeight={slim ? 80 : 100}
             rowRenderer={stableRowRenderer}
             width={width}
-            overscanRowCount={10}
+            overscanRowCount={OVERSCAN_ROWS}
             onRowsRendered={handleRowsRendered}
             onScroll={handleScroll}
           />

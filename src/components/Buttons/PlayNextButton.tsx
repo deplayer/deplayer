@@ -21,7 +21,7 @@ type Props = {
 const PlayNextButton = (props: Props) => {
   const liveStore = useAppStore()
   const location = useLocation()
-  const { songs, mediaIds, transparent = true, fullWidth = false, alignLeft = false, className = '' } = props
+  const { songs, mediaIds, resolveIds, transparent = true, fullWidth = false, alignLeft = false, className = '' } = props
 
   const playNext = async () => {
     if (!liveStore) return
@@ -31,8 +31,8 @@ const PlayNextButton = (props: Props) => {
 
       // Windowed collections hand us a resolver so Play Next keeps
       // whole-collection semantics instead of the loaded window only.
-      if (props.resolveIds) {
-        trackIds = await props.resolveIds()
+      if (resolveIds) {
+        trackIds = await resolveIds()
       } else if (mediaIds && mediaIds.length > 0) {
         // Use provided media IDs directly
         trackIds = mediaIds
