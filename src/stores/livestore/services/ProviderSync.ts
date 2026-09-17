@@ -28,12 +28,10 @@ const logger = createLogger({ namespace: 'ProviderSync' })
 // ---------------------------------------------------------------------------
 const SYNC_PAGE_SIZE = 50
 
-// Progress publishes per page — a zustand set that re-renders only the
-// Topbar bar, no LiveStore work — so the bar tracks every page. The reactive
-// refresh stays throttled: re-running every active query per page would
-// thrash reactive consumers. A 62k library streams ~120 pages of ~500 songs;
-// refreshing every 10 pages (~5k songs) keeps mid-sync data visibility cheap.
-const PROGRESS_REFRESH_PAGES = 10
+// Progress publishes and the reactive refresh runs per page. Both are cheap
+// since the collection window became a snapshot: a manualRefresh tick only
+// re-runs the subscribed aggregates (live counts, favorites, queue), not the
+// collection rows — so data visibility tracks every page without thrash.
 
 /** A Provider that supports incremental streaming sync. */
 export interface StreamingProvider extends IMusicProvider {
@@ -69,11 +67,11 @@ export type ProviderSyncResult =
  * used only in log messages.
  *
  * Commit contract (deferred mode): pages are added/flushed with
- * `skipRefresh`. To keep a long sync visibly alive, every
- * `PROGRESS_REFRESH_PAGES` pages the method publishes progress telemetry to
- * `useUIStore` and performs a `refresh('SyncProvider.progress')` so cheap
- * reactive consumers (counts, the collection view) catch up mid-stream. The
- * caller still owns the single final `refresh` after all providers complete.
+ * `skipRefresh`. Every page publishes progress telemetry to `useUIStore`
+ * and performs a `refresh('SyncProvider.progress')` — cheap since the
+ * collection window became a snapshot, a tick only re-runs subscribed
+ * aggregates (live counts, favorites, queue). The caller still owns the
+ * single final `refresh` after all providers complete.
  * A page whose flush fails is NOT advanced in the resume state — the
  * rejection propagates out of add/flush before the per-page save, so the next
  * session resumes at that page.
@@ -153,13 +151,11 @@ export async function syncProvider(
         total: scanStatus.count,
       })
 
-      // Throttled reactive refresh: lets cheap reactive consumers (counts,
-      // the collection view) catch up mid-stream without per-page thrash.
-      // The saga's single final refresh stays the authoritative end-of-sync
-      // commit for this cycle.
-      if (pages % PROGRESS_REFRESH_PAGES === 0) {
-        await batchedMediaCommitter.refresh('SyncProvider.progress')
-      }
+      // Per-page reactive refresh: with the collection window unsubscribed,
+      // a tick only re-runs the cheap aggregates (live count, favorites,
+      // queue), so freshly committed pages become visible immediately. The
+      // committer's waitForIdle keeps this off interaction-critical frames.
+      await batchedMediaCommitter.refresh('SyncProvider.progress')
 
       if (complete) break
     }

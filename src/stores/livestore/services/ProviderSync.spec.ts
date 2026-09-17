@@ -211,7 +211,7 @@ describe('ProviderSync', () => {
     expect(lastStream(provider).return).not.toHaveBeenCalled()
   })
 
-  it('publishes progress per page, refreshes every 10, then clears on completion', async () => {
+  it('publishes progress and refreshes every page, then clears on completion', async () => {
     const pages = Array.from({ length: 11 }, (_, i) =>
       makePage([{ id: `t${i}` } as unknown as NormalizedMedia], i < 10, i + 1),
     )
@@ -224,9 +224,10 @@ describe('ProviderSync', () => {
     )
 
     expect(result).toEqual({ status: 'synced', pages: 11 })
-    // One reactive refresh at the 10-page boundary (11 pages total, not a
-    // multiple of 10). Determinate: the fake scan exposes a count of 100.
-    expect(refreshSpy).toHaveBeenCalledTimes(1)
+    // Reactive refresh per page: every committed page becomes visible
+    // immediately (the count climbs per page, no multi-page staircase).
+    // Determinate: the fake scan exposes a count of 100.
+    expect(refreshSpy).toHaveBeenCalledTimes(11)
     expect(refreshSpy).toHaveBeenCalledWith('SyncProvider.progress')
     // Progress published at start (added 0), then after every page (1 item
     // per page in the fake — the last publish is page 11), then cleared in
