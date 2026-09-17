@@ -7,6 +7,8 @@ import Icon from '../common/Icon'
 
 type Props = {
   mediaIds?: string[]
+  /** One-shot resolver for ALL matching ids (windowed collections). Wins over mediaIds. */
+  resolveIds?: () => Promise<string[]>
   className?: string
 }
 
@@ -14,9 +16,12 @@ const PlayAllButton = (props: Props) => {
   const dispatch = useDispatch()
   const location = useLocation()
 
-  const playAll = () => {
-    if (props.mediaIds && props.mediaIds.length > 0) {
-      dispatch({ type: types.PLAY_LIST, trackIds: props.mediaIds })
+  const playAll = async () => {
+    // Windowed collections hand us a resolver so Play All keeps
+    // whole-collection semantics instead of playing just the loaded window.
+    const trackIds = props.resolveIds ? await props.resolveIds() : props.mediaIds
+    if (trackIds && trackIds.length > 0) {
+      dispatch({ type: types.PLAY_LIST, trackIds })
     }
   }
 

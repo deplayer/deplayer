@@ -25,8 +25,12 @@ _Avoid_: queue state (for the raw row), Redux queue
 
 
 **Collection filter**:
-The canonical filter value for the Collection view (genres/types/artists/providers/favorites). Owned by the `collection/filter` module, which is the single owner of its match semantics (OR within a category, AND across categories, exact genre/provider matching, favorites requiring membership) and of the query plan that evaluates it. Smart playlists persist a projection of it (no favorites field).
+The canonical filter value for the Collection view (genres/types/artists/providers/favorites). Owned by the `collection/filter` module, which is the single owner of its match semantics (OR within a category, AND across categories, exact genre/provider matching, favorites requiring membership), expressed as one shared SQL clause set from which the window, count, and all-ids queries are all derived. Smart playlists persist a projection of it (no favorites field).
 _Avoid_: active filters (for the value object), filtered songs
+
+**Collection window**:
+The bounded, snapshot-semantics slice of the filtered collection the Collection view renders: refetched only on filter/search change or growth, never shifted by sync commits. The live count for the same clauses is a separate reactive query; Play All resolves the full id list as a one-shot query at click time.
+_Avoid_: pagination (for the data window), infinite scroll
 
 **Cursor geometry**:
 The page size a saved album-list cursor was produced with. A resume whose page size differs from the stored geometry restarts the walk instead of trusting the offset.
@@ -40,7 +44,7 @@ _Avoid_: cursor version
 - A **Stream source** of blob kind is released exactly when playback moves past it (PlaybackController), or when the SongView download list is replaced/unmounted
 - The **Playback queue** is read via `useQueue`/`readQueue`; the playback head resolves to the persisted `currentTrackId` column, falling back to the index into the active track list
 - Shuffle reorders the random list only and keeps the active track in position; the **Stream source** release on playback advance is the queue's one effect on media
-- A **Collection filter** is evaluated by the planner over the `media_genres` read model; the rows path post-filters with the same predicate that defines the semantics, so SQL and JS can't diverge
+- A **Collection filter** is evaluated entirely in SQL over the `media_genres` read model; window, count, and all-ids queries share one clause set, so they cannot diverge. Bind values are positional arrays — object-form binds are silently mangled by LiveStore's named-param preparation
 
 
 

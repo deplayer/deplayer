@@ -31,19 +31,29 @@ type Props = {
   disableCovers?: boolean,
   disableAddButton?: boolean,
   slim?: boolean,
+  /** Live total for the current filter; falls back to the loaded row count. */
+  total?: number,
+  /** True when the window can grow (more rows beyond the loaded window). */
+  hasMore?: boolean,
+  /** Called when the user scrolls near the end of the loaded window. */
+  onLoadMore?: () => void,
+  /** One-shot resolver for ALL ids in the current filter (Play All/Next). */
+  resolveAllIds?: () => Promise<string[]>,
 }
 
 const Toolbar = ({ 
   isToolbarVisible, 
   isToolbarHidden, 
   handleTransitionEnd, 
-  tableIds, 
+  tableIds,
+  total,
   actions,
 }: {
   isToolbarVisible: boolean,
   isToolbarHidden: boolean,
   handleTransitionEnd: () => void,
   tableIds: Array<string>,
+  total?: number,
   actions: React.ReactNode,
 }) => {
   const location = useLocation()
@@ -58,7 +68,7 @@ const Toolbar = ({
       >
         <div className='flex items-center gap-4 flex-1'>
           <div className='p-2'>
-            #<b>{tableIds.length}</b>
+            #<b>{total ?? tableIds.length}</b>
           </div>
           {location.pathname === '/collection' && (
             <div className='flex-1 max-w-xl'>
@@ -222,15 +232,19 @@ const SongRowWithHooks = React.memo(({
   )
 })
 
-const MusicTable = ({ 
-  error, 
-  tableIds, 
+const MusicTable = ({
+  error,
+  tableIds,
   mediaMap,
   queue: queueProp,
-  disableCurrent, 
-  disableCovers, 
-  disableAddButton, 
-  slim 
+  disableCurrent,
+  disableCovers,
+  disableAddButton,
+  slim,
+  total,
+  hasMore,
+  onLoadMore,
+  resolveAllIds,
 }: Props) => {
   
   // ContextualMenu reads queue.trackIds / queue.currentPlaying, so the real row
@@ -252,6 +266,13 @@ const MusicTable = ({
   const [isToolbarVisible, setIsToolbarVisible] = React.useState(true)
   const lastScrollTopRef = React.useRef(0)
   const [isToolbarHidden, setIsToolbarHidden] = React.useState(false)
+
+  // Window growth: react-virtualized reports rendered ranges; grow the data
+  // window when the viewport approaches the loaded edge (2x overscan buffer).
+  // Declared before the loading early return so hook order stays uniform.
+  const handleRowsRendered = React.useCallback(({ stopIndex }: { stopIndex: number }) => {
+    if (hasMore && onLoadMore && stopIndex >= tableIds.length - 1 - 20) onLoadMore()
+  }, [hasMore, onLoadMore, tableIds.length])
 
   const errors = error && <div>{error}</div>
 
@@ -349,18 +370,18 @@ const MusicTable = ({
         return (
         <>
           <AddNewMediaButton className='btn-sm' />
-          <PlayAllButton className='btn-sm' mediaIds={tableIds} />
-          {currentSongId && <PlayNextButton className='btn-sm' mediaIds={tableIds} />}
+          <PlayAllButton className='btn-sm' resolveIds={resolveAllIds} />
+          {currentSongId && <PlayNextButton className='btn-sm' resolveIds={resolveAllIds} />}
         </>
       )
       case '/search-results':
         return (
           <>
-            <PlayAllButton className='btn-sm' mediaIds={tableIds} />
+            <PlayAllButton className='btn-sm' resolveIds={resolveAllIds} />
             {currentSongId && (
-              <PlayNextButton 
+              <PlayNextButton
                 className='btn-sm'
-                mediaIds={tableIds}
+                resolveIds={resolveAllIds}
               />
             )}
           </>
@@ -370,7 +391,7 @@ const MusicTable = ({
     }
   }
 
-  const actions = React.useMemo(() => getActions(), [location.pathname, currentSongId, tableIds.length])
+  const actions = React.useMemo(() => getActions(), [location.pathname, currentSongId, tableIds.length, resolveAllIds])
 
   // Clear scrollToIndex after first render so it doesn't fight with user scrolling
   React.useEffect(() => {
@@ -413,6 +434,7 @@ const MusicTable = ({
         isToolbarHidden={isToolbarHidden}
         handleTransitionEnd={handleTransitionEnd}
         tableIds={tableIds}
+        total={total}
         actions={actions}
       />
       <AutoSizer className='music-table'>
@@ -424,7 +446,7 @@ const MusicTable = ({
             rowRenderer={stableRowRenderer}
             width={width}
             overscanRowCount={10}
-            scrollToIndex={scrollToIndex >= 0 ? scrollToIndex : undefined}
+            onRowsRendered={handleRowsRendered}
             onScroll={handleScroll}
           />
         )}

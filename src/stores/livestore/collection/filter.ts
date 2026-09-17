@@ -1,31 +1,27 @@
 /**
  * Collection filter module.
  *
- * Single owner of the collection-filter concept: the Filter value object,
- * the match semantics, and the query plan that evaluates it.
+ * Owns every match semantic for the collection list as SQL clauses, and
+ * exposes three queries built from those clauses:
  *
- * Semantics (the one contract):
- * - Within a category: OR (any selected value matches).
- * - Across categories: AND (every active category must match).
- * - Genres and providers: exact match.
- * - Favorites active: every result must be a favorite; with zero favorites
- *   in the library the result is empty (never the whole library).
+ * - `collectionWindowQuery` — a bounded snapshot of full rows, ordered by
+ *   `(title, id)`, refreshed only when the caller refetches (filter/search
+ *   change or window growth). Deliberately not subscribed: sync commits
+ *   cannot shift rows under the user's scroll position.
+ * - `collectionCountQuery` — a live aggregate for the same clauses.
+ * - `collectionAllIdsQuery` — the unbounded id list for one-shot consumers
+ *   (Play All, smart playlists) that need the whole filtered collection.
  *
- * Path selection (the planner's job, invisible to callers):
- * - 'ids'        – artists/types/favorites are SQL-expressible: SELECT id.
- * - 'genre-ids'  – genres join the indexed media_genres read model: SQL.
- * - 'rows'       – providers or search need client-side filtering:
- *                  SELECT rows, post-filtered with the SAME predicate
- *                  that defines the semantics. The SQL clauses and the
- *                  client predicate can never disagree.
+ * All three share one clause builder, so the WHERE semantics cannot drift
+ * between the count and the rows it counts.
  *
- * Pure parts (matchesFilter, matchesSearch, parseFilter, plan kind) are
- * testable without LiveStore or React; the query builders are plain
- * schema definitions, so the plan itself is testable the same way.
+ * Match semantics (parity with the previous client-side predicate):
+ * - OR within a category, AND across categories.
+ * - Genres match exactly via the indexed `media_genres` read model.
+ * - Providers match exactly by token in the denormalized `providersFlat` CSV.
  */
 
 import { queryDb, Schema } from '@livestore/livestore'
-import { tables } from '../schema'
 
 export interface Filter {
   genres: string[]
@@ -49,22 +45,6 @@ export const EMPTY_FILTER: Filter = {
  */
 export type SmartPlaylistFilters = Pick<Filter, 'genres' | 'types' | 'artists' | 'providers'>
 
-/**
- * Minimum shape the predicate needs. Raw query rows are mapped to this
- * (via the denormalized genresFlat/providersFlat columns); parsed
- * MediaRow objects map trivially.
- */
-export interface FilterableMedia {
-  id: string
-  artistId?: string
-  type?: string
-  genres: string[]
-  providers: string[]
-  title?: string
-  artistName?: string
-  albumName?: string
-}
-
 const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every((v) => typeof v === 'string')
 
@@ -81,63 +61,9 @@ export const parseFilter = (raw: Record<string, unknown> | null | undefined): Fi
     types: toList(raw.types),
     artists: toList(raw.artists),
     providers: toList(raw.providers),
-    favorites: Array.isArray(rawFavorites)
-      ? rawFavorites[0] === 'true'
-      : Boolean(rawFavorites),
-  }
-}
-
-const matchInCategory = (selected: readonly string[], values: readonly string[]): boolean =>
-  selected.some((v) => values.includes(v))
-
-/**
- * The single match semantic. No filters active → true.
- */
-export const matchesFilter = (
-  filter: Filter,
-  media: FilterableMedia,
-  favoriteIds: ReadonlySet<string>,
-): boolean => {
-  if (filter.genres.length > 0 && !matchInCategory(filter.genres, media.genres)) return false
-  if (filter.types.length > 0 && !matchInCategory(filter.types, media.type ? [media.type] : [])) return false
-  if (filter.artists.length > 0 && !matchInCategory(filter.artists, media.artistId ? [media.artistId] : [])) return false
-  if (filter.providers.length > 0 && !matchInCategory(filter.providers, media.providers)) return false
-  if (filter.favorites && !favoriteIds.has(media.id)) return false
-  return true
-}
-
-/**
- * Search over title/artist/album, case-insensitive substring, >= 3 chars.
- */
-export const matchesSearch = (
-  searchTerm: string,
-  media: Pick<FilterableMedia, 'title' | 'artistName' | 'albumName'>,
-): boolean => {
-  const term = searchTerm.trim().toLowerCase()
-  if (term.length < 3) return true
-  return Boolean(
-    media.title?.toLowerCase().includes(term) ||
-    media.artistName?.toLowerCase().includes(term) ||
-    media.albumName?.toLowerCase().includes(term)
-  )
-}
-
-/**
- * Map a raw rows-path query result (denormalized flat columns) into
- * FilterableMedia for the shared predicate.
- */
-export const rawRowToFilterable = (row: Record<string, unknown>): FilterableMedia => {
-  const splitFlat = (value: unknown): string[] =>
-    typeof value === 'string' && value.length > 0 ? value.split(',') : []
-  return {
-    id: String(row.id ?? ''),
-    artistId: row.artistId as string | undefined,
-    type: row.type as string | undefined,
-    genres: splitFlat(row.genresFlat),
-    providers: splitFlat(row.providersFlat),
-    title: row.title as string | undefined,
-    artistName: row.artistName as string | undefined,
-    albumName: row.albumName as string | undefined,
+    favorites:
+      rawFavorites === true ||
+      (Array.isArray(rawFavorites) && rawFavorites.includes('true')),
   }
 }
 
@@ -146,7 +72,10 @@ export const parseIds = (raw: unknown): string[] => {
   if (!Array.isArray(raw)) return []
   const ids: string[] = []
   for (const r of raw) {
-    if (typeof r === 'string') { ids.push(r); continue }
+    if (typeof r === 'string') {
+      ids.push(r)
+      continue
+    }
     if (r && typeof r === 'object' && 'id' in r && typeof (r as Record<string, unknown>).id === 'string') {
       ids.push((r as Record<string, string>).id)
     }
@@ -155,10 +84,85 @@ export const parseIds = (raw: unknown): string[] => {
 }
 
 // ---------------------------------------------------------------------------
-// Query plan
+// Clause builder — the single owner of match semantics
 // ---------------------------------------------------------------------------
 
-const NOOP_ID = '__NONE__'
+export interface CollectionClauses {
+  /** Empty string when unfiltered; otherwise a `?`-parameterized predicate. */
+  readonly where: string
+  /** Positional binds, in `?` appearance order (array form is required). */
+  readonly bindValues: readonly string[]
+  /** Genre filters require the indexed media_genres join. */
+  readonly genreJoin: boolean
+}
+/** Escape LIKE wildcards so a user term containing %/_/\\ matches literally. */
+const escapeLike = (term: string): string => term.replace(/[\\%_]/g, (ch) => `\\${ch}`)
+
+export const buildCollectionClauses = (
+  filter: Filter,
+  searchTerm: string,
+  favoriteIds: readonly string[],
+): CollectionClauses => {
+  // Favorites active with nothing favorited can never match; keep one query
+  // shape by short-circuiting to an unsatisfiable predicate.
+  if (filter.favorites && favoriteIds.length === 0) {
+    return { where: '1 = 0', bindValues: [], genreJoin: false }
+  }
+
+  const clauses: string[] = []
+  // Positional binds in `?` appearance order. MUST stay an array: LiveStore's
+  // prepareBindValues maps object-form keys to `$key` named params and drops
+  // keys whose text is absent from the SQL, so numeric-keyed objects can
+  // never feed positional placeholders.
+  const bindValues: string[] = []
+
+  if (filter.genres.length > 0) {
+    clauses.push(`mg.genre IN (${filter.genres.map(() => '?').join(',')})`)
+    bindValues.push(...filter.genres)
+  }
+
+  if (filter.artists.length > 0) {
+    clauses.push(`m.artistId IN (${filter.artists.map(() => '?').join(',')})`)
+    bindValues.push(...filter.artists)
+  }
+
+  if (filter.types.length > 0) {
+    clauses.push(`m.type IN (${filter.types.map(() => '?').join(',')})`)
+    bindValues.push(...filter.types)
+  }
+
+  if (filter.favorites) {
+    clauses.push(`m.id IN (${favoriteIds.map(() => '?').join(',')})`)
+    bindValues.push(...favoriteIds)
+  }
+
+  if (filter.providers.length > 0) {
+    // Exact token match against the denormalized CSV: ',a,' never matches
+    // a provider key that merely contains 'a' as a substring.
+    const tokenLikes = filter.providers.map(() => `(',' || m.providersFlat || ',') LIKE ? ESCAPE '\\'`)
+    clauses.push(`(${tokenLikes.join(' OR ')})`)
+    bindValues.push(...filter.providers.map(provider => `,${provider},`))
+  }
+
+  const term = searchTerm.trim()
+  if (term.length >= 3) {
+    clauses.push(
+      `(m.title LIKE ? ESCAPE '\\' OR m.artistName LIKE ? ESCAPE '\\' OR m.albumName LIKE ? ESCAPE '\\')`,
+    )
+    const pattern = `%${escapeLike(term)}%`
+    bindValues.push(pattern, pattern, pattern)
+  }
+
+  return {
+    where: clauses.join(' AND '),
+    bindValues,
+    genreJoin: filter.genres.length > 0,
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Queries — all three share the clauses, so count/window/ids cannot drift
+// ---------------------------------------------------------------------------
 
 const ROW_COLUMNS = [
   'id', 'title', 'track', 'artistId', 'artistName',
@@ -166,125 +170,65 @@ const ROW_COLUMNS = [
   'type', 'genresFlat', 'providersFlat',
 ] as const
 
-// Lazy: importing this module must not execute a query. The cached
-// instance keeps query identity stable (useQuery memo key).
-let cachedNoopIds: unknown
-let cachedNoopRows: unknown
+// Only the columns the decode depends on are typed; the rest pass through
+// rawToMediaRow, which is tolerant of nulls and JSON-string columns.
+const rowSchema = Schema.Array(
+  Schema.Struct({
+    id: Schema.String,
+    title: Schema.String,
+    track: Schema.Unknown,
+    artistId: Schema.Unknown,
+    artistName: Schema.Unknown,
+    albumId: Schema.Unknown,
+    albumName: Schema.Unknown,
+    duration: Schema.Unknown,
+    cover: Schema.Unknown,
+    stream: Schema.Unknown,
+    type: Schema.Unknown,
+    genresFlat: Schema.Unknown,
+    providersFlat: Schema.Unknown,
+  }),
+)
 
-export const noopIdsQuery = (): unknown =>
-  (cachedNoopIds ??= queryDb(tables.media.select('id').where('id', '=', NOOP_ID)))
+const idSchema = Schema.Array(Schema.Struct({ id: Schema.String }))
 
-export const noopRowsQuery = (): unknown =>
-  (cachedNoopRows ??= queryDb(tables.media.select(...ROW_COLUMNS).where('id', '=', NOOP_ID)))
+const countSchema = Schema.Array(Schema.Struct({ count: Schema.Number }))
 
-export type CollectionQueryPlan =
-  | {
-      kind: 'ids' | 'genre-ids'
-      activeQuery: unknown
-      /** A guaranteed-empty twin so both useQuery hooks stay mounted. */
-      inactiveQuery: unknown
-    }
-  | {
-      kind: 'rows'
-      activeQuery: unknown
-      inactiveQuery: unknown
-      /** Post-filter (the shared predicate + search) for the rows path. */
-      postFilter: (row: Record<string, unknown>) => boolean
-    }
+const fromSql = (c: CollectionClauses): string =>
+  c.genreJoin ? 'FROM media m INNER JOIN media_genres mg ON mg.mediaId = m.id' : 'FROM media m'
+
+const whereSql = (c: CollectionClauses): string => (c.where.length > 0 ? ` WHERE ${c.where}` : '')
 
 /**
- * Plan a collection query for the given filter and search term.
+ * Bounded snapshot of full rows, ordered deterministically by `(title, id)`.
  *
- * @param filter - canonical Filter
- * @param searchTerm - search term (empty string disables search)
- * @param favoriteIds - current favorite media ids
+ * @param limit - window size; the caller refetches with a larger limit to
+ * grow the window (results are a stable prefix, so growth never reorders).
  */
-export const planCollectionQuery = (
-  filter: Filter,
-  searchTerm: string,
-  favoriteIds: readonly string[],
-): CollectionQueryPlan => {
-  const hasSearch = searchTerm.trim().length >= 3
-  const hasProviders = filter.providers.length > 0
-  const hasGenres = filter.genres.length > 0
-  const hasArtists = filter.artists.length > 0
-  const hasTypes = filter.types.length > 0
-  const favoritesActive = filter.favorites
-
-  if (favoritesActive && favoriteIds.length === 0) {
-    return {
-      kind: 'ids',
-      activeQuery: noopIdsQuery(),
-      inactiveQuery: noopRowsQuery(),
-    }
-  }
-
-  // SQL-expressible path (no providers, no search).
-  if (!hasSearch && !hasProviders) {
-    if (hasGenres) {
-      return { kind: 'genre-ids', activeQuery: buildGenreJoinQuery(filter, favoriteIds), inactiveQuery: noopRowsQuery() }
-    }
-
-    let q = tables.media.select('id').orderBy('title', 'asc')
-    if (hasArtists) q = q.where({ artistId: { op: 'IN', value: filter.artists } })
-    if (hasTypes) q = q.where({ type: { op: 'IN', value: filter.types } })
-    if (favoritesActive) q = q.where({ id: { op: 'IN', value: favoriteIds } })
-    return { kind: 'ids', activeQuery: q, inactiveQuery: noopRowsQuery() }
-  }
-
-  // Rows path: pull the columns the predicate and MediaRow need, apply the
-  // SQL-expressible clauses, and post-filter with the shared predicate.
-  let q = tables.media.select(...ROW_COLUMNS).orderBy('title', 'asc')
-  if (hasArtists) q = q.where({ artistId: { op: 'IN', value: filter.artists } })
-  if (hasTypes) q = q.where({ type: { op: 'IN', value: filter.types } })
-  if (favoritesActive) q = q.where({ id: { op: 'IN', value: favoriteIds } })
-
-  const favoriteSet = new Set(favoriteIds)
-  const postFilter = (row: Record<string, unknown>): boolean => {
-    const media = rawRowToFilterable(row)
-    return matchesFilter(filter, media, favoriteSet) && matchesSearch(searchTerm, media)
-  }
-
-  return { kind: 'rows', activeQuery: queryDb(q), inactiveQuery: noopIdsQuery(), postFilter }
-}
-
-/**
- * Genre filters use the indexed media_genres read model (exact genre match,
- * SQL-side) instead of full-row client-side filtering.
- */
-const buildGenreJoinQuery = (
-  filter: Filter,
-  favoriteIds: readonly string[],
-): unknown => {
-  const clauses = ['mg.genre IN (' + filter.genres.map(() => '?').join(',') + ')']
-  const bindValues: Record<number, string> = {}
-  let idx = 1
-  for (const genre of filter.genres) bindValues[idx++] = genre
-
-  if (filter.artists.length > 0) {
-    clauses.push('m.artistId IN (' + filter.artists.map(() => '?').join(',') + ')')
-    for (const artistId of filter.artists) bindValues[idx++] = artistId
-  }
-
-  if (filter.types.length > 0) {
-    clauses.push('m.type IN (' + filter.types.map(() => '?').join(',') + ')')
-    for (const type of filter.types) bindValues[idx++] = type
-  }
-
-  if (filter.favorites && favoriteIds.length > 0) {
-    clauses.push('m.id IN (' + favoriteIds.map(() => '?').join(',') + ')')
-    for (const id of favoriteIds) bindValues[idx++] = id
-  }
-
-  return queryDb({
-    query: `
-      SELECT DISTINCT m.id AS id
-      FROM media m
-      INNER JOIN media_genres mg ON mg.mediaId = m.id
-      WHERE ${clauses.join(' AND ')}
-      ORDER BY m.title ASC
-    `,
-    bindValues,
-    schema: Schema.Array(Schema.Struct({ id: Schema.String })),
+export const collectionWindowQuery = (c: CollectionClauses, limit: number) =>
+  queryDb({
+    query:
+      `SELECT ${c.genreJoin ? 'DISTINCT ' : ''}${ROW_COLUMNS.map((col) => `m.${col}`).join(', ')}` +
+      ` ${fromSql(c)}${whereSql(c)} ORDER BY m.title ASC, m.id ASC LIMIT ${limit}`,
+    bindValues: c.bindValues,
+    schema: rowSchema,
   })
-}
+
+/** Live count for the same clauses (DISTINCT when the genre join fans out). */
+export const collectionCountQuery = (c: CollectionClauses) =>
+  queryDb({
+    query:
+      `SELECT COUNT(${c.genreJoin ? 'DISTINCT ' : ''}m.id) AS count ${fromSql(c)}${whereSql(c)}`,
+    bindValues: c.bindValues,
+    schema: countSchema,
+  })
+
+/** All matching ids in window order — for one-shot whole-collection consumers. */
+export const collectionAllIdsQuery = (c: CollectionClauses) =>
+  queryDb({
+    query:
+      `SELECT ${c.genreJoin ? 'DISTINCT ' : ''}m.id AS id ${fromSql(c)}${whereSql(c)}` +
+      ` ORDER BY m.title ASC, m.id ASC`,
+    bindValues: c.bindValues,
+    schema: idSchema,
+  })

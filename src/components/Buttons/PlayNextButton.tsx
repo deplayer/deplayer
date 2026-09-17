@@ -10,6 +10,8 @@ import type { MediaRow } from '../../types/media'
 type Props = {
   songs?: MediaRow[],
   mediaIds?: string[],
+  /** One-shot resolver for ALL matching ids (windowed collections). Wins over mediaIds. */
+  resolveIds?: () => Promise<string[]>,
   transparent?: boolean,
   fullWidth?: boolean,
   alignLeft?: boolean,
@@ -27,7 +29,11 @@ const PlayNextButton = (props: Props) => {
     try {
       let trackIds: string[] = []
 
-      if (mediaIds && mediaIds.length > 0) {
+      // Windowed collections hand us a resolver so Play Next keeps
+      // whole-collection semantics instead of the loaded window only.
+      if (props.resolveIds) {
+        trackIds = await props.resolveIds()
+      } else if (mediaIds && mediaIds.length > 0) {
         // Use provided media IDs directly
         trackIds = mediaIds
       } else if (songs && songs.length > 0) {

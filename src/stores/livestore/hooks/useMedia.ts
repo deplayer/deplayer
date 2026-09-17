@@ -2,7 +2,7 @@ import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
 import { useMemo } from 'react'
-import { planCollectionQuery, parseIds, type Filter } from '../collection/filter'
+import { buildCollectionClauses, collectionAllIdsQuery, parseIds, type Filter } from '../collection/filter'
 import { useFavoriteIds } from './useFavorites'
 
 import type { MediaRow } from '../../../types/media'
@@ -339,9 +339,9 @@ export const useMostPlayed = (limit = 20) => {
 /**
  * Filtered media IDs for a collection filter.
  *
- * A thin adapter over the collection-filter module: plans the query and
- * executes the plan, with no search term. All match semantics and path
- * selection live in `collection/filter.ts`.
+ * A thin adapter over the collection-filter module: builds the clause set
+ * (no search term) and subscribes to the all-ids query. All match
+ * semantics live in `collection/filter.ts`.
  *
  * @param filters - Collection filter value
  * @returns Array of filtered media IDs
@@ -351,27 +351,17 @@ export const useFilteredMedia = (filters: Filter) => {
   const favoriteIds = useFavoriteIds()
   const favoriteIdsArray = useMemo(() => Array.from(favoriteIds), [favoriteIds])
 
-  // Thin adapter: all match semantics and path selection live in the
-  // collection-filter module; this hook only executes the plan.
-  const plan = useMemo(
-    () => planCollectionQuery(filters, '', favoriteIdsArray),
+  // Thin adapter: all match semantics live in the collection-filter
+  // module; this hook only subscribes to the all-ids query it builds.
+  const clauses = useMemo(
+    () => buildCollectionClauses(filters, '', favoriteIdsArray),
     [filters, favoriteIdsArray],
   )
+  const allIdsQuery = useMemo(() => collectionAllIdsQuery(clauses), [clauses])
 
-  const activeRaw = store.useQuery(plan.activeQuery as Parameters<typeof store.useQuery>[0])
-  const inactiveRaw = store.useQuery(plan.inactiveQuery as Parameters<typeof store.useQuery>[0])
-  void inactiveRaw // subscription only: keeps the twin slot mounted and empty
+  const activeRaw = store.useQuery(allIdsQuery as Parameters<typeof store.useQuery>[0])
 
-  return useMemo(() => {
-    const ids = parseIds(activeRaw)
-    if (plan.kind !== 'rows') return ids
-
-    const rows = Array.isArray(activeRaw) ? activeRaw : []
-    return rows
-      .filter((raw: Record<string, unknown>) => plan.postFilter(raw))
-      .map((raw: Record<string, unknown>) => String((raw as { id?: unknown }).id ?? ''))
-      .filter(Boolean)
-  }, [plan, activeRaw])
+  return useMemo(() => parseIds(activeRaw), [activeRaw])
 }
 
 /**

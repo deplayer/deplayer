@@ -1,95 +1,21 @@
 import { describe, expect, it } from 'vitest'
 import {
   EMPTY_FILTER,
-  matchesFilter,
-  matchesSearch,
-  noopIdsQuery,
+  buildCollectionClauses,
+  collectionAllIdsQuery,
+  collectionCountQuery,
+  collectionWindowQuery,
   parseFilter,
   parseIds,
-  planCollectionQuery,
-  rawRowToFilterable,
   type Filter,
-  type FilterableMedia,
 } from './filter'
-
-const NO_FAVORITES = new Set<string>()
-
-const media = (overrides: Partial<FilterableMedia> = {}): FilterableMedia => ({
-  id: 'm1',
-  artistId: 'artist-1',
-  type: 'audio',
-  genres: ['Rock'],
-  providers: ['Spotify'],
-  title: 'Song Title',
-  artistName: 'Artist Name',
-  albumName: 'Album Name',
-  ...overrides,
-})
 
 const filter = (overrides: Partial<Filter> = {}): Filter => ({ ...EMPTY_FILTER, ...overrides })
 
-describe('matchesFilter semantics', () => {
-  it('passes everything when no filter is active', () => {
-    expect(matchesFilter(filter(), media(), NO_FAVORITES)).toBe(true)
-  })
-
-  it('ORs within a category', () => {
-    const f = filter({ genres: ['Rock', 'Jazz'] })
-    expect(matchesFilter(f, media({ genres: ['Rock'] }), NO_FAVORITES)).toBe(true)
-    expect(matchesFilter(f, media({ genres: ['Jazz'] }), NO_FAVORITES)).toBe(true)
-    expect(matchesFilter(f, media({ genres: ['Metal'] }), NO_FAVORITES)).toBe(false)
-  })
-
-  it('ANDs across categories', () => {
-    const f = filter({ genres: ['Rock'], artists: ['artist-2'] })
-    // Matches genre but not artist → excluded
-    expect(matchesFilter(f, media(), NO_FAVORITES)).toBe(false)
-    // Matches both → included
-    expect(matchesFilter(f, media({ artistId: 'artist-2' }), NO_FAVORITES)).toBe(true)
-  })
-
-  it('matches genres exactly, not by substring', () => {
-    const f = filter({ genres: ['Rock'] })
-    expect(matchesFilter(f, media({ genres: ['Rockabilly'] }), NO_FAVORITES)).toBe(false)
-    expect(matchesFilter(f, media({ genres: ['Rock', 'Pop'] }), NO_FAVORITES)).toBe(true)
-  })
-
-  it('matches providers exactly, not by substring', () => {
-    const f = filter({ providers: ['Spot'] })
-    expect(matchesFilter(f, media({ providers: ['Spotify'] }), NO_FAVORITES)).toBe(false)
-  })
-
-  it('requires favorites membership when favorites is active', () => {
-    const favs = new Set(['m1'])
-    const f = filter({ favorites: true })
-    expect(matchesFilter(f, media(), favs)).toBe(true)
-    expect(matchesFilter(f, media({ id: 'm2' }), favs)).toBe(false)
-  })
-
-  it('ANDs favorites with other categories', () => {
-    const favs = new Set(['m1'])
-    const f = filter({ favorites: true, genres: ['Rock'] })
-    expect(matchesFilter(f, media({ genres: ['Metal'] }), favs)).toBe(false)
-    expect(matchesFilter(f, media(), favs)).toBe(true)
-  })
-})
-
-describe('matchesSearch', () => {
-  it('requires a term of at least 3 characters', () => {
-    const m = media()
-    expect(matchesSearch('ro', m)).toBe(true)
-    expect(matchesSearch('son', m)).toBe(true)
-    expect(matchesSearch('  song  ', m)).toBe(true)
-  })
-
-  it('searches title, artist name, and album name case-insensitively', () => {
-    const m = media()
-    expect(matchesSearch('song', m)).toBe(true)
-    expect(matchesSearch('ARTIST', m)).toBe(true)
-    expect(matchesSearch('album name', m)).toBe(true)
-    expect(matchesSearch('nope', m)).toBe(false)
-  })
-})
+/** QuerySQL surface used for assertions: label carries the SQL text. */
+interface QueryLike {
+  label: string
+}
 
 describe('parseFilter', () => {
   it('returns the empty filter for null/undefined', () => {
@@ -113,27 +39,6 @@ describe('parseFilter', () => {
   })
 })
 
-describe('rawRowToFilterable', () => {
-  it('splits denormalized flat columns into arrays', () => {
-    const row = rawRowToFilterable({
-      id: 'm1',
-      artistId: 'a1',
-      type: 'audio',
-      genresFlat: 'Rock,Pop',
-      providersFlat: 'Spotify,Apple',
-      title: 'T',
-    })
-    expect(row.genres).toEqual(['Rock', 'Pop'])
-    expect(row.providers).toEqual(['Spotify', 'Apple'])
-  })
-
-  it('tolerates missing flat columns', () => {
-    const row = rawRowToFilterable({ id: 'm1' })
-    expect(row.genres).toEqual([])
-    expect(row.providers).toEqual([])
-  })
-})
-
 describe('parseIds', () => {
   it('handles flat strings, id-rows, and garbage', () => {
     expect(parseIds(['a', { id: 'b' }, null, 42])).toEqual(['a', 'b'])
@@ -141,80 +46,119 @@ describe('parseIds', () => {
   })
 })
 
-describe('planCollectionQuery', () => {
-
-  it('plans the cheap ids path with no filters', () => {
-    expect(planCollectionQuery(filter(), '', []).kind).toBe('ids')
+describe('buildCollectionClauses', () => {
+  it('emits no WHERE for an empty filter without search', () => {
+    const c = buildCollectionClauses(filter(), '', [])
+    expect(c.where).toBe('')
+    expect(c.genreJoin).toBe(false)
+    expect(c.bindValues).toEqual([])
   })
 
-  it('plans the ids path for artists/types/favorites (SQL-expressible)', () => {
-    expect(planCollectionQuery(filter({ artists: ['a1'] }), '', []).kind).toBe('ids')
-    expect(planCollectionQuery(filter({ types: ['audio'] }), '', []).kind).toBe('ids')
-    expect(planCollectionQuery(filter({ favorites: true }), '', ['m1']).kind).toBe('ids')
+  it('ORs within a category via IN lists', () => {
+    const c = buildCollectionClauses(filter({ genres: ['Rock', 'Jazz'] }), '', [])
+    expect(c.where).toBe('mg.genre IN (?,?)')
+    expect(c.genreJoin).toBe(true)
+    expect(c.bindValues).toEqual(['Rock', 'Jazz'])
   })
 
-  it('plans the genre read-model join for genre filters without providers/search', () => {
-    expect(planCollectionQuery(filter({ genres: ['Rock'] }), '', []).kind).toBe('genre-ids')
-    expect(planCollectionQuery(filter({ genres: ['Rock'], artists: ['a1'], types: ['audio'] }), '', []).kind).toBe('genre-ids')
+  it('ANDs across categories', () => {
+    const c = buildCollectionClauses(filter({ artists: ['a1'], types: ['audio'] }), '', [])
+    expect(c.where).toContain(' AND ')
+    expect(c.where).toContain('m.artistId IN (?)')
+    expect(c.where).toContain('m.type IN (?)')
   })
 
-  it('emits the media_genres join SQL for genre plans', () => {
-    const plan = planCollectionQuery(filter({ genres: ['Rock'] }), '', [])
-    expect(plan.kind).toBe('genre-ids')
-    const query = plan.activeQuery as { label: string; hash: string }
-    expect(query.label).toContain('INNER JOIN media_genres mg ON mg.mediaId = m.id')
-    expect(query.label).toContain('mg.genre IN (?)')
-    expect(query.label).toContain('ORDER BY m.title ASC')
+  it('short-circuits favorites-on with no favorites to an unsatisfiable predicate', () => {
+    const c = buildCollectionClauses(filter({ favorites: true }), '', [])
+    expect(c.where).toBe('1 = 0')
+    expect(c.genreJoin).toBe(false)
   })
 
-  it('plans the rows path when providers need client-side filtering', () => {
-    const plan = planCollectionQuery(filter({ providers: ['Spotify'] }), '', [])
-    expect(plan.kind).toBe('rows')
-    if (plan.kind !== 'rows') return
-    // Genre is now enforced by the shared predicate, not dropped:
-    const plan2 = planCollectionQuery(filter({ genres: ['Rock'], providers: ['Spotify'] }), '', [])
-    if (plan2.kind !== 'rows') throw new Error('expected rows plan')
-    const rockSpotify = { id: 'm1', genresFlat: 'Rock', providersFlat: 'Spotify' }
-    const metalSpotify = { id: 'm2', genresFlat: 'Metal', providersFlat: 'Spotify' }
-    const rockApple = { id: 'm3', genresFlat: 'Rock', providersFlat: 'Apple' }
-    expect(plan2.postFilter(rockSpotify)).toBe(true)
-    expect(plan2.postFilter(metalSpotify)).toBe(false)
-    expect(plan2.postFilter(rockApple)).toBe(false)
+  it('ANDs the favorites id list with other categories', () => {
+    const c = buildCollectionClauses(filter({ artists: ['a1'], favorites: true }), '', ['m1', 'm2'])
+    expect(c.where).toContain('m.artistId IN (?)')
+    expect(c.where).toContain('m.id IN (?,?)')
+    expect(c.where).toContain(' AND ')
+    expect(c.bindValues).toEqual(['a1', 'm1', 'm2'])
   })
 
-  it('plans the rows path when search is active and post-filters it', () => {
-    const plan = planCollectionQuery(filter(), 'song', [])
-    expect(plan.kind).toBe('rows')
-    if (plan.kind !== 'rows') return
-    expect(plan.postFilter({ id: 'm1', title: 'Song One', artistName: '', albumName: '' })).toBe(true)
-    expect(plan.postFilter({ id: 'm2', title: 'Other', artistName: '', albumName: '' })).toBe(false)
+  it('matches providers by exact CSV token, not substring', () => {
+    const c = buildCollectionClauses(filter({ providers: ['sub'] }), '', [])
+    // The comma padding is what makes ',sub,' unable to match 'subsonic'.
+    expect(c.where).toContain("(',' || m.providersFlat || ',') LIKE ? ESCAPE '\\'")
+    expect(c.bindValues[0]).toBe(',sub,')
   })
 
-  it('returns the NOOP ids plan for favorites-on with no favorites', () => {
-    const plan = planCollectionQuery(filter({ favorites: true }), '', [])
-    expect(plan.kind).toBe('ids')
-    // The empty plan must be the shared NOOP query instance, not all media:
-    expect(plan.activeQuery).toBe(noopIdsQuery())
-    expect(noopIdsQuery()).toBe(noopIdsQuery())
+  it('ORs multiple providers', () => {
+    const c = buildCollectionClauses(filter({ providers: ['sub', 'jam'] }), '', [])
+    expect(c.where).toMatch(/\(.*LIKE.*OR.*LIKE.*\)/)
+    expect(c.bindValues).toEqual([',sub,', ',jam,'])
+  })
+  it('ignores search terms shorter than 3 characters', () => {
+    expect(buildCollectionClauses(filter(), 'ab', []).where).toBe('')
+    expect(buildCollectionClauses(filter(), '  ', []).where).toBe('')
   })
 
-  it('keeps the favorite clause on the genre join plan', () => {
-    const plan = planCollectionQuery(filter({ genres: ['Rock'], favorites: true }), '', ['m1', 'm2'])
-    expect(plan.kind).toBe('genre-ids')
-    const sql = (plan.activeQuery as { label: string }).label
-    expect(sql).toContain('INNER JOIN media_genres')
-    expect(sql).toContain('m.id IN (?,?)')
+  it('searches title, artist and album with a substring pattern', () => {
+    const c = buildCollectionClauses(filter(), 'love', [])
+    expect(c.where).toContain("m.title LIKE ? ESCAPE '\\'")
+    expect(c.where).toContain("m.artistName LIKE ? ESCAPE '\\'")
+    expect(c.where).toContain("m.albumName LIKE ? ESCAPE '\\'")
+    expect(c.bindValues).toEqual(['%love%', '%love%', '%love%'])
   })
 
-  it('emits genre join SQL with bind values for artists and types', () => {
-    const plan = planCollectionQuery(
-      filter({ genres: ['Rock', 'Jazz'], artists: ['a1'], types: ['audio'] }),
-      '',
-      [],
-    )
-    expect(plan.kind).toBe('genre-ids')
-    const q = plan.activeQuery as { label: string; hash: string }
-    expect(q.label).toContain('mg.genre IN (?,?)')
-    expect(q.hash).toBe(q.label + '-1:Rock,2:Jazz,3:a1,4:audio')
+  it('escapes LIKE wildcards in the search term', () => {
+    const c = buildCollectionClauses(filter(), '50%off_', [])
+    expect(c.bindValues[0]).toBe('%50\\%off\\_%')
+  })
+})
+
+describe('collection query builders', () => {
+  it('window: plain scan ordered by (title, id) with LIMIT, no join', () => {
+    const q = collectionWindowQuery(buildCollectionClauses(filter(), '', []), 250) as QueryLike
+    expect(q.label).toContain('FROM media m')
+    expect(q.label).not.toContain('media_genres')
+    expect(q.label).not.toContain('DISTINCT')
+    expect(q.label).toContain('ORDER BY m.title ASC, m.id ASC')
+    expect(q.label).toContain('LIMIT 250')
+  })
+
+  it('window: genre filters use the media_genres join and DISTINCT', () => {
+    const q = collectionWindowQuery(buildCollectionClauses(filter({ genres: ['Rock'] }), '', []), 100) as QueryLike
+    expect(q.label).toContain('INNER JOIN media_genres mg ON mg.mediaId = m.id')
+    expect(q.label).toContain('DISTINCT')
+    expect(q.label).toContain('mg.genre IN (?)')
+    expect(q.label).toContain('LIMIT 100')
+  })
+
+  it('count: aggregates without the genre join when unfiltered', () => {
+    const q = collectionCountQuery(buildCollectionClauses(filter(), '', [])) as QueryLike
+    expect(q.label).toContain('SELECT COUNT(m.id) AS count FROM media m')
+    expect(q.label).not.toContain('WHERE')
+    expect(q.label).not.toContain('media_genres')
+  })
+
+  it('count: genre filters aggregate DISTINCT over the join', () => {
+    const q = collectionCountQuery(buildCollectionClauses(filter({ genres: ['Rock'] }), '', [])) as QueryLike
+    expect(q.label).toContain('COUNT(DISTINCT m.id)')
+    expect(q.label).toContain('INNER JOIN media_genres')
+  })
+
+  it('allIds: full id list in window order, unbounded', () => {
+    const q = collectionAllIdsQuery(buildCollectionClauses(filter(), '', [])) as QueryLike
+    expect(q.label).toContain('SELECT m.id AS id FROM media m')
+    expect(q.label).toContain('ORDER BY m.title ASC, m.id ASC')
+    expect(q.label).not.toContain('LIMIT')
+  })
+
+  it('window, count and allIds share identical WHERE semantics', () => {
+    const c = buildCollectionClauses(filter({ artists: ['a1'] }), 'love', [])
+    const window = (collectionWindowQuery(c, 250) as QueryLike).label
+    const count = (collectionCountQuery(c) as QueryLike).label
+    const allIds = (collectionAllIdsQuery(c) as QueryLike).label
+    const where = 'm.artistId IN (?) AND (m.title LIKE ?'
+    expect(window).toContain(where)
+    expect(count).toContain(where)
+    expect(allIds).toContain(where)
   })
 })
