@@ -82,4 +82,41 @@ describe('SubsonicApiProvider.streamAlbumsSince', () => {
     }
     expect(collected.sort()).toEqual(['S1', 'S2', 'S3'])
   })
+
+  it('prefetches the next page before yielding the current one', async () => {
+    const calls: string[] = []
+    let listCalls = 0
+    mockedAxios.get.mockImplementation(async (url: string) => {
+      calls.push(url)
+      if (url.includes('getAlbumList2')) {
+        listCalls++
+        return listCalls === 1
+          ? albumList([{ id: 'a1', created: '2026-03-18T00:00:00Z' }])
+          : albumList([{ id: 'a2', created: '2026-03-10T00:00:00Z' }])
+      }
+      return albumDetail({ id: 'a1' }, [
+        { id: 's1', title: 'S1', artist: 'A', album: 'Al1', duration: 1, track: 1 },
+      ])
+    })
+
+    const gen = provider.streamAlbumsSince!('2026-03-15T00:00:00Z', { pageSize: 1 })
+
+    const first = await gen.next()
+    if (first.done) throw new Error('expected a first page')
+    expect(first.value.media.map((m) => m.media.title)).toEqual(['S1'])
+    expect(first.value.hasMore).toBe(true)
+    expect(first.value.nextCursor).toBe(1)
+    // (narrowed by the done-guard above)
+    // The page-2 album list was already requested before page 1 was
+    // yielded: its download overlaps whatever the consumer does with page 1.
+    expect(calls.filter((u) => u.includes('getAlbumList2'))).toHaveLength(2)
+
+    const second = await gen.next()
+    // a2 predates `since`: boundary crossed, empty page, stream ends.
+    if (second.done) throw new Error('expected a second page')
+    expect(second.value.hasMore).toBe(false)
+    expect(second.value.media).toEqual([])
+
+    expect((await gen.next()).done).toBe(true)
+  })
 })

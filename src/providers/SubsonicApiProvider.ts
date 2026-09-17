@@ -36,6 +36,14 @@ type SubsonicPingResponse = {
 const logger = createLogger({ namespace: "SubsonicApiProvider" });
 
 /**
+ * Concurrent getAlbum requests per page. Page fetch time is dominated by
+ * sequential round trips over the album details; 20 concurrent reads (up
+ * from lockstep slices of 10) roughly halves the waves a 50-album page
+ * needs while staying within what Subsonic servers tolerate.
+ */
+const ALBUM_FETCH_PARALLELISM = 20
+
+/**
  * Implement the Subsonic API
  */
 export default class SubsonicApiProvider implements IMusicProvider {
@@ -121,19 +129,24 @@ export default class SubsonicApiProvider implements IMusicProvider {
     opts: { cursor?: number | null; pageSize?: number } = {},
   ): AsyncGenerator<{ media: NormalizedMedia[]; nextCursor: number | null; hasMore: boolean }, void, void> {
     const pageSize = opts.pageSize ?? 50
-    const ALBUM_FETCH_PARALLELISM = 10
-    let offset = opts.cursor ?? 0
     const sinceMs = since ? new Date(since).getTime() : -Infinity
 
-    while (true) {
+    /**
+     * Fetch one album-list page (offset-based) and resolve its songs.
+     * Pure fetch: no generator state, so it can run ahead of the consumer.
+     */
+    const fetchPage = async (offset: number): Promise<{
+      media: NormalizedMedia[]
+      hasMore: boolean
+      nextOffset: number
+    }> => {
       const list = await axios.get(
         `${this.baseUrl}/rest/getAlbumList2.view?u=${this.user}&p=${this.password}` +
         `&c=deplayer&v=1.16.1&f=json&type=newest&size=${pageSize}&offset=${offset}`,
       )
       const albums: SubsonicAlbum[] = list.data['subsonic-response'].albumList2?.album || []
       if (albums.length === 0) {
-        yield { media: [], nextCursor: null, hasMore: false }
-        return
+        return { media: [], hasMore: false, nextOffset: offset }
       }
 
       let crossedBoundary = false
@@ -152,32 +165,63 @@ export default class SubsonicApiProvider implements IMusicProvider {
         }
       }
 
-      const pageMedia: NormalizedMedia[] = []
-      for (let i = 0; i < fresh.length; i += ALBUM_FETCH_PARALLELISM) {
-        const slice = fresh.slice(i, i + ALBUM_FETCH_PARALLELISM)
-        const results = await Promise.allSettled(
-          slice.map(async (album) => {
+      // Bounded-concurrency detail fetch: a fixed pool of workers pulls album
+      // ids off a shared cursor, so a slow request doesn't stall its whole
+      // round the way lockstep slices did. Results are index-stable — page
+      // media order always matches the server's album order.
+      const details: { songs: SubsonicSong[]; album: SubsonicAlbum }[] = new Array(fresh.length)
+      let next = 0
+      const worker = async (): Promise<void> => {
+        while (next < fresh.length) {
+          const i = next++
+          try {
             const detail = await axios.get(
               `${this.baseUrl}/rest/getAlbum.view?u=${this.user}&p=${this.password}` +
-              `&c=deplayer&v=1.16.1&f=json&id=${album.id}`,
+              `&c=deplayer&v=1.16.1&f=json&id=${fresh[i].id}`,
             )
-            const songs = detail.data['subsonic-response'].album?.song || []
-            return { songs, album }
-          }),
-        )
-        for (const r of results) {
-          if (r.status === 'fulfilled') {
-            for (const m of this.mapSongs(r.value.songs, [r.value.album])) pageMedia.push(m)
-          } else {
-            logger.error('Error fetching album songs:', r.reason)
+            details[i] = {
+              songs: detail.data['subsonic-response'].album?.song || [],
+              album: fresh[i],
+            }
+          } catch (error) {
+            logger.error(`Error fetching songs for album ${fresh[i].id}:`, error)
           }
+        }
+      }
+      await Promise.all(
+        Array.from({ length: Math.min(ALBUM_FETCH_PARALLELISM, fresh.length) }, worker),
+      )
+
+      const pageMedia: NormalizedMedia[] = []
+      for (const d of details) {
+        if (d) {
+          for (const m of this.mapSongs(d.songs, [d.album])) pageMedia.push(m)
         }
       }
 
       const hasMore = !crossedBoundary && albums.length === pageSize
-      offset += pageSize
-      yield { media: pageMedia, nextCursor: hasMore ? offset : null, hasMore }
-      if (!hasMore) return
+      return { media: pageMedia, hasMore, nextOffset: offset + pageSize }
+    }
+
+    // Prefetch pipeline: the next page's download starts BEFORE the current
+    // page is yielded, so the consumer's commit overlaps the network instead
+    // of serialising after it. A prefetch rejection surfaces at the next
+    // `await pending` (same failure point as before); the no-op catch keeps
+    // an abandoned generator from surfacing an unhandled rejection.
+    const startFetch = (offset: number) => {
+      const p = fetchPage(offset)
+      p.catch(() => {})
+      return p
+    }
+
+    const offset = opts.cursor ?? 0
+    let pending = startFetch(offset)
+    for (;;) {
+      const page = await pending
+      const next = page.hasMore ? startFetch(page.nextOffset) : null
+      yield { media: page.media, nextCursor: page.hasMore ? page.nextOffset : null, hasMore: page.hasMore }
+      if (next === null) return
+      pending = next
     }
   }
 

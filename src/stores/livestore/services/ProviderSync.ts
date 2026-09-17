@@ -28,10 +28,11 @@ const logger = createLogger({ namespace: 'ProviderSync' })
 // ---------------------------------------------------------------------------
 const SYNC_PAGE_SIZE = 50
 
-// Progress is published (and the UI refreshed) every N pages, not per page:
-// a 62k library streams ~1,240 pages, and per-page UI notifications would
-// thrash every reactive consumer. 10 pages x SYNC_PAGE_SIZE = 500 items per
-// tick keeps the visible bar moving without hammering the store.
+// Progress publishes per page — a zustand set that re-renders only the
+// Topbar bar, no LiveStore work — so the bar tracks every page. The reactive
+// refresh stays throttled: re-running every active query per page would
+// thrash reactive consumers. A 62k library streams ~120 pages of ~500 songs;
+// refreshing every 10 pages (~5k songs) keeps mid-sync data visibility cheap.
 const PROGRESS_REFRESH_PAGES = 10
 
 /** A Provider that supports incremental streaming sync. */
@@ -144,16 +145,19 @@ export async function syncProvider(
         pageSize: SYNC_PAGE_SIZE,
       })
 
-      // Throttled UI cadence: publish progress and let reactive consumers
-      // re-read their cheap queries (COUNT(*), collections) every N pages.
+      // Per-page progress publish (cheap): the Topbar bar reflects durable
+      // progress — the page above is committed AND its cursor saved.
+      useUIStore.getState().setSyncProgress({
+        active: true,
+        added,
+        total: scanStatus.count,
+      })
+
+      // Throttled reactive refresh: lets cheap reactive consumers (counts,
+      // the collection view) catch up mid-stream without per-page thrash.
       // The saga's single final refresh stays the authoritative end-of-sync
       // commit for this cycle.
       if (pages % PROGRESS_REFRESH_PAGES === 0) {
-        useUIStore.getState().setSyncProgress({
-          active: true,
-          added,
-          total: scanStatus.count,
-        })
         await batchedMediaCommitter.refresh('SyncProvider.progress')
       }
 
