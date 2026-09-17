@@ -44,9 +44,7 @@ _Avoid_: cursor version
 - A **Stream source** of blob kind is released exactly when playback moves past it (PlaybackController), or when the SongView download list is replaced/unmounted
 - The **Playback queue** is read via `useQueue`/`readQueue`; the playback head resolves to the persisted `currentTrackId` column, falling back to the index into the active track list
 - Shuffle reorders the random list only and keeps the active track in position; the **Stream source** release on playback advance is the queue's one effect on media
-- A **Collection filter** is evaluated entirely in SQL over the `media_genres` read model; window, count, and all-ids queries share one clause set, so they cannot diverge. Bind values are positional arrays — object-form binds are silently mangled by LiveStore's named-param preparation
-
-
+- All raw SQL against LiveStore uses positional array binds — object-form binds are mangled into `$key` named params (keys absent from the SQL text are dropped), and raw `store.query` returns an array of row objects. Pinned by `livestore-bind-contract.spec.ts`
 
 ## Example dialogue
 

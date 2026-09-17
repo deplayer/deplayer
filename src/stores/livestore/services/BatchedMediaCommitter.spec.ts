@@ -10,7 +10,8 @@ const makeMedia = (n: number): NormalizedMedia[] =>
   })) as unknown as NormalizedMedia[]
 
 const makeFakeStore = () => ({
-  query: vi.fn(async () => [{ values: [] as string[][] }]),
+  // Raw store.query returns row objects; the existence prefilter reads .id.
+  query: vi.fn(async () => [] as Array<{ id: string }>),
   commit: vi.fn(async () => undefined),
   manualRefresh: vi.fn(),
 })
@@ -117,6 +118,31 @@ describe('BatchedMediaCommitter.flush', () => {
       const placeholders = (q.match(/\?/g) || []).length
       expect(placeholders).toBeLessThanOrEqual(500)
     }
+  })
+
+  it('prefilters existing ids: committed payload excludes them, binds positionally', async () => {
+    const store = makeFakeStore()
+    // The prefilter's SELECT reports m0..m2 as already in the database.
+    store.query.mockImplementation(async () => [{ id: 'm0' }, { id: 'm1' }, { id: 'm2' }])
+    // @ts-expect-error test seam
+    batchedMediaCommitter.setStore(store)
+    // @ts-expect-error test seam: directly push to private buffer
+    batchedMediaCommitter.pendingMedia.push(...makeMedia(5))
+
+    await batchedMediaCommitter.flush()
+
+    // Object-form binds never reach positional placeholders and the old
+    // decode read a nonexistent .values — both made this filter a no-op.
+    const queryCalls = store.query.mock.calls as unknown as Array<[{ bindValues: unknown }]>
+    expect(Array.isArray(queryCalls[0][0].bindValues)).toBe(true)
+    expect(queryCalls[0][0].bindValues).toEqual(['m0', 'm1', 'm2', 'm3', 'm4'])
+
+    const commitCalls = store.commit.mock.calls as unknown as Array<
+      [unknown, { args: { media: Array<{ id: string }> } }]
+    >
+    const bulkEvents = commitCalls.map(([, event]) => event).filter(e => e?.args?.media)
+    expect(bulkEvents).toHaveLength(1)
+    expect(bulkEvents[0].args.media.map(m => m.id)).toEqual(['m3', 'm4'])
   })
 })
 

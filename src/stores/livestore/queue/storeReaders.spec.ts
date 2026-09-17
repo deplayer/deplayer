@@ -100,6 +100,13 @@ describe('resolveCurrentPlayingSongId', () => {
     expect(result).toBeNull()
   })
 
+  it('binds the queue id positionally (object binds never reach the ?)', () => {
+    const mockStore = makeLiveStoreMock([])
+    resolveCurrentPlayingSongId(() => mockStore as unknown as LiveStore)
+    const queryArg = mockStore.query.mock.calls[0][0] as { bindValues: unknown }
+    expect(queryArg.bindValues).toEqual(['default'])
+  })
+
   it('returns null when queue table is empty', () => {
     const mockStore = makeLiveStoreMock([])
     const result = resolveCurrentPlayingSongId(() => mockStore as unknown as LiveStore)

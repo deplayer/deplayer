@@ -64,7 +64,9 @@ export function resolveCurrentPlayingSongId(
 
   const result = store.query({
     query: `SELECT trackIds, randomTrackIds, currentPlaying, currentTrackId, shuffle FROM queue WHERE id = ?`,
-    bindValues: { 1: 'default' }
+    // Positional array bind — object-form binds are mangled into named
+    // params and never reach the placeholder (livestore-bind-contract.spec).
+    bindValues: ['default'],
   }) as Array<{
     trackIds?: string | readonly string[]
     randomTrackIds?: string | readonly string[]

@@ -199,14 +199,21 @@ class BatchedMediaCommitter {
       for (let off = 0; off < mediaToCommit.length; off += EXISTENCE_CHUNK) {
         const slice = mediaToCommit.slice(off, off + EXISTENCE_CHUNK)
         const placeholders = slice.map(() => '?').join(',')
-        const bindValues: Record<number, string> = {}
-        for (let k = 0; k < slice.length; k++) bindValues[k + 1] = slice[k].media.id
+        // Positional array bind: LiveStore maps object keys to $key named
+        // params (dropping keys absent from the SQL text), so object-form
+        // binds silently never reach the `?` placeholders — the prefilter
+        // matched nothing until this was an array. See
+        // livestore-bind-contract.spec.ts.
         const result = await this.store!.query({
           query: `SELECT id FROM media WHERE id IN (${placeholders})`,
-          bindValues,
+          bindValues: slice.map(item => item.media.id),
         })
-        const rows = (result as Array<{ values?: string[][] }>)?.[0]?.values || []
-        for (const row of rows) existingIds.add(row[0])
+        // Raw store.query returns an array of row objects ({ id }), not the
+        // wa-sqlite { values } matrix.
+        const rows = (result as Array<{ id?: string }>) ?? []
+        for (const row of rows) {
+          if (row.id !== undefined) existingIds.add(row.id)
+        }
       }
       profiler.end('query-existing-ids')
 
