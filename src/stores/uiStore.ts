@@ -6,6 +6,13 @@ export type VisualsMode = 'off' | 'ambient' | 'panel'
 // Re-exported for call sites that read it from the UI store.
 export type { Filter }
 
+/** Live progress of an in-flight library sync, published by syncProvider. */
+export type SyncProgress = {
+  active: boolean
+  added: number
+  total: number // 0 when the provider exposes no scan count (indeterminate)
+}
+
 type UIState = {
   // Layout
   sidebarToggled: boolean
@@ -29,6 +36,7 @@ type UIState = {
 
   // App state
   ready: boolean
+  syncProgress: SyncProgress
 
   // Search & Filters
   activeFilters: Filter
@@ -53,6 +61,7 @@ type UIActions = {
   setPanelPosition: (right: number | null, bottom: number, top: number | null) => void
   setBackgroundImage: (url: string) => void
   setReady: (ready: boolean) => void
+  setSyncProgress: (progress: SyncProgress) => void
   setFilter: (filterType: keyof Filter, values: string[] | boolean) => void
   clearFilters: () => void
   setSearchTerm: (term: string) => void
@@ -87,6 +96,7 @@ export const useUIStore = create<UIState & UIActions>((set) => ({
   panelPositionBottom: 0, // 0 = neutral, CSS default bottom applies until dragged
   panelPositionTop: null, // null = bottom-anchored; set on mobile top-snap
   ready: false,
+  syncProgress: { active: false, added: 0, total: 0 },
   activeFilters: emptyFilters,
   searchTerm: '',
   searchActive: false,
@@ -116,6 +126,7 @@ export const useUIStore = create<UIState & UIActions>((set) => ({
     set({ panelPositionRight: right, panelPositionBottom: bottom, panelPositionTop: top }),
   setBackgroundImage: (url) => set({ backgroundImage: url }),
   setReady: (ready) => set({ ready }),
+  setSyncProgress: (syncProgress) => set({ syncProgress }),
   setFilter: (filterType, values) =>
     set((s) => ({ activeFilters: { ...s.activeFilters, [filterType]: values } })),
   clearFilters: () => set({ activeFilters: emptyFilters }),

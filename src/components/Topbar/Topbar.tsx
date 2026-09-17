@@ -73,6 +73,7 @@ const Topbar = ({ children }: Props) => {
   const closeSearch = useUIStore((s) => s.closeSearch)
   const toggleRightPanel = useUIStore((s) => s.toggleRightPanel)
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
+  const syncProgress = useUIStore((s) => s.syncProgress)
   const loading = useSelector((state: RootState) => state.search.loading)
 
   const { type: detailType, id: detailId } = extractIdFromPath(location.pathname)
@@ -163,6 +164,26 @@ const Topbar = ({ children }: Props) => {
           <Icon icon='faShareAlt' />
         </button>
       </div>
+
+      {syncProgress.active && (
+        <progress
+          className='absolute bottom-0 left-0 right-0 w-full h-1'
+          value={
+            syncProgress.total > 0
+              ? Math.min(
+                  100,
+                  Math.round((syncProgress.added / syncProgress.total) * 100),
+                )
+              : undefined
+          }
+          aria-label={I18n.t('labels.syncingLibrary')}
+          title={
+            syncProgress.total > 0
+              ? `${syncProgress.added} / ${syncProgress.total}`
+              : undefined
+          }
+        />
+      )}
     </div>
   )
 }

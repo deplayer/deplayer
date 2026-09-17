@@ -13,6 +13,7 @@ import {
 } from './ProviderSync'
 import { batchedMediaCommitter } from './BatchedMediaCommitter'
 import { resumeFor, save } from './SyncResumeState'
+import { useUIStore } from '../../uiStore'
 
 vi.mock('./SyncResumeState', () => ({
   resumeFor: vi.fn(),
@@ -85,6 +86,8 @@ describe('ProviderSync', () => {
   let addSpy: Mock
   let flushSpy: Mock
   let setStoreSpy: Mock
+  let refreshSpy: Mock
+  let progressSpy: Mock
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -97,6 +100,11 @@ describe('ProviderSync', () => {
     setStoreSpy = vi
       .spyOn(batchedMediaCommitter, 'setStore')
       .mockImplementation(() => {}) as Mock
+    refreshSpy = vi
+      .spyOn(batchedMediaCommitter, 'refresh')
+      .mockResolvedValue(undefined) as Mock
+    progressSpy = vi
+      .spyOn(useUIStore.getState(), 'setSyncProgress') as Mock
     vi.mocked(resumeFor).mockResolvedValue({
       since: '2026-07-17T00:00:00Z',
       cursor: null,
@@ -180,9 +188,9 @@ describe('ProviderSync', () => {
     }
   })
 
-  it('pauses at the page cap, saves the cursor, and cleans up the generator', async () => {
+  it('streams past the former page cap to completion, saving per page', async () => {
     const pages = Array.from({ length: 11 }, (_, i) =>
-      makePage([{ id: `t${i}` } as unknown as NormalizedMedia], true, i + 1),
+      makePage([{ id: `t${i}` } as unknown as NormalizedMedia], i < 10, i + 1),
     )
     const provider = makeProvider(pages)
 
@@ -192,15 +200,102 @@ describe('ProviderSync', () => {
       provider as StreamingProvider,
     )
 
-    expect(result).toEqual({ status: 'paused', pages: 10, cursor: 10 })
-    expect(vi.mocked(save)).toHaveBeenCalledTimes(10)
+    expect(result).toEqual({ status: 'synced', pages: 11 })
+    expect(vi.mocked(save)).toHaveBeenCalledTimes(11)
     expect(vi.mocked(save)).toHaveBeenLastCalledWith(fakeLiveStore, 'test', {
       scanStatus: SCAN,
-      cursor: 10,
-      complete: false,
+      cursor: 11,
+      complete: true,
       pageSize: 50,
     })
-    expect(lastStream(provider).return).toHaveBeenCalledTimes(1)
+    expect(lastStream(provider).return).not.toHaveBeenCalled()
+  })
+
+  it('refreshes and publishes progress every 10 pages, then clears on completion', async () => {
+    const pages = Array.from({ length: 11 }, (_, i) =>
+      makePage([{ id: `t${i}` } as unknown as NormalizedMedia], i < 10, i + 1),
+    )
+    const provider = makeProvider(pages)
+
+    const result = await syncProvider(
+      fakeLiveStore,
+      'test',
+      provider as StreamingProvider,
+    )
+
+    expect(result).toEqual({ status: 'synced', pages: 11 })
+    // One progress refresh at the 10-page boundary (11 pages total, not a
+    // multiple of 10). Determinate: the fake scan exposes a count of 100.
+    expect(refreshSpy).toHaveBeenCalledTimes(1)
+    expect(refreshSpy).toHaveBeenCalledWith('SyncProvider.progress')
+    // Progress published at start (added 0) and at the 10-page tick (10 items
+    // of 1 in the fake), then cleared in finally.
+    expect(progressSpy).toHaveBeenNthCalledWith(1, {
+      active: true,
+      added: 0,
+      total: 100,
+    })
+    expect(progressSpy).toHaveBeenNthCalledWith(2, {
+      active: true,
+      added: 10,
+      total: 100,
+    })
+    expect(progressSpy).toHaveBeenLastCalledWith({
+      active: false,
+      added: 0,
+      total: 0,
+    })
+    expect(useUIStore.getState().syncProgress).toEqual({
+      active: false,
+      added: 0,
+      total: 0,
+    })
+  })
+
+  it('publishes an indeterminate progress when the scan exposes no count', async () => {
+    const provider = makeProvider([
+      makePage([{ id: 't1' } as unknown as NormalizedMedia], false, 1),
+    ])
+    provider.getScanStatus.mockResolvedValue({ ...SCAN, count: 0 })
+
+    const result = await syncProvider(
+      fakeLiveStore,
+      'test',
+      provider as StreamingProvider,
+    )
+
+    expect(result).toEqual({ status: 'synced', pages: 1 })
+    expect(progressSpy).toHaveBeenNthCalledWith(1, {
+      active: true,
+      added: 0,
+      total: 0,
+    })
+    expect(progressSpy).toHaveBeenLastCalledWith({
+      active: false,
+      added: 0,
+      total: 0,
+    })
+  })
+
+  it('clears progress when a flush fails mid-stream', async () => {
+    flushSpy.mockRejectedValue(new Error('flush boom'))
+    const provider = makeProvider([
+      makePage([{ id: 't1' } as unknown as NormalizedMedia], true, 1),
+      makePage([{ id: 't2' } as unknown as NormalizedMedia], false, 2),
+    ])
+
+    const result = await syncProvider(
+      fakeLiveStore,
+      'test',
+      provider as StreamingProvider,
+    )
+
+    expect(result).toEqual({ status: 'failed', pages: 0 })
+    expect(progressSpy).toHaveBeenLastCalledWith({
+      active: false,
+      added: 0,
+      total: 0,
+    })
   })
 
   it('saves an empty page without committing', async () => {

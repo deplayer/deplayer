@@ -78,6 +78,7 @@
   },
   "labels": {
     "sync": "Sincronitza",
+    "syncingLibrary": "Sincronitzant la biblioteca…",
     "enableSync": "Activa la sincronització",
     "syncServerUrl": "URL del servidor de sincronització",
     "syncDescription": "Sincronitza les teves dades entre dispositius utilitzant una base de dades PostgreSQL.",
