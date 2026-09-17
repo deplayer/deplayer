@@ -2,10 +2,46 @@ import { Events, Schema } from '@livestore/livestore'
 
 /**
  * Media Domain Events
- * 
+ *
  * These events represent all operations on media tracks in the library.
  * Artist and Album are embedded as they'll be normalized during materialization.
  */
+
+/**
+ * One item of a sync batch. Shared by mediaBulkAdded and mediaBulkUpdated so
+ * the two events can never drift apart in shape.
+ *
+ * Note: media ids are content-derived (title/artist/album/track — no provider
+ * passes forcedId), so for a stable id the title/artist/album fields are
+ * always identical to what is already stored; bulk updates exist for the
+ * fields the id does not cover (duration, discNumber, type, genres, stream
+ * membership, externalId, shareUrl, filePath).
+ */
+const mediaSyncItemSchema = Schema.Struct({
+  id: Schema.String,
+  title: Schema.String,
+  artist: Schema.Struct({
+    id: Schema.String,
+    name: Schema.String,
+  }),
+  album: Schema.Struct({
+    id: Schema.String,
+    name: Schema.String,
+    artistId: Schema.String,
+    thumbnailUrl: Schema.optional(Schema.String),
+    year: Schema.optional(Schema.Number),
+  }),
+  type: Schema.String,
+  duration: Schema.optional(Schema.Number),
+  track: Schema.optional(Schema.Number),
+  discNumber: Schema.optional(Schema.Number),
+  stream: Schema.Unknown,
+  cover: Schema.optional(Schema.Unknown),
+  genres: Schema.Array(Schema.String),
+  externalId: Schema.optional(Schema.String),
+  shareUrl: Schema.optional(Schema.String),
+  filePath: Schema.optional(Schema.String),
+})
 
 export const mediaEvents = {
   /**
@@ -74,33 +110,19 @@ export const mediaEvents = {
   mediaBulkAdded: Events.synced({
     name: 'v1.MediaBulkAdded',
     schema: Schema.Struct({
-      media: Schema.Array(
-        Schema.Struct({
-          id: Schema.String,
-          title: Schema.String,
-          artist: Schema.Struct({
-            id: Schema.String,
-            name: Schema.String,
-          }),
-          album: Schema.Struct({
-            id: Schema.String,
-            name: Schema.String,
-            artistId: Schema.String,
-            thumbnailUrl: Schema.optional(Schema.String),
-            year: Schema.optional(Schema.Number),
-          }),
-          type: Schema.String,
-          duration: Schema.optional(Schema.Number),
-          track: Schema.optional(Schema.Number),
-          discNumber: Schema.optional(Schema.Number),
-          stream: Schema.Unknown,
-          cover: Schema.optional(Schema.Unknown),
-          genres: Schema.Array(Schema.String),
-          externalId: Schema.optional(Schema.String),
-          shareUrl: Schema.optional(Schema.String),
-          filePath: Schema.optional(Schema.String),
-        })
-      ),
+      media: Schema.Array(mediaSyncItemSchema),
+    }),
+  }),
+
+  /**
+   * Bulk metadata update for media that already exists. Emitted by the sync
+   * committer when a stable-id row differs in the fields the id does not
+   * cover. Media that does not exist yet goes through mediaBulkAdded.
+   */
+  mediaBulkUpdated: Events.synced({
+    name: 'v1.MediaBulkUpdated',
+    schema: Schema.Struct({
+      media: Schema.Array(mediaSyncItemSchema),
     }),
   }),
 

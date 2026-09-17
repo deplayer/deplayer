@@ -563,6 +563,42 @@ const materializers = State.SQLite.materializers(events, {
     ])
   },
 
+  'v1.MediaBulkUpdated': (event: { readonly media: readonly { readonly id: string; readonly title: string; readonly artist: { readonly id: string; readonly name: string }; readonly album: { readonly id: string; readonly name: string; readonly artistId: string }; readonly type: string; readonly duration?: number; readonly track?: number; readonly discNumber?: number; readonly stream: unknown; readonly cover?: unknown; readonly genres: readonly string[]; readonly externalId?: string; readonly shareUrl?: string; readonly filePath?: string }[] }) => {
+    const now = Date.now()
+    return event.media.flatMap((item: { readonly id: string; readonly title: string; readonly artist: { readonly id: string; readonly name: string }; readonly album: { readonly id: string; readonly name: string; readonly artistId: string }; readonly type: string; readonly duration?: number; readonly track?: number; readonly discNumber?: number; readonly stream: unknown; readonly cover?: unknown; readonly genres: readonly string[]; readonly externalId?: string; readonly shareUrl?: string; readonly filePath?: string }) => {
+      // Full-field sync of an existing row. The id is content-derived, so
+      // title/artist/album fields are identical to what is stored; the
+      // fields that can actually differ are the ones the id does not cover.
+      return [
+        tables.media
+          .update({
+            title: item.title,
+            artistId: item.artist.id,
+            albumId: item.album.id,
+            type: item.type,
+            duration: item.duration ?? null,
+            track: item.track ?? null,
+            discNumber: item.discNumber ?? null,
+            stream: item.stream,
+            cover: item.cover ?? null,
+            genres: item.genres,
+            externalId: item.externalId ?? null,
+            shareUrl: item.shareUrl ?? null,
+            filePath: item.filePath ?? null,
+            artistName: item.artist.name,
+            albumName: item.album.name,
+            genresFlat: item.genres.join(','),
+            providersFlat: item.stream ? Object.keys(item.stream).join(',') : '',
+            updatedAt: now,
+          })
+          .where('id', '=', item.id),
+        // Genre membership is derived state: rebuild it for updated rows.
+        tables.mediaGenres.delete().where('mediaId', '=', item.id),
+        ...normalizeGenreRows(item.id, item.genres, now),
+      ]
+    })
+  },
+
   'v1.MediaRemoved': ({ id }: { id: string }) => {
     return [
       tables.mediaGenres.delete().where('mediaId', '=', id),

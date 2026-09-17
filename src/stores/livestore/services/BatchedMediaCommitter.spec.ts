@@ -120,10 +120,17 @@ describe('BatchedMediaCommitter.flush', () => {
     }
   })
 
-  it('prefilters existing ids: committed payload excludes them, binds positionally', async () => {
+  it('routes the batch: new→bulkAdded, drifted→bulkUpdated, unchanged→dropped; binds positionally', async () => {
     const store = makeFakeStore()
-    // The prefilter's SELECT reports m0..m2 as already in the database.
-    store.query.mockImplementation(async () => [{ id: 'm0' }, { id: 'm1' }, { id: 'm2' }])
+    // The SELECT reports m0..m2 as already stored: m0/m1 identical, m2 drifted
+    // (duration differs); m3/m4 are absent → new.
+    const unchangedRow = (id: string) => ({
+      id, type: 'audio', duration: null, discNumber: null,
+      genresFlat: '', providersFlat: '', externalId: null, shareUrl: null, filePath: null,
+    })
+    store.query.mockImplementation(async () => [
+      unchangedRow('m0'), unchangedRow('m1'), { ...unchangedRow('m2'), duration: 123 },
+    ])
     // @ts-expect-error test seam
     batchedMediaCommitter.setStore(store)
     // @ts-expect-error test seam: directly push to private buffer
@@ -137,12 +144,15 @@ describe('BatchedMediaCommitter.flush', () => {
     expect(Array.isArray(queryCalls[0][0].bindValues)).toBe(true)
     expect(queryCalls[0][0].bindValues).toEqual(['m0', 'm1', 'm2', 'm3', 'm4'])
 
-    const commitCalls = store.commit.mock.calls as unknown as Array<
-      [unknown, { args: { media: Array<{ id: string }> } }]
-    >
-    const bulkEvents = commitCalls.map(([, event]) => event).filter(e => e?.args?.media)
-    expect(bulkEvents).toHaveLength(1)
+    const bulkEvents = (store.commit.mock.calls as unknown as Array<
+      [unknown, { name: string; args: { media: Array<{ id: string; duration?: number }> } }]
+    >)
+      .map(([, event]) => event)
+      .filter(e => e?.args?.media)
+    expect(bulkEvents.map(e => e.name)).toEqual(['v1.MediaBulkAdded', 'v1.MediaBulkUpdated'])
     expect(bulkEvents[0].args.media.map(m => m.id)).toEqual(['m3', 'm4'])
+    expect(bulkEvents[1].args.media.map(m => m.id)).toEqual(['m2'])
+    expect(bulkEvents[1].args.media[0].duration).toBeUndefined()
   })
 })
 

@@ -1,5 +1,6 @@
 import type { LiveStore } from '../accessor'
 import { mediaEvents } from '../events/media'
+import { partitionSyncBatch, type ExistingMediaRow } from './mediaDiff'
 import { NormalizedMedia } from '../../../utils/normalizeMedia'
 import { profiler } from '../../../utils/performanceProfiler'
 import { createLogger } from '../../../utils/logger'
@@ -194,8 +195,11 @@ class BatchedMediaCommitter {
 
     try {
       profiler.start('query-existing-ids')
+      // Fetch the comparable columns (not just ids): the batch is partitioned
+      // into new / changed / unchanged against them, so metadata drift lands
+      // as MediaBulkUpdated instead of being silently dropped.
       const EXISTENCE_CHUNK = 500
-      const existingIds = new Set<string>()
+      const existing = new Map<string, ExistingMediaRow>()
       for (let off = 0; off < mediaToCommit.length; off += EXISTENCE_CHUNK) {
         const slice = mediaToCommit.slice(off, off + EXISTENCE_CHUNK)
         const placeholders = slice.map(() => '?').join(',')
@@ -205,48 +209,61 @@ class BatchedMediaCommitter {
         // matched nothing until this was an array. See
         // livestore-bind-contract.spec.ts.
         const result = await this.store!.query({
-          query: `SELECT id FROM media WHERE id IN (${placeholders})`,
+          query: `SELECT id, type, duration, discNumber, genresFlat, providersFlat, externalId, shareUrl, filePath FROM media WHERE id IN (${placeholders})`,
           bindValues: slice.map(item => item.media.id),
         })
-        // Raw store.query returns an array of row objects ({ id }), not the
-        // wa-sqlite { values } matrix.
-        const rows = (result as Array<{ id?: string }>) ?? []
+        // Raw store.query returns an array of row objects ({ id, ... }), not
+        // the wa-sqlite { values } matrix.
+        const rows = (result as Array<ExistingMediaRow>) ?? []
         for (const row of rows) {
-          if (row.id !== undefined) existingIds.add(row.id)
+          if (row.id !== undefined) existing.set(row.id, row)
         }
       }
       profiler.end('query-existing-ids')
 
-      const newMedia = mediaToCommit.filter(m => !existingIds.has(m.media.id))
+      const { newItems, changedItems } = partitionSyncBatch(mediaToCommit, existing)
 
-      profiler.mark(`filtered: ${newMedia.length} new of ${mediaToCommit.length}`)
+      profiler.mark(`partitioned: ${newItems.length} new, ${changedItems.length} changed, ${mediaToCommit.length - newItems.length - changedItems.length} unchanged of ${mediaToCommit.length}`)
 
-      if (newMedia.length === 0) {
-        profiler.mark('flush-end (no new items)')
+      // New rows and drifted rows take different events but the same
+      // chunked-commit pipeline.
+      const batches: Array<{ label: 'add' | 'update'; items: readonly NormalizedMedia[] }> = []
+      if (newItems.length > 0) batches.push({ label: 'add', items: newItems })
+      if (changedItems.length > 0) batches.push({ label: 'update', items: changedItems })
+
+      if (batches.length === 0) {
+        profiler.mark('flush-end (nothing to commit)')
       } else {
-        const totalChunks = Math.ceil(newMedia.length / this.CHUNK_SIZE)
+        const totalChunks = batches.reduce(
+          (sum, batch) => sum + Math.ceil(batch.items.length / this.CHUNK_SIZE),
+          0,
+        )
         let chunkIndex = 0
-        for (let i = 0; i < newMedia.length; i += this.CHUNK_SIZE) {
-          const chunk = newMedia.slice(i, i + this.CHUNK_SIZE)
+        for (const batch of batches) {
+          for (let i = 0; i < batch.items.length; i += this.CHUNK_SIZE) {
+            const chunk = batch.items.slice(i, i + this.CHUNK_SIZE)
 
-          profiler.start(`chunk-${chunkIndex}-normalize`)
-          const normalizedChunk = chunk.map(toEventPayload)
-          profiler.end(`chunk-${chunkIndex}-normalize`)
+            profiler.start(`chunk-${chunkIndex}-normalize`)
+            const normalizedChunk = chunk.map(toEventPayload)
+            profiler.end(`chunk-${chunkIndex}-normalize`)
 
-          profiler.start(`chunk-${chunkIndex}-commit`)
-          await this.store.commit(
-            { skipRefresh: true },
-            mediaEvents.mediaBulkAdded({ media: normalizedChunk }),
-          )
-          profiler.end(`chunk-${chunkIndex}-commit`)
+            profiler.start(`chunk-${chunkIndex}-commit`)
+            await this.store.commit(
+              { skipRefresh: true },
+              batch.label === 'add'
+                ? mediaEvents.mediaBulkAdded({ media: normalizedChunk })
+                : mediaEvents.mediaBulkUpdated({ media: normalizedChunk }),
+            )
+            profiler.end(`chunk-${chunkIndex}-commit`)
 
-          if (chunkIndex < totalChunks - 1) {
-            profiler.start(`chunk-${chunkIndex}-yield`)
-            await this.yieldToMain()
-            profiler.end(`chunk-${chunkIndex}-yield`)
+            if (chunkIndex < totalChunks - 1) {
+              profiler.start(`chunk-${chunkIndex}-yield`)
+              await this.yieldToMain()
+              profiler.end(`chunk-${chunkIndex}-yield`)
+            }
+
+            chunkIndex++
           }
-
-          chunkIndex++
         }
 
         // Successful non-empty commit sets refreshPending so refresh() has work to do.
@@ -257,8 +274,9 @@ class BatchedMediaCommitter {
       }
   } catch (error) {
     // Re-queue BEFORE rejecting so the batch stays recoverable. Re-committing
-    // already-committed items is safe: the existence check filters them out.
-    logger.error('Flush failed; batch re-queued', error)
+    // already-committed items is safe: they re-partition as unchanged (or as
+    // idempotent updates), and MediaBulkAdded's ON CONFLICT IGNORE still
+    // guards the replay window between commit and re-query.
     this.pendingMedia.push(...mediaToCommit)
     throw error
     } finally {
