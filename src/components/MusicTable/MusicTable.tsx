@@ -261,7 +261,7 @@ const MusicTable = ({
   // Get data from LiveStore hooks
   const currentSongId = useCurrentPlayingSongId('default')
   const favoriteIds = useFavoriteIds() // Single query, shared by all rows
-  const loading = useUIStore(s => s.loading)
+  const booting = useUIStore(s => s.bootStatus === 'booting')
   const mqlMatch = useUIStore(s => s.mqlMatch)
   const location = useLocation()
   
@@ -423,9 +423,9 @@ const MusicTable = ({
   }
 
   // Early return lives after every hook on purpose: a conditional return
-  // placed above a hook changes the hook order when `loading` flips and React
-  // throws. Keep it as the last statement before the render.
-  if (loading) {
+  // placed above a hook changes the hook order when `bootStatus` flips and
+  // React throws. Keep it as the last statement before the render.
+  if (booting) {
     return (
       <div className={`queue`}>
         <blockquote className='blockquote'>

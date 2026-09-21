@@ -19,7 +19,7 @@ const Queue = (props: Props) => {
   // Get data from LiveStore hooks and contexts for Queue logic
   const liveQueue = useQueue('default')
   const liveSettings = useSettings()
-  const loading = useUIStore(s => s.loading)
+  const booting = useUIStore(s => s.bootStatus === 'booting')
   const mqlMatch = useUIStore(s => s.mqlMatch)
   const displayMiniQueue = useUIStore(s => s.displayMiniQueue)
   
@@ -53,7 +53,7 @@ const Queue = (props: Props) => {
     return null
   }
 
-  if (loading) {
+  if (booting) {
     return (
       <div className="queue">
         <EmptyState

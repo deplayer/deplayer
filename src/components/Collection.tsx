@@ -13,14 +13,14 @@ import { getEmptyStateFallback } from './common/EmptyState/emptyStateFallback'
 const Collection = () => {
   // Get data from LiveStore hooks and contexts
   const liveSettings = useSettings()
-  const loading = useUIStore(s => s.loading)
+  const booting = useUIStore(s => s.bootStatus === 'booting')
 
   const { ids, map, count, fetching, hasMore, grow, resolveAllIds } = useCollectionData()
 
   // Spinner gates: app boot, or the very first window of a fresh filter
   // while the count is still unknown (prevents an empty-state flash).
   const awaitingFirstWindow = fetching && ids.length === 0 && count === undefined
-  if (loading || awaitingFirstWindow) {
+  if (booting || awaitingFirstWindow) {
     return <Spinner />
   }
 

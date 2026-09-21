@@ -5,7 +5,6 @@ import { getLiveStoreInstance } from "../../stores/livestore/accessor";
 import { initializeSettingsAction } from "../../stores/livestore/actions/settings";
 import * as types from "../../constants/ActionTypes";
 import { createLogger } from "../../utils/logger";
-import { useUIStore } from "../../stores/uiStore";
 
 const logger = createLogger({ namespace: "collection-watchers" });
 
@@ -57,8 +56,6 @@ export function* initializeWatcher(): Generator<any, void, any> {
       // Flip uiStore flags before the action stream so saga consumers and
       // ready-gated UI (JoinRoom) react with the store already settled.
       logger.info("Dispatching INITIALIZED action");
-      useUIStore.getState().setLoading(false);
-      useUIStore.getState().setReady(true);
       yield put({ type: types.INITIALIZED });
       logger.info("Initialization complete");
       

@@ -34,6 +34,7 @@ import GlobalKeyHandlers from './components/GlobalKeyHandlers'
 import JoinRoom from './pages/JoinRoom';
 import { useLanguage } from './hooks/useLanguage'
 import { setLiveStoreInstance } from './stores/livestore/accessor'
+import { BootStatusSync } from './components/BootStatusSync'
 
 interface SongProps {
   playerPortal: portals.HtmlPortalNode
@@ -71,6 +72,7 @@ const AppContent = ({ playerPortal }: { playerPortal: portals.HtmlPortalNode }) 
 
   return (
     <>
+      {liveStore && <BootStatusSync />}
       <LayoutContainer>
         <Routes>
           <Route path="/join/:id" element={<JoinRoom />} />

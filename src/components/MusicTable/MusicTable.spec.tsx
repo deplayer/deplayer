@@ -154,7 +154,7 @@ describe('MusicTable', () => {
     expect(within(grid).queryByRole('row')).not.toBeInTheDocument()
   })
 
-  it('keeps hook order stable when the loading flag flips', async () => {
+  it('keeps hook order stable when the boot status flips', async () => {
     setup()
 
     await waitFor(() => {
@@ -162,16 +162,16 @@ describe('MusicTable', () => {
     })
     expect(screen.getByRole('grid')).toBeInTheDocument()
 
-    // Flipping loading used to change the number of hooks between renders
+    // Flipping bootStatus used to change the number of hooks between renders
     // (the early return sat above the refs/callbacks), which React rejects
     // with "Rendered fewer hooks than expected". Both directions must render.
     act(() => {
-      useUIStore.setState({ loading: true })
+      useUIStore.setState({ bootStatus: 'booting' })
     })
     expect(screen.queryByRole('grid')).not.toBeInTheDocument()
 
     act(() => {
-      useUIStore.setState({ loading: false })
+      useUIStore.setState({ bootStatus: 'ready' })
     })
     expect(screen.getByRole('grid')).toBeInTheDocument()
   })

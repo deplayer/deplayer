@@ -8,7 +8,7 @@ const JoinRoom = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const appReady = useUIStore(s => s.ready);
+  const appReady = useUIStore(s => s.bootStatus !== 'booting');
 
   useEffect(() => {
     if (id && appReady) {

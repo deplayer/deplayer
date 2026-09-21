@@ -24,7 +24,7 @@ export const renderWithProviders = (
   window.history.pushState({}, 'Test page', route)
   
   // Set Zustand UI store to test-friendly defaults
-  useUIStore.setState({ loading: false, ready: true })
+  useUIStore.setState({ bootStatus: 'ready' })
   
   const store = createTestStore(initialState)
   const storeRegistry = new StoreRegistry()

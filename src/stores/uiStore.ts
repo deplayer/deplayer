@@ -13,13 +13,20 @@ export type SyncProgress = {
   total: number // 0 when the provider exposes no scan count (indeterminate)
 }
 
+/**
+ * App boot lifecycle. `booting` until LiveStore is ready; then `ready` when
+ * the library holds at least one track, or `empty` when it holds none. Kept in
+ * sync with the live media count, so a library that fills after boot leaves
+ * `empty`.
+ */
+export type BootStatus = 'booting' | 'ready' | 'empty'
+
 type UIState = {
   // Layout
   sidebarToggled: boolean
   rightPanelToggled: boolean
   mqlMatch: boolean
   heightMqlMatch: boolean
-  loading: boolean
   displayMiniQueue: boolean
 
   // Modals
@@ -35,7 +42,7 @@ type UIState = {
   panelPositionTop: number | null // null = bottom-anchored (CSS default bottom); number = top offset
 
   // App state
-  ready: boolean
+  bootStatus: BootStatus
   syncProgress: SyncProgress
 
   // Search & Filters
@@ -51,7 +58,6 @@ type UIActions = {
   toggleRightPanel: (value?: boolean) => void
   setMqlMatch: (value: boolean) => void
   setHeightMqlMatch: (value: boolean) => void
-  setLoading: (loading: boolean) => void
   toggleMiniQueue: () => void
   setShowAddMediaModal: (show: boolean) => void
   toggleSpectrum: () => void
@@ -60,7 +66,7 @@ type UIActions = {
   setVisualsMode: (mode: VisualsMode) => void
   setPanelPosition: (right: number | null, bottom: number, top: number | null) => void
   setBackgroundImage: (url: string) => void
-  setReady: (ready: boolean) => void
+  setBootStatus: (status: BootStatus) => void
   setSyncProgress: (progress: SyncProgress) => void
   setFilter: (filterType: keyof Filter, values: string[] | boolean) => void
   clearFilters: () => void
@@ -85,7 +91,6 @@ export const useUIStore = create<UIState & UIActions>((set) => ({
   rightPanelToggled: false,
   mqlMatch: false,
   heightMqlMatch: false,
-  loading: true,
   displayMiniQueue: true,
   showAddMediaModal: false,
   showSpectrum: false,
@@ -95,7 +100,7 @@ export const useUIStore = create<UIState & UIActions>((set) => ({
   panelPositionRight: 12, // matches CSS default (right: 12px); null = left-anchored after drag
   panelPositionBottom: 0, // 0 = neutral, CSS default bottom applies until dragged
   panelPositionTop: null, // null = bottom-anchored; set on mobile top-snap
-  ready: false,
+  bootStatus: 'booting',
   syncProgress: { active: false, added: 0, total: 0 },
   activeFilters: emptyFilters,
   searchTerm: '',
@@ -110,7 +115,6 @@ export const useUIStore = create<UIState & UIActions>((set) => ({
     set((s) => ({ rightPanelToggled: value !== undefined ? value : !s.rightPanelToggled })),
   setMqlMatch: (value) => set({ mqlMatch: value }),
   setHeightMqlMatch: (value) => set({ heightMqlMatch: value }),
-  setLoading: (loading) => set({ loading }),
   toggleMiniQueue: () => set((s) => ({ displayMiniQueue: !s.displayMiniQueue })),
   setShowAddMediaModal: (show) => set({ showAddMediaModal: show }),
   toggleSpectrum: () => set((s) => ({ showSpectrum: !s.showSpectrum })),
@@ -125,7 +129,7 @@ export const useUIStore = create<UIState & UIActions>((set) => ({
   setPanelPosition: (right, bottom, top) =>
     set({ panelPositionRight: right, panelPositionBottom: bottom, panelPositionTop: top }),
   setBackgroundImage: (url) => set({ backgroundImage: url }),
-  setReady: (ready) => set({ ready }),
+  setBootStatus: (bootStatus) => set({ bootStatus }),
   setSyncProgress: (syncProgress) => set({ syncProgress }),
   setFilter: (filterType, values) =>
     set((s) => ({ activeFilters: { ...s.activeFilters, [filterType]: values } })),
