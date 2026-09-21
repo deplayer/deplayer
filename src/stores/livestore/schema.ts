@@ -25,6 +25,7 @@ import { lyricsEvents } from './events/lyrics'
 import { settingsEvents } from './events/settings'
 import { syncEvents } from './events/sync'
 import { deriveCurrentTrackId } from './queue'
+import { normalizeGenres } from '../../utils/genres'
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -316,19 +317,16 @@ export const events = {
 
 // Normalize genre array into media_genres insert-or-ignore operations.
 const normalizeGenreRows = (mediaId: string, genres: readonly string[] | undefined, now: number) =>
-  Array.from(new Set((Array.isArray(genres) ? genres : [])
-    .map((genre) => genre.trim())
-    .filter(Boolean)))
-    .map((genre) =>
-      tables.mediaGenres
-        .insert({
-          id: JSON.stringify([mediaId, genre]),
-          mediaId,
-          genre,
-          createdAt: now,
-        })
-        .onConflict('id', 'ignore'),
-    )
+  normalizeGenres(genres).map((genre) =>
+    tables.mediaGenres
+      .insert({
+        id: JSON.stringify([mediaId, genre]),
+        mediaId,
+        genre,
+        createdAt: now,
+      })
+      .onConflict('id', 'ignore'),
+  )
 // Shared upsert for sync resume state rows (see services/SyncResumeState.ts).
 // v1 events predate per-provider cursor geometry; they replay with
 // cursorPageSize 0 ("unknown"), which the geometry guard treats as
@@ -364,7 +362,7 @@ const materializers = State.SQLite.materializers(events, {
     const { id, title, artist, album, type, duration, track, discNumber, stream, cover, genres, externalId, shareUrl, filePath } = event
     
     // Compute denormalized fields for fast queries
-    const genresFlat = Array.isArray(genres) ? genres.join(',') : ''
+    const genresFlat = normalizeGenres(genres).join(',')
     const providersFlat = stream ? Object.keys(stream).join(',') : ''
     
     // Return array of operations: insert artist, insert album, insert media
@@ -452,7 +450,7 @@ const materializers = State.SQLite.materializers(events, {
     if (cover !== undefined) updates.cover = cover
     if (genres !== undefined) {
       // Update denormalized genres
-      updates.genresFlat = Array.isArray(genres) ? genres.join(',') : ''
+      updates.genresFlat = normalizeGenres(genres).join(',')
     }
 
     const mediaUpdate = tables.media.update(updates).where('id', '=', id)
@@ -546,7 +544,7 @@ const materializers = State.SQLite.materializers(events, {
     // Insert all media items (unavoidable - one per item)
     for (const item of event.media) {
       // Compute denormalized fields for fast queries
-      const genresFlat = Array.isArray(item.genres) ? item.genres.join(',') : ''
+      const genresFlat = normalizeGenres(item.genres).join(',')
       const providersFlat = item.stream ? Object.keys(item.stream).join(',') : ''
       
       operations.push(
@@ -613,7 +611,7 @@ const materializers = State.SQLite.materializers(events, {
             filePath: item.filePath ?? null,
             artistName: item.artist.name,
             albumName: item.album.name,
-            genresFlat: item.genres.join(','),
+            genresFlat: normalizeGenres(item.genres).join(','),
             providersFlat: item.stream ? Object.keys(item.stream).join(',') : '',
             updatedAt: now,
           })

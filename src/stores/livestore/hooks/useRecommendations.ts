@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
+import { NO_MATCH_ID } from '../query'
 import { getLocalRecommendations } from '../../../services/Recommendations/RecommendationService'
 
 /**
@@ -26,7 +27,7 @@ export const useRecommendations = (
   const query = useMemo(() => {
     if (!artistId) return tables.media
       .select('id', 'title', 'artistId', 'artistName', 'genresFlat', 'playCount', 'cover')
-      .where('id', '=', '__NONE__')
+      .where('id', '=', NO_MATCH_ID)
     return tables.media
       .select('id', 'title', 'artistId', 'artistName', 'genresFlat', 'playCount', 'cover')
       .where({ artistId: { op: 'NOT IN', value: [artistId] } })

@@ -1,6 +1,7 @@
 import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
+import { NO_MATCH_ID } from '../query'
 
 /**
  * Get lyrics for a specific media track
@@ -15,7 +16,7 @@ export const useLyrics = (mediaId: string | undefined) => {
       ? queryDb(
           tables.lyrics.select().where('mediaId', '=', mediaId).limit(1)
         )
-      : queryDb(tables.lyrics.select().where('id', '=', '__NONE__').limit(1))
+      : queryDb(tables.lyrics.select().where('id', '=', NO_MATCH_ID).limit(1))
   )
 }
 

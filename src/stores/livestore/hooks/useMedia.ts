@@ -1,6 +1,7 @@
 import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
+import { NO_MATCH_ID } from '../query'
 import { useMemo } from 'react'
 import { buildCollectionClauses, collectionAllIdsQuery, parseIds, type Filter } from '../collection/filter'
 import { useFavoriteIds } from './useFavorites'
@@ -45,7 +46,7 @@ export const useMediaById = (id: string | null | undefined) => {
     queryDb(
       id 
         ? tables.media.select().where('id', '=', id).limit(1)
-        : tables.media.select().where('id', '=', '__NONE__').limit(1) // Return empty if no id
+        : tables.media.select().where('id', '=', NO_MATCH_ID).limit(1) // Return empty if no id
     )
   )
   const rawMedia = (result as unknown[])[0] ?? null
@@ -70,7 +71,7 @@ export const useMediaByArtist = (artistId: string | null | undefined) => {
             .select()
             .where('artistId', '=', artistId)
             .orderBy('title', 'asc')
-        : tables.media.select().where('id', '=', '__NONE__') // Return empty if no artistId
+        : tables.media.select().where('id', '=', NO_MATCH_ID) // Return empty if no artistId
     )
   )
   
@@ -96,7 +97,7 @@ export const useMediaByAlbum = (albumId: string | null | undefined) => {
             .where('albumId', '=', albumId)
             .orderBy('track', 'asc') // Order by track number
             .orderBy('title', 'asc')
-        : tables.media.select().where('id', '=', '__NONE__') // Return empty if no albumId
+        : tables.media.select().where('id', '=', NO_MATCH_ID) // Return empty if no albumId
     )
   )
   
@@ -130,7 +131,7 @@ export const useSearchMedia = (searchTerm: string | undefined | null, limit = 10
   
   // Use useMemo to create stable query objects
   const titleQuery = useMemo(() => {
-    if (!hasSearch || !term) return queryDb(tables.media.select().where('id', '=', '__NONE__').limit(limit))
+    if (!hasSearch || !term) return queryDb(tables.media.select().where('id', '=', NO_MATCH_ID).limit(limit))
     return queryDb(
       tables.media
         .select()
@@ -140,7 +141,7 @@ export const useSearchMedia = (searchTerm: string | undefined | null, limit = 10
   }, [hasSearch, term, limit])
   
   const artistQuery = useMemo(() => {
-    if (!hasSearch || !term) return queryDb(tables.media.select().where('id', '=', '__NONE__').limit(limit))
+    if (!hasSearch || !term) return queryDb(tables.media.select().where('id', '=', NO_MATCH_ID).limit(limit))
     return queryDb(
       tables.media
         .select()
@@ -203,7 +204,7 @@ export const useSearchMediaIds = (searchTerm: string | undefined | null, limit =
 
   const titleQuery = useMemo(() => {
     if (!hasSearch || !term) {
-      return queryDb(tables.media.select('id').where('id', '=', '__NONE__').limit(limit))
+      return queryDb(tables.media.select('id').where('id', '=', NO_MATCH_ID).limit(limit))
     }
     return queryDb(
       tables.media
@@ -215,7 +216,7 @@ export const useSearchMediaIds = (searchTerm: string | undefined | null, limit =
 
   const artistQuery = useMemo(() => {
     if (!hasSearch || !term) {
-      return queryDb(tables.media.select('id').where('id', '=', '__NONE__').limit(limit))
+      return queryDb(tables.media.select('id').where('id', '=', NO_MATCH_ID).limit(limit))
     }
     return queryDb(
       tables.media
@@ -415,7 +416,7 @@ export const useMediaMapForIds = (ids: string[]) => {
 
   const query = useMemo(() => {
     if (!shouldQuery) {
-      return queryDb(tables.media.select().where('id', '=', '__NONE__'))
+      return queryDb(tables.media.select().where('id', '=', NO_MATCH_ID))
     }
     return queryDb(
       tables.media

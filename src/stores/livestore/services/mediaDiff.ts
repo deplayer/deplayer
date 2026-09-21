@@ -21,6 +21,7 @@
  */
 
 import type { NormalizedMedia } from '../../../utils/normalizeMedia'
+import { normalizeGenres } from '../../../utils/genres'
 
 /** Columns fetched by the committer's existence/drift SELECT. */
 export interface ExistingMediaRow {
@@ -47,7 +48,7 @@ const itemDiffers = (item: NormalizedMedia, row: ExistingMediaRow): boolean => {
   if (media.type !== row.type) return true
   if ((media.duration ?? null) !== row.duration) return true
   if ((media.discNumber ?? null) !== row.discNumber) return true
-  if (media.genres.join(',') !== normalizeString(row.genresFlat)) return true
+  if (normalizeGenres(media.genres).join(',') !== normalizeString(row.genresFlat)) return true
   if (Object.keys(media.stream ?? {}).join(',') !== normalizeString(row.providersFlat)) return true
   if ((media.externalId ?? null) !== row.externalId) return true
   if ((media.shareUrl ?? null) !== row.shareUrl) return true

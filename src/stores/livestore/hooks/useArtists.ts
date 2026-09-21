@@ -1,6 +1,7 @@
 import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
+import { NO_MATCH_ID } from '../query'
 import { useMemo } from 'react'
 
 type ArtistRecord = { id: string; name: string; createdAt: number; updatedAt: number }
@@ -62,7 +63,7 @@ export const useArtistsByIds = (ids: string[]) => {
   const store = useAppStore()
   
   const query = useMemo(() => {
-    if (!ids.length) return tables.artists.select().where('id', '=', '__NONE__')
+    if (!ids.length) return tables.artists.select().where('id', '=', NO_MATCH_ID)
     return tables.artists.select().where({ id: { op: 'IN', value: ids } })
   }, [ids])
   
@@ -93,7 +94,7 @@ export const useArtistById = (id: string | null | undefined) => {
     queryDb(
       id 
         ? tables.artists.select().where('id', '=', id).limit(1)
-        : tables.artists.select().where('id', '=', '__NONE__').limit(1) // Return empty if no id
+        : tables.artists.select().where('id', '=', NO_MATCH_ID).limit(1) // Return empty if no id
     )
   )
   return (result as ArtistRecord[])[0] || null

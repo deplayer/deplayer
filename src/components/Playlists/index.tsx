@@ -86,12 +86,12 @@ const Playlists = memo(() => {
     : false
 
   const transformedPlaylists = useMemo(() =>
-    (playlists as unknown as Array<{ id: string; name: string; trackIds?: string[] }>).map((playlist) => ({
+    playlists.map((playlist) => ({
       _id: playlist.id,
       id: playlist.id,
       name: playlist.name,
-      // usePlaylists assembles this from playlist_items.
-      trackIds: playlist.trackIds ?? [],
+      // Assembled from playlist_items by usePlaylists.
+      trackIds: playlist.trackIds,
     }))
   , [playlists])
 

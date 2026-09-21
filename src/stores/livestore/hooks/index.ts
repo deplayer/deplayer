@@ -43,10 +43,8 @@ export {
 } from './useArtists'
 
 // Playlist hooks
-export {
-  usePlaylists,
-  usePlaylistById,
-} from './usePlaylists'
+export { usePlaylists, usePlaylistById } from './usePlaylists'
+export type { PlaylistRow } from './usePlaylists'
 
 // Smart Playlist hooks
 export {

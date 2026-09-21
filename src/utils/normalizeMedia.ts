@@ -1,5 +1,6 @@
 import type { MediaRow, Cover, Stream } from '../types/media'
 import { generateMediaId, generateArtistId, generateAlbumId } from './generateIds'
+import { normalizeGenres } from './genres'
 
 export type DurationInput =
   | { value: number; unit: 'ms' }
@@ -41,12 +42,6 @@ function normalizeDuration(input?: DurationInput): number {
   }
 }
 
-function normalizeGenres(input?: string[] | string): string[] {
-  if (!input) return []
-  if (typeof input === 'string') return input ? [input] : []
-  return input.filter(g => g !== '')
-}
-
 export function normalizeMedia(raw: RawMediaInput): NormalizedMedia {
   const artistName = raw.artistName || 'Unknown Artist'
   const albumName = raw.albumName || 'Unknown Album'
@@ -82,7 +77,7 @@ export function normalizeMedia(raw: RawMediaInput): NormalizedMedia {
     externalId: raw.externalId ?? null,
     shareUrl: raw.shareUrl ?? null,
     filePath: raw.filePath ?? null,
-    genresFlat: genres.join(','),
+    genresFlat: normalizeGenres(genres).join(','),
     providersFlat: Object.keys(stream).join(',')
   }
 

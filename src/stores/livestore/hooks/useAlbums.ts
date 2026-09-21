@@ -1,6 +1,7 @@
 import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
+import { NO_MATCH_ID } from '../query'
 import { useMemo } from 'react'
 import { rawToMediaRow } from '../transformMedia'
 import type { MediaRow } from '../../../types/media'
@@ -73,7 +74,7 @@ export const useAlbumById = (id: string | null | undefined) => {
     queryDb(
       id 
         ? tables.albums.select().where('id', '=', id).limit(1)
-        : tables.albums.select().where('id', '=', '__NONE__').limit(1) // Return empty if no id
+        : tables.albums.select().where('id', '=', NO_MATCH_ID).limit(1) // Return empty if no id
     )
   )
   return (result as AlbumRecord[])[0] || null
@@ -94,7 +95,7 @@ export const useAlbumsByArtist = (artistId: string | null | undefined) => {
     queryDb(
       artistId
         ? tables.albums.select().where('artistId', '=', artistId).orderBy('year', 'desc')
-        : tables.albums.select().where('id', '=', '__NONE__') // Return empty if no artistId
+        : tables.albums.select().where('id', '=', NO_MATCH_ID) // Return empty if no artistId
     )
   )
 }
@@ -203,7 +204,7 @@ export const useSongsByAlbumForArtist = (artistId: string | null | undefined) =>
             .select()
             .where('artistId', '=', artistId)
             .orderBy('track', 'asc')
-        : tables.media.select().where('id', '=', '__NONE__')
+        : tables.media.select().where('id', '=', NO_MATCH_ID)
     )
   )
   

@@ -22,6 +22,7 @@
  */
 
 import { queryDb, Schema } from '@livestore/livestore'
+import { MEDIA_ROW_COLUMNS_SQL, mediaRowSchema } from '../query'
 
 export interface Filter {
   genres: string[]
@@ -164,32 +165,6 @@ export const buildCollectionClauses = (
 // Queries — all three share the clauses, so count/window/ids cannot drift
 // ---------------------------------------------------------------------------
 
-const ROW_COLUMNS = [
-  'id', 'title', 'track', 'artistId', 'artistName',
-  'albumId', 'albumName', 'duration', 'cover', 'stream',
-  'type', 'genresFlat', 'providersFlat',
-] as const
-
-// Only the columns the decode depends on are typed; the rest pass through
-// rawToMediaRow, which is tolerant of nulls and JSON-string columns.
-const rowSchema = Schema.Array(
-  Schema.Struct({
-    id: Schema.String,
-    title: Schema.String,
-    track: Schema.Unknown,
-    artistId: Schema.Unknown,
-    artistName: Schema.Unknown,
-    albumId: Schema.Unknown,
-    albumName: Schema.Unknown,
-    duration: Schema.Unknown,
-    cover: Schema.Unknown,
-    stream: Schema.Unknown,
-    type: Schema.Unknown,
-    genresFlat: Schema.Unknown,
-    providersFlat: Schema.Unknown,
-  }),
-)
-
 const idSchema = Schema.Array(Schema.Struct({ id: Schema.String }))
 
 const countSchema = Schema.Array(Schema.Struct({ count: Schema.Number }))
@@ -208,10 +183,10 @@ const whereSql = (c: CollectionClauses): string => (c.where.length > 0 ? ` WHERE
 export const collectionWindowQuery = (c: CollectionClauses, limit: number) =>
   queryDb({
     query:
-      `SELECT ${c.genreJoin ? 'DISTINCT ' : ''}${ROW_COLUMNS.map((col) => `m.${col}`).join(', ')}` +
+      `SELECT ${c.genreJoin ? 'DISTINCT ' : ''}${MEDIA_ROW_COLUMNS_SQL}` +
       ` ${fromSql(c)}${whereSql(c)} ORDER BY m.title ASC, m.id ASC LIMIT ${limit}`,
     bindValues: c.bindValues,
-    schema: rowSchema,
+    schema: mediaRowSchema,
   })
 
 /** Live count for the same clauses (DISTINCT when the genre join fans out). */

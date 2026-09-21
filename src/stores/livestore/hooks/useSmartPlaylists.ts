@@ -1,6 +1,7 @@
 import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
+import { NO_MATCH_ID } from '../query'
 
 /**
  * LiveStore Hooks for Smart Playlists
@@ -47,7 +48,7 @@ export const useSmartPlaylistById = (smartPlaylistId: string | null | undefined)
     queryDb(
       smartPlaylistId
         ? tables.smartPlaylists.select().where('id', '=', smartPlaylistId).limit(1)
-        : tables.smartPlaylists.select().where('id', '=', '__NONE__').limit(1)
+        : tables.smartPlaylists.select().where('id', '=', NO_MATCH_ID).limit(1)
     )
   )
   return (result as SmartPlaylist[])[0] || null

@@ -1,6 +1,7 @@
 import { useAppStore } from '../store'
 import { queryDb, Schema } from '@livestore/livestore'
 import { tables } from '../schema'
+import { MEDIA_ROW_COLUMNS_SQL, mediaRowSchema, NO_MATCH_ID } from '../query'
 import { useMemo } from 'react'
 import type { MediaRow } from '../../../types/media'
 import { rawToMediaRow } from '../transformMedia'
@@ -71,35 +72,6 @@ export const useGenres = (): Array<{ name: string; count: number }> => {
 }
 
 /**
- * Columns a SongView genre-recommendation row needs. JSON columns come back
- * as text from raw SQL and are parsed by `rawToMediaRow`.
- */
-const MEDIA_BY_GENRE_COLUMNS = `
-        m.id, m.title, m.track, m.artistId, m.artistName,
-        m.albumId, m.albumName, m.duration, m.discNumber, m.playCount,
-        m.cover, m.stream, m.type, m.genresFlat, m.providersFlat`
-
-const mediaByGenreSchema = Schema.Array(
-  Schema.Struct({
-    id: Schema.String,
-    title: Schema.Unknown,
-    track: Schema.Unknown,
-    artistId: Schema.Unknown,
-    artistName: Schema.Unknown,
-    albumId: Schema.Unknown,
-    albumName: Schema.Unknown,
-    duration: Schema.Unknown,
-    discNumber: Schema.Unknown,
-    playCount: Schema.Unknown,
-    cover: Schema.Unknown,
-    stream: Schema.Unknown,
-    type: Schema.Unknown,
-    genresFlat: Schema.Unknown,
-    providersFlat: Schema.Unknown,
-  }),
-)
-
-/**
  * Songs in a genre, matched EXACTLY through the indexed `media_genres` join —
  * the same semantics the collection filter uses. The previous
  * `genresFlat LIKE '%genre%'` match was a substring match, so "Rock" also
@@ -108,14 +80,14 @@ const mediaByGenreSchema = Schema.Array(
 const mediaByGenreQuery = (genre: string, limit: number) =>
   queryDb({
     query: `
-      SELECT ${MEDIA_BY_GENRE_COLUMNS}
+      SELECT ${MEDIA_ROW_COLUMNS_SQL}
       FROM media m
       INNER JOIN media_genres mg ON mg.mediaId = m.id
       WHERE mg.genre = ?
       ORDER BY m.id
       LIMIT ?
     `,
-    schema: mediaByGenreSchema,
+    schema: mediaRowSchema,
     bindValues: [genre, limit],
   })
 
@@ -132,7 +104,7 @@ export const useMediaByGenre = (genre: string | undefined | null, limit = 25): M
   const rows = store.useQuery(
     genre
       ? mediaByGenreQuery(genre, limit)
-      : queryDb(tables.media.select().where('id', '=', '__NONE__'))
+      : queryDb(tables.media.select().where('id', '=', NO_MATCH_ID))
   )
 
   return useMemo(() => {

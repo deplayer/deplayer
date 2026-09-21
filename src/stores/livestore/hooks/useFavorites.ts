@@ -1,6 +1,7 @@
 import { useAppStore } from '../store'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '../schema'
+import { NO_MATCH_ID } from '../query'
 import { useMemo } from 'react'
 
 /**
@@ -56,7 +57,7 @@ export const useIsFavorite = (mediaId: string | null | undefined) => {
             .select()
             .where('mediaId', '=', mediaId)
             .limit(1)
-        : tables.favorites.select().where('id', '=', '__NONE__').limit(1)
+        : tables.favorites.select().where('id', '=', NO_MATCH_ID).limit(1)
     )
   )
   
@@ -80,7 +81,7 @@ export const useFavoriteIds = (skip = false): Set<string> => {
   const favoriteRecords = store.useQuery(
     queryDb(
       skip
-        ? tables.favorites.select('mediaId').where('id', '=', '__NONE__')
+        ? tables.favorites.select('mediaId').where('id', '=', NO_MATCH_ID)
         : tables.favorites.select('mediaId')
     )
   )
