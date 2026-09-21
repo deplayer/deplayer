@@ -60,7 +60,6 @@ export function* initializeWatcher(): Generator<any, void, any> {
       useUIStore.getState().setLoading(false);
       useUIStore.getState().setReady(true);
       yield put({ type: types.INITIALIZED });
-      yield put({ type: types.APPLY_MOST_PLAYED_SORT });
       logger.info("Initialization complete");
       
     } catch (error: unknown) {
