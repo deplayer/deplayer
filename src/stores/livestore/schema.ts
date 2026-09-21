@@ -128,7 +128,6 @@ export const tables = {
       discNumber: State.SQLite.integer({ nullable: true }),
       stream: State.SQLite.json({}),
       cover: State.SQLite.json({ nullable: true }),
-      genres: State.SQLite.json({}),
       externalId: State.SQLite.text({ nullable: true }),
       shareUrl: State.SQLite.text({ nullable: true }),
       filePath: State.SQLite.text({ nullable: true }),
@@ -394,7 +393,6 @@ const materializers = State.SQLite.materializers(events, {
           discNumber: discNumber ?? null,
           stream,
           cover: cover ?? null,
-          genres,
           externalId: externalId ?? null,
           shareUrl: shareUrl ?? null,
           filePath: filePath ?? null,
@@ -415,7 +413,6 @@ const materializers = State.SQLite.materializers(events, {
           discNumber: discNumber ?? null,
           stream,
           cover: cover ?? null,
-          genres,
           externalId: externalId ?? null,
           shareUrl: shareUrl ?? null,
           filePath: filePath ?? null,
@@ -441,7 +438,6 @@ const materializers = State.SQLite.materializers(events, {
     }
     if (cover !== undefined) updates.cover = cover
     if (genres !== undefined) {
-      updates.genres = genres
       // Update denormalized genres
       updates.genresFlat = Array.isArray(genres) ? genres.join(',') : ''
     }
@@ -554,7 +550,6 @@ const materializers = State.SQLite.materializers(events, {
             discNumber: item.discNumber ?? null,
             stream: item.stream,
             cover: item.cover ?? null,
-            genres: item.genres,
             externalId: item.externalId ?? null,
             shareUrl: item.shareUrl ?? null,
             filePath: item.filePath ?? null,
@@ -600,7 +595,6 @@ const materializers = State.SQLite.materializers(events, {
             discNumber: item.discNumber ?? null,
             stream: item.stream,
             cover: item.cover ?? null,
-            genres: item.genres,
             externalId: item.externalId ?? null,
             shareUrl: item.shareUrl ?? null,
             filePath: item.filePath ?? null,
