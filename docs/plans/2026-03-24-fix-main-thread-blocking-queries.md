@@ -90,8 +90,7 @@ Expected: All pass.
 **Step 5: Commit**
 
 ```bash
-jj describe -m "perf: scope useRecommendations query to exclude source artist + limit 200"
-jj new
+git commit -m "perf: scope useRecommendations query to exclude source artist + limit 200"
 ```
 
 ---
@@ -163,8 +162,7 @@ Expected: All pass.
 **Step 4: Commit**
 
 ```bash
-jj describe -m "perf: RecentAlbums uses targeted artist lookup instead of full table scan"
-jj new
+git commit -m "perf: RecentAlbums uses targeted artist lookup instead of full table scan"
 ```
 
 ---
@@ -226,8 +224,7 @@ Expected: All pass.
 **Step 5: Commit**
 
 ```bash
-jj describe -m "perf: move search term filtering to SQL LIKE in useCollectionData"
-jj new
+git commit -m "perf: move search term filtering to SQL LIKE in useCollectionData"
 ```
 
 ---
@@ -280,8 +277,7 @@ Expected: All pass.
 **Step 5: Commit**
 
 ```bash
-jj describe -m "perf: deprecate full-scan hooks, migrate consumers to scoped queries"
-jj new
+git commit -m "perf: deprecate full-scan hooks, migrate consumers to scoped queries"
 ```
 
 ---
@@ -309,7 +305,7 @@ All must pass.
 **Step 3: Final commit**
 
 ```bash
-jj describe -m "perf: fix main thread blocking from full-table LiveStore queries"
+git commit -m "perf: fix main thread blocking from full-table LiveStore queries"
 ```
 
 ---

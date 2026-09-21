@@ -99,8 +99,7 @@ npm run build
 **Step 4: Commit**
 
 ```bash
-jj describe -m "feat: add syncState table and events to LiveStore"
-jj new
+git commit -m "feat: add syncState table and events to LiveStore"
 ```
 
 ---
@@ -228,8 +227,7 @@ npm test -- src/providers/SubsonicApiProvider.getScanStatus.spec.ts
 **Step 5: Commit**
 
 ```bash
-jj describe -m "feat: add getScanStatus to SubsonicApiProvider"
-jj new
+git commit -m "feat: add getScanStatus to SubsonicApiProvider"
 ```
 
 ---
@@ -438,8 +436,7 @@ npm test -- src/providers/SubsonicApiProvider.getNewestAlbumsSince.spec.ts
 **Step 5: Commit**
 
 ```bash
-jj describe -m "feat: add getNewestAlbumsSince to SubsonicApiProvider"
-jj new
+git commit -m "feat: add getNewestAlbumsSince to SubsonicApiProvider"
 ```
 
 ---
@@ -500,8 +497,7 @@ npm run build
 **Step 4: Commit**
 
 ```bash
-jj describe -m "feat: add getAlbumsBatch for progressive hydration"
-jj new
+git commit -m "feat: add getAlbumsBatch for progressive hydration"
 ```
 
 ---
@@ -764,8 +760,7 @@ npm run build
 **Step 4: Commit**
 
 ```bash
-jj describe -m "feat: replace fetchRecentAlbums with incremental syncMediaLibrary"
-jj new
+git commit -m "feat: replace fetchRecentAlbums with incremental syncMediaLibrary"
 ```
 
 ---
@@ -800,8 +795,7 @@ npm run lint
 **Step 5: Commit**
 
 ```bash
-jj describe -m "refactor: remove deprecated fullSync and getRecentMedia"
-jj new
+git commit -m "refactor: remove deprecated fullSync and getRecentMedia"
 ```
 
 ---
@@ -835,8 +829,7 @@ npm test -- src/sagas/collection/syncMediaLibrary.spec.ts
 **Step 3: Commit**
 
 ```bash
-jj describe -m "test: add integration tests for syncMediaLibrary"
-jj new
+git commit -m "test: add integration tests for syncMediaLibrary"
 ```
 
 ---
@@ -865,5 +858,5 @@ Verify:
 **Step 3: Final commit**
 
 ```bash
-jj describe -m "feat: incremental Subsonic sync — complete"
+git commit -m "feat: incremental Subsonic sync — complete"
 ```

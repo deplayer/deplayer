@@ -133,8 +133,7 @@ Expected: No errors.
 **Step 4: Commit**
 
 ```bash
-jj describe -m "feat: add Zustand UI store to replace UIContext"
-jj new
+git commit -m "feat: add Zustand UI store to replace UIContext"
 ```
 
 ---
@@ -226,8 +225,7 @@ Expected: Clean.
 **Step 4: Commit**
 
 ```bash
-jj describe -m "feat: add Redux→Zustand sync middleware for UI state"
-jj new
+git commit -m "feat: add Redux→Zustand sync middleware for UI state"
 ```
 
 ---
@@ -365,8 +363,7 @@ Expected: All pass.
 **Step 5: Commit**
 
 ```bash
-jj describe -m "refactor: migrate all useUI() consumers to useUIStore selectors"
-jj new
+git commit -m "refactor: migrate all useUI() consumers to useUIStore selectors"
 ```
 
 ---
@@ -415,8 +412,7 @@ Expected: All pass.
 **Step 4: Commit**
 
 ```bash
-jj describe -m "refactor: internalize activeFilters/searchTerm in useCollectionData"
-jj new
+git commit -m "refactor: internalize activeFilters/searchTerm in useCollectionData"
 ```
 
 ---
@@ -453,8 +449,7 @@ Expected: All pass.
 **Step 6: Commit**
 
 ```bash
-jj describe -m "refactor: delete UIContext, replaced by Zustand useUIStore"
-jj new
+git commit -m "refactor: delete UIContext, replaced by Zustand useUIStore"
 ```
 
 ---
@@ -486,8 +481,7 @@ Expected: All pass.
 **Step 3: Commit**
 
 ```bash
-jj describe -m "refactor: migrate Redux state.app consumers to Zustand useUIStore"
-jj new
+git commit -m "refactor: migrate Redux state.app consumers to Zustand useUIStore"
 ```
 
 ---
@@ -531,7 +525,7 @@ Expected: Only the sync middleware and configureStore.ts references remain.
 **Step 5: Final commit**
 
 ```bash
-jj describe -m "perf: replace UIContext with Zustand — eliminate context stampede on navigation"
+git commit -m "perf: replace UIContext with Zustand — eliminate context stampede on navigation"
 ```
 
 ---
