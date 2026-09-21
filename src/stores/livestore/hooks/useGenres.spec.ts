@@ -14,7 +14,7 @@ vi.mock('../store', () => ({
   useAppStore: () => ({ useQuery }),
 }))
 
-import { useGenres, useSongsByGenre } from './useGenres'
+import { useGenres, useMediaByGenre, useSongsByGenre } from './useGenres'
 
 const reset = (queries: unknown[]) => {
   useQueryReturns.length = 0
@@ -143,5 +143,70 @@ describe('useSongsByGenre', () => {
 
     const { result } = renderHook(() => useSongsByGenre())
     expect(result.current).toEqual({})
+  })
+})
+
+describe('useMediaByGenre', () => {
+  beforeEach(() => {
+    reset([])
+  })
+
+  const emittedQuery = () => {
+    const calls = useQuery.mock.calls as unknown as Array<[{ label?: string; hash?: string }?]>
+    const def = calls[0]?.[0]
+    return { sql: def?.label ?? '', hash: def?.hash ?? '' }
+  }
+
+  it('matches the genre exactly through the media_genres join', () => {
+    renderHook(() => useMediaByGenre('Rock'))
+    const { sql } = emittedQuery()
+
+    // Exact membership: join media_genres and compare genre with equality.
+    // The previous `genresFlat LIKE '%Rock%'` also matched Rockabilly and
+    // Classic Rock, diverging from the collection filter's exact semantics.
+    expect(sql).toContain('INNER JOIN media_genres')
+    expect(sql).toContain('mg.genre = ?')
+    expect(sql).not.toContain('LIKE')
+  })
+
+  it('binds the genre and limit positionally', () => {
+    renderHook(() => useMediaByGenre('Rock', 10))
+    const { hash } = emittedQuery()
+    expect(hash).toContain('0:Rock')
+    expect(hash).toContain('1:10')
+  })
+
+  it('decodes raw rows into MediaRow objects (JSON columns parsed)', () => {
+    reset([[
+      {
+        id: 'm1',
+        title: 'Track',
+        track: 1,
+        artistId: 'a1',
+        artistName: 'Artist',
+        albumId: 'al1',
+        albumName: 'Album',
+        duration: 1000,
+        discNumber: 1,
+        playCount: 0,
+        cover: '{"thumbnailUrl":"t","fullUrl":"f"}',
+        stream: '{"subsonic":{"service":"subsonic","uris":[]}}',
+        type: 'audio',
+        genresFlat: 'Rock',
+        providersFlat: 'subsonic',
+      },
+    ]])
+
+    const { result } = renderHook(() => useMediaByGenre('Rock'))
+    expect(result.current).toHaveLength(1)
+    expect(result.current[0].id).toBe('m1')
+    expect(result.current[0].cover).toEqual({ thumbnailUrl: 't', fullUrl: 'f' })
+    expect(result.current[0].stream).toEqual({ subsonic: { service: 'subsonic', uris: [] } })
+  })
+
+  it('queries nothing and returns [] when there is no genre', () => {
+    reset([null as unknown])
+    const { result } = renderHook(() => useMediaByGenre(undefined))
+    expect(result.current).toEqual([])
   })
 })

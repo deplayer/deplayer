@@ -63,9 +63,9 @@ const RoutedSongView = (props: RoutedSongViewProps) => {
 
     // Add genre songs for recommendations
     if (firstGenre && genreSongs) {
-      songsByGenre[firstGenre] = genreSongs.map((s: Record<string, unknown>) => s.id as string)
-      genreSongs.forEach((s: Record<string, unknown>) => {
-        rows[s.id as string] = s as unknown as MediaRow
+      songsByGenre[firstGenre] = genreSongs.map((s) => s.id)
+      genreSongs.forEach((s) => {
+        rows[s.id] = s
       })
     }
 
