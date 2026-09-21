@@ -20,9 +20,11 @@ import type { LiveStore } from '../accessor'
 import { queueEvents } from '../events/queue'
 import { tables } from '../schema'
 import { addNext, playAll, addToQueue, clearQueue, removeFromQueue, toggleShuffle, toggleRepeat, setCurrentPlaying } from './transitions'
-import { readQueue } from './storeReaders'
-import { activeListName, stepNext, stepPrevious, stepToMedia } from './stepping'
-import type { QueueHeadRow, QueueItemRow } from './types'
+import { readQueue, storedPermutation } from './storeReaders'
+import { stepNext, stepPrevious, stepToMedia } from './stepping'
+import { activeIndexToOrderedIndex, orderedIndexToActiveIndex } from './resolution'
+import { ORDERED_LIST } from './types'
+import type { ActiveRow, QueueHeadRow, QueueItemRow } from './types'
 
 /**
  * Replace queue with new tracks, positioned at the first track.
@@ -137,7 +139,7 @@ export const toggleShuffleAction = async (store: LiveStore, shuffle: boolean) =>
 
   const ev = toggleShuffle(current, shuffle)
   if (ev) {
-    await store.commit(queueEvents.queueUpdated(ev))
+    await store.commit(queueEvents.queueShuffleToggled(ev))
   }
 }
 
@@ -186,9 +188,11 @@ export async function playNextAction(store: LiveStore): Promise<void> {
     return
   }
 
-  const list = activeListName(head.shuffle)
   const cur = head.currentPlaying ?? -1
-  const [atNext, atZero] = await readItemRows(store, list, cur + 1, 0)
+  const [atNext, atZero] = await Promise.all([
+    readActiveRow(store, head, cur + 1),
+    readActiveRow(store, head, 0),
+  ])
 
   const ev = stepNext(head, atNext, atZero)
   if (ev) {
@@ -210,9 +214,11 @@ export async function playPreviousAction(store: LiveStore): Promise<void> {
     return
   }
 
-  const list = activeListName(head.shuffle)
   const cur = head.currentPlaying ?? 0
-  const [atPrev, last] = await readPrevRows(store, list, cur, head.repeat)
+  const atPrev = cur > 0 ? await readActiveRow(store, head, cur - 1) : null
+  // The wrap row is only fetched when the step can use it, so the common case
+  // (stepping back from a queue with repeat off) costs one point read.
+  const last = atPrev === null && head.repeat ? await readLastActiveRow(store, head) : null
 
   // Always commits when a queue exists (even the stay-put case).
   const ev = stepPrevious(head, atPrev, last)
@@ -239,21 +245,27 @@ export async function playMediaAction(
     return
   }
 
-  const list = activeListName(head.shuffle)
   const found = (
     await store.query(
       queryDb(
         tables.queueItems
           .select('position', 'trackId')
           .where('queueId', '=', 'default')
-          .where('list', '=', list)
+          .where('list', '=', ORDERED_LIST)
           .where('trackId', '=', mediaId)
           .limit(1)
       )
     ) as unknown as QueueItemRow[]
   )[0] ?? null
 
-  const ev = stepToMedia(found)
+  // The query yields an ordered index; the event must carry the active-list
+  // position (what currentPlaying indexes when shuffle is on).
+  const perm = headPermutation(head)
+  const active: ActiveRow | null = found
+    ? { position: orderedIndexToActiveIndex(perm, found.position), trackId: found.trackId }
+    : null
+
+  const ev = stepToMedia(active)
   if (ev) {
     await store.commit(queueEvents.queuePositionChanged(ev))
   } else {
@@ -264,9 +276,10 @@ export async function playMediaAction(
 /**
  * Point-read helpers for the O(1) step actions.
  *
- * Each reads at most two `queue_items` rows — only the neighbors a step
- * actually needs — plus the head row. No JSON parsing, no full-list
- * materialization.
+ * `queue_items` holds only the ordered list; the shuffle order is a
+ * permutation on the head row. A step therefore maps its active-list position
+ * through that permutation and reads exactly one ordered row — the head row
+ * plus at most two row reads, no full-list materialization.
  */
 
 const readQueueHead = async (store: LiveStore): Promise<QueueHeadRow | null> => {
@@ -281,9 +294,13 @@ const readQueueHead = async (store: LiveStore): Promise<QueueHeadRow | null> => 
   return result[0] ?? null
 }
 
-const readItem = async (
+/** The head row's shuffle permutation, or null when the active list is ordered. */
+const headPermutation = (head: QueueHeadRow): Int32Array | null =>
+  storedPermutation(head.shuffle, head.randomOrder)
+
+/** Point-read the ordered row at an ordered-list index. */
+const readOrderedRow = async (
   store: LiveStore,
-  list: string,
   position: number
 ): Promise<QueueItemRow | null> => {
   const result = (await store.query(
@@ -291,7 +308,7 @@ const readItem = async (
       tables.queueItems
         .select('position', 'trackId')
         .where('queueId', '=', 'default')
-        .where('list', '=', list)
+        .where('list', '=', ORDERED_LIST)
         .where('position', '=', position)
         .limit(1)
     )
@@ -299,29 +316,35 @@ const readItem = async (
   return result[0] ?? null
 }
 
-const readItemRows = async (
+/**
+ * Point-read the row occupying an active-list position. The returned row
+ * carries the *active* position, so the pure stepping rules commit it as-is.
+ */
+const readActiveRow = async (
   store: LiveStore,
-  list: string,
-  ...positions: number[]
-): Promise<(QueueItemRow | null)[]> => {
-  const rows = await Promise.all(positions.map((p) => readItem(store, list, p)))
-  return rows
+  head: QueueHeadRow,
+  activePosition: number
+): Promise<ActiveRow | null> => {
+  const orderedIndex = activeIndexToOrderedIndex(headPermutation(head), activePosition)
+  const row = await readOrderedRow(store, orderedIndex)
+  return row ? { position: activePosition, trackId: row.trackId } : null
 }
 
 /**
- * The previous step needs the row at `cur - 1` (when `cur > 0`) and, for
- * the repeat wrap, the highest-position row in the active list. The wrap row
- * is only fetched when the step can actually use it, so the common case
- * (stepping back from a queue with repeat off) costs one point read.
+ * The row at the last active-list position (the repeat wrap for a back step).
+ * Under shuffle the permutation length already gives that position, so no
+ * extra query is needed.
  */
-const readPrevRows = async (
+const readLastActiveRow = async (
   store: LiveStore,
-  list: string,
-  cur: number,
-  repeat: boolean
-): Promise<[QueueItemRow | null, QueueItemRow | null]> => {
-  const atPrev = cur > 0 ? await readItem(store, list, cur - 1) : null
-  if (atPrev !== null || !repeat) return [atPrev, null]
+  head: QueueHeadRow
+): Promise<ActiveRow | null> => {
+  const perm = headPermutation(head)
+  if (perm) {
+    const activePosition = perm.length - 1
+    if (activePosition < 0) return null
+    return readActiveRow(store, head, activePosition)
+  }
 
   const last = (
     await store.query(
@@ -329,11 +352,11 @@ const readPrevRows = async (
         tables.queueItems
           .select('position', 'trackId')
           .where('queueId', '=', 'default')
-          .where('list', '=', list)
+          .where('list', '=', ORDERED_LIST)
           .orderBy('position', 'desc')
           .limit(1)
       )
     ) as unknown as QueueItemRow[]
   )[0] ?? null
-  return [atPrev, last]
+  return last ? { position: last.position, trackId: last.trackId } : null
 }

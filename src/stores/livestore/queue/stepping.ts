@@ -1,20 +1,15 @@
 /**
- * Pure queue stepping rules for the normalized queue_items storage.
+ * Pure queue stepping rules for the normalized queue storage.
  *
  * The async step actions (playNextAction / playPreviousAction /
- * playMediaAction) fetch only the queue head row and the one or two
- * neighboring queue_items rows they need, then hand them to these
- * functions. The rules mirror the full-list transitions in
- * `./transitions.ts` (which stay the source of truth for the list-mutating
- * actions) and are pure: no LiveStore, no schema, testable without
- * infrastructure.
+ * playMediaAction) fetch only the queue head row and the one or two ordered
+ * `queue_items` rows they need, resolve the shuffle permutation in the head
+ * row, and hand the resulting active-list rows to these functions. The rules
+ * mirror the full-list transitions in `./transitions.ts` and are pure: no
+ * LiveStore, no schema, testable without infrastructure.
  */
 
-import type { QueuePositionChangedEvent, QueueHeadRow, QueueItemRow } from './types'
-
-/** The list `currentPlaying` indexes into. */
-export const activeListName = (shuffle: boolean | null | undefined): 'ordered' | 'random' =>
-  shuffle ? 'random' : 'ordered'
+import type { QueuePositionChangedEvent, QueueHeadRow, ActiveRow } from './types'
 
 const args = (position: number, trackId?: string): QueuePositionChangedEvent =>
   ({ queueId: 'default', position, trackId })
@@ -31,8 +26,8 @@ const args = (position: number, trackId?: string): QueuePositionChangedEvent =>
  */
 export function stepNext(
   head: QueueHeadRow,
-  atNext: QueueItemRow | null,
-  atZero: QueueItemRow | null,
+  atNext: ActiveRow | null,
+  atZero: ActiveRow | null,
 ): QueuePositionChangedEvent | null {
   if (atNext) return args(atNext.position, atNext.trackId)
   if (head.repeat && atZero) return args(0, atZero.trackId)
@@ -53,8 +48,8 @@ export function stepNext(
  */
 export function stepPrevious(
   head: QueueHeadRow,
-  atPrev: QueueItemRow | null,
-  last: QueueItemRow | null,
+  atPrev: ActiveRow | null,
+  last: ActiveRow | null,
 ): QueuePositionChangedEvent {
   if (atPrev) return args(atPrev.position, atPrev.trackId)
   if (head.repeat && last) return args(last.position, last.trackId)
@@ -69,7 +64,7 @@ export function stepPrevious(
  * Not found → null (the action warns, matching `transitions.playMedia`).
  */
 export function stepToMedia(
-  found: QueueItemRow | null,
+  found: ActiveRow | null,
 ): QueuePositionChangedEvent | null {
   if (!found) return null
   return args(found.position, found.trackId)

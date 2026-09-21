@@ -250,47 +250,42 @@ describe('toggleShuffle', () => {
     expect(toggleShuffle(makeState({ trackIds: [], randomTrackIds: [] }), false)).toBeNull()
   })
 
-  it('enables shuffle with a deterministic permutation and remaps currentPlaying to the same song', () => {
+  it('enables shuffle with a deterministic permutation of ordered indices and remaps currentPlaying to the same song', () => {
     const event = toggleShuffle(makeState({ currentPlaying: 1 }), true, rng([0.5, 0.25]))
+    // fisherYates([0,1,2]) = [2,0,1] -> shuffled ids ['c','a','b'] ('b' moves 1 -> 2)
     expect(event).toEqual({
-      id: 'default',
-      trackIds: ['a', 'b', 'c'],
-      randomTrackIds: ['c', 'a', 'b'],
-      currentPlaying: 2, // 'b' moved from index 1 to index 2 in the shuffled list
+      queueId: 'default',
       shuffle: true,
-      repeat: false,
+      currentPlaying: 2,
+      randomOrder: [2, 0, 1],
     })
   })
 
   it('enabling shuffle on an already-shuffled queue anchors on trackIds (suspected bug #2, locked in)', () => {
     // Active song is randomTrackIds[1] = 'a'. Re-enabling shuffles the plain
     // list and anchors on trackIds[1] ('b'), so the playing song changes from
-    // 'a' to 'b' (randomTrackIds[2]). The event's randomTrackIds is a fresh
-    // permutation of the plain list, not derived from the previous order.
+    // 'a' to 'b'. The permutation is a fresh one over the plain list, not
+    // derived from the previous order.
     const state = makeState({ shuffle: true, randomTrackIds: ['c', 'a', 'b'], currentPlaying: 1 })
     const event = toggleShuffle(state, true, rng([0.9, 0.9])) // identity permutation
     expect(event).toEqual({
-      id: 'default',
-      trackIds: ['a', 'b', 'c'],
-      randomTrackIds: ['a', 'b', 'c'],
-      currentPlaying: 1,
+      queueId: 'default',
       shuffle: true,
-      repeat: false,
+      currentPlaying: 1,
+      randomOrder: [0, 1, 2],
     })
   })
 
-  it('disables shuffle by remapping the shuffled position back to the plain-list index', () => {
+  it('disables shuffle by remapping the shuffled position back to the plain-list index and clearing the permutation', () => {
     const event = toggleShuffle(
       makeState({ shuffle: true, randomTrackIds: ['b', 'c', 'a'], currentPlaying: 2 }),
       false
     )
     expect(event).toEqual({
-      id: 'default',
-      trackIds: ['a', 'b', 'c'],
-      randomTrackIds: [],
-      currentPlaying: 0, // 'a' is at index 0 in the plain list
+      queueId: 'default',
       shuffle: false,
-      repeat: false,
+      currentPlaying: 0, // 'a' is at index 0 in the plain list
+      randomOrder: [],
     })
   })
 
@@ -299,7 +294,7 @@ describe('toggleShuffle', () => {
       makeState({ shuffle: true, randomTrackIds: ['b', 'c', 'a'], currentPlaying: null }),
       false
     )
-    expect(event?.randomTrackIds).toEqual([])
+    expect(event?.randomOrder).toEqual([])
     expect(event?.currentPlaying).toBeUndefined()
     expect(event?.shuffle).toBe(false)
   })
@@ -309,19 +304,20 @@ describe('toggleShuffle', () => {
       makeState({ shuffle: true, randomTrackIds: ['b', 'c'], trackIds: ['a', 'b', 'c'], currentPlaying: 5 }),
       false
     )
-    expect(event?.randomTrackIds).toEqual([])
+    expect(event?.randomOrder).toEqual([])
     expect(event?.currentPlaying).toBe(5)
     expect(event?.shuffle).toBe(false)
   })
 
-  it('preserves repeat across the toggle', () => {
+  it('emits a head-only event that cannot clobber repeat', () => {
     const on = toggleShuffle(makeState({ repeat: true }), true, rng([0.5, 0.25]))
-    expect(on?.repeat).toBe(true)
+    expect(on).not.toHaveProperty('repeat')
     const off = toggleShuffle(
       makeState({ shuffle: true, randomTrackIds: ['b', 'c', 'a'], currentPlaying: 1, repeat: true }),
       false
     )
-    expect(off?.repeat).toBe(true)
+    expect(off).not.toHaveProperty('repeat')
+    expect(off).not.toHaveProperty('trackIds')
   })
 })
 

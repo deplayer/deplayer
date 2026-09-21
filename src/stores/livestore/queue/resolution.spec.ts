@@ -3,6 +3,13 @@ import {
   parseIds,
   getActiveTrackIds,
   resolveCurrentSongId,
+  encodePermutation,
+  decodePermutation,
+  permutationOf,
+  permutationToTrackIds,
+  activeOrderPermutation,
+  activeIndexToOrderedIndex,
+  orderedIndexToActiveIndex,
 } from './resolution'
 import type { QueueState } from './types'
 
@@ -123,6 +130,109 @@ describe('resolveCurrentSongId', () => {
   it('falls back to index when currentTrackId is undefined', () => {
     const q = makeQueue({ currentPlaying: 2 })
     expect(resolveCurrentSongId(q)).toBe('track-c')
+  })
+})
+
+describe('permutation blob', () => {
+  it('encodes to Int32 little-endian bytes', () => {
+    // Pins the stored wire format, independent of the encoder.
+    expect(Array.from(encodePermutation([0, 1]))).toEqual([0, 0, 0, 0, 1, 0, 0, 0])
+    expect(Array.from(encodePermutation([2, 0, 1]))).toEqual([
+      2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
+    ])
+  })
+
+  it('decodes Int32 little-endian bytes without the encoder', () => {
+    // Hand-written bytes: the wire format must survive a decoder/encoder
+    // change in lockstep.
+    const blob = new Uint8Array([1, 0, 0, 0, 0, 0, 0, 0])
+    expect(Array.from(decodePermutation(blob)!)).toEqual([1, 0])
+  })
+
+  it('round-trips through a byte copy', () => {
+    const indices = [3, 0, 2, 1]
+    expect(Array.from(decodePermutation(encodePermutation(indices))!)).toEqual(indices)
+  })
+
+  it('returns null for absent, empty, or malformed input', () => {
+    expect(decodePermutation(null)).toBeNull()
+    expect(decodePermutation(undefined)).toBeNull()
+    expect(decodePermutation(new Uint8Array(0))).toBeNull()
+    expect(decodePermutation(new Uint8Array([1, 0, 0]))).toBeNull()
+    expect(decodePermutation('nope')).toBeNull()
+  })
+
+  it('decodes a plain number array (JSON round-trip)', () => {
+    expect(Array.from(decodePermutation([2, 1, 0])!)).toEqual([2, 1, 0])
+  })
+})
+
+describe('permutationOf', () => {
+  it('maps a shuffled track list to ordered indices', () => {
+    expect(permutationOf(['a', 'b', 'c'], ['c', 'a', 'b'])).toEqual([2, 0, 1])
+  })
+
+  it('is always a complete permutation of the ordered indices', () => {
+    // Ids the ordered list does not have are dropped, and unmentioned slots
+    // are appended, so downstream length invariants hold.
+    const perm = permutationOf(['a', 'b', 'c'], ['c', 'ghost'])
+    expect(perm).toHaveLength(3)
+    expect([...perm].sort()).toEqual([0, 1, 2])
+  })
+
+  it('keeps both slots of a duplicated track', () => {
+    const perm = permutationOf(['a', 'b', 'a'], ['a', 'a', 'b'])
+    expect(perm).toHaveLength(3)
+    expect([...perm].sort()).toEqual([0, 1, 2])
+  })
+
+  it('returns the identity permutation for an empty random list', () => {
+    expect(permutationOf(['a', 'b', 'c'], [])).toEqual([0, 1, 2])
+  })
+})
+
+describe('activeOrderPermutation', () => {
+  it('is null when shuffle is off, whatever is stored', () => {
+    expect(activeOrderPermutation(false, encodePermutation([1, 0]))).toBeNull()
+    expect(activeOrderPermutation(undefined, null)).toBeNull()
+  })
+
+  it('decodes the stored order when shuffle is on', () => {
+    expect(Array.from(activeOrderPermutation(true, encodePermutation([1, 0]))!)).toEqual([1, 0])
+  })
+
+  it('is null when shuffle is on with nothing stored', () => {
+    expect(activeOrderPermutation(true, null)).toBeNull()
+  })
+})
+
+describe('position mapping', () => {
+  it('maps an active position to an ordered index through the permutation', () => {
+    const perm = Int32Array.from([2, 0, 1])
+    expect(activeIndexToOrderedIndex(perm, 0)).toBe(2)
+    expect(activeIndexToOrderedIndex(perm, 2)).toBe(1)
+  })
+
+  it('treats a missing or out-of-range position as identity', () => {
+    const perm = Int32Array.from([2, 0, 1])
+    expect(activeIndexToOrderedIndex(null, 5)).toBe(5)
+    expect(activeIndexToOrderedIndex(perm, 5)).toBe(5)
+    expect(activeIndexToOrderedIndex(perm, -1)).toBe(-1)
+  })
+
+  it('maps an ordered index back to its active position', () => {
+    const perm = Int32Array.from([2, 0, 1])
+    expect(orderedIndexToActiveIndex(perm, 2)).toBe(0)
+    expect(orderedIndexToActiveIndex(perm, 0)).toBe(1)
+    expect(orderedIndexToActiveIndex(perm, 1)).toBe(2)
+    expect(orderedIndexToActiveIndex(null, 4)).toBe(4)
+  })
+
+  it('rebuilds the shuffled track ids from the ordered list', () => {
+    expect(permutationToTrackIds(['a', 'b', 'c'], Int32Array.from([2, 0, 1]))).toEqual([
+      'c', 'a', 'b',
+    ])
+    expect(permutationToTrackIds(['a', 'b'], null)).toEqual([])
   })
 })
 

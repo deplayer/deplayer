@@ -12,17 +12,23 @@
  *   `toggleShuffleAction`, `toggleRepeatAction`, `setCurrentPlayingAction`,
  *   `playNextAction`, `playPreviousAction`, `playMediaAction`).
  * - **Pure rules**: `parseIds`, `getActiveTrackIds`, `resolveCurrentSongId`,
- *   `deriveCurrentTrackId`, `fisherYates`, and the
- *   transition functions — the read/write domain logic the above are built
- *   from. Testable with no LiveStore and no React.
+ *   `deriveCurrentTrackId`, `fisherYates`, the permutation helpers
+ *   (`encodePermutation`, `decodePermutation`, `permutationOf`,
+ *   `permutationToTrackIds`, `activeIndexToOrderedIndex`,
+ *   `orderedIndexToActiveIndex`), and the transition functions — the
+ *   read/write domain logic the above are built from. Testable with no
+ *   LiveStore and no React.
  *
  */
+
+export { ORDERED_LIST } from './types'
 
 export type {
   QueueState,
   QueueUpdatedEvent,
   QueuePositionChangedEvent,
   QueueRepeatToggledEvent,
+  QueueShuffleToggledEvent,
   QueueClearedEvent,
   QueueTransitionEvent,
 } from './types'
@@ -33,6 +39,12 @@ export {
   resolveCurrentSongId,
   deriveCurrentTrackId,
   fisherYates,
+  encodePermutation,
+  decodePermutation,
+  permutationOf,
+  permutationToTrackIds,
+  activeIndexToOrderedIndex,
+  orderedIndexToActiveIndex,
 } from './resolution'
 
 export {

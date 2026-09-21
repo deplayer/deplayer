@@ -20,7 +20,7 @@ A resolved play target (`{url, kind}`) returned by StreamUriService. Blob-kind s
 _Avoid_: stream URI (unqualified), blob URL
 
 **Playback queue**:
-The app's single deep module owning the playback queue domain: the ordered track lists plus the playback head (current position, shuffle, repeat), persisted as a `queue` head row plus `queue_items` rows (one per track per list). Callers read the normalized `QueueState` and mutate only through the queue actions; the raw row shapes (`QueueHeadRow`, `QueueItemRow`) are an implementation detail.
+The app's single deep module owning the playback queue domain: the ordered track list plus the playback head (current position, shuffle, repeat), persisted as a `queue` head row plus `queue_items` rows (one per track in the ordered list). The shuffle order is not a second row set: it is a permutation of ordered indices stored on the head row, so toggling shuffle writes one row regardless of queue length. Callers read the normalized `QueueState` (whose `randomTrackIds` is reconstructed from that permutation) and mutate only through the queue actions; the raw row shapes (`QueueHeadRow`, `QueueItemRow`) are an implementation detail.
 _Avoid_: queue state (for the raw rows), Redux queue
 
 **Collection filter**:
@@ -46,6 +46,8 @@ _Avoid_: cursor version
 - A **Stream source** of blob kind is released exactly when playback moves past it (PlaybackController), or when the SongView download list is replaced/unmounted
 - The **Playback queue** is read via `useQueue`/`readQueue`; the playback head resolves to the persisted `currentTrackId` column, falling back to a point read of the item at the active position in `queue_items`
 - Shuffle reorders the random list only and keeps the active track in position; the **Stream source** release on playback advance is the queue's one effect on media
+- The shuffle order is a permutation of ordered indices on the head row, never a set of `queue_items` rows: a toggle is a single head-row write, and navigation maps the active position through the permutation before point-reading the ordered row it needs
+- A shuffle flag with no stored permutation (the append path omits it) means the active list IS the ordered list. The UI (`getActiveTrackIds`), the materialized `currentTrackId`, and the step actions all resolve the active order through that same fallback, so they cannot disagree about which track a position points at
 - A **Sync batch** can only detect drift in fields the content-derived media id does not cover (type, duration, discNumber, genres, stream membership, externalId, shareUrl, filePath); renames produce new ids and arrive as adds. Stream/cover JSON blobs are deliberately not compared — URL rotation is not an update
 - All raw SQL against LiveStore uses positional array binds — object-form binds are mangled into `$key` named params (keys absent from the SQL text are dropped), and raw `store.query` returns an array of row objects. Pinned by `livestore-bind-contract.spec.ts`
 

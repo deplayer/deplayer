@@ -21,6 +21,7 @@ import type {
   QueueUpdatedEvent,
   QueuePositionChangedEvent,
   QueueRepeatToggledEvent,
+  QueueShuffleToggledEvent,
   QueueClearedEvent,
 } from './types'
 import { parseIds, fisherYates } from './resolution'
@@ -165,9 +166,13 @@ export function clearQueue(): QueueClearedEvent {
  * the next/previous navigation order changes. `currentPlaying` is re-indexed
  * to point at the same song in the new order.
  *
+ * Emits a head-only `QueueShuffleToggled` event carrying the new order as a
+ * permutation of ordered indices — the track lists are not rewritten, so the
+ * cost is independent of queue length.
+ *
  * SUSPECTED BUG #2 (preserved intentionally): the ENABLE path anchors the
  * current song on `trackIds[currentPlaying]` (the original order), NOT on the
- * active list. A queue whose `currentPlaying` indexes `randomTrackIds`
+ * active list. A queue whose `currentPlaying` indexes the shuffled order
  * (already shuffled in a previous session) would anchor on the wrong song
  * when re-enabled. Do NOT "fix" here.
  */
@@ -175,32 +180,33 @@ export function toggleShuffle(
   current: QueueState | null,
   shuffle: boolean,
   random: () => number = Math.random,
-): QueueUpdatedEvent | null {
+): QueueShuffleToggledEvent | null {
   if (current === null) return null
   const trackIds = parseIds(current.trackIds)
   if (trackIds.length === 0) return null
 
   if (shuffle) {
-    // ENABLE SHUFFLE: generate a new random order, keep the same song playing.
-    const randomTrackIds = fisherYates(trackIds, random)
+    // ENABLE SHUFFLE: shuffle the ordered *indices* (exact under duplicates),
+    // then re-index currentPlaying to the same song's new position.
+    const randomOrder = fisherYates(
+      Array.from({ length: trackIds.length }, (_, i) => i),
+      random,
+    )
 
     let newCurrentPlaying = current.currentPlaying
     if (current.currentPlaying !== null && current.currentPlaying !== undefined) {
       // bug #2: anchor on trackIds[currentPlaying], not the active list.
-      const currentTrackId = trackIds[current.currentPlaying]
-      const indexInShuffled = randomTrackIds.indexOf(currentTrackId)
+      const indexInShuffled = randomOrder.indexOf(current.currentPlaying)
       if (indexInShuffled !== -1) {
         newCurrentPlaying = indexInShuffled
       }
     }
 
     return {
-      id: 'default',
-      trackIds,
-      randomTrackIds,
-      currentPlaying: newCurrentPlaying ?? undefined,
+      queueId: 'default',
       shuffle: true,
-      repeat: current.repeat ?? false,
+      currentPlaying: newCurrentPlaying ?? undefined,
+      randomOrder,
     }
   }
 
@@ -220,12 +226,10 @@ export function toggleShuffle(
   }
 
   return {
-    id: 'default',
-    trackIds,
-    randomTrackIds: [],
-    currentPlaying: newCurrentPlaying ?? undefined,
+    queueId: 'default',
     shuffle: false,
-    repeat: current.repeat ?? false,
+    currentPlaying: newCurrentPlaying ?? undefined,
+    randomOrder: [],
   }
 }
 

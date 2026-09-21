@@ -6,7 +6,8 @@
  *
  * `useQueue` assembles the normalized `QueueState` from the `queue` head
  * row plus the `queue_items` rows (mirroring `readQueue` via the shared
- * `assembleQueueState`).
+ * `assembleQueueState`). The head row's `randomOrder` permutation supplies
+ * `randomTrackIds`; `queue_items` holds only the ordered list.
  */
 
 import { queryDb } from '@livestore/livestore'
@@ -42,7 +43,6 @@ export const useQueue = (queueId = 'default'): QueueState | null => {
       tables.queueItems
         .select('list', 'position', 'trackId')
         .where('queueId', '=', queueId)
-        .orderBy('list', 'asc')
         .orderBy('position', 'asc')
     )
   )

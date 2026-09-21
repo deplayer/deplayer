@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { activeListName, stepNext, stepPrevious, stepToMedia } from './stepping'
-import type { QueueHeadRow, QueueItemRow } from './types'
+import { stepNext, stepPrevious, stepToMedia } from './stepping'
+import type { ActiveRow, QueueHeadRow } from './types'
 
 const head = (overrides: Partial<QueueHeadRow> = {}): QueueHeadRow => ({
   id: 'default',
@@ -8,28 +8,15 @@ const head = (overrides: Partial<QueueHeadRow> = {}): QueueHeadRow => ({
   currentTrackId: null,
   shuffle: false,
   repeat: false,
+  randomOrder: null,
   updatedAt: 0,
   ...overrides,
 })
 
-const row = (position: number, trackId: string): QueueItemRow => ({
-  id: `default:ordered:${position}`,
-  queueId: 'default',
-  list: 'ordered',
+/** A row at an active-list position (already permutation-resolved). */
+const row = (position: number, trackId: string): ActiveRow => ({
   position,
   trackId,
-})
-
-describe('activeListName', () => {
-  it('returns "ordered" when shuffle is off', () => {
-    expect(activeListName(false)).toBe('ordered')
-    expect(activeListName(null)).toBe('ordered')
-    expect(activeListName(undefined)).toBe('ordered')
-  })
-
-  it('returns "random" when shuffle is on', () => {
-    expect(activeListName(true)).toBe('random')
-  })
 })
 
 describe('stepNext', () => {

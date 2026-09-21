@@ -1,6 +1,14 @@
 // ============================================================================
 // SCHEMA VERSION HISTORY
 // ============================================================================
+// v0.7  (2026-09-21) Shuffle order moved out of queue_items into a
+//         `randomOrder` permutation blob on the queue head row. queue_items
+//         now holds only the ordered list, and QueueShuffleToggled updates
+//         the head row alone, so toggling shuffle on a 60k queue is one row
+//         write instead of a 120k-row table rebuild. Rematerialization
+//         idempotently rebuilds the permutation from the randomTrackIds
+//         already carried by every QueueUpdated event, so existing shuffled
+//         queues survive the migration unchanged.
 // v0.6  (2026-09-21) Normalized the playback queue: track lists moved from
 //         the queue row's JSON cells into queue_items (one row per track per
 //         list), making advance navigation O(1). The schema hash change
@@ -24,7 +32,7 @@ import { favoriteEvents } from './events/favorites'
 import { lyricsEvents } from './events/lyrics'
 import { settingsEvents } from './events/settings'
 import { syncEvents } from './events/sync'
-import { deriveCurrentTrackId } from './queue'
+import { deriveCurrentTrackId, encodePermutation, ORDERED_LIST, permutationOf } from './queue'
 import { normalizeGenres } from '../../utils/genres'
 
 // ============================================================================
@@ -196,7 +204,8 @@ export const tables = {
     ],
   }),
 
-  // Queue table (head row only — track lists live in queue_items)
+  // Queue table (head row only — the ordered track list lives in queue_items,
+  // the shuffle order in the randomOrder permutation blob)
   queue: State.SQLite.table({
     name: 'queue',
     columns: {
@@ -205,11 +214,14 @@ export const tables = {
       currentTrackId: State.SQLite.text({ nullable: true }),
       shuffle: State.SQLite.boolean({ default: false }),
       repeat: State.SQLite.boolean({ default: false }),
+      // Shuffle order: Int32 LE indices into the ordered list (null = unshuffled)
+      randomOrder: State.SQLite.blob({ nullable: true }),
       updatedAt: State.SQLite.integer({}),
     },
   }),
 
-  // Queue item rows: one row per track per list (position = 0-based index)
+  // Queue item rows: one row per track in the ordered list (position = 0-based
+  // index). The shuffle order is the head row's randomOrder permutation.
   queueItems: State.SQLite.table({
     name: 'queue_items',
     columns: {
@@ -705,6 +717,12 @@ const materializers = State.SQLite.materializers(events, {
   'v1.QueueUpdated': ({ id, trackIds, randomTrackIds, currentPlaying, shuffle, repeat }: { readonly id: string; readonly trackIds: readonly string[]; readonly randomTrackIds?: readonly string[]; readonly currentPlaying?: number; readonly shuffle: boolean; readonly repeat: boolean }) => {
     const now = Date.now()
     const currentTrackId = deriveCurrentTrackId(trackIds, randomTrackIds, currentPlaying, shuffle)
+    // Shuffle order as a permutation of ordered indices (one blob, not a
+    // second row set). Absent/empty randomTrackIds clears it.
+    const randomOrder =
+      randomTrackIds && randomTrackIds.length > 0
+        ? encodePermutation(permutationOf(trackIds, randomTrackIds))
+        : null
     const head = tables.queue
       .insert({
         id,
@@ -712,6 +730,7 @@ const materializers = State.SQLite.materializers(events, {
         currentTrackId,
         shuffle,
         repeat,
+        randomOrder,
         updatedAt: now,
       })
       .onConflict('id', 'update', {
@@ -719,10 +738,11 @@ const materializers = State.SQLite.materializers(events, {
         currentTrackId,
         shuffle,
         repeat,
+        randomOrder,
         updatedAt: now,
       })
-    // Rebuild item rows from the event arrays. Deterministic ids
-    // (queueId:list:position) keep eventlog rematerialization idempotent.
+    // Rebuild the ordered rows from the event array. Deterministic ids
+    // (queueId:ordered:position) keep eventlog rematerialization idempotent.
     return [
       head,
       tables.queueItems.delete().where('queueId', '=', id),
@@ -730,16 +750,7 @@ const materializers = State.SQLite.materializers(events, {
         tables.queueItems.insert({
           id: `${id}:ordered:${position}`,
           queueId: id,
-          list: 'ordered',
-          position,
-          trackId,
-        })
-      ),
-      ...(randomTrackIds ?? []).map((trackId: string, position: number) =>
-        tables.queueItems.insert({
-          id: `${id}:random:${position}`,
-          queueId: id,
-          list: 'random',
+          list: ORDERED_LIST,
           position,
           trackId,
         })
@@ -755,10 +766,23 @@ const materializers = State.SQLite.materializers(events, {
         .update({
           currentPlaying: null,
           currentTrackId: null,
+          randomOrder: null,
           updatedAt: now,
         })
         .where('id', '=', queueId),
     ]
+  },
+
+  'v1.QueueShuffleToggled': ({ queueId, shuffle, currentPlaying, randomOrder }: { readonly queueId: string; readonly shuffle: boolean; readonly currentPlaying?: number; readonly randomOrder?: readonly number[] }) => {
+    const now = Date.now()
+    return tables.queue
+      .update({
+        shuffle,
+        currentPlaying: currentPlaying ?? null,
+        randomOrder: shuffle ? encodePermutation(randomOrder ?? []) : null,
+        updatedAt: now,
+      })
+      .where('id', '=', queueId)
   },
 
   'v1.QueueRepeatToggled': ({ queueId, repeat }: { queueId: string; repeat: boolean }) => {

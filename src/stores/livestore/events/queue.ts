@@ -44,6 +44,23 @@ export const queueEvents = {
   }),
 
   /**
+   * Fired when shuffle mode is toggled.
+   *
+   * Touches the head row only: `randomOrder` is a permutation of ordered-list
+   * indices, so a 60k-track queue toggles in one row write instead of
+   * rewriting every track row.
+   */
+  queueShuffleToggled: Events.synced({
+    name: 'v1.QueueShuffleToggled',
+    schema: Schema.Struct({
+      queueId: Schema.String,
+      shuffle: Schema.Boolean,
+      currentPlaying: Schema.optional(Schema.Number),
+      randomOrder: Schema.optional(Schema.Array(Schema.Number)),
+    }),
+  }),
+
+  /**
    * Fired when the currently playing position changes
    */
   queuePositionChanged: Events.synced({

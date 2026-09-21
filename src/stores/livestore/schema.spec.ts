@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { tables } from './schema'
+import { schema, tables } from './schema'
 
 /**
  * Assert that performance-critical indexes are declared on the owning
@@ -96,5 +96,55 @@ describe('LiveStore schema indexes', () => {
       const names = indexNames('playbackHistory')
       expect(names).toContain('idx_playback_history_played_at')
     })
+  })
+})
+
+/**
+ * The playback queue's write budget.
+ *
+ * Toggling shuffle must not touch the track rows: a 60k-track queue rewrote
+ * `queue_items` (120k rows) on every toggle, which measured ~3.5s. These
+ * tests pin the statement counts so that regression cannot come back
+ * unnoticed.
+ */
+describe('LiveStore queue materializer write budget', () => {
+  const materialize = (eventName: string, args: Record<string, unknown>) => {
+    const materializer = schema.state.materializers.get(eventName)
+    if (!materializer) throw new Error(`No materializer for ${eventName}`)
+    return materializer(args, undefined as never)
+  }
+
+  it('toggling shuffle writes a single queue row, whatever the queue length', () => {
+    const randomOrder = Array.from({ length: 60_000 }, (_, i) => i)
+    const result = materialize('v1.QueueShuffleToggled', {
+      queueId: 'default',
+      shuffle: true,
+      currentPlaying: 0,
+      randomOrder,
+    })
+
+    // One statement, and it must not touch the track rows.
+    expect(Array.isArray(result)).toBe(false)
+    expect(String(result)).not.toContain('queue_items')
+  })
+
+  it('replacing the queue writes one ordered row per track plus the head', () => {
+    const trackIds = Array.from({ length: 1_000 }, (_, i) => `t${i}`)
+    const result = materialize('v1.QueueUpdated', {
+      id: 'default',
+      trackIds,
+      currentPlaying: 0,
+      shuffle: false,
+      repeat: false,
+    }) as unknown as unknown[]
+
+    // head + delete-all + one insert per ordered track (no random-list rows)
+    expect(result).toHaveLength(2 + trackIds.length)
+  })
+
+  it('clearing the queue clears the stored permutation too', () => {
+    const result = materialize('v1.QueueCleared', { queueId: 'default' }) as unknown as unknown[]
+    const sql = result.map((r) => String(r)).join('\n')
+    expect(sql).toContain('randomOrder')
   })
 })

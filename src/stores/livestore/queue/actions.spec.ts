@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import type { Mock } from 'vitest'
 import type { LiveStore } from '../accessor'
+import { encodePermutation, permutationOf } from './resolution'
+import { ORDERED_LIST } from './types'
 import {
   addNextAction,
   addToQueueAction,
@@ -45,16 +47,17 @@ function makeHead(overrides: Record<string, unknown> = {}): Record<string, unkno
     currentTrackId: null,
     shuffle: false,
     repeat: false,
+    randomOrder: null,
     updatedAt: new Date(),
     ...overrides,
   }
 }
 
-function makeItemRow(list: string, position: number, trackId: string): Record<string, unknown> {
+function makeItemRow(position: number, trackId: string): Record<string, unknown> {
   return {
-    id: `default:${list}:${position}`,
+    id: `default:${ORDERED_LIST}:${position}`,
     queueId: 'default',
-    list,
+    list: ORDERED_LIST,
     position,
     trackId,
   }
@@ -74,46 +77,58 @@ function bindsFromHash(hash: string): unknown[] {
     })
 }
 
-function listFor(fix: QueueFixture, list: string): string[] {
-  return list === 'random' ? (fix.random ?? []) : (fix.ordered ?? [])
-}
-
 function routeQuery(fix: QueueFixture, def: QueryDef): Record<string, unknown>[] {
   const label = def.label ?? ''
   const binds = bindsFromHash(def.hash ?? '')
+  const ordered = fix.ordered ?? []
 
   if (label.includes('FROM \'queue\' WHERE "id"')) {
     return fix.head ? [fix.head] : []
   }
-  if (label.includes('FROM \'queue_items\'') && label.includes('ORDER BY "list"')) {
-    return [
-      ...listFor(fix, 'ordered').map((t, i) => makeItemRow('ordered', i, t)),
-      ...listFor(fix, 'random').map((t, i) => makeItemRow('random', i, t)),
-    ]
-  }
+  // Point reads must be matched before the full-list query, which matches any
+  // queue_items statement.
   if (label.includes('"trackId" = ? LIMIT')) {
-    const list = String(binds[1])
     const trackId = String(binds[2])
-    const position = listFor(fix, list).indexOf(trackId)
-    return position === -1 ? [] : [makeItemRow(list, position, trackId)]
+    const position = ordered.indexOf(trackId)
+    return position === -1 ? [] : [makeItemRow(position, trackId)]
   }
   if (label.includes('"position" = ? LIMIT')) {
-    const list = String(binds[1])
     const position = Number(binds[2])
-    const trackId = listFor(fix, list)[position]
-    return trackId === undefined ? [] : [makeItemRow(list, position, trackId)]
+    const trackId = ordered[position]
+    return trackId === undefined ? [] : [makeItemRow(position, trackId)]
   }
   if (label.includes('ORDER BY "position" desc')) {
-    const list = String(binds[1])
-    const source = listFor(fix, list)
-    if (source.length === 0) return []
-    return [makeItemRow(list, source.length - 1, source[source.length - 1])]
+    if (ordered.length === 0) return []
+    return [makeItemRow(ordered.length - 1, ordered[ordered.length - 1]!)]
+  }
+  if (label.includes('FROM \'queue_items\'')) {
+    // Only the ordered list is materialized as rows.
+    return ordered.map((t, i) => makeItemRow(i, t))
   }
   throw new Error(`Unrouted query: ${label}`)
 }
 
+/**
+ * The head row's `randomOrder` blob is derived from the fixture's ordered +
+ * random lists, mirroring what the QueueUpdated materializer stores.
+ */
+function withPermutation(fix: QueueFixture): QueueFixture {
+  if (!fix.head) return fix
+  const random = fix.random ?? []
+  return {
+    ...fix,
+    head: {
+      ...fix.head,
+      randomOrder:
+        random.length > 0
+          ? encodePermutation(permutationOf(fix.ordered ?? [], random))
+          : null,
+    },
+  }
+}
+
 function makeStore(fixture: FixtureArg = null): { query: Mock; commit: Mock } {
-  const fix = normalizeFixture(fixture)
+  const fix = withPermutation(normalizeFixture(fixture))
   return {
     query: vi.fn((def: QueryDef) => routeQuery(fix, def)),
     commit: vi.fn(async () => undefined),
@@ -294,30 +309,28 @@ describe('queue actions', () => {
       expect(store.commit).not.toHaveBeenCalled()
     })
 
-    it('enables shuffle by building a shuffled random list and re-indexing currentPlaying', async () => {
+    it('enables shuffle by committing a head-only permutation and re-indexing currentPlaying', async () => {
       const store = makeStore({
         head: makeHead({ currentPlaying: 2 }),
         ordered: ['a', 'b', 'c'],
       })
-      // Two Math.random calls (both 0.6): i=2 j=1 [a,c,b]; i=1 j=1 no-op → [a,c,b]
+      // Two Math.random calls (both 0.6): i=2 j=1 [2,1,0]->[2,0,1]; i=1 j=1 no-op
       vi.spyOn(Math, 'random')
         .mockReturnValueOnce(0.6)
         .mockReturnValueOnce(0.6)
       await toggleShuffleAction(store as unknown as LiveStore, true)
       const [name, args] = committed(store)
-      expect(name).toBe('v1.QueueUpdated')
+      expect(name).toBe('v1.QueueShuffleToggled')
       expect(args).toEqual({
-        id: 'default',
-        trackIds: ['a', 'b', 'c'],
-        randomTrackIds: ['a', 'c', 'b'],
-        currentPlaying: 1,
+        queueId: 'default',
         shuffle: true,
-        repeat: false,
+        currentPlaying: 1,
+        randomOrder: [0, 2, 1],
       })
       expect(Math.random).toHaveBeenCalledTimes(2)
     })
 
-    it('disables shuffle by clearing randomTrackIds and re-indexing into the original order', async () => {
+    it('disables shuffle by clearing the permutation and re-indexing into the original order', async () => {
       const store = makeStore({
         head: makeHead({ currentPlaying: 2, shuffle: true }),
         ordered: ['a', 'b', 'c'],
@@ -325,14 +338,12 @@ describe('queue actions', () => {
       })
       await toggleShuffleAction(store as unknown as LiveStore, false)
       const [name, args] = committed(store)
-      expect(name).toBe('v1.QueueUpdated')
+      expect(name).toBe('v1.QueueShuffleToggled')
       expect(args).toEqual({
-        id: 'default',
-        trackIds: ['a', 'b', 'c'],
-        randomTrackIds: [],
-        currentPlaying: 0,
+        queueId: 'default',
         shuffle: false,
-        repeat: false,
+        currentPlaying: 0,
+        randomOrder: [],
       })
     })
   })
