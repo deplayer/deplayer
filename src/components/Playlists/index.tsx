@@ -120,6 +120,11 @@ const Playlists = memo(() => {
     }))
   , [smartPlaylists, songsByGenre])
 
+  // Hook order must not depend on whether the page has playlists: this call
+  // used to sit after the early return below, so creating a first playlist
+  // changed the hook count between renders and React threw.
+  const featured = usePickFeatured(transformedPlaylists, transformedSmartPlaylists, genrePlaylists)
+
   const { action: fallbackAction, description: fallbackDescription } = getEmptyStateFallback([
     queueStep(hasQueueItems),
     { condition: hasCollectionItems, action: <EmptyStateAction to='/collection' icon='faDatabase' label='message.jumpToCollection' />, description: 'message.addSongsToQueue' },
@@ -136,8 +141,6 @@ const Playlists = memo(() => {
       />
     )
   }
-
-  const featured = usePickFeatured(transformedPlaylists, transformedSmartPlaylists, genrePlaylists)
 
   return (
     <div className='playlists z-10 flex flex-col w-full overflow-y-auto h-full py-6'>
