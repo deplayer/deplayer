@@ -167,19 +167,32 @@ export const tables = {
       { name: 'idx_media_genres_mediaId', columns: ['mediaId'] },
     ],
   }),
-  // Playlists table
+  // Playlists table (head row only — tracks live in playlist_items)
   playlists: State.SQLite.table({
     name: 'playlists',
     columns: {
       id: State.SQLite.text({ primaryKey: true }),
       name: State.SQLite.text({}),
-      trackIds: State.SQLite.json({ default: [] }),
       shuffle: State.SQLite.boolean({ default: false }),
       repeat: State.SQLite.boolean({ default: false }),
       currentPlaying: State.SQLite.integer({ nullable: true }),
       createdAt: State.SQLite.integer({}),
       updatedAt: State.SQLite.integer({}),
     },
+  }),
+
+  // Playlist item rows: one row per track (position = 0-based index)
+  playlistItems: State.SQLite.table({
+    name: 'playlist_items',
+    columns: {
+      id: State.SQLite.text({ primaryKey: true }),
+      playlistId: State.SQLite.text({}),
+      position: State.SQLite.integer({}),
+      trackId: State.SQLite.text({}),
+    },
+    indexes: [
+      { name: 'idx_playlist_items_playlist_position', columns: ['playlistId', 'position'] },
+    ],
   }),
 
   // Queue table (head row only — track lists live in queue_items)
@@ -626,7 +639,6 @@ const materializers = State.SQLite.materializers(events, {
       .insert({
         id,
         name,
-        trackIds: [],
         shuffle: false,
         repeat: false,
         currentPlaying: null,
@@ -645,13 +657,29 @@ const materializers = State.SQLite.materializers(events, {
 
   'v1.PlaylistReordered': ({ playlistId, trackIds }: { readonly playlistId: string; readonly trackIds: readonly string[] }) => {
     const now = Date.now()
-    return tables.playlists
-      .update({ trackIds, updatedAt: now })
-      .where('id', '=', playlistId)
+    return [
+      tables.playlists
+        .update({ updatedAt: now })
+        .where('id', '=', playlistId),
+      // Rebuild item rows from the event array. Deterministic ids
+      // (playlistId:position) keep eventlog rematerialization idempotent.
+      tables.playlistItems.delete().where('playlistId', '=', playlistId),
+      ...trackIds.map((trackId: string, position: number) =>
+        tables.playlistItems.insert({
+          id: `${playlistId}:${position}`,
+          playlistId,
+          position,
+          trackId,
+        })
+      ),
+    ]
   },
 
   'v1.PlaylistDeleted': ({ playlistId }: { playlistId: string }) => {
-    return tables.playlists.delete().where('id', '=', playlistId)
+    return [
+      tables.playlistItems.delete().where('playlistId', '=', playlistId),
+      tables.playlists.delete().where('id', '=', playlistId),
+    ]
   },
 
   'v1.PlaylistShuffleToggled': ({ playlistId, shuffle }: { playlistId: string; shuffle: boolean }) => {

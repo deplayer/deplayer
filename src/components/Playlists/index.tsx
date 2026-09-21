@@ -86,13 +86,12 @@ const Playlists = memo(() => {
     : false
 
   const transformedPlaylists = useMemo(() =>
-    (playlists as unknown as Array<{ id: string; name: string; trackIds: unknown }>).map((playlist) => ({
+    (playlists as unknown as Array<{ id: string; name: string; trackIds?: string[] }>).map((playlist) => ({
       _id: playlist.id,
       id: playlist.id,
       name: playlist.name,
-      trackIds: typeof playlist.trackIds === 'string'
-        ? JSON.parse(playlist.trackIds)
-        : (playlist.trackIds || []) as string[]
+      // usePlaylists assembles this from playlist_items.
+      trackIds: playlist.trackIds ?? [],
     }))
   , [playlists])
 

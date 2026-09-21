@@ -2,6 +2,29 @@ import type { LiveStore } from '../accessor'
 import { events } from '../schema'
 
 /**
+ * Current ordered track ids of a playlist, or null when no head row exists.
+ *
+ * Tracks live one row per track in `playlist_items`; `playlistReordered`
+ * still carries the whole array, so mutating actions must read it first.
+ */
+const readPlaylistTrackIds = async (
+  store: LiveStore,
+  playlistId: string
+): Promise<string[] | null> => {
+  const head = (await store.query({
+    query: 'SELECT id FROM playlists WHERE id = ?',
+    bindValues: [playlistId],
+  })) as Array<{ id?: string }>
+  if (!head[0]) return null
+
+  const rows = (await store.query({
+    query: 'SELECT trackId FROM playlist_items WHERE playlistId = ? ORDER BY position ASC',
+    bindValues: [playlistId],
+  })) as Array<{ trackId?: string }>
+  return rows.flatMap((row) => (row.trackId ? [row.trackId] : []))
+}
+
+/**
  * LiveStore Playlists Actions
  *
  * These actions handle playlist CRUD operations and track management.
@@ -55,20 +78,12 @@ export const addTrackToPlaylistAction = async (
   trackId: string,
   position?: number
 ) => {
-  // Read current trackIds
-  const result = await store.query({
-    query: `SELECT trackIds FROM playlists WHERE id = ?`,
-    bindValues: [playlistId]
-  })
-  
-  const rows = (result as Array<{ values?: string[][] }>)?.[0]?.values || []
-  if (rows.length === 0) {
+  // Read current trackIds (one row per track in playlist_items).
+  const currentTrackIds = await readPlaylistTrackIds(store, playlistId)
+  if (currentTrackIds === null) {
     console.warn(`Playlist ${playlistId} not found`)
     return
   }
-  
-  // Parse trackIds (stored as JSON)
-  const currentTrackIds: string[] = rows[0][0] ? JSON.parse(rows[0][0]) : []
   
   // Add track at position
   let newTrackIds: string[]
@@ -103,20 +118,12 @@ export const removeTrackFromPlaylistAction = async (
   playlistId: string,
   trackId: string
 ) => {
-  // Read current trackIds
-  const result = await store.query({
-    query: `SELECT trackIds FROM playlists WHERE id = ?`,
-    bindValues: [playlistId]
-  })
-  
-  const rows = (result as Array<{ values?: string[][] }>)?.[0]?.values || []
-  if (rows.length === 0) {
+  // Read current trackIds (one row per track in playlist_items).
+  const currentTrackIds = await readPlaylistTrackIds(store, playlistId)
+  if (currentTrackIds === null) {
     console.warn(`Playlist ${playlistId} not found`)
     return
   }
-  
-  // Parse trackIds (stored as JSON)
-  const currentTrackIds: string[] = rows[0][0] ? JSON.parse(rows[0][0]) : []
   
   // Remove all occurrences of trackId
   const newTrackIds = currentTrackIds.filter(id => id !== trackId)
