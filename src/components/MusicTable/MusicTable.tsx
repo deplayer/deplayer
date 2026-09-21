@@ -275,22 +275,11 @@ const MusicTable = ({
   // Window growth: react-virtualized reports rendered ranges; grow the data
   // window when the viewport approaches the loaded edge. The threshold is
   // derived from OVERSCAN so the two can't silently desync.
-  // Declared before the loading early return so hook order stays uniform.
   const handleRowsRendered = React.useCallback(({ stopIndex }: { stopIndex: number }) => {
     if (hasMore && onLoadMore && stopIndex >= tableIds.length - 1 - GROW_AHEAD_OF_ROWS) onLoadMore()
   }, [hasMore, onLoadMore, tableIds.length])
 
   const errors = error && <div>{error}</div>
-
-  if (loading) {
-    return (
-      <div className={`queue`}>
-        <blockquote className='blockquote'>
-          <Spinner />
-        </blockquote>
-      </div>
-    )
-  }
 
   // Refs for values that change frequently but shouldn't recreate rowRenderer.
   // currentSongId is intentionally NOT a ref: it must be in rowRenderer's
@@ -431,6 +420,19 @@ const MusicTable = ({
     if (!isToolbarVisible) {
       setIsToolbarHidden(true)
     }
+  }
+
+  // Early return lives after every hook on purpose: a conditional return
+  // placed above a hook changes the hook order when `loading` flips and React
+  // throws. Keep it as the last statement before the render.
+  if (loading) {
+    return (
+      <div className={`queue`}>
+        <blockquote className='blockquote'>
+          <Spinner />
+        </blockquote>
+      </div>
+    )
   }
 
   return (

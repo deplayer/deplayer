@@ -1,9 +1,10 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { screen, within, cleanup, waitFor } from '@testing-library/react'
+import { screen, within, cleanup, waitFor, act } from '@testing-library/react'
 import MusicTable from './MusicTable'
 import { renderWithProviders } from '../../test-utils/render'
 import { createTestMediaList } from '../../test-utils/factories'
 import { createDefaultState } from '../../test-utils/store'
+import { useUIStore } from '../../stores/uiStore'
 import * as livestoreHooks from '../../stores/livestore/hooks'
 
 // Mock LiveStore hooks since tests provide data via props
@@ -151,6 +152,28 @@ describe('MusicTable', () => {
     const grid = screen.getByRole('grid')
     expect(grid).toBeInTheDocument()
     expect(within(grid).queryByRole('row')).not.toBeInTheDocument()
+  })
+
+  it('keeps hook order stable when the loading flag flips', async () => {
+    setup()
+
+    await waitFor(() => {
+      expect(screen.queryByText(/LiveStore is loading/)).not.toBeInTheDocument()
+    })
+    expect(screen.getByRole('grid')).toBeInTheDocument()
+
+    // Flipping loading used to change the number of hooks between renders
+    // (the early return sat above the refs/callbacks), which React rejects
+    // with "Rendered fewer hooks than expected". Both directions must render.
+    act(() => {
+      useUIStore.setState({ loading: true })
+    })
+    expect(screen.queryByRole('grid')).not.toBeInTheDocument()
+
+    act(() => {
+      useUIStore.setState({ loading: false })
+    })
+    expect(screen.getByRole('grid')).toBeInTheDocument()
   })
 
   describe('current track highlight', () => {
