@@ -2,8 +2,10 @@
  * Queue module types.
  *
  * `QueueState` is the normalized, raw-row-tolerant shape shared by the
- * resolution functions, transitions, and the async actions. `QueueRecord`
- * is the raw LiveStore row shape returned by the query hooks.
+ * resolution functions, transitions, and the async actions. `QueueHeadRow`
+ * is the raw head row of the `queue` table (playback state only — the
+ * track lists live in `queue_items`), and `QueueItemRow` is one row of
+ * `queue_items`.
  */
 
 export interface QueueState {
@@ -15,16 +17,24 @@ export interface QueueState {
   repeat?: boolean
 }
 
-export interface QueueRecord {
+/** Raw `queue` table row (playback head only). */
+export interface QueueHeadRow {
   id: string;
-  trackIds: string | string[];
-  randomTrackIds: string | string[];
   currentPlaying: number | null;
+  currentTrackId: string | null;
   shuffle: boolean;
   repeat: boolean;
-  nextSongId: string | null;
-  prevSongId: string | null;
+  updatedAt: number | null;
   [key: string]: unknown;
+}
+
+/** Raw `queue_items` table row: one track at one position in one list. */
+export interface QueueItemRow {
+  id: string;
+  queueId: string;
+  list: 'ordered' | 'random' | string;
+  position: number;
+  trackId: string;
 }
 
 // ============================================================================

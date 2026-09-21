@@ -1,6 +1,11 @@
 // ============================================================================
 // SCHEMA VERSION HISTORY
 // ============================================================================
+// v0.6  (2026-09-21) Normalized the playback queue: track lists moved from
+//         the queue row's JSON cells into queue_items (one row per track per
+//         list), making advance navigation O(1). The schema hash change
+//         triggers eventlog rematerialization, which rebuilds queue_items
+//         from existing QueueUpdated events (event shapes unchanged).
 // v0.5  (2026-07-17) Moved performance-critical indexes to declarative table
 //         definitions. Removed boot-time index/backfill setup.
 // v0.4  (2026-07-13) Added media_genres indexed read model table.
@@ -178,19 +183,33 @@ export const tables = {
     },
   }),
 
-  // Queue table
+  // Queue table (head row only — track lists live in queue_items)
   queue: State.SQLite.table({
     name: 'queue',
     columns: {
       id: State.SQLite.text({ primaryKey: true }),
-      trackIds: State.SQLite.json({ default: [] }),
-      randomTrackIds: State.SQLite.json({ default: [] }),
       currentPlaying: State.SQLite.integer({ nullable: true }),
       currentTrackId: State.SQLite.text({ nullable: true }),
       shuffle: State.SQLite.boolean({ default: false }),
       repeat: State.SQLite.boolean({ default: false }),
       updatedAt: State.SQLite.integer({}),
     },
+  }),
+
+  // Queue item rows: one row per track per list (position = 0-based index)
+  queueItems: State.SQLite.table({
+    name: 'queue_items',
+    columns: {
+      id: State.SQLite.text({ primaryKey: true }),
+      queueId: State.SQLite.text({}),
+      list: State.SQLite.text({}),
+      position: State.SQLite.integer({}),
+      trackId: State.SQLite.text({}),
+    },
+    indexes: [
+      { name: 'idx_queue_items_queue_list_position', columns: ['queueId', 'list', 'position'] },
+      { name: 'idx_queue_items_queue_list_trackId', columns: ['queueId', 'list', 'trackId'] },
+    ],
   }),
 
   // Favorites table
@@ -630,30 +649,6 @@ const materializers = State.SQLite.materializers(events, {
       .where('id', '=', playlistId)
   },
 
-  'v1.PlaylistTrackAdded': ({ playlistId, trackId: _trackId, position: _position }: { playlistId: string; trackId: string; position?: number }) => {
-    const now = Date.now()
-    // Note: Since LiveStore's QueryBuilder doesn't support raw SQL expressions for JSON manipulation,
-    // we rely on the application layer to:
-    // 1. Read current trackIds
-    // 2. Append/insert trackId at position
-    // 3. Dispatch PlaylistReordered event with the new trackIds array
-    // This materializer only updates the timestamp to track when the change occurred
-    return tables.playlists
-      .update({ updatedAt: now })
-      .where('id', '=', playlistId)
-  },
-
-  'v1.PlaylistTrackRemoved': ({ playlistId, trackId: _trackId }: { playlistId: string; trackId: string }) => {
-    const now = Date.now()
-    // Note: Same as PlaylistTrackAdded - application layer should:
-    // 1. Read current trackIds
-    // 2. Remove trackId
-    // 3. Dispatch PlaylistReordered event with the new trackIds array
-    return tables.playlists
-      .update({ updatedAt: now })
-      .where('id', '=', playlistId)
-  },
-
   'v1.PlaylistReordered': ({ playlistId, trackIds }: { readonly playlistId: string; readonly trackIds: readonly string[] }) => {
     const now = Date.now()
     return tables.playlists
@@ -683,11 +678,9 @@ const materializers = State.SQLite.materializers(events, {
   'v1.QueueUpdated': ({ id, trackIds, randomTrackIds, currentPlaying, shuffle, repeat }: { readonly id: string; readonly trackIds: readonly string[]; readonly randomTrackIds?: readonly string[]; readonly currentPlaying?: number; readonly shuffle: boolean; readonly repeat: boolean }) => {
     const now = Date.now()
     const currentTrackId = deriveCurrentTrackId(trackIds, randomTrackIds, currentPlaying, shuffle)
-    return tables.queue
+    const head = tables.queue
       .insert({
         id,
-        trackIds,
-        randomTrackIds: randomTrackIds ?? [],
         currentPlaying: currentPlaying ?? null,
         currentTrackId,
         shuffle,
@@ -695,56 +688,50 @@ const materializers = State.SQLite.materializers(events, {
         updatedAt: now,
       })
       .onConflict('id', 'update', {
-        trackIds,
-        randomTrackIds: randomTrackIds ?? [],
         currentPlaying: currentPlaying ?? null,
         currentTrackId,
         shuffle,
         repeat,
         updatedAt: now,
       })
-  },
-
-  'v1.QueueTrackAdded': ({ queueId, trackId: _trackId, position: _position }: { queueId: string; trackId: string; position?: number }) => {
-    const now = Date.now()
-    // Note: Same as playlists - application layer should:
-    // 1. Read current trackIds
-    // 2. Append/insert trackId at position
-    // 3. Dispatch QueueUpdated event with the new trackIds array
-    return tables.queue
-      .update({ updatedAt: now })
-      .where('id', '=', queueId)
-  },
-
-  'v1.QueueTrackRemoved': ({ queueId, trackId: _trackId }: { queueId: string; trackId: string }) => {
-    const now = Date.now()
-    // Note: Application layer should:
-    // 1. Read current trackIds
-    // 2. Remove trackId
-    // 3. Dispatch QueueUpdated event with the new trackIds array
-    return tables.queue
-      .update({ updatedAt: now })
-      .where('id', '=', queueId)
+    // Rebuild item rows from the event arrays. Deterministic ids
+    // (queueId:list:position) keep eventlog rematerialization idempotent.
+    return [
+      head,
+      tables.queueItems.delete().where('queueId', '=', id),
+      ...trackIds.map((trackId: string, position: number) =>
+        tables.queueItems.insert({
+          id: `${id}:ordered:${position}`,
+          queueId: id,
+          list: 'ordered',
+          position,
+          trackId,
+        })
+      ),
+      ...(randomTrackIds ?? []).map((trackId: string, position: number) =>
+        tables.queueItems.insert({
+          id: `${id}:random:${position}`,
+          queueId: id,
+          list: 'random',
+          position,
+          trackId,
+        })
+      ),
+    ]
   },
 
   'v1.QueueCleared': ({ queueId }: { queueId: string }) => {
     const now = Date.now()
-    return tables.queue
-      .update({
-        trackIds: [],
-        randomTrackIds: [],
-        currentPlaying: null,
-        currentTrackId: null,
-        updatedAt: now,
-      })
-      .where('id', '=', queueId)
-  },
-
-  'v1.QueueShuffleToggled': ({ queueId, shuffle }: { queueId: string; shuffle: boolean }) => {
-    const now = Date.now()
-    return tables.queue
-      .update({ shuffle, updatedAt: now })
-      .where('id', '=', queueId)
+    return [
+      tables.queueItems.delete().where('queueId', '=', queueId),
+      tables.queue
+        .update({
+          currentPlaying: null,
+          currentTrackId: null,
+          updatedAt: now,
+        })
+        .where('id', '=', queueId),
+    ]
   },
 
   'v1.QueueRepeatToggled': ({ queueId, repeat }: { queueId: string; repeat: boolean }) => {

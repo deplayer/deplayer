@@ -1,50 +1,78 @@
 /**
  * Synchronous queue store readers.
  *
- * `readQueue` is the module's canonical read: it normalizes the raw
- * `queue` row into `QueueState` (raw-row tolerant, includes the persisted
- * `currentTrackId`). `resolveCurrentPlayingSongId` queries the queue table
- * directly (non-reactive) for call sites that already hold a store instance.
+ * `readQueue` is the module's canonical read: it assembles the normalized
+ * `QueueState` from the `queue` head row plus the `queue_items` rows.
+ * `resolveCurrentPlayingSongId` queries the tables directly (non-reactive)
+ * for call sites that already hold a store instance.
  */
 
 import { queryDb } from '@livestore/livestore'
 import type { LiveStore } from '../accessor'
 import { tables } from '../schema'
-import { parseIds, resolveCurrentSongId } from './resolution'
-import type { QueueState } from './types'
+import type { QueueHeadRow, QueueItemRow, QueueState } from './types'
+
+/**
+ * Assemble the normalized `QueueState` from the head row and item rows.
+ * Shared by `readQueue` and the `useQueue` hook so both reads stay in
+ * sync. Returns null when there is no head row.
+ */
+export const assembleQueueState = (
+  head: QueueHeadRow | null | undefined,
+  itemRows: readonly QueueItemRow[],
+): QueueState | null => {
+  if (!head) return null
+  const trackIds = itemRows
+    .filter((r) => r.list === 'ordered')
+    .sort((a, b) => a.position - b.position)
+    .map((r) => r.trackId)
+  const randomTrackIds = itemRows
+    .filter((r) => r.list === 'random')
+    .sort((a, b) => a.position - b.position)
+    .map((r) => r.trackId)
+  return {
+    trackIds,
+    randomTrackIds,
+    currentPlaying: head.currentPlaying,
+    currentTrackId: head.currentTrackId || null,
+    shuffle: Boolean(head.shuffle),
+    repeat: Boolean(head.repeat),
+  }
+}
 
 /**
  * Read the current queue from LiveStore.
- * Includes the persisted currentTrackId column so callers can
+ * Head row plus item rows; returns the shared QueueState shape (raw-row
+ * tolerant). Includes the persisted currentTrackId column so callers can
  * prefer it over the index-based fallback.
- * Returns the shared QueueState shape (raw-row tolerant).
  */
 export const readQueue = async (store: LiveStore): Promise<QueueState | null> => {
   try {
-    const query = queryDb(
-      tables.queue
-        .select()
-        .where('id', '=', 'default')
-        .limit(1)
+    const headResult = await store.query(
+      queryDb(
+        tables.queue
+          .select()
+          .where('id', '=', 'default')
+          .limit(1)
+      )
     )
 
-    const result = await store.query(query)
-
-    // queryDb returns array of objects directly
-    const row = Array.isArray(result) ? result[0] : null
-
-    if (!row) {
+    const head = (headResult as unknown as QueueHeadRow[])?.[0] ?? null
+    if (!head) {
       return null
     }
 
-    return {
-      trackIds: parseIds(row.trackIds),
-      randomTrackIds: parseIds(row.randomTrackIds),
-      currentPlaying: row.currentPlaying as number | null,
-      currentTrackId: (row.currentTrackId as string) || null,
-      shuffle: Boolean(row.shuffle),
-      repeat: Boolean(row.repeat),
-    }
+    const itemResult = await store.query(
+      queryDb(
+        tables.queueItems
+          .select('list', 'position', 'trackId')
+          .where('queueId', '=', 'default')
+          .orderBy('list', 'asc')
+          .orderBy('position', 'asc')
+      )
+    )
+
+    return assembleQueueState(head, itemResult as unknown as QueueItemRow[])
   } catch (error) {
     console.error('[readQueue] Error:', error)
     return null
@@ -52,9 +80,10 @@ export const readQueue = async (store: LiveStore): Promise<QueueState | null> =>
 }
 
 /**
- * Resolve the current playing song ID by querying the queue table directly.
- * Uses resolveCurrentSongId on the fetched row so the same resolution logic
- * (currentTrackId authority, shuffle fallback) applies everywhere.
+ * Resolve the current playing song ID by querying the queue tables
+ * directly. The persisted currentTrackId is authoritative when present;
+ * otherwise the active position is resolved with a point read of
+ * `queue_items` (shuffle-aware list selection).
  */
 export function resolveCurrentPlayingSongId(
   liveStore: () => LiveStore | null
@@ -63,13 +92,11 @@ export function resolveCurrentPlayingSongId(
   if (!store) return null
 
   const result = store.query({
-    query: `SELECT trackIds, randomTrackIds, currentPlaying, currentTrackId, shuffle FROM queue WHERE id = ?`,
+    query: `SELECT currentTrackId, currentPlaying, shuffle FROM queue WHERE id = ?`,
     // Positional array bind — object-form binds are mangled into named
     // params and never reach the placeholder (livestore-bind-contract.spec).
     bindValues: ['default'],
   }) as Array<{
-    trackIds?: string | readonly string[]
-    randomTrackIds?: string | readonly string[]
     currentPlaying?: number | null
     currentTrackId?: string | null
     shuffle?: boolean
@@ -77,11 +104,16 @@ export function resolveCurrentPlayingSongId(
 
   const row = result[0]
   if (!row) return null
-  return resolveCurrentSongId({
-    trackIds: row.trackIds ?? [],
-    randomTrackIds: row.randomTrackIds ?? [],
-    currentPlaying: row.currentPlaying,
-    currentTrackId: row.currentTrackId,
-    shuffle: row.shuffle ?? false,
-  })
+  const currentTrackId = row.currentTrackId ?? null
+  if (currentTrackId) return currentTrackId
+
+  const currentPlaying = row.currentPlaying
+  if (currentPlaying === null || currentPlaying === undefined) return null
+
+  const list = row.shuffle ? 'random' : 'ordered'
+  const item = store.query({
+    query: 'SELECT trackId FROM queue_items WHERE queueId = ? AND list = ? AND position = ?',
+    bindValues: ['default', list, currentPlaying],
+  }) as Array<{ trackId?: string | null }>
+  return item[0]?.trackId ?? null
 }

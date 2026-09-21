@@ -30,29 +30,6 @@ export const playlistEvents = {
   }),
 
   /**
-   * Fired when a track is added to a playlist
-   */
-  playlistTrackAdded: Events.synced({
-    name: 'v1.PlaylistTrackAdded',
-    schema: Schema.Struct({
-      playlistId: Schema.String,
-      trackId: Schema.String,
-      position: Schema.optional(Schema.Number),
-    }),
-  }),
-
-  /**
-   * Fired when a track is removed from a playlist
-   */
-  playlistTrackRemoved: Events.synced({
-    name: 'v1.PlaylistTrackRemoved',
-    schema: Schema.Struct({
-      playlistId: Schema.String,
-      trackId: Schema.String,
-    }),
-  }),
-
-  /**
    * Fired when playlist tracks are reordered
    */
   playlistReordered: Events.synced({

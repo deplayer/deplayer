@@ -23,46 +23,12 @@ export const queueEvents = {
   }),
 
   /**
-   * Fired when a track is added to the queue
-   */
-  queueTrackAdded: Events.synced({
-    name: 'v1.QueueTrackAdded',
-    schema: Schema.Struct({
-      queueId: Schema.String,
-      trackId: Schema.String,
-      position: Schema.optional(Schema.Number),
-    }),
-  }),
-
-  /**
-   * Fired when a track is removed from the queue
-   */
-  queueTrackRemoved: Events.synced({
-    name: 'v1.QueueTrackRemoved',
-    schema: Schema.Struct({
-      queueId: Schema.String,
-      trackId: Schema.String,
-    }),
-  }),
-
-  /**
    * Fired when the queue is cleared
    */
   queueCleared: Events.synced({
     name: 'v1.QueueCleared',
     schema: Schema.Struct({
       queueId: Schema.String,
-    }),
-  }),
-
-  /**
-   * Fired when shuffle mode is toggled
-   */
-  queueShuffleToggled: Events.synced({
-    name: 'v1.QueueShuffleToggled',
-    schema: Schema.Struct({
-      queueId: Schema.String,
-      shuffle: Schema.Boolean,
     }),
   }),
 

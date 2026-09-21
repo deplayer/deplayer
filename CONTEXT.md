@@ -20,9 +20,8 @@ A resolved play target (`{url, kind}`) returned by StreamUriService. Blob-kind s
 _Avoid_: stream URI (unqualified), blob URL
 
 **Playback queue**:
-The app's single deep module owning the playback queue domain: the ordered track lists plus the playback head (current position, shuffle, repeat), persisted as one `queue` row. Callers read the normalized `QueueState` and mutate only through the queue actions; the raw row shape (`QueueRecord`) is an implementation detail.
-_Avoid_: queue state (for the raw row), Redux queue
-
+The app's single deep module owning the playback queue domain: the ordered track lists plus the playback head (current position, shuffle, repeat), persisted as a `queue` head row plus `queue_items` rows (one per track per list). Callers read the normalized `QueueState` and mutate only through the queue actions; the raw row shapes (`QueueHeadRow`, `QueueItemRow`) are an implementation detail.
+_Avoid_: queue state (for the raw rows), Redux queue
 
 **Collection filter**:
 The canonical filter value for the Collection view (genres/types/artists/providers/favorites). Owned by the `collection/filter` module, which is the single owner of its match semantics (OR within a category, AND across categories, exact genre/provider matching, favorites requiring membership), expressed as one shared SQL clause set from which the window, count, and all-ids queries are all derived. Smart playlists persist a projection of it (no favorites field).
@@ -45,7 +44,7 @@ _Avoid_: cursor version
 - A **Sync resume state** is written only after its page committed (BatchedMediaCommitter flush success); a failed flush must leave the row untouched
 - **Cursor geometry** is persisted alongside the cursor it describes
 - A **Stream source** of blob kind is released exactly when playback moves past it (PlaybackController), or when the SongView download list is replaced/unmounted
-- The **Playback queue** is read via `useQueue`/`readQueue`; the playback head resolves to the persisted `currentTrackId` column, falling back to the index into the active track list
+- The **Playback queue** is read via `useQueue`/`readQueue`; the playback head resolves to the persisted `currentTrackId` column, falling back to a point read of the item at the active position in `queue_items`
 - Shuffle reorders the random list only and keeps the active track in position; the **Stream source** release on playback advance is the queue's one effect on media
 - A **Sync batch** can only detect drift in fields the content-derived media id does not cover (type, duration, discNumber, genres, stream membership, externalId, shareUrl, filePath); renames produce new ids and arrive as adds. Stream/cover JSON blobs are deliberately not compared — URL rotation is not an update
 - All raw SQL against LiveStore uses positional array binds — object-form binds are mangled into `$key` named params (keys absent from the SQL text are dropped), and raw `store.query` returns an array of row objects. Pinned by `livestore-bind-contract.spec.ts`

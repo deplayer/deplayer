@@ -1,11 +1,11 @@
 /**
- * LiveStore Queue Actions
- *
- * Thin adapters over the pure transition functions in `./transitions`.
- * Each action: input guard → (optional) readQueue → transition → commit the
- * returned event only when non-null. All queue-domain logic (shuffle
- * reordering, repeat wrap, position clamping, active-list selection) lives in
- * the pure modules so it is testable without a LiveStore.
+ * Thin adapters over the pure rules in `./transitions` (list-mutating
+ * actions) and `./stepping` (position advances). Each action: input guard
+ * → read the head row (and, for advances, only the needed `queue_items`
+ * rows) → rule → commit the returned event only when non-null. All
+ * queue-domain logic (shuffle reordering, repeat wrap, position clamping,
+ * active-list selection) lives in the pure modules so it is testable
+ * without a LiveStore.
  *
  * Side effects (audio playback, notifications) remain in Redux saga.
  * All actions require a store parameter from useStore() hook.
@@ -15,22 +15,14 @@
  * fire-and-forget commit on the addToQueue fresh-create path).
  */
 
+import { queryDb } from '@livestore/livestore'
 import type { LiveStore } from '../accessor'
 import { queueEvents } from '../events/queue'
+import { tables } from '../schema'
+import { addNext, playAll, addToQueue, clearQueue, removeFromQueue, toggleShuffle, toggleRepeat, setCurrentPlaying } from './transitions'
 import { readQueue } from './storeReaders'
-import {
-  playAll,
-  addToQueue,
-  addNext,
-  removeFromQueue,
-  clearQueue,
-  toggleShuffle,
-  toggleRepeat,
-  setCurrentPlaying,
-  playNext,
-  playPrevious,
-  playMedia,
-} from './transitions'
+import { activeListName, stepNext, stepPrevious, stepToMedia } from './stepping'
+import type { QueueHeadRow, QueueItemRow } from './types'
 
 /**
  * Replace queue with new tracks, positioned at the first track.
@@ -187,14 +179,18 @@ export const setCurrentPlayingAction = async (store: LiveStore, position: number
  * @param store - LiveStore instance
  */
 export async function playNextAction(store: LiveStore): Promise<void> {
-  const queue = await readQueue(store)
+  const head = await readQueueHead(store)
 
-  if (!queue) {
+  if (!head) {
     console.warn(`[playNextAction] Queue default not found`)
     return
   }
 
-  const ev = playNext(queue)
+  const list = activeListName(head.shuffle)
+  const cur = head.currentPlaying ?? -1
+  const [atNext, atZero] = await readItemRows(store, list, cur + 1, 0)
+
+  const ev = stepNext(head, atNext, atZero)
   if (ev) {
     await store.commit(queueEvents.queuePositionChanged(ev))
   }
@@ -207,15 +203,19 @@ export async function playNextAction(store: LiveStore): Promise<void> {
  * @param store - LiveStore instance
  */
 export async function playPreviousAction(store: LiveStore): Promise<void> {
-  const queue = await readQueue(store)
+  const head = await readQueueHead(store)
 
-  if (!queue) {
+  if (!head) {
     console.warn(`[playPreviousAction] Queue default not found`)
     return
   }
 
+  const list = activeListName(head.shuffle)
+  const cur = head.currentPlaying ?? 0
+  const [atPrev, last] = await readPrevRows(store, list, cur)
+
   // Always commits when a queue exists (even the stay-put case).
-  const ev = playPrevious(queue)
+  const ev = stepPrevious(head, atPrev, last)
   if (ev) {
     await store.commit(queueEvents.queuePositionChanged(ev))
   }
@@ -232,17 +232,104 @@ export async function playMediaAction(
   store: LiveStore,
   mediaId: string
 ): Promise<void> {
-  const queue = await readQueue(store)
+  const head = await readQueueHead(store)
 
-  if (!queue) {
+  if (!head) {
     console.warn(`[playMediaAction] Queue default not found`)
     return
   }
 
-  const ev = playMedia(queue, mediaId)
+  const list = activeListName(head.shuffle)
+  const found = (
+    await store.query(
+      queryDb(
+        tables.queueItems
+          .select('position', 'trackId')
+          .where('queueId', '=', 'default')
+          .where('list', '=', list)
+          .where('trackId', '=', mediaId)
+          .limit(1)
+      )
+    ) as unknown as QueueItemRow[]
+  )[0] ?? null
+
+  const ev = stepToMedia(found)
   if (ev) {
     await store.commit(queueEvents.queuePositionChanged(ev))
   } else {
     console.warn(`[playMediaAction] Media ${mediaId} not found in queue`)
   }
+}
+
+/**
+ * Point-read helpers for the O(1) step actions.
+ *
+ * Each reads at most two `queue_items` rows — only the neighbors a step
+ * actually needs — plus the head row. No JSON parsing, no full-list
+ * materialization.
+ */
+
+const readQueueHead = async (store: LiveStore): Promise<QueueHeadRow | null> => {
+  const result = (await store.query(
+    queryDb(
+      tables.queue
+        .select()
+        .where('id', '=', 'default')
+        .limit(1)
+    )
+  )) as unknown as QueueHeadRow[]
+  return result[0] ?? null
+}
+
+const readItem = async (
+  store: LiveStore,
+  list: string,
+  position: number
+): Promise<QueueItemRow | null> => {
+  const result = (await store.query(
+    queryDb(
+      tables.queueItems
+        .select('position', 'trackId')
+        .where('queueId', '=', 'default')
+        .where('list', '=', list)
+        .where('position', '=', position)
+        .limit(1)
+    )
+  )) as unknown as QueueItemRow[]
+  return result[0] ?? null
+}
+
+const readItemRows = async (
+  store: LiveStore,
+  list: string,
+  ...positions: number[]
+): Promise<(QueueItemRow | null)[]> => {
+  const rows = await Promise.all(positions.map((p) => readItem(store, list, p)))
+  return rows
+}
+
+/**
+ * The previous step needs the row at `cur - 1` (when `cur > 0`) and, for
+ * the repeat wrap, the highest-position row in the active list.
+ */
+const readPrevRows = async (
+  store: LiveStore,
+  list: string,
+  cur: number
+): Promise<[QueueItemRow | null, QueueItemRow | null]> => {
+  const last = (
+    await store.query(
+      queryDb(
+        tables.queueItems
+          .select('position', 'trackId')
+          .where('queueId', '=', 'default')
+          .where('list', '=', list)
+          .orderBy('position', 'desc')
+          .limit(1)
+      )
+    ) as unknown as QueueItemRow[]
+  )[0] ?? null
+
+  const atPrev = cur > 0 ? await readItem(store, list, cur - 1) : null
+  return [atPrev, last]
 }

@@ -4,15 +4,16 @@
  * These hooks provide reactive access to playback queue data from LiveStore.
  * They automatically update when the underlying data changes.
  *
- * `useQueue` normalizes the raw row into `QueueState` (the single canonical
- * read shape, mirroring `readQueue`).
+ * `useQueue` assembles the normalized `QueueState` from the `queue` head
+ * row plus the `queue_items` rows (mirroring `readQueue` via the shared
+ * `assembleQueueState`).
  */
 
 import { queryDb } from '@livestore/livestore'
 import { useAppStore } from '../store'
 import { tables } from '../schema'
-import { parseIds } from './resolution'
-import type { QueueRecord, QueueState } from './types'
+import { assembleQueueState } from './storeReaders'
+import type { QueueHeadRow, QueueItemRow, QueueState } from './types'
 
 /**
  * Get the current queue state
@@ -28,7 +29,7 @@ import type { QueueRecord, QueueState } from './types'
  */
 export const useQueue = (queueId = 'default'): QueueState | null => {
   const store = useAppStore()
-  const result = store.useQuery(
+  const headResult = store.useQuery(
     queryDb(
       tables.queue
         .select()
@@ -36,16 +37,17 @@ export const useQueue = (queueId = 'default'): QueueState | null => {
         .limit(1)
     )
   )
-  const raw = (result as unknown as QueueRecord[])?.[0]
-  if (!raw) return null
-  return {
-    trackIds: parseIds(raw.trackIds),
-    randomTrackIds: parseIds(raw.randomTrackIds),
-    currentPlaying: raw.currentPlaying,
-    currentTrackId: (raw.currentTrackId as string | null) || null,
-    shuffle: raw.shuffle,
-    repeat: raw.repeat,
-  }
+  const itemResult = store.useQuery(
+    queryDb(
+      tables.queueItems
+        .select('list', 'position', 'trackId')
+        .where('queueId', '=', queueId)
+        .orderBy('list', 'asc')
+        .orderBy('position', 'asc')
+    )
+  )
+  const head = (headResult as unknown as QueueHeadRow[])?.[0]
+  return assembleQueueState(head, (itemResult as unknown as QueueItemRow[]) ?? [])
 }
 
 /**

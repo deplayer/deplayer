@@ -1,383 +1,506 @@
-/**
- * Tests for the LiveStore queue action adapters.
- *
- * The transition logic itself is covered by ./transitions.spec.ts; these
- * tests verify the adapter boundary: what each action reads, which event it
- * commits (or deliberately does not), and which console warnings it emits.
- * A fake store records committed events so assertions are on observable
- * behavior only.
- */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import type { Mock } from 'vitest'
 import type { LiveStore } from '../accessor'
 import {
-  playAllAction,
-  addToQueueAction,
   addNextAction,
-  removeFromQueueAction,
+  addToQueueAction,
   clearQueueAction,
-  toggleShuffleAction,
-  toggleRepeatAction,
-  setCurrentPlayingAction,
+  playAllAction,
+  playMediaAction,
   playNextAction,
   playPreviousAction,
-  playMediaAction,
+  removeFromQueueAction,
+  setCurrentPlayingAction,
+  toggleRepeatAction,
+  toggleShuffleAction,
 } from './actions'
 
-interface FakeStore {
-  query: Mock
-  commit: Mock
+// ---------------------------------------------------------------------------
+// Store fake that routes queries by the `def` object produced by queryDb:
+//   def.label — the exact generated SQL text
+//   def.hash  — SQL + "-<index>:<value>..." bind trail (e.g. "-1:random,2:0")
+// Both are captured from the live query-builder output so the router stays
+// faithful to the real SQL.
+// ---------------------------------------------------------------------------
+
+type QueryDef = { label?: string; hash?: string }
+
+interface QueueFixture {
+  head?: Record<string, unknown>
+  ordered?: string[]
+  random?: string[]
 }
 
-const makeStore = (rows: unknown[] = []): FakeStore => ({
-  query: vi.fn(async () => rows),
-  commit: vi.fn(async () => undefined),
-})
+type FixtureArg = QueueFixture | string[] | null
+function normalizeFixture(fixture: FixtureArg): QueueFixture {
+  if (fixture === null) return {}
+  if (Array.isArray(fixture)) return { head: makeHead(), ordered: fixture }
+  return fixture.head ? fixture : { head: makeHead(), ...fixture }
+}
 
-/** Raw queue row as stored in the DB. */
-const makeRow = (overrides: Record<string, unknown> = {}) => ({
-  id: 'default',
-  trackIds: JSON.stringify(['a', 'b', 'c']),
-  randomTrackIds: null,
-  currentPlaying: 0,
-  currentTrackId: null,
-  shuffle: false,
-  repeat: false,
-  updatedAt: new Date(),
-  ...overrides,
-})
+function makeHead(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    id: 'default',
+    currentPlaying: 0,
+    currentTrackId: null,
+    shuffle: false,
+    repeat: false,
+    updatedAt: new Date(),
+    ...overrides,
+  }
+}
 
-const committed = (store: FakeStore) => store.commit.mock.calls.map((c) => c[0])
+function makeItemRow(list: string, position: number, trackId: string): Record<string, unknown> {
+  return {
+    id: `default:${list}:${position}`,
+    queueId: 'default',
+    list,
+    position,
+    trackId,
+  }
+}
 
-beforeEach(() => {
-  vi.spyOn(console, 'warn').mockImplementation(() => undefined)
-  vi.spyOn(console, 'error').mockImplementation(() => undefined)
-})
+/** Recover the bind values from the def.hash bind trail ("...-1:random,2:0"). */
+function bindsFromHash(hash: string): unknown[] {
+  const dash = hash.lastIndexOf('-')
+  if (dash === -1) return []
+  return hash
+    .slice(dash + 1)
+    .split(',')
+    .map((part) => {
+      const value = part.slice(part.indexOf(':') + 1)
+      const n = Number(value)
+      return value !== '' && !Number.isNaN(n) ? n : value
+    })
+}
 
-afterEach(() => {
-  vi.restoreAllMocks()
-})
+function listFor(fix: QueueFixture, list: string): string[] {
+  return list === 'random' ? (fix.random ?? []) : (fix.ordered ?? [])
+}
 
-describe('playAllAction', () => {
-  it('warns and commits nothing when no tracks are provided', async () => {
-    const store = makeStore()
-    await playAllAction(store as unknown as LiveStore, [])
-    expect(console.warn).toHaveBeenCalledWith('playAllAction: No tracks provided')
-    expect(store.commit).not.toHaveBeenCalled()
+function routeQuery(fix: QueueFixture, def: QueryDef): Record<string, unknown>[] {
+  const label = def.label ?? ''
+  const binds = bindsFromHash(def.hash ?? '')
+
+  if (label.includes('FROM \'queue\' WHERE "id"')) {
+    return fix.head ? [fix.head] : []
+  }
+  if (label.includes('FROM \'queue_items\'') && label.includes('ORDER BY "list"')) {
+    return [
+      ...listFor(fix, 'ordered').map((t, i) => makeItemRow('ordered', i, t)),
+      ...listFor(fix, 'random').map((t, i) => makeItemRow('random', i, t)),
+    ]
+  }
+  if (label.includes('"trackId" = ? LIMIT')) {
+    const list = String(binds[1])
+    const trackId = String(binds[2])
+    const position = listFor(fix, list).indexOf(trackId)
+    return position === -1 ? [] : [makeItemRow(list, position, trackId)]
+  }
+  if (label.includes('"position" = ? LIMIT')) {
+    const list = String(binds[1])
+    const position = Number(binds[2])
+    const trackId = listFor(fix, list)[position]
+    return trackId === undefined ? [] : [makeItemRow(list, position, trackId)]
+  }
+  if (label.includes('ORDER BY "position" desc')) {
+    const list = String(binds[1])
+    const source = listFor(fix, list)
+    if (source.length === 0) return []
+    return [makeItemRow(list, source.length - 1, source[source.length - 1])]
+  }
+  throw new Error(`Unrouted query: ${label}`)
+}
+
+function makeStore(fixture: FixtureArg = null): { query: Mock; commit: Mock } {
+  const fix = normalizeFixture(fixture)
+  return {
+    query: vi.fn((def: QueryDef) => routeQuery(fix, def)),
+    commit: vi.fn(async () => undefined),
+  }
+}
+function committed(store: { commit: Mock }): [string, Record<string, unknown>] {
+  const event = store.commit.mock.calls[0]?.[0] as { name: string; args: Record<string, unknown> }
+  return [event.name, event.args]
+}
+
+describe('queue actions', () => {
+  beforeEach(() => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.spyOn(console, 'error').mockImplementation(() => {})
   })
 
-  it('commits a queueUpdated event resetting the queue', async () => {
-    const store = makeStore([makeRow()])
-    await playAllAction(store as unknown as LiveStore, ['x', 'y'])
-    expect(store.commit).toHaveBeenCalledTimes(1)
-    const [ev] = committed(store)
-    expect(ev.name).toBe('v1.QueueUpdated')
-    expect(ev.args).toEqual({
-      id: 'default',
-      trackIds: ['x', 'y'],
-      currentPlaying: 0,
-      shuffle: false,
-      repeat: false,
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  describe('playAllAction', () => {
+    it('warns and does not commit when there are no tracks', async () => {
+      const store = makeStore()
+      await playAllAction(store as unknown as LiveStore, [])
+      expect(console.warn).toHaveBeenCalledWith('playAllAction: No tracks provided')
+      expect(store.commit).not.toHaveBeenCalled()
+    })
+
+    it('commits a QueueUpdated event with the given track IDs', async () => {
+      const store = makeStore()
+      await playAllAction(store as unknown as LiveStore, ['x', 'y'])
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueueUpdated')
+      expect(args).toEqual({
+        id: 'default',
+        trackIds: ['x', 'y'],
+        currentPlaying: 0,
+        shuffle: false,
+        repeat: false,
+      })
     })
   })
-})
 
-describe('addToQueueAction', () => {
-  it('commits nothing for an empty track list', async () => {
-    const store = makeStore([makeRow()])
-    await addToQueueAction(store as unknown as LiveStore, [])
-    expect(store.commit).not.toHaveBeenCalled()
-  })
+  describe('addToQueueAction', () => {
+    it('does not commit when the trackIds argument is empty', async () => {
+      const store = makeStore(null)
+      await addToQueueAction(store as unknown as LiveStore, [])
+      expect(store.commit).not.toHaveBeenCalled()
+    })
 
-  it('fresh-creates the queue and commits without awaiting (preserved fire-and-forget)', async () => {
-    const store = makeStore([])
-    let resolveCommit!: () => void
-    store.commit.mockImplementation(
-      () => new Promise<void>((resolve) => { resolveCommit = resolve })
-    )
+    it('creates a fresh queue and commits without awaiting (preserved fire-and-forget)', async () => {
+      const store = makeStore(null)
+      let resolveCommit!: () => void
+      store.commit.mockImplementation(
+        () => new Promise<void>((resolve) => { resolveCommit = resolve }),
+      )
 
-    const done = await addToQueueAction(store as unknown as LiveStore, ['x'])
-    // The action resolved while the commit promise is still pending.
-    expect(done).toBeUndefined()
-    expect(store.commit).toHaveBeenCalledTimes(1)
-    resolveCommit()
-  })
+      const done = await addToQueueAction(store as unknown as LiveStore, ['d'])
+      // The action resolved while the commit promise is still pending.
+      expect(done).toBeUndefined()
+      expect(store.commit).toHaveBeenCalledTimes(1)
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueueUpdated')
+      expect(args.trackIds).toEqual(['d'])
+      resolveCommit()
+    })
 
-  it('appends to an existing queue and awaits the commit', async () => {
-    const store = makeStore([makeRow({ currentPlaying: 1, shuffle: true, repeat: true })])
-    await addToQueueAction(store as unknown as LiveStore, ['d'])
-    const [ev] = committed(store)
-    expect(ev.name).toBe('v1.QueueUpdated')
-    // randomTrackIds is deliberately omitted (suspected bug #1, locked in).
-    expect(ev.args).toEqual({
-      id: 'default',
-      trackIds: ['a', 'b', 'c', 'd'],
-      currentPlaying: 1,
-      shuffle: true,
-      repeat: true,
+    it('appends to existing tracks preserving currentPlaying and shuffle state', async () => {
+      const store = makeStore({
+        head: makeHead({ currentPlaying: 1, shuffle: true, repeat: true }),
+        ordered: ['a', 'b', 'c'],
+      })
+      await addToQueueAction(store as unknown as LiveStore, ['d'])
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueueUpdated')
+      expect(args).toEqual({
+        id: 'default',
+        trackIds: ['a', 'b', 'c', 'd'],
+        currentPlaying: 1,
+        shuffle: true,
+        repeat: true,
+      })
+      // randomTrackIds intentionally omitted (locked suspected bug #1)
+      expect(args).not.toHaveProperty('randomTrackIds')
+    })
+
+    it('rejects when the commit fails', async () => {
+      const store = makeStore({ head: makeHead(), ordered: ['a'] })
+      store.commit.mockRejectedValue(new Error('boom'))
+      await expect(addToQueueAction(store as unknown as LiveStore, ['d'])).rejects.toThrow('boom')
     })
   })
 
-  it('propagates commit rejections on the append path (awaited)', async () => {
-    const store = makeStore([makeRow()])
-    store.commit.mockRejectedValue(new Error('commit failed'))
-    await expect(addToQueueAction(store as unknown as LiveStore, ['d'])).rejects.toThrow(
-      'commit failed'
-    )
-  })
-})
+  describe('addNextAction', () => {
+    it('creates a new queue and returns the first track when no queue exists', async () => {
+      const store = makeStore(null)
+      const result = await addNextAction(store as unknown as LiveStore, ['d'])
+      expect(result).toBe('d')
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueueUpdated')
+      expect(args.trackIds).toEqual(['d'])
+      expect(args.currentPlaying).toBe(0)
+    })
 
-describe('addNextAction', () => {
-  it('returns null and commits nothing for an empty track list', async () => {
-    const store = makeStore([makeRow()])
-    expect(await addNextAction(store as unknown as LiveStore, [])).toBeNull()
-    expect(store.commit).not.toHaveBeenCalled()
-  })
+    it('inserts the new track at currentPlaying + 1', async () => {
+      const store = makeStore({
+        head: makeHead({ currentPlaying: 1 }),
+        ordered: ['a', 'b', 'c'],
+      })
+      const result = await addNextAction(store as unknown as LiveStore, ['d'])
+      expect(result).toBeNull()
+      const [, args] = committed(store)
+      expect(args.trackIds).toEqual(['a', 'b', 'd', 'c'])
+      expect(args.currentPlaying).toBe(1)
+    })
 
-  it('starts a fresh queue and returns the first track id', async () => {
-    const store = makeStore([])
-    const first = await addNextAction(store as unknown as LiveStore, ['x', 'y'])
-    expect(first).toBe('x')
-    const [ev] = committed(store)
-    expect(ev.name).toBe('v1.QueueUpdated')
-    expect(ev.args.trackIds).toEqual(['x', 'y'])
-    expect(ev.args.currentPlaying).toBe(0)
-  })
-
-  it('inserts after the currently playing track and commits no firstTrackId', async () => {
-    const store = makeStore([makeRow({ currentPlaying: 1 })])
-    const first = await addNextAction(store as unknown as LiveStore, ['d'])
-    expect(first).toBeNull()
-    const [ev] = committed(store)
-    expect(ev.args.trackIds).toEqual(['a', 'b', 'd', 'c'])
-    expect(ev.args.currentPlaying).toBe(1)
-  })
-
-  it('inserts at the front when there is no current position', async () => {
-    const store = makeStore([makeRow({ currentPlaying: null })])
-    await addNextAction(store as unknown as LiveStore, ['d'])
-    const [ev] = committed(store)
-    expect(ev.args.trackIds).toEqual(['d', 'a', 'b', 'c'])
-  })
-})
-
-describe('removeFromQueueAction', () => {
-  it('commits nothing when there is no queue', async () => {
-    const store = makeStore([])
-    await removeFromQueueAction(store as unknown as LiveStore, 'a')
-    expect(store.commit).not.toHaveBeenCalled()
+    it('inserts at index 0 when currentPlaying is null', async () => {
+      const store = makeStore({
+        head: makeHead({ currentPlaying: null }),
+        ordered: ['a', 'b', 'c'],
+      })
+      const result = await addNextAction(store as unknown as LiveStore, ['d'])
+      expect(result).toBeNull()
+      const [, args] = committed(store)
+      expect(args.trackIds).toEqual(['d', 'a', 'b', 'c'])
+      expect(args.currentPlaying).toBeUndefined()
+    })
   })
 
-  it('removes all occurrences and clamps currentPlaying', async () => {
-    const store = makeStore([makeRow({ trackIds: JSON.stringify(['a', 'b', 'a']), currentPlaying: 2 })])
-    await removeFromQueueAction(store as unknown as LiveStore, 'a')
-    const [ev] = committed(store)
-    expect(ev.args.trackIds).toEqual(['b'])
-    expect(ev.args.currentPlaying).toBe(0)
+  describe('removeFromQueueAction', () => {
+    it('removes all matching occurrences and clamps currentPlaying', async () => {
+      const store = makeStore({
+        head: makeHead({ currentPlaying: 2 }),
+        ordered: ['a', 'b', 'a'],
+      })
+      await removeFromQueueAction(store as unknown as LiveStore, 'a')
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueueUpdated')
+      expect(args.trackIds).toEqual(['b'])
+      expect(args.currentPlaying).toBe(0)
+    })
+
+    it('commits unchanged state when the trackId is not in the queue', async () => {
+      const store = makeStore({
+        head: makeHead({ currentPlaying: 1 }),
+        ordered: ['a', 'b', 'c'],
+      })
+      await removeFromQueueAction(store as unknown as LiveStore, 'z')
+      const [, args] = committed(store)
+      expect(args.trackIds).toEqual(['a', 'b', 'c'])
+      expect(args.currentPlaying).toBe(1)
+    })
   })
 
-  it('commits an unchanged event when the track is absent (no-op commit preserved)', async () => {
-    const store = makeStore([makeRow({ currentPlaying: 1 })])
-    await removeFromQueueAction(store as unknown as LiveStore, 'z')
-    expect(store.commit).toHaveBeenCalledTimes(1)
-    const [ev] = committed(store)
-    expect(ev.args.trackIds).toEqual(['a', 'b', 'c'])
-    expect(ev.args.currentPlaying).toBe(1)
-  })
-})
-
-describe('clearQueueAction', () => {
-  it('commits queueCleared unconditionally without reading the queue', async () => {
-    const store = makeStore([])
-    await clearQueueAction(store as unknown as LiveStore)
-    expect(store.query).not.toHaveBeenCalled()
-    const [ev] = committed(store)
-    expect(ev.name).toBe('v1.QueueCleared')
-    expect(ev.args).toEqual({ queueId: 'default' })
-  })
-})
-
-describe('toggleShuffleAction', () => {
-  it('warns and commits nothing when there is no queue', async () => {
-    const store = makeStore([])
-    await toggleShuffleAction(store as unknown as LiveStore, true)
-    expect(console.warn).toHaveBeenCalledWith(
-      '[toggleShuffleAction] No queue or empty queue, cannot toggle shuffle'
-    )
-    expect(store.commit).not.toHaveBeenCalled()
+  describe('clearQueueAction', () => {
+    it('commits a QueueCleared event without reading the store', async () => {
+      const store = makeStore()
+      await clearQueueAction(store as unknown as LiveStore)
+      expect(store.query).not.toHaveBeenCalled()
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueueCleared')
+      expect(args).toEqual({ queueId: 'default' })
+    })
   })
 
-  it('warns and commits nothing when the queue is empty', async () => {
-    const store = makeStore([makeRow({ trackIds: '[]', randomTrackIds: null })])
-    await toggleShuffleAction(store as unknown as LiveStore, true)
-    expect(console.warn).toHaveBeenCalled()
-    expect(store.commit).not.toHaveBeenCalled()
+  describe('toggleShuffleAction', () => {
+    it('warns when no queue exists', async () => {
+      const store = makeStore(null)
+      await toggleShuffleAction(store as unknown as LiveStore, true)
+      expect(console.warn).toHaveBeenCalledWith('[toggleShuffleAction] No queue or empty queue, cannot toggle shuffle')
+      expect(store.commit).not.toHaveBeenCalled()
+    })
+
+    it('warns when the queue is empty', async () => {
+      const store = makeStore({ head: makeHead(), ordered: [] })
+      await toggleShuffleAction(store as unknown as LiveStore, true)
+      expect(console.warn).toHaveBeenCalledWith('[toggleShuffleAction] No queue or empty queue, cannot toggle shuffle')
+      expect(store.commit).not.toHaveBeenCalled()
+    })
+
+    it('enables shuffle by building a shuffled random list and re-indexing currentPlaying', async () => {
+      const store = makeStore({
+        head: makeHead({ currentPlaying: 2 }),
+        ordered: ['a', 'b', 'c'],
+      })
+      // Two Math.random calls (both 0.6): i=2 j=1 [a,c,b]; i=1 j=1 no-op → [a,c,b]
+      vi.spyOn(Math, 'random')
+        .mockReturnValueOnce(0.6)
+        .mockReturnValueOnce(0.6)
+      await toggleShuffleAction(store as unknown as LiveStore, true)
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueueUpdated')
+      expect(args).toEqual({
+        id: 'default',
+        trackIds: ['a', 'b', 'c'],
+        randomTrackIds: ['a', 'c', 'b'],
+        currentPlaying: 1,
+        shuffle: true,
+        repeat: false,
+      })
+      expect(Math.random).toHaveBeenCalledTimes(2)
+    })
+
+    it('disables shuffle by clearing randomTrackIds and re-indexing into the original order', async () => {
+      const store = makeStore({
+        head: makeHead({ currentPlaying: 2, shuffle: true }),
+        ordered: ['a', 'b', 'c'],
+        random: ['b', 'c', 'a'],
+      })
+      await toggleShuffleAction(store as unknown as LiveStore, false)
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueueUpdated')
+      expect(args).toEqual({
+        id: 'default',
+        trackIds: ['a', 'b', 'c'],
+        randomTrackIds: [],
+        currentPlaying: 0,
+        shuffle: false,
+        repeat: false,
+      })
+    })
   })
 
-  it('enables shuffle with a deterministic permutation and remaps currentPlaying', async () => {
-    const store = makeStore([makeRow({ currentPlaying: 1 })])
-    const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.5)
+  describe('toggleRepeatAction', () => {
+    it('warns when no queue exists', async () => {
+      const store = makeStore(null)
+      await toggleRepeatAction(store as unknown as LiveStore, true)
+      expect(console.warn).toHaveBeenCalledWith('[toggleRepeatAction] No queue exists, cannot toggle repeat')
+      expect(store.commit).not.toHaveBeenCalled()
+    })
 
-    await toggleShuffleAction(store as unknown as LiveStore, true)
-    expect(randomSpy).toHaveBeenCalledTimes(2)
-    const [ev] = committed(store)
-    expect(ev.name).toBe('v1.QueueUpdated')
-    // r=0.5 both draws: i=2 j=floor(0.5*3)=1 swap idx2/1 -> [a,c,b]; i=1 j=1 no swap
-    expect(ev.args.randomTrackIds).toEqual(['a', 'c', 'b'])
-    expect(ev.args.currentPlaying).toBe(2) // 'b' moved to index 2
-    expect(ev.args.shuffle).toBe(true)
-    expect(ev.args.trackIds).toEqual(['a', 'b', 'c'])
+    it('commits a QueueRepeatToggled event', async () => {
+      const store = makeStore({ head: makeHead() })
+      await toggleRepeatAction(store as unknown as LiveStore, true)
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueueRepeatToggled')
+      expect(args).toEqual({ queueId: 'default', repeat: true })
+    })
   })
 
-  it('disables shuffle by remapping the shuffled position back to the plain list', async () => {
-    const store = makeStore([
-      makeRow({ randomTrackIds: JSON.stringify(['b', 'c', 'a']), shuffle: true, currentPlaying: 2 }),
-    ])
-    await toggleShuffleAction(store as unknown as LiveStore, false)
-    const [ev] = committed(store)
-    expect(ev.args.randomTrackIds).toEqual([])
-    expect(ev.args.currentPlaying).toBe(0) // 'a' is at plain index 0
-    expect(ev.args.shuffle).toBe(false)
-  })
-})
-
-describe('toggleRepeatAction', () => {
-  it('warns and commits nothing when there is no queue', async () => {
-    const store = makeStore([])
-    await toggleRepeatAction(store as unknown as LiveStore, true)
-    expect(console.warn).toHaveBeenCalledWith(
-      '[toggleRepeatAction] No queue exists, cannot toggle repeat'
-    )
-    expect(store.commit).not.toHaveBeenCalled()
+  describe('setCurrentPlayingAction', () => {
+    it('commits a QueuePositionChanged event without reading the store', async () => {
+      const store = makeStore()
+      await setCurrentPlayingAction(store as unknown as LiveStore, 3)
+      expect(store.query).not.toHaveBeenCalled()
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueuePositionChanged')
+      expect(args).toEqual({ queueId: 'default', position: 3 })
+    })
   })
 
-  it('commits a partial repeat-toggled event', async () => {
-    const store = makeStore([makeRow()])
-    await toggleRepeatAction(store as unknown as LiveStore, true)
-    const [ev] = committed(store)
-    expect(ev.name).toBe('v1.QueueRepeatToggled')
-    expect(ev.args).toEqual({ queueId: 'default', repeat: true })
-  })
-})
+  describe('playNextAction', () => {
+    it('warns when no queue exists', async () => {
+      const store = makeStore(null)
+      await playNextAction(store as unknown as LiveStore)
+      expect(console.warn).toHaveBeenCalledWith('[playNextAction] Queue default not found')
+      expect(store.commit).not.toHaveBeenCalled()
+    })
 
-describe('setCurrentPlayingAction', () => {
-  it('commits a positionChanged event without reading the queue', async () => {
-    const store = makeStore([])
-    await setCurrentPlayingAction(store as unknown as LiveStore, 3)
-    expect(store.query).not.toHaveBeenCalled()
-    const [ev] = committed(store)
-    expect(ev.name).toBe('v1.QueuePositionChanged')
-    expect(ev.args).toEqual({ queueId: 'default', position: 3 })
-  })
-})
+    it('advances to the next position with its trackId', async () => {
+      const store = makeStore({
+        head: makeHead({ currentPlaying: 0 }),
+        ordered: ['a', 'b', 'c'],
+      })
+      await playNextAction(store as unknown as LiveStore)
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueuePositionChanged')
+      expect(args).toEqual({ queueId: 'default', position: 1, trackId: 'b' })
+    })
 
-describe('playNextAction', () => {
-  it('warns and commits nothing when there is no queue', async () => {
-    const store = makeStore([])
-    await playNextAction(store as unknown as LiveStore)
-    expect(console.warn).toHaveBeenCalledWith('[playNextAction] Queue default not found')
-    expect(store.commit).not.toHaveBeenCalled()
-  })
+    it('does not commit at the end when repeat is off', async () => {
+      const store = makeStore({
+        head: makeHead({ currentPlaying: 2 }),
+        ordered: ['a', 'b', 'c'],
+      })
+      await playNextAction(store as unknown as LiveStore)
+      expect(store.commit).not.toHaveBeenCalled()
+    })
 
-  it('commits the advanced position with the resolved trackId', async () => {
-    const store = makeStore([makeRow({ currentPlaying: 0 })])
-    await playNextAction(store as unknown as LiveStore)
-    const [ev] = committed(store)
-    expect(ev.name).toBe('v1.QueuePositionChanged')
-    expect(ev.args).toEqual({ queueId: 'default', position: 1, trackId: 'b' })
-  })
+    it('wraps to position 0 with the first trackId when repeat is on', async () => {
+      const store = makeStore({
+        head: makeHead({ currentPlaying: 2, repeat: true }),
+        ordered: ['a', 'b', 'c'],
+      })
+      await playNextAction(store as unknown as LiveStore)
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueuePositionChanged')
+      expect(args).toEqual({ queueId: 'default', position: 0, trackId: 'a' })
+    })
 
-  it('commits nothing at the end of the queue when repeat is off', async () => {
-    const store = makeStore([makeRow({ currentPlaying: 2 })])
-    await playNextAction(store as unknown as LiveStore)
-    expect(store.commit).not.toHaveBeenCalled()
-  })
-
-  it('wraps to position 0 when repeat is on', async () => {
-    const store = makeStore([makeRow({ currentPlaying: 2, repeat: true })])
-    await playNextAction(store as unknown as LiveStore)
-    const [ev] = committed(store)
-    expect(ev.args).toEqual({ queueId: 'default', position: 0, trackId: 'a' })
-  })
-
-  it('navigates the shuffled list when shuffle is on', async () => {
-    const store = makeStore([
-      makeRow({ randomTrackIds: JSON.stringify(['c', 'a', 'b']), shuffle: true, currentPlaying: 1 }),
-    ])
-    await playNextAction(store as unknown as LiveStore)
-    const [ev] = committed(store)
-    expect(ev.args).toEqual({ queueId: 'default', position: 2, trackId: 'b' })
-  })
-})
-
-describe('playPreviousAction', () => {
-  it('warns and commits nothing when there is no queue', async () => {
-    const store = makeStore([])
-    await playPreviousAction(store as unknown as LiveStore)
-    expect(console.warn).toHaveBeenCalledWith('[playPreviousAction] Queue default not found')
-    expect(store.commit).not.toHaveBeenCalled()
+    it('advances within the random list when shuffle is on', async () => {
+      const store = makeStore({
+        head: makeHead({ currentPlaying: 1, shuffle: true }),
+        ordered: ['a', 'b', 'c'],
+        random: ['c', 'a', 'b'],
+      })
+      await playNextAction(store as unknown as LiveStore)
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueuePositionChanged')
+      expect(args).toEqual({ queueId: 'default', position: 2, trackId: 'b' })
+    })
   })
 
-  it('commits the previous position with the resolved trackId', async () => {
-    const store = makeStore([makeRow({ currentPlaying: 1 })])
-    await playPreviousAction(store as unknown as LiveStore)
-    const [ev] = committed(store)
-    expect(ev.args).toEqual({ queueId: 'default', position: 0, trackId: 'a' })
+  describe('playPreviousAction', () => {
+    it('warns when no queue exists', async () => {
+      const store = makeStore(null)
+      await playPreviousAction(store as unknown as LiveStore)
+      expect(console.warn).toHaveBeenCalledWith('[playPreviousAction] Queue default not found')
+      expect(store.commit).not.toHaveBeenCalled()
+    })
+
+    it('goes back one position with its trackId', async () => {
+      const store = makeStore({
+        head: makeHead({ currentPlaying: 1 }),
+        ordered: ['a', 'b', 'c'],
+      })
+      await playPreviousAction(store as unknown as LiveStore)
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueuePositionChanged')
+      expect(args).toEqual({ queueId: 'default', position: 0, trackId: 'a' })
+    })
+
+    it('stays at position 0 when repeat is off (commits with no trackId)', async () => {
+      const store = makeStore({
+        head: makeHead({ currentPlaying: 0 }),
+        ordered: ['a', 'b', 'c'],
+      })
+      await playPreviousAction(store as unknown as LiveStore)
+      expect(store.commit).toHaveBeenCalledTimes(1)
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueuePositionChanged')
+      expect(args).toEqual({ queueId: 'default', position: 0, trackId: undefined })
+    })
+
+    it('wraps to the last position with its trackId when repeat is on', async () => {
+      const store = makeStore({
+        head: makeHead({ currentPlaying: 0, repeat: true }),
+        ordered: ['a', 'b', 'c'],
+      })
+      await playPreviousAction(store as unknown as LiveStore)
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueuePositionChanged')
+      expect(args).toEqual({ queueId: 'default', position: 2, trackId: 'c' })
+    })
+
+    it('commits position 0 with no trackId for an empty list', async () => {
+      const store = makeStore({ head: makeHead(), ordered: [] })
+      await playPreviousAction(store as unknown as LiveStore)
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueuePositionChanged')
+      expect(args).toEqual({ queueId: 'default', position: 0, trackId: undefined })
+    })
   })
 
-  it('commits a stay-put event at position 0 when repeat is off (always commits)', async () => {
-    const store = makeStore([makeRow({ currentPlaying: 0 })])
-    await playPreviousAction(store as unknown as LiveStore)
-    expect(store.commit).toHaveBeenCalledTimes(1)
-    const [ev] = committed(store)
-    expect(ev.args).toEqual({ queueId: 'default', position: 0, trackId: 'a' })
-  })
+  describe('playMediaAction', () => {
+    it('warns when no queue exists', async () => {
+      const store = makeStore(null)
+      await playMediaAction(store as unknown as LiveStore, 'c')
+      expect(console.warn).toHaveBeenCalledWith('[playMediaAction] Queue default not found')
+      expect(store.commit).not.toHaveBeenCalled()
+    })
 
-  it('wraps to the end when repeat is on at position 0', async () => {
-    const store = makeStore([makeRow({ currentPlaying: 0, repeat: true })])
-    await playPreviousAction(store as unknown as LiveStore)
-    const [ev] = committed(store)
-    expect(ev.args).toEqual({ queueId: 'default', position: 2, trackId: 'c' })
-  })
+    it('jumps to the media position with its trackId', async () => {
+      const store = makeStore({ ordered: ['a', 'b', 'c'] })
+      await playMediaAction(store as unknown as LiveStore, 'c')
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueuePositionChanged')
+      expect(args).toEqual({ queueId: 'default', position: 2, trackId: 'c' })
+    })
 
-  it('emits an undefined trackId for an empty active list (suspected bug #1, locked in)', async () => {
-    const store = makeStore([makeRow({ trackIds: '[]', randomTrackIds: null })])
-    await playPreviousAction(store as unknown as LiveStore)
-    expect(store.commit).toHaveBeenCalledTimes(1)
-    const [ev] = committed(store)
-    expect(ev.args.position).toBe(0)
-    expect(ev.args.trackId).toBeUndefined()
-  })
-})
+    it('warns and does not commit when the media is not in the queue', async () => {
+      const store = makeStore({ ordered: ['a', 'b', 'c'] })
+      await playMediaAction(store as unknown as LiveStore, 'z')
+      expect(console.warn).toHaveBeenCalledWith('[playMediaAction] Media z not found in queue')
+      expect(store.commit).not.toHaveBeenCalled()
+    })
 
-describe('playMediaAction', () => {
-  it('warns and commits nothing when there is no queue', async () => {
-    const store = makeStore([])
-    await playMediaAction(store as unknown as LiveStore, 'a')
-    expect(console.warn).toHaveBeenCalledWith('[playMediaAction] Queue default not found')
-    expect(store.commit).not.toHaveBeenCalled()
-  })
-
-  it('commits the found position with the trackId', async () => {
-    const store = makeStore([makeRow({ currentPlaying: null })])
-    await playMediaAction(store as unknown as LiveStore, 'c')
-    const [ev] = committed(store)
-    expect(ev.args).toEqual({ queueId: 'default', position: 2, trackId: 'c' })
-  })
-
-  it('warns and commits nothing when the media is not in the active list', async () => {
-    const store = makeStore([makeRow()])
-    await playMediaAction(store as unknown as LiveStore, 'z')
-    expect(console.warn).toHaveBeenCalledWith('[playMediaAction] Media z not found in queue')
-    expect(store.commit).not.toHaveBeenCalled()
-  })
-
-  it('finds the track through the shuffled list when shuffle is on', async () => {
-    const store = makeStore([
-      makeRow({ randomTrackIds: JSON.stringify(['c', 'a', 'b']), shuffle: true, currentPlaying: null }),
-    ])
-    await playMediaAction(store as unknown as LiveStore, 'b')
-    const [ev] = committed(store)
-    expect(ev.args).toEqual({ queueId: 'default', position: 2, trackId: 'b' })
+    it('resolves within the random list when shuffle is on', async () => {
+      const store = makeStore({
+        head: makeHead({ shuffle: true }),
+        ordered: ['a', 'b', 'c'],
+        random: ['c', 'a', 'b'],
+      })
+      await playMediaAction(store as unknown as LiveStore, 'b')
+      const [name, args] = committed(store)
+      expect(name).toBe('v1.QueuePositionChanged')
+      expect(args).toEqual({ queueId: 'default', position: 2, trackId: 'b' })
+    })
   })
 })
