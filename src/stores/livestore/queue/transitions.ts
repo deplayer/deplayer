@@ -23,7 +23,7 @@ import type {
   QueueRepeatToggledEvent,
   QueueClearedEvent,
 } from './types'
-import { getActiveTrackIds, parseIds, fisherYates } from './resolution'
+import { parseIds, fisherYates } from './resolution'
 
 /**
  * Replace the queue with new tracks, positioned at the first track.
@@ -248,69 +248,4 @@ export function toggleRepeat(
  */
 export function setCurrentPlaying(position: number): QueuePositionChangedEvent {
   return { queueId: 'default', position }
-}
-
-/**
- * Advance to the next track. At the end with repeat on, wraps to 0. At the
- * end with repeat off, returns `null` (no commit; playback stops).
- */
-export function playNext(
-  current: QueueState | null,
-): QueuePositionChangedEvent | null {
-  if (current === null) return null
-  const active = getActiveTrackIds(current)
-  if (active.length === 0) return null
-
-  const currentIndex = current.currentPlaying ?? -1
-  const nextIndex = currentIndex + 1
-
-  if (nextIndex < active.length) {
-    return { queueId: 'default', position: nextIndex, trackId: active[nextIndex] }
-  }
-  if (current.repeat && active.length > 0) {
-    return { queueId: 'default', position: 0, trackId: active[0] }
-  }
-  return null
-}
-
-/**
- * Go to the previous track. Always commits when a queue exists (even the
- * stay-put case at the start with repeat off). Returns `null` only when there
- * is no queue.
- */
-export function playPrevious(
-  current: QueueState | null,
-): QueuePositionChangedEvent | null {
-  if (current === null) return null
-  const active = getActiveTrackIds(current)
-  const currentIndex = current.currentPlaying ?? 0
-  const prevIndex = currentIndex - 1
-
-  let newPosition: number
-  if (prevIndex >= 0) {
-    newPosition = prevIndex
-  } else if (current.repeat && active.length > 0) {
-    newPosition = active.length - 1
-  } else {
-    newPosition = 0
-  }
-
-  // Edge: empty active list → active[newPosition] is undefined → trackId
-  // is undefined; the current code behaves identically (trackId optional).
-  return { queueId: 'default', position: newPosition, trackId: active[newPosition] }
-}
-
-/**
- * Play a specific track by ID (resolves its position in the active list).
- * Returns `null` when the track is not in the queue.
- */
-export function playMedia(
-  current: QueueState | null,
-  mediaId: string,
-): QueuePositionChangedEvent | null {
-  if (current === null) return null
-  const active = getActiveTrackIds(current)
-  const index = active.indexOf(mediaId)
-  if (index === -1) return null
-  return { queueId: 'default', position: index, trackId: mediaId }
 }

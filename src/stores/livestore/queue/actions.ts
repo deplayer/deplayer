@@ -212,7 +212,7 @@ export async function playPreviousAction(store: LiveStore): Promise<void> {
 
   const list = activeListName(head.shuffle)
   const cur = head.currentPlaying ?? 0
-  const [atPrev, last] = await readPrevRows(store, list, cur)
+  const [atPrev, last] = await readPrevRows(store, list, cur, head.repeat)
 
   // Always commits when a queue exists (even the stay-put case).
   const ev = stepPrevious(head, atPrev, last)
@@ -310,13 +310,19 @@ const readItemRows = async (
 
 /**
  * The previous step needs the row at `cur - 1` (when `cur > 0`) and, for
- * the repeat wrap, the highest-position row in the active list.
+ * the repeat wrap, the highest-position row in the active list. The wrap row
+ * is only fetched when the step can actually use it, so the common case
+ * (stepping back from a queue with repeat off) costs one point read.
  */
 const readPrevRows = async (
   store: LiveStore,
   list: string,
-  cur: number
+  cur: number,
+  repeat: boolean
 ): Promise<[QueueItemRow | null, QueueItemRow | null]> => {
+  const atPrev = cur > 0 ? await readItem(store, list, cur - 1) : null
+  if (atPrev !== null || !repeat) return [atPrev, null]
+
   const last = (
     await store.query(
       queryDb(
@@ -329,7 +335,5 @@ const readPrevRows = async (
       )
     ) as unknown as QueueItemRow[]
   )[0] ?? null
-
-  const atPrev = cur > 0 ? await readItem(store, list, cur - 1) : null
   return [atPrev, last]
 }

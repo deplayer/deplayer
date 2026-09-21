@@ -44,9 +44,6 @@ export {
   toggleShuffle,
   toggleRepeat,
   setCurrentPlaying,
-  playNext,
-  playPrevious,
-  playMedia,
 } from './transitions'
 
 export { readQueue, resolveCurrentPlayingSongId } from './storeReaders'
