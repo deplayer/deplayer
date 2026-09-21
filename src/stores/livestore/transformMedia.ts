@@ -1,4 +1,5 @@
 import type { MediaRow } from '../../types/media'
+import { parseGenresCsv } from '../../utils/genres'
 
 /**
  * Transform raw LiveStore media row into MediaRow with parsed JSON fields.
@@ -30,15 +31,6 @@ export function rawToMediaRow(raw: unknown): MediaRow | null {
     ...r,
     stream: parseJson(r.stream, {}),
     cover: parseJson(r.cover, null) as MediaRow['cover'],
-    genres: parseGenres(r.genresFlat),
+    genres: parseGenresCsv(r.genresFlat),
   } as unknown as MediaRow
-}
-
-/** Display genres derived from the comma-joined `genresFlat` column. */
-const parseGenres = (val: unknown): string[] => {
-  if (typeof val !== 'string' || val.length === 0) return []
-  return val
-    .split(',')
-    .map((genre) => genre.trim())
-    .filter((genre) => genre.length > 0)
 }

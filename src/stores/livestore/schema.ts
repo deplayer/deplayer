@@ -9,7 +9,7 @@
 // v0.5  (2026-07-17) Moved performance-critical indexes to declarative table
 //         definitions. Removed boot-time index/backfill setup.
 // v0.4  (2026-07-13) Added media_genres indexed read model table.
-//         - Maintained by media materializers (normalizeGenreRows helper).
+//         - Maintained by media materializers (genreRowsFor helper).
 //         - Replaces unbounded genre-to-track-ID map allocations in useGenres
 //           and useCollectionData that caused V8 OOM during provider sync.
 // v0.3  Added playback_history table (decoupled from media to avoid reactive cascade).
@@ -315,9 +315,11 @@ export const events = {
 // MATERIALIZERS - Map events to SQLite operations
 // ============================================================================
 
-// Normalize genre array into media_genres insert-or-ignore operations.
-const normalizeGenreRows = (mediaId: string, genres: readonly string[] | undefined, now: number) =>
-  normalizeGenres(genres).map((genre) =>
+// Insert-or-ignore operations for one media's genre membership. Takes the
+// already-normalized list, so a write normalizes once and derives both the
+// CSV column and these rows from the same list.
+const genreRowsFor = (mediaId: string, genres: readonly string[], now: number) =>
+  genres.map((genre) =>
     tables.mediaGenres
       .insert({
         id: JSON.stringify([mediaId, genre]),
@@ -362,7 +364,8 @@ const materializers = State.SQLite.materializers(events, {
     const { id, title, artist, album, type, duration, track, discNumber, stream, cover, genres, externalId, shareUrl, filePath } = event
     
     // Compute denormalized fields for fast queries
-    const genresFlat = normalizeGenres(genres).join(',')
+    const genresList = normalizeGenres(genres)
+    const genresFlat = genresList.join(',')
     const providersFlat = stream ? Object.keys(stream).join(',') : ''
     
     // Return array of operations: insert artist, insert album, insert media
@@ -433,13 +436,15 @@ const materializers = State.SQLite.materializers(events, {
           providersFlat,
           updatedAt: now,
         }),
-      ...normalizeGenreRows(id, genres, now),
+      ...genreRowsFor(id, genresList, now),
     ]
   },
 
   'v1.MediaUpdated': ({ id, title, duration, stream, cover, genres }: { readonly id: string; readonly title?: string; readonly duration?: number; readonly stream?: unknown; readonly cover?: unknown; readonly genres?: readonly string[] }) => {
     const now = Date.now()
     const updates: Record<string, unknown> = { updatedAt: now }
+    // Normalized once: the CSV column and the media_genres rows share it.
+    const genresList = genres === undefined ? null : normalizeGenres(genres)
     if (title !== undefined) updates.title = title
     if (duration !== undefined) updates.duration = duration
     if (stream !== undefined) {
@@ -448,17 +453,17 @@ const materializers = State.SQLite.materializers(events, {
       updates.providersFlat = stream ? Object.keys(stream).join(',') : ''
     }
     if (cover !== undefined) updates.cover = cover
-    if (genres !== undefined) {
+    if (genresList !== null) {
       // Update denormalized genres
-      updates.genresFlat = normalizeGenres(genres).join(',')
+      updates.genresFlat = genresList.join(',')
     }
 
     const mediaUpdate = tables.media.update(updates).where('id', '=', id)
-    if (genres === undefined) return mediaUpdate
+    if (genresList === null) return mediaUpdate
     return [
       mediaUpdate,
       tables.mediaGenres.delete().where('mediaId', '=', id),
-      ...normalizeGenreRows(id, genres, now),
+      ...genreRowsFor(id, genresList, now),
     ]
   },
 
@@ -544,7 +549,8 @@ const materializers = State.SQLite.materializers(events, {
     // Insert all media items (unavoidable - one per item)
     for (const item of event.media) {
       // Compute denormalized fields for fast queries
-      const genresFlat = normalizeGenres(item.genres).join(',')
+      const genresList = normalizeGenres(item.genres)
+      const genresFlat = genresList.join(',')
       const providersFlat = item.stream ? Object.keys(item.stream).join(',') : ''
       
       operations.push(
@@ -573,7 +579,7 @@ const materializers = State.SQLite.materializers(events, {
           })
           .onConflict('id', 'ignore')
       )
-      operations.push(...normalizeGenreRows(item.id, item.genres, now))
+      operations.push(...genreRowsFor(item.id, genresList, now))
     }
     
     return operations
@@ -594,6 +600,7 @@ const materializers = State.SQLite.materializers(events, {
       // Full-field sync of an existing row. The id is content-derived, so
       // title/artist/album fields are identical to what is stored; the
       // fields that can actually differ are the ones the id does not cover.
+      const genresList = normalizeGenres(item.genres)
       return [
         tables.media
           .update({
@@ -611,14 +618,14 @@ const materializers = State.SQLite.materializers(events, {
             filePath: item.filePath ?? null,
             artistName: item.artist.name,
             albumName: item.album.name,
-            genresFlat: normalizeGenres(item.genres).join(','),
+            genresFlat: genresList.join(','),
             providersFlat: item.stream ? Object.keys(item.stream).join(',') : '',
             updatedAt: now,
           })
           .where('id', '=', item.id),
         // Genre membership is derived state: rebuild it for updated rows.
         tables.mediaGenres.delete().where('mediaId', '=', item.id),
-        ...normalizeGenreRows(item.id, item.genres, now),
+        ...genreRowsFor(item.id, genresList, now),
       ]
     })
   },

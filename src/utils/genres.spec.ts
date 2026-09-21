@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { normalizeGenres } from './genres'
+import { normalizeGenres, parseGenresCsv } from './genres'
 
 describe('normalizeGenres', () => {
   it('trims entries', () => {
@@ -31,5 +31,23 @@ describe('normalizeGenres', () => {
     // Both genre representations are written from this result, so a
     // whitespace-padded input must not yield 'Rock ,Punk' anywhere.
     expect(normalizeGenres(['Rock ', ' Punk', 'Rock']).join(',')).toBe('Rock,Punk')
+  })
+})
+
+describe('parseGenresCsv', () => {
+  it('splits entries, trimming each and dropping blanks', () => {
+    expect(parseGenresCsv(' rock , ,punk ')).toEqual(['rock', 'punk'])
+  })
+
+  it('returns an empty list for absent or non-string input', () => {
+    expect(parseGenresCsv(undefined)).toEqual([])
+    expect(parseGenresCsv(null)).toEqual([])
+    expect(parseGenresCsv(42)).toEqual([])
+    expect(parseGenresCsv('')).toEqual([])
+  })
+
+  it('round-trips the encoding the column is written with', () => {
+    const genres = normalizeGenres([' Rock ', 'Punk', 'Rock', ''])
+    expect(parseGenresCsv(genres.join(','))).toEqual(genres)
   })
 })

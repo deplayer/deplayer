@@ -30,12 +30,27 @@ export type PlaylistRow = {
   trackIds: string[]
 }
 
-/** Track ids of one playlist, in stored order. */
-const trackIdsForPlaylist = (items: readonly PlaylistItemRow[], playlistId: string): string[] =>
-  items
-    .filter((item) => item.playlistId === playlistId)
-    .sort((a, b) => a.position - b.position)
-    .map((item) => item.trackId)
+/**
+ * Track ids of every playlist, grouped in a single pass, each bucket in
+ * stored order.
+ */
+const groupTrackIds = (items: readonly PlaylistItemRow[]): Map<string, string[]> => {
+  const grouped = new Map<string, PlaylistItemRow[]>()
+  for (const item of items) {
+    const bucket = grouped.get(item.playlistId)
+    if (bucket) bucket.push(item)
+    else grouped.set(item.playlistId, [item])
+  }
+
+  const trackIds = new Map<string, string[]>()
+  for (const [playlistId, bucket] of grouped) {
+    trackIds.set(
+      playlistId,
+      bucket.sort((a, b) => a.position - b.position).map((item) => item.trackId)
+    )
+  }
+  return trackIds
+}
 
 /**
  * Get all playlists, each with its assembled `trackIds`.
@@ -61,10 +76,12 @@ export const usePlaylists = (): PlaylistRow[] => {
 
   return useMemo(() => {
     if (!Array.isArray(rows)) return []
-    const itemRows = (Array.isArray(items) ? items : []) as unknown as PlaylistItemRow[]
-    return (rows as unknown as PlaylistRow[]).map((row) => ({
+    const byPlaylist = groupTrackIds(
+      (Array.isArray(items) ? items : []) as unknown as PlaylistItemRow[]
+    )
+    return (rows as unknown as Omit<PlaylistRow, 'trackIds'>[]).map((row) => ({
       ...row,
-      trackIds: trackIdsForPlaylist(itemRows, row.id),
+      trackIds: byPlaylist.get(row.id) ?? [],
     }))
   }, [rows, items])
 }
@@ -98,11 +115,11 @@ export const usePlaylistById = (id: string | null | undefined): PlaylistRow | nu
   )
 
   return useMemo(() => {
-    const row = (rows as unknown as PlaylistRow[] | undefined)?.[0]
+    const row = (rows as unknown as Omit<PlaylistRow, 'trackIds'>[] | undefined)?.[0]
     if (!row) return null
     return {
       ...row,
-      trackIds: trackIdsForPlaylist(items as unknown as PlaylistItemRow[], row.id),
+      trackIds: groupTrackIds(items as unknown as PlaylistItemRow[]).get(row.id) ?? [],
     }
   }, [rows, items])
 }

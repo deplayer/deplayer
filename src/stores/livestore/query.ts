@@ -21,10 +21,13 @@ export const NO_MATCH_ID = '__NONE__'
  * Canonical media column projection for raw SQL over `media`.
  *
  * Covers what both raw-query call sites read: the collection window rows and
- * the SongView genre list. One list feeds the SQL text and the decode schema,
- * so a new column is added in exactly one place.
+ * the SongView genre list. It is the superset of the two, so collection rows
+ * now carry `discNumber` and `playCount` where they previously did not.
+ *
+ * Deliberately module-private: call sites use the derived SQL and decode
+ * schema below, so no one hand-builds a projection that can drift from them.
  */
-export const MEDIA_ROW_COLUMNS = [
+const MEDIA_ROW_COLUMNS = [
   'id',
   'title',
   'track',

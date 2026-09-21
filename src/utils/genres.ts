@@ -16,3 +16,17 @@ export const normalizeGenres = (input?: readonly string[] | string | null): stri
     new Set(list.map((genre) => genre.trim()).filter((genre) => genre.length > 0))
   )
 }
+
+/**
+ * Inverse of `normalizeGenres(...).join(',')`, the encoding used for the
+ * `genresFlat` column: splits the CSV, trims entries, drops blanks.
+ *
+ * Lives beside its writer so the pair cannot drift.
+ */
+export const parseGenresCsv = (val: unknown): string[] => {
+  if (typeof val !== 'string' || val.length === 0) return []
+  return val
+    .split(',')
+    .map((genre) => genre.trim())
+    .filter((genre) => genre.length > 0)
+}
