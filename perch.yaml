@@ -1,0 +1,5 @@
+- name: no-console-log
+  where: "src/**"
+  ensure: >-
+    Production code does not print with console.log; it uses the project's
+    logger (createLogger) so log levels apply.
