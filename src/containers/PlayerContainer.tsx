@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import PlayerControls from '../components/Player/PlayerControls'
 import { useLocation } from 'react-router'
@@ -7,11 +7,14 @@ import { useQueue, useSettings, useMediaById } from '../stores/livestore/hooks'
 import { getActiveTrackIds, resolveCurrentSongId } from '../stores/livestore/queue'
 import { useUIStore } from '../stores/uiStore'
 import { defaultState as settingsDefaultState } from '../reducers/settings'
-import { createHtmlPortalNode } from 'react-reverse-portal'
+import type { HtmlPortalNode } from 'react-reverse-portal'
 
 type Props = {
-  playerPortal: ReturnType<typeof createHtmlPortalNode>
+  playerPortal: HtmlPortalNode
 }
+
+// Stable identity so PlayerControls does not re-render on container re-renders
+const STATIC_MATCH = { params: {} }
 
 const PlayerContainer = ({ playerPortal }: Props) => {
   const dispatch = useDispatch()
@@ -29,7 +32,7 @@ const PlayerContainer = ({ playerPortal }: Props) => {
   const lastValidCurrentPlayingIdRef = useRef<string | null>(null)
 
   // Get the active track list based on shuffle state
-  const trackIds = getActiveTrackIds(liveQueue)
+  const trackIds = useMemo(() => getActiveTrackIds(liveQueue), [liveQueue])
 
   // Resolve the active track id using the shared persisted-ID-first resolution.
   // Falling back to the last valid id (when streamUri is live but the index
@@ -47,23 +50,27 @@ const PlayerContainer = ({ playerPortal }: Props) => {
   // to the resolved active track id (persisted-id-first, with the last-valid
   // fallback). The raw index stays untouched; PlayerControls keys off
   // currentTrackId for its row lookup.
-  const queue = liveQueue
-    ? { ...liveQueue, currentTrackId: currentPlayingId }
-    : null
+  const queue = useMemo(
+    () => (liveQueue ? { ...liveQueue, currentTrackId: currentPlayingId } : null),
+    [liveQueue, currentPlayingId]
+  )
 
   // Convert LiveStore settings to Redux-compatible format
-  const settings = liveSettings ? {
-    ...settingsDefaultState,
-    settings: liveSettings,
-  } : settingsDefaultState
+  const settings = useMemo(
+    () => (liveSettings ? { ...settingsDefaultState, settings: liveSettings } : settingsDefaultState),
+    [liveSettings]
+  )
 
   // PlayerControls only reads collection.rows[currentPlayingId]. Single-entry
   // map keyed by the active track avoids materializing the queue.
-  const collection = {
-    rows: currentMedia && currentPlayingId
-      ? { [currentPlayingId]: currentMedia }
-      : {}
-  }
+  const collection = useMemo(
+    () => ({
+      rows: currentMedia && currentPlayingId
+        ? { [currentPlayingId]: currentMedia }
+        : {}
+    }),
+    [currentMedia, currentPlayingId]
+  )
 
   return (
     <PlayerControls
@@ -75,7 +82,7 @@ const PlayerContainer = ({ playerPortal }: Props) => {
       playerPortal={playerPortal}
       dispatch={dispatch}
       location={location}
-      match={{ params: {} }}
+      match={STATIC_MATCH}
       queue={queue}
       settings={settings}
       collection={collection}
