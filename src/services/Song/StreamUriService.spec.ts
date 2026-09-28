@@ -23,14 +23,17 @@ const song = (service: string, uri: string): MediaRow =>
   ({ stream: { p1: { service, uris: [{ uri }] } } }) as unknown as MediaRow
 
 describe('getStreamUri', () => {
-  it('returns a blob-kind source for opfs files', async () => {
-    (readFile as Mock).mockResolvedValue({ unwrap: () => new ArrayBuffer(8) })
+  it('reads opfs files as a zero-copy File (no ArrayBuffer/Blob copy)', async () => {
+    const file = new File([new Uint8Array(8)], 'track.mp3', { type: 'audio/mpeg' })
+    ;(readFile as Mock).mockResolvedValue({ unwrap: () => file })
 
     const source = await getStreamUri(song('opfs', 'opfs://track.mp3'), 0)
 
     expect(source.kind).toBe('blob')
     expect(source.url).toBe('blob:mock')
+    expect(readFile).toHaveBeenCalledWith('/track.mp3', { encoding: 'blob' })
     expect(createObjectURL).toHaveBeenCalledTimes(1)
+    expect(createObjectURL).toHaveBeenCalledWith(file)
   })
 
   it('returns a blob-kind source for filesystem File handlers', async () => {

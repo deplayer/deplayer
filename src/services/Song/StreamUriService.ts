@@ -8,9 +8,9 @@ const logger = createLogger({ namespace: "StreamUriService" });
 
 /**
  * Stream source — a resolved play target. Blob-kind URLs are object URLs
- * created by this service (whole local file in memory); the service owns
- * them and releaseStreamSource must be called when playback moves on.
- * Remote URLs need no release.
+ * over local files (OPFS File / filesystem File — no in-memory copy); the
+ * service owns them and releaseStreamSource must be called when playback
+ * moves on. Remote URLs need no release.
  */
 export interface StreamSource {
   url: string;
@@ -52,12 +52,14 @@ async function handleOpfs(streamUri: string | null): Promise<StreamSource> {
 
   const fixedStreamUri = streamUri?.replace("opfs://", "/");
 
-  const file = await readFile(fixedStreamUri);
-  const fileArrayBuffer = file.unwrap();
+  // Zero-copy: the native File references OPFS storage directly, so the
+  // audio element streams from disk. The previous binary read materialized
+  // the whole track as an ArrayBuffer and copied it again into a Blob —
+  // two full-file copies in JS per resolution, on every play/next/prev and
+  // on every SongView provider refresh, which janked the main thread.
+  const file = await readFile(fixedStreamUri, { encoding: "blob" });
 
-  const blob = new Blob([fileArrayBuffer], { type: "audio/mpeg" });
-
-  return { url: URL.createObjectURL(blob), kind: "blob" };
+  return { url: URL.createObjectURL(file.unwrap()), kind: "blob" };
 }
 
 async function handleFilesystem(streamUri: string | null): Promise<StreamSource> {
@@ -99,7 +101,7 @@ async function handleFilesystem(streamUri: string | null): Promise<StreamSource>
 
 /**
  * Resolve the stream source for `song` from its `providerNum`-th provider.
- * Blob-kind sources pin the whole file in memory until releaseStreamSource.
+ * Blob-kind sources pin the local file via its object URL until releaseStreamSource.
  */
 export const getStreamUri = async (
   song: MediaRow,
