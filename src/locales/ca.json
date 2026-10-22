@@ -196,7 +196,8 @@
     "startSearch": "Començar a Cercar",
     "addProvider": "Afegir Proveïdor",
     "startSearchingForMusic": "Comença a cercar música per afegir a la col·lecció",
-    "addSearchableProvider": "Afegeix un proveïdor de cerca per començar a descobrir música"
+    "addSearchableProvider": "Afegeix un proveïdor de cerca per començar a descobrir música",
+    "songNotFound": "No s'ha trobat la cançó"
   },
   "peer": {
     "connectedPeers": "Parells connectats",
@@ -279,6 +280,18 @@
     "songs": "cançons",
     "playAll": "Reproduir tot",
     "shuffle": "Aleatori",
-    "showMore": "Veure més"
+    "showMore": "Veure més",
+    "play": "Reprodueix",
+    "lyrics": "Lletra",
+    "pin": "Desa al dispositiu",
+    "unpin": "Treu del dispositiu",
+    "more": "Més opcions",
+    "neverPlayed": "Mai reproduïda",
+    "playedTimes": "Reproduïda %{count} vegades",
+    "unknownArtist": "Artista desconegut",
+    "unknownAlbum": "Àlbum desconegut",
+    "playFrom": "Reprodueix des de %{service}",
+    "downloadFrom": "Descarrega des de %{service}",
+    "loadingLyrics": "Carregant la lletra…"
   }
 }

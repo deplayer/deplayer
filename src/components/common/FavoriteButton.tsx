@@ -1,3 +1,4 @@
+import { I18n } from 'react-redux-i18n'
 import React from 'react'
 import { useAppStore } from '../../stores/livestore/store'
 import { useFavoriteIds } from '../../stores/livestore/hooks'
@@ -39,12 +40,13 @@ const FavoriteButton: React.FC<Props> = React.memo(({ songId, className = '', fa
     <button
       onClick={toggleFavorite}
       className={`p-2 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${className}`}
-      aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+      aria-label={I18n.t(isFavorite ? 'favorites.removeFromFavorites' : 'favorites.addToFavorites')}
       aria-pressed={isFavorite}
     >
       <svg
         className={`w-5 h-5 ${isFavorite ? 'text-error fill-current' : 'text-base-content/50 hover:text-error'}`}
         viewBox="0 0 24 24"
+        fill={isFavorite ? 'currentColor' : 'none'}
         stroke="currentColor"
         strokeWidth="2"
       >

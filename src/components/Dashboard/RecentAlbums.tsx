@@ -1,4 +1,4 @@
-import { Translate } from 'react-redux-i18n'
+import { I18n, Translate } from 'react-redux-i18n'
 import HorizontalSlider from '../HorizontalSlider'
 import AlbumCover from '../common/AlbumCover'
 import { useMemo } from 'react'
@@ -55,7 +55,7 @@ const RecentAlbums = () => {
   // Map LiveStore albums to expected format with artist names
   const albumsWithArtists = (recentAlbums as unknown as AlbumRow[]).map(album => ({
     ...album,
-    artistName: artistsMap[album.artistId]?.name || 'Unknown Artist'
+    artistName: artistsMap[album.artistId]?.name || I18n.t('common.unknownArtist')
   }))
 
   return (

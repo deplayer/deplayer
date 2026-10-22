@@ -1,4 +1,5 @@
 import React from 'react'
+import { I18n } from 'react-redux-i18n'
 import HorizontalSlider from '../HorizontalSlider'
 import Spinner from '../Spinner'
 import MediaCover from '../common/AlbumCover'
@@ -18,7 +19,7 @@ const MediaCoverWrapper = ({ media }: MediaCoverProps) => {
     <MediaCover
       id={media.id}
       name={media.title}
-      artistName={media.artistName || 'Unknown Artist'}
+      artistName={media.artistName || I18n.t('common.unknownArtist')}
       cover={media.cover}
       playCount={media.playCount}
       showPlayCount

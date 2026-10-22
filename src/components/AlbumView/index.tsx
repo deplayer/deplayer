@@ -2,7 +2,7 @@ import { useDispatch } from 'react-redux'
 import { useMatch } from 'react-router'
 import { redirect, Link } from 'react-router-dom'
 import { useMemo } from 'react'
-import { Translate } from 'react-redux-i18n'
+import { I18n, Translate } from 'react-redux-i18n'
 
 import HeroSection from '../common/HeroSection'
 import CoverImage from '../MusicTable/CoverImage'
@@ -13,7 +13,7 @@ import RelatedAlbums from '../RelatedAlbums'
 import BecauseYouListened from '../BecauseYouListened'
 import * as types from '../../constants/ActionTypes'
 import { getDurationStr } from '../../utils/timeFormatter'
-import type { AlbumRow } from '../../types/media'
+import type { AlbumRow, MediaRow } from '../../types/media'
 import { useAlbumById, useMediaByAlbum, useAlbumsByArtist } from '../../stores/livestore/hooks'
 
 export default function AlbumView() {
@@ -26,7 +26,7 @@ export default function AlbumView() {
   const relatedAlbumsData = useAlbumsByArtist(album?.artistId)
 
   const { songIds, mediaMap, totalDuration, genres } = useMemo(() => {
-    const map: Record<string, unknown> = {}
+    const map: Record<string, MediaRow> = {}
     const ids: string[] = []
     let duration = 0
     const genreSet = new Set<string>()
@@ -88,7 +88,7 @@ export default function AlbumView() {
           <div className="flex items-center gap-2 text-sm opacity-80 flex-wrap">
             {album.artistId && (
               <Link to={`/artist/${album.artistId}`} className="hover:underline font-medium">
-                {album.artistName || 'Unknown Artist'}
+                {album.artistName || I18n.t('common.unknownArtist')}
               </Link>
             )}
             {album.year && <span>• {album.year}</span>}

@@ -216,7 +216,8 @@
     "startSearch": "Start Searching",
     "addProvider": "Add Provider",
     "startSearchingForMusic": "Start searching for music to add to your collection",
-    "addSearchableProvider": "Add a searchable provider to start discovering music"
+    "addSearchableProvider": "Add a searchable provider to start discovering music",
+    "songNotFound": "The requested song can not be found"
   },
   "peer": {
     "connectedPeers": "Connected peers",
@@ -299,6 +300,18 @@
     "songs": "songs",
     "playAll": "Play All",
     "shuffle": "Shuffle",
-    "showMore": "Show more"
+    "showMore": "Show more",
+    "play": "Play",
+    "lyrics": "Lyrics",
+    "pin": "Keep offline",
+    "unpin": "Remove offline copy",
+    "more": "More options",
+    "neverPlayed": "Never played",
+    "playedTimes": "Played %{count} times",
+    "unknownArtist": "Unknown artist",
+    "unknownAlbum": "Unknown album",
+    "playFrom": "Play from %{service}",
+    "downloadFrom": "Download from %{service}",
+    "loadingLyrics": "Loading lyrics…"
   }
 }

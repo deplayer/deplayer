@@ -1,3 +1,4 @@
+import { I18n } from 'react-redux-i18n'
 import { Link } from 'react-router-dom'
 import { getDurationStr } from '../../utils/timeFormatter'
 import Icon from '../common/Icon'
@@ -32,7 +33,7 @@ const DigitalScreen = (props: DigitalScreenProps) => {
               {currentPlaying.artistId && (
                 <Link to={`/artist/${currentPlaying.artistId}`} 
                       className='text-base-content/70 hover:text-primary-focus truncate pointer-events-auto uppercase'>
-                  <span className='text-sm tracking-widest'>{currentPlaying.artistName || 'Unknown Artist'}</span>
+                  <span className='text-sm tracking-widest'>{currentPlaying.artistName || I18n.t('common.unknownArtist')}</span>
                 </Link>
               )}
             </>

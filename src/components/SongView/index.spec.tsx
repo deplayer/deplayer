@@ -1,11 +1,10 @@
 import { screen } from '@testing-library/react'
 import { describe, it, expect, beforeAll, vi } from 'vitest'
+import type { ComponentProps } from 'react'
+import { createHtmlPortalNode } from 'react-reverse-portal'
 import SongView from './index'
 import type { MediaRow } from '../../types/media'
 import { renderWithProviders, defaultTestState, TestState } from '../../utils/test-utils'
-import { State as CollectionState } from '../../reducers/collection'
-import { State as PlayerState } from '../../reducers/player'
-import { Dispatch } from 'redux'
 
 vi.mock('../../stores/livestore/store', () => ({
   useAppStore: () => ({ commit: vi.fn() }),
@@ -31,16 +30,7 @@ vi.mock('../../stores/livestore/actions', () => ({
 }))
 
 
-interface Props {
-  playerPortal: any
-  location: Location
-  player: PlayerState
-  collection: CollectionState
-  songId: string
-  dispatch: Dispatch
-  loading: boolean
-  className?: string | null
-}
+type Props = ComponentProps<typeof SongView>
 
 // Mock IntersectionObserver
 beforeAll(() => {
@@ -96,7 +86,7 @@ const createTestProps = (customProps: Partial<Props> = {}): TestSetup => {
   const defaultProps: Props = {
     songId: song.id,
     dispatch: vi.fn(),
-    playerPortal: document.createElement('div'),
+    playerPortal: createHtmlPortalNode(),
     loading: false,
     className: '',
     collection: {

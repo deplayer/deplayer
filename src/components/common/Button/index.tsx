@@ -41,8 +41,6 @@ const Button = (props: Props) => {
     'transition-all': true,
     'duration-200': true,
     'ease-in-out': true,
-    'font-mono': true,
-    'tracking-wider': true,
     'text-shadow-sm': true,
     'disabled:opacity-50': true,
     'disabled:cursor-not-allowed': true,

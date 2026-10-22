@@ -1,3 +1,4 @@
+import { I18n } from 'react-redux-i18n'
 import { Dispatch } from 'redux'
 import { Location } from 'react-router-dom'
 import React from 'react'
@@ -132,7 +133,7 @@ class PlayerControls extends React.Component<Props, State> {
     }
 
     const options: NotificationOptions = {
-      body: `${track.artistName || 'Unknown Artist'} - ${track.albumName || 'Unknown Album'}`,
+      body: `${track.artistName || I18n.t('common.unknownArtist')} - ${track.albumName || I18n.t('common.unknownAlbum')}`,
       icon: track.cover?.thumbnailUrl || track.cover?.fullUrl,
       silent: true,
       tag: 'now-playing',

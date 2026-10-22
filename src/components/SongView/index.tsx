@@ -1,6 +1,6 @@
 import { Dispatch } from 'redux'
 import { Link, useNavigate } from 'react-router-dom'
-import { Translate } from 'react-redux-i18n'
+import { I18n, Translate } from 'react-redux-i18n'
 import * as React from 'react'
 import { AutoSizer } from 'react-virtualized'
 
@@ -105,7 +105,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
   const becauseYouListenedBlock = React.useMemo(
     () => (song?.artistId && genres.length > 0 ? (
       <div className="mt-8 overflow-hidden">
-        <BecauseYouListened artistId={song.artistId} artistName={song.artistName || 'Unknown'} genres={genres} />
+        <BecauseYouListened artistId={song.artistId} artistName={song.artistName || I18n.t('common.unknownArtist')} genres={genres} />
       </div>
     ) : null),
     [song?.artistId, song?.artistName, genres]
@@ -172,7 +172,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
   }
 
   if (!song || !song.id) {
-    return <CenteredMessage><div className='text-center'>The requested song can not be found</div></CenteredMessage>
+    return <CenteredMessage><div className='text-center'><Translate value='message.songNotFound' /></div></CenteredMessage>
   }
 
   const songFinder = song.id === currentPlaying
@@ -195,15 +195,33 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
     navigate('/collection')
   }
 
-  const typeIcon = song.type === 'audio' ? <Icon className='pr-2' icon='faMusic' /> : <Icon className='pr-2' icon='faVideo' />
-  const flexDirection = song.type === 'video' ? 'flex-col' : 'flex-row'
-  const imageSize = song.type === 'video' ? 'w-full' : 'md:m-6 md:rounded-b-lg image lg:max-w-md xl:max-w-xl'
+  const typeIcon = song.type === 'audio' ? <Icon className='mr-1' icon='faMusic' /> : <Icon className='mr-1' icon='faVideo' />
+  // Side-by-side only from lg: below it a shrink-0 full-width cover squeezes the info column to ~0px.
+  const flexDirection = song.type === 'video' ? 'flex-col' : 'flex-col lg:flex-row'
+  const imageSize = song.type === 'video' ? 'w-full' : 'p-4 sm:p-6 sm:max-w-md sm:mx-auto lg:mx-0 lg:max-w-md xl:max-w-xl'
+  const inQueue = trackIds.includes(song.id)
+  const playCount = song.playCount ?? 0
+  const iconButton = 'btn btn-circle btn-ghost border border-base-content/20 hover:border-base-content/40'
+
+  const togglePin = () => {
+    dispatch({ type: pinned ? types.UNPIN_SONG : types.PIN_SONG, songId: song.id })
+    setPinnedSong(!pinned)
+  }
+
+  const toggleQueue = async () => {
+    if (!liveStore) return
+    if (inQueue) {
+      await removeFromQueueAction(liveStore, song.id)
+    } else {
+      await addToQueueAction(liveStore, [song.id])
+    }
+  }
 
   return (
     <div data-testid="song-view" className={`song-view ${className} w-full overflow-y-auto z-10 flex flex-col`}>
-      <div className={`song sm:flex ${flexDirection}`}>
-        <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className={`w-full shrink-0 ${imageSize}`}>
-          <div className='flex flex-col w-full md:sticky md:top-0 h-full'>
+      <div className={`song flex ${flexDirection}`}>
+        <div className={`w-full shrink-0 ${imageSize}`}>
+          <div className='flex flex-col w-full lg:sticky lg:top-0 rounded-lg overflow-hidden'>
             {songFinder && song.type === 'video' && (
               <OutPortal
                 id='player-portal'
@@ -215,153 +233,107 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
                 useImage
                 cover={song.cover || undefined}
                 size='full'
-                albumName={song.albumName || 'N/A'}
+                albumName={song.albumName || I18n.t('common.unknownAlbum')}
               />
             }
-
-            <div className='btn-group md:mx-0 flex items-center flex-wrap p-4'>
-              {(!songFinder || !player.playing) &&
-                <Button
-                  large
-                  onClick={() => {
-                    dispatch({ type: types.PLAY_SONG, songId: song.id })
-                  }}
-                >
-                  <Icon
-                    icon='faPlay'
-                    className='mr-2'
-                  />
-                  <Translate value="common.play" />
-                </Button>
-              }
-
-              {!trackIds.includes(song.id) &&
-                <Button
-                  transparent
-                  alignLeft
-                  onClick={async () => {
-                    if (liveStore) {
-                      await addToQueueAction(liveStore, [song.id])
-                    }
-                  }}
-                >
-                  <Icon
-                    icon='faPlusCircle'
-                    className='mx-2'
-                  />
-                  <Translate value='buttons.addToQueue' />
-                </Button>
-              }
-
-              {trackIds.includes(song.id) &&
-                <Button
-                  transparent
-                  alignLeft
-                  onClick={async () => {
-                    if (liveStore) {
-                      await removeFromQueueAction(liveStore, song.id)
-                    }
-                  }}
-                >
-                  <Icon
-                    icon='faMinusCircle'
-                    className='mx-2'
-                  />
-                  <Translate value='buttons.removeFromQueue' />
-                </Button>
-              }
-
-              <Button
-                large
-                transparent
-                onClick={() => {
-                  setShowLyrics(true)
-                }}
-              >
-                <Icon
-                  icon='faScroll'
-                  className='mr-2'
-                />
-                <Translate value="common.lyrics" />
-              </Button>
-
-              <Button
-                large
-                transparent
-                onClick={() => {
-                  if (!pinned) {
-                    dispatch({ type: types.PIN_SONG, songId: song.id })
-                    setPinnedSong(true)
-                  } else {
-                    dispatch({ type: types.UNPIN_SONG, songId: song.id })
-                    setPinnedSong(false)
-                  }
-                }}
-              >
-                <Icon
-                  icon={pinned ? 'faMinusCircle' : 'faPlusCircle'}
-                  className='mr-2'
-                />
-                {pinned ? <Translate value="media.unpin" /> : <Translate value="media.pin" />}
-              </Button>
-
-              <FavoriteButton songId={song.id} className="ml-2" />
-            </div>
           </div>
         </div>
 
-        <div className="content flex-grow pt-6 sm:pt-0 md:pt-6 md:pr-6 justify-between min-w-0">
+        <div className="content flex-grow px-4 pb-4 sm:px-6 lg:pl-0 lg:pt-6 justify-between min-w-0">
           <div style={{ background: 'rgba(0, 0, 0, 0.2)' }} className="p-6 rounded-lg">
-            <h2 className='text-3xl inline-block text-wrap truncate ...'>
+            <h2 className='text-4xl font-bold leading-tight break-words'>
               {song.title}
             </h2>
-            <Tag onClick={() => handleTypeClick(song.type)} className="cursor-pointer hover:bg-opacity-50 mr-2 mt-4 w-fit inline-block" transparent>{typeIcon} {song.type}</Tag>
             {song.artistId && (
-              <div className='text-lg mt-2'>
-                <Link to={`/artist/${song.artistId}`}>
-                  <h3>
-                    <Icon
-                      icon='faMicrophoneAlt'
-                      className='mr-1 w-8'
-                    />
-                    <span>{song.artistName || 'Unknown Artist'}</span>
-                  </h3>
-                </Link>
-              </div>
+              <Link to={`/artist/${song.artistId}`} className='block mt-2 text-xl text-primary hover:underline w-fit'>
+                {song.artistName || <Translate value='common.unknownArtist' />}
+              </Link>
             )}
             {song.albumId && (
-              <div className='color-white text-lg mt-2'>
-                <Link to={`/album/${song.albumId}`}>
-                  <Icon
-                    className='mr-1 w-8'
-                    icon='faCompactDisc'
-                  />
-                  {song.albumName || 'N/A'}
-                </Link>
-              </div>
+              <Link to={`/album/${song.albumId}`} className='block mt-1 text-base-content/70 hover:underline w-fit'>
+                {song.albumName || <Translate value='common.unknownAlbum' />}
+              </Link>
             )}
+            <div className='mt-3 flex flex-wrap items-center gap-x-2 text-sm text-base-content/60'>
+              <button
+                type='button'
+                onClick={() => handleTypeClick(song.type)}
+                className='inline-flex items-center capitalize hover:text-base-content'
+              >
+                {typeIcon}{song.type}
+              </button>
+              <span aria-hidden>·</span>
+              <span>{getDurationStr(song.duration)}</span>
+              <span aria-hidden>·</span>
+              <span>
+                {playCount === 0
+                  ? <Translate value='common.neverPlayed' />
+                  : <Translate value='common.playedTimes' count={playCount} />}
+              </span>
+            </div>
             {song.genres?.length > 0 && (
-              <div className='mt-2 flex flex-wrap'>
+              <div className='mt-3 flex flex-wrap gap-2'>
                 {song.genres.map((genre: string) => (
                   <Tag
                     key={genre}
                     transparent
                     onClick={() => handleGenreClick(genre)}
-                    className="cursor-pointer hover:bg-opacity-50 mr-2 mb-2"
+                    className="cursor-pointer hover:bg-opacity-50"
                   >
                     {genre}
                   </Tag>
                 ))}
               </div>
             )}
-            <div className='mt-4'>
-              <Icon icon='faStopwatch' /> {getDurationStr(song.duration)}
+
+            <div className='mt-6 flex flex-wrap items-center gap-3' data-testid='song-actions'>
+              {(!songFinder || !player.playing) &&
+                <button
+                  type='button'
+                  className='btn btn-primary rounded-full px-6 normal-case text-base'
+                  onClick={() => dispatch({ type: types.PLAY_SONG, songId: song.id })}
+                >
+                  <Icon icon='faPlay' />
+                  <Translate value='common.play' />
+                </button>
+              }
+              <div className='tooltip' data-tip={I18n.t(inQueue ? 'buttons.removeFromQueue' : 'buttons.addToQueue')}>
+                <button
+                  type='button'
+                  className={`${iconButton} ${inQueue ? 'text-primary' : ''}`}
+                  onClick={toggleQueue}
+                  aria-label={I18n.t(inQueue ? 'buttons.removeFromQueue' : 'buttons.addToQueue')}
+                  aria-pressed={inQueue}
+                >
+                  <Icon icon={inQueue ? 'faCheck' : 'faList'} />
+                </button>
+              </div>
+              <FavoriteButton songId={song.id} className={`${iconButton} p-0 !rounded-full`} />
+              <div className='tooltip' data-tip={I18n.t('common.lyrics')}>
+                <button
+                  type='button'
+                  className={iconButton}
+                  onClick={() => setShowLyrics(true)}
+                  aria-label={I18n.t('common.lyrics')}
+                >
+                  <Icon icon='faScroll' />
+                </button>
+              </div>
+              <div className='tooltip' data-tip={I18n.t(pinned ? 'common.unpin' : 'common.pin')}>
+                <button
+                  type='button'
+                  className={`${iconButton} ${pinned ? 'text-primary' : ''}`}
+                  onClick={togglePin}
+                  aria-label={I18n.t(pinned ? 'common.unpin' : 'common.pin')}
+                  aria-pressed={pinned}
+                >
+                  <Icon icon='faHardDrive' />
+                </button>
+              </div>
             </div>
-            <div className='mt-2'>
-              <Translate value='song.label.played' /> {song.playCount ?? 0} <Translate value='song.label.times' />
-            </div>
-            <div className='mt-2 flex flex-col gap-2'>
-              <label className='text-base-content' htmlFor='providers-section'><Translate value='labels.providers' /></label>
+
+            <div className='mt-6 flex flex-col gap-2'>
+              <label className='text-sm text-base-content/60' htmlFor='providers-section'><Translate value='labels.providers' /></label>
               <div className='flex flex-wrap gap-2' id='providers-section'>
                 {
                   Object.values(song.stream).map((value: Stream, index: number) => {
@@ -380,8 +352,8 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
                         <div className='flex-1 flex gap-2 px-3 py-1'>
                           <Button
                             onClick={() => dispatch({ type: types.PLAY_SONG_FROM, songId: song.id, providerIndex: index })}
-                            className='btn-sm bg-primary hover:bg-primary-focus text-primary-content border-0 min-w-[2.5rem]'
-                            aria-label={`Play from ${value.service}`}
+                            className='btn-sm btn-ghost border border-base-content/20 min-w-[2.5rem]'
+                            aria-label={I18n.t('common.playFrom', { service: value.service })}
                           >
                             <Icon icon='faPlay' className='text-lg' />
                           </Button>
@@ -392,7 +364,7 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
                               download={streamUrl.isBlob ? `${song.title}.${streamUrl.format || 'mp3'}` : undefined}
                               target={streamUrl.isBlob ? undefined : "_blank"}
                               rel={streamUrl.isBlob ? undefined : "noopener noreferrer"}
-                              aria-label={`Download from ${value.service}`}
+                              aria-label={I18n.t('common.downloadFrom', { service: value.service })}
                             >
                               <Icon icon='faDownload' className='text-lg' />
                             </a>

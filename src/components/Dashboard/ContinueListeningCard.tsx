@@ -1,3 +1,4 @@
+import { I18n } from 'react-redux-i18n'
 import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import CoverImage from '../MusicTable/CoverImage'
@@ -28,7 +29,7 @@ const ContinueListeningCard = () => {
           <Link to={`/song/${song.id}`}>
             <p className="font-medium truncate">{song.title}</p>
             <p className="text-sm opacity-70 truncate">
-              {song.artistName || 'Unknown Artist'} – {song.albumName || 'Unknown Album'}
+              {song.artistName || I18n.t('common.unknownArtist')} – {song.albumName || I18n.t('common.unknownAlbum')}
             </p>
           </Link>
         </div>

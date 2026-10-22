@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { Translate } from 'react-redux-i18n'
+import { Dispatch } from 'redux'
 import Modal from '../common/Modal'
 import * as types from '../../constants/ActionTypes'
-import { Dispatch } from 'redux'
 import { useLyrics } from '../../stores/livestore/hooks'
 
 type Props = {
@@ -12,49 +13,35 @@ type Props = {
   currentPlayingSongId?: string
 }
 
-const Lyrics = (props: Props) => {
-  const lyricsData = useLyrics(props.songId)
-  const [error, setError] = useState<string | undefined>()
-  
-  // Get lyrics text from LiveStore query result
+const Lyrics = ({ onClose, songId, dispatch, isOpen, currentPlayingSongId }: Props) => {
+  const lyricsData = useLyrics(songId)
   const lyrics = lyricsData && lyricsData.length > 0 ? lyricsData[0].lyricsText : undefined
 
-  // Fetch lyrics when modal opens and no lyrics exist
+  // Fetch lyrics from the API when the modal opens and LiveStore has none
   useEffect(() => {
-    if (props.isOpen && !lyrics && props.songId) {
-      // Trigger saga to fetch lyrics from API
-      props.dispatch({ type: types.FETCH_LYRICS, songId: props.songId })
-      setError(undefined)
+    if (isOpen && !lyrics && songId) {
+      dispatch({ type: types.FETCH_LYRICS, songId })
     }
-  }, [props.songId, props.isOpen, lyrics])
+  }, [songId, isOpen, lyrics, dispatch])
 
-  // Close modal if the currently playing song changes
+  // Close the modal when playback moves to a different song
   useEffect(() => {
-    if (props.isOpen && props.currentPlayingSongId && props.currentPlayingSongId !== props.songId) {
-      props.onClose()
+    if (isOpen && currentPlayingSongId && currentPlayingSongId !== songId) {
+      onClose()
     }
-  }, [props.currentPlayingSongId])
+  }, [currentPlayingSongId, isOpen, songId, onClose])
 
   return (
-    <Modal
-      onClose={() => {
-        props.onClose()
-      }}
-      isOpen={props.isOpen}
-    >
-      <h2>Lyrics</h2>
+    <Modal onClose={onClose} isOpen={isOpen}>
+      <h2><Translate value='common.lyrics' /></h2>
       <div className='p-4 my-6'>
-        {error ? (
-          <div className='text-error text-center'>
-            {error}
-          </div>
-        ) : lyrics ? (
+        {lyrics ? (
           <pre className='overflow-y-auto w-full whitespace-pre-wrap'>
             {lyrics}
           </pre>
         ) : (
           <div className='text-center'>
-            Loading lyrics…
+            <Translate value='common.loadingLyrics' />
           </div>
         )}
       </div>
