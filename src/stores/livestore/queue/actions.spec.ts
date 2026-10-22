@@ -395,12 +395,12 @@ describe('queue actions', () => {
       expect(args).toEqual({ queueId: 'default', position: 1, trackId: 'b' })
     })
 
-    it('does not commit at the end when repeat is off', async () => {
+    it('reports no advance and does not commit at the end when repeat is off', async () => {
       const store = makeStore({
         head: makeHead({ currentPlaying: 2 }),
         ordered: ['a', 'b', 'c'],
       })
-      await playNextAction(store as unknown as LiveStore)
+      expect(await playNextAction(store as unknown as LiveStore)).toBe(false)
       expect(store.commit).not.toHaveBeenCalled()
     })
 
@@ -409,7 +409,7 @@ describe('queue actions', () => {
         head: makeHead({ currentPlaying: 2, repeat: true }),
         ordered: ['a', 'b', 'c'],
       })
-      await playNextAction(store as unknown as LiveStore)
+      expect(await playNextAction(store as unknown as LiveStore)).toBe(true)
       const [name, args] = committed(store)
       expect(name).toBe('v1.QueuePositionChanged')
       expect(args).toEqual({ queueId: 'default', position: 0, trackId: 'a' })

@@ -1,19 +1,10 @@
-import type { MediaRow } from '../types/media'
 import logger from '../utils/logger'
 
 // fix ts window typings
-declare var window: Window & { Notification?: typeof Notification; MediaMetadata?: unknown }
+// eslint-disable-next-line no-var -- `declare var` is required for ambient global augmentation
+declare var window: Window & { Notification?: typeof Notification }
 
 export default class NotificationService {
-  sendNotification = (media: MediaRow) => {
-    const Notification = this.getNotificationClass()
-    if (Notification) {
-      new Notification(
-        media.title + ' - ' + media.artistName
-      )
-    }
-  }
-
   getNotificationClass () {
     const Notification = window.Notification
 

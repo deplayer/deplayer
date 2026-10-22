@@ -35,7 +35,7 @@ interface Props {
   player: PlayerState
   settings: SettingsState
   itemCount: number
-  collection: { rows: Record<string, any> } // Simplified type - only needs rows (from LiveStore or Redux)
+  collection: { rows: Record<string, MediaRow> } // Only the current track's row is needed (from LiveStore or Redux)
   dispatch: Dispatch
   playerPortal: ReturnType<typeof createHtmlPortalNode>
   match: {
@@ -240,6 +240,10 @@ class PlayerControls extends React.Component<Props, State> {
       playedSeconds: state.playedSeconds,
       loadedSeconds: state.loadedSeconds
     });
+
+    const internal = this.playerRef.current?.getInternalPlayer()
+    const playbackRate = internal instanceof HTMLMediaElement ? internal.playbackRate : 1
+    MediaSessionService.getInstance().setPositionState(this.props.player.duration, state.playedSeconds, playbackRate)
   }
 
   onDuration = (duration: number): void => {
@@ -308,7 +312,7 @@ class PlayerControls extends React.Component<Props, State> {
 
     const currentPlaying = currentPlayingId 
       ? this.props.collection.rows[currentPlayingId]
-      : null
+      : undefined
 
     // If we have no media info but audio is playing, show minimal player
     if (!currentPlaying && !streamUri) {

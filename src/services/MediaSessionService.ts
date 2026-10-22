@@ -8,7 +8,15 @@ import logger from '../utils/logger'
 // eslint-disable-next-line no-var -- `declare var` is required for ambient global augmentation
 declare var navigator: Navigator & { mediaSession?: MediaSession }
 // eslint-disable-next-line no-var -- `declare var` is required for ambient global augmentation
-declare var window: Window & { MediaMetadata?: new (init: { title: string; artist: string; album: string; artwork: Array<{ src: string; type: string; sizes: string }> }) => MediaMetadata }
+declare var window: Window & { MediaMetadata?: new (init: MediaMetadataInit) => MediaMetadata }
+
+const DEFAULT_SEEK_OFFSET_SECONDS = 10
+
+interface SessionTransport {
+  seekTo(seconds: number): void
+  getCurrentTime(): number
+  stop(): void
+}
 
 export default class MediaSessionService {
   private static instance: MediaSessionService | null = null
@@ -24,7 +32,7 @@ export default class MediaSessionService {
     return MediaSessionService.instance
   }
 
-  registerHandlers(dispatch: Dispatch): void {
+  registerHandlers(dispatch: Dispatch, transport: SessionTransport): void {
     if (this.handlersRegistered) {
       return
     }
@@ -47,42 +55,81 @@ export default class MediaSessionService {
     session.setActionHandler('nexttrack', () => {
       dispatch({ type: actions.PLAY_NEXT })
     })
+    session.setActionHandler('seekto', (details) => {
+      if (details.seekTime !== undefined) {
+        transport.seekTo(details.seekTime)
+      }
+    })
+    session.setActionHandler('seekbackward', (details) => {
+      const offset = details.seekOffset ?? DEFAULT_SEEK_OFFSET_SECONDS
+      transport.seekTo(Math.max(0, transport.getCurrentTime() - offset))
+    })
+    session.setActionHandler('seekforward', (details) => {
+      const offset = details.seekOffset ?? DEFAULT_SEEK_OFFSET_SECONDS
+      transport.seekTo(transport.getCurrentTime() + offset)
+    })
+    session.setActionHandler('stop', () => {
+      transport.stop()
+      dispatch({ type: actions.STOP_PLAYING })
+      dispatch({ type: actions.PLAYBACK_IDLE })
+    })
 
     this.handlersRegistered = true
   }
 
-  updateMetadata(media: MediaRow | null): void {
+  updateMetadata(media: MediaRow): void {
     const session = this.getSession()
-    if (!session || !media || !window.MediaMetadata) {
+    if (!session || !window.MediaMetadata) {
       return
+    }
+
+    const artwork: MediaImage[] = []
+    if (media.cover?.thumbnailUrl) {
+      artwork.push({ src: media.cover.thumbnailUrl, sizes: '96x96' })
+    }
+    if (media.cover?.fullUrl) {
+      artwork.push({ src: media.cover.fullUrl, sizes: '512x512' })
     }
 
     session.metadata = new window.MediaMetadata({
       title: media.title,
       artist: media.artistName,
       album: media.albumName,
-      artwork: [
-        { src: this.getThumbnail(media), type: 'image/png', sizes: '96x96' },
-        { src: this.getFullCover(media), type: 'image/png', sizes: '512x512' }
-      ]
+      artwork,
     })
-
-    session.playbackState = 'playing'
   }
 
-  setPlaybackState(state: 'playing' | 'paused' | 'none'): void {
+  setPlaybackState(state: MediaSessionPlaybackState): void {
     const session = this.getSession()
     if (session) {
       session.playbackState = state
     }
   }
 
-  private getThumbnail(media: MediaRow): string {
-    return media.cover ? media.cover.thumbnailUrl : ''
+  /** Nothing is playing anymore: drop the OS card instead of leaving a dead one. */
+  clear(): void {
+    const session = this.getSession()
+    if (session) {
+      session.metadata = null
+      session.playbackState = 'none'
+    }
   }
 
-  private getFullCover(media: MediaRow): string {
-    return media.cover ? media.cover.fullUrl : ''
+  /** Feeds the OS scrubber; ignores unknown/invalid durations (streams, not-yet-loaded media). */
+  setPositionState(duration: number, position: number, playbackRate: number): void {
+    const session = this.getSession()
+    if (!session?.setPositionState || !Number.isFinite(duration) || duration <= 0 || playbackRate === 0) {
+      return
+    }
+    try {
+      session.setPositionState({
+        duration,
+        position: Math.min(Math.max(0, position), duration),
+        playbackRate,
+      })
+    } catch (e) {
+      logger.log('MediaSession', 'setPositionState failed', e)
+    }
   }
 
   private getSession(): MediaSession | null {

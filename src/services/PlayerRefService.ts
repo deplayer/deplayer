@@ -180,6 +180,16 @@ class PlayerRefService implements PlaybackTransport {
       }
     }
   }
+
+  /** Seek the current player to an absolute position in seconds. */
+  seekTo(seconds: number): void {
+    this.playerRef?.current?.seekTo(seconds, "seconds");
+  }
+
+  /** Current playback position in seconds; 0 when no player is mounted. */
+  getCurrentTime(): number {
+    return this.playerRef?.current?.getCurrentTime() ?? 0;
+  }
 }
 
 export default PlayerRefService;

@@ -46,7 +46,7 @@ function createFakeDataPort(overrides?: Partial<PlaybackDataPort>): PlaybackData
     shuffleQueue: vi.fn().mockResolvedValue(undefined),
     addNext: vi.fn().mockResolvedValue(undefined),
     select: vi.fn().mockResolvedValue(undefined),
-    next: vi.fn().mockResolvedValue(undefined),
+    next: vi.fn().mockResolvedValue(true),
     previous: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   }
@@ -312,6 +312,52 @@ describe('PlaybackController', () => {
 
       expect(result.status).toBe('idle')
       expect((result as { reason: string }).reason).toBe('missing-stream')
+    })
+
+    it('reports the track actually started after skipping a dead one', async () => {
+      const song3 = fakeMedia('song-3')
+      const q = queueState({ currentPlaying: 1 })
+      const q2 = queueState({ currentPlaying: 2, currentTrackId: 'song-3' })
+      const { ctrl, data, dispatch } = makeController()
+
+      vi.mocked(data.readQueue).mockResolvedValueOnce(q)
+      vi.mocked(data.readQueue).mockResolvedValueOnce(q)
+      vi.mocked(data.readQueue).mockResolvedValueOnce(q2)
+      vi.mocked(data.readMedia).mockResolvedValueOnce(null)
+      vi.mocked(data.readMedia).mockResolvedValueOnce(song3)
+
+      const result = await ctrl.next()
+
+      expect(result.status).toBe('started')
+      const started = dispatch.mock.calls
+        .map((c: unknown[]) => c[0] as { type: string; media?: unknown })
+        .filter(a => a.type === 'TRACK_STARTED')
+      expect(started).toEqual([{ type: 'TRACK_STARTED', media: song3 }])
+    })
+
+    it('ends (PLAYBACK_IDLE, no replay) when next() cannot advance past the last track', async () => {
+      const { ctrl, data, dispatch, transport } = makeController()
+      vi.mocked(data.readQueue).mockResolvedValue(queueState({ currentPlaying: 2, currentTrackId: 'song-3' }))
+      vi.mocked(data.readMedia).mockResolvedValue(fakeMedia('song-3'))
+      vi.mocked(data.next).mockResolvedValue(false)
+
+      const result = await ctrl.next()
+
+      expect(result).toEqual({ status: 'idle', reason: 'end-of-queue' })
+      expect(transport.play).not.toHaveBeenCalled()
+      expect(dispatch).toHaveBeenCalledWith({ type: 'PLAYBACK_IDLE' })
+    })
+
+    it('does not signal PLAYBACK_IDLE for a superseded request', async () => {
+      const { ctrl, data, dispatch } = makeController()
+      vi.mocked(data.readQueue).mockResolvedValue(queueState({ currentTrackId: 'song-2' }))
+      vi.mocked(data.readMedia).mockResolvedValue(fakeMedia('song-2'))
+
+      const [first, second] = await Promise.all([ctrl.next(), ctrl.next()])
+
+      expect(first).toEqual({ status: 'idle', reason: 'superseded' })
+      expect(second.status).toBe('started')
+      expect(dispatch).not.toHaveBeenCalledWith({ type: 'PLAYBACK_IDLE' })
     })
 
     it('does not infinitely loop on missing stream', async () => {

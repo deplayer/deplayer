@@ -1,23 +1,19 @@
-import { takeLatest, call } from 'redux-saga/effects'
+import { takeLatest } from 'redux-saga/effects'
+import type { SagaIterator } from 'redux-saga'
 
-import { getCurrentSongFromLiveStore } from './selectors';
+import type { MediaRow } from '../types/media'
 import * as types from '../constants/ActionTypes'
 
-// Handling setCurrentPlaying saga
-function* setCurrentPlaying(): Generator<any, void, any> {
-  // Setting current playing title
-  const song = yield call(getCurrentSongFromLiveStore)
-  if (song?.title) {
-    const artistName = song.artistName || 'Unknown Artist'
-    document.title = `${song.title} - ${artistName}`
+function setDocumentTitle({ media }: { type: string; media: MediaRow }): void {
+  if (media.title) {
+    const artistName = media.artistName || 'Unknown Artist'
+    document.title = `${media.title} - ${artistName}`
   }
 }
 
 // Binding actions to sagas
-function* titleSaga(): Generator<any, void, any> {
-  yield takeLatest(types.SET_CURRENT_PLAYING, setCurrentPlaying)
-  yield takeLatest(types.PLAY_NEXT, setCurrentPlaying)
-  yield takeLatest(types.PLAY_PREV, setCurrentPlaying)
+function* titleSaga(): SagaIterator {
+  yield takeLatest(types.TRACK_STARTED, setDocumentTitle)
 }
 
 export default titleSaga

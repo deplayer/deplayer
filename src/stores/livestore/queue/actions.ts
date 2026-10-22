@@ -179,13 +179,14 @@ export const setCurrentPlayingAction = async (store: LiveStore, position: number
  * Increments currentPlaying index or loops if repeat is on
  *
  * @param store - LiveStore instance
+ * @returns false when there is nothing to advance to (end of queue with repeat off, or no queue)
  */
-export async function playNextAction(store: LiveStore): Promise<void> {
+export async function playNextAction(store: LiveStore): Promise<boolean> {
   const head = await readQueueHead(store)
 
   if (!head) {
     console.warn(`[playNextAction] Queue default not found`)
-    return
+    return false
   }
 
   const cur = head.currentPlaying ?? -1
@@ -195,9 +196,9 @@ export async function playNextAction(store: LiveStore): Promise<void> {
   ])
 
   const ev = stepNext(head, atNext, atZero)
-  if (ev) {
-    await store.commit(queueEvents.queuePositionChanged(ev))
-  }
+  if (!ev) return false
+  await store.commit(queueEvents.queuePositionChanged(ev))
+  return true
 }
 
 /**

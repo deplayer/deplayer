@@ -46,7 +46,8 @@ export interface PlaybackDataPort {
   addNext(trackIds: readonly string[]): Promise<void>
   select(songId: string): Promise<void>
   shuffleQueue(): Promise<void>
-  next(): Promise<void>
+  /** Advances the queue; resolves false at the end of the queue (repeat off). */
+  next(): Promise<boolean>
   previous(): Promise<void>
 }
 
@@ -90,15 +91,23 @@ export class PlaybackController {
   // request always wins and stale ones return 'superseded'.
   // -----------------------------------------------------------------------
 
-  private async enqueueTrackChange<T>(
-    operation: (isCurrent: PlaybackRequestGuard) => Promise<T>
-  ): Promise<T> {
+  private async enqueueTrackChange(
+    operation: (isCurrent: PlaybackRequestGuard) => Promise<PlaybackResult>
+  ): Promise<PlaybackResult> {
     const generation = ++this.playbackRequestGeneration
     const isCurrent: PlaybackRequestGuard = () => generation === this.playbackRequestGeneration
 
     const result = this.playbackCommandTail
       .catch(() => undefined)
       .then(() => operation(isCurrent))
+      .then((outcome) => {
+        // Audio was stopped and no track replaced it (end of queue, dead streams).
+        // Superseded requests hand off to a newer one; store-unavailable may abort before stopping.
+        if (outcome.status === 'idle' && outcome.reason !== SUPERSEDED && outcome.reason !== 'store-unavailable') {
+          this.dispatch({ type: 'PLAYBACK_IDLE' })
+        }
+        return outcome
+      })
 
     this.playbackCommandTail = result.then(() => undefined, () => undefined)
 
@@ -179,6 +188,7 @@ export class PlaybackController {
 
       if (options.media) {
         this.dispatch({ type: 'SET_CURRENT_PLAYING_STREAMS', streams: options.media.stream })
+        this.dispatch({ type: 'TRACK_STARTED', media: options.media })
       }
 
       this.dispatch({ type: 'SHOW_PLAYER' })
@@ -202,8 +212,9 @@ export class PlaybackController {
         this.dispatch({ type: 'STOP_PLAYING' })
         this.transport.stop()
 
-        await this.data.next()
+        const advanced = await this.data.next()
         if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
+        if (!advanced) return { status: 'idle', reason: 'end-of-queue' }
 
         const queue = await this.data.readQueue()
         if (!queue) {
@@ -377,6 +388,7 @@ export class PlaybackController {
     this.dispatch({ type: 'PUSH_TO_VIEW', song: songId })
     this.dispatch({ type: 'SET_CURRENT_PLAYING_STREAMS', streams: media.stream })
     this.dispatch({ type: 'SHOW_PLAYER' })
+    this.dispatch({ type: 'TRACK_STARTED', media })
     // Imperative play — waits for ReactPlayer to mount the internal element.
     // Redux `playing` state will be set by ReactPlayer's onPlay callback.
 
@@ -399,7 +411,7 @@ export class PlaybackController {
   private async onDeadStream(
     result: PlaybackResult,
     songId: string,
-    advance: () => Promise<void>,
+    advance: () => Promise<unknown>,
     isCurrent: PlaybackRequestGuard,
   ): Promise<PlaybackResult> {
     if (result.status === 'idle' && result.reason !== 'store-unavailable' && result.reason !== SUPERSEDED) {
@@ -413,7 +425,7 @@ export class PlaybackController {
    * Used as a fallback when the current track's media/stream is missing.
    * If the next track also fails, returns idle — no recursive retry.
    */
-  private async advanceFallback(songId: string, advance: () => Promise<void>, isCurrent: PlaybackRequestGuard): Promise<PlaybackResult> {
+  private async advanceFallback(songId: string, advance: () => Promise<unknown>, isCurrent: PlaybackRequestGuard): Promise<PlaybackResult> {
     try {
       const beforeQueue = await this.data.readQueue()
       if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
@@ -529,8 +541,8 @@ export function createLiveStorePlaybackDataPort(
       await toggleShuffleAction(store(), true)
     },
 
-    async next(): Promise<void> {
-      await playNextAction(store())
+    async next(): Promise<boolean> {
+      return playNextAction(store())
     },
 
     async previous(): Promise<void> {

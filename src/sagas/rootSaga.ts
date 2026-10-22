@@ -17,7 +17,7 @@ function* rootSaga(store: Store) {
     collectionSaga(),
     mediaSessionSaga(store),
     wakeLock(store),
-    notificationsSaga(store),
+    notificationsSaga(),
     playerSaga(store),
     searchSaga(),
     titleSaga(),
