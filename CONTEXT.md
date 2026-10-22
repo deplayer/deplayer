@@ -8,6 +8,13 @@ Music player PWA: React + Redux-Saga UI over a LiveStore (SQLite/WASM/OPFS) medi
 A remote music source (Subsonic, Jellyfin, Mstream) exposing its catalogue through the IMusicProvider seam.
 _Avoid_: backend, server, connector
 
+**Provider instance**:
+One configured connection to a Provider, stored under a settings key: `<type>` for the first (`subsonic`), `<type><n>` for repeats (`subsonic2`). The provider registry (`providers/registry.ts`) is the only owner of the key-to-type rule, schema lookup and construction. A constructed Provider's `providerKey` is always its type, never the instance key (it is persisted on media rows as the display-only `stream.service`).
+_Avoid_: provider key (for the settings key)
+
+**Provider connections**:
+The stored set of Provider instances and its mutations (save, remove, enable, add), expressed as pure transforms in `components/Providers/connections.ts` and persisted by `useProviderConnections`.
+
 **Streaming provider**:
 A Provider implementing the optional streaming-sync members (`getScanStatus`, `streamAlbumsSince`), and therefore participating in background library sync.
 _Avoid_: syncable provider, sync backend

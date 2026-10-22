@@ -1,32 +1,17 @@
-
-import providersIndex from '../providers'
 import { NormalizedMedia } from '../utils/normalizeMedia'
-import type { IMusicProvider } from '../providers/IMusicProvider'
-import type { ProviderSettings, SettingsShape } from './settings/shape'
-
-export interface ProviderInstance extends Partial<IMusicProvider> {
-  search(searchTerm: string): Promise<NormalizedMedia[]>;
-  providerKey?: string;
-}
-
+import { createProvider } from '../providers/registry'
+import type { ProviderInstance } from '../providers/registry'
+import type { SettingsShape } from './settings/shape'
 
 export default class ProvidersService {
   providers: Record<string, ProviderInstance> = {}
 
   constructor(config: SettingsShape) {
-    Object.keys(config.providers).forEach((provider) => {
-
-      const providerType = provider.replace(/[0-9]/g, '')
-
-      if (providersIndex[providerType as keyof typeof providersIndex]) {
-        const parameters = config.providers[provider]
-
-        if (parameters.enabled) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          this.providers[provider] = new (providersIndex[providerType as keyof typeof providersIndex] as new (params: ProviderSettings, type: string) => ProviderInstance)(parameters, providerType)
-        }
-      }
-    })
+    for (const [instanceKey, parameters] of Object.entries(config.providers)) {
+      if (!parameters.enabled) continue
+      const provider = createProvider(instanceKey, parameters)
+      if (provider) this.providers[instanceKey] = provider
+    }
   }
 
   search = (searchTerm: string): Array<Promise<NormalizedMedia[]>> => {
