@@ -1,14 +1,14 @@
-import { takeLatest, call, select } from 'redux-saga/effects'
+import { type Effect, takeLatest, call, select } from 'redux-saga/effects'
 
 import WakeLock from '../services/wakeLock'
 import logger from '../utils/logger'
 import * as types from '../constants/ActionTypes'
 import { getPlayer } from './selectors'
-import { Dispatch } from 'redux'
+import type { State } from '../reducers'
 
 // Handling START_PLAYING saga
-function* startWakeLock(_dispatch: Dispatch): Generator<any, void, any> {
-  const player = yield select(getPlayer)
+function* startWakeLock(): Generator<Effect, void, unknown> {
+  const player = (yield select(getPlayer)) as State['player']
 
   if (player.playing) {
     try {
@@ -20,8 +20,8 @@ function* startWakeLock(_dispatch: Dispatch): Generator<any, void, any> {
 }
 
 // Handling START_PLAYING saga
-function* stopWakeLock(_dispatch: Dispatch): Generator<any, void, any> {
-  const player = yield select(getPlayer)
+function* stopWakeLock(): Generator<Effect, void, unknown> {
+  const player = (yield select(getPlayer)) as State['player']
 
   if (!player.playing) {
     try {
@@ -34,10 +34,10 @@ function* stopWakeLock(_dispatch: Dispatch): Generator<any, void, any> {
 
 
 // Binding actions to sagas
-function* wakeLockSaga(store: { dispatch: Dispatch }): Generator<any, void, any> {
-  yield takeLatest(types.START_PLAYING, startWakeLock, store.dispatch)
-  yield takeLatest(types.PAUSE_PLAYING, stopWakeLock, store.dispatch)
-  yield takeLatest(types.STOP_PLAYING, stopWakeLock, store.dispatch)
+function* wakeLockSaga(): Generator<Effect, void, unknown> {
+  yield takeLatest(types.START_PLAYING, startWakeLock)
+  yield takeLatest(types.PAUSE_PLAYING, stopWakeLock)
+  yield takeLatest(types.STOP_PLAYING, stopWakeLock)
 }
 
 export default wakeLockSaga

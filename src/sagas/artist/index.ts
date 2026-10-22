@@ -1,4 +1,4 @@
-import { call, put, takeLatest } from 'redux-saga/effects'
+import { type Effect, call, put, takeLatest } from 'redux-saga/effects'
 import * as types from '../../constants/ActionTypes'
 import { getSongByIdFromLiveStore, getSettingsFromLiveStore } from './../selectors'
 import MusicbrainzProvider from '../../providers/MusicbrainzProvider'
@@ -11,11 +11,13 @@ import { queryDb } from '@livestore/livestore'
 import { tables } from '../../stores/livestore/schema'
 import ProvidersService from '../../services/ProvidersService'
 import { IMusicProvider } from '../../providers/IMusicProvider'
+import type { MediaRow } from '../../types/media'
+import type { NormalizedMedia } from '../../utils/normalizeMedia'
 
 const logger = createLogger({ namespace: 'artist-saga' })
 
 // Simplified artist metadata fetching (no persistence for now)
-function* loadMoreArtistSongsFromProvider(action: { type: string; artist: { name: string } }): Generator<any, void, any> {
+function* loadMoreArtistSongsFromProvider(action: { type: string; artist: { name: string } }): Generator<Effect, void, unknown> {
   // Clear existing artist metadata first
   yield put({ type: types.CLEAR_ARTIST_METADATA })
 
@@ -42,8 +44,8 @@ function* loadMoreArtistSongsFromProvider(action: { type: string; artist: { name
   }
 }
 
-export function* fetchSongMetadata(action: { type: string; songId: string }): Generator<any, void, any> {
-  const song = yield call(getSongByIdFromLiveStore, action.songId)
+export function* fetchSongMetadata(action: { type: string; songId: string }): Generator<Effect, void, unknown> {
+  const song = (yield call(getSongByIdFromLiveStore, action.songId)) as MediaRow | null
   if (!song) {
     logger.error('Song not found:', action.songId)
     return
@@ -60,7 +62,7 @@ export function* fetchSongMetadata(action: { type: string; songId: string }): Ge
     const lyricsQuery = queryDb(
       tables.lyrics.select().where('mediaId', '=', song.id).limit(1)
     )
-    const storedLyrics = yield call(() => liveStore.query(lyricsQuery))
+    const storedLyrics = (yield call(() => liveStore.query(lyricsQuery))) as ReadonlyArray<{ lyricsText?: string | null }> | null
     
     if (storedLyrics && storedLyrics.length > 0 && storedLyrics[0].lyricsText) {
       logger.debug('Found lyrics in LiveStore')
@@ -72,7 +74,7 @@ export function* fetchSongMetadata(action: { type: string; songId: string }): Ge
     // If not in LiveStore, try to fetch from API
     const mbProvider = new LyricsovhProvider()
     try {
-      const response = yield call([mbProvider, 'searchLyrics'], song)
+      const response = (yield call([mbProvider, 'searchLyrics'], song)) as { lyrics: string } | null
       logger.debug('API Response:', response)
       
       if (!response || !response.lyrics) {
@@ -92,7 +94,7 @@ export function* fetchSongMetadata(action: { type: string; songId: string }): Ge
 }
 
 // Fetch songs for an artist from all enabled providers
-function* fetchArtistSongsFromProvider(action: { type: string; artist: { name: string } }): Generator<any, void, any> {
+function* fetchArtistSongsFromProvider(action: { type: string; artist: { name: string } }): Generator<Effect, void, unknown> {
   const artistName = action.artist?.name
   if (!artistName) {
     logger.debug('No artist name provided')
@@ -119,9 +121,9 @@ function* fetchArtistSongsFromProvider(action: { type: string; artist: { name: s
       if (provider.getArtistSongs) {
         try {
           logger.debug(`Fetching songs for ${artistName} from ${provider.providerKey}`)
-          const songs = yield call([provider, provider.getArtistSongs], artistName)
+          const songs = (yield call([provider, provider.getArtistSongs], artistName)) as NormalizedMedia[] | undefined
 
-          if (songs?.length > 0) {
+          if (songs && songs.length > 0) {
             logger.debug(`Found ${songs.length} songs, merging into LiveStore`)
             yield call(addMediaBulkAction, liveStore, songs)
           }
@@ -137,7 +139,7 @@ function* fetchArtistSongsFromProvider(action: { type: string; artist: { name: s
 }
 
 // Binding actions to sagas
-function* artistSaga(): Generator<any, void, any> {
+function* artistSaga(): Generator<Effect, void, unknown> {
   yield takeLatest(types.LOAD_ARTIST, loadMoreArtistSongsFromProvider)
   yield takeLatest(types.FETCH_ARTIST_SONGS, fetchArtistSongsFromProvider)
   yield takeLatest(types.FETCH_LYRICS, fetchSongMetadata)

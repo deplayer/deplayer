@@ -1,7 +1,8 @@
-import { call, takeLatest, takeEvery, put, select } from 'redux-saga/effects'
+import { type Effect, call, takeLatest, takeEvery, put, select } from 'redux-saga/effects'
 import screenfull from 'screenfull'
 import { push } from "redux-first-history"
 import type { Dispatch } from 'redux'
+import type { State } from '../../reducers'
 import type { MediaRow } from '../../types/media'
 import type { Store } from 'redux'
 import type { SagaIterator } from 'redux-saga'
@@ -74,7 +75,7 @@ export interface PlaySongFromAction {
 // Saga handlers — thin adapters around PlaybackController
 // ---------------------------------------------------------------------------
 
-export function* setCurrentPlaying(action: SetCurrentPlayingAction): Generator<any, void, any> {
+export function* setCurrentPlaying(action: SetCurrentPlayingAction): Generator<Effect, void, unknown> {
   const result = yield* callController(() =>
     getController().playCurrent(action.songId, {
       media: action.media,
@@ -84,7 +85,7 @@ export function* setCurrentPlaying(action: SetCurrentPlayingAction): Generator<a
   logResult(result, 'setCurrentPlaying')
 }
 
-export function* handlePlayList(action: PlayListAction): Generator<any, void, any> {
+export function* handlePlayList(action: PlayListAction): Generator<Effect, void, unknown> {
   const result = yield* callController(() =>
     getController().playList(
       action.trackIds,
@@ -95,7 +96,7 @@ export function* handlePlayList(action: PlayListAction): Generator<any, void, an
   logResult(result, 'playList')
 }
 
-function* handlePlaySong(action: PlaySongAction): Generator<any, void, any> {
+function* handlePlaySong(action: PlaySongAction): Generator<Effect, void, unknown> {
   const result = yield* callController(() =>
     getController().playSong(action.songId, action.contextIds)
   )
@@ -109,41 +110,41 @@ export function* handlePlaySongFrom(action: PlaySongFromAction): SagaIterator {
   logResult(result, 'playSongFrom')
 }
 
-function* handlePlayNext(): Generator<any, void, any> {
+function* handlePlayNext(): Generator<Effect, void, unknown> {
   const result = yield* callController(() => getController().next())
   logResult(result, 'playNext')
 }
 
-function* handlePlayPrev(): Generator<any, void, any> {
+function* handlePlayPrev(): Generator<Effect, void, unknown> {
   const result = yield* callController(() => getController().previous())
   logResult(result, 'playPrev')
 }
 
-function* handleError(): Generator<any, void, any> {
+function* handleError(): Generator<Effect, void, unknown> {
   yield put({ type: types.REGISTER_PLAYER_ERROR })
 
-  const player = yield select(getPlayer)
+  const player = (yield select(getPlayer)) as State['player']
   const result = yield* callController(() => getController().retry(player.errorCount))
   logResult(result, 'playError')
 }
 
-function* goToViewPage(action: { type: string; song?: string }): Generator<any, void, any> {
-  const state = yield select()
+function* goToViewPage(action: { type: string; song?: string }): Generator<Effect, void, unknown> {
+  const state = (yield select()) as { router: { location: { pathname: string } } }
 
   if (!state.router.location.pathname.match(/^\/song.*?$/)) {
     return
   }
 
   // Use the action's song ID when present; fall back to LiveStore lookup
-  const songId = action.song || (yield call(getCurrentSongFromLiveStore))
+  const songId = action.song || ((yield call(getCurrentSongFromLiveStore)) as MediaRow | null)
 
   if (songId) {
     yield put(push(routes.songView(songId as string)))
   }
 }
 
-function* handleFullscreen(): Generator<any, void, any> {
-  const player = yield select(getPlayer)
+function* handleFullscreen(): Generator<Effect, void, unknown> {
+  const player = (yield select(getPlayer)) as State['player']
 
   if (!screenfull.isEnabled) {
     return
@@ -151,13 +152,13 @@ function* handleFullscreen(): Generator<any, void, any> {
 
   if (player.fullscreen) {
     yield call(() => useUIStore.getState().toggleSidebar(false))
-    yield screenfull.request()
+    yield call(() => screenfull.request())
   } else {
-    yield screenfull.exit()
+    yield call(() => screenfull.exit())
   }
 }
 
-function* handlePlayRequest(): Generator<any, void, any> {
+function* handlePlayRequest(): Generator<Effect, void, unknown> {
   try {
     yield call(() => getController().play())
   } catch (error) {
@@ -165,12 +166,12 @@ function* handlePlayRequest(): Generator<any, void, any> {
   }
 }
 
-function* handlePauseRequest(): Generator<any, void, any> {
-  getController().pause()
+function* handlePauseRequest(): Generator<Effect, void, unknown> {
+  yield call(() => getController().pause())
 }
 
-function* handleToggleRequest(): Generator<any, void, any> {
-  getController().toggle()
+function* handleToggleRequest(): Generator<Effect, void, unknown> {
+  yield call(() => getController().toggle())
 }
 
 // ---------------------------------------------------------------------------
@@ -178,8 +179,8 @@ function* handleToggleRequest(): Generator<any, void, any> {
 // ---------------------------------------------------------------------------
 
 /** Typed wrapper around yield call() for PlaybackController methods. */
-function* callController<T>(fn: () => Promise<T>): Generator<any, T, any> {
-  return yield call(fn)
+function* callController<T>(fn: () => Promise<T>): Generator<Effect, T, unknown> {
+  return (yield call(fn)) as T
 }
 
 function logResult(result: PlaybackResult, caller: string): void {
@@ -192,7 +193,7 @@ function logResult(result: PlaybackResult, caller: string): void {
 // Saga entry point
 // ---------------------------------------------------------------------------
 
-function* playerSaga(store: Store): Generator<any, void, any> {
+function* playerSaga(store: Store): Generator<Effect, void, unknown> {
   // Construct the controller with production dependencies
   controller = new PlaybackController({
     data: createLiveStorePlaybackDataPort(getLiveStoreInstance),

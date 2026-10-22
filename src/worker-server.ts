@@ -33,7 +33,7 @@ async function serve(request: Request) {
 
   console.log("clientlist", clientlist);
 
-  const [data, port] = await new Promise<[any, MessagePort]>((resolve) => {
+  const [data, port] = await new Promise<[ResponseInit & { body: BodyInit | null }, MessagePort]>((resolve) => {
     // Use race condition for whoever controls the response stream
     for (const client of clientlist) {
       const messageChannel = new MessageChannel();

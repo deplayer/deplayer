@@ -31,8 +31,8 @@ const RoomList = ({ peers, rooms, dispatch, onJoinRoom }: Props) => {
       const firstRoom = rooms[0];
       const hasPeers = Object.keys(peers[firstRoom.id] || {}).length > 0;
       
-      if (hasPeers && !expandedRooms.includes(firstRoom.id)) {
-        setExpandedRooms(prev => [...prev, firstRoom.id]);
+      if (hasPeers) {
+        setExpandedRooms(prev => prev.includes(firstRoom.id) ? prev : [...prev, firstRoom.id]);
       }
     }
   }, [rooms, peers]);

@@ -72,7 +72,7 @@ export default function peers(
           },
         },
       };
-    case types.PEER_SET_USERNAME:
+    case types.PEER_SET_USERNAME: {
       const { peerId, username, roomCode } = action.peer;
       return {
         ...state,
@@ -84,6 +84,7 @@ export default function peers(
           },
         },
       };
+    }
     case types.PEER_JOINED:
       return {
         ...state,
@@ -95,10 +96,11 @@ export default function peers(
           },
         },
       };
-    case types.PEER_LEFT:
+    case types.PEER_LEFT: {
       const roomPeers = state.peers[action.peer.roomCode] || {};
-      const { [action.peer.peerId]: removedPeer, ...remainingPeers } =
-        roomPeers;
+      const remainingPeers = Object.fromEntries(
+        Object.entries(roomPeers).filter(([id]) => id !== action.peer.peerId)
+      );
       return {
         ...state,
         peers: {
@@ -106,6 +108,7 @@ export default function peers(
           [action.peer.roomCode]: remainingPeers,
         },
       };
+    }
     case types.PEER_STATUS_RECEIVED:
       return {
         ...state,
@@ -129,7 +132,7 @@ export default function peers(
         },
       };
 
-    case types.SET_STREAMING_PEER:
+    case types.SET_STREAMING_PEER: {
       const foundPeer = Object.values(state.peers)
         .flatMap((roomPeers) => Object.values(roomPeers))
         .find((peer) => peer.peerId === action.peerId);
@@ -148,6 +151,7 @@ export default function peers(
           },
         },
       };
+    }
 
     default:
       return state;

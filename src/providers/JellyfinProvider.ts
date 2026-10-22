@@ -117,7 +117,7 @@ export default class JellyfinProvider implements IMusicProvider {
       let startIndex = 0;
       const limit = 100;
 
-      while (true) {
+      for (;;) {
         const results = await getItemsApi(this.api).getItems({
           userId: this.userId,
           searchTerm,

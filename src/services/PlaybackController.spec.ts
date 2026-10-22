@@ -88,6 +88,11 @@ function makeController(overrides?: {
   return { ctrl, data, transport, dispatch, setBg, resolveStream }
 }
 
+/** Test-only access to the controller's private currentSongId. */
+function setCurrentSongId(ctrl: PlaybackController, songId: string) {
+  (ctrl as unknown as { currentSongId: string | null }).currentSongId = songId
+}
+
 function queueState(overrides?: Partial<PlaybackQueue>): PlaybackQueue {
   return {
     trackIds: ['song-1', 'song-2', 'song-3'],
@@ -413,13 +418,12 @@ describe('PlaybackController', () => {
   describe('retry', () => {
     it('retries with the given provider index', async () => {
       const media = fakeMedia('song-1')
-      const { ctrl, resolveStream } = makeController()
+      const { ctrl, data, resolveStream } = makeController()
 
       // First playCurrent sets currentSongId internally via startStreamWithMedia
-      vi.mocked(ctrl as any).currentSongId = 'song-1'
+      setCurrentSongId(ctrl, 'song-1')
 
       // Mock readMedia for retry
-      const data = (ctrl as any).data
       vi.mocked(data.readMedia).mockResolvedValueOnce(media)
 
       const result = await ctrl.retry(1)
@@ -443,7 +447,7 @@ describe('PlaybackController', () => {
       const q2 = queueState({ currentPlaying: 1, currentTrackId: 'song-2' })
       const { ctrl, data, resolveStream } = makeController()
 
-      vi.mocked(ctrl as any).currentSongId = 'song-1'
+      setCurrentSongId(ctrl, 'song-1')
       vi.mocked(data.readMedia).mockResolvedValueOnce(media1).mockResolvedValueOnce(media2)
       vi.mocked(data.readQueue).mockResolvedValueOnce(q).mockResolvedValueOnce(q2)
       // First stream (current song) is dead; the next song resolves fine.
@@ -463,7 +467,7 @@ describe('PlaybackController', () => {
       const q2 = queueState({ currentPlaying: 1, currentTrackId: 'song-2' })
       const { ctrl, data, resolveStream } = makeController()
 
-      vi.mocked(ctrl as any).currentSongId = 'song-1'
+      setCurrentSongId(ctrl, 'song-1')
       vi.mocked(data.readMedia).mockResolvedValueOnce(media).mockResolvedValueOnce(media2)
       vi.mocked(data.readQueue).mockResolvedValueOnce(q).mockResolvedValueOnce(q2)
       resolveStream.mockResolvedValue({ url: '', kind: 'remote' })

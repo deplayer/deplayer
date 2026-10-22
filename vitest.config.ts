@@ -1,9 +1,12 @@
-import { defineConfig } from 'vitest/config'
+import { defineConfig, type UserConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath } from 'url'
 
+type VitePlugins = NonNullable<UserConfig['plugins']>
+
 export default defineConfig({
-  plugins: [react() as any],
+  // @vitejs/plugin-react resolves a different `vite` copy than vitest bundles, so the Plugin types don't line up
+  plugins: [react() as unknown as VitePlugins[number]],
   resolve: {
     alias: {
       'virtual:pwa-register/react': new URL('./src/test-utils/pwa-mock.ts', import.meta.url).pathname,

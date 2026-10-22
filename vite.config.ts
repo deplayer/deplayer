@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import fixReactVirtualized from 'esbuild-plugin-react-virtualized'
 import { fileURLToPath } from 'url'
@@ -7,10 +7,10 @@ import svgr from 'vite-plugin-svgr'
 
 // Custom cross-origin isolation plugin with credentialless mode
 // This is less strict than require-corp and works better with third-party resources
-const crossOriginIsolation = () => ({
+const crossOriginIsolation = (): Plugin => ({
   name: 'configure-cross-origin-isolation',
-  configureServer(server: any) {
-    server.middlewares.use((_req: any, res: any, next: any) => {
+  configureServer(server) {
+    server.middlewares.use((_req, res, next) => {
       res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
       res.setHeader("Cross-Origin-Embedder-Policy", "credentialless");
       next();
@@ -87,7 +87,7 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['@electric-sql/pglite', 'node-datachannel', '@livestore/wa-sqlite'],
     esbuildOptions: {
-      plugins: [fixReactVirtualized as any],
+      plugins: [fixReactVirtualized],
     },
   },
   resolve: {

@@ -1,5 +1,5 @@
 // Handling ADD_TO_COLLECTION saga
-import { put, call } from "redux-saga/effects";
+import { type Effect, put, call } from "redux-saga/effects";
 
 import { getLiveStoreInstance } from "../../stores/livestore/accessor";
 import { addMediaBulkAction, removeMediaAction, trackMediaPlayedAction } from "../../stores/livestore/actions/media";
@@ -9,7 +9,7 @@ import * as types from "../../constants/ActionTypes";
 
 import { NormalizedMedia } from "../../utils/normalizeMedia";
 
-export function* saveToDbWorker(data: Array<NormalizedMedia>): Generator<any, void, any> {
+export function* saveToDbWorker(data: Array<NormalizedMedia>): Generator<Effect, void, unknown> {
   try {
     // Write to LiveStore (single source of truth)
     const liveStore = getLiveStoreInstance();
@@ -31,7 +31,7 @@ export function* saveToDbWorker(data: Array<NormalizedMedia>): Generator<any, vo
 }
 
 // Handling REMOVE_FROM_COLLECTION saga
-export function* removeFromDbWorker(action: { type: string; data: string[] }): Generator<any, void, any> {
+export function* removeFromDbWorker(action: { type: string; data: string[] }): Generator<Effect, void, unknown> {
   try {
     // Remove from LiveStore (single source of truth)
     const liveStore = getLiveStoreInstance();
@@ -59,7 +59,7 @@ export function* removeFromDbWorker(action: { type: string; data: string[] }): G
   }
 }
 
-export function* deleteCollectionWorker(): Generator<any, void, any> {
+export function* deleteCollectionWorker(): Generator<Effect, void, unknown> {
   try {
     // Note: This worker is kept for backward compatibility but is not implemented
     // Collection deletion should be handled via LiveStore hooks/actions in components
@@ -79,7 +79,7 @@ export function* deleteCollectionWorker(): Generator<any, void, any> {
   }
 }
 
-export function* exportCollectionWorker(): Generator<any, void, any> {
+export function* exportCollectionWorker(): Generator<Effect, void, unknown> {
   try {
     // Note: Export functionality temporarily disabled
     // Will be re-implemented using LiveStore queries
@@ -90,10 +90,7 @@ export function* exportCollectionWorker(): Generator<any, void, any> {
   }
 }
 
-export function* importCollectionWorker(_action: {
-  type: string;
-  data: unknown;
-}): Generator<any, void, any> {
+export function* importCollectionWorker(): Generator<Effect, void, unknown> {
   try {
     // Note: Import functionality temporarily disabled
     // Will be re-implemented using LiveStore actions
@@ -108,7 +105,7 @@ export function* importCollectionWorker(_action: {
 export function* trackSongPlayed(action: {
   type: string;
   songId: string;
-}): Generator<any, void, any> {
+}): Generator<Effect, void, unknown> {
   try {
     // Track in LiveStore (single source of truth)
     const liveStore = getLiveStoreInstance();

@@ -44,16 +44,18 @@ const mockAddToQueueAction = vi.fn().mockResolvedValue(undefined)
 const mockDeleteSmartPlaylistAction = vi.fn().mockResolvedValue(undefined)
 
 vi.mock('../../stores/livestore/actions', () => ({
-  playAllAction: (...args: any[]) => mockPlayAllAction(...args),
-  addToQueueAction: (...args: any[]) => mockAddToQueueAction(...args),
+  playAllAction: (...args: unknown[]) => mockPlayAllAction(...args),
+  addToQueueAction: (...args: unknown[]) => mockAddToQueueAction(...args),
 }))
 
 vi.mock('../../stores/livestore/actions/smartPlaylists', () => ({
-  deleteSmartPlaylistAction: (...args: any[]) => mockDeleteSmartPlaylistAction(...args),
+  deleteSmartPlaylistAction: (...args: unknown[]) => mockDeleteSmartPlaylistAction(...args),
 }))
 
 
 const mockDispatch = vi.fn()
+
+type MockRow = CollectionState['rows'][string]
 
 describe('Playlist', () => {
   const mockCollectionState: CollectionState = {
@@ -64,14 +66,14 @@ describe('Playlist', () => {
         duration: 180000,
         album: { id: 'album-1' },
         cover: { thumbnailUrl: 'cover1.jpg' }
-      } as any,
+      } as unknown as MockRow,
       'song-2': {
         id: 'song-2',
         title: 'Song 2',
         duration: 240000,
         album: { id: 'album-2' },
         cover: { thumbnailUrl: 'cover2.jpg' }
-      } as any,
+      } as unknown as MockRow,
       'song-3': {
         id: 'song-3',
         title: 'Song 3',
@@ -79,7 +81,7 @@ describe('Playlist', () => {
         album: { id: 'album-3' },
         cover: { thumbnailUrl: 'cover3.jpg' },
         genres: ['Rock']
-      } as any
+      } as unknown as MockRow
     },
     albums: {},
     artists: {},
@@ -123,9 +125,9 @@ describe('Playlist', () => {
       ...mockCollectionState,
       rows: {
         ...mockCollectionState.rows,
-        'song-1': { ...mockCollectionState.rows['song-1'], genres: ['Rock'] } as any,
-        'song-2': { ...mockCollectionState.rows['song-2'], genres: ['Pop'] } as any,
-        'song-3': { ...mockCollectionState.rows['song-3'], genres: ['Rock'] } as any
+        'song-1': { ...mockCollectionState.rows['song-1'], genres: ['Rock'] } as unknown as MockRow,
+        'song-2': { ...mockCollectionState.rows['song-2'], genres: ['Pop'] } as unknown as MockRow,
+        'song-3': { ...mockCollectionState.rows['song-3'], genres: ['Rock'] } as unknown as MockRow
       }
     },
     dispatch: mockDispatch

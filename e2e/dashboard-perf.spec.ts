@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
 /**
  * Focused test: measure what happens on the Dashboard route
@@ -10,17 +10,17 @@ import { test, expect } from '@playwright/test'
  * - Dashboard: useRecentlyPlayed, useMediaCount, useMostPlayed, useGenres, etc.
  */
 
-async function waitForLiveStore(page: any) {
+async function waitForLiveStore(page: Page) {
   await page.waitForFunction(
-    () => (window as any).__liveStore != null,
+    () => window.__liveStore != null,
     { timeout: 15_000 }
   )
   await page.waitForTimeout(500)
 }
 
-async function seedMedia(page: any, count: number) {
+async function seedMedia(page: Page, count: number) {
   await page.evaluate(async (count: number) => {
-    const store = (window as any).__liveStore
+    const store = window.__liveStore
     if (!store) throw new Error('LiveStore not available')
     const { mediaEvents } = await import('/src/stores/livestore/events/media.ts')
 
@@ -61,7 +61,7 @@ test.describe('Dashboard Performance', () => {
     // Measure: commit a single trivial media update and count how many
     // re-renders / long tasks it triggers
     const results = await page.evaluate(async () => {
-      const store = (window as any).__liveStore
+      const store = window.__liveStore
       const { mediaEvents } = await import('/src/stores/livestore/events/media.ts')
 
       let longTasks = 0
@@ -103,14 +103,12 @@ test.describe('Dashboard Performance', () => {
       return new Promise<{ avgFps: number; minFps: number; frameTimes: number[] }>((resolve) => {
         const frameTimes: number[] = []
         let lastTime = performance.now()
-        let frames = 0
         const duration = 3000
 
         const measure = (now: number) => {
           const delta = now - lastTime
           frameTimes.push(delta)
           lastTime = now
-          frames++
 
           if (now - frameTimes[0] < duration) {
             requestAnimationFrame(measure)
@@ -142,7 +140,7 @@ test.describe('Dashboard Performance', () => {
     await page.waitForTimeout(2000)
 
     const results = await page.evaluate(async () => {
-      const store = (window as any).__liveStore
+      const store = window.__liveStore
       const { mediaEvents } = await import('/src/stores/livestore/events/media.ts')
 
       let frameDips = 0

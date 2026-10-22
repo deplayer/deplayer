@@ -1,17 +1,20 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import type { ComponentProps } from 'react'
 import { Formik } from 'formik'
 
 import FormField from './FormField'
 
-const setup = (customProps: any) => {
+type FormFieldProps = ComponentProps<typeof FormField>
+
+const setup = (customProps: Partial<FormFieldProps>) => {
   const defaultProps = {
     field: {}
   }
 
-  const props = { ...defaultProps, ...customProps }
+  const props = { ...defaultProps, ...customProps } as FormFieldProps
 
-  render(<Formik initialValues={{}} onSubmit={(foo: any) => foo}>{() => (<FormField {...props} />)}</Formik>)
+  render(<Formik initialValues={{}} onSubmit={() => undefined}>{() => (<FormField {...props} />)}</Formik>)
 }
 
 describe('FormField', () => {

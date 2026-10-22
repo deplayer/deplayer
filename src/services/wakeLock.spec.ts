@@ -6,7 +6,7 @@ describe('WakeLock Service', () => {
   const mockRequest = vi.fn();
   let visibilityState = 'visible';
   let visibilityCallback: EventListenerOrEventListenerObject | null = null;
-  let releaseCallback: Function | null = null;
+  let releaseCallback: (() => void) | null = null;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -17,7 +17,7 @@ describe('WakeLock Service', () => {
     // Mock wake lock
     mockRequest.mockResolvedValue({
       release: mockRelease,
-      addEventListener: (event: string, callback: Function) => {
+      addEventListener: (event: string, callback: () => void) => {
         if (event === 'release') releaseCallback = callback;
       }
     });

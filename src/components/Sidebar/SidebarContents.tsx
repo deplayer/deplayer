@@ -24,7 +24,7 @@ import LogoSvg from '../../logo.svg?react'
 
 type ContentProps = {
   dispatch: Dispatch,
-  onSetSidebarOpen: Function,
+  onSetSidebarOpen: (open: boolean) => void,
   className?: string
 }
 

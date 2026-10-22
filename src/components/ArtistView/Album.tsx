@@ -5,6 +5,7 @@ import { Translate } from 'react-redux-i18n'
 import Icon from '../common/Icon'
 import SongRow from '../MusicTable/SongRow'
 import CoverImage from '../MusicTable/CoverImage'
+import type { MediaRow } from '../../types/media'
 import type { QueueState } from '../../stores/livestore/queue'
 import type { Dispatch } from 'redux'
 import { useAppStore } from '../../stores/livestore/store'
@@ -21,7 +22,7 @@ type AlbumProps = {
   songs: Array<string>,
   dispatch: Dispatch,
   queue: QueueState | null,
-  mediaMap: Record<string, any>  // Passed from parent - no hook call needed
+  mediaMap: Record<string, MediaRow>  // Passed from parent - no hook call needed
 }
 
 /**
@@ -91,7 +92,7 @@ const Album = React.memo((props: AlbumProps) => {
     for (const songId of uniqueSongsSet) {
       const song = mediaMap[songId]
       if (!song) {
-        console.warn(`Song ${songId} not found in collection for album ${props.album.name}`)
+        console.warn(`Song ${songId} not found in collection for album ${album.name}`)
         continue
       }
       
@@ -153,12 +154,12 @@ const Album = React.memo((props: AlbumProps) => {
         </div>
       )
     })
-  }, [songs, album.name, albumId, mediaMap, dispatch, playAlbum])
+  }, [songs, album.name, albumId, mediaMap, dispatch, uniqueSongIds])
 
   // Memoize the cover image source
   const coverSource = React.useMemo(() => {
     const firstSongId = songs?.[0]
-    return firstSongId ? mediaMap[firstSongId]?.cover : undefined
+    return firstSongId ? mediaMap[firstSongId]?.cover ?? undefined : undefined
   }, [songs, mediaMap])
 
   return (

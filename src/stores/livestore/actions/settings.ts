@@ -6,21 +6,6 @@ import { tables } from '../schema'
 
 const SETTINGS_STORAGE_KEY = 'deplayer-settings'
 
-// Stub for removed sync settings functionality
-const storeSyncSettings = async (_settings: Record<string, unknown>) => {}
-
-/**
- * localStorage fallback for settings persistence.
- * Used when LiveStore is running with the in-memory adapter (no SharedWorker).
- */
-const saveSettingsToLocalStorage = (settings: Record<string, unknown>) => {
-  try {
-    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings))
-  } catch (e) {
-    console.warn('[Settings] Failed to save settings to localStorage:', e)
-  }
-}
-
 const loadSettingsFromLocalStorage = (): Record<string, unknown> | null => {
   try {
     const raw = localStorage.getItem(SETTINGS_STORAGE_KEY)
@@ -107,18 +92,6 @@ export const saveSettingsAction = async (store: LiveStore, settingsPayload: Reco
   // Commit settings updated event
   store.commit(updateSettings('default', settingsToSave))
 
-  // Mirror to localStorage when using in-memory adapter
-  if (false) {
-    saveSettingsToLocalStorage(settingsToSave)
-  }
-
-  // Store sync settings in localStorage if provided
-  const appSettings = settingsToSave.app as Record<string, unknown>
-  const newSync = appSettings.sync as Record<string, unknown> | undefined
-  if (newSync) {
-    storeSyncSettings(newSync)
-  }
-
   // Return both old and new settings for saga to check if reconnection needed
   return {
     prevSettings,
@@ -133,9 +106,6 @@ export const saveSettingsAction = async (store: LiveStore, settingsPayload: Reco
 export const deleteSettingsAction = async (store: LiveStore) => {
   // Reset settings to defaults by overwriting with default values
   store.commit(initializeSettings('default', defaultSettings))
-
-  // Reset sync settings in localStorage to defaults
-  storeSyncSettings({ enabled: false, serverUrl: 'http://localhost:3000' })
 
   // Clear localStorage fallback
   try {

@@ -185,7 +185,7 @@ function WebtorrentServer({
       console.error('Error streaming torrent:', err)
       onError?.(err as Error)
     }
-  }, [onReady, onError, onBufferEnd])
+  }, [webtorrentService, onReady, onError, onBufferEnd])
 
   // Handle torrent loading
   React.useEffect(() => {
@@ -222,7 +222,9 @@ function WebtorrentServer({
         clearInterval(progressInterval.current)
       }
     }
-  }, [url, client, processTorrent]) // eslint-disable-next-line react-hooks/exhaustive-deps -- onError excluded to prevent stale callback issue
+  // onError and currentTorrent are intentionally excluded: onError to prevent a stale-callback re-add, currentTorrent is only read by the cleanup of the run that set it
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [url, client, processTorrent])
 
   const defaultStyle = {
     width: '100%',

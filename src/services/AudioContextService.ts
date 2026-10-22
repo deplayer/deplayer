@@ -37,7 +37,7 @@ class AudioContextService {
     if (!ctx) return null;
 
     // Return existing analyzer if we have one
-    let existingAnalyzer = this.analyzers.get(audioElement);
+    const existingAnalyzer = this.analyzers.get(audioElement);
     if (existingAnalyzer) {
       return existingAnalyzer;
     }

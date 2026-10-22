@@ -7,4 +7,5 @@
  * For persistent, synced state, use LiveStore queries and events.
  */
 
-export { ThemeProvider, useTheme, THEMES, type Theme } from './ThemeContext'
+export { ThemeProvider } from './ThemeContext'
+export { useTheme, THEMES, type Theme } from './themeContext'

@@ -9,6 +9,7 @@ import {
   saveToDbWorker,
 } from "./workers";
 import * as types from "../../constants/ActionTypes";
+import type { NormalizedMedia } from "../../utils/normalizeMedia";
 
 // Mock getLiveStoreInstance to return a fake store in tests
 vi.mock("../../stores/livestore/accessor", () => ({
@@ -32,7 +33,7 @@ describe("collection workers", () => {
 
   describe("saveToDbWorker", () => {
     it("works", () => {
-      const data: any[] = [];
+      const data: NormalizedMedia[] = [];
       return expectSaga(saveToDbWorker, data)
         .put({ type: types.SAVE_COLLECTION_FULLFILLED })
         .run(100);
@@ -75,10 +76,7 @@ describe("collection workers", () => {
 
   describe("importCollectionWorker", () => {
     it("dispatches finished with error since import is temporarily unavailable", () => {
-      return expectSaga(importCollectionWorker, {
-        type: "TO_BE_FIXED",
-        data: {},
-      })
+      return expectSaga(importCollectionWorker)
         .put({
           type: types.IMPORT_COLLECTION_FINISHED,
           result: { error: "Import collection is temporarily unavailable" },

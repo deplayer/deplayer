@@ -326,6 +326,9 @@ const MusicTable = ({
 
     // Slow path: use LiveStore hooks
     return <SongRowWithHooks key={key} {...sharedProps} />
+  // liveQueue is read via liveQueueRef, but it stays in the deps on purpose: a new rowRenderer identity
+  // makes the virtualized List re-render visible rows when the queue changes.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [liveQueue, mqlMatch, dispatch, disableAddButton, disableCovers, currentSongId])
 
   // Stable rowRenderer wrapper that includes slim without creating new function refs
@@ -347,7 +350,7 @@ const MusicTable = ({
     if (idx >= 0) setScrollToIndex(idx)
   }, [currentSongId, disableCurrent, tableIds])
 
-  const getActions = () => {
+  const actions = React.useMemo(() => {
     if (location.pathname.match(/\/song\/.*/)) {
       return <ToggleMiniQueueButton />
     }
@@ -384,9 +387,7 @@ const MusicTable = ({
       default:
         return null
     }
-  }
-
-  const actions = React.useMemo(() => getActions(), [location.pathname, currentSongId, tableIds.length, resolveAllIds])
+  }, [location.pathname, currentSongId, tableIds, resolveAllIds])
 
   // Clear scrollToIndex after first render so it doesn't fight with user scrolling
   React.useEffect(() => {

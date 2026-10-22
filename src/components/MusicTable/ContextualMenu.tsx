@@ -332,11 +332,15 @@ const ContextualMenu = (props: MenuProps) => {
     }
   }, [closeMenu])
 
+  // Keep the latest handler in a ref so the document listener below doesn't need re-subscribing every render
+  const handleKeyDownRef = useRef(handleKeyDown)
+  handleKeyDownRef.current = handleKeyDown
+
   useEffect(() => {
     if (isOpen) {
       document.addEventListener('click', handleClickOutside)
       const keydownHandler = (e: KeyboardEvent) => {
-        handleKeyDown(e as unknown as React.KeyboardEvent)
+        handleKeyDownRef.current(e as unknown as React.KeyboardEvent)
       }
       document.addEventListener('keydown', keydownHandler)
       return () => {
@@ -344,7 +348,7 @@ const ContextualMenu = (props: MenuProps) => {
         document.removeEventListener('keydown', keydownHandler)
       }
     }
-  }, [isOpen, handleClickOutside, handleKeyDown])
+  }, [isOpen, handleClickOutside])
 
   // Focus management
   useEffect(() => {

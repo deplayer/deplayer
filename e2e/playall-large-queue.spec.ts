@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
 /**
  * OOM regression guard for "PlayAll on a large collection".
@@ -19,17 +19,17 @@ import { test, expect } from '@playwright/test'
 const SEED_COUNT = 10_000
 const HEAP_BUDGET_MB = 250
 
-async function waitForLiveStore(page: any) {
+async function waitForLiveStore(page: Page) {
   await page.waitForFunction(
-    () => (window as any).__liveStore != null,
+    () => window.__liveStore != null,
     { timeout: 30_000 },
   )
   await page.waitForTimeout(500)
 }
 
-async function seedMedia(page: any, count: number) {
+async function seedMedia(page: Page, count: number) {
   await page.evaluate(async (count: number) => {
-    const store = (window as any).__liveStore
+    const store = window.__liveStore
     if (!store) throw new Error('LiveStore not available')
     const { mediaEvents } = await import('/src/stores/livestore/events/media.ts')
 
@@ -60,7 +60,7 @@ async function seedMedia(page: any, count: number) {
   }, count)
 }
 
-async function jsHeapMb(page: any): Promise<number> {
+async function jsHeapMb(page: Page): Promise<number> {
   const session = await page.context().newCDPSession(page)
   await session.send('HeapProfiler.collectGarbage')
   const { result } = await session.send('Runtime.evaluate', {
@@ -89,7 +89,7 @@ test.describe('OOM regression: PlayAll on large library', () => {
 
     // Queue the whole library and start playback.
     await page.evaluate(async () => {
-      const store = (window as any).__liveStore
+      const store = window.__liveStore
       const { queueEvents } = await import('/src/stores/livestore/events/queue.ts')
       const trackIds = Array.from({ length: 10_000 }, (_, i) => `oom-media-${i}`)
       await store.commit(
@@ -108,7 +108,6 @@ test.describe('OOM regression: PlayAll on large library', () => {
     await page.waitForTimeout(3000)
     const heapAfterPlayAll = await jsHeapMb(page)
 
-    // eslint-disable-next-line no-console
     console.log(
       `[oom] heap after seed: ${heapAfterSeed} MB, after PlayAll: ${heapAfterPlayAll} MB`,
     )

@@ -1,4 +1,3 @@
-/// <reference types="vitest" />
 /**
  * Store-field reachability check.
  *

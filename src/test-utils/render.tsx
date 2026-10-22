@@ -52,6 +52,3 @@ export const renderWithProviders = (
     })
   }
 }
-
-// Re-export everything
-export * from '@testing-library/react' 

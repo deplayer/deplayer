@@ -1,15 +1,15 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
-async function waitForLiveStore(page: any) {
+async function waitForLiveStore(page: Page) {
   await page.waitForFunction(
-    () => (window as any).__liveStore != null,
+    () => window.__liveStore != null,
     { timeout: 30_000 }
   )
 }
 
-async function seedMedia(page: any, count: number) {
+async function seedMedia(page: Page, count: number) {
   await page.evaluate(async (count: number) => {
-    const store = (window as any).__liveStore
+    const store = window.__liveStore
     if (!store) throw new Error('LiveStore not available')
     const { mediaEvents } = await import('/src/stores/livestore/events/media.ts')
     const BATCH = 200
@@ -55,7 +55,7 @@ test.describe('Scroll During Sync', () => {
     // Start scrolling while simultaneously adding new media
     // This simulates Navidrome sync running in background
     const results = await page.evaluate(async () => {
-      const store = (window as any).__liveStore
+      const store = window.__liveStore
       const { mediaEvents } = await import('/src/stores/livestore/events/media.ts')
       const list = document.querySelector('.music-table .ReactVirtualized__List')
       if (!list) return { error: 'List not found' }

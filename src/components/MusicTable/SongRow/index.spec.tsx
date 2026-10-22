@@ -3,6 +3,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
+import type { AnyAction } from 'redux'
 import type { MediaRow } from '../../../types/media'
 import SongRow from './index'
 import type { Props } from './index'
@@ -57,7 +58,7 @@ const setup = (overrideProps = {}) => {
   }
 
   const props: Props = {
-    dispatch: (_action: any) => _action,
+    dispatch: <T extends AnyAction>(_action: T) => _action,
     song: mockSong,
     queue: {
       trackIds: [],

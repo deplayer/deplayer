@@ -1,4 +1,3 @@
-import { ReactNode } from 'react'
 import { render } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
@@ -17,7 +16,7 @@ export interface TestState {
   i18n?: {
     locale: string
   }
-  translations?: Record<string, any>
+  translations?: Record<string, unknown>
 }
 
 export const defaultTestState: TestState = {
@@ -47,23 +46,6 @@ const createTestStore = (initialState: Partial<TestState> = {}) => {
   })
 }
 
-interface TestWrapperProps {
-  children: ReactNode
-  initialState?: Partial<TestState>
-}
-
-const TestWrapper = ({ children, initialState = {} }: TestWrapperProps) => {
-  const store = createTestStore(initialState)
-
-  return (
-    <Provider store={store}>
-      <BrowserRouter>
-        {children}
-      </BrowserRouter>
-    </Provider>
-  )
-}
-
 export const renderWithProviders = (
   ui: React.ReactElement,
   { initialState = {} }: { initialState?: Partial<TestState> } = {}
@@ -71,9 +53,11 @@ export const renderWithProviders = (
   return {
     ...render(ui, {
       wrapper: ({ children }) => (
-        <TestWrapper initialState={initialState}>
-          {children}
-        </TestWrapper>
+        <Provider store={createTestStore(initialState)}>
+          <BrowserRouter>
+            {children}
+          </BrowserRouter>
+        </Provider>
       )
     })
   }

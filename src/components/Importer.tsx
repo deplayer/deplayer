@@ -37,7 +37,7 @@ export default class Importer extends React.Component<Props> {
   updateProgress(evt: ProgressEvent): void {
     if (evt.lengthComputable) {
       // evt.loaded and evt.total are ProgressEvent properties
-      var loaded = (evt.loaded / evt.total);
+      const loaded = (evt.loaded / evt.total);
       if (loaded < 1) {
         // Increase the prog bar length
         // style.width = (loaded * 200) + "px";
@@ -47,7 +47,7 @@ export default class Importer extends React.Component<Props> {
   }
 
   getAsText(readFile: File) {
-    var reader = new FileReader()
+    const reader = new FileReader()
 
     // Read file into memory as UTF-16
     reader.readAsText(readFile, "UTF-8")

@@ -25,7 +25,7 @@ vi.mock("../../services/CollectionService", () => ({
 }));
 
 describe("addToCollectionWatcher", () => {
-  let mockChannel: Channel<any>;
+  let mockChannel: Channel<object>;
 
   beforeEach(() => {
     mockChannel = channel();

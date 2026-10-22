@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react'
+import { useState, useCallback, useEffect, ReactNode } from 'react'
+import { THEMES, DEFAULT_THEME, ThemeContext, type Theme, type ThemeContextValue } from './themeContext'
 
 /**
  * ThemeContext - UI Theme Management
@@ -10,28 +11,7 @@ import { createContext, useContext, useState, useCallback, useEffect, ReactNode 
  * See ThemeModal.tsx for full list.
  */
 
-export const THEMES = [
-  "deplayer", "deplayer-light", "light", "dark", "cupcake", "bumblebee", "emerald", 
-  "corporate", "synthwave", "retro", "cyberpunk", "valentine", "halloween", "garden", 
-  "forest", "aqua", "lofi", "fantasy", "black", "luxury", "dracula", "cmyk", "autumn", 
-  "business", "acid", "lemonade", "night", "coffee", "winter", "dim", "nord", "sunset", 
-  "teenage-engineering", "teenage-engineering-light", "cassette-futurism"
-] as const
-
-export type Theme = typeof THEMES[number]
-
-const DEFAULT_THEME: Theme = 'deplayer'
 const THEME_STORAGE_KEY = 'theme'
-
-type ThemeContextValue = {
-  theme: Theme
-  setTheme: (theme: Theme) => void
-}
-
-const ThemeContext = createContext<ThemeContextValue>({
-  theme: DEFAULT_THEME,
-  setTheme: () => {},
-})
 
 type Props = {
   children: ReactNode
@@ -65,12 +45,4 @@ export const ThemeProvider = ({ children }: Props) => {
   }
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
-}
-
-/**
- * Hook to access theme context
- * @throws Error if used outside ThemeProvider
- */
-export const useTheme = (): ThemeContextValue => {
-  return useContext(ThemeContext)
 }

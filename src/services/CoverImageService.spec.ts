@@ -53,9 +53,9 @@ describe('CoverImageService', () => {
   })
 
   it('should respect max concurrency', async () => {
-    const resolvers: Array<(v: any) => void> = []
+    const resolvers: Array<(v: undefined) => void> = []
     vi.mocked(fetch).mockImplementation(() => new Promise(resolve => {
-      resolvers.push(() => resolve(createMockResponse() as any))
+      resolvers.push(() => resolve(createMockResponse() as unknown as Response))
     }))
 
     const controllers = Array.from({ length: 5 }, () => new AbortController())
@@ -90,7 +90,7 @@ describe('CoverImageService', () => {
   })
 
   it('should abort fetch when signal is aborted and no other consumers', async () => {
-    let fetchAbortSignal: AbortSignal | undefined
+    let fetchAbortSignal: AbortSignal | null | undefined
     // Mock caches.open to return a cache with no match (so it proceeds to fetch)
     vi.stubGlobal('caches', {
       open: vi.fn().mockResolvedValue({
@@ -98,7 +98,7 @@ describe('CoverImageService', () => {
         put: vi.fn().mockResolvedValue(undefined),
       }),
     })
-    vi.mocked(fetch).mockImplementation((_url, opts: any) => {
+    vi.mocked(fetch).mockImplementation((_url, opts?: RequestInit) => {
       fetchAbortSignal = opts?.signal
       return new Promise((_resolve, reject) => {
         // Simulate real fetch abort behavior

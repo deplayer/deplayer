@@ -39,7 +39,7 @@ function ReloadPrompt() {
     toast.info(msg, {
       autoClose: false,
     })
-  }, [offlineReady, needRefresh])
+  }, [offlineReady, needRefresh, updateServiceWorker])
 
   return <></>
 }

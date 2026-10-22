@@ -174,7 +174,7 @@ function CommandBar({ togglePlaying, playNext, playPrev }: Props) {
   }))
 
   // Define available commands
-  const commands: CommandItem[] = [
+  const commands: CommandItem[] = useMemo(() => [
     {
       id: 'toggle-playing',
       type: 'command',
@@ -218,10 +218,10 @@ function CommandBar({ togglePlaying, playNext, playPrev }: Props) {
       category: 'commands',
       icon: 'faRedo'
     }
-  ]
+  ], [togglePlaying, playNext, playPrev, liveStore, liveQueue?.shuffle, liveQueue?.repeat])
 
   // Define navigation items
-  const navigationItems: NavigationItem[] = [
+  const navigationItems: NavigationItem[] = useMemo(() => [
     {
       id: 'nav-artists',
       type: 'navigation',
@@ -270,7 +270,7 @@ function CommandBar({ togglePlaying, playNext, playPrev }: Props) {
       category: 'sidebar',
       path: '/explore'
     }
-  ]
+  ], [])
 
   const filterItems = useCallback((items: CommandBarItem[], searchTerm: string): CommandBarItem[] => {
     if (!searchTerm) return items
@@ -432,13 +432,14 @@ function CommandBar({ togglePlaying, playNext, playPrev }: Props) {
         e.preventDefault()
         setSelectedIndex(prev => prev > 0 ? prev - 1 : prev)
         break
-      case 'Enter':
+      case 'Enter': {
         e.preventDefault()
         const selectedItem = allItems[selectedIndex]
         if (selectedItem) {
           handleItemSelect(selectedItem)
         }
         break
+      }
       case 'Escape':
         e.preventDefault()
         handleClose()

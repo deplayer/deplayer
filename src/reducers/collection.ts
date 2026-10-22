@@ -86,7 +86,7 @@ export default (state: State = defaultState, action: CollectionAction = {}) => {
       // No Redux state update needed
       return state;
 
-    case types.RECEIVE_SETTINGS:
+    case types.RECEIVE_SETTINGS: {
       const enabledProviders = Array.from(
         new Set(
           Object.keys(action.settings!.providers).filter(
@@ -99,6 +99,7 @@ export default (state: State = defaultState, action: CollectionAction = {}) => {
         ...state,
         enabledProviders,
       };
+    }
 
     case types.CLEAR_COLLECTION:
       return {
@@ -119,7 +120,7 @@ export default (state: State = defaultState, action: CollectionAction = {}) => {
       // No Redux state needed - components use LiveStore hooks
       return state;
 
-    case types.UPDATE_MEDIA:
+    case types.UPDATE_MEDIA: {
       const media = action.media!;
       return {
         ...state,
@@ -128,13 +129,15 @@ export default (state: State = defaultState, action: CollectionAction = {}) => {
           [media.id]: media,
         },
       };
+    }
 
-    case types.SET_SEARCH_RESULTS:
+    case types.SET_SEARCH_RESULTS: {
       const searchResults = action.searchResults || [];
       return {
         ...state,
         searchResults: Array.from(new Set(searchResults.map((media: MediaRow) => media.id))),
       };
+    }
 
     case types.FETCH_RECENT_ALBUMS_SUCCESS:
       return {

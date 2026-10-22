@@ -1,8 +1,9 @@
-import { takeEvery, put, call, select } from "redux-saga/effects";
+import { type Effect, takeEvery, put, call, select } from "redux-saga/effects";
 import { joinRoom } from "trystero/nostr";
 import * as types from "../../constants/ActionTypes";
 import PeerService from "../../services/PeerService";
 import { Store } from "redux";
+import type { Room } from "trystero";
 
 interface JoinRoomAction {
   type: typeof types.JOIN_ROOM_REQUESTED;
@@ -12,11 +13,11 @@ interface JoinRoomAction {
 function* handleJoinRoom(
   store: Store,
   action: JoinRoomAction
-): Generator<any, void, any> {
+): Generator<Effect, void, unknown> {
   const { roomCode, username, config } = action.payload;
 
   try {
-    const room = yield call(joinRoom, config, roomCode);
+    const room = (yield call(joinRoom, config, roomCode)) as Room;
     const peerService = PeerService.getInstance(store.dispatch, store.getState().collection);
 
     console.log("About to setup communication channels...");
@@ -53,13 +54,13 @@ interface LeaveRoomAction {
   payload: { roomCode: string };
 }
 
-function* handleLeaveRoom(action: LeaveRoomAction): Generator<any, void, any> {
+function* handleLeaveRoom(action: LeaveRoomAction): Generator<Effect, void, unknown> {
   const { roomCode } = action.payload;
 
   try {
-    const roomState = yield select((state: { rooms: Map<string, { room: { leave: () => void } }> }) => state.rooms.get(roomCode));
+    const roomState = (yield select((state: { rooms: Map<string, { room: { leave: () => void } }> }) => state.rooms.get(roomCode))) as { room: { leave: () => void } } | undefined
     if (roomState) {
-      yield call((roomState as { room: { leave: () => void } }).room.leave);
+      yield call(roomState.room.leave);
       yield put({ type: types.REMOVE_ROOM, room: roomCode });
       yield put({ type: types.RESET_PEER_STATUS, roomCode });
     }

@@ -125,9 +125,7 @@ export async function removeMediaBulkAction(
  * Clear entire collection - removes all media
  * Note: This requires querying all media IDs first
  */
-export async function clearCollectionAction(
-  _store: LiveStore
-): Promise<void> {
+export async function clearCollectionAction(): Promise<void> {
   // We'll need to get all media IDs and remove them
   // This assumes you have access to the store's query capabilities
   // For now, this is a placeholder that would need the actual implementation

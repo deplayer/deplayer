@@ -1,5 +1,7 @@
-import { actionChannel, fork, take, put } from "redux-saga/effects";
+import { type Effect, actionChannel, fork, take, put } from "redux-saga/effects";
 
+import type { Channel } from "redux-saga";
+import type { NormalizedMedia } from "../../utils/normalizeMedia";
 import { saveToDbWorker } from "./workers";
 import { getLiveStoreInstance } from "../../stores/livestore/accessor";
 import { initializeSettingsAction } from "../../stores/livestore/actions/settings";
@@ -8,11 +10,11 @@ import { createLogger } from "../../utils/logger";
 
 const logger = createLogger({ namespace: "collection-watchers" });
 
-export function* addToCollectionWatcher(): Generator<any, void, any> {
-  const handleChannel = yield actionChannel(types.ADD_TO_COLLECTION);
+export function* addToCollectionWatcher(): Generator<Effect, void, unknown> {
+  const handleChannel = (yield actionChannel(types.ADD_TO_COLLECTION)) as Channel<{ data: Array<NormalizedMedia> }>;
 
   while (true) {
-    const { data } = yield take(handleChannel);
+    const { data } = (yield take(handleChannel)) as { data: Array<NormalizedMedia> };
 
     try {
       yield fork(saveToDbWorker, data);
@@ -28,7 +30,7 @@ export function* addToCollectionWatcher(): Generator<any, void, any> {
 }
 
 // Application initialization routines
-export function* initializeWatcher(): Generator<any, void, any> {
+export function* initializeWatcher(): Generator<Effect, void, unknown> {
   while (true) {
     yield take(types.INITIALIZE);
     

@@ -73,7 +73,7 @@ export default (state: State = defaultState, action: Action) => {
         ],
       };
 
-    case types.JOIN_PEER_ROOM:
+    case types.JOIN_PEER_ROOM: {
       const existingRoomIndex = state.rooms.findIndex(
         (room) => room.id === action.roomCode
       );
@@ -98,6 +98,7 @@ export default (state: State = defaultState, action: Action) => {
           },
         ],
       };
+    }
 
     case types.REMOVE_ROOM:
       return {

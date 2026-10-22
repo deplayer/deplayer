@@ -1,5 +1,4 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { AnyAction } from "redux";
 import { State as RootState } from "../reducers";
 import { State as CollectionState, defaultState as collectionDefaultState } from "../reducers/collection";
 import { State as SearchState, defaultState as searchDefaultState } from "../reducers/search";
@@ -30,7 +29,7 @@ export const createTestStore = (initialState: Partial<RootState> = {}) => {
   const defaultState = createDefaultState();
 
   return configureStore({
-    reducer: (state = defaultState, _action: AnyAction) => state,
+    reducer: (state = defaultState) => state,
     preloadedState: { ...defaultState, ...initialState },
   });
 };

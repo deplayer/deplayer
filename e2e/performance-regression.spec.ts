@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
 /**
  * Performance regression tests for deplayer.
@@ -13,23 +13,23 @@ import { test, expect } from '@playwright/test'
 
 // --- Helpers ---
 
-async function waitForLiveStore(page: any) {
+async function waitForLiveStore(page: Page) {
   await page.waitForFunction(
-    () => (window as any).__liveStore != null,
+    () => window.__liveStore != null,
     { timeout: 15_000 }
   )
   await page.waitForTimeout(500)
 }
 
-async function navigateToCollection(page: any) {
+async function navigateToCollection(page: Page) {
   await page.locator('a[href="/collection"]').last().click({ force: true })
   await page.waitForURL('**/collection')
   await page.waitForTimeout(1500)
 }
 
-async function seedMedia(page: any, count: number, prefix = 'perf') {
+async function seedMedia(page: Page, count: number, prefix = 'perf') {
   return page.evaluate(async ({ count, prefix }: { count: number; prefix: string }) => {
-    const store = (window as any).__liveStore
+    const store = window.__liveStore
     if (!store) throw new Error('LiveStore not available')
 
     const { mediaEvents } = await import('/src/stores/livestore/events/media.ts')
@@ -75,9 +75,9 @@ interface PerfMetrics {
  * Start performance monitoring inside the page.
  * Returns a handle that can be stopped later to collect metrics.
  */
-async function startPerfMonitor(page: any): Promise<void> {
+async function startPerfMonitor(page: Page): Promise<void> {
   await page.evaluate(() => {
-    const w = window as any
+    const w = window
     w.__perfLongTasks = 0
     w.__perfTotalBlocking = 0
     w.__perfFrameDips = 0
@@ -104,9 +104,9 @@ async function startPerfMonitor(page: any): Promise<void> {
   })
 }
 
-async function stopPerfMonitor(page: any): Promise<PerfMetrics> {
+async function stopPerfMonitor(page: Page): Promise<PerfMetrics> {
   return page.evaluate(() => {
-    const w = window as any
+    const w = window
     w.__perfMeasuring = false
     w.__perfObserver?.disconnect()
     return {
@@ -141,7 +141,7 @@ test.describe('Performance Regression Suite', () => {
 
     // Simulate what BatchedMediaCommitter does: skipRefresh chunks + final manualRefresh
     await page.evaluate(async () => {
-      const store = (window as any).__liveStore
+      const store = window.__liveStore
       const { mediaEvents } = await import('/src/stores/livestore/events/media.ts')
 
       const BATCHES = 5
@@ -192,7 +192,7 @@ test.describe('Performance Regression Suite', () => {
 
     // Simulate the BAD path: each batch commits without skipRefresh
     await page.evaluate(async () => {
-      const store = (window as any).__liveStore
+      const store = window.__liveStore
       const { mediaEvents } = await import('/src/stores/livestore/events/media.ts')
 
       const BATCHES = 5
@@ -236,7 +236,7 @@ test.describe('Performance Regression Suite', () => {
     await startPerfMonitor(page)
 
     await page.evaluate(async () => {
-      const store = (window as any).__liveStore
+      const store = window.__liveStore
       const { mediaEvents } = await import('/src/stores/livestore/events/media.ts')
 
       for (let i = 0; i < 10; i++) {
@@ -262,7 +262,7 @@ test.describe('Performance Regression Suite', () => {
     await startPerfMonitor(page)
 
     await page.evaluate(async () => {
-      const store = (window as any).__liveStore
+      const store = window.__liveStore
       const { mediaEvents } = await import('/src/stores/livestore/events/media.ts')
 
       for (let i = 0; i < 10; i++) {
@@ -304,7 +304,7 @@ test.describe('Performance Regression Suite', () => {
 
     // Set up queue before measuring (this is an expensive one-time operation)
     await page.evaluate(async () => {
-      const store = (window as any).__liveStore
+      const store = window.__liveStore
       const { queueEvents } = await import('/src/stores/livestore/events/queue.ts')
       await store.commit(queueEvents.queueUpdated({
         id: 'default',
@@ -320,7 +320,7 @@ test.describe('Performance Regression Suite', () => {
 
     // Simulate rapid queue position changes (as if songs are advancing)
     await page.evaluate(async () => {
-      const store = (window as any).__liveStore
+      const store = window.__liveStore
       const { queueEvents } = await import('/src/stores/livestore/events/queue.ts')
 
       for (let i = 1; i <= 10; i++) {

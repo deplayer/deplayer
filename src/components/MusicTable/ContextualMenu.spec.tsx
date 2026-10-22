@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
+import { createStore, type Store } from 'redux'
 import ContextualMenu from './ContextualMenu'
 import type { MediaRow } from '../../types/media'
 import { type QueueState } from '../../stores/livestore/queue'
@@ -21,9 +21,9 @@ const mockRemoveFromQueueAction = vi.fn().mockResolvedValue(undefined)
 const mockAddNextAction = vi.fn().mockResolvedValue('track-id')
 
 vi.mock('../../stores/livestore/actions', () => ({
-  addToQueueAction: (...args: any[]) => mockAddToQueueAction(...args),
-  addNextAction: (...args: any[]) => mockAddNextAction(...args),
-  removeFromQueueAction: (...args: any[]) => mockRemoveFromQueueAction(...args),
+  addToQueueAction: (...args: unknown[]) => mockAddToQueueAction(...args),
+  addNextAction: (...args: unknown[]) => mockAddNextAction(...args),
+  removeFromQueueAction: (...args: unknown[]) => mockRemoveFromQueueAction(...args),
 }))
 
 vi.mock('../../stores/livestore/store', () => ({
@@ -43,7 +43,7 @@ vi.mock('../../stores/livestore/hooks', () => ({
 describe('ContextualMenu', () => {
   let mockSong1: MediaRow
   let mockSong2: MediaRow
-  let mockStore: any
+  let mockStore: Store<{ queue: QueueState }>
   let user: ReturnType<typeof userEvent.setup>
 
   beforeEach(() => {

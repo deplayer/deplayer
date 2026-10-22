@@ -1,15 +1,15 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
-async function waitForLiveStore(page: any) {
+async function waitForLiveStore(page: Page) {
   await page.waitForFunction(
-    () => (window as any).__liveStore != null,
+    () => window.__liveStore != null,
     { timeout: 30_000 }
   )
 }
 
-async function seedMedia(page: any, count: number) {
+async function seedMedia(page: Page, count: number) {
   await page.evaluate(async (count: number) => {
-    const store = (window as any).__liveStore
+    const store = window.__liveStore
     if (!store) throw new Error('LiveStore not available')
     const { mediaEvents } = await import('/src/stores/livestore/events/media.ts')
     const BATCH = 200
@@ -110,10 +110,9 @@ test.describe('Scroll Performance - Collection', () => {
     console.log(`Rows visible before scroll: ${results.rowsVisible}`)
     console.log(`Total frames: ${results.totalFrames}`)
     console.log(`Average FPS: ${results.avgFps}`)
-    console.log(`P95 FPS: ${(results as any).p95Fps}`)
+    console.log(`P95 FPS: ${results.p95Fps}`)
     console.log(`Min FPS: ${results.minFps}`)
     console.log(`Dropped frames (below 30fps): ${results.droppedFrames}`)
-    if ((results as any).error) console.log(`Error: ${(results as any).error}`)
 
     expect(results.avgFps, 'Average FPS during scroll').toBeGreaterThan(15)
   })
@@ -162,7 +161,6 @@ test.describe('Scroll Performance - Collection', () => {
     console.log(`\n=== ROW RENDERING CHECK (5K items) ===`)
     console.log(`At 50%: ${result.midSongRows} song rows, ${result.midLoadingRows} loading rows`)
     console.log(`At 75%: ${result.lateSongRows} song rows, ${result.lateLoadingRows} loading rows`)
-    if ((result as any).error) console.log(`Error: ${(result as any).error}`)
 
     expect(result.midSongRows, 'Song rows at 50% scroll').toBeGreaterThan(0)
     expect(result.midLoadingRows, 'Loading rows at 50% scroll').toBe(0)

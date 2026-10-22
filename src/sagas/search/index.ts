@@ -1,4 +1,5 @@
 import {
+  type Effect,
   call,
   put,
   takeLatest,
@@ -15,7 +16,7 @@ import { batchedMediaCommitter } from "../../stores/livestore/services/BatchedMe
 import { NormalizedMedia } from "../../utils/normalizeMedia";
 
 // Going to search results page
-export function* goToSearchResults(): Generator<any, void, any> {
+export function* goToSearchResults(): Generator<Effect, void, unknown> {
   yield put(push("/search-results"));
 }
 
@@ -24,16 +25,16 @@ export function* goToSearchResults(): Generator<any, void, any> {
 function* performSingleProviderSearch(
   searchTerm: string,
   provider: string
-): Generator<any, void, any> {
+): Generator<Effect, void, unknown> {
   try {
     const settings = yield* getSettingsFromLiveStore();
     const providerService = new ProvidersService(settings);
     
-    const searchResults: NormalizedMedia[] = yield call(
+    const searchResults = (yield call(
       providerService.searchForProvider,
       searchTerm,
       provider
-    );
+    )) as NormalizedMedia[];
 
     if (searchResults && searchResults.length > 0) {
       // Get LiveStore instance and initialize batched committer
@@ -61,7 +62,7 @@ type SearchAction = {
 };
 
 // Handling search saga
-export function* search(action: SearchAction): Generator<any, void, any> {
+export function* search(action: SearchAction): Generator<Effect, void, unknown> {
   const searchTerm = action.searchTerm;
   const redirect = !action.noRedirect;
 
@@ -103,7 +104,7 @@ export function* search(action: SearchAction): Generator<any, void, any> {
 }
 
 // Binding actions to sagas
-function* searchSaga(): Generator<any, void, any> {
+function* searchSaga(): Generator<Effect, void, unknown> {
   yield takeLatest(types.START_SEARCH, search);
 }
 

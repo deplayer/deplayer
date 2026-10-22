@@ -404,7 +404,6 @@ export const useMediaMapForIds = (ids: string[]) => {
 
   if (validIds.length > MEDIA_MAP_SOFT_CAP && !mediaMapOverCapWarned) {
     mediaMapOverCapWarned = true
-    // eslint-disable-next-line no-console
     console.warn(
       `[useMediaMapForIds] subscribed to ${validIds.length} ids (cap ${MEDIA_MAP_SOFT_CAP}). ` +
         `Use useMediaById per row or paginate.`,

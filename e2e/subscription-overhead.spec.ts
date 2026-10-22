@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
 /**
  * Measures the cost of phantom media-table subscriptions.
@@ -13,17 +13,17 @@ import { test, expect } from '@playwright/test'
  *    (where SidebarContents + CommandBar are always mounted)
  */
 
-async function waitForLiveStore(page: any) {
+async function waitForLiveStore(page: Page) {
   await page.waitForFunction(
-    () => (window as any).__liveStore != null,
+    () => window.__liveStore != null,
     { timeout: 15_000 }
   )
   await page.waitForTimeout(500)
 }
 
-async function seedMedia(page: any, count: number) {
+async function seedMedia(page: Page, count: number) {
   await page.evaluate(async (count: number) => {
-    const store = (window as any).__liveStore
+    const store = window.__liveStore
     if (!store) throw new Error('LiveStore not available')
     const { mediaEvents } = await import('/src/stores/livestore/events/media.ts')
 
@@ -68,7 +68,7 @@ test.describe('Subscription Overhead', () => {
 
     // Measure: commit a MediaUpdated event (simulates metadata correction)
     const results = await page.evaluate(async () => {
-      const store = (window as any).__liveStore
+      const store = window.__liveStore
       const { mediaEvents } = await import('/src/stores/livestore/events/media.ts')
 
       let longTasks = 0
@@ -119,7 +119,7 @@ test.describe('Subscription Overhead', () => {
 
     // Simulate a background sync adding 50 new items (periodic sync scenario)
     const results = await page.evaluate(async () => {
-      const store = (window as any).__liveStore
+      const store = window.__liveStore
       const { mediaEvents } = await import('/src/stores/livestore/events/media.ts')
 
       let longTasks = 0

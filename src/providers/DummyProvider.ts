@@ -10,7 +10,7 @@ export default class DummyProvider implements IMusicProvider {
     this.enabled = settings.enabled
   }
 
-  search(_searchTerm: string): Promise<NormalizedMedia[]> {
+  search(): Promise<NormalizedMedia[]> {
     return new Promise((resolve) => {
       resolve([] as NormalizedMedia[])
     })
