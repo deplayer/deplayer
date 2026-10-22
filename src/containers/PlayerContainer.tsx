@@ -7,6 +7,7 @@ import { useQueue, useSettings, useMediaById } from '../stores/livestore/hooks'
 import { getActiveTrackIds, resolveCurrentSongId } from '../stores/livestore/queue'
 import { useUIStore } from '../stores/uiStore'
 import { defaultState as settingsDefaultState } from '../reducers/settings'
+import { useAudioElement } from '../hooks/useAudioElement'
 import type { HtmlPortalNode } from 'react-reverse-portal'
 
 type Props = {
@@ -22,6 +23,7 @@ const PlayerContainer = ({ playerPortal }: Props) => {
 
   const showVisuals = useUIStore((s) => s.showVisuals)
   const showSpectrum = useUIStore((s) => s.showSpectrum)
+  const audioElement = useAudioElement()
   const mqlMatch = useUIStore((s) => s.mqlMatch)
 
   const location = useLocation()
@@ -76,6 +78,7 @@ const PlayerContainer = ({ playerPortal }: Props) => {
     <PlayerControls
       showVisuals={showVisuals}
       showSpectrum={showSpectrum}
+      audioElement={audioElement}
       mqlMatch={mqlMatch}
       slim={false}
       player={player}

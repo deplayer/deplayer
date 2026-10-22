@@ -12,7 +12,7 @@ import RightPanelContainer from './RightPanelContainer'
 import ButterchurnVisualizer from '../components/ButterchurnVisualizer'
 import VisualizerPanel from '../components/Player/VisualizerPanel'
 import { panelContainerStyleFromPosition } from '../components/Player/panelPosition'
-import PlayerRefService from '../services/PlayerRefService'
+import { useAudioElement } from '../hooks/useAudioElement'
 import { useUIStore } from '../stores/uiStore'
 import { CSSTransition } from 'react-transition-group'
 
@@ -35,15 +35,7 @@ const Layout = ({ children }: LayoutProps) => {
   // removed findDOMNode, so the ref is mandatory here.
   const panelRef = React.useRef<HTMLDivElement>(null)
 
-  const getInternalPlayer = () => {
-    const playerRef = PlayerRefService.getInstance().getPlayerRef()
-    if (!playerRef?.current) return null
-    const internalPlayer = playerRef.current.getInternalPlayer()
-    if (internalPlayer instanceof HTMLAudioElement) return internalPlayer
-    return null
-  }
-
-  const internalPlayer = getInternalPlayer()
+  const internalPlayer = useAudioElement()
 
   const panelContainerStyle = panelContainerStyleFromPosition(
     panelPositionRight,

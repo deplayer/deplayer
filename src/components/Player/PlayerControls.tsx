@@ -27,6 +27,7 @@ ReactPlayer.addCustomPlayer(PeerStreamPlayer as unknown as ReactPlayer)
 interface Props {
   showVisuals: boolean
   showSpectrum: boolean
+  audioElement: HTMLAudioElement | null
   mqlMatch: boolean
   queue: QueueState | null
   location: Location
@@ -245,6 +246,10 @@ class PlayerControls extends React.Component<Props, State> {
     this.props.dispatch({ type: types.SET_PLAYER_DURATION, value: duration })
   }
 
+  onReady = (): void => {
+    PlayerRefService.getInstance().notifyAudioElementChanged()
+  }
+
   // Play prev song of the player list
   playPrev = (): void => {
     this.props.dispatch({ type: types.PLAY_PREV })
@@ -273,15 +278,6 @@ class PlayerControls extends React.Component<Props, State> {
     if (!this.props.player.showPlayer) {
       this.props.dispatch({ type: types.SHOW_PLAYER })
     }
-  }
-
-  getInternalPlayer = (): HTMLAudioElement | null => {
-    if (!this.playerRef.current) return null
-    const internalPlayer = this.playerRef.current.getInternalPlayer()
-    if (internalPlayer instanceof HTMLAudioElement) {
-      return internalPlayer
-    }
-    return null
   }
 
   onSeekMouseUp = (value: number | number[]): void => {
@@ -360,7 +356,7 @@ class PlayerControls extends React.Component<Props, State> {
       'backdrop-blur': this.props.player.fullscreen
     })
 
-    const internalPlayer = this.getInternalPlayer()
+    const internalPlayer = this.props.audioElement
 
     return (
       <React.Fragment>
@@ -392,6 +388,7 @@ class PlayerControls extends React.Component<Props, State> {
                 }
               }}
               config={config}
+              onReady={this.onReady}
               onError={this.handleError}
               onProgress={this.onProgress}
               onDuration={this.onDuration}

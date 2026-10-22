@@ -71,6 +71,10 @@ class ButterchurnVisualizer extends React.Component<Props> {
 
   componentDidUpdate(prevProps: Props) {
     if (this.props.playerRef !== prevProps.playerRef) {
+      this.analyser = AudioContextService.getInstance().getAnalyser(this.props.playerRef)
+      if (this.analyser && this.visualizer) {
+        this.visualizer.connectAudio(this.analyser)
+      }
       this.loadRandomPreset()
     }
   }

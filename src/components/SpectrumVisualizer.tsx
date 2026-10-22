@@ -53,29 +53,61 @@ class SpectrumVisualizer extends React.Component<Props> {
 
   componentDidMount() {
     this.prepareElements()
-    this.analyser = AudioContextService.getInstance().getAnalyser(this.props.playerRef)
-    if (this.analyser) {
-      this.initAudioEvents(this.analyser)
+    this.attach(this.props.playerRef)
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    // ReactPlayer is keyed per track, so each track brings a new <audio> element.
+    if (prevProps.playerRef !== this.props.playerRef) {
+      this.detach(prevProps.playerRef)
+      this.attach(this.props.playerRef)
     }
   }
 
   componentWillUnmount() {
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId)
+    this.detach(this.props.playerRef)
+  }
+
+  // Playback is started imperatively, usually before this component mounts,
+  // so the 'play' event alone cannot be relied on to start drawing.
+  attach = (element: HTMLAudioElement) => {
+    this.analyser = AudioContextService.getInstance().getAnalyser(element)
+    if (!this.analyser) return
+    element.addEventListener('play', this.onPlay)
+    element.addEventListener('pause', this.onPause)
+    if (!element.paused) {
+      this.onPlay()
     }
   }
 
-  initAudioEvents = (analyser: AnalyserNode) => {
-    this.props.playerRef.onpause = () => {
-      this.playStatus = 'PAUSED'
+  detach = (element: HTMLAudioElement) => {
+    element.removeEventListener('play', this.onPlay)
+    element.removeEventListener('pause', this.onPause)
+    this.stopDrawing()
+    this.analyser = null
+  }
+
+  onPlay = () => {
+    this.playStatus = 'PLAYING'
+    if (this.analyser) {
+      this.drawSpectrum(this.analyser)
     }
-    this.props.playerRef.onplay = () => {
-      this.playStatus = 'PLAYING'
-      this.drawSpectrum(analyser)
+  }
+
+  onPause = () => {
+    this.playStatus = 'PAUSED'
+  }
+
+  stopDrawing = () => {
+    if (this.animationId !== null) {
+      cancelAnimationFrame(this.animationId)
+      this.animationId = null
     }
   }
 
   drawSpectrum = (analyser: AnalyserNode) => {
+    // A pause/play cycle restarts the loop; never run two at once.
+    this.stopDrawing()
     if (!this.canvas) return
 
     const cwidth = this.canvas.width
@@ -106,9 +138,7 @@ class SpectrumVisualizer extends React.Component<Props> {
         const allCapsReachBottom = !capYPositionArray.some(cap => cap > 0)
         if (allCapsReachBottom) {
           ctx.clearRect(0, 0, cwidth, cheight + this.props.capHeight)
-          if (this.animationId) {
-            cancelAnimationFrame(this.animationId)
-          }
+          this.stopDrawing()
           return
         }
       }

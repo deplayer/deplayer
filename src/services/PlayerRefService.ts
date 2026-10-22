@@ -19,6 +19,7 @@ const logger = createLogger({ namespace: "PlayerRefService" });
 class PlayerRefService implements PlaybackTransport {
   private static instance: PlayerRefService;
   private playerRef: React.RefObject<ReactPlayer | null> | null = null;
+  private audioElementListeners = new Set<() => void>();
 
   private constructor() {}
 
@@ -31,10 +32,33 @@ class PlayerRefService implements PlaybackTransport {
 
   setPlayerRef(ref: React.RefObject<ReactPlayer | null> | null) {
     this.playerRef = ref;
+    this.notifyAudioElementChanged();
   }
 
   getPlayerRef(): React.RefObject<ReactPlayer | null> | null {
     return this.playerRef;
+  }
+
+  /** The <audio> element ReactPlayer renders right now; null for video, iframes, or no player. */
+  getAudioElement = (): HTMLAudioElement | null => {
+    const internal = this.playerRef?.current?.getInternalPlayer();
+    return internal instanceof HTMLAudioElement ? internal : null;
+  };
+
+  /**
+   * ReactPlayer is keyed per track, so every track change mounts a new media
+   * element. Audio-graph consumers (spectrum, visualizers) subscribe here to
+   * rebind instead of holding on to a detached element.
+   */
+  subscribeAudioElement = (listener: () => void): (() => void) => {
+    this.audioElementListeners.add(listener);
+    return () => {
+      this.audioElementListeners.delete(listener);
+    };
+  };
+
+  notifyAudioElementChanged(): void {
+    for (const listener of this.audioElementListeners) listener();
   }
 
 
