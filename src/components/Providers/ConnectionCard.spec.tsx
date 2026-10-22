@@ -84,6 +84,14 @@ describe('ConnectionCard — visual shell', () => {
     expect(screen.getByTestId('field-row-subsonic-baseUrl')).toBeInTheDocument()
   })
 
+  it('populates text and url inputs with the stored config values', async () => {
+    const user = userEvent.setup()
+    render(<ConnectionCard {...defaultProps} />)
+    await user.click(screen.getByTestId('card-title-subsonic'))
+    expect(within(screen.getByTestId('field-row-subsonic-baseUrl')).getByRole('textbox')).toHaveValue('https://nav.example.com')
+    expect(within(screen.getByTestId('field-row-subsonic-user')).getByRole('textbox')).toHaveValue('genar')
+  })
+
   it('renders the disabled status dot when config.enabled is false', () => {
     render(<ConnectionCard {...defaultProps} config={{ ...baseConfig, enabled: false }} />)
     expect(screen.getByLabelText(/Disabled/i)).toBeInTheDocument()

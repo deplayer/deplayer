@@ -60,6 +60,7 @@ const FormField = ({ field }: Props) => {
     return (
       <div>
         <Field
+          name={field.name}
           id={`field-${field.name}`}
           as="select"
           className="select select-bordered w-full"
@@ -78,6 +79,7 @@ const FormField = ({ field }: Props) => {
   return (
     <div>
       <Field
+        name={field.name}
         id={`field-${field.name}`}
         type={field.type}
         className="input input-bordered w-full"
