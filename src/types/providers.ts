@@ -11,20 +11,8 @@ export type FieldSchema = {
   options?: Array<{ label: string; value: string }>
 }
 
-export type TitleField = {
-  type: 'title'
-  label: string
-}
-
-export type SyncField = {
-  type: 'sync'
-  providerKey: string
-}
-
-/** FieldSchema after SettingsBuilder adds the Formik field path */
+/** FieldSchema plus the Formik field path */
 export type BuiltFieldSchema = FieldSchema & { name: string }
-
-export type FormField = BuiltFieldSchema | TitleField | SyncField
 
 export type ProviderSchema = {
   key: string
@@ -32,12 +20,6 @@ export type ProviderSchema = {
   repeatable: boolean
   fields: FieldSchema[]
   capabilities: Array<'sync' | 'search' | 'stream'>
-}
-
-export type SectionSchema = {
-  key: string
-  label: string
-  fields: FieldSchema[]
 }
 
 export type HealthStatus =

@@ -9,17 +9,21 @@ type Props = {
 const FormField = ({ field }: Props) => {
   const [showPassword, setShowPassword] = useState(false)
 
+  // Every input shares these; a Field without `name` binds to the whole values object.
+  const common = { name: field.name, id: `field-${field.name}` }
+
   const description = field.description ? (
     <p className="text-xs text-base-content/60 mt-1">{field.description}</p>
   ) : null
 
-  if (field.type === 'boolean') {
-    return (
-      <div>
-        <Field name={field.name}>
+  let input
+  switch (field.type) {
+    case 'boolean':
+      input = (
+        <Field {...common}>
           {({ field: f }: FieldProps) => (
             <input
-              id={`field-${field.name}`}
+              id={common.id}
               type="checkbox"
               className="toggle toggle-primary"
               checked={f.value}
@@ -27,18 +31,13 @@ const FormField = ({ field }: Props) => {
             />
           )}
         </Field>
-        {description}
-      </div>
-    )
-  }
-
-  if (field.type === 'password') {
-    return (
-      <div>
+      )
+      break
+    case 'password':
+      input = (
         <div className="flex gap-2">
           <Field
-            id={`field-${field.name}`}
-            name={field.name}
+            {...common}
             type={showPassword ? 'text' : 'password'}
             className="input input-bordered w-full"
             placeholder={field.placeholder}
@@ -51,40 +50,33 @@ const FormField = ({ field }: Props) => {
             {showPassword ? 'Hide' : 'Show'}
           </button>
         </div>
-        {description}
-      </div>
-    )
-  }
-
-  if (field.type === 'select') {
-    return (
-      <div>
-        <Field
-          name={field.name}
-          id={`field-${field.name}`}
-          as="select"
-          className="select select-bordered w-full"
-        >
+      )
+      break
+    case 'select':
+      input = (
+        <Field {...common} as="select" className="select select-bordered w-full">
           {field.options?.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
             </option>
           ))}
         </Field>
-        {description}
-      </div>
-    )
+      )
+      break
+    default:
+      input = (
+        <Field
+          {...common}
+          type={field.type}
+          className="input input-bordered w-full"
+          placeholder={field.placeholder}
+        />
+      )
   }
 
   return (
     <div>
-      <Field
-        name={field.name}
-        id={`field-${field.name}`}
-        type={field.type}
-        className="input input-bordered w-full"
-        placeholder={field.placeholder}
-      />
+      {input}
       {description}
     </div>
   )
