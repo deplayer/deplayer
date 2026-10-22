@@ -38,9 +38,9 @@ const providerRegistry: Record<string, ProviderSchema> = {
     repeatable: true,
     fields: [
       { key: 'enabled', type: 'boolean', label: 'labels.enabled' },
-      { key: 'baseUrl', type: 'url', label: 'labels.jellyfin.baseUrl', required: true },
-      { key: 'apiKey', type: 'text', label: 'labels.jellyfin.apiKey', required: true },
-      { key: 'username', type: 'text', label: 'labels.jellyfin.username', required: true },
+      { key: 'baseUrl', type: 'url', label: 'labels.baseUrl', required: true },
+      { key: 'apiKey', type: 'text', label: 'labels.apiKey', required: true },
+      { key: 'username', type: 'text', label: 'labels.username', required: true },
       { key: 'password', type: 'password', label: 'labels.password', required: true },
     ],
     capabilities: ['search', 'stream'],

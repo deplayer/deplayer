@@ -27,6 +27,23 @@ afterEach(() => {
   cleanup()
 })
 
+// Node >= 25 ships its own `localStorage` global that is undefined unless
+// --localstorage-file is set, and it shadows the DOM env's. Install an
+// in-memory Storage when none is usable.
+if (typeof globalThis.localStorage === 'undefined') {
+  const data = new Map<string, string>()
+  const storage = {
+    getItem: (k: string) => (data.has(k) ? data.get(k)! : null),
+    setItem: (k: string, v: string) => { data.set(k, String(v)) },
+    removeItem: (k: string) => { data.delete(k) },
+    clear: () => data.clear(),
+    key: (i: number) => Array.from(data.keys())[i] ?? null,
+    get length() { return data.size },
+  }
+  Object.defineProperty(globalThis, 'localStorage', { value: storage, configurable: true, writable: true })
+  Object.defineProperty(window, 'localStorage', { value: storage, configurable: true, writable: true })
+}
+
 globalThis.indexedDB = indexeddb
 
 const Mock = vi.fn()
