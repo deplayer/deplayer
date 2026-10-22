@@ -1,0 +1,22 @@
+name = "deplayer-sync"
+account_id = "8d98bbb4f0bb19c15ce61155c9313d1d"
+main = "./src/worker.ts"
+compatibility_date = "2025-05-07"
+compatibility_flags = ["enable_request_signal", "nodejs_compat"]
+
+[vars]
+RP_ID = "deplayer.app"
+RP_NAME = "deplayer"
+ALLOWED_ORIGINS = "https://deplayer.app,http://127.0.0.1:5173,http://localhost:5173"
+
+[[durable_objects.bindings]]
+name = "SYNC_BACKEND_DO"
+class_name = "SyncBackendDO"
+
+[[durable_objects.bindings]]
+name = "AUTH_DO"
+class_name = "AuthDO"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["SyncBackendDO", "AuthDO"]

@@ -69,6 +69,7 @@ const DeplayerLogo = () => {
 }
 
 const SidebarContents = (props: ContentProps) => {
+  const { dispatch } = props
   const location = useLocation()
   
   // Get UI state from context
@@ -88,6 +89,21 @@ const SidebarContents = (props: ContentProps) => {
   const searchResultIds = useSearchMediaIds(searchTerm, 1000)
   
   const trackIds = getActiveTrackIds(liveQueue)
+
+  // Stable identities so CommandBar does not re-render on every
+  // SidebarContents render (dispatch from useDispatch is stable).
+  const togglePlaying = React.useCallback(
+    () => dispatch({ type: 'PLAYBACK_TOGGLE_REQUESTED' }),
+    [dispatch]
+  )
+  const playNext = React.useCallback(
+    () => dispatch({ type: 'PLAY_NEXT' }),
+    [dispatch]
+  )
+  const playPrev = React.useCallback(
+    () => dispatch({ type: 'PLAY_PREV' }),
+    [dispatch]
+  )
 
   return (
     <div className={`flex flex-col h-full bg-base-100 ${props.className || ''}`}>
@@ -137,9 +153,9 @@ const SidebarContents = (props: ContentProps) => {
 
       <div className='w-full'>  
         <CommandBar 
-          togglePlaying={() => props.dispatch({ type: 'PLAYBACK_TOGGLE_REQUESTED' })}
-          playNext={() => props.dispatch({ type: 'PLAY_NEXT' })}
-          playPrev={() => props.dispatch({ type: 'PLAY_PREV' })}
+          togglePlaying={togglePlaying}
+          playNext={playNext}
+          playPrev={playPrev}
         />
       </div>
 

@@ -43,3 +43,6 @@ node_modules/
 # Task files
 # tasks.json
 # tasks/ 
+# sync-worker local secrets
+sync-worker/.dev.vars
+sync-worker/.wrangler/

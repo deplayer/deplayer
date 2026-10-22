@@ -16,7 +16,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    exclude: ['e2e/**', '**/node_modules/**', 'server/**'],
+    exclude: ['e2e/**', 'sync-worker/**', '**/node_modules/**', 'server/**'],
     environment: 'happy-dom',
     setupFiles: ['./src/setupTests.ts'],
     deps: {

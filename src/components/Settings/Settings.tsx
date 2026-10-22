@@ -8,6 +8,7 @@ import Importer from '../Importer'
 import MainContainer from '../common/MainContainer'
 import * as types from '../../constants/ActionTypes'
 import CenteredMessage from '../common/CenteredMessage'
+import SyncAccount from './SyncAccount'
 import { deleteSettingsAction } from '../../stores/livestore/actions'
 
 
@@ -66,12 +67,8 @@ const Settings: React.FC = () => {
             <Translate value="labels.settingsDescription" />
           </h2>
 
-        {/* SettingsForm temporarily disabled */}
-        {/* SettingsForm temporarily disabled */}
-        {/* SettingsForm temporarily disabled */}
-        {/* SettingsForm temporarily disabled */}
-        {/* SettingsForm temporarily disabled */}
-        {/* SettingsForm temporarily disabled */}
+
+          <SyncAccount />
 
           <div className='my-12'>
             <h2 className='text-2xl py-3 text-base-content'><Translate value="labels.actions" /></h2>

@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import SidebarContents from './SidebarContents'
@@ -18,11 +19,13 @@ function MSidebar({ children }: Props) {
 
   const docked = mqlMatch && sidebarToggled
 
-  const onSetSidebarOpen = (open: boolean) => {
+  // Stable identity: a fresh closure here re-rendered SidebarContents (and
+  // its CommandBar) on every player state change.
+  const onSetSidebarOpen = useCallback((open: boolean) => {
     if (!docked) {
       toggleSidebar(open)
     }
-  }
+  }, [docked, toggleSidebar])
 
   const contents = (
     <SidebarContents

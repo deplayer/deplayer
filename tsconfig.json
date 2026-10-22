@@ -17,6 +17,13 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    /* @livestore/utils is vendored per-package (never hoisted); map the
+       specifier used in src/ to the copy bundled with @livestore/livestore. */
+    "paths": {
+      "@livestore/utils/effect": [
+        "./node_modules/@livestore/livestore/node_modules/@livestore/utils/dist/effect/mod.d.ts"
+      ]
+    },
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,

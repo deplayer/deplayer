@@ -464,4 +464,4 @@ const MusicTable = ({
   )
 }
 
-export default MusicTable
+export default React.memo(MusicTable)

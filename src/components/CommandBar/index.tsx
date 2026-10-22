@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, useRef, ReactNode } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef, ReactNode, memo } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useAppStore } from '../../stores/livestore/store'
@@ -608,4 +608,4 @@ function CommandBar({ togglePlaying, playNext, playPrev }: Props) {
   )
 }
 
-export default CommandBar
+export default memo(CommandBar)

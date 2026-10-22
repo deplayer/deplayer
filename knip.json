@@ -19,7 +19,12 @@
     "@testing-library/react",
     "@testing-library/jest-dom",
     "postcss",
-    "autoprefixer"
+    "autoprefixer",
+    "jose",
+    "@simplewebauthn/server",
+    "@livestore/adapter-node",
+    "wrangler",
+    "@cloudflare/workers-types"
   ],
   "ignoreBinaries": [
     "vite"

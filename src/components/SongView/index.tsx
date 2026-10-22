@@ -34,6 +34,10 @@ import { addToQueueAction, removeFromQueueAction } from '../../stores/livestore/
 
 const MAX_LIST_ITEMS = 25
 
+// Stable empty list: shared identity keeps memo dependencies from changing
+// on every render when the song has no genres.
+const EMPTY_GENRES: string[] = []
+
 type Props = {
   playerPortal: React.ComponentProps<typeof OutPortal>['node'],
   location: Location,
@@ -70,6 +74,57 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
   const [pinned, setPinnedSong] = React.useState(isSongPinned)
   const [showLyrics, setShowLyrics] = React.useState(false)
   const [streamUrls, setStreamUrls] = React.useState<StreamUrl[]>([])
+
+  // Stable identity when the song has no genres (the `|| []` would otherwise
+  // allocate a fresh array each render and invalidate the memos below).
+  const genres = song?.genres ?? EMPTY_GENRES
+
+  // Memoized so player-prop re-renders don't rebuild the recommendation
+  // sliders — react-slick otherwise re-rendered ~130 cover/link/icon leaves
+  // per interaction. Copy before sort: the old in-place sort mutated the
+  // shared collection array on every render.
+  const sameGenreSongs = React.useMemo(() => {
+    if (!genres.length || !songsByGenre[genres[0]]) return null
+    return [...songsByGenre[genres[0]]]
+      .sort((songId1: string, songId2: string) => sortByPlayCount(songId1, songId2, rows))
+      .slice(0, MAX_LIST_ITEMS)
+      .map((songId: string) => rows[songId])
+  }, [genres, songsByGenre, rows])
+
+  const relatedAlbums = React.useMemo(() => {
+    if (!song?.artistId || !albumsByArtist?.[song.artistId]) return []
+    return albumsByArtist[song.artistId].reduce((acc: AlbumRow[], albumId: string): AlbumRow[] => {
+      if (!albums[albumId]) return acc
+      acc.push(albums[albumId])
+      return acc
+    }, [])
+  }, [song?.artistId, albumsByArtist, albums])
+
+  // Element-level memos: when only `player` changes, React skips these
+  // subtrees entirely instead of re-rendering the slider machinery.
+  const becauseYouListenedBlock = React.useMemo(
+    () => (song?.artistId && genres.length > 0 ? (
+      <div className="mt-8 overflow-hidden">
+        <BecauseYouListened artistId={song.artistId} artistName={song.artistName || 'Unknown'} genres={genres} />
+      </div>
+    ) : null),
+    [song?.artistId, song?.artistName, genres]
+  )
+
+  const relatedAlbumsBlock = React.useMemo(
+    () => <RelatedAlbums albums={relatedAlbums} />,
+    [relatedAlbums]
+  )
+
+  const sameGenreSlider = React.useMemo(
+    () => (sameGenreSongs ? (
+      <MediaSlider
+        title={<Translate value='titles.sameGenreSongs' />}
+        mediaItems={sameGenreSongs}
+      />
+    ) : null),
+    [sameGenreSongs]
+  )
 
   React.useEffect(() => {
     if (!song) return
@@ -119,21 +174,6 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
   if (!song || !song.id) {
     return <CenteredMessage><div className='text-center'>The requested song can not be found</div></CenteredMessage>
   }
-
-  const genres = song.genres || []
-
-  const sameGenreSongs = genres.length && songsByGenre[genres[0]]
-    ? songsByGenre[genres[0]]
-      .sort((songId1: string, songId2: string) => sortByPlayCount(songId1, songId2, rows))
-      .slice(0, MAX_LIST_ITEMS)
-      .map((songId: string) => rows[songId])
-    : null
-
-  const relatedAlbums = song?.artistId && albumsByArtist?.[song.artistId]?.reduce((acc: AlbumRow[], albumId: string): AlbumRow[] => {
-    if (!albums[albumId]) return acc
-    acc.push(albums[albumId])
-    return acc
-  }, []) || []
 
   const songFinder = song.id === currentPlaying
 
@@ -376,26 +416,13 @@ const SongView = ({ songId, loading, className = '', dispatch, playerPortal, pla
             )
           }
 
-          {song.artistId && genres.length > 0 && (
-            <div className="mt-8 overflow-hidden">
-              <BecauseYouListened
-                artistId={song.artistId}
-                artistName={song.artistName || 'Unknown'}
-                genres={genres}
-              />
-            </div>
-          )}
+          {becauseYouListenedBlock}
 
           <AutoSizer>
             {({ width }) => (
               <div className='flex flex-col pt-8' style={{ width: width }}>
-                <RelatedAlbums albums={relatedAlbums} />
-                {sameGenreSongs &&
-                  <MediaSlider
-                    title={<Translate value='titles.sameGenreSongs' />}
-                    mediaItems={sameGenreSongs}
-                  />
-                }
+                {relatedAlbumsBlock}
+                {sameGenreSlider}
               </div>
             )}
           </AutoSizer>

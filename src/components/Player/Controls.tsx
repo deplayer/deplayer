@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import Button from '../common/Button'
 import Icon from '../common/Icon'
 import FullscreenButton from './FullscreenButton'
@@ -67,4 +68,4 @@ const Controls = (props: ControlProps) => {
   )
 }
 
-export default Controls
+export default memo(Controls)

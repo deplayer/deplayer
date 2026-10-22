@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import CoverImage from '../../MusicTable/CoverImage'
 import Tag from '../Tag'
@@ -15,7 +16,7 @@ type MediaCoverProps = {
   type?: 'album' | 'song'  // Add type to determine the link path
 }
 
-const MediaCover = ({ id, name, artistName, cover, playCount, showPlayCount, type = 'album' }: MediaCoverProps) => {
+const MediaCover = memo(({ id, name, artistName, cover, playCount, showPlayCount, type = 'album' }: MediaCoverProps) => {
   // Only return null if we have no id or name
   if (!id || !name) {
     return null
@@ -64,8 +65,8 @@ const MediaCover = ({ id, name, artistName, cover, playCount, showPlayCount, typ
       </Link>
     </div>
   )
-}
+})
 
 // For backward compatibility, export both names
 export const AlbumCover = (props: MediaCoverProps) => <MediaCover {...props} type="album" />
-export default MediaCover 
+export default MediaCover
