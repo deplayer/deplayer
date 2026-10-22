@@ -85,7 +85,8 @@ const RoutedSongView = (props: RoutedSongViewProps) => {
     }
   }, [song, artistId, albumsByArtist, firstGenre, genreSongs])
 
-  return (<SongView songId={songId} collection={collection as unknown as CollectionState} loading={false} location={window.location} {...props} />)
+  // key: per-song local state (pin, lyrics) must reset when navigating between songs
+  return (<SongView key={songId} songId={songId} collection={collection as unknown as CollectionState} loading={false} location={window.location} {...props} />)
 }
 
 export default connect(
