@@ -256,7 +256,7 @@ export async function playMediaAction(
           .where('trackId', '=', mediaId)
           .limit(1)
       )
-    ) as unknown as QueueItemRow[]
+    )
   )[0] ?? null
 
   // The query yields an ordered index; the event must carry the active-list
@@ -291,7 +291,7 @@ const readQueueHead = async (store: LiveStore): Promise<QueueHeadRow | null> => 
         .where('id', '=', 'default')
         .limit(1)
     )
-  )) as unknown as QueueHeadRow[]
+  ))
   return result[0] ?? null
 }
 
@@ -303,7 +303,7 @@ const headPermutation = (head: QueueHeadRow): Int32Array | null =>
 const readOrderedRow = async (
   store: LiveStore,
   position: number
-): Promise<QueueItemRow | null> => {
+): Promise<Pick<QueueItemRow, 'position' | 'trackId'> | null> => {
   const result = (await store.query(
     queryDb(
       tables.queueItems
@@ -313,7 +313,7 @@ const readOrderedRow = async (
         .where('position', '=', position)
         .limit(1)
     )
-  )) as unknown as QueueItemRow[]
+  ))
   return result[0] ?? null
 }
 
@@ -357,7 +357,7 @@ const readLastActiveRow = async (
           .orderBy('position', 'desc')
           .limit(1)
       )
-    ) as unknown as QueueItemRow[]
+    )
   )[0] ?? null
   return last ? { position: last.position, trackId: last.trackId } : null
 }

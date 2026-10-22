@@ -34,5 +34,21 @@ module.exports = {
         ],
       },
     },
+    {
+      // LiveStore query results are typed by the query builder (single-column
+      // selects pluck to plain values). `as unknown as` overrode that and hid
+      // wrong row shapes; narrow the declared types instead.
+      files: ['src/stores/livestore/**/*.{ts,tsx}'],
+      excludedFiles: ['**/*.spec.{ts,tsx}'],
+      rules: {
+        'no-restricted-syntax': [
+          'error',
+          {
+            selector: "TSAsExpression > TSAsExpression.expression > TSUnknownKeyword.typeAnnotation",
+            message: 'no `as unknown as` in LiveStore code: use the inferred query result type',
+          },
+        ],
+      },
+    },
   ],
 }

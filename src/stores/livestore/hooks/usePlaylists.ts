@@ -75,11 +75,8 @@ export const usePlaylists = (): PlaylistRow[] => {
   )
 
   return useMemo(() => {
-    if (!Array.isArray(rows)) return []
-    const byPlaylist = groupTrackIds(
-      (Array.isArray(items) ? items : []) as unknown as PlaylistItemRow[]
-    )
-    return (rows as unknown as Omit<PlaylistRow, 'trackIds'>[]).map((row) => ({
+    const byPlaylist = groupTrackIds(items)
+    return rows.map((row) => ({
       ...row,
       trackIds: byPlaylist.get(row.id) ?? [],
     }))
@@ -115,11 +112,11 @@ export const usePlaylistById = (id: string | null | undefined): PlaylistRow | nu
   )
 
   return useMemo(() => {
-    const row = (rows as unknown as Omit<PlaylistRow, 'trackIds'>[] | undefined)?.[0]
+    const row = rows[0]
     if (!row) return null
     return {
       ...row,
-      trackIds: groupTrackIds(items as unknown as PlaylistItemRow[]).get(row.id) ?? [],
+      trackIds: groupTrackIds(items).get(row.id) ?? [],
     }
   }, [rows, items])
 }

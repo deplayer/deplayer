@@ -33,7 +33,7 @@ export const useSettings = (settingsId = 'default'): SettingsShape | null => {
     )
   )
 
-  const settingsRecord = (result as unknown as Array<{ settings: unknown }>)[0]
+  const settingsRecord = result[0]
   return settingsRecord ? parseSettingsRow(settingsRecord.settings) : null
 }
 

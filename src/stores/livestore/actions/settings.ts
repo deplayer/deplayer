@@ -44,7 +44,7 @@ export const initializeSettingsAction = async (store: LiveStore) => {
   )
   
   const result = await store.query(query)
-  const settingsRecord = (result as unknown[])[0] as Record<string, unknown> | undefined
+  const settingsRecord = result[0]
 
   if (!settingsRecord) {
     // No settings exist in LiveStore — check localStorage fallback
@@ -75,7 +75,7 @@ export const saveSettingsAction = async (store: LiveStore, settingsPayload: Reco
   )
   
   const result = await store.query(query)
-  const settingsRecord = (result as unknown[])[0] as Record<string, unknown> | undefined
+  const settingsRecord = result[0]
   
   const prevSettings = settingsRecord ? getSettingsData(settingsRecord) : defaultSettings
 

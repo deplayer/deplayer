@@ -42,11 +42,12 @@ export type PermutationBlob = Uint8Array<ArrayBuffer>
  */
 export const ORDERED_LIST = 'ordered'
 
-/** Raw `queue_items` table row: one track at one position in the ordered list. */
+/**
+ * The `queue_items` columns queue reads select: one track at one position.
+ * `list` is a plain text column; only `ORDERED_LIST` rows are written.
+ */
 export interface QueueItemRow {
-  id: string;
-  queueId: string;
-  list: typeof ORDERED_LIST;
+  list: string;
   position: number;
   trackId: string;
 }

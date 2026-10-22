@@ -226,45 +226,14 @@ export const useSearchMediaIds = (searchTerm: string | undefined | null, limit =
     )
   }, [hasSearch, term, limit])
   
-  // Search by title - only select ID
+  // Single-column selects pluck: both results are id strings.
   const titleMatches = store.useQuery(titleQuery)
-  
-  // Search by artist name - only select ID
   const artistMatches = store.useQuery(artistQuery)
-  
+
   return useMemo(() => {
     // Early return for no search - most common case on /collection page
     if (!hasSearch) return []
-    
-    const seenIds = new Set<string>()
-    const mergedIds: string[] = []
-    
-    // Add title match IDs (objects with { id: string })
-    // Filter out any undefined/null IDs to prevent downstream query errors
-    if (Array.isArray(titleMatches)) {
-      for (const result of titleMatches) {
-        const id = (result as { id?: string })?.id
-        // Guard against undefined/null IDs
-        if (id && typeof id === 'string' && !seenIds.has(id)) {
-          seenIds.add(id)
-          mergedIds.push(id)
-        }
-      }
-    }
-    
-    // Add artist match IDs
-    if (Array.isArray(artistMatches)) {
-      for (const result of artistMatches) {
-        const id = (result as { id?: string })?.id
-        // Guard against undefined/null IDs
-        if (id && typeof id === 'string' && !seenIds.has(id)) {
-          seenIds.add(id)
-          mergedIds.push(id)
-        }
-      }
-    }
-    
-    return mergedIds.slice(0, limit)
+    return [...new Set([...titleMatches, ...artistMatches])].slice(0, limit)
   }, [titleMatches, artistMatches, hasSearch, limit])
 }
 
@@ -286,19 +255,8 @@ export const useRecentlyPlayed = (limit = 20) => {
     )
   )
 
-  const mediaIds = useMemo(() => {
-    if (!Array.isArray(recentIds)) return []
-    const seen = new Set<string>()
-    const ids: string[] = []
-    for (const row of recentIds) {
-      const id = (row as { mediaId: string }).mediaId
-      if (!seen.has(id)) {
-        seen.add(id)
-        ids.push(id)
-      }
-    }
-    return ids
-  }, [recentIds])
+  // Single-column select plucks: rows are mediaId strings, newest first.
+  const mediaIds = useMemo(() => [...new Set(recentIds)], [recentIds])
 
   const mediaMap = useMediaMapForIds(mediaIds)
 

@@ -33,12 +33,11 @@ export const defaultSettings = {
 export const getSettingsQuery = settings$
 
 // Helper to get settings data from query result
-export const getSettingsData = (settingsRow: Record<string, unknown> | null) => {
+export const getSettingsData = (settingsRow: { settings?: unknown } | null) => {
   if (!settingsRow) {
     return defaultSettings
   }
-  const row = settingsRow as unknown as { settings?: typeof defaultSettings }
-  return row.settings || defaultSettings
+  return (settingsRow.settings as typeof defaultSettings | undefined) || defaultSettings
 }
 
 // Create update settings event

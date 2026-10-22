@@ -134,13 +134,9 @@ class BatchedMediaCommitter {
    * to align with browser frame boundaries
    */
   private yieldToMain(): Promise<void> {
-    return new Promise(resolve => {
-      if ('scheduler' in window && 'yield' in (window as unknown as { scheduler: { yield: () => Promise<void> } }).scheduler) {
-        (window as unknown as { scheduler: { yield: () => Promise<void> } }).scheduler.yield().then(resolve)
-      } else {
-        requestAnimationFrame(() => resolve())
-      }
-    })
+    const { scheduler } = window as Window & { scheduler?: { yield?: () => Promise<void> } }
+    if (scheduler?.yield) return scheduler.yield()
+    return new Promise(resolve => requestAnimationFrame(() => resolve()))
   }
 
   /**
@@ -151,8 +147,7 @@ class BatchedMediaCommitter {
   private waitForIdle(): Promise<void> {
     return new Promise(resolve => {
       if ('requestIdleCallback' in window) {
-        (window as unknown as { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => void })
-          .requestIdleCallback(() => resolve(), { timeout: 2000 })
+        window.requestIdleCallback(() => resolve(), { timeout: 2000 })
       } else {
         setTimeout(resolve, 100)
       }

@@ -182,6 +182,8 @@ src/
 This project is migrating to LiveStore. When working with LiveStore:
 - **Documentation lookup**: When you need to look up information about LiveStore, always use the `docs` directory shipped with `@livestore/livestore` package in `node_modules/@livestore/livestore/docs`
 - LiveStore documentation is available locally in the node_modules directory
+- **Query result shapes**: a single-column `table.select('x')` returns `x[]` (plain values), not row objects. Use the inferred `useQuery`/`store.query` result type; `as unknown as` is lint-banned under `src/stores/livestore`.
+- **Testing hooks**: test LiveStore hooks against a real in-memory store with `makeTestStore()` / `appStoreFor()` from `src/test-utils/liveStore.ts` instead of hand-shaped `useQuery` mocks.
 
 
 <skills_system priority="1">

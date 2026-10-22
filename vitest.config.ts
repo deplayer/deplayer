@@ -20,6 +20,10 @@ export default defineConfig({
   test: {
     globals: true,
     exclude: ['e2e/**', 'sync-worker/**', '**/node_modules/**', 'server/**'],
+    // Real-store specs load @livestore/adapter-node, which pulls in the
+    // native @parcel/watcher addon; it cannot load in two worker threads of
+    // one process ("Module did not self-register"), so isolate by process.
+    pool: 'forks',
     environment: 'happy-dom',
     setupFiles: ['./src/setupTests.ts'],
     deps: {

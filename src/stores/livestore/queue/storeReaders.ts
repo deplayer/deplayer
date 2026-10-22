@@ -105,7 +105,7 @@ export const readQueue = async (store: LiveStore): Promise<QueueState | null> =>
       )
     )
 
-    const head = (headResult as unknown as QueueHeadRow[])?.[0] ?? null
+    const head = headResult[0] ?? null
     if (!head) {
       return null
     }
@@ -119,7 +119,7 @@ export const readQueue = async (store: LiveStore): Promise<QueueState | null> =>
       )
     )
 
-    return assembleQueueState(head, itemResult as unknown as QueueItemRow[])
+    return assembleQueueState(head, itemResult)
   } catch (error) {
     console.error('[readQueue] Error:', error)
     return null

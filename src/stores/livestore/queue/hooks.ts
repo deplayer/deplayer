@@ -14,7 +14,7 @@ import { queryDb } from '@livestore/livestore'
 import { useAppStore } from '../store'
 import { tables } from '../schema'
 import { assembleQueueState } from './storeReaders'
-import type { QueueHeadRow, QueueItemRow, QueueState } from './types'
+import type { QueueState } from './types'
 
 /**
  * Get the current queue state
@@ -46,8 +46,7 @@ export const useQueue = (queueId = 'default'): QueueState | null => {
         .orderBy('position', 'asc')
     )
   )
-  const head = (headResult as unknown as QueueHeadRow[])?.[0]
-  return assembleQueueState(head, (itemResult as unknown as QueueItemRow[]) ?? [])
+  return assembleQueueState(headResult[0], itemResult)
 }
 
 /**
@@ -70,6 +69,6 @@ export const useCurrentPlayingSongId = (queueId = 'default'): string | null => {
         .limit(1)
     )
   )
-  const row = (result as unknown as Array<{ currentTrackId: string | null }>)?.[0]
-  return row?.currentTrackId ?? null
+  // Single-column select plucks: the result is [currentTrackId] or [].
+  return result[0] ?? null
 }

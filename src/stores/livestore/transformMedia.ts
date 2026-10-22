@@ -32,5 +32,5 @@ export function rawToMediaRow(raw: unknown): MediaRow | null {
     stream: parseJson(r.stream, {}),
     cover: parseJson(r.cover, null) as MediaRow['cover'],
     genres: parseGenresCsv(r.genresFlat),
-  } as unknown as MediaRow
+  } as MediaRow
 }

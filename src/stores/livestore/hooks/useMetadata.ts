@@ -93,21 +93,15 @@ export const useAvailableTypes = (): string[] => {
 
 export const useMediaCount = (): number => {
   const store = useAppStore()
-  return store.useQuery(
-    queryDb(tables.media.count()),
-  ) as unknown as number
+  return store.useQuery(queryDb(tables.media.count()))
 }
 
 export const useArtistsCount = (): number => {
   const store = useAppStore()
-  return store.useQuery(
-    queryDb(tables.artists.count()),
-  ) as unknown as number
+  return store.useQuery(queryDb(tables.artists.count()))
 }
 
 export const useAlbumsCount = (): number => {
   const store = useAppStore()
-  return store.useQuery(
-    queryDb(tables.albums.count()),
-  ) as unknown as number
+  return store.useQuery(queryDb(tables.albums.count()))
 }

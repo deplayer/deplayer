@@ -60,7 +60,6 @@ export {
 
 // Favorites hooks
 export {
-  useFavorites,
   useIsFavorite,
   useFavoriteIds,
 } from './useFavorites'
