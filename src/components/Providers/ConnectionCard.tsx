@@ -19,7 +19,7 @@ type Props = {
   onSave: (instanceKey: string, slice: ProviderConfig) => void | Promise<void>
   onRemove: (instanceKey: string) => void
   onToggleEnabled: (instanceKey: string, enabled: boolean) => void
-  onTestConnection?: (instanceKey: string) => void
+  onTestConnection?: (instanceKey: string, values?: Record<string, unknown>) => void
 }
 
 
@@ -198,7 +198,7 @@ export const ConnectionCard = ({
             validate={values => validate(values, schema)}
             onSubmit={handleSubmit}
           >
-            {({ dirty, isValid, resetForm, isSubmitting }) => (
+            {({ dirty, isValid, resetForm, isSubmitting, values }) => (
               <Form>
                 <div className="border-t border-base-300 pt-4 flex flex-col gap-3">
                   <div className="flex items-center gap-3">
@@ -234,7 +234,7 @@ export const ConnectionCard = ({
                     <button
                       type="button"
                       className="btn btn-ghost btn-sm mr-auto"
-                      onClick={() => onTestConnection(instanceKey)}
+                      onClick={() => onTestConnection(instanceKey, { ...config, ...values })}
                     >
                       <Translate value="providers.testConnection" />
                     </button>

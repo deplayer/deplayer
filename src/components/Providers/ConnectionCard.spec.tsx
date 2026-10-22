@@ -168,7 +168,7 @@ describe('ConnectionCard — form behavior', () => {
     // The Test connection button in the form footer
     const [testBtn] = screen.getAllByRole('button', { name: /testConnection/i })
     await user.click(testBtn)
-    expect(onTestConnection).toHaveBeenCalledWith('subsonic')
+    expect(onTestConnection).toHaveBeenCalledWith('subsonic', expect.objectContaining({ baseUrl: 'https://nav.example.com', user: 'genar' }))
   })
 
   it('singleton schema (itunes) still renders title and enabled toggle even with no fields', () => {

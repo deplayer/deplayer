@@ -64,7 +64,7 @@ const ConnectionCardConnected = (props: ConnectionCardConnectedProps) => {
       onSave={async (key, slice) => { await props.onSave(key, slice); refresh() }}
       onRemove={props.onRemove}
       onToggleEnabled={props.onToggleEnabled}
-      onTestConnection={() => refresh()}
+      onTestConnection={(_key, values) => refresh(values)}
     />
   )
 }

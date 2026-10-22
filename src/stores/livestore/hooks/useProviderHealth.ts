@@ -14,7 +14,7 @@ export type ProviderHealthFactory = (
 
 export type UseProviderHealthReturn = {
   result: HealthCheckResult
-  refresh: () => void
+  refresh: (override?: Record<string, unknown>) => void
 }
 
 const DEBOUNCE_MS = 200
@@ -38,8 +38,10 @@ export const useProviderHealth = (
   config: Record<string, unknown>,
   factory: ProviderHealthFactory,
 ): UseProviderHealthReturn => {
-  const enabled = config.enabled !== false
-  const instance = factory(providerKey, config)
+  const [override, setOverride] = useState<Record<string, unknown> | undefined>()
+  const effective = override ?? config
+  const enabled = effective.enabled !== false
+  const instance = factory(providerKey, effective)
   const probe = instance?.healthcheck?.bind(instance)
 
   const [result, setResult] = useState<HealthCheckResult>(() =>
@@ -48,14 +50,15 @@ export const useProviderHealth = (
   const [refreshCounter, setRefreshCounter] = useState(0)
   const lastRefreshRef = useRef(0)
 
-  const refresh = useCallback(() => {
+  const refresh = useCallback((next?: Record<string, unknown>) => {
     const now = Date.now()
     if (now - lastRefreshRef.current < DEBOUNCE_MS) return
     lastRefreshRef.current = now
+    setOverride(next)
     setRefreshCounter(c => c + 1)
   }, [])
 
-  const configKey = JSON.stringify(config)
+  const configKey = JSON.stringify(effective)
 
   useEffect(() => {
     if (!enabled) { setResult(makeDisabled()); return }
