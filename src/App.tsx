@@ -10,7 +10,7 @@ import { HistoryRouter as Router } from "redux-first-history/rr6";
 import { Provider } from 'react-redux'
 import { store, history } from './store/configureStore'
 import { StoreRegistry, StoreRegistryProvider } from '@livestore/react'
-import { useAppStore } from './stores/livestore/store'
+import { AppStoreProvider, useAppStore } from './stores/livestore/store'
 import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck'
 import { ThemeProvider } from './contexts'
 
@@ -114,13 +114,15 @@ const App = () => {
             <span className='loading loading-spinner loading-lg'></span>
           </div>
         }>
-          <ThemeProvider>
-            <Provider store={store}>
-              <Router history={history}>
-                <AppContent playerPortal={playerPortal} />
-              </Router>
-            </Provider>
-          </ThemeProvider>
+          <AppStoreProvider>
+            <ThemeProvider>
+              <Provider store={store}>
+                <Router history={history}>
+                  <AppContent playerPortal={playerPortal} />
+                </Router>
+              </Provider>
+            </ThemeProvider>
+          </AppStoreProvider>
         </Suspense>
       </StoreRegistryProvider>
     </BrowserCompatibilityCheck>

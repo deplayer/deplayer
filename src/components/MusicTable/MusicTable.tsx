@@ -176,9 +176,12 @@ const SongRowDirect = React.memo(({
   )
 })
 
-// Slow path: uses LiveStore hooks for data fetching (fallback when no mediaMap/queue provided)
+// Slow path: fetches the song via LiveStore (fallback when no mediaMap is
+// provided). The queue comes from MusicTable's single subscription: a
+// per-row useQueue would load and assemble every queue item per mounted row.
 const SongRowWithHooks = React.memo(({ 
   songId, 
+  queue,
   isCurrent,
   style, 
   slim,
@@ -190,6 +193,7 @@ const SongRowWithHooks = React.memo(({
   favoriteIds,
 }: {
   songId: string
+  queue: QueueData
   isCurrent: boolean
   style: React.CSSProperties
   slim: boolean
@@ -201,7 +205,6 @@ const SongRowWithHooks = React.memo(({
   favoriteIds: Set<string>
 }) => {
   const song = useMediaById(songId)
-  const liveQueue = useQueue('default')
   
   if (!song || !song.id) {
     return <LoadingRow style={style} slim={slim} />
@@ -214,7 +217,7 @@ const SongRowWithHooks = React.memo(({
   return (
     <SongRow
       song={song}
-      queue={liveQueue ?? undefined}
+      queue={queue ?? undefined}
       isCurrent={isCurrent}
       onClick={onClick}
       dispatch={dispatch}
@@ -229,6 +232,7 @@ const SongRowWithHooks = React.memo(({
 }, (prevProps, nextProps) => {
   return (
     prevProps.songId === nextProps.songId &&
+    prevProps.queue === nextProps.queue &&
     prevProps.isCurrent === nextProps.isCurrent &&
     prevProps.slim === nextProps.slim &&
     prevProps.mqlMatch === nextProps.mqlMatch &&
@@ -324,8 +328,8 @@ const MusicTable = ({
       return <SongRowDirect key={key} {...sharedProps} mediaMap={currentMediaMap} queue={currentQueue} />
     }
 
-    // Slow path: use LiveStore hooks
-    return <SongRowWithHooks key={key} {...sharedProps} />
+    // Slow path: fetch each song via LiveStore
+    return <SongRowWithHooks key={key} {...sharedProps} queue={currentQueue} />
   // liveQueue is read via liveQueueRef, but it stays in the deps on purpose: a new rowRenderer identity
   // makes the virtualized List re-render visible rows when the queue changes.
   // eslint-disable-next-line react-hooks/exhaustive-deps

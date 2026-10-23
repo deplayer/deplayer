@@ -2,7 +2,9 @@ import { makePersistedAdapter } from '@livestore/adapter-web'
 import LiveStoreSharedWorker from '@livestore/adapter-web/shared-worker?sharedworker'
 import { getSyncUrl } from '../../services/syncAuth/config'
 import { getSyncSession } from '../../services/syncAuth/session'
-import { useStore } from '@livestore/react'
+import { useStore, type ReactApi } from '@livestore/react'
+import type { Store } from '@livestore/livestore'
+import { createContext, createElement, use, type ReactNode } from 'react'
 import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
 import LiveStoreWorker from './livestore.worker?worker'
 import { schema } from './schema.js'
@@ -70,18 +72,38 @@ const adapter = makePersistedAdapter({
   sharedWorker: LiveStoreSharedWorker,
 })
 
+/** The app's loaded LiveStore with the React API (`useQuery`, …) attached. */
+export type AppStore = Store<typeof schema> & ReactApi
+
+const AppStoreContext = createContext<AppStore | null>(null)
+
 /**
- * Hook to access the app's LiveStore instance.
- * Uses the new v0.4 multi-store API via StoreRegistry.
- * Suspends until the store is loaded.
+ * Loads the app's LiveStore once (suspends until ready) and shares it.
+ * Must sit inside StoreRegistryProvider and a Suspense boundary.
+ *
+ * Every `useAppStore()` consumer reads this context instead of calling
+ * `useStore` itself: each `useStore` mount resolves the store through the
+ * registry's Effect runtime and retains it in an effect — several ms per
+ * call, paid ~4x by every virtualized row mounted while scrolling.
  */
-export const useAppStore = () =>
-  useStore({
+export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
+  const store = useStore({
     storeId: resolveStoreId(),
     schema,
     adapter,
     batchUpdates,
     syncPayload: resolveSyncPayload(),
   })
+  return createElement(AppStoreContext, { value: store }, children)
+}
+
+/**
+ * Hook to access the app's LiveStore instance provided by AppStoreProvider.
+ */
+export const useAppStore = (): AppStore => {
+  const store = use(AppStoreContext)
+  if (!store) throw new Error('useAppStore must be used inside <AppStoreProvider>')
+  return store
+}
 
 export { schema }
