@@ -11,7 +11,7 @@ import {
   playNextAction,
   playPreviousAction,
   toggleShuffleAction,
-  resolveCurrentSongId,
+  resolveCurrentPlayingSongId,
   parseIds,
   type QueueState,
 } from '../stores/livestore/queue'
@@ -41,6 +41,8 @@ export class PlaybackStoreUnavailableError extends Error {
 
 export interface PlaybackDataPort {
   readQueue(): Promise<PlaybackQueue | null>
+  /** O(1) lookup of the current track (head row + at most one point read). */
+  readCurrentSongId(): Promise<string | null>
   readMedia(songId: string): Promise<MediaRow | null>
   replaceQueue(trackIds: readonly string[]): Promise<void>
   addNext(trackIds: readonly string[]): Promise<void>
@@ -216,13 +218,8 @@ export class PlaybackController {
         if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
         if (!advanced) return { status: 'idle', reason: 'end-of-queue' }
 
-        const queue = await this.data.readQueue()
-        if (!queue) {
-          return { status: 'idle', reason: 'store-unavailable' }
-        }
+        const songId = await this.data.readCurrentSongId()
         if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
-
-        const songId = resolveCurrentSongId(queue)
         if (!songId) {
           return { status: 'idle', reason: 'end-of-queue' }
         }
@@ -242,13 +239,8 @@ export class PlaybackController {
         await this.data.previous()
         if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
 
-        const queue = await this.data.readQueue()
-        if (!queue) {
-          return { status: 'idle', reason: 'store-unavailable' }
-        }
+        const songId = await this.data.readCurrentSongId()
         if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
-
-        const songId = resolveCurrentSongId(queue)
         if (!songId) {
           return { status: 'idle', reason: 'end-of-queue' }
         }
@@ -427,22 +419,11 @@ export class PlaybackController {
    */
   private async advanceFallback(songId: string, advance: () => Promise<unknown>, isCurrent: PlaybackRequestGuard): Promise<PlaybackResult> {
     try {
-      const beforeQueue = await this.data.readQueue()
-      if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
-      if (!beforeQueue) {
-        return { status: 'idle', reason: 'store-unavailable' }
-      }
-
       await advance()
       if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
 
-      const afterQueue = await this.data.readQueue()
+      const nextId = await this.data.readCurrentSongId()
       if (!isCurrent()) return { status: 'idle', reason: SUPERSEDED }
-      if (!afterQueue) {
-        return { status: 'idle', reason: 'store-unavailable' }
-      }
-
-      const nextId = resolveCurrentSongId(afterQueue)
       if (!nextId || nextId === songId) {
         return { status: 'idle', reason: 'missing-stream' }
       }
@@ -508,6 +489,10 @@ export function createLiveStorePlaybackDataPort(
         shuffle: q.shuffle,
         repeat: q.repeat,
       }
+    },
+
+    async readCurrentSongId(): Promise<string | null> {
+      return resolveCurrentPlayingSongId(store)
     },
 
     async readMedia(songId: string): Promise<MediaRow | null> {

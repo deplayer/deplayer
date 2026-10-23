@@ -41,6 +41,7 @@ function fakeMedia(id: string, overrides?: Partial<MediaRow>): MediaRow {
 function createFakeDataPort(overrides?: Partial<PlaybackDataPort>): PlaybackDataPort {
   return {
     readQueue: vi.fn().mockResolvedValue(null),
+    readCurrentSongId: vi.fn().mockResolvedValue(null),
     readMedia: vi.fn().mockResolvedValue(null),
     replaceQueue: vi.fn().mockResolvedValue(undefined),
     shuffleQueue: vi.fn().mockResolvedValue(undefined),
@@ -297,14 +298,11 @@ describe('PlaybackController', () => {
 
   describe('missing media / missing stream exhausts queue', () => {
     it('advances at most once and returns idle after exhaustion', async () => {
-      const q = queueState({ currentPlaying: 1 })
-      const q2 = queueState({ currentPlaying: 2, currentTrackId: 'song-3' })
       const { ctrl, data } = makeController()
 
-      // readQueue calls: next() main → tryNextTrack before-next → tryNextTrack after-next
-      vi.mocked(data.readQueue).mockResolvedValueOnce(q)    // next() reads queue
-      vi.mocked(data.readQueue).mockResolvedValueOnce(q)    // tryNextTrack: before advance
-      vi.mocked(data.readQueue).mockResolvedValueOnce(q2)   // tryNextTrack: after advance
+      // next() reads the current track, then the fallback reads it after advancing
+      vi.mocked(data.readCurrentSongId).mockResolvedValueOnce('song-2')
+      vi.mocked(data.readCurrentSongId).mockResolvedValueOnce('song-3')
       // readMedia calls: startStream → tryNextTrack's startStream
       vi.mocked(data.readMedia).mockResolvedValueOnce(null)  // first song: media missing
       vi.mocked(data.readMedia).mockResolvedValueOnce(null)  // next song: media missing too
@@ -321,13 +319,10 @@ describe('PlaybackController', () => {
 
     it('reports the track actually started after skipping a dead one', async () => {
       const song3 = fakeMedia('song-3')
-      const q = queueState({ currentPlaying: 1 })
-      const q2 = queueState({ currentPlaying: 2, currentTrackId: 'song-3' })
       const { ctrl, data, dispatch } = makeController()
 
-      vi.mocked(data.readQueue).mockResolvedValueOnce(q)
-      vi.mocked(data.readQueue).mockResolvedValueOnce(q)
-      vi.mocked(data.readQueue).mockResolvedValueOnce(q2)
+      vi.mocked(data.readCurrentSongId).mockResolvedValueOnce('song-2')
+      vi.mocked(data.readCurrentSongId).mockResolvedValueOnce('song-3')
       vi.mocked(data.readMedia).mockResolvedValueOnce(null)
       vi.mocked(data.readMedia).mockResolvedValueOnce(song3)
 
@@ -342,7 +337,7 @@ describe('PlaybackController', () => {
 
     it('ends (PLAYBACK_IDLE, no replay) when next() cannot advance past the last track', async () => {
       const { ctrl, data, dispatch, transport } = makeController()
-      vi.mocked(data.readQueue).mockResolvedValue(queueState({ currentPlaying: 2, currentTrackId: 'song-3' }))
+      vi.mocked(data.readCurrentSongId).mockResolvedValue('song-3')
       vi.mocked(data.readMedia).mockResolvedValue(fakeMedia('song-3'))
       vi.mocked(data.next).mockResolvedValue(false)
 
@@ -355,7 +350,7 @@ describe('PlaybackController', () => {
 
     it('does not signal PLAYBACK_IDLE for a superseded request', async () => {
       const { ctrl, data, dispatch } = makeController()
-      vi.mocked(data.readQueue).mockResolvedValue(queueState({ currentTrackId: 'song-2' }))
+      vi.mocked(data.readCurrentSongId).mockResolvedValue('song-2')
       vi.mocked(data.readMedia).mockResolvedValue(fakeMedia('song-2'))
 
       const [first, second] = await Promise.all([ctrl.next(), ctrl.next()])
@@ -367,19 +362,15 @@ describe('PlaybackController', () => {
 
     it('does not infinitely loop on missing stream', async () => {
       const media = fakeMedia('song-1')
-      const q = queueState()
       const { ctrl, data, resolveStream } = makeController()
 
-      vi.mocked(data.readQueue).mockResolvedValue(q)
       vi.mocked(data.readMedia).mockResolvedValue(media)
       // Stream resolver returns empty
       resolveStream.mockResolvedValue('')
 
-      // Advance → no stream, tries next
-      // tryNextTrack → readQueue → next → readQueue → try again
-      vi.mocked(data.readQueue).mockResolvedValue(q) // before next
-      const q2 = queueState({ currentPlaying: 1, currentTrackId: 'song-2' })
-      vi.mocked(data.readQueue).mockResolvedValueOnce(q2) // after next
+      // Advance → no stream → fallback advances once → still no stream
+      vi.mocked(data.readCurrentSongId).mockResolvedValueOnce('song-1')
+      vi.mocked(data.readCurrentSongId).mockResolvedValueOnce('song-2')
       vi.mocked(data.readMedia).mockResolvedValueOnce(media) // media found but...
       resolveStream.mockResolvedValueOnce('') // ...stream empty again
 
@@ -443,13 +434,11 @@ describe('PlaybackController', () => {
     it('advances the queue when the stream is dead', async () => {
       const media1 = fakeMedia('song-1')
       const media2 = fakeMedia('song-2')
-      const q = queueState()
-      const q2 = queueState({ currentPlaying: 1, currentTrackId: 'song-2' })
       const { ctrl, data, resolveStream } = makeController()
 
       setCurrentSongId(ctrl, 'song-1')
       vi.mocked(data.readMedia).mockResolvedValueOnce(media1).mockResolvedValueOnce(media2)
-      vi.mocked(data.readQueue).mockResolvedValueOnce(q).mockResolvedValueOnce(q2)
+      vi.mocked(data.readCurrentSongId).mockResolvedValueOnce('song-2')
       // First stream (current song) is dead; the next song resolves fine.
       resolveStream.mockResolvedValueOnce({ url: '', kind: 'remote' })
 
@@ -463,13 +452,11 @@ describe('PlaybackController', () => {
     it('stays idle when the fallback track also has no stream', async () => {
       const media = fakeMedia('song-1')
       const media2 = fakeMedia('song-2')
-      const q = queueState()
-      const q2 = queueState({ currentPlaying: 1, currentTrackId: 'song-2' })
       const { ctrl, data, resolveStream } = makeController()
 
       setCurrentSongId(ctrl, 'song-1')
       vi.mocked(data.readMedia).mockResolvedValueOnce(media).mockResolvedValueOnce(media2)
-      vi.mocked(data.readQueue).mockResolvedValueOnce(q).mockResolvedValueOnce(q2)
+      vi.mocked(data.readCurrentSongId).mockResolvedValueOnce('song-2')
       resolveStream.mockResolvedValue({ url: '', kind: 'remote' })
 
       const result = await ctrl.retry(0)
@@ -546,7 +533,7 @@ describe('PlaybackController', () => {
     it('converts to idle result', async () => {
       const { ctrl, data } = makeController()
 
-      vi.mocked(data.readQueue).mockRejectedValue(new PlaybackStoreUnavailableError())
+      vi.mocked(data.readCurrentSongId).mockRejectedValue(new PlaybackStoreUnavailableError())
 
       const result = await ctrl.next()
       expect(result.status).toBe('idle')
