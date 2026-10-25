@@ -49,7 +49,8 @@ const resolveStoreId = (): string => {
  *   localStorage, so the URL is carried through the payload; when no URL is
  *   configured (no stored setting, no build-time default) this payload is
  *   `undefined` and the worker runs the store local-only.
- * - `authToken` — the passkey session JWT (only when signed in).
+ * - `authToken` — the passkey session JWT (only when signed in). Without it
+ *   the server rejects the store, so the worker runs it local-only too.
  */
 const resolveSyncPayload = (): Record<string, string> | undefined => {
   const syncUrl = getSyncUrl()

@@ -1,7 +1,6 @@
 import { makeWorker } from '@livestore/adapter-web/worker'
-import { SyncBackend } from '@livestore/common'
 import { makeWsSync } from '@livestore/sync-cf/client'
-import { Effect, Scope, Stream, SubscriptionRef } from '@livestore/utils/effect'
+import { makeLocalOnlyBackend } from './localOnlySyncBackend'
 import { schema } from './schema.js'
 
 /**
@@ -19,9 +18,11 @@ import { schema } from './schema.js'
  * the Cloudflare sync worker in `sync-worker/` re-checks it on every
  * push/pull and rejects anonymous or foreign-store traffic.
  *
- * When no URL is configured the payload carries no `syncUrl`, and this
- * worker uses a no-op local-only backend: the store stays fully local
- * (offline-first, unchanged behavior).
+ * Without a URL, or without a session token (anonymous stores are never
+ * synced: the server rejects them), the store is local-only and uses
+ * `makeLocalOnlyBackend`, which confirms the device's own events so LiveStore
+ * can discard their rollback changesets (offline-first, nothing leaves the
+ * device).
  */
 
 /**
@@ -32,36 +33,14 @@ import { schema } from './schema.js'
  */
 const toWsUrl = (url: string): string => url.replace(/^http/i, 'ws')
 
-/** The backend URL the page shipped via the sync payload, if any. */
-const syncUrlFromPayload = (payload: unknown): string | undefined => {
+/** A non-empty string field of the sync payload the page shipped, if any. */
+const payloadField = (payload: unknown, key: 'syncUrl' | 'authToken'): string | undefined => {
   if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) {
     return undefined
   }
-  const candidate = (payload as { syncUrl?: unknown }).syncUrl
+  const candidate = (payload as Record<string, unknown>)[key]
   return typeof candidate === 'string' && candidate !== '' ? candidate : undefined
 }
-
-/**
- * No-op backend used when no sync URL is configured: pulls are empty,
- * pushes are acknowledged locally, and the backend never reports as
- * connected. Keeps the store fully local (offline-first).
- */
-const makeLocalOnlyBackend = (): Effect.Effect<SyncBackend.SyncBackend, never, Scope.Scope> =>
-  Effect.gen(function* () {
-    const isConnected = yield* SubscriptionRef.make(false)
-    return SyncBackend.of({
-      isConnected,
-      connect: Effect.void,
-      ping: Effect.void,
-      pull: () => Stream.empty,
-      push: () => Effect.void,
-      metadata: {
-        name: 'local-only',
-        description: 'No sync backend configured; the store stays local'
-      },
-      supports: { pullPageInfoKnown: true, pullLive: false }
-    })
-  })
 
 makeWorker({
   schema,
@@ -70,11 +49,12 @@ makeWorker({
     /**
      * Per-store-start backend constructor: the page ships the active
      * backend URL in the sync payload (module workers cannot read
-     * localStorage). Without a URL the store runs local-only.
+     * localStorage). Without a URL or a session token the store runs
+     * local-only.
      */
     backend: ({ storeId, clientId, payload }) => {
-      const url = syncUrlFromPayload(payload)
-      if (url === undefined) {
+      const url = payloadField(payload, 'syncUrl')
+      if (url === undefined || payloadField(payload, 'authToken') === undefined) {
         return makeLocalOnlyBackend()
       }
       return makeWsSync({ url: toWsUrl(url) })({ storeId, clientId, payload })

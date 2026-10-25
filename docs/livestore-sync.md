@@ -81,13 +81,20 @@ Key properties:
 - **The token travels in the WebSocket URL query string**, which is how the
   LiveStore WS transport conveys its `syncPayload`
   (`{ syncUrl, authToken? }`).
-- **Expired/missing token:** the sync connection is rejected. Local reads and
+- **Expired token:** the sync connection is rejected. Local reads and
   writes keep working (the client runs with `onSyncError: 'ignore'`); pending
   events push automatically after the user signs in again.
-- Anonymous devices (no session) still connect to the configured backend but
-  ship no `authToken`; their sync attempts are rejected and they stay
-  local-only. Devices with no backend URL configured have no sync backend at
-  all.
+- Anonymous devices (no session) never open a sync connection: the server
+  would reject a store without an `authToken`, so the worker treats it like a
+  device with no backend URL configured and keeps the store local-only.
+- **Local-only stores confirm their own events.** LiveStore keeps a rollback
+  changeset per event in the state database (`__livestore_session_changeset`)
+  and only discards it once the sync backend confirms the event. The
+  local-only backend (`src/stores/livestore/localOnlySyncBackend.ts`) echoes
+  every push back as confirmed; a backend that never confirms grows the state
+  database with every commit until the client session can no longer load it
+  at boot (`sqlite3.backup failed with rc=7`: the snapshot is copied twice
+  into a 2 GiB wasm heap, so the limit is a state db of roughly 1 GB).
 - CORS: requests with an `Origin` not in `ALLOWED_ORIGINS` get HTTP 403.
   `RP_ID` must match the site identity the browser knows (production:
   `deplayer.app`; local dev: `localhost`).

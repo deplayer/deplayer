@@ -14,6 +14,9 @@ export default defineConfig({
       'webtorrent': fileURLToPath(new URL('./node_modules/webtorrent/dist/webtorrent.min.js', import.meta.url)),
       'react': fileURLToPath(new URL('./node_modules/react', import.meta.url)),
       'react-dom': fileURLToPath(new URL('./node_modules/react-dom', import.meta.url)),
+      // Mirrors vite.config.ts: @livestore/utils is only vendored inside each
+      // @livestore/* package, so src/'s bare specifier needs an explicit target.
+      '@livestore/utils/effect': fileURLToPath(new URL('./node_modules/@livestore/livestore/node_modules/@livestore/utils/dist/effect/mod.js', import.meta.url)),
     },
     dedupe: ['react', 'react-dom'],
   },
