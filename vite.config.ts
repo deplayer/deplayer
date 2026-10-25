@@ -92,16 +92,7 @@ export default defineConfig({
   },
   resolve: {
     alias: [
-      { find: 'webtorrent', replacement: fileURLToPath(new URL('./node_modules/webtorrent/dist/webtorrent.min.js', import.meta.url)) },
-      // @livestore/utils is not hoisted to the root node_modules (each
-      // @livestore/* package vendors an identical copy); resolve the exact
-      // bare specifier used by src/ against the copy vendored by
-      // @livestore/livestore. Anchored regex so subpaths (e.g. /effect/browser)
-      // keep resolving through each package's own copy.
-      {
-        find: /^@livestore\/utils\/effect$/,
-        replacement: fileURLToPath(new URL('./node_modules/@livestore/livestore/node_modules/@livestore/utils/dist/effect/mod.js', import.meta.url))
-      }
+      { find: 'webtorrent', replacement: fileURLToPath(new URL('./node_modules/webtorrent/dist/webtorrent.min.js', import.meta.url)) }
     ]
   },
   assetsInclude: ['**/*.wasm'],
