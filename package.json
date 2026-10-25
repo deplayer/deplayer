@@ -83,7 +83,7 @@
     "@types/react-virtualized": "^9.21.30",
     "@types/redux-mock-store": "^1.5.0",
     "@types/redux-promise": "^0.5.32",
-    "@types/webtorrent": "^0.109.8",
+    "@types/webtorrent": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
     "@vite-pwa/assets-generator": "^0.2.6",
@@ -139,7 +139,7 @@
     "vite-plugin-pwa": "^0.21.1",
     "vite-plugin-svgr": "^4.3.0",
     "vitest": "^1.6.0",
-    "webtorrent": "^2.5.0",
+    "webtorrent": "^3.0.21",
     "workbox-build": "^7.1.1",
     "workbox-window": "^7.1.0",
     "wrangler": "^4.150.0"

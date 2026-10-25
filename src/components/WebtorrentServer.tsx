@@ -175,12 +175,6 @@ function WebtorrentServer({
           }
         }
       })
-
-      file.on('error', (err: Error) => {
-        console.error('File streaming error:', err)
-        onError?.(err)
-      })
-
     } catch (err) {
       console.error('Error streaming torrent:', err)
       onError?.(err as Error)

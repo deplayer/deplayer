@@ -5,7 +5,7 @@ const logger = createLogger({ namespace: "WebtorrentService" });
 
 class WebtorrentService {
   private static instance: WebtorrentService;
-  private client: WebTorrent.Instance;
+  private client: WebTorrent;
   private serverInitialized: boolean = false;
 
   private constructor() {
@@ -19,7 +19,7 @@ class WebtorrentService {
     return WebtorrentService.instance;
   }
 
-  getClient(): WebTorrent.Instance {
+  getClient(): WebTorrent {
     return this.client;
   }
 
