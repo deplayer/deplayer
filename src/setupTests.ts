@@ -90,35 +90,3 @@ vi.mock('./services/ID3Tag/ID3TagService', () => {
     })
   }
 })
-
-
-// Mock music-metadata module
-const mockMetadata = {
-  common: {
-    title: 'Test Song',
-    artist: 'Test Artist',
-    album: 'Test Album',
-    genre: ['Test Genre'],
-    track: { no: 1 },
-    year: 2024,
-    picture: null
-  },
-  format: {
-    duration: 180
-  }
-}
-
-vi.mock('music-metadata', () => {
-  return {
-    default: {
-      parseBlob: vi.fn().mockResolvedValue(mockMetadata)
-    },
-    parseBlob: vi.fn().mockResolvedValue(mockMetadata),
-    parseBuffer: vi.fn().mockResolvedValue(mockMetadata),
-    parseStream: vi.fn().mockResolvedValue(mockMetadata),
-    parseFile: vi.fn().mockResolvedValue(mockMetadata),
-    orderTags: vi.fn(),
-    ratingToStars: vi.fn(),
-    selectCover: vi.fn()
-  }
-}) 
