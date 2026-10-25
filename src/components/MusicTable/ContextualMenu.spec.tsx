@@ -450,8 +450,8 @@ describe('ContextualMenu', () => {
       await user.click(trigger)
       
       const menu = screen.getByRole('menu')
-      expect(menu).toHaveStyle({ position: 'absolute' })
-      expect(menu).toHaveAttribute('style')
+      expect(menu.style.left).toMatch(/^-?\d+(\.\d+)?px$/)
+      expect(menu.style.top).toMatch(/^-?\d+(\.\d+)?px$/)
     })
 
     it('should handle right-click positioning with click coordinates', async () => {
