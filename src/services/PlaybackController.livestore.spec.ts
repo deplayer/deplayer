@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { makeTestStore, type TestLiveStore } from '../test-utils/liveStore'
 import { createTestMedia } from '../test-utils/factories'
-import { playAllAction, toggleShuffleAction } from '../stores/livestore/queue'
+import { playAllAction, toggleRepeatAction, toggleShuffleAction } from '../stores/livestore/queue'
 import type { LiveStore } from '../stores/livestore/accessor'
 import { PlaybackController, createLiveStorePlaybackDataPort, type PlaybackResult } from './PlaybackController'
 
@@ -34,6 +34,8 @@ describe('PlaybackController step against a real LiveStore', () => {
     it(`next()/previous() play the stepped track without reading the whole queue (shuffle=${shuffle})`, async () => {
       await playAllAction(store, ['a', 'b', 'c', 'd'])
       if (shuffle) await toggleShuffleAction(store, true)
+      // Shuffle can land the current track last; repeat keeps next() deterministic.
+      await toggleRepeatAction(store, true)
 
       const ctrl = new PlaybackController({
         data: {

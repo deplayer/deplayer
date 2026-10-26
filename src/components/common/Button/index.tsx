@@ -48,7 +48,7 @@ const Button = (props: Props) => {
     'hover:scale-[1.02]': true,
     'active:scale-[0.98]': true,
     // Style variants
-    'btn-ghost': props.variant === 'ghost',
+    'btn-ghost': props.variant === 'ghost' || (props.transparent && !props.inverted),
     'btn-outline': props.variant === 'outline',
     'bg-primary': props.variant === 'default' && !props.inverted,
     'text-primary-content': props.variant === 'default' && !props.inverted,

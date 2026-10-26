@@ -32,6 +32,7 @@ const PlayAllButton = (props: Props) => {
   return (
     <Button
       transparent
+      className={props.className}
       aria-label={I18n.t('buttons.playAll')}
       onClick={playAll}
     >
