@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
 
-const useQuery = vi.fn<[query: unknown], unknown[]>(() => [])
+const useQuery = vi.fn<(query: unknown) => unknown[]>(() => [])
 vi.mock('../store', () => ({ useAppStore: () => ({ useQuery }) }))
 vi.mock('./useFavorites', () => ({ useFavoriteIds: () => new Set<string>() }))
 

@@ -31,8 +31,8 @@ const defaultQueue: QueueShape = {
   repeat: false,
   shuffle: false,
 }
-const useQueue = vi.fn<[], QueueShape>(() => defaultQueue)
-const useSettings = vi.fn<[], { providers: Record<string, unknown> }>(() => ({ providers: {} }))
+const useQueue = vi.fn<() => QueueShape>(() => defaultQueue)
+const useSettings = vi.fn<() => { providers: Record<string, unknown> }>(() => ({ providers: {} }))
 vi.mock('../stores/livestore/hooks', () => ({
   useQueue: (...args: unknown[]) => useQueue(...(args as [])),
   useSettings: (...args: unknown[]) => useSettings(...(args as [])),
