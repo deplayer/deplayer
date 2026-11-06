@@ -12,6 +12,8 @@ import ArtistsMenuItem from './ArtistsMenuItem'
 import MenuItem from './MenuItem'
 import ExploreMenuItem from './ExploreMenuItem'
 import ThemeModal from './ThemeModal'
+import CreditsModal from './CreditsModal'
+import { signature } from '../../brand/signature.js'
 
 import { inSection } from '../../utils/router'
 import Icon from '../common/Icon'
@@ -71,6 +73,7 @@ const DeplayerLogo = () => {
 const SidebarContents = (props: ContentProps) => {
   const { dispatch } = props
   const location = useLocation()
+  const [isCreditsOpen, setIsCreditsOpen] = React.useState(false)
   
   // Get UI state from context
   const searchTerm = useUIStore(s => s.searchTerm)
@@ -184,7 +187,17 @@ const SidebarContents = (props: ContentProps) => {
             <span><Translate value="sidebar.buyMeACoffee" /></span>
           </a>
         </div>
+        <p className="mt-4 font-mono text-xs text-base-content/60">
+          <a href={signature.url} target="_blank" rel="noreferrer" className="link link-primary">
+            {signature.short}
+          </a>
+          {' · '}
+          <button type="button" className="link link-primary" onClick={() => setIsCreditsOpen(true)}>
+            Credits
+          </button>
+        </p>
       </section>
+      <CreditsModal isOpen={isCreditsOpen} onClose={() => setIsCreditsOpen(false)} />
     </div>
   )
 }
